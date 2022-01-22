@@ -9,10 +9,10 @@ export class VirtualPlayerNamesService {
     constructor(private http: HttpClient) {}
 
     fetchVirtualPlayerNames(level: string): VirtualPlayerName[] {
-        return [];
+        throw new Error('Method not implemented.');
     }
 
     updateVirtualPlayerNames(virtualPlayerNames: VirtualPlayerName[]): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 }

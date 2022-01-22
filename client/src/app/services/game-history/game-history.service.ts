@@ -9,14 +9,14 @@ export class GameHistoryService {
     constructor(private http: HttpClient) {}
 
     fetchGameHistories(): GameHistory[] {
-        return [];
+        throw new Error('Method not implemented.');
     }
 
     resetGameHistory(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 
     addGameHistory(gameHistory: GameHistory): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 }

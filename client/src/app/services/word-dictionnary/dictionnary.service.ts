@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { WordDictionnary } from '@app/classes/admin/word-dictionnary';
 
 @Injectable({
     providedIn: 'root',
@@ -8,10 +9,10 @@ export class WordDictionnaryService {
     constructor(private http: HttpClient) {}
 
     fetchWordDictionnaries(): WordDictionnary[] {
-        return [];
+        throw new Error('Method not implemented.');
     }
 
-    updateWordDictionnary(wordDictionaries: WordDictionary[]): void {
-        return;
+    updateWordDictionnaries(wordDictionaries: WordDictionnary[]): void {
+        throw new Error('Method not implemented.');
     }
 }

@@ -7,18 +7,18 @@ import { GameType } from '@app/classes/game-type';
     providedIn: 'root',
 })
 export class HighScoreService {
-    private lowestHighScore: Map<GameType, number>;
+    private lowestHighScoreOfGameType: Map<GameType, number>;
     constructor(private http: HttpClient) {}
 
-    fetchHighScore(gameType: GameType): HighScore[] {
-        return [];
+    fetchHighScores(gameType: GameType): HighScore[] {
+        throw new Error('Method not implemented.');
     }
 
     resetHighScores(gameType: GameType): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 
     addHighScore(highscore: HighScore, gameType: GameType): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 }
