@@ -1,4 +1,4 @@
-export interface Action {
+export default interface Action {
     willEndTurn(): boolean;
     // messageColor: number; // TODO: potentially make a color enum
 
