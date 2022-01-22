@@ -1,12 +1,6 @@
 import { ActionPlay } from '@app/classes/actions/action-play';
 
-export class ActionPass implements ActionPlay {
-    willEndTurn: boolean;
-
-    constructor() {
-        this.willEndTurn = true;
-    }
-
+export class ActionPass extends ActionPlay {
     execute(): void {
         return;
     }

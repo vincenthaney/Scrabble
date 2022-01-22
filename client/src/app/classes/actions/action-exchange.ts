@@ -1,12 +1,11 @@
 import { ActionPlay } from '@app/classes/actions/action-play';
 import { Tile } from '@app/classes/tile';
 
-export class ActionExchange implements ActionPlay {
-    willEndTurn: boolean;
+export class ActionExchange extends ActionPlay {
     tilesToExchange: Tile[];
 
     constructor(tilesToExchange: Tile[]) {
-        this.willEndTurn = true;
+        super();
         this.tilesToExchange = tilesToExchange;
     }
 

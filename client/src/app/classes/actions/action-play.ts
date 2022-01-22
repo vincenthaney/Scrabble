@@ -1,8 +1,10 @@
 import { Action } from '@app/classes/actions/action';
 
-export interface ActionPlay extends Action {
-    willEndTurn: boolean;
+export abstract class ActionPlay implements Action {
+    willEndTurn(): boolean {
+        return true;
+    }
 
-    execute(): void;
-    getMessage(): string;
+    abstract execute(): void;
+    abstract getMessage(): string;
 }

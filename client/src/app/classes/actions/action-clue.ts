@@ -1,12 +1,6 @@
 import { ActionInfo } from '@app/classes/actions/action-info';
 
-export class ActionClue implements ActionInfo {
-    willEndTurn: boolean;
-
-    constructor() {
-        this.willEndTurn = false;
-    }
-
+export class ActionClue extends ActionInfo {
     execute(): void {
         return;
     }
