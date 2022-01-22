@@ -10,6 +10,6 @@ export class ScoreComputerService {
 
     // TODO: Potentially make an interface of a candidate word to make it clearer
     computeScore(words: Square[][]): number {
-        return 0;
+        throw new Error('Method not implemented.');
     }
 }

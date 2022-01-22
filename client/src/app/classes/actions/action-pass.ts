@@ -2,10 +2,10 @@ import { ActionPlay } from '@app/classes/actions';
 
 export default class ActionPass extends ActionPlay {
     execute(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 
     getMessage(): string {
-        return '';
+        throw new Error('Method not implemented.');
     }
 }

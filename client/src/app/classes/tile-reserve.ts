@@ -4,18 +4,18 @@ export class TileReserve {
     tiles: Tile[];
 
     getTiles(amount: number): Tile[] {
-        return new Array(0);
+        throw new Error('Method not implemented.');
     }
 
     swapTiles(tiles: Tile[]): Tile[] {
-        return tiles;
+        throw new Error('Method not implemented.');
     }
 
     getTilesLeft(): number {
-        return 0;
+        throw new Error('Method not implemented.');
     }
 
     getTilesLeftPerLetter(): Map<string, number> {
-        return new Map<string, number>();
+        throw new Error('Method not implemented.');
     }
 }

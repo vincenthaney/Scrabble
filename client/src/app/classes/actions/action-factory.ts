@@ -5,27 +5,27 @@ import { Orientation } from '@app/classes/orientation';
 
 export default class ActionFactory {
     createPass(): ActionPass {
-        return new ActionPass();
+        throw new Error('Method not implemented.');
     }
     createPlaceText(tileToPlace: string, startingSquare: string, orientation: string): ActionPlace {
-        return this.createPlace(tileToPlace, startingSquare, orientation);
+        throw new Error('Method not implemented.');
     }
     createPlace(tileToPlace: Tile[], startingSquare: Square, orientation: Orientation): ActionPlace {
-        return new ActionPlace(tileToPlace, startingSquare, orientation);
+        throw new Error('Method not implemented.');
     }
     createExchangeText(tilesToExchange: string): ActionExchange {
-        return this.createExchange(tilesToExchange);
+        throw new Error('Method not implemented.');
     }
     createExchange(tilesToExchange: Tile[]): ActionExchange {
-        return new ActionExchange(tilesToExchange);
+        throw new Error('Method not implemented.');
     }
     createHelp(): ActionHelp {
-        return new ActionHelp();
+        throw new Error('Method not implemented.');
     }
     createClue(): ActionClue {
-        return new ActionClue();
+        throw new Error('Method not implemented.');
     }
     createReserve(): ActionReserve {
-        return new ActionReserve();
+        throw new Error('Method not implemented.');
     }
 }

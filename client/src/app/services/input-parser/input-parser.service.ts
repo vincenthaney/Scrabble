@@ -5,6 +5,6 @@ import { Injectable } from '@angular/core';
 })
 export class InputParserService {
     parseInput(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 }

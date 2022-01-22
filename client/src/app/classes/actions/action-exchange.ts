@@ -7,13 +7,14 @@ export default class ActionExchange extends ActionPlay {
     constructor(tilesToExchange: Tile[]) {
         super();
         this.tilesToExchange = tilesToExchange;
+        throw new Error('Method not implemented.');
     }
 
     execute(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 
     getMessage(): string {
-        return '';
+        throw new Error('Method not implemented.');
     }
 }

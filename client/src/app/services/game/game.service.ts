@@ -20,20 +20,19 @@ export class GameService {
     gameType: GameType;
 
     playAction(action: Action): void {
-        action.execute();
-        return;
+        throw new Error('Method not implemented.');
     }
 
     isGameOver(): boolean {
-        return false;
+        throw new Error('Method not implemented.');
     }
 
     sendScores(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 
     // TODO: Maybe rename to sendGame or sendFinishedGame
     sendGameHistory(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 }

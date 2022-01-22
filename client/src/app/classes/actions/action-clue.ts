@@ -2,10 +2,10 @@ import { ActionInfo } from '@app/classes/actions';
 
 export default class ActionClue extends ActionInfo {
     execute(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 
     getMessage(): string {
-        return '';
+        throw new Error('Method not implemented.');
     }
 }

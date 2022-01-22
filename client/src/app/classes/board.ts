@@ -5,9 +5,9 @@ import { Position } from '@app/classes/position';
 export class Board {
     grid: Square[][];
     placeTile(position: Position, tile: Tile): boolean {
-        return false;
+        throw new Error('Method not implemented.');
     } // Verify if there is already a tile in that square
     removePlayedTiles(): void {
-        return;
+        throw new Error('Method not implemented.');
     }
 }
