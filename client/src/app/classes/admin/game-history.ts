@@ -17,7 +17,7 @@ export class GameHistory extends StorableModel {
         player2Name: string,
         player1Score: number,
         player2Score: number,
-        gameType: Game,
+        gameType: GameType,
     ) {
         super();
         throw new Error('Method not implemented.');
