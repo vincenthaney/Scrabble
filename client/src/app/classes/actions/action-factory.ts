@@ -1,5 +1,3 @@
-import { Action } from '@app/classes/actions/action';
-import { ActionPlay } from '@app/classes/actions/action-play';
 import { ActionPass } from '@app/classes/actions/action-pass';
 import { ActionPlace } from '@app/classes/actions/action-place';
 import { ActionExchange } from '@app/classes/actions/action-exchange';
@@ -12,15 +10,18 @@ import { Orientation } from '@app/classes/orientation';
 
 // TODO: Who has the responsibility of parsing input command and retrieve the Player tiles and board. 
 // Right now, TextActionFactory and GUI have same createPlace method
-export class TextActionFactory {
-    createAction(userInput: string): Action {
-        return new ActionPass();
-    }
+export class ActionFactory {
     createPass(): ActionPass {
         return new ActionPass();
     }
+    createPlaceText(tileToPlace: string, startingSquare: string, orientation: string): ActionPlace {
+        return this.createPlace(tileToPlace, startingSquare, orientation);
+    }
     createPlace(tileToPlace: Tile[], startingSquare: Square, orientation: Orientation): ActionPlace {
         return new ActionPlace(tileToPlace, startingSquare, orientation);
+    }
+    createExchangeText(tilesToExchange: string): ActionExchange {
+        return this.createExchange(tilesToExchange);
     }
     createExchange(tilesToExchange: Tile[]): ActionExchange {
         return new ActionExchange(tilesToExchange);
