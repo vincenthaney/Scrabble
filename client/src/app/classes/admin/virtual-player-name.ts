@@ -1,6 +1,6 @@
-import { IStorableModel } from './istorablemodel';
+import { StorableModel } from '@app/classes/admin/storable-model';
 
-export class VirtualPlayerName extends IStorableModel {
+export class VirtualPlayerName extends StorableModel {
     name: string;
     isEditable: boolean;
     level: string;

@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HighScore } from '@app/classes/admin/highscore';
+import { HighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
-
 @Injectable({
     providedIn: 'root',
 })

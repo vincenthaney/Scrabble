@@ -1,6 +1,6 @@
-import { IStorableModel } from './istorablemodel';
+import { StorableModel } from '@app/classes/admin/storable-model';
 
-export class WordDictionnary extends IStorableModel {
+export class WordDictionnary extends StorableModel {
     name: string;
     description: string;
     isEditable: boolean;

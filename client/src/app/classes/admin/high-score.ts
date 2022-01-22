@@ -1,6 +1,6 @@
-import { IStorableModel } from './istorablemodel';
+import { StorableModel } from '@app/classes/admin/storable-model';
 
-export class HighScore extends IStorableModel {
+export class HighScore extends StorableModel {
     score: number;
     playerNames: string[];
     constructor(score: number, playerNames: string[]) {

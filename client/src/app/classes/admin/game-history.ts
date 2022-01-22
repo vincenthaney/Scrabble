@@ -1,7 +1,7 @@
+import { StorableModel } from '@app/classes/admin/storable-model';
 import { GameType } from '@app/classes/game-type';
-import { IStorableModel } from './istorablemodel';
 
-export class GameHistory extends IStorableModel {
+export class GameHistory extends StorableModel {
     startTime: Date;
     gameLength: number;
     player1Name: string;
