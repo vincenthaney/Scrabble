@@ -3,7 +3,7 @@ import { Square } from '@app/classes/square';
 import { Position } from '@app/classes/position';
 
 export class Board {
-    matrix: Square[][];
+    grid: Square[][];
     placeTile(position: Position, tile: Tile): boolean {
         return false;
     } // Verify if there is already a tile in that square
