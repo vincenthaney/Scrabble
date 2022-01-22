@@ -16,15 +16,14 @@ export class GameService {
     // player1: IPlayer;
     // player2: IPlayer;
     tileReserve: TileReserve;
-    start: Date; // TODO: Check if useful when implementing game history
     wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
     gameType: GameType;
 
     playAction(action: Action): void {
+        action.execute();
         return;
     }
 
-    // TODO: Verify if Game is responsible to check if game is over. Maybe Add attribute to not call multiple times in a single turn
     isGameOver(): boolean {
         return false;
     }
