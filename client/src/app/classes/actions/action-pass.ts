@@ -1,6 +1,6 @@
-import { ActionPlay } from '@app/classes/actions/action-play';
+import { ActionPlay } from '@app/classes/actions';
 
-export class ActionPass extends ActionPlay {
+export default class ActionPass extends ActionPlay {
     execute(): void {
         return;
     }

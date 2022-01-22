@@ -1,6 +1,6 @@
-import { Action } from '@app/classes/actions/action';
+import { Action } from '@app/classes/actions';
 
-export abstract class ActionPlay implements Action {
+export default abstract class ActionPlay implements Action {
     willEndTurn(): boolean {
         return true;
     }

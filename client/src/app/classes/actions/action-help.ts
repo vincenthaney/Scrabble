@@ -1,6 +1,6 @@
-import { ActionInfo } from '@app/classes/actions/action-info';
+import { ActionInfo } from '@app/classes/actions';
 
-export class ActionHelp extends ActionInfo {
+export default class ActionHelp extends ActionInfo {
     execute(): void {
         return;
     }

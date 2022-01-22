@@ -1,14 +1,9 @@
-import { ActionPass } from '@app/classes/actions/action-pass';
-import { ActionPlace } from '@app/classes/actions/action-place';
-import { ActionExchange } from '@app/classes/actions/action-exchange';
-import { ActionClue } from '@app/classes/actions/action-clue';
-import { ActionHelp } from '@app/classes/actions/action-help';
-import { ActionReserve } from '@app/classes/actions/action-reserve';
+import { ActionPass, ActionPlace, ActionExchange, ActionClue, ActionHelp, ActionReserve } from '@app/classes/actions';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { Orientation } from '@app/classes/orientation';
 
-export class ActionFactory {
+export default class ActionFactory {
     createPass(): ActionPass {
         return new ActionPass();
     }
