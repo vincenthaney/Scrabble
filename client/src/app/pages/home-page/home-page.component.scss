@@ -1,0 +1,37 @@
+.container {
+    min-height: 100vh;
+    height: auto;
+}
+
+.justified {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button-group {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.button {
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.team-name {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    color: green;
+}
+
+
+.footer-item {
+    text-align: center;
+}
+
+.footer-item p  {
+    color: #00000063;
+}
