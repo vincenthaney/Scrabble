@@ -1,5 +1,5 @@
 export interface Round {
-    // player : IPlayer;  // TODO: Check if coupling to player is necessary
+    // player : IPlayer;
     startTime: Date;
     limitTime: Date;
     completedTime: Date | null;

@@ -5,11 +5,11 @@ import { Board } from '@app/classes/board';
 @Injectable({
     providedIn: 'root',
 })
-export class ScoreCalculatorService {
+export class ScoreComputerService {
     board: Board;
 
     // TODO: Potentially make an interface of a candidate word to make it clearer
-    calculate(words: Square[][]): number {
+    computeScore(words: Square[][]): number {
         return 0;
     }
 }
