@@ -8,8 +8,6 @@ import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { Orientation } from '@app/classes/orientation';
 
-// TODO: Who has the responsibility of parsing input command and retrieve the Player tiles and board. 
-// Right now, TextActionFactory and GUI have same createPlace method
 export class ActionFactory {
     createPass(): ActionPass {
         return new ActionPass();
