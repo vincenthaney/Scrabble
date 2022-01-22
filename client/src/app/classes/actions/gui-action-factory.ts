@@ -9,10 +9,10 @@ export class GUIActionFactory {
     createPass(): ActionPass {
         return new ActionPass();
     }
-    createPlace(tileToPlace: Tile[], startingSquare: Square, Orientation: Orientation): ActionPlace {
-        return new ActionPlace();
+    createPlace(tilesToPlace: Tile[], startingSquare: Square, orientation: Orientation): ActionPlace {
+        return new ActionPlace(tilesToPlace, startingSquare, orientation);
     }
     createExchange(tilesToExchange: Tile[]): ActionExchange {
-        return new ActionExchange();
+        return new ActionExchange(tilesToExchange);
     }
 }
