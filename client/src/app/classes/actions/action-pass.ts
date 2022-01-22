@@ -1,17 +1,17 @@
 import { ActionPlay } from '@app/classes/actions/action-play';
 
 export class ActionPass implements ActionPlay {
-    isTurnEnding: boolean;
+    willEndTurn: boolean;
 
     constructor() {
-        this.isTurnEnding = true;
+        this.willEndTurn = true;
     }
 
     execute(): void {
         return;
     }
 
-    message(): string {
+    getMessage(): string {
         return '';
     }
 }

@@ -1,7 +1,7 @@
 export interface Action {
-    isTurnEnding: boolean;
+    willEndTurn: boolean;
     // messageColor: number; // TODO: potentially make a color enum
 
     execute(): void;
-    message(): string;
+    getMessage(): string;
 }

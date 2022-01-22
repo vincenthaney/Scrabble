@@ -1,17 +1,20 @@
 import { ActionPlay } from '@app/classes/actions/action-play';
+import { Tile } from '@app/classes/tile';
 
 export class ActionExchange implements ActionPlay {
-    isTurnEnding: boolean;
+    willEndTurn: boolean;
+    tilesToExchange: Tile[];
 
-    constructor() {
-        this.isTurnEnding = true;
+    constructor(tilesToExchange: Tile[]) {
+        this.willEndTurn = true;
+        this.tilesToExchange = tilesToExchange;
     }
 
     execute(): void {
         return;
     }
 
-    message(): string {
+    getMessage(): string {
         return '';
     }
 }

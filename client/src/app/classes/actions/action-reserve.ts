@@ -1,17 +1,17 @@
 import { ActionInfo } from '@app/classes/actions/action-info';
 
 export class ActionReserve implements ActionInfo {
-    isTurnEnding: boolean;
+    willEndTurn: boolean;
 
     constructor() {
-        this.isTurnEnding = false;
+        this.willEndTurn = false;
     }
 
     execute(): void {
         return;
     }
 
-    message(): string {
+    getMessage(): string {
         return '';
     }
 }
