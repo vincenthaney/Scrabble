@@ -1,1 +1,7 @@
-<p>board works!</p>
+<h2>Board</h2>
+
+<div *ngFor="let row of squares">
+    <div *ngFor="let square of row">
+        <p>{{ square.color }}</p>
+    </div>
+</div>

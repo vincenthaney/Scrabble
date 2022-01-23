@@ -8,6 +8,11 @@ import { TileComponent } from '@app/components/tile/tile.component';
     styleUrls: ['./square.component.scss'],
 })
 export class SquareComponent {
-    tile: TileComponent | null = null;
+    tile: TileComponent | null;
     color: COLORS = COLORS.Beige;
+
+    constructor(tile: TileComponent | null, color: COLORS) {
+        this.tile = tile;
+        this.color = color;
+    }
 }
