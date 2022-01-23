@@ -1,6 +1,6 @@
-import { StorableModel } from '@app/classes/admin/storable-model';
+import { StorableModel } from '@app/classes/admin';
 
-export class HighScore extends StorableModel {
+export default class HighScore extends StorableModel {
     score: number;
     playerNames: string[];
     constructor(score: number, playerNames: string[]) {
@@ -8,7 +8,3 @@ export class HighScore extends StorableModel {
         throw new Error('Method not implemented.');
     }
 
-    toJSON(): string {
-        return super.toJSON();
-    }
-}

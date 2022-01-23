@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { WordDictionnary } from '@app/classes/admin/word-dictionnary';
+import { WordDictionnary } from '@app/classes/admin';
 
 @Injectable({
     providedIn: 'root',

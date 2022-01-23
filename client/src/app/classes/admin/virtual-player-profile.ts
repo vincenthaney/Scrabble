@@ -1,6 +1,6 @@
-import { StorableModel } from '@app/classes/admin/storable-model';
+import { StorableModel } from '@app/classes/admin';
 
-export class VirtualPlayerName extends StorableModel {
+export default class VirtualPlayerProfile extends StorableModel {
     name: string;
     isEditable: boolean;
     level: string;
@@ -8,9 +8,5 @@ export class VirtualPlayerName extends StorableModel {
     constructor(name: string, isEditable: boolean, level: string) {
         super();
         throw new Error('Method not implemented.');
-    }
-
-    toJSON(): string {
-        return super.toJSON();
     }
 }

@@ -1,7 +1,7 @@
-import { StorableModel } from '@app/classes/admin/storable-model';
+import { StorableModel } from '@app/classes/admin';
 import { GameType } from '@app/classes/game-type';
 
-export class GameHistory extends StorableModel {
+export default class GameHistory extends StorableModel {
     startTime: Date;
     gameLength: number;
     player1Name: string;
@@ -21,8 +21,5 @@ export class GameHistory extends StorableModel {
     ) {
         super();
         throw new Error('Method not implemented.');
-    }
-    toJSON(): string {
-        return super.toJSON();
     }
 }

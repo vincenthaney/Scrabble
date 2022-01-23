@@ -1,6 +1,6 @@
-import { StorableModel } from '@app/classes/admin/storable-model';
+import { StorableModel } from '@app/classes/admin';
 
-export class WordDictionnary extends StorableModel {
+export default class WordDictionnary extends StorableModel {
     name: string;
     description: string;
     isEditable: boolean;
@@ -13,9 +13,5 @@ export class WordDictionnary extends StorableModel {
 
     getWords(): string[] {
         return [...this.words];
-    }
-
-    toJSON(): string {
-        return super.toJSON();
     }
 }

@@ -1,18 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { VirtualPlayerName } from '@app/classes/admin/virtual-player-name';
+import { VirtualPlayerProfile } from '@app/classes/admin';
 
 @Injectable({
     providedIn: 'root',
 })
-export class VirtualPlayerNamesService {
+export class VirtualPlayerProfilesService {
     constructor(private http: HttpClient) {}
 
-    fetchVirtualPlayerNames(level: string): VirtualPlayerName[] {
+    fetchVirtualPlayerProfiles(level: string): VirtualPlayerProfile[] {
         throw new Error('Method not implemented.');
     }
 
-    updateVirtualPlayerNames(virtualPlayerNames: VirtualPlayerName[]): void {
+    updateVirtualPlayerProfiles(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
         throw new Error('Method not implemented.');
     }
 }
