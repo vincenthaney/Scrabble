@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { InputParserService } from '@app/services';
+import { HighScoreService } from '@app/services';
 
-describe('InputParserService', () => {
-    let service: InputParserService;
+describe('HighScoreService', () => {
+    let service: HighScoreService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(InputParserService);
+        service = TestBed.inject(HighScoreService);
     });
 
     it('should be created', () => {
