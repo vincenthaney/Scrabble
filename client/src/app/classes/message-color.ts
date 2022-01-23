@@ -1,4 +1,4 @@
-import { COLORS } from '@app/classes/message-color-constants';
+import { COLORS } from '@app/classes/color-constants';
 
 export enum MessageColor {
     LocalPlayer = COLORS.Blue,
