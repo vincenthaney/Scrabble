@@ -3,4 +3,4 @@ import { Injectable } from '@angular/core';
 @Injectable({
     providedIn: 'root',
 })
-export default class GameHistoryService {}
+export default class VirtualPlayerProfilesService {}

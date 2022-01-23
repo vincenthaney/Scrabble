@@ -8,16 +8,11 @@ export default class ActionPlace extends ActionPlay {
     startingSquare: Square;
     orientation: Orientation;
 
-    constructor(tilesToPlace: Tile[], startingSquare: Square, orientation: Orientation) {
-        super();
-        this.tilesToPlace = tilesToPlace;
-        this.startingSquare = startingSquare;
-        this.orientation = orientation;
+    execute(): void {
+        throw new Error('Method not implemented.');
     }
 
-    execute(): void {
-        throw new Error('Method not implemented.');    }
-
     getMessage(): string {
-        throw new Error('Method not implemented.');    }
+        throw new Error('Method not implemented.');
+    }
 }

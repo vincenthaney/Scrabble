@@ -4,7 +4,7 @@ import { Round } from '@app/classes/round';
 @Injectable({
     providedIn: 'root',
 })
-export class RoundManagerService {
+export default class RoundManagerService {
     currentRound: Round;
     completedRounds: Round[];
     maxRoundTime: number;
