@@ -16,6 +16,9 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
+import { InformationBoxComponent } from './components/information-box/information-box.component';
+import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -32,10 +35,13 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
         PlayAreaComponent,
         SidebarComponent,
         HomePageComponent,
-        BoardComponent,
         SquareComponent,
         TileComponent,
+        InformationBoxComponent,
+        CommunicationBoxComponent,
+        BoardComponent,
         TileRackComponent,
+        SurrenderDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
