@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TileReserve } from '@app/classes/tile-reserve';
+import { TileReserve } from '@app/classes/tile';
 import { Action } from '@app/classes/actions/action';
 
 import { GameType } from '@app/classes/game-type';
