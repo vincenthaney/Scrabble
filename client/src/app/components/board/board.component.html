@@ -1,4 +1,6 @@
-<mat-grid-list cols="{{ boardSize.x + 2 * marginColumnAmount }}" rows="15" class="grid-layout-custom">
+<mat-grid-list cols="{{ boardSize.x + 2 * marginColumnAmount }}" rowHeight="fit" id="board-grid">
+    <mat-grid-tile [colspan]="boardSize.x + 2 * marginColumnAmount" [rowspan]="1" [style.background]="'grey'"></mat-grid-tile>
+
     <div *ngFor="let squareRow of squares">
         <mat-grid-tile [colspan]="marginColumnAmount" [rowspan]="1" [style.background]="'grey'"></mat-grid-tile>
         <mat-grid-tile id="square" *ngFor="let square of squareRow" [colspan]="square.squareSize.x" [rowspan]="square.squareSize.y">
@@ -6,4 +8,6 @@
         </mat-grid-tile>
         <mat-grid-tile [colspan]="marginColumnAmount" [rowspan]="1" [style.background]="'grey'"></mat-grid-tile>
     </div>
+
+    <mat-grid-tile [colspan]="boardSize.x + 2 * marginColumnAmount" [rowspan]="1" [style.background]="'grey'"></mat-grid-tile>
 </mat-grid-list>

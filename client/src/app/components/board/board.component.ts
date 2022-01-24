@@ -12,7 +12,6 @@ import { SquareView } from '@app/components/square/square-view';
 })
 export class BoardComponent {
     readonly boardSize: Vec2 = BOARD_SIZE;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     readonly marginColumnAmount = 2;
     squares: SquareView[][];
 
@@ -26,10 +25,8 @@ export class BoardComponent {
                     squareSize: SQUARE_SIZE,
                     squarePosition: { x: i, y: j },
                     color: COLORS.Beige,
-                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                     id: Math.floor(Math.random() * 1000),
                 };
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 this.squares[i][j] = square;
             }
         }

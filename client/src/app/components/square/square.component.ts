@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from './square-view';
 
@@ -7,10 +7,16 @@ import { SquareView } from './square-view';
     templateUrl: './square.component.html',
     styleUrls: ['./square.component.scss'],
 })
-export class SquareComponent {
+export class SquareComponent implements OnInit {
     @Input() squareView: SquareView;
     canvasContext: CanvasRenderingContext2D;
+    style = {};
 
+    ngOnInit() {
+        this.style = {
+            'background-color': this.squareView.color,
+        };
+    }
     getSquareSize(): Vec2 {
         return this.squareView.squareSize;
     }

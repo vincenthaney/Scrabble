@@ -2,8 +2,8 @@
 // export const COLOR_BLUE = 0x0000ff;
 // export const COLOR_GRAY = 0xaaaaaa;
 export enum COLORS {
-    Red = 0xff0000,
-    Blue = 0x0000ff,
-    Gray = 0xaaaaaa,
-    Beige = 0xfff8e7,
+    Red = '#ff0000',
+    Blue = '#0000ff',
+    Gray = '#aaaaaa',
+    Beige = '#fff8e7',
 }
