@@ -2,6 +2,6 @@
 
 <div *ngFor="let row of squares">
     <div *ngFor="let square of row">
-        <p>{{ square.color }}</p>
+        <app-square [tile]="square.tile" [color]="square.color" [squarePosition]="square.squarePosition"></app-square>
     </div>
 </div>

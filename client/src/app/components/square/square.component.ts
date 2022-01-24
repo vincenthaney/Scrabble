@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { COLORS } from '@app/classes/color-constants';
+import { SQUARE_SIZE } from '@app/classes/game-constants';
+import { Vec2 } from '@app/classes/vec2';
 import { TileComponent } from '@app/components/tile/tile.component';
 
 @Component({
@@ -8,11 +10,14 @@ import { TileComponent } from '@app/components/tile/tile.component';
     styleUrls: ['./square.component.scss'],
 })
 export class SquareComponent {
-    tile: TileComponent | null;
-    color: COLORS = COLORS.Beige;
+    private static squareSize: Vec2 = SQUARE_SIZE;
 
-    constructor(tile: TileComponent | null, color: COLORS) {
-        this.tile = tile;
-        this.color = color;
+    @Input() squarePosition: Vec2;
+    @Input() tile: TileComponent | null;
+    @Input() color: COLORS = COLORS.Beige;
+    canvasContext: CanvasRenderingContext2D;
+
+    static getSquareSize(): Vec2 {
+        return SquareComponent.squareSize;
     }
 }
