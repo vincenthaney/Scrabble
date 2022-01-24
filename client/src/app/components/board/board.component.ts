@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { Board } from '@app/classes/board';
-import { SquareComponent } from '@app/components/square/square.component';
+import { COLORS } from '@app/classes/color-constants';
+import { BOARD_SIZE, SQUARE_SIZE } from '@app/classes/game-constants';
+import { Vec2 } from '@app/classes/vec2';
+import { SquareView } from '@app/components/square/square-view';
 
 @Component({
     selector: 'app-board',
@@ -8,14 +11,26 @@ import { SquareComponent } from '@app/components/square/square.component';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent {
-    squares: SquareComponent[][];
+    readonly boardSize: Vec2 = BOARD_SIZE;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    readonly marginColumnAmount = 2;
+    squares: SquareView[][];
 
     constructor() {
         this.squares = [];
         for (let i = 0; i < Board.size.x; i++) {
             this.squares[i] = [];
             for (let j = 0; j < Board.size.y; j++) {
-                this.squares[i][j] = new SquareComponent();
+                const square: SquareView = {
+                    square: null,
+                    squareSize: SQUARE_SIZE,
+                    squarePosition: { x: i, y: j },
+                    color: COLORS.Beige,
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    id: Math.floor(Math.random() * 1000),
+                };
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                this.squares[i][j] = square;
             }
         }
     }

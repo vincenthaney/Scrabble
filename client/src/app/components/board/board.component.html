@@ -1,7 +1,9 @@
-<h2>Board</h2>
-
-<div *ngFor="let row of squares">
-    <div *ngFor="let square of row">
-        <app-square [tile]="square.tile" [color]="square.color" [squarePosition]="square.squarePosition"></app-square>
+<mat-grid-list cols="{{ boardSize.x + 2 * marginColumnAmount }}" rows="15" class="grid-layout-custom">
+    <div *ngFor="let squareRow of squares">
+        <mat-grid-tile [colspan]="marginColumnAmount" [rowspan]="1" [style.background]="'grey'"></mat-grid-tile>
+        <mat-grid-tile id="square" *ngFor="let square of squareRow" [colspan]="square.squareSize.x" [rowspan]="square.squareSize.y">
+            <app-square [squareView]="square"></app-square>
+        </mat-grid-tile>
+        <mat-grid-tile [colspan]="marginColumnAmount" [rowspan]="1" [style.background]="'grey'"></mat-grid-tile>
     </div>
-</div>
+</mat-grid-list>

@@ -1,8 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { COLORS } from '@app/classes/color-constants';
-import { SQUARE_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
-import { TileComponent } from '@app/components/tile/tile.component';
+import { SquareView } from './square-view';
 
 @Component({
     selector: 'app-square',
@@ -10,14 +8,15 @@ import { TileComponent } from '@app/components/tile/tile.component';
     styleUrls: ['./square.component.scss'],
 })
 export class SquareComponent {
-    private static squareSize: Vec2 = SQUARE_SIZE;
-
-    @Input() squarePosition: Vec2;
-    @Input() tile: TileComponent | null;
-    @Input() color: COLORS = COLORS.Beige;
+    @Input() squareView: SquareView;
     canvasContext: CanvasRenderingContext2D;
 
-    static getSquareSize(): Vec2 {
-        return SquareComponent.squareSize;
+    getSquareSize(): Vec2 {
+        return this.squareView.squareSize;
+    }
+
+    click() {
+        // eslint-disable-next-line no-console
+        console.log(this.squareView.id);
     }
 }
