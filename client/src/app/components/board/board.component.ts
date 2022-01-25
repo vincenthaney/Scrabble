@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { COLORS } from '@app/classes/color-constants';
 import { BOARD_SIZE, SQUARE_SIZE } from '@app/classes/game-constants';
@@ -10,12 +10,12 @@ import { SquareView } from '@app/components/square/square-view';
     templateUrl: './board.component.html',
     styleUrls: ['./board.component.scss'],
 })
-export class BoardComponent {
+export class BoardComponent implements OnInit {
     readonly boardSize: Vec2 = BOARD_SIZE;
     readonly marginColumnAmount = 2;
     squares: SquareView[][];
 
-    constructor() {
+    ngOnInit() {
         this.squares = [];
         for (let i = 0; i < Board.size.x; i++) {
             this.squares[i] = [];
