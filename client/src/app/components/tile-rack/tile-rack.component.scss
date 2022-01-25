@@ -13,4 +13,11 @@
     padding: 0px;
     width: calc(100% - 24px);
     height: calc(100% - 24px);
+    background-color: brown;
+    display: flex;
+    align-items: center;
+}
+
+.rack-tile {
+    height: 100%;
 }
