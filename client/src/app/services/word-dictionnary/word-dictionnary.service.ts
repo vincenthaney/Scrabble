@@ -1,22 +1,18 @@
 // import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GameHistory } from '@app/classes/admin';
+import { WordDictionnary } from '@app/classes/admin';
 
 @Injectable({
     providedIn: 'root',
 })
-export default class GameHistoryService {
+export default class WordDictionnaryService {
     // constructor(private http: HttpClient) {}
 
-    fetchGameHistories(): GameHistory[] {
+    fetchWordDictionnaries(): WordDictionnary[] {
         throw new Error('Method not implemented.');
     }
 
-    resetGameHistory(): void {
-        throw new Error('Method not implemented.');
-    }
-
-    // addGameHistory(gameHistory: GameHistory): void {
+    // updateWordDictionnaries(wordDictionaries: WordDictionnary[]): void {
     //     throw new Error('Method not implemented.');
     // }
 }
