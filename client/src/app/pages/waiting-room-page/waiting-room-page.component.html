@@ -1,15 +1,15 @@
-
-<div disabled = "isOpponentFound()">
-    <p>{{messageWaitingRoom}}
-        <mat-progress-spinner class="spinner" mode="indeterminate"></mat-progress-spinner>
-    </p>
-    <button mat-flat-button color="primary" disabled="true">
+<div class = "center">
+    <p>{{messageWaitingRoom}}</p>
+    <mat-progress-spinner class="spinner" mode="indeterminate"></mat-progress-spinner>
+    <button class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
         Démarrer la partie
     </button>
-    <button mat-flat-button color="primary" disabled="true">
+    <button class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
         Rejeter adversaire
     </button>
+    <img class="image" src="https://bit.ly/3m206ss" width="100" height="20" alt="Logo Scrabble" />
 </div>
+<img src="https://bit.ly/3m206ss" width="100" height="20" alt="Logo Scrabble" />
 
 <button mat-flat-button color="primary" routerLink="home-page">
     Annuler la partie
