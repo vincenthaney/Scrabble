@@ -14,11 +14,11 @@ export class WaitingRoomPageComponent {
     }
 
     isOpponentFound() {
-        if (this.opponent != null) {
+        if (this.opponent == null) {
             this.messageWaitingRoom = "En attente qu'un adversaire se joigne à votre partie.";
             return false;
         } else {
-            this.messageWaitingRoom = 'Un adversaire souhaite se joindre à votre partie.';
+            this.messageWaitingRoom = IPlayer.name + ' à rejoint votre partie.';
             return true;
         }
     }
