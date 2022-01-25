@@ -19,6 +19,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
+import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -42,6 +43,7 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         BoardComponent,
         TileRackComponent,
         SurrenderDialogComponent,
+        WaitingPageComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],

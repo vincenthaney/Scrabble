@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
+// import { Action } from '@app/classes/actions';
 import { GameType } from '@app/classes/game-type';
 import { TileReserve } from '@app/classes/tile-reserve';
-import { RoundManagerService } from '@app/services';
+import { RoundManagerService } from '@app/services/';
 
 @Injectable({
     providedIn: 'root',
 })
-export default class GameService {
+export default class GameHistoryService {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
@@ -16,6 +17,10 @@ export default class GameService {
     tileReserve: TileReserve;
     wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
     gameType: GameType;
+
+    // playAction(action: Action): void {
+    //     throw new Error('Method not implemented.');
+    // }
 
     isGameOver(): boolean {
         throw new Error('Method not implemented.');
