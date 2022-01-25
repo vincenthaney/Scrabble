@@ -1,6 +1,8 @@
 <div class = "center">
-    <p>{{messageWaitingRoom}}</p>
-    <mat-progress-spinner class="spinner" mode="indeterminate"></mat-progress-spinner>
+    <div class="sameline">
+        {{messageWaitingRoom}}
+        <mat-progress-spinner class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
+    </div>
     <button class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
         Démarrer la partie
     </button>
