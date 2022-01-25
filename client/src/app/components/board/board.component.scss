@@ -1,5 +1,7 @@
 #board {
-    height: calc(100% - 100% / 20);
+    height: calc(100% - 24px);
+    min-height: 300px;
+    aspect-ratio: 1 / 1;
 }
 
 #board-grid {
@@ -10,4 +12,19 @@
 .square {
     width: 100%;
     height: 100%;
+}
+
+.square-background {
+    outline-style: solid;
+    outline-color: black;
+    outline-width: 1px;
+}
+
+.letter-number-grid {
+    margin: 0px;
+    font-family: 'CaveStoryRegular';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    color: white;
 }
