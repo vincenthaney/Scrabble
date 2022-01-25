@@ -1,4 +1,16 @@
 
+<div disabled = "isOpponentFound()">
+    <p>{{messageWaitingRoom}}
+        <mat-progress-spinner class="spinner" mode="indeterminate"></mat-progress-spinner>
+    </p>
+    <button mat-flat-button color="primary" disabled="true">
+        Démarrer la partie
+    </button>
+    <button mat-flat-button color="primary" disabled="true">
+        Rejeter adversaire
+    </button>
+</div>
+
 <button mat-flat-button color="primary" routerLink="home-page">
     Annuler la partie
 </button>
@@ -6,3 +18,4 @@
 <button mat-flat-button color="primary" disabled="true">
     Convertir en partie solo
 </button>
+
