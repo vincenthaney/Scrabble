@@ -13,6 +13,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
+import { WaitingRoomPageComponent } from '@app/pages/waiting-room-page/waiting-room-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,6 +31,7 @@ import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.compo
         SidebarComponent,
         HomePageComponent,
         WaitingPageComponent,
+        WaitingRoomPageComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
