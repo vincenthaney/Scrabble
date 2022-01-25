@@ -9,15 +9,36 @@
     align-items: center;
 }
 
+#rack-grid {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    grid-template-rows: 100%;
+}
+
 #rack-card {
     padding: 0px;
-    width: calc(100% - 24px);
-    height: calc(100% - 24px);
+    // width: calc(100% - 24px);
+    height: 100%;
     background-color: brown;
     display: flex;
     align-items: center;
+    justify-content: space-evenly;
+    max-width: 600px;
 }
 
-.rack-tile {
+#rack-button {
+    display: grid;
+    grid-row: span 2;
+    grid-template-rows: 50% 50%;
     height: 100%;
+    padding: 0px;
+    background-color: brown;
+}
+
+.btn-rack {
+    margin: 5px 50px;
+    padding: 0px;
+}
+.rack-tile {
+    // height: 100%;
 }
