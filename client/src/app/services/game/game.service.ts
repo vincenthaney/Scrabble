@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { INIT_PLAYER_TILE_AMOUNT } from '@app/classes/game-constants';
 // import { Action } from '@app/classes/actions';
 import { GameType } from '@app/classes/game-type';
 import { TileReserve } from '@app/classes/tile-reserve';
@@ -7,7 +8,7 @@ import { RoundManagerService } from '@app/services/';
 @Injectable({
     providedIn: 'root',
 })
-export default class GameHistoryService {
+export default class GameService {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
@@ -22,6 +23,10 @@ export default class GameHistoryService {
     //     throw new Error('Method not implemented.');
     // }
 
+    // REMOVE WHEN WE CAN GET TILES FROM PLAYER
+    getInitPlayerTileAmount(): number {
+        return INIT_PLAYER_TILE_AMOUNT;
+    }
     isGameOver(): boolean {
         throw new Error('Method not implemented.');
     }
