@@ -2,9 +2,22 @@
     width: 100%;
     height: 100%;
 }
+.space-between {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: space-between;
+    flex-direction: column;
+}
 
 .center-both {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#text-button-container {
+    display: flex;
+    justify-content: space-evenly;
+    padding-bottom: 2%;
 }
