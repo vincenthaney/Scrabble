@@ -1,4 +1,4 @@
-<div id="board" #board [ngStyle]="boardStyle">
+<div id="board" #board>
     <mat-grid-list cols="{{ colAmount }}" rowHeight="fit" gutterSize="3px" id="board-grid">
         <mat-grid-tile *ngFor="let item of [].constructor(colAmount); let i = index" [colspan]="1" [rowspan]="1">
             <p *ngIf="i > 0" class="letter-number-grid">{{ i }}</p>
