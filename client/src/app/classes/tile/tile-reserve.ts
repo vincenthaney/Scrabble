@@ -1,9 +1,10 @@
 import { Tile } from '@app/classes/tile';
+import { LETTER_VALUES } from '@app/constants/game';
 import TILES from './tile-reserve.data';
 import { LetterValue } from './tile.types';
+import * as TilesError from './tiles.errors';
 
-const UPPER = 1;
-const LOWER = -1;
+const RESERVE_THRESHOLD = 7;
 
 export default class TileReserve {
     private tiles: Tile[];
@@ -25,26 +26,27 @@ export default class TileReserve {
     }
 
     getTiles(amount: number): Tile[] {
-        if (amount < 1) throw new Error('Amount must be a positive number greater than 1.');
-        if (this.tiles.length < amount) throw new Error(`Not enough tile. (${this.tiles.length} < ${amount})`);
+        if (amount < 1) throw new Error(TilesError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        if (this.tiles.length < amount) throw new Error(TilesError.NOT_ENOUGH_TILES);
 
-        const tiles: Tile[] = [];
+        const tilesToReturn: Tile[] = [];
         for (let i = 0; i < amount; ++i) {
             const tile = this.tiles[Math.floor(Math.random() * this.tiles.length)];
-            tiles.push(tile);
+            tilesToReturn.push(tile);
             this.removeTile(tile);
         }
-        return tiles;
+        return tilesToReturn;
     }
 
-    swapTiles(tiles: Tile[]): Tile[] {
-        if (this.tiles.length < tiles.length) throw new Error(`Not enough tile. (${this.tiles.length} < ${tiles.length})`);
-        if (tiles.some((tile) => !this.referenceTiles.includes(tile))) throw new Error('Must swap tiles from tiles originally in reserve.');
+    swapTiles(tilesToSwap: Tile[]): Tile[] {
+        if (this.tiles.length < tilesToSwap.length) throw new Error(TilesError.NOT_ENOUGH_TILES);
+        if (this.tiles.length < RESERVE_THRESHOLD) throw new Error(TilesError.MUST_HAVE_7_TILES_TO_SWAP);
+        if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(TilesError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
 
-        const newTiles: Tile[] = this.getTiles(tiles.length);
-        this.tiles = this.tiles.concat(tiles);
+        const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
+        this.tiles = this.tiles.concat(tilesToSwap);
 
-        return newTiles;
+        return tilesToReturn;
     }
 
     getTilesLeft(): number {
@@ -52,30 +54,18 @@ export default class TileReserve {
     }
 
     getTilesLeftPerLetter(): Map<LetterValue, number> {
-        const sortedTiles = this.tiles.sort((a, b) => (a.letter > b.letter ? UPPER : LOWER));
         const map = new Map<LetterValue, number>();
 
-        let lastLetter: LetterValue | undefined;
-        let letterCount = 0;
-        sortedTiles.forEach((tile) => {
-            if (tile.letter !== lastLetter) {
-                if (lastLetter !== undefined) {
-                    map.set(lastLetter, letterCount);
-                }
-                lastLetter = tile.letter;
-                letterCount = 1;
-            } else {
-                letterCount++;
-            }
+        LETTER_VALUES.forEach((letter) => {
+            map.set(letter, this.tiles.filter((t) => t.letter === letter).length);
         });
-        if (lastLetter !== undefined) map.set(lastLetter, letterCount);
 
         return map;
     }
 
     private removeTile(tile: Tile): void {
         const index = this.tiles.indexOf(tile);
-        if (index < 0) throw new Error('Tile is not in reserve.');
+        if (index < 0) throw new Error(TilesError.TILE_NOT_IN_RESERVE);
         this.tiles.splice(index, 1);
     }
 }
