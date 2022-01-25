@@ -1,15 +1,14 @@
-.container {
-    height: 100%;
+.space-between {
     display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: space-between;
+    flex-direction: column;
+
 }
 
-.play-area-container {
-    overflow: auto;
-    flex: 1 1 auto;
-}
-
-.play-area {
-    display: grid;
-    width: min-content;
-    outline: none;
+#text-button-container {
+    display: flex;
+    justify-content: space-evenly;
+    padding-bottom: 2%;
 }
