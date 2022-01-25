@@ -1,1 +1,9 @@
-<p>tile-rack works!</p>
+<div id="rac" class="full-size flex-center">
+    <mat-card class="full-size" id="rack-card">
+        <mat-grid-list cols=" {{ tiles.length }}" rows="1:1" gutterSize="3px">
+            <mat-grid-tile *ngFor="let tile of tiles">
+                <app-tile [tile]="tile"></app-tile>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </mat-card>
+</div>

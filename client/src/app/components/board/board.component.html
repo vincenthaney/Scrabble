@@ -1,5 +1,5 @@
 <div id="board" #board>
-    <mat-grid-list cols="{{ colAmount }}" rowHeight="fit" gutterSize="3px" id="board-grid">
+    <mat-grid-list cols="{{ colAmount }}" rowHeight="fit" gutterSize="3px" id="board-grid" class="full-size">
         <mat-grid-tile *ngFor="let item of [].constructor(colAmount); let i = index" [colspan]="1" [rowspan]="1">
             <p *ngIf="i > 0" class="letter-number-grid">{{ i }}</p>
         </mat-grid-tile>
@@ -9,7 +9,7 @@
                 <p class="letter-number-grid">{{ marginLetters[i] }}</p>
             </mat-grid-tile>
             <mat-grid-tile *ngFor="let square of squareRow" [colspan]="square.squareSize.x" [rowspan]="square.squareSize.y" class="square-background">
-                <app-square class="square" [squareView]="square"></app-square>
+                <app-square class="full-size" [squareView]="square"></app-square>
             </mat-grid-tile>
         </div>
     </mat-grid-list>

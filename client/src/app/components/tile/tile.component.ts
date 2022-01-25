@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Tile } from '@app/classes/tile';
 
 @Component({
@@ -7,6 +7,6 @@ import { Tile } from '@app/classes/tile';
     styleUrls: ['./tile.component.scss'],
 })
 export class TileComponent {
-    tile: Tile;
+    @Input() tile: Tile;
     isPlayed: boolean = false;
 }
