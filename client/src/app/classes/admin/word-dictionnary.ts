@@ -6,10 +6,10 @@ export default class WordDictionnary extends StorableModel {
     isEditable: boolean;
     private words: string[];
 
-    constructor(name: string, description: string, isEditable: boolean, words: string[]) {
-        super();
-        throw new Error('Method not implemented.');
-    }
+    // constructor(name: string, description: string, isEditable: boolean, words: string[]) {
+    //     super();
+    //     throw new Error('Method not implemented.');
+    // }
 
     getWords(): string[] {
         return [...this.words];

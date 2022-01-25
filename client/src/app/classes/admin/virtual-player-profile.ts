@@ -5,8 +5,8 @@ export default class VirtualPlayerProfile extends StorableModel {
     isEditable: boolean;
     level: string;
 
-    constructor(name: string, isEditable: boolean, level: string) {
-        super();
-        throw new Error('Method not implemented.');
-    }
+    // constructor(name: string, isEditable: boolean, level: string) {
+    //     super();
+    //     throw new Error('Method not implemented.');
+    // }
 }
