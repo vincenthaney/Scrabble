@@ -6,4 +6,8 @@ export enum COLORS {
     Blue = '#0000ff',
     Gray = '#aaaaaa',
     Beige = '#fff8e7',
+    SquareLightBlue = '#a7cee0',
+    SquareLightRed = '#ffa5a5',
+    SquareDarkBlue = '#2e5984',
+    SquareDarkRed = '#d65d42',
 }
