@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import defaultDialogErrors from './default-dialog.component.errors';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
 @Component({
@@ -15,17 +16,17 @@ export class DefaultDialogComponent {
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: DefaultDialogParameters, private router: Router) {
         // Data must be handled because it is not typed correctly when used in dialog.open(...)
-        if (!this.data.title || typeof this.data.title !== 'string') throw new Error('Default dialog must have a title of type string.');
+        if (!this.data.title || typeof this.data.title !== 'string') throw new Error(defaultDialogErrors.DIALOG_MUST_HAVE_TITLE);
 
         this.title = this.data.title;
         this.content = this.data.content;
         this.buttons = [];
 
         if (this.data.buttons) {
-            if (!Array.isArray(this.data.buttons)) throw new Error('Default dialog buttons must be an array');
+            if (!Array.isArray(this.data.buttons)) throw new Error(defaultDialogErrors.DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
 
             this.data.buttons.forEach((btn) => {
-                if (!btn.content) throw new Error('Default dialog buttons element must have content');
+                if (!btn.content) throw new Error(defaultDialogErrors.BUTTON_MUST_HAVE_CONTENT);
                 this.buttons.push({
                     content: btn.content,
                     closeDialog: btn.redirect ? true : btn.closeDialog ?? false,
