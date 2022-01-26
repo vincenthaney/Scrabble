@@ -14,7 +14,7 @@ export class GamePageComponent {
             if (result) {
                 this.surrenderDialog.closeAll();
                 // TODO: Verify if possible to do it cleaner and hardcoded to /lobby rightnow
-                window.location.href = window.location.hostname + '/lobby';
+                window.location.href = window.location.hostname + '#/lobby';
             }
         });
         surrenderDialogRef.afterClosed().subscribe(() => {
