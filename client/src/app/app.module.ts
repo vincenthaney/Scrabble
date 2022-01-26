@@ -18,6 +18,8 @@ import { BoardComponent } from './components/board/board.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
+import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
+import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 
 /**
  * Main module that is used in main.ts.
@@ -40,6 +42,8 @@ import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.compo
         RackComponent,
         SurrenderDialogComponent,
         WaitingPageComponent,
+        LobbyPageComponent,
+        LobbyInfoComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
