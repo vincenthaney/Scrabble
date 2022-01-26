@@ -2,7 +2,7 @@ import { Tile } from '@app/classes/tile';
 import { LETTER_VALUES } from '@app/constants/game';
 import TILES from './tile-reserve.data';
 import { LetterValue } from './tile.types';
-import * as TilesError from './tiles.errors';
+import TileError from './tiles.errors';
 
 const RESERVE_THRESHOLD = 7;
 
@@ -26,8 +26,8 @@ export default class TileReserve {
     }
 
     getTiles(amount: number): Tile[] {
-        if (amount < 1) throw new Error(TilesError.AMOUNT_MUST_BE_GREATER_THAN_1);
-        if (this.tiles.length < amount) throw new Error(TilesError.NOT_ENOUGH_TILES);
+        if (amount < 1) throw new Error(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        if (this.tiles.length < amount) throw new Error(TileError.NOT_ENOUGH_TILES);
 
         const tilesToReturn: Tile[] = [];
         for (let i = 0; i < amount; ++i) {
@@ -39,9 +39,9 @@ export default class TileReserve {
     }
 
     swapTiles(tilesToSwap: Tile[]): Tile[] {
-        if (this.tiles.length < tilesToSwap.length) throw new Error(TilesError.NOT_ENOUGH_TILES);
-        if (this.tiles.length < RESERVE_THRESHOLD) throw new Error(TilesError.MUST_HAVE_7_TILES_TO_SWAP);
-        if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(TilesError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
+        if (this.tiles.length < tilesToSwap.length) throw new Error(TileError.NOT_ENOUGH_TILES);
+        if (this.tiles.length < RESERVE_THRESHOLD) throw new Error(TileError.MUST_HAVE_7_TILES_TO_SWAP);
+        if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
 
         const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
         this.tiles = this.tiles.concat(tilesToSwap);
@@ -65,7 +65,7 @@ export default class TileReserve {
 
     private removeTile(tile: Tile): void {
         const index = this.tiles.indexOf(tile);
-        if (index < 0) throw new Error(TilesError.TILE_NOT_IN_RESERVE);
+        if (index < 0) throw new Error(TileError.TILE_NOT_IN_RESERVE);
         this.tiles.splice(index, 1);
     }
 }

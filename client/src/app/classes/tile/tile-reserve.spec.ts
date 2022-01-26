@@ -3,7 +3,7 @@ import { reduce } from '@app/utils/array';
 import Tile from './tile';
 import TileReserve from './tile-reserve';
 import TILES from './tile-reserve.data';
-import * as TilesError from './tiles.errors';
+import TileError from './tiles.errors';
 
 describe('TileReserve Test', () => {
     let tileReserve: TileReserve;
@@ -34,7 +34,7 @@ describe('TileReserve Test', () => {
 
     it('getTiles: should throw error when get 0 tiles', () => {
         const amountToRemove = 0;
-        expect(() => tileReserve.getTiles(amountToRemove)).toThrowError(TilesError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        expect(() => tileReserve.getTiles(amountToRemove)).toThrowError(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
     });
 
     it('getTiles: should remove tiles when getTiles (1)', () => {
@@ -71,12 +71,12 @@ describe('TileReserve Test', () => {
         const totalTiles = tileReserve.getTilesLeft();
         const amountToRemove = totalTiles + 1;
 
-        expect(() => tileReserve.getTiles(amountToRemove)).toThrowError(TilesError.NOT_ENOUGH_TILES);
+        expect(() => tileReserve.getTiles(amountToRemove)).toThrowError(TileError.NOT_ENOUGH_TILES);
     });
 
     it('swapTiles: should throw error when swapping no tiles', () => {
         const tiles: Tile[] = [];
-        expect(() => tileReserve.swapTiles(tiles)).toThrowError(TilesError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        expect(() => tileReserve.swapTiles(tiles)).toThrowError(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
     });
 
     it('swapTiles: should contain the same amount of tiles, but not the same instances (1)', () => {
@@ -115,19 +115,19 @@ describe('TileReserve Test', () => {
         const amount = tileReserve.getTilesLeft() - 3;
         const tiles: Tile[] = tileReserve.getTiles(amount - 3);
 
-        expect(() => tileReserve.swapTiles([tiles[0]])).toThrowError(TilesError.MUST_HAVE_7_TILES_TO_SWAP);
+        expect(() => tileReserve.swapTiles([tiles[0]])).toThrowError(TileError.MUST_HAVE_7_TILES_TO_SWAP);
     });
 
     it('swapTiles: should throw error when tile is not from reserve', () => {
         const tiles: Tile[] = [{ letter: '*', value: 0 }];
-        expect(() => tileReserve.swapTiles(tiles)).toThrowError(TilesError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
+        expect(() => tileReserve.swapTiles(tiles)).toThrowError(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
     });
 
     it('removeTile: should throw error when tile is not in reserve', () => {
         const tile = tileReserve.getTiles(1);
 
         // eslint-disable-next-line dot-notation
-        expect(() => tileReserve['removeTile'](tile[0])).toThrowError(TilesError.TILE_NOT_IN_RESERVE);
+        expect(() => tileReserve['removeTile'](tile[0])).toThrowError(TileError.TILE_NOT_IN_RESERVE);
     });
 
     const testGetTilesOnSuccess = (amount: number, total: number) => {
