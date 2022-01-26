@@ -1,6 +1,6 @@
 import { Tile } from '@app/classes/tile';
+import LetterDistribution from '@app/data/letter-distribution.json';
 import { LETTER_VALUES } from '@app/constants/game';
-import TILES from './tile-reserve.data';
 import { LetterValue } from './tile.types';
 import TileError from './tiles.errors';
 
@@ -17,11 +17,12 @@ export default class TileReserve {
 
     private static initTiles(): Tile[] {
         const tiles: Tile[] = [];
-        TILES.forEach((tile) => {
+        LetterDistribution.tiles.forEach((tile) => {
             for (let i = 0; i < tile.amount; ++i) {
-                tiles.push({ letter: tile.letter, value: tile.score });
+                tiles.push({ letter: tile.letter as LetterValue, value: tile.score });
             }
         });
+
         return tiles;
     }
 

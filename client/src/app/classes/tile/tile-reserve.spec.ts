@@ -2,8 +2,9 @@ import { LETTER_VALUES } from '@app/constants/game';
 import { reduce } from '@app/utils/array';
 import Tile from './tile';
 import TileReserve from './tile-reserve';
-import TILES from './tile-reserve.data';
+import LetterDistribution from '@app/data/letter-distribution.json';
 import TileError from './tiles.errors';
+import { LetterValue } from './tile.types';
 
 describe('TileReserve Test', () => {
     let tileReserve: TileReserve;
@@ -13,7 +14,7 @@ describe('TileReserve Test', () => {
     });
 
     it('getTilesLeft: should have specific amount of tiles', () => {
-        const expected = reduce(TILES, 0, (previous, tile) => {
+        const expected = reduce(LetterDistribution.tiles, 0, (previous, tile) => {
             return previous + tile.amount;
         });
         expect(tileReserve.getTilesLeft()).toBe(expected);
@@ -21,8 +22,8 @@ describe('TileReserve Test', () => {
 
     it('getTilesLeftPerLetter: should have a specific amount of tiles for each letters', () => {
         const letterMap = tileReserve.getTilesLeftPerLetter();
-        TILES.forEach((tile) => {
-            expect(letterMap.get(tile.letter)).toBe(tile.amount);
+        LetterDistribution.tiles.forEach((tile) => {
+            expect(letterMap.get(tile.letter as LetterValue)).toBe(tile.amount);
         });
     });
 
