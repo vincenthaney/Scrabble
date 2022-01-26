@@ -8,8 +8,17 @@ import { SurrenderDialogComponent } from '@app/components/surrender-dialog/surre
 })
 export class GamePageComponent {
     constructor(public surrenderDialog: MatDialog) {}
-
     openDialog() {
-        this.surrenderDialog.open(SurrenderDialogComponent);
+        const surrenderDialogRef = this.surrenderDialog.open(SurrenderDialogComponent);
+        const subscriber = surrenderDialogRef.componentInstance.surrenderConfirmed.subscribe((result) => {
+            if (result) {
+                this.surrenderDialog.closeAll();
+                // TODO: Verify if possible to do it cleaner and hardcoded to /lobby rightnow
+                window.location.href = window.location.hostname + '/lobby';
+            }
+        });
+        surrenderDialogRef.afterClosed().subscribe(() => {
+            subscriber.unsubscribe();
+        });
     }
 }
