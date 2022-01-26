@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Board } from '@app/classes/board';
 import { COLORS } from '@app/classes/color-constants';
 import { BOARD_SIZE, GRID_MARGIN_LETTER, SQUARE_SIZE } from '@app/classes/game-constants';
-import { Square } from '@app/classes/square';
 import { SquareView } from '@app/components/square/square-view';
 
 const MARGIN_COLUMN_SIZE = 1;
@@ -20,13 +19,12 @@ export class BoardComponent implements OnInit {
     colAmount: number;
 
     ngOnInit() {
-        const boardGrid: Square[][] = Board.fillBoardGrid();
         this.squares = [];
         for (let i = 0; i < Board.size.x; i++) {
             this.squares[i] = [];
             for (let j = 0; j < Board.size.y; j++) {
                 const square: SquareView = {
-                    square: boardGrid[i][j],
+                    square: null,
                     squareSize: SQUARE_SIZE,
                     squarePosition: { x: i, y: j },
                     color: COLORS.Beige,
