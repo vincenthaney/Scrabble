@@ -1,0 +1,52 @@
+.game-creation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: larger;
+}
+
+#game-parameters {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 500px;
+    margin-top: 200px;
+}
+mat-button-toggle-group {
+    margin-bottom: 30px;
+}
+
+mat-button-toggle-group, mat-button-toggle, mat-form-field, input {
+    width: 100%;
+}
+
+.mat-form-field-wrapper {
+    padding-bottom: 0px;
+    background-color: red;
+}
+.mat-form-field-appearance-outline .mat-form-field-wrapper {
+    margin: 0 0;
+}
+
+button {
+    width: 150px;
+    background-color: #0e520e;
+    color: white;
+    height: 50px;
+}
+
+#bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 500px;
+    margin-top: 40px;
+}
+
+.alert {
+    margin-top: -20px;
+    color: red;
+    display: flex;
+
+}

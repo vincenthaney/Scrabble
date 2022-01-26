@@ -1,7 +1,46 @@
-<p>game-creation-page works!</p>
+<span class="game-creation-container">
+    <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
+    
+    <section id="game-parameters">
+        <h1>Créez une partie</h1>
+        <mat-button-toggle-group color="primary" [(ngModel)]="gameType" name="gameType" aria-label="Game Type">
+            <mat-button-toggle [value]="GameType.Classic">{{GameType.Classic}}</mat-button-toggle>
+            <mat-button-toggle [value]="GameType.LOG2990">{{GameType.LOG2990}}</mat-button-toggle>
+        </mat-button-toggle-group>
 
+        <mat-button-toggle-group color="primary" [(ngModel)]="gameMode" name="gameMode" aria-label="Game Mode">
+            <mat-button-toggle [value]="GameMode.Solo">{{GameMode.Solo}}</mat-button-toggle>
+            <mat-button-toggle [value]="GameMode.Multiplayer">{{GameMode.Multiplayer}}</mat-button-toggle>
+        </mat-button-toggle-group>
 
-<div class="game-cretion-container">
-    <mat-slide-toggle color="primary">Mode de jeu</mat-slide-toggle>
+        <mat-form-field appearance="outline">
+            <mat-label>Temps par tour</mat-label>
+            <mat-select [(value)]="timer" placeholder="1 minute">
+                <mat-option value="60">1 minute</mat-option>
+            </mat-select>
+        </mat-form-field>
 
-</div>
+        <mat-form-field appearance="outline">
+            <mat-label>Nom du joueur</mat-label>
+            <input matInput id="playerNameController" type="text" [(ngModel)]="playerName" [formControl]="playerNameController" autocomplete="off">
+        </mat-form-field>
+        <span *ngIf="playerNameController.invalid && (playerNameController.dirty || playerNameController.touched)" class="alert">
+            <span *ngIf="playerNameController.errors?.['minlength']">
+                Votre nom doit contenir au moins 2 caractères.
+            </span>
+            <span *ngIf="playerNameController.errors?.['maxlength']">
+                Votre nom doit contenir au plus 20 caractères.
+            </span>
+            <span *ngIf="playerNameController.errors?.['pattern'] && !playerNameController.errors?.['maxlength']">
+                Votre nom peut contenir que des lettres et des chiffres.
+            </span>
+        </span>
+        
+    </section>
+
+    <span id="bottom-buttons">
+        <button mat-flat-button routerLink="/home">Retour à l'accueil</button>
+        <button mat-flat-button routerLink="/waiting" (click)="createGame">Créer une partie</button>
+    </span>
+
+</span>
