@@ -1,6 +1,7 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -9,15 +10,15 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { HomePageComponent } from '@app/pages/home-page/home-page.component';
-import { InformationBoxComponent } from './components/information-box/information-box.component';
-import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
+import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { BoardComponent } from './components/board/board.component';
+import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
+import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
-import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -41,7 +42,7 @@ import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.compo
         SurrenderDialogComponent,
         WaitingPageComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule, ScrollingModule],
     providers: [],
     bootstrap: [AppComponent],
 })
