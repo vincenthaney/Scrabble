@@ -28,8 +28,8 @@ export class GameCreationPageComponent {
     playerNameController = new FormControl('', [
         Validators.pattern(NameValidation.rule),
         Validators.minLength(NameValidation.minLength),
-        Validators.maxLength(NameValidation.maxLength)],
-    );
+        Validators.maxLength(NameValidation.maxLength),
+    ]);
 
     constructor(private router: Router) {}
 
@@ -44,6 +44,6 @@ export class GameCreationPageComponent {
     }
 
     onNameFieldChange(newName: string) {
-        this.playerName! = newName;
+        this.playerName = newName;
     }
 }
