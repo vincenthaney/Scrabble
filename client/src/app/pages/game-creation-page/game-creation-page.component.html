@@ -3,9 +3,9 @@
     
     <section id="game-parameters">
         <h1>Créez une partie</h1>
-        <mat-button-toggle-group color="primary" [(ngModel)]="gameType" name="gameType" aria-label="Game Type">
-            <mat-button-toggle [value]="GameType.Classic">{{GameType.Classic}}</mat-button-toggle>
-            <mat-button-toggle [value]="GameType.LOG2990">{{GameType.LOG2990}}</mat-button-toggle>
+        <mat-button-toggle-group color="primary" id="first" [(ngModel)]="gameType" name="gameType" aria-label="Game Type">
+            <mat-button-toggle id="log2990-button" [value]="GameType.Classic">{{GameType.Classic}}</mat-button-toggle>
+            <mat-button-toggle id="classic-button" [value]="GameType.LOG2990">{{GameType.LOG2990}}</mat-button-toggle>
         </mat-button-toggle-group>
 
         <mat-button-toggle-group color="primary" [(ngModel)]="gameMode" name="gameMode" aria-label="Game Mode">
@@ -35,12 +35,12 @@
                 Votre nom peut contenir que des lettres et des chiffres.
             </span>
         </span>
-        
+
     </section>
 
     <span id="bottom-buttons">
-        <button mat-flat-button routerLink="/home">Retour à l'accueil</button>
-        <button mat-flat-button routerLink="/waiting" (click)="createGame">Créer une partie</button>
+        <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>
+        <button mat-flat-button id="create-game-button" routerLink="waiting-room" (click)="createGame()">Créer la partie</button>
     </span>
 
 </span>
