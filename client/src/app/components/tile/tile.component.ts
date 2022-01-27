@@ -8,7 +8,7 @@ import { Tile } from '@app/classes/tile';
     styleUrls: ['./tile.component.scss'],
 })
 export class TileComponent {
-    @Input() private tile: Tile;
+    @Input() tile: Tile;
     isPlayed: boolean = false;
 
     getTile() {
