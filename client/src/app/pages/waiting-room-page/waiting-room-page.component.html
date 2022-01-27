@@ -1,7 +1,9 @@
 <div class = "center">
     <div class="sameline">
         {{messageWaitingRoom}}
-        <mat-progress-spinner class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
+        <div *ngIf="!isOpponentFound">
+            <mat-progress-spinner id="spinnerOpponentFound" class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
+        </div>
     </div>
     <button id="start-game-button" class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
         Démarrer la partie
