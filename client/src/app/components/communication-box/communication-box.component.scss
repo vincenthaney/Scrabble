@@ -5,10 +5,22 @@
   }
   
 .scroll-item {
-    height: 18px;
+    height: 20px;
   }
 
 #objectives-container {
 
+}
+
+input {
+    height: 20px;
+}
+
+mat-accordion {
+    margin: 20px;
+}
+
+mat-expansion-panel-header {
+    padding-left: 10px;
 }
 
