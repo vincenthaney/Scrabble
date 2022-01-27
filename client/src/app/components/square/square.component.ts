@@ -20,9 +20,4 @@ export class SquareComponent implements OnInit {
     getSquareSize(): Vec2 {
         return this.squareView.squareSize;
     }
-
-    click() {
-        // eslint-disable-next-line no-console
-        console.log(this.squareView.id);
-    }
 }
