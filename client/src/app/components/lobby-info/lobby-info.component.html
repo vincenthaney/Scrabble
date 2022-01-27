@@ -5,7 +5,6 @@
             Adversaire: Justin 
             <!--Adversaire: {{playerName}} -->
         </div>
-
         <div class="info">
             <mat-icon svgIcon="game-type" aria-hidden="false" aria-label="game-type icon"></mat-icon>
             Type de partie: Classique
@@ -23,7 +22,7 @@
     </div>
    
     <div class="right-side">
-        <button ng-disabled="isDisabled" mat-flat-button color="primary">
+        <button  [disabled]="isDisabled"  mat-flat-button color="primary" (click)="connectSocket()">
             Joindre 
             <span class="material-icons">person_add</span>
         </button>

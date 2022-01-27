@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -20,7 +20,6 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -45,7 +44,7 @@ import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component
         LobbyPageComponent,
         LobbyInfoComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],
 })
