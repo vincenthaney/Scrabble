@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { COLORS } from '@app/classes/color-constants';
-import { BOARD_SIZE, GRID_MARGIN_LETTER, MARGIN_COLUMN_SIZE, SQUARE_SIZE } from '@app/classes/game-constants';
+import { GRID_MARGIN_LETTER, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from '@app/components/square/square-view';
 import { BoardService } from '@app/services/';
@@ -26,10 +26,13 @@ export class BoardComponent implements OnInit {
 
     ngOnInit() {
         this.initializeBoard();
-        this.colAmount = BOARD_SIZE.x + MARGIN_COLUMN_SIZE;
+        this.colAmount = this.gridSize.x + MARGIN_COLUMN_SIZE;
     }
 
     private initializeBoard() {
+        if (!this.gridSize) {
+            this.gridSize = UNDEFINED_GRID_SIZE;
+        }
         this.squareGrid = [];
         this.colorGrid = [];
         for (let i = 0; i < this.gridSize.y; i++) {
