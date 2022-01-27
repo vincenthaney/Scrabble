@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -32,8 +32,9 @@ const GAME_TYPE_ICON =
     styleUrls: ['./lobby-info.component.scss'],
 })
 export class LobbyInfoComponent {
+    @Input() validName: boolean = false;
+
     timer: number;
-    playerName: string;
     // gameMode: GameMode;
     // dictionnaries: Dictionnaries[]
     isDisabled: boolean;
@@ -42,10 +43,10 @@ export class LobbyInfoComponent {
     constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
         iconRegistry.addSvgIconLiteral('versus', sanitizer.bypassSecurityTrustHtml(VERSUS_ICON));
         iconRegistry.addSvgIconLiteral('game-type', sanitizer.bypassSecurityTrustHtml(GAME_TYPE_ICON));
-        this.isDisabled = true;
+        this.validName = false;
     }
 
-    connectSocket() {
+    joinLobby() {
         //
     }
 }

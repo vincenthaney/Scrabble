@@ -22,7 +22,7 @@
     </div>
    
     <div class="right-side">
-        <button  [disabled]="isDisabled"  mat-flat-button color="primary" (click)="connectSocket()">
+        <button  [disabled]="!validName"  mat-flat-button color="primary" (click)="joinLobby()">
             Joindre 
             <span class="material-icons">person_add</span>
         </button>

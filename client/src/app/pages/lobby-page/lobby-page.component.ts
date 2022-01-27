@@ -14,7 +14,8 @@ export class LobbyPageComponent {
         // Validators.minLength(NameValidation.minLength),
         // Validators.maxLength(NameValidation.maxLength),
         Validators.minLength(2),
-        // Validators.maxLength(20),
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        Validators.maxLength(20),
     ]);
     onNameFieldChange(name: string) {
         this.playerName = name;
