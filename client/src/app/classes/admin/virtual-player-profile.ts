@@ -1,5 +1,5 @@
 import { StorableModel } from '@app/classes/admin';
-import { VirtualPlayerLevel } from '../player/virtual-player-level';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 export default class VirtualPlayerProfile extends StorableModel {
     name: string;
