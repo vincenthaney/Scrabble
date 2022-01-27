@@ -19,15 +19,11 @@
             Temps par tour: 1 min
             <!-- Temps par tour: {{timer}} -->
         </div>
-        
-        <!-- <div class="info">
-            <mat-icon svgIcon="dictionnary" aria-hidden="false" aria-label="dictionnary icon"></mat-icon> 
-             Dictionnaire(s) utilisé(s): {{dictionnaries}} 
-        </div> -->
+
     </div>
    
     <div class="right-side">
-        <button mat-flat-button color="primary">
+        <button ng-disabled="isDisabled" mat-flat-button color="primary">
             Joindre 
             <span class="material-icons">person_add</span>
         </button>
