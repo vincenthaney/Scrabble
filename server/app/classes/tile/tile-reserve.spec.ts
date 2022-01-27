@@ -1,6 +1,6 @@
 import * as mock from 'mock-fs';
 import { expect } from 'chai';
-import * as path from 'path';
+import { join } from 'path';
 import { LETTER_VALUES } from '@app/constants/game';
 import { reduce } from '@app/utils/array';
 import TileReserve from './tile-reserve';
@@ -19,7 +19,7 @@ const mockLetterDistribution: LetterDistributionData = {
 // mockPaths must be of type any because keys must be dynamic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockPaths: any = [];
-mockPaths[path.join(__dirname, '../../../assets/letter-distribution.json')] = JSON.stringify(mockLetterDistribution);
+mockPaths[join(__dirname, '../../../assets/letter-distribution.json')] = JSON.stringify(mockLetterDistribution);
 
 describe('TileReserve Test', () => {
     let tileReserve: TileReserve;

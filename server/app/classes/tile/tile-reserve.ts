@@ -1,8 +1,8 @@
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileError from '@app/classes/tile/tiles.errors';
 import { LETTER_VALUES } from '@app/constants/game';
-import * as fs from 'fs';
-import * as path from 'path';
+import { promises } from 'fs';
+import { join } from 'path';
 import { LetterDistributionData, TileData } from './tile.types';
 
 const RESERVE_THRESHOLD = 7;
@@ -19,8 +19,8 @@ export default class TileReserve {
     }
 
     static async fetchLetterDistribution(): Promise<TileData[]> {
-        const filePath = path.join(__dirname, '../../../assets/letter-distribution.json');
-        const dataBuffer = await fs.promises.readFile(filePath, 'utf-8');
+        const filePath = join(__dirname, '../../../assets/letter-distribution.json');
+        const dataBuffer = await promises.readFile(filePath, 'utf-8');
         const data: LetterDistributionData = JSON.parse(dataBuffer);
         return data.tiles;
     }
