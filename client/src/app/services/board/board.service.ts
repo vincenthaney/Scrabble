@@ -6,7 +6,7 @@ import { Vec2 } from '@app/classes/vec2';
 @Injectable({
     providedIn: 'root',
 })
-export class BoardService {
+export default class BoardService {
     private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
     grid: Square[][];
 
