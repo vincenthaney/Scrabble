@@ -3,11 +3,9 @@ import { OnlinePlayer } from '@app/classes/player';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-
 import { WaitingRoomPageComponent } from './waiting-room-page.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { WaitingRoomMessages } from './waiting-room-page.component.const';
-import { By } from '@angular/platform-browser';
 
 let loader: HarnessLoader;
 
@@ -78,21 +76,4 @@ describe('WaitingRoomPageComponent', () => {
         const rejectButton = await loader.getHarness(MatButtonHarness.with({ selector: '#reject-button' })); // === buttons[0]
         expect(await rejectButton.isDisabled()).toBe(true);
     });
-
-    it('should throw error when opponent connects and mat-spinner not generated in DOM', async () => {
-        const testOpponent = new OnlinePlayer();
-        component.opponent = testOpponent;
-        component.setOpponent(testOpponent);
-        const progressSpinner = fixture.debugElement.query(By.css('.spinnerOpponentFound'));
-        expect(progressSpinner).toBeNull();
-    });
-
-    // it('should throw error when opponent connects and mat-spinner not generated in DOM', async () => {
-    //     const testOpponent = new OnlinePlayer();
-    //     component.opponent = testOpponent;
-    //     component.setOpponent(testOpponent);
-    //     component.disconnectOpponent();
-    //     const progressSpinner = fixture.debugElement.query(By.css('.spinnerOpponentFound'));
-    //     expect(progressSpinner).toBeNull();
-    // });
 });
