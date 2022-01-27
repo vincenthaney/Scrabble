@@ -15,6 +15,7 @@ export class BoardComponent implements OnInit {
     readonly marginColumnSize: number = MARGIN_COLUMN_SIZE;
     gridSize: Vec2;
     squareGrid: SquareView[][];
+    colorGrid: COLORS[][];
     colAmount: number;
 
     constructor(private boardService: BoardService) {
@@ -30,13 +31,16 @@ export class BoardComponent implements OnInit {
 
     private initializeBoard() {
         this.squareGrid = [];
+        this.colorGrid = [];
         for (let i = 0; i < this.gridSize.y; i++) {
+            this.colorGrid[i] = [];
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
+                this.colorGrid[i][j] = COLORS.Beige;
                 const square: SquareView = {
                     square: this.boardService.grid[i][j],
                     squareSize: SQUARE_SIZE,
-                    color: COLORS.Beige,
+                    color: this.colorGrid[i][j],
                 };
                 this.squareGrid[i][j] = square;
             }

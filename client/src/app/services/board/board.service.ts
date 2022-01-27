@@ -24,6 +24,7 @@ export default class BoardService {
     }
 
     private initializeBoardGrid() {
+        this.grid = [];
         for (let i = 0; i < BoardService.size.y; i++) {
             this.grid[i] = [];
             for (let j = 0; j < BoardService.size.x; j++) {
