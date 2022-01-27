@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Board } from '@app/classes/board';
 import { COLORS } from '@app/classes/color-constants';
 import { BOARD_SIZE, GRID_MARGIN_LETTER, SQUARE_SIZE } from '@app/classes/game-constants';
+import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from '@app/components/square/square-view';
+import { BoardService } from '@app/services/board/board.service';
 
 const MARGIN_COLUMN_SIZE = 1;
 const ID_MULTIPLIER = 10000;
@@ -15,24 +16,33 @@ const ID_MULTIPLIER = 10000;
 export class BoardComponent implements OnInit {
     readonly marginLetters = GRID_MARGIN_LETTER;
     readonly marginColumnSize: number = MARGIN_COLUMN_SIZE;
-    squares: SquareView[][];
+    gridSize: Vec2;
+    squareGrid: SquareView[][];
     colAmount: number;
 
+    constructor(private boardService: BoardService) {
+        this.marginLetters = GRID_MARGIN_LETTER;
+        this.marginColumnSize = MARGIN_COLUMN_SIZE;
+        this.gridSize = boardService.getGridSize();
+    }
+
     ngOnInit() {
-        this.squares = [];
-        for (let i = 0; i < Board.size.x; i++) {
-            this.squares[i] = [];
-            for (let j = 0; j < Board.size.y; j++) {
+        this.initializeBoard();
+        this.colAmount = BOARD_SIZE.x + MARGIN_COLUMN_SIZE;
+    }
+
+    private initializeBoard() {
+        this.squareGrid = [];
+        for (let i = 0; i < this.gridSize.y; i++) {
+            this.squareGrid[i] = [];
+            for (let j = 0; j < this.gridSize.x; j++) {
                 const square: SquareView = {
                     square: null,
                     squareSize: SQUARE_SIZE,
-                    squarePosition: { x: i, y: j },
                     color: COLORS.Beige,
-                    id: Math.floor(Math.random() * ID_MULTIPLIER),
                 };
-                this.squares[i][j] = square;
+                this.squareGrid[i][j] = square;
             }
         }
-        this.colAmount = BOARD_SIZE.x + MARGIN_COLUMN_SIZE;
     }
 }
