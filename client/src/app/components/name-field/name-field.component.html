@@ -10,6 +10,6 @@
         Votre nom doit contenir au plus 20 caractères.
     </span>
     <span *ngIf="playerNameController.errors?.['pattern'] && !playerNameController.errors?.['maxlength']">
-        Votre nom ne peut contenir que des lettres et des chiffres.
+        Votre nom ne peut pas contenir de caractères spéciaux.
     </span>
 </span>

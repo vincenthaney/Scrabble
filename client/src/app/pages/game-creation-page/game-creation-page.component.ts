@@ -23,7 +23,6 @@ export class GameCreationPageComponent {
     timer: number = DEFAULT_TIMER;
     dictionnaryName: string = 'default';
 
-
     constructor(private router: Router) {}
 
     createGame() {
