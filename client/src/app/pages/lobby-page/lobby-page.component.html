@@ -1,34 +1,58 @@
-<h1>Sélection de partie</h1>
+<div class="container">
+    <body>
+        <h1>Sélection de partie</h1>
+    
+        <form>
+                <mat-label>Nom d'utilisateur : </mat-label>
+                <mat-form-field appearance="fill">
+                    <input matInput id="nom" type="text" placeholder="Ex: MichelGagnon" value="Invité">
+                </mat-form-field>
+        </form>
+        <mat-divider></mat-divider>
+        <div class="grid-container">
+            <div class="grid">
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+                <app-lobby-info></app-lobby-info>
+        </div>
+        
+        
+        </div>
+        
+        <!-- <mat-list> -->
+        
+            <!-- <div mat-subheader>Parties classiques</div>
+            <app-lobby-info *ngFor="let classicLobby of classicLobbies">
+            </app-lobby-info>
+            <mat-divider></mat-divider>
+            <div mat-subheader>Parties classiques</div>
+            <app-lobby-info *ngFor="let specialLobby of specialLobbies">
+            </app-lobby-info> -->
+        <!-- </mat-list> -->
 
-<form>
-        <mat-label>Nom d'utilisateur : </mat-label>
-        <mat-form-field appearance="fill">
-            <input matInput id="nom" type="text" placeholder="Ex: MichelGagnon" value="Invité">
-        </mat-form-field>
-</form>
-<mat-divider></mat-divider>
-<div class="grid-container">
-    <div class="grid">
-        <app-lobby-info></app-lobby-info>
-        <app-lobby-info></app-lobby-info>
-        <app-lobby-info></app-lobby-info>
-        <app-lobby-info></app-lobby-info>
-        <app-lobby-info></app-lobby-info>
+    </body>
+    <footer>
+        <button mat-flat-button color="primary" routerLink="/home">Retour à l'accueil</button> 
+    </footer>
+
 </div>
 
-
-</div>
-
-<!-- <mat-list> -->
-
-    <!-- <div mat-subheader>Parties classiques</div>
-    <app-lobby-info *ngFor="let classicLobby of classicLobbies">
-    </app-lobby-info>
-    <mat-divider></mat-divider>
-    <div mat-subheader>Parties classiques</div>
-    <app-lobby-info *ngFor="let specialLobby of specialLobbies">
-    </app-lobby-info> -->
-<!-- </mat-list> -->
-<footer>
-    <button mat-flat-button color="primary" routerLink="/home">Retour à l'accueil</button> 
-</footer>
