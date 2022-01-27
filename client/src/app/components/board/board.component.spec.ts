@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MARGIN_COLUMN_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
@@ -9,7 +10,8 @@ describe('BoardComponent', () => {
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
 
-    const boardSizesToTest: Vec2[][] = [
+    const boardServiceGridSize: Vec2 = { x: 15, y: 15 };
+    const boardSizesToTest = [
         [
             { x: -1, y: -1 },
             { x: 0, y: 0 },
@@ -30,6 +32,7 @@ describe('BoardComponent', () => {
 
     beforeEach(async () => {
         boardServiceSpy = jasmine.createSpyObj('BoardService', ['getGridSize']);
+        boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
     });
 
     beforeEach(async () => {
@@ -79,5 +82,13 @@ describe('BoardComponent', () => {
                 expect(actualBoardSize).toEqual(expectedBoardSize);
             },
         );
+    });
+
+    it('Call to BoardService getGridSize should assign right value to gridSize', () => {
+        expect(component.gridSize).toEqual(boardServiceGridSize);
+    });
+
+    it('Initialization of colAmount should be BoardService.grid.x + MARGIN_COLUMN_SIZE', () => {
+        expect(component.colAmount).toEqual(boardServiceGridSize.x + MARGIN_COLUMN_SIZE);
     });
 });
