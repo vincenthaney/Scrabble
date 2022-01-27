@@ -41,14 +41,17 @@ button {
 #bottom-buttons {
     display: flex;
     justify-content: space-between;
-    width: 80%;
-    max-width: 500px;
     margin-top: 40px;
+}
+
+.alert-group {
+    height: 0px;
+    color: red;
 }
 
 .alert {
     margin-top: -20px;
-    color: red;
+    
     display: flex;
 
 }

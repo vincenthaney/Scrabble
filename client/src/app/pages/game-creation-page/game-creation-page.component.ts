@@ -1,12 +1,9 @@
 import { Component } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { NAME_VALIDATION } from '@app/classes/name-validation';
-
-// TODO : remove and put in seperate file when timer is implemented
-const DEFAULT_TIMER = 60;
 
 @Component({
     selector: 'app-game-creation-page',
@@ -19,31 +16,29 @@ export class GameCreationPageComponent {
 
     gameType: GameType = GameType.Classic;
     gameMode: GameMode = GameMode.Solo;
-    playerName: string;
 
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
-    timer: number = DEFAULT_TIMER;
-    dictionnaryName: string = 'default';
+    timerOptions: number[];
+    dictoptions: string[];
 
-    playerNameController = new FormControl('', [
-        Validators.pattern(NAME_VALIDATION.rule),
-        Validators.minLength(NAME_VALIDATION.minLength),
-        Validators.maxLength(NAME_VALIDATION.maxLength),
-    ]);
+    gameParameters = new FormGroup({
+        inputTimer: new FormControl('', Validators.required),
+        inputDict: new FormControl('', Validators.required),
+        inputName: new FormControl('', [
+            Validators.required,
+            Validators.pattern(NAME_VALIDATION.rule),
+            Validators.minLength(NAME_VALIDATION.minLength),
+            Validators.maxLength(NAME_VALIDATION.maxLength),
+        ]),
+    });
 
     constructor(private router: Router) {}
 
     createGame() {
-        if (this.playerNameController.invalid) {
-            // open dialog 'please correct username'
-        } else {
+        if (this.gameParameters.valid) {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
         }
-    }
-
-    onNameFieldChange(newName: string) {
-        this.playerName = newName;
     }
 }
