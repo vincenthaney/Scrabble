@@ -42,30 +42,3 @@ export class DefaultDialogComponent {
         if (button.redirect) this.router.navigate([button.redirect]);
     }
 }
-
-/*
-
-HOW TO USE :
-
-    constructor(public dialog: MatDialog) {}
-
-    openDialog() {
-        this.dialog.open(DefaultDialogComponent, {
-            data: {
-                title: 'Dialog title',
-                content: 'This is the dialog content',
-                buttons: [
-                    {
-                        content: 'Close',
-                        closeDialog: true,
-                    },
-                    {
-                        content: 'Ok',
-                        redirect: '/game',
-                    },
-                ],
-            },
-        });
-    }
-
-*/
