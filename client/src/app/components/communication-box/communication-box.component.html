@@ -1,1 +1,25 @@
-<p>communication-box component!</p>
+<section id="objectives-container">
+    <mat-accordion>
+        <mat-expansion-panel hideToggle>
+            <mat-expansion-panel-header>Objectifs</mat-expansion-panel-header>
+            <div *ngFor="let obj of objectives">{{obj}}</div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel hideToggle>
+            <mat-expansion-panel-header>Tuiles restantes</mat-expansion-panel-header>
+            <span *ngFor="let letter of lettersLeft">{{letter}}</span>
+        </mat-expansion-panel>
+
+    </mat-accordion>
+</section>
+
+<section>
+    <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area">
+        <div class="scroll-item" *cdkVirtualFor="let msg of messages">{{msg}}</div>
+    </cdk-virtual-scroll-viewport>
+</section>
+
+<form [formGroup]="messageForm" (ngSubmit)="sendMessage()">
+    <input matInput type="text" formControlName="content" [(ngModel)]="message"/>
+    <button type="submit" mat-flat-button color="primary">Envoyer</button>
+</form>
