@@ -1,8 +1,10 @@
-<div id="player-info-container">
-    <span *ngFor="let player of [player1, player2], let i=index" class="player-info">
-        <p id="player-name-`index`" class="player-name">{{player.name}}</p>
-        <p id="player-name-`index`" class="player-score">Pointage : {{player.score}}</p>
-        <p id="player-name-`index`" class="turn-time">Temps restant : 3:11</p>
-        <p id="player-name-`index`" class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
-    </span>
+<div id="outer-container">
+    <div id="player-info-container">
+        <span *ngFor="let player of [player1, player2], let i = index" class="player-info" attr.id="player-info-{{i+1}}">
+            <p attr.id="player-name-{{i+1}}" class="player-name">{{player.name}}</p>
+            <p attr.id="player-score-{{i+1}}" class="player-score">Pointage : {{player.score}}</p>
+            <p attr.id="player-time-{{i+1}}" class="turn-time">Temps restant : 3:11</p>
+            <p attr.id="player-tiles-{{i+1}}" class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
+        </span>
+    </div>
 </div>

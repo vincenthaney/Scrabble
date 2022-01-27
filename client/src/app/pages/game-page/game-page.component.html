@@ -1,6 +1,6 @@
 <!-- TODO: Change hardcoded values (Right now 10 cols 
     and 10 rows and each row is 9.9 % of screen height) -->
- <mat-grid-list cols="10" rowHeight="4.95vh">
+ <mat-grid-list cols="10" rowHeight="4.44vh">
     <mat-grid-tile 
     [colspan] = "10"
     [rowspan] = "3"
@@ -10,21 +10,21 @@
 
     <mat-grid-tile 
     [colspan] = "1"
-    [rowspan] = "9"
+    [rowspan] = "19"
     [style.background]="'green'">
     VIDE
     </mat-grid-tile>
 
     <mat-grid-tile 
     [colspan] = "6"
-    [rowspan] = "7"
+    [rowspan] = "15"
     [style.background]="'lightblue'">
         <app-board id="board"></app-board> 
     </mat-grid-tile>
 
     <mat-grid-tile 
     [colspan] = "2"
-    [rowspan] = "9"
+    [rowspan] = "19"
     [style.background]="'purple'">
         <div class="space-between">
             <app-communication-box id="communication-box"></app-communication-box>
@@ -37,14 +37,14 @@
 
     <mat-grid-tile 
     [colspan] = "1"
-    [rowspan] = "9"
+    [rowspan] = "19"
     [style.background]="'green'">
     VIDE
     </mat-grid-tile>
 
     <mat-grid-tile 
     [colspan] = "6"
-    [rowspan] = "1"
+    [rowspan] = "3"
     [style.background]="'pink'">
         <app-rack ></app-rack>
     </mat-grid-tile>

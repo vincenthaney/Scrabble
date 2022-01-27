@@ -9,6 +9,4 @@ import { OnlinePlayer, Opponent, Player } from '@app/classes/player';
 export class InformationBoxComponent {
     player1: Player = new Player("Mathilde");
     player2: Opponent = new OnlinePlayer("Raphael");
-
-    
 }
