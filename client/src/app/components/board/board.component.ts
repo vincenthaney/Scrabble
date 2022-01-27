@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { COLORS } from '@app/classes/color-constants';
-import { BOARD_SIZE, GRID_MARGIN_LETTER, SQUARE_SIZE } from '@app/classes/game-constants';
+import { BOARD_SIZE, GRID_MARGIN_LETTER, MARGIN_COLUMN_SIZE, SQUARE_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from '@app/components/square/square-view';
-import { BoardService } from '@app/services/board/board.service';
-
-const MARGIN_COLUMN_SIZE = 1;
-const ID_MULTIPLIER = 10000;
+import { BoardService } from '@app/services/';
 
 @Component({
     selector: 'app-board',
@@ -23,7 +20,7 @@ export class BoardComponent implements OnInit {
     constructor(private boardService: BoardService) {
         this.marginLetters = GRID_MARGIN_LETTER;
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
-        this.gridSize = boardService.getGridSize();
+        this.gridSize = this.boardService.getGridSize();
     }
 
     ngOnInit() {
@@ -37,7 +34,7 @@ export class BoardComponent implements OnInit {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
                 const square: SquareView = {
-                    square: null,
+                    square: this.boardService.grid[i][j],
                     squareSize: SQUARE_SIZE,
                     color: COLORS.Beige,
                 };

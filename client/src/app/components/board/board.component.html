@@ -4,7 +4,7 @@
             <p *ngIf="i > 0" class="letter-number-grid">{{ i }}</p>
         </mat-grid-tile>
 
-        <div *ngFor="let squareRow of squares; let i = index">
+        <div *ngFor="let squareRow of squareGrid; let i = index">
             <mat-grid-tile [colspan]="marginColumnSize" [rowspan]="1">
                 <p class="letter-number-grid">{{ marginLetters[i] }}</p>
             </mat-grid-tile>
