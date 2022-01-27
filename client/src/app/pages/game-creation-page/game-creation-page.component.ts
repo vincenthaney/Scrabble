@@ -22,13 +22,14 @@ export class GameCreationPageComponent {
     playerName: string;
 
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
-    timer: number = DEFAULT_TIMER;    
+    timer: number = DEFAULT_TIMER;
     dictionnaryName: string = 'default';
 
     playerNameController = new FormControl('', [
         Validators.pattern(NameValidation.rule),
         Validators.minLength(NameValidation.minLength),
-        Validators.maxLength(NameValidation.maxLength)]);
+        Validators.maxLength(NameValidation.maxLength)],
+    );
 
     constructor(private router: Router) {}
 
@@ -42,7 +43,7 @@ export class GameCreationPageComponent {
         }
     }
 
-    onNameFieldChange(event: any) {
-        this.playerName = event.target.value;
+    onNameFieldChange(newName: string) {
+        this.playerName! = newName;
     }
 }

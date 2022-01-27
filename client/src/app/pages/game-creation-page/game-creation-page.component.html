@@ -29,7 +29,7 @@
 
         <mat-form-field appearance="outline">
             <mat-label>Nom du joueur</mat-label>
-            <input matInput id="playerNameController" type="text" [formControl]="playerNameController" autocomplete="off" (change)="onNameFieldChange($event)">
+            <input matInput id="playerNameController" type="text" [formControl]="playerNameController" autocomplete="off" (ngModelChange)="onNameFieldChange($event)">
         </mat-form-field>
         <span *ngIf="playerNameController.invalid && (playerNameController.dirty || playerNameController.touched)" class="alert">
             <span *ngIf="playerNameController.errors?.['minlength']">
