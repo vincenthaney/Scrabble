@@ -3,7 +3,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-import { NameValidation } from '@app/classes/name-validation';
+import { NAME_VALIDATION } from '@app/classes/name-validation';
 
 // TODO : remove and put in seperate file when timer is implemented
 const DEFAULT_TIMER = 60;
@@ -26,9 +26,9 @@ export class GameCreationPageComponent {
     dictionnaryName: string = 'default';
 
     playerNameController = new FormControl('', [
-        Validators.pattern(NameValidation.rule),
-        Validators.minLength(NameValidation.minLength),
-        Validators.maxLength(NameValidation.maxLength),
+        Validators.pattern(NAME_VALIDATION.rule),
+        Validators.minLength(NAME_VALIDATION.minLength),
+        Validators.maxLength(NAME_VALIDATION.maxLength),
     ]);
 
     constructor(private router: Router) {}
