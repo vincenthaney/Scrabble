@@ -6,6 +6,9 @@ import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { WaitingRoomPageComponent } from './waiting-room-page.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { WaitingRoomMessages } from './waiting-room-page.component.const';
+import { MatDialogModule } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 
 let loader: HarnessLoader;
 
@@ -16,7 +19,7 @@ describe('WaitingRoomPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [WaitingRoomPageComponent],
-            imports: [MatProgressSpinnerModule],
+            imports: [MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
         }).compileComponents();
         fixture = TestBed.createComponent(WaitingRoomPageComponent);
         loader = TestbedHarnessEnvironment.loader(fixture);
