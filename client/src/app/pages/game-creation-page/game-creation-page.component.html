@@ -21,6 +21,13 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
+            <mat-label>Dictionnaire utilisé</mat-label>
+            <mat-select [(value)]="dictionnaryName" placeholder="Par défaut (Français)">
+                <mat-option value="default">Par défaut (Français)</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
             <mat-label>Nom du joueur</mat-label>
             <input matInput id="playerNameController" type="text" [(ngModel)]="playerName" [formControl]="playerNameController" autocomplete="off">
         </mat-form-field>

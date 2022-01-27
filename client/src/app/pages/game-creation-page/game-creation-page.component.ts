@@ -17,7 +17,7 @@ export class GameCreationPageComponent implements OnInit {
   gameMode: GameMode = GameMode.Solo;
   timer: number = 60;
   playerName: string;
-  //Dictionary;
+  dictionnaryName: string = "default";
 
   playerNameController = new FormControl('', [
     Validators.pattern("^([a-zA-Z0-9]+[ '\\-]{0,1})*$"),
