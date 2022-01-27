@@ -3,14 +3,14 @@
     
     <section id="game-parameters">
         <h1>Créez une partie</h1>
-        <mat-button-toggle-group color="primary" id="first" [(ngModel)]="gameType" name="gameType" aria-label="Game Type">
+        <mat-button-toggle-group color="primary" [(ngModel)]="gameType" name="gameType" aria-label="Game Type">
             <mat-button-toggle id="log2990-button" [value]="GameType.Classic">{{GameType.Classic}}</mat-button-toggle>
             <mat-button-toggle id="classic-button" [value]="GameType.LOG2990">{{GameType.LOG2990}}</mat-button-toggle>
         </mat-button-toggle-group>
 
         <mat-button-toggle-group color="primary" [(ngModel)]="gameMode" name="gameMode" aria-label="Game Mode">
-            <mat-button-toggle [value]="GameMode.Solo">{{GameMode.Solo}}</mat-button-toggle>
-            <mat-button-toggle [value]="GameMode.Multiplayer">{{GameMode.Multiplayer}}</mat-button-toggle>
+            <mat-button-toggle id="solo-button" [value]="GameMode.Solo">{{GameMode.Solo}}</mat-button-toggle>
+            <mat-button-toggle id="multi-button" [value]="GameMode.Multiplayer">{{GameMode.Multiplayer}}</mat-button-toggle>
         </mat-button-toggle-group>
 
         <mat-form-field appearance="outline">
@@ -39,7 +39,7 @@
                 Votre nom doit contenir au plus 20 caractères.
             </span>
             <span *ngIf="playerNameController.errors?.['pattern'] && !playerNameController.errors?.['maxlength']">
-                Votre nom peut contenir que des lettres et des chiffres.
+                Votre nom ne peut contenir que des lettres et des chiffres.
             </span>
         </span>
 
