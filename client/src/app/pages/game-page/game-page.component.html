@@ -1,6 +1,61 @@
-<div class="container">
-    <app-sidebar></app-sidebar>
-    <section class="play-area-container">
-        <app-play-area class="play-area" tabindex="0"></app-play-area>
-    </section>
-</div>
+<!-- TODO: Change hardcoded values (Right now 10 cols 
+    and 10 rows and each row is 9.9 % of screen height) -->
+ <mat-grid-list cols="10" rowHeight="9.9vh">
+    <mat-grid-tile 
+    [colspan] = "10"
+    [rowspan] = "1"
+    [style.background]="'red'">
+        <app-information-box id="info-box"></app-information-box>
+    </mat-grid-tile>
+
+    <mat-grid-tile 
+    [colspan] = "1"
+    [rowspan] = "9"
+    [style.background]="'green'">
+    VIDE
+    </mat-grid-tile>
+
+    <mat-grid-tile 
+    [colspan] = "6"
+    [rowspan] = "7"
+    [style.background]="'lightblue'">
+        <app-board id="board"></app-board> 
+    </mat-grid-tile>
+
+    <mat-grid-tile 
+    [colspan] = "2"
+    [rowspan] = "9"
+    [style.background]="'purple'">
+        <div class="space-between">
+            <app-communication-box id="communication-box"></app-communication-box>
+            <div id="text-button-container">        
+                <button mat-flat-button color="primary">Agrandir la police</button>
+                <button mat-flat-button color="primary">Réduire la police</button>
+            </div>
+        </div>
+    </mat-grid-tile>
+
+    <mat-grid-tile 
+    [colspan] = "1"
+    [rowspan] = "9"
+    [style.background]="'green'">
+    VIDE
+    </mat-grid-tile>
+
+    <mat-grid-tile 
+    [colspan] = "6"
+    [rowspan] = "1"
+    [style.background]="'pink'">
+        <app-rack ></app-rack>
+    </mat-grid-tile>
+
+    <mat-grid-tile 
+    [colspan] = "6"
+    [rowspan] = "1"
+    [style.background]="'orange'">
+        <button mat-flat-button color="primary">Passer</button>
+        <button mat-flat-button color="primary">Placer</button>
+        <button mat-flat-button id="surrender-dialog-button"(click)="openDialog()" color="primary">Abandonner</button> 
+        <button mat-flat-button color="primary">Confirmer action</button>
+    </mat-grid-tile>
+ </mat-grid-list>
