@@ -3,10 +3,10 @@
         {{messageWaitingRoom}}
         <mat-progress-spinner class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
     </div>
-    <button class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
+    <button id="start-game-button" class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
         Démarrer la partie
     </button>
-    <button class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
+    <button id="reject-button" class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
         Rejeter adversaire
     </button>
     <img class="image" src="https://bit.ly/3m206ss" width="100" height="20" alt="Logo Scrabble" />

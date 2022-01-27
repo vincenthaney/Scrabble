@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { IPlayer } from '@app/classes/player';
+import { OnlinePlayer } from '@app/classes/player';
+import { WaitingRoomMessages } from './waiting-room-page.component.const';
 
 @Component({
     selector: 'app-waiting-room-page',
@@ -7,19 +8,24 @@ import { IPlayer } from '@app/classes/player';
     styleUrls: ['./waiting-room-page.component.scss'],
 })
 export class WaitingRoomPageComponent {
-    @Input() opponent: IPlayer;
-    messageWaitingRoom: string;
-    constructor() {
-        this.messageWaitingRoom = "En attente qu'un adversaire se joigne à votre partie.";
+    @Input() opponent: OnlinePlayer | undefined;
+    host: OnlinePlayer;
+    messageWaitingRoom: string = WaitingRoomMessages.HostWaitingMessage;
+    isOpponentFound: boolean;
+
+    setHost(host: OnlinePlayer) {
+        this.host = host;
     }
 
-    isOpponentFound() {
-        if (this.opponent == null) {
-            this.messageWaitingRoom = "En attente qu'un adversaire se joigne à votre partie.";
-            return false;
-        } else {
-            this.messageWaitingRoom = IPlayer.name + ' à rejoint votre partie.';
-            return true;
-        }
+    setOpponent(opponent: OnlinePlayer) {
+        this.opponent = opponent;
+        this.messageWaitingRoom = this.opponent.name + WaitingRoomMessages.OpponentFoundMessage;
+        this.isOpponentFound = true;
+    }
+
+    disconnectOpponent() {
+        this.opponent = undefined;
+        this.messageWaitingRoom = WaitingRoomMessages.HostWaitingMessage;
+        this.isOpponentFound = false;
     }
 }
