@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { UNDEFINED_LETTER, UNDEFINED_LETTER_VALUE } from '@app/classes/game-constants';
+import { UNDEFINED_TILE } from '@app/classes/game-constants';
 import { Tile } from '@app/classes/tile';
 
 @Component({
@@ -13,10 +13,7 @@ export class TileComponent {
 
     getTile() {
         if (!this.tile) {
-            return {
-                letter: UNDEFINED_LETTER,
-                value: UNDEFINED_LETTER_VALUE,
-            };
+            return UNDEFINED_TILE;
         }
         return this.tile;
     }
