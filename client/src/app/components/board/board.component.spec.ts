@@ -9,7 +9,7 @@ describe('BoardComponent', () => {
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
 
-    const boardSizesToTest: Map<Vec2, Vec2> = new Map([
+    const boardSizesToTest: Vec2[][] = [
         [
             { x: -1, y: -1 },
             { x: 0, y: 0 },
@@ -26,7 +26,7 @@ describe('BoardComponent', () => {
             { x: 15, y: 10 },
             { x: 15, y: 10 },
         ],
-    ]);
+    ];
 
     beforeEach(async () => {
         boardServiceSpy = jasmine.createSpyObj('BoardService', ['getGridSize']);
@@ -50,19 +50,34 @@ describe('BoardComponent', () => {
     });
 
     boardSizesToTest.forEach((testCase) => {
-        const boardSize = testCase;
-        const expectedBoardSize: Vec2 | undefined = boardSizesToTest.get(testCase);
+        const boardSize = testCase[0];
+        const expectedBoardSize: Vec2 | undefined = testCase[1];
+
         if (!expectedBoardSize) {
             // eslint-disable-next-line no-console
             console.log('Test board size was not mapped to expected board size');
             return;
         }
-        it('Initializing board of size' + boardSize + ' should create board of size' + expectedBoardSize, () => {
-            component.gridSize = boardSize;
-            // eslint-disable-next-line dot-notation
-            component['initializeBoard']();
-            const actualBoardSize: Vec2 = { x: component.squareGrid[0].length, y: component.squareGrid.length };
-            expect(actualBoardSize).toBe(expectedBoardSize);
-        });
+        it(
+            'Initializing board of size ' +
+                boardSize.x +
+                ' : ' +
+                boardSize.y +
+                ' should create board of size ' +
+                expectedBoardSize.x +
+                ' : ' +
+                expectedBoardSize.y,
+            () => {
+                component.gridSize = boardSize;
+                // eslint-disable-next-line dot-notation
+                component['initializeBoard']();
+
+                const actualRowAmount = component.squareGrid.length;
+                const actualColAmount = expectedBoardSize.y <= 0 ? 0 : component.squareGrid[0].length;
+
+                const actualBoardSize: Vec2 = { x: actualColAmount, y: actualRowAmount };
+                expect(actualBoardSize).toEqual(expectedBoardSize);
+            },
+        );
     });
 });

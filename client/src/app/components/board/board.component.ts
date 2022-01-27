@@ -40,12 +40,13 @@ export class BoardComponent implements OnInit {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
                 this.colorGrid[i][j] = COLORS.Beige;
-                const square: SquareView = {
-                    square: this.boardService.grid[i][j],
+                const square = this.boardService.grid && this.boardService.grid[i] ? this.boardService.grid[i][j] : null;
+                const squareView: SquareView = {
+                    square,
                     squareSize: SQUARE_SIZE,
                     color: this.colorGrid[i][j],
                 };
-                this.squareGrid[i][j] = square;
+                this.squareGrid[i][j] = squareView;
             }
         }
     }
