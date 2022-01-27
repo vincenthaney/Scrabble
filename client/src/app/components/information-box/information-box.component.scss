@@ -1,0 +1,19 @@
+#player-info-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100%;
+    width: 100vw;
+    line-height: 10px;
+}
+
+.player-info-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.player-name {
+    font-size: 1.5em;
+    font-weight: 500;
+    padding-bottom: 5px;
+}

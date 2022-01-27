@@ -1,1 +1,8 @@
-<p>information-box component!</p>
+<div id="player-info-container">
+    <span *ngFor="let player of [player1, player2], let i=index" class="player-info">
+        <p id="player-name-`index`" class="player-name">{{player.name}}</p>
+        <p id="player-name-`index`" class="player-score">Pointage : {{player.score}}</p>
+        <p id="player-name-`index`" class="turn-time">Temps restant : 3:11</p>
+        <p id="player-name-`index`" class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
+    </span>
+</div>
