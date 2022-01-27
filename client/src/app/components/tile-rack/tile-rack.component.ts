@@ -17,8 +17,14 @@ export class TileRackComponent implements OnInit {
 
     private initializeTileRack() {
         this.tiles = [];
+        if (!this.gameService.localPlayer || !this.gameService.localPlayer.tiles) {
+            return;
+        }
+
         this.gameService.localPlayer.tiles.forEach((tile: Tile) => {
-            this.tiles.push({ letter: tile.letter, value: tile.value });
+            if (tile) {
+                this.tiles.push({ letter: tile.letter, value: tile.value });
+            }
         });
     }
 }
