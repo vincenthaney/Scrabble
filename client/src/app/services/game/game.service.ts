@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { INIT_PLAYER_TILE_AMOUNT } from '@app/classes/game-constants';
 // import { Action } from '@app/classes/actions';
 import { GameType } from '@app/classes/game-type';
+import { IPlayer } from '@app/classes/player';
 import { TileReserve } from '@app/classes/tile-reserve';
 import { RoundManagerService } from '@app/services/';
 
@@ -13,8 +13,8 @@ export default class GameService {
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
     roundManagerService: RoundManagerService;
-    // player1: IPlayer;
-    // player2: IPlayer;
+    localPlayer: IPlayer;
+    opponentPlayer: IPlayer;
     tileReserve: TileReserve;
     wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
     gameType: GameType;
@@ -23,10 +23,6 @@ export default class GameService {
     //     throw new Error('Method not implemented.');
     // }
 
-    // REMOVE WHEN WE CAN GET TILES FROM PLAYER
-    getInitPlayerTileAmount(): number {
-        return INIT_PLAYER_TILE_AMOUNT;
-    }
     isGameOver(): boolean {
         throw new Error('Method not implemented.');
     }

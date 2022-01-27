@@ -13,9 +13,10 @@
     display: grid;
     grid-template-columns: 70% 30%;
     grid-template-rows: 100%;
+    align-self: center;
 }
 
-#rack-card {
+#rack-tile-card {
     padding: 0px;
     // width: calc(100% - 24px);
     height: 100%;
@@ -26,18 +27,26 @@
     max-width: 600px;
 }
 
-#rack-button {
+.rack-card {
+    padding: 0px;
+    // width: calc(100% - 24px);
+    height: 100%;
+    background-color: brown;
+}
+
+#rack-button-container {
     display: grid;
-    grid-row: span 2;
     grid-template-rows: 50% 50%;
     height: 100%;
     padding: 0px;
-    background-color: brown;
+    border-radius: 3px;
+    align-items: center;
 }
 
 .btn-rack {
     margin: 5px 50px;
     padding: 0px;
+    // align-self: center;
 }
 .rack-tile {
     // height: 100%;
