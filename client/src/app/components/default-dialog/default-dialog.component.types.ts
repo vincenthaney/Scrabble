@@ -1,8 +1,8 @@
 export interface DefaultDialogButtonParameters {
     content: string;
-    closeDialog: boolean;
+    closeDialog?: boolean;
     action?: () => void;
-    redirect: string;
+    redirect?: string;
 }
 export interface DefaultDialogParameters {
     title: string;
