@@ -15,7 +15,7 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 @Component({
-    template: '' 
+    template: '',
 })
 class TestComponent {}
 
@@ -31,9 +31,9 @@ describe('GameCreationPageComponent', () => {
             imports: [
                 AppMaterialModule,
                 BrowserAnimationsModule,
-                FormsModule, 
+                FormsModule,
                 ReactiveFormsModule,
-                CommonModule, 
+                CommonModule,
                 MatButtonToggleModule,
                 MatButtonModule,
                 MatFormFieldModule,
@@ -41,8 +41,9 @@ describe('GameCreationPageComponent', () => {
                 MatInputModule,
                 RouterTestingModule.withRoutes([
                     { path: 'waiting-room', component: TestComponent },
-                    { path: 'home', component: TestComponent }
-            ])],
+                    { path: 'home', component: TestComponent },
+                ]),
+            ],
             providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness],
         }).compileComponents();
     });
@@ -94,5 +95,4 @@ describe('GameCreationPageComponent', () => {
             expect(location.path()).toBe('/home');
         });
     });
-
 });

@@ -6,7 +6,7 @@ import { GameType } from '@app/classes/game-type';
 import { NameValidation } from '@app/classes/name-validation';
 
 // TODO : remove and put in seperate file when timer is implemented
-const DEFAULT_TIMER: number = 60;
+const DEFAULT_TIMER = 60;
 
 @Component({
     selector: 'app-game-creation-page',
@@ -44,7 +44,5 @@ export class GameCreationPageComponent {
 
     onNameFieldChange(event: any) {
         this.playerName = event.target.value;
-        console.log(event.target.value);
     }
-
 }
