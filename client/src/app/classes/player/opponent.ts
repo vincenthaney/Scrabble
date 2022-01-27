@@ -1,8 +1,7 @@
-import EventEmitter from 'events';
 import IPlayer from './iplayer';
 
 export default abstract class Opponent extends IPlayer {
-    events: EventEmitter;
+    events: Event;
 
     /**
      * Indicate to the opponent that it is his turn to play.
