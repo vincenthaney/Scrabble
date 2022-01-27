@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { COLORS } from '@app/classes/color-constants';
+import { DEFAULT_SQUARE_COLOR } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from './square-view';
 
@@ -23,7 +23,7 @@ export class SquareComponent implements OnInit {
     private initializeColor() {
         if (!this.squareView || !this.squareView.color) {
             this.style = {
-                'background-color': COLORS.Beige,
+                'background-color': DEFAULT_SQUARE_COLOR,
             };
             return;
         }
