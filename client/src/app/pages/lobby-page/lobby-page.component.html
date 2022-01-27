@@ -1,14 +1,26 @@
 <h1>Sélection de partie</h1>
 
 <form>
-        <label for="nom">Nom d'utilisateur: </label> 
+        <mat-label>Nom d'utilisateur : </mat-label>
         <mat-form-field appearance="fill">
-            <input matInput id="nom" type="text" placeholder="Ex:Michel Gagnon" value="Joueur 1">
+            <input matInput id="nom" type="text" placeholder="Ex: MichelGagnon" value="Invité">
         </mat-form-field>
 </form>
 <mat-divider></mat-divider>
+<div class="grid-container">
+    <div class="grid">
+        <app-lobby-info></app-lobby-info>
+        <app-lobby-info></app-lobby-info>
+        <app-lobby-info></app-lobby-info>
+        <app-lobby-info></app-lobby-info>
+        <app-lobby-info></app-lobby-info>
+</div>
 
-<mat-list>
+
+</div>
+
+<!-- <mat-list> -->
+
     <!-- <div mat-subheader>Parties classiques</div>
     <app-lobby-info *ngFor="let classicLobby of classicLobbies">
     </app-lobby-info>
@@ -16,7 +28,7 @@
     <div mat-subheader>Parties classiques</div>
     <app-lobby-info *ngFor="let specialLobby of specialLobbies">
     </app-lobby-info> -->
-</mat-list>
+<!-- </mat-list> -->
 <footer>
-    <button mat-flat-button color="primary" routerLink="/home">Retour à l'accueil</button>
+    <button mat-flat-button color="primary" routerLink="/home">Retour à l'accueil</button> 
 </footer>
