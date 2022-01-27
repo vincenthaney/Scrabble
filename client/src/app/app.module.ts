@@ -20,6 +20,8 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
+import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -43,6 +45,7 @@ import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component
         WaitingPageComponent,
         LobbyPageComponent,
         LobbyInfoComponent,
+        DefaultDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
     providers: [],
