@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MARGIN_COLUMN_SIZE } from '@app/classes/game-constants';
+import { MARGIN_COLUMN_SIZE, UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
@@ -32,7 +32,6 @@ describe('BoardComponent', () => {
 
     beforeEach(async () => {
         boardServiceSpy = jasmine.createSpyObj('BoardService', ['getGridSize']);
-        boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
     });
 
     beforeEach(async () => {
@@ -54,7 +53,7 @@ describe('BoardComponent', () => {
 
     boardSizesToTest.forEach((testCase) => {
         const boardSize = testCase[0];
-        const expectedBoardSize: Vec2 | undefined = testCase[1];
+        const expectedBoardSize: Vec2 = testCase[1];
 
         if (!expectedBoardSize) {
             // eslint-disable-next-line no-console
@@ -85,10 +84,24 @@ describe('BoardComponent', () => {
     });
 
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {
+        boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
+
+        fixture = TestBed.createComponent(BoardComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
         expect(component.gridSize).toEqual(boardServiceGridSize);
     });
 
     it('Initialization of colAmount should be BoardService.grid.x + MARGIN_COLUMN_SIZE', () => {
+        boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
+
+        fixture = TestBed.createComponent(BoardComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
         expect(component.colAmount).toEqual(boardServiceGridSize.x + MARGIN_COLUMN_SIZE);
+    });
+
+    it('If BoardService returns no grid, component should have UNDEFINED_GRID_SIZE size', () => {
+        expect(component.gridSize).toEqual(UNDEFINED_GRID_SIZE);
     });
 });

@@ -21,7 +21,11 @@ export class BoardComponent implements OnInit {
     constructor(private boardService: BoardService) {
         this.marginLetters = GRID_MARGIN_LETTER;
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
+
         this.gridSize = this.boardService.getGridSize();
+        if (!this.gridSize) {
+            this.gridSize = UNDEFINED_GRID_SIZE;
+        }
     }
 
     ngOnInit() {
@@ -30,9 +34,6 @@ export class BoardComponent implements OnInit {
     }
 
     private initializeBoard() {
-        if (!this.gridSize) {
-            this.gridSize = UNDEFINED_GRID_SIZE;
-        }
         this.squareGrid = [];
         this.colorGrid = [];
         for (let i = 0; i < this.gridSize.y; i++) {
