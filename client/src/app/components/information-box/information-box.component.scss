@@ -3,13 +3,14 @@
     height: 100%;
 }
 
-#player-info-container {
+#inner-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     line-height: 7px;
     margin: 30px 10vw;
     vertical-align: middle;
+    align-items: center;
 }
 
 .player-info-container {
@@ -26,4 +27,16 @@
 
 #player-info-2 {
     text-align: right;
+}
+
+#time-left-container {
+    text-align: center;
+    border-color:black;
+    border-width: 5px;
+}
+
+#time-left {
+    font-size: 2em;
+    font-weight: 500;
+    margin-top: 15px;
 }
