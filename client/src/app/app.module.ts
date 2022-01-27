@@ -16,6 +16,7 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { BoardComponent } from './components/board/board.component';
 import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
+import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
@@ -42,6 +43,7 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         SurrenderDialogComponent,
         WaitingPageComponent,
         GameCreationPageComponent,
+        DefaultDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
     providers: [],
