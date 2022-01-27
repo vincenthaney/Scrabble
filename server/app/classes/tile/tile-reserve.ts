@@ -1,32 +1,43 @@
-import { Tile } from '@app/classes/tile';
-import LetterDistribution from '@app/data/letter-distribution.json';
+import { LetterValue, Tile } from '@app/classes/tile';
+import TileError from '@app/classes/tile/tiles.errors';
 import { LETTER_VALUES } from '@app/constants/game';
-import { LetterValue } from './tile.types';
-import TileError from './tiles.errors';
+import * as fs from 'fs';
+import * as path from 'path';
+import { LetterDistributionData, TileData } from './tile.types';
 
 const RESERVE_THRESHOLD = 7;
 
 export default class TileReserve {
     private tiles: Tile[];
     private referenceTiles: Tile[];
+    private initialized: boolean;
 
     constructor() {
-        this.tiles = TileReserve.initTiles();
-        this.referenceTiles = [...this.tiles];
+        this.tiles = [];
+        this.referenceTiles = [];
+        this.initialized = false;
     }
 
-    private static initTiles(): Tile[] {
-        const tiles: Tile[] = [];
-        LetterDistribution.tiles.forEach((tile) => {
+    static async fetchLetterDistribution(): Promise<TileData[]> {
+        const filePath = path.join(__dirname, '../../../assets/letter-distribution.json');
+        const dataBuffer = await fs.promises.readFile(filePath, 'utf-8');
+        const data: LetterDistributionData = JSON.parse(dataBuffer);
+        return data.tiles;
+    }
+
+    async init(): Promise<void> {
+        const letterDistribution = await TileReserve.fetchLetterDistribution();
+        letterDistribution.forEach((tile) => {
             for (let i = 0; i < tile.amount; ++i) {
-                tiles.push({ letter: tile.letter as LetterValue, value: tile.score });
+                this.tiles.push({ letter: tile.letter as LetterValue, value: tile.score });
             }
         });
-
-        return tiles;
+        this.referenceTiles = [...this.tiles];
+        this.initialized = true;
     }
 
     getTiles(amount: number): Tile[] {
+        if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         if (amount < 1) throw new Error(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
         if (this.tiles.length < amount) throw new Error(TileError.NOT_ENOUGH_TILES);
 
@@ -40,6 +51,7 @@ export default class TileReserve {
     }
 
     swapTiles(tilesToSwap: Tile[]): Tile[] {
+        if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         if (this.tiles.length < tilesToSwap.length) throw new Error(TileError.NOT_ENOUGH_TILES);
         if (this.tiles.length < RESERVE_THRESHOLD) throw new Error(TileError.MUST_HAVE_7_TILES_TO_SWAP);
         if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
@@ -51,10 +63,12 @@ export default class TileReserve {
     }
 
     getTilesLeft(): number {
+        if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         return this.tiles.length;
     }
 
     getTilesLeftPerLetter(): Map<LetterValue, number> {
+        if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         const map = new Map<LetterValue, number>();
 
         LETTER_VALUES.forEach((letter) => {
@@ -62,6 +76,10 @@ export default class TileReserve {
         });
 
         return map;
+    }
+
+    isInitialized(): boolean {
+        return this.initialized;
     }
 
     private removeTile(tile: Tile): void {
