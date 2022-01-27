@@ -33,14 +33,14 @@ describe('WaitingRoomPageComponent', () => {
     });
 
     it("should throw error when opponent connects and message doesn't change", async () => {
-        const testOpponent = new OnlinePlayer();
+        const testOpponent = new OnlinePlayer('testName');
         testOpponent.name = 'testName';
         component.setOpponent(testOpponent);
         expect(component.messageWaitingRoom).toEqual(testOpponent.name + WaitingRoomMessages.OpponentFoundMessage);
     });
 
     it("should throw error when opponent disconnects and message doesn't change", async () => {
-        const testOpponent = new OnlinePlayer();
+        const testOpponent = new OnlinePlayer('testName');
         testOpponent.name = 'testName';
         component.setOpponent(testOpponent);
         component.disconnectOpponent();
@@ -48,21 +48,21 @@ describe('WaitingRoomPageComponent', () => {
     });
 
     it('should throw error when opponent connects and start-button stays disabled', async () => {
-        const testOpponent = new OnlinePlayer();
+        const testOpponent = new OnlinePlayer('testName');
         component.setOpponent(testOpponent);
         const startButton = await loader.getHarness(MatButtonHarness.with({ selector: '#start-game-button' })); // === buttons[0]
         expect(await startButton.isDisabled()).toBe(true);
     });
 
     it('should throw error when opponent connects and reject-button stays disabled', async () => {
-        const testOpponent = new OnlinePlayer();
+        const testOpponent = new OnlinePlayer('testName');
         component.opponent = testOpponent;
         const rejectButton = await loader.getHarness(MatButtonHarness.with({ selector: '#reject-button' })); // === buttons[0]
         expect(await rejectButton.isDisabled()).toBe(true);
     });
 
     it('should throw error when opponent disconnects and start-button stays enabled', async () => {
-        const testOpponent = new OnlinePlayer();
+        const testOpponent = new OnlinePlayer('testName');
         component.opponent = testOpponent;
         component.disconnectOpponent();
         const startButton = await loader.getHarness(MatButtonHarness.with({ selector: '#start-game-button' })); // === buttons[0]
@@ -70,7 +70,7 @@ describe('WaitingRoomPageComponent', () => {
     });
 
     it('should throw error when opponent disconnects and reject-button stays enabled', async () => {
-        const testOpponent = new OnlinePlayer();
+        const testOpponent = new OnlinePlayer('testName');
         component.opponent = testOpponent;
         component.disconnectOpponent();
         const rejectButton = await loader.getHarness(MatButtonHarness.with({ selector: '#reject-button' })); // === buttons[0]
