@@ -5,40 +5,46 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { NameValidation } from '@app/classes/name-validation';
 
-@Component({  
+// TODO : remove and put in seperate file when timer is implemented
+const DEFAULT_TIMER: number = 60;
+
+@Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
-    styleUrls: ['./game-creation-page.component.scss']
+    styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent {
-    GameType = GameType;
-    GameMode = GameMode;
-
-    // TODO : remove and put in seperate file when timer is implemented
-    readonly DEFAULT_TIMER: number = 60;
+    gameTypes = GameType;
+    gameModes = GameMode;
 
     gameType: GameType = GameType.Classic;
     gameMode: GameMode = GameMode.Solo;
-    timer: number = this.DEFAULT_TIMER;
     playerName: string;
+
+    // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
+    timer: number = DEFAULT_TIMER;    
     dictionnaryName: string = 'default';
 
     playerNameController = new FormControl('', [
-    Validators.pattern(NameValidation.RULE),
-    Validators.minLength(NameValidation.MIN_LENGTH),
-    Validators.maxLength(NameValidation.MAX_LENGTH)]);
+        Validators.pattern(NameValidation.rule),
+        Validators.minLength(NameValidation.minLength),
+        Validators.maxLength(NameValidation.maxLength)]);
 
-    constructor(private router: Router) { }
+    constructor(private router: Router) {}
 
     createGame() {
         if (this.playerNameController.invalid) {
-            // open dialog "please correct username"
-        }
-        else {
+            // open dialog 'please correct username'
+        } else {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
         }
+    }
+
+    onNameFieldChange(event: any) {
+        this.playerName = event.target.value;
+        console.log(event.target.value);
     }
 
 }

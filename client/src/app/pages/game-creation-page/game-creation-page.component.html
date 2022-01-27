@@ -3,14 +3,14 @@
     
     <section id="game-parameters">
         <h1>Créez une partie</h1>
-        <mat-button-toggle-group color="primary" [(ngModel)]="gameType" name="gameType" aria-label="Game Type">
-            <mat-button-toggle id="log2990-button" [value]="GameType.Classic">{{GameType.Classic}}</mat-button-toggle>
-            <mat-button-toggle id="classic-button" [value]="GameType.LOG2990">{{GameType.LOG2990}}</mat-button-toggle>
+        <mat-button-toggle-group color="primary" [(ngModel)]="gameTypes" name="gameTypes" aria-label="Game Type">
+            <mat-button-toggle id="log2990-button" [value]="gameTypes.Classic">{{gameTypes.Classic}}</mat-button-toggle>
+            <mat-button-toggle id="classic-button" [value]="gameTypes.LOG2990">{{gameTypes.LOG2990}}</mat-button-toggle>
         </mat-button-toggle-group>
 
-        <mat-button-toggle-group color="primary" [(ngModel)]="gameMode" name="gameMode" aria-label="Game Mode">
-            <mat-button-toggle id="solo-button" [value]="GameMode.Solo">{{GameMode.Solo}}</mat-button-toggle>
-            <mat-button-toggle id="multi-button" [value]="GameMode.Multiplayer">{{GameMode.Multiplayer}}</mat-button-toggle>
+        <mat-button-toggle-group color="primary" [(ngModel)]="gameModes" name="gameModes" aria-label="Game Mode">
+            <mat-button-toggle id="solo-button" [value]="gameModes.Solo">{{gameModes.Solo}}</mat-button-toggle>
+            <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{gameModes.Multiplayer}}</mat-button-toggle>
         </mat-button-toggle-group>
 
         <mat-form-field appearance="outline">
@@ -23,13 +23,13 @@
         <mat-form-field appearance="outline">
             <mat-label>Dictionnaire utilisé</mat-label>
             <mat-select [(value)]="dictionnaryName" placeholder="Par défaut (Français)">
-                <mat-option value="default">Par défaut (Français)</mat-option>
+                <mat-option value="default-dict">Par défaut (Français)</mat-option>
             </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
             <mat-label>Nom du joueur</mat-label>
-            <input matInput id="playerNameController" type="text" [(ngModel)]="playerName" [formControl]="playerNameController" autocomplete="off">
+            <input matInput id="playerNameController" type="text" [formControl]="playerNameController" autocomplete="off" (change)="onNameFieldChange($event)">
         </mat-form-field>
         <span *ngIf="playerNameController.invalid && (playerNameController.dirty || playerNameController.touched)" class="alert">
             <span *ngIf="playerNameController.errors?.['minlength']">
