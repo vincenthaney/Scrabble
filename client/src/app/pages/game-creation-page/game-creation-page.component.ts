@@ -3,6 +3,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
+import { NameValidation } from '@app/classes/name-validation';
 
 @Component({
   selector: 'app-game-creation-page',
@@ -20,9 +21,9 @@ export class GameCreationPageComponent implements OnInit {
   dictionnaryName: string = "default";
 
   playerNameController = new FormControl('', [
-    Validators.pattern("^([a-zA-Z0-9]+[ '\\-]{0,1})*$"),
-    Validators.minLength(2),
-    Validators.maxLength(20)]);
+    Validators.pattern(NameValidation.RULE),
+    Validators.minLength(NameValidation.MIN_LENGTH),
+    Validators.maxLength(NameValidation.MAX_LENGTH)]);
 
   constructor(private router: Router) { }
 
