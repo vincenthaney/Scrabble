@@ -1,19 +1,3 @@
-import { EventEmitter } from 'events';
 import IPlayer from './iplayer';
 
-export default abstract class Opponent extends IPlayer {
-    event: EventEmitter;
-
-    constructor(name: string) {
-        super(name);
-        this.event = new EventEmitter();
-    }
-
-    /**
-     * Indicate to the opponent that it is his turn to play.
-     *
-     * @Param none
-     * @Return void, the event emitter will handle the completion
-     */
-    abstract startRound(): void;
-}
+export default abstract class Opponent extends IPlayer {}
