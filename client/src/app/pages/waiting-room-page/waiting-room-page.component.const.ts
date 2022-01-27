@@ -1,4 +1,4 @@
 export enum WaitingRoomMessages {
-    HostWaitingMessage = "En attente qu'un adversaire se joigne à votre partie.",
+    HostWaitingMessage = "En attente d'un adversaire.",
     OpponentFoundMessage = 'a rejoint votre partie.',
 }

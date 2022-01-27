@@ -15,9 +15,19 @@
 }
 
 .button{
-    padding: 5px;
+    margin-bottom: 6px;
+}
+
+.button-box{
+    display: flex;
+    flex-direction: column;
+    height: 35%;
+    width: 25%;
+    align-content: center;
 }
 
 .image{
-    padding: 20px
+    padding: 20px;
+    justify-self: center;
+    align-self: center;
 }
