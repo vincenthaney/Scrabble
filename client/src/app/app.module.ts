@@ -12,8 +12,14 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
+import { InformationBoxComponent } from './components/information-box/information-box.component';
+import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
+import { BoardComponent } from './components/board/board.component';
+import { RackComponent } from './components/rack/rack.component';
+import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { WaitingRoomPageComponent } from '@app/pages/waiting-room-page/waiting-room-page.component';
+import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,8 +36,14 @@ import { WaitingRoomPageComponent } from '@app/pages/waiting-room-page/waiting-r
         PlayAreaComponent,
         SidebarComponent,
         HomePageComponent,
+        InformationBoxComponent,
+        CommunicationBoxComponent,
+        BoardComponent,
+        RackComponent,
+        SurrenderDialogComponent,
         WaitingPageComponent,
         WaitingRoomPageComponent,
+        DefaultDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
