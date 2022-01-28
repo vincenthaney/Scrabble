@@ -2,7 +2,6 @@ import * as mock from 'mock-fs'; // required when running test. Otherwise compil
 import { expect } from 'chai';
 import { join } from 'path';
 import { LETTER_VALUES } from '@app/constants/game';
-import { reduce } from '@app/utils/array';
 import TileReserve from './tile-reserve';
 import { LetterDistributionData, LetterValue } from './tile.types';
 import * as TileError from './tiles.errors';
@@ -43,9 +42,9 @@ describe('TileReserve', () => {
     it('getTilesLeft: should have specific amount of tiles', async () => {
         // eslint-disable-next-line dot-notation
         const tilesData = await TileReserve['fetchLetterDistribution']();
-        const expected = reduce(tilesData, 0, (previous, tile) => {
+        const expected = tilesData.reduce((previous, tile) => {
             return previous + tile.amount;
-        });
+        }, 0);
         expect(tileReserve.getTilesLeft()).to.equal(expected);
     });
 
