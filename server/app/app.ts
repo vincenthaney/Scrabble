@@ -9,7 +9,7 @@ import * as logger from 'morgan';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
-import { GameDispatcherController } from './controllers/game-dispatcher';
+import { GameDispatcherController } from './controllers/game-dispatcher.controller';
 
 @Service()
 export class Application {
