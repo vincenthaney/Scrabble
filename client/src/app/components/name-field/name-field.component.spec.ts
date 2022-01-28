@@ -30,7 +30,7 @@ describe('NameFieldComponent', () => {
     it('onNameFieldChange should change the playerName', () => {
         const expected = 'ThOm';
         component.playerName = 'Charles';
-        component.onNameFieldChange(expected);
+        component.onNameChange(expected);
         expect(component.playerName).toBe(expected);
     });
 
@@ -39,7 +39,7 @@ describe('NameFieldComponent', () => {
             return false;
         };
         const spy = spyOn(component.nameChange, 'emit').and.callFake(fakeNameChange);
-        component.onNameFieldChange('Charles');
+        component.onNameChange('Charles');
         expect(spy).toHaveBeenCalled();
         expect(component.nameChange.emit).toHaveBeenCalledWith(true);
     });
