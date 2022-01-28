@@ -1,0 +1,57 @@
+.game-creation-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: larger;
+}
+
+#game-parameters {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    max-width: 500px;
+    margin-top: 12vh;
+}
+
+mat-button-toggle-group {
+    margin-bottom: 30px;
+}
+
+mat-button-toggle-group, mat-button-toggle, mat-form-field, input {
+    width: 100%;
+}
+
+mat-button-toggle {
+    display: inline-flex;
+    height: 58px;
+    align-items: center;
+}
+
+button {
+    width: 160px;
+    background-color: #0e520e;
+    color: white;
+    height: 50px;
+    font-size: 1em;
+}
+
+#bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.alert-group {
+    height: 0px;
+    color: red;
+}
+
+.alert {
+    margin-top: -20px;
+    
+    display: flex;
+
+}
