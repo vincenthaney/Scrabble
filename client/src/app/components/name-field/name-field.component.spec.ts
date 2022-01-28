@@ -3,7 +3,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
 import { NameFieldComponent } from './name-field.component';
 
 describe('NameFieldComponent', () => {
@@ -27,20 +26,34 @@ describe('NameFieldComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('onNameFieldChange should change the playerName', () => {
+    it('onNameChange should change the playerName', () => {
         const expected = 'ThOm';
         component.playerName = 'Charles';
         component.onNameChange(expected);
         expect(component.playerName).toBe(expected);
     });
 
-    it('onNameFieldChange should emit nameChange', () => {
+    it('onNameChange should emit isInputNameValid true with a valid name', () => {
         const fakeNameChange = () => {
             return false;
         };
-        const spy = spyOn(component.nameChange, 'emit').and.callFake(fakeNameChange);
-        component.onNameChange('Charles');
+
+        const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
+        component.formParameters.patchValue({ inputName: 'testName' });
+        component.onNameChange('testName');
         expect(spy).toHaveBeenCalled();
-        expect(component.nameChange.emit).toHaveBeenCalledWith(true);
+        expect(component.isInputNameValid.emit).toHaveBeenCalledWith(true);
+    });
+
+    it('onNameChange should emit isInputNameValid false with an invalid name', () => {
+        const fakeNameChange = () => {
+            return false;
+        };
+
+        const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
+        component.formParameters.patchValue({ inputName: '!nval!dName' });
+        component.onNameChange('!nval!dName');
+        expect(spy).toHaveBeenCalled();
+        expect(component.isInputNameValid.emit).toHaveBeenCalledWith(false);
     });
 });
