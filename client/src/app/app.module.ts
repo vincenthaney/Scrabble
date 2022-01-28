@@ -8,19 +8,21 @@ import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
+import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { HomePageComponent } from '@app/pages/home-page/home-page.component';
-import { InformationBoxComponent } from './components/information-box/information-box.component';
-import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
 import { BoardComponent } from './components/board/board.component';
+import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
+import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
+import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
-import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
+import { NameFieldComponent } from './components/name-field/name-field.component';
 
 /**
  * Main module that is used in main.ts.
@@ -45,7 +47,9 @@ import { DefaultDialogComponent } from './components/default-dialog/default-dial
         WaitingPageComponent,
         LobbyPageComponent,
         LobbyInfoComponent,
+        GameCreationPageComponent,
         DefaultDialogComponent,
+        NameFieldComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
     providers: [],
