@@ -1,15 +1,19 @@
-<mat-form-field appearance="outline">
-    <mat-label>Nom du joueur</mat-label>
-    <input matInput id="playerNameController" type="text" [formControl]="playerNameController" autocomplete="off" (ngModelChange)="onNameFieldChange($event)">
-</mat-form-field>
-<span *ngIf="playerNameController.invalid && (playerNameController.dirty || playerNameController.touched)" class="alert">
-    <span *ngIf="playerNameController.errors?.['minlength']">
-        Votre nom doit contenir au moins 2 caractères.
+<div class="form-group">
+    <mat-form-field appearance="outline">
+        <mat-label >Nom du joueur</mat-label>
+        <input matInput id="playerNameValidator" type="text" formControlName="inputName" [formControl]="playerNameValidator" autocomplete="off" (ngModelChange)="onNameChange($event)">
+    </mat-form-field>
+    <span *ngIf="playerNameValidator.invalid && (playerNameValidator.dirty || playerNameValidator.touched)" class="alert">
+        <span *ngIf="playerNameValidator.errors?.['minlength']">
+            Votre nom doit contenir au moins 2 caractères.
+        </span>
+        <span *ngIf="playerNameValidator.errors?.['maxlength']">
+            Votre nom doit contenir au plus 20 caractères.
+        </span>
+        <span *ngIf="playerNameValidator.errors?.['pattern'] && !playerNameValidator.errors?.['maxlength'] && !playerNameValidator?.errors?.['minlength']">
+            Votre nom ne peut pas contenir de caractères spéciaux.
+        </span>
     </span>
-    <span *ngIf="playerNameController.errors?.['maxlength']">
-        Votre nom doit contenir au plus 20 caractères.
-    </span>
-    <span *ngIf="playerNameController.errors?.['pattern'] && !playerNameController.errors?.['maxlength'] && !playerNameController?.errors?.['minlength']">
-        Votre nom ne peut pas contenir de caractères spéciaux.
-    </span>
-</span>
+</div>
+
+

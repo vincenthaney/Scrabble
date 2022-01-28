@@ -19,26 +19,24 @@ export class GameCreationPageComponent {
 
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
-    dictoptions: string[];
+    dictOptions: string[];
 
     gameParameters = new FormGroup({
         inputTimer: new FormControl('', Validators.required),
         inputDict: new FormControl('', Validators.required),
-        inputName: new FormControl('', [
-            Validators.required,
-            Validators.pattern(NAME_VALIDATION.rule),
-            Validators.minLength(NAME_VALIDATION.minLength),
-            Validators.maxLength(NAME_VALIDATION.maxLength),
-        ]),
     });
 
     constructor(private router: Router) {}
 
     createGame() {
-        if (this.gameParameters.valid) {
+        if (this.gameParameters.valid && this.isNameValid) {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
         }
+    }
+
+    onNameChange(isNameValid: boolean) {
+        this.isNameValid = isNameValid;
     }
 }

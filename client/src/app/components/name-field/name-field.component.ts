@@ -9,16 +9,17 @@ import { FormControl, Validators } from '@angular/forms';
 })
 export class NameFieldComponent {
     @Output() nameChange = new EventEmitter<boolean>();
+
     playerName: string;
 
-    playerNameController = new FormControl('', [
+    playerNameValidator = new FormControl('', [
         Validators.pattern(NAME_VALIDATION.rule),
         Validators.minLength(NAME_VALIDATION.minLength),
         Validators.maxLength(NAME_VALIDATION.maxLength),
     ]);
 
-    onNameFieldChange(newName: string) {
+    onNameChange(newName: string) {
         this.playerName = newName;
-        this.nameChange.emit(this.playerNameController.valid);
+        this.nameChange.emit(this.playerNameValidator.valid);
     }
 }
