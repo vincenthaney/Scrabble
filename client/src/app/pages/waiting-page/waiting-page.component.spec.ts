@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { WaitingPageComponent } from './waiting-page.component';
+
 
 describe('WaitingPageComponent', () => {
     let component: WaitingPageComponent;
@@ -9,6 +10,7 @@ describe('WaitingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [WaitingPageComponent],
+            imports: [MatProgressSpinnerModule],
         }).compileComponents();
     });
 
