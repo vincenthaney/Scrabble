@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { UNDEFINED_TILE } from '@app/classes/game-constants';
 import { Tile } from '@app/classes/tile';
+import { UNDEFINED_TILE } from '@app/constants/game';
 
 @Component({
     selector: 'app-tile',

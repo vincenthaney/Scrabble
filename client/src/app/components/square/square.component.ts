@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DEFAULT_SQUARE_COLOR } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
+import { DEFAULT_SQUARE_COLOR } from '@app/constants/game';
 import { SquareView } from './square-view';
 
 @Component({

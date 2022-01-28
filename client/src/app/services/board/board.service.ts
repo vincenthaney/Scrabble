@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BOARD_SIZE } from '@app/classes/game-constants';
 import { Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
+import { BOARD_SIZE } from '@app/constants/game';
 
 @Injectable({
     providedIn: 'root',

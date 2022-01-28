@@ -1,4 +1,6 @@
 import { LetterValue } from '@app/classes/tile';
+import { Vec2 } from '@app/classes/vec2';
+import { COLORS } from '@app/constants/colors';
 
 export const LETTER_VALUES: LetterValue[] = [
     'A',
@@ -29,3 +31,11 @@ export const LETTER_VALUES: LetterValue[] = [
     'Z',
     '*',
 ];
+
+export const BOARD_SIZE: Vec2 = { x: 15, y: 15 };
+export const SQUARE_SIZE: Vec2 = { x: 1, y: 1 };
+export const MARGIN_COLUMN_SIZE = 1;
+
+export const DEFAULT_SQUARE_COLOR = COLORS.Beige;
+export const UNDEFINED_TILE = { letter: '?', value: -1 };
+export const UNDEFINED_GRID_SIZE: Vec2 = { x: 0, y: 0 };

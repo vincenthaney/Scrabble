@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { COLORS } from '@app/classes/color-constants';
-import { GRID_MARGIN_LETTERS, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from '@app/components/square/square-view';
+import { COLORS } from '@app/constants/colors';
+import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_GRID_SIZE } from '@app/constants/game';
 import { BoardService } from '@app/services/';
 
 @Component({
@@ -11,18 +11,18 @@ import { BoardService } from '@app/services/';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent implements OnInit {
-    readonly marginLetters = GRID_MARGIN_LETTERS;
-    readonly marginColumnSize: number = MARGIN_COLUMN_SIZE;
+    readonly marginLetters;
+    readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
     colorGrid: COLORS[][];
     colAmount: number;
 
     constructor(private boardService: BoardService) {
-        this.marginLetters = GRID_MARGIN_LETTERS;
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
 
         this.gridSize = this.boardService.getGridSize();
+        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
         if (!this.gridSize) {
             this.gridSize = UNDEFINED_GRID_SIZE;
         }

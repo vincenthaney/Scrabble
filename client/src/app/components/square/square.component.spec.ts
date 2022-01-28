@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { COLORS } from '@app/classes/color-constants';
 import { DEFAULT_SQUARE_COLOR } from '@app/classes/game-constants';
+import { COLORS } from '@app/constants/colors';
 import { SquareView } from './square-view';
 import { SquareComponent } from './square.component';
 
