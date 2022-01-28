@@ -22,7 +22,7 @@ const mockLetterDistribution: LetterDistributionData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, TileConst.LETTER_DISTRIBUTION_RELATIVE_PATH)] = JSON.stringify(mockLetterDistribution);
 
-describe('TileReserve Test', () => {
+describe('TileReserve', () => {
     let tileReserve: TileReserve;
 
     beforeEach(async () => {
@@ -30,6 +30,10 @@ describe('TileReserve Test', () => {
 
         tileReserve = new TileReserve();
         await tileReserve.init();
+    });
+
+    afterEach(() => {
+        mock.restore();
     });
 
     it('should initialize', () => {
