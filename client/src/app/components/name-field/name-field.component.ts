@@ -21,29 +21,6 @@ export class NameFieldComponent {
         ]),
     });
 
-    // isInvalidAndModified(): boolean {
-    //     // Ternary operator since the return types are boolean | undefined
-    //     return this.formParameters.get('inputName')?.invalid &&
-    //         (this.formParameters.get('inputName')?.dirty || this.formParameters.get('inputName')?.touched ? true : false)
-    //         ? true
-    //         : false;
-    // }
-
-    // isTooShort(): boolean {
-    //     return this.formParameters.get('inputName')?.errors?.minlength;
-    // }
-
-    // isTooLong(): boolean {
-    //     return this.formParameters.get('inputName')?.errors?.maxlength;
-    // }
-
-    // hasSpecialCharacters(): boolean {
-    //     return (
-    //         this.formParameters.get('inputName')?.errors?.pattern &&
-    //         !this.formParameters.get('inputName')?.errors?.maxlength &&
-    //         !this.formParameters.get('inputName')?.errors?.minlength
-    //     );
-    // }
     onNameChange(newName: string) {
         this.playerName = newName;
         this.isInputNameValid.emit(this.formParameters.get('inputName')?.valid);
