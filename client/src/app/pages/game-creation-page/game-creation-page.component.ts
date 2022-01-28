@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-
-// TODO : remove and put in seperate file when timer is implemented
-const DEFAULT_TIMER = 60;
 
 @Component({
     selector: 'app-game-creation-page',
@@ -20,22 +18,27 @@ export class GameCreationPageComponent {
     gameMode: GameMode = GameMode.Solo;
 
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
-    timer: number = DEFAULT_TIMER;
-    dictionnaryName: string = 'default';
+    timerOptions: number[];
+    dictoptions: string[];
+
+    gameParameters = new FormGroup({
+        inputTimer: new FormControl('', Validators.required),
+        inputDict: new FormControl('', Validators.required),
+        inputName: new FormControl('', [
+            Validators.required,
+            Validators.pattern(NAME_VALIDATION.rule),
+            Validators.minLength(NAME_VALIDATION.minLength),
+            Validators.maxLength(NAME_VALIDATION.maxLength),
+        ]),
+    });
 
     constructor(private router: Router) {}
 
     createGame() {
-        if (!this.isNameValid) {
-            // open dialog 'please correct username'
-        } else {
+        if (this.gameParameters.valid) {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
         }
-    }
-
-    onNameFieldChange(isNameValid: boolean) {
-        this.isNameValid = isNameValid;
     }
 }
