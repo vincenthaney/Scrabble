@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { COLORS } from '@app/classes/color-constants';
-import { GRID_MARGIN_LETTER, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
+import { GRID_MARGIN_LETTERS, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareView } from '@app/components/square/square-view';
 import { BoardService } from '@app/services/';
@@ -11,7 +11,7 @@ import { BoardService } from '@app/services/';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent implements OnInit {
-    readonly marginLetters = GRID_MARGIN_LETTER;
+    readonly marginLetters = GRID_MARGIN_LETTERS;
     readonly marginColumnSize: number = MARGIN_COLUMN_SIZE;
     gridSize: Vec2;
     squareGrid: SquareView[][];
@@ -19,7 +19,7 @@ export class BoardComponent implements OnInit {
     colAmount: number;
 
     constructor(private boardService: BoardService) {
-        this.marginLetters = GRID_MARGIN_LETTER;
+        this.marginLetters = GRID_MARGIN_LETTERS;
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
 
         this.gridSize = this.boardService.getGridSize();

@@ -56,8 +56,6 @@ describe('BoardComponent', () => {
         const expectedBoardSize: Vec2 = testCase[1];
 
         if (!expectedBoardSize) {
-            // eslint-disable-next-line no-console
-            console.log('Test board size was not mapped to expected board size');
             return;
         }
         it(
@@ -75,6 +73,13 @@ describe('BoardComponent', () => {
                 component['initializeBoard']();
 
                 const actualRowAmount = component.squareGrid.length;
+
+                /* 
+                    If the Grid size is supposed to be smaller or equal to 0,
+                    then each row of the grid will not be initialized. 
+                    In that case, we assign null values to the actual column amount.
+                    If the expected size is greater than 0, then the row length is defined
+                */
                 const actualColAmount = expectedBoardSize.y <= 0 ? 0 : component.squareGrid[0].length;
 
                 const actualBoardSize: Vec2 = { x: actualColAmount, y: actualRowAmount };
@@ -86,6 +91,10 @@ describe('BoardComponent', () => {
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {
         boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
 
+        /* 
+            We need to recreate the component so the mock on the service
+            applies when we create the component
+        */
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -95,6 +104,10 @@ describe('BoardComponent', () => {
     it('Initialization of colAmount should be BoardService.grid.x + MARGIN_COLUMN_SIZE', () => {
         boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
 
+        /* 
+            We need to recreate the component so the mock on the service
+            applies when we create the component
+        */
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

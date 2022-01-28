@@ -21,14 +21,13 @@ export class SquareComponent implements OnInit {
     }
 
     private initializeColor() {
-        if (!this.squareView || !this.squareView.color) {
-            this.style = {
-                'background-color': DEFAULT_SQUARE_COLOR,
-            };
-            return;
-        }
-        this.style = {
-            'background-color': this.squareView.color,
-        };
+        this.style =
+            this.squareView && this.squareView.color
+                ? {
+                      'background-color': this.squareView.color,
+                  }
+                : {
+                      'background-color': DEFAULT_SQUARE_COLOR,
+                  };
     }
 }
