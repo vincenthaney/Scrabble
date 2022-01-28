@@ -183,3 +183,32 @@ describe('TileReserve', () => {
         expect(tileReserve.getTilesLeft()).to.equal(expectedNumberTiles);
     };
 });
+
+describe('TileReserve: uninitialized', () => {
+    let tileReserve: TileReserve;
+
+    beforeEach(async () => {
+        tileReserve = new TileReserve();
+    });
+
+    it('should have attribute initialized to false', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
+        expect(tileReserve.isInitialized()).to.be.false;
+    });
+
+    it('should throw error when getTile while uninitialized', () => {
+        expect(() => tileReserve.getTiles(0)).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+    });
+
+    it('should throw error when swapTile while uninitialized', () => {
+        expect(() => tileReserve.swapTiles([])).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+    });
+
+    it('should throw error when getTilesLeft while uninitialized', () => {
+        expect(() => tileReserve.getTilesLeft()).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+    });
+
+    it('should throw error when getTilesLeftPerLetter while uninitialized', () => {
+        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+    });
+});
