@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { NAME_VALIDATION } from '@app/classes/name-validation';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-name-field',
@@ -8,27 +8,44 @@ import { FormControl, Validators } from '@angular/forms';
     styleUrls: ['./name-field.component.scss'],
 })
 export class NameFieldComponent {
-    @Output() nameChange = new EventEmitter<boolean>();
+    @Output() isInputNameValid = new EventEmitter<boolean>();
 
     playerName: string;
 
-    playerNameValidator = new FormControl('', [
-        Validators.pattern(NAME_VALIDATION.rule),
-        Validators.minLength(NAME_VALIDATION.minLength),
-        Validators.maxLength(NAME_VALIDATION.maxLength),
-    ]);
+    formParameters = new FormGroup({
+        inputName: new FormControl('', [
+            Validators.required,
+            Validators.pattern(NAME_VALIDATION.rule),
+            Validators.minLength(NAME_VALIDATION.minLength),
+            Validators.maxLength(NAME_VALIDATION.maxLength),
+        ]),
+    });
 
-    isInvalidAndModified(): boolean {
-        return this.playerNameValidator.invalid && (this.playerNameValidator.dirty || this.playerNameValidator.touched);
-    }
+    // isInvalidAndModified(): boolean {
+    //     // Ternary operator since the return types are boolean | undefined
+    //     return this.formParameters.get('inputName')?.invalid &&
+    //         (this.formParameters.get('inputName')?.dirty || this.formParameters.get('inputName')?.touched ? true : false)
+    //         ? true
+    //         : false;
+    // }
 
-    hasSpecialCharacters(): boolean {
-        return (
-            this.playerNameValidator.errors?.pattern && !this.playerNameValidator.errors?.maxlength && !this.playerNameValidator?.errors?.minlength
-        );
-    }
+    // isTooShort(): boolean {
+    //     return this.formParameters.get('inputName')?.errors?.minlength;
+    // }
+
+    // isTooLong(): boolean {
+    //     return this.formParameters.get('inputName')?.errors?.maxlength;
+    // }
+
+    // hasSpecialCharacters(): boolean {
+    //     return (
+    //         this.formParameters.get('inputName')?.errors?.pattern &&
+    //         !this.formParameters.get('inputName')?.errors?.maxlength &&
+    //         !this.formParameters.get('inputName')?.errors?.minlength
+    //     );
+    // }
     onNameChange(newName: string) {
         this.playerName = newName;
-        this.nameChange.emit(this.playerNameValidator.valid);
+        this.isInputNameValid.emit(this.formParameters.get('inputName')?.valid);
     }
 }
