@@ -42,6 +42,7 @@ describe('GameCreationPageComponent', () => {
                 RouterTestingModule.withRoutes([
                     { path: 'waiting-room', component: TestComponent },
                     { path: 'home', component: TestComponent },
+                    { path: 'game-creation', component: GameCreationPageComponent },
                 ]),
             ],
             providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness],
@@ -74,10 +75,10 @@ describe('GameCreationPageComponent', () => {
     // });
 
     // it('2 clicking on LOG2990 button should set gameType attribute to LOG2990', () => {
-    //   component.gameType = component.GameType.Classic;
+    //   component.gameType = component.gameTypes.Classic;
     //   const log2990Button = fixture.debugElement.nativeElement.querySelector('#log2990-button');
     //   log2990Button.dispatchEvent(new Event('change'));
-    //   expect(component.gameType).toEqual(component.GameType.LOG2990);
+    //   expect(component.gameType).toEqual(component.gameTypes.LOG2990);
     // });
 
     // it('clicking on Classic button should set gameType attribute to Classic', () => {
@@ -86,11 +87,114 @@ describe('GameCreationPageComponent', () => {
     //   expect(component.gameType).toEqual(component.GameType.Classic);
     // });
 
-    it('back button should reroute to home page', async () => {
-        // const backButton = await loader.getHarness(MatButtonHarness.with({selector: '#back-button'}));
+    it('back button should reroute to home page', () => {
         const backButton = fixture.debugElement.nativeElement.querySelector('#back-button');
         const location: Location = TestBed.inject(Location);
+        const initLocation = location.path();
         backButton.click();
+        fixture.whenStable().then(() => {
+            expect(location.path()).toBe('/home');
+            expect(location.path() == initLocation).toBeFalse();
+        });
+    });
+
+    it('initial value of form fields should be empty', async () => {
+        const gameParametersForm = component.gameParameters;
+        const initialFormValues = {
+            inputTimer: '',
+            inputDict: '',
+            inputName: '',
+        }
+        expect(gameParametersForm.value).toEqual(initialFormValues);
+    });
+
+    it('form should be invalid if all fields are empty', async () => {
+        const gameParametersForm = component.gameParameters;
+        const initialFormValues = {
+            inputTimer: '',
+            inputDict: '',
+            inputName: '',
+        };
+        gameParametersForm.setValue(initialFormValues);
+        expect(gameParametersForm.valid).toBeFalsy();
+    });
+
+    it('form should not be valid if inputTimer is empty', () => {
+        const gameParametersForm = component.gameParameters;
+        const formValues = {
+            inputTimer: '',
+            inputDict: 'default-dict',
+            inputName: 'something',
+        };
+        gameParametersForm.setValue(formValues);
+        expect(gameParametersForm.valid).toBeFalsy();
+    });
+
+    it('form should not be valid if inputDict is empty', () => {
+        const gameParametersForm = component.gameParameters;
+        const formValues = {
+            inputTimer: '30',
+            inputDict: '',
+            inputName: 'something',
+        };
+        gameParametersForm.setValue(formValues);
+        expect(gameParametersForm.valid).toBeFalsy();
+    });
+
+    it('form should not be valid if inputName is empty', () => {
+        const gameParametersForm = component.gameParameters;
+        const formValues = {
+            inputTimer: '30',
+            inputDict: 'french-dict',
+            inputName: '',
+        };
+        gameParametersForm.setValue(formValues);
+        expect(gameParametersForm.valid).toBeFalsy();
+    });
+    
+    it('form should call onSubmit when submit button is clicked', async () => {
+        const spy = spyOn(component, 'onSubmit');
+        const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+        submitButton.click();
+        expect(spy).toHaveBeenCalled();
+    });
+    
+    it('form should not call createGame on submit if invalid', async () => {
+        const spy = spyOn(component, 'createGame');
+
+        const gameParametersForm = component.gameParameters;
+        gameParametersForm.setErrors({'error': true});
+
+        const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+        submitButton.click();
+        
+        expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('form should call createGame on submit if valid', async () => {
+        const spy = spyOn(component, 'createGame');
+
+        const gameParametersForm = component.gameParameters;
+        const validInputs = {
+            inputTimer: '30',
+            inputDict: 'french-dict',
+            inputName: 'nom valide',
+        };
+        gameParametersForm.setValue(validInputs);
+
+        const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+        submitButton.click();
+        
+        expect(spy).toHaveBeenCalled();
+    });
+
+
+    it('createGame button should reroute to home page', async () => {
+        const location: Location = TestBed.inject(Location);
+
+        const backButton = fixture.debugElement.nativeElement.querySelector('#back-button');
+        backButton.click();
+        
         fixture.whenStable().then(() => {
             expect(location.path()).toBe('/home');
         });
