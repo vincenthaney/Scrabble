@@ -13,7 +13,7 @@
             <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{gameModes.Multiplayer}}</mat-button-toggle>
         </mat-button-toggle-group>
 
-        <form [formGroup]="gameParameters" (ngSubmit)="createGame()">
+        <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
             <span id="form-fields">
                 <mat-form-field appearance="outline">
                     <mat-label>Temps par tour</mat-label>

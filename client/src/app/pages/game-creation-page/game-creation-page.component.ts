@@ -34,11 +34,15 @@ export class GameCreationPageComponent {
 
     constructor(private router: Router) {}
 
-    createGame() {
+    onSubmit() {
         if (this.gameParameters.valid) {
-            // send new game request to server (?)
-            // route to waiting room
-            this.router.navigateByUrl('waiting');
+            this.createGame();
         }
+        console.log('clic');
+    }
+
+    createGame() {
+        // send new game request to server (?)
+        this.router.navigateByUrl('waiting-room');
     }
 }
