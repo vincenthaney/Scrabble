@@ -18,6 +18,15 @@ export class NameFieldComponent {
         Validators.maxLength(NAME_VALIDATION.maxLength),
     ]);
 
+    isInvalidAndModified(): boolean {
+        return this.playerNameValidator.invalid && (this.playerNameValidator.dirty || this.playerNameValidator.touched);
+    }
+
+    hasSpecialCharacters(): boolean {
+        return (
+            this.playerNameValidator.errors?.pattern && !this.playerNameValidator.errors?.maxlength && !this.playerNameValidator?.errors?.minlength
+        );
+    }
     onNameChange(newName: string) {
         this.playerName = newName;
         this.nameChange.emit(this.playerNameValidator.valid);
