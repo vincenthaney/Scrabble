@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -10,6 +11,7 @@ import { GameType } from '@app/classes/game-type';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent {
+    @ViewChild(NameFieldComponent) child: NameFieldComponent;
     isNameValid: boolean = false;
     gameTypes = GameType;
     gameModes = GameMode;
@@ -33,6 +35,8 @@ export class GameCreationPageComponent {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
+        } else {
+            this.child.formParameters.markAllAsTouched();
         }
     }
 
