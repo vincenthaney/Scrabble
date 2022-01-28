@@ -16,8 +16,10 @@ export default class ActionPlace extends ActionPlay {
     }
 
     execute(): void {
-        throw new Error('Method not implemented.');    }
+        throw new Error('Method not implemented.');
+    }
 
     getMessage(): string {
-        throw new Error('Method not implemented.');    }
+        throw new Error('Method not implemented.');
+    }
 }
