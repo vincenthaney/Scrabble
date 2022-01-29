@@ -31,16 +31,12 @@ export class GameCreationPageComponent {
     constructor(private router: Router) {}
 
     createGame() {
-        if (this.gameParameters.valid && this.isNameValid) {
+        if (this.gameParameters.valid && this.child.formParameters.get('inputName')?.valid) {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
         } else {
             this.child.formParameters.markAllAsTouched();
         }
-    }
-
-    onNameChange(isNameValid: boolean) {
-        this.isNameValid = isNameValid;
     }
 }
