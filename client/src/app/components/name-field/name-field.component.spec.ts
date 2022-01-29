@@ -37,7 +37,6 @@ describe('NameFieldComponent', () => {
         const fakeNameChange = () => {
             return false;
         };
-
         const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
         component.formParameters.patchValue({ inputName: 'testName' });
         component.onNameChange('testName');
@@ -49,7 +48,6 @@ describe('NameFieldComponent', () => {
         const fakeNameChange = () => {
             return false;
         };
-
         const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
         component.formParameters.patchValue({ inputName: '!nval!dName' });
         component.onNameChange('!nval!dName');
