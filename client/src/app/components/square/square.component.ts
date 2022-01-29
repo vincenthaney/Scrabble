@@ -13,7 +13,7 @@ export class SquareComponent implements OnInit {
     style = {};
 
     ngOnInit() {
-        this.initializeColor();
+        this.initializeStyle();
     }
 
     getSquareSize(): Vec2 {

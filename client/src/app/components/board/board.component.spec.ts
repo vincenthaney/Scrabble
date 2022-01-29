@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MARGIN_COLUMN_SIZE, UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
+import { UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
@@ -99,19 +99,6 @@ describe('BoardComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         expect(component.gridSize).toEqual(boardServiceGridSize);
-    });
-
-    it('Initialization of colAmount should be BoardService.grid.x + MARGIN_COLUMN_SIZE', () => {
-        boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
-
-        /* 
-            We need to recreate the component so the mock on the service
-            applies when we create the component
-        */
-        fixture = TestBed.createComponent(BoardComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-        expect(component.colAmount).toEqual(boardServiceGridSize.x + MARGIN_COLUMN_SIZE);
     });
 
     it('If BoardService returns no grid, component should have UNDEFINED_GRID_SIZE size', () => {

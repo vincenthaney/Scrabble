@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DEFAULT_SQUARE_COLOR } from '@app/classes/game-constants';
-import { COLORS } from '@app/constants/colors';
-import { SquareView } from './square-view';
+import { SquareView } from '../../classes/square/square-view';
 import { SquareComponent } from './square.component';
 
 describe('SquareComponent', () => {
@@ -29,26 +28,23 @@ describe('SquareComponent', () => {
 
     it('getSquareSize should return square size of associated SquareView', () => {
         const squareSize = { x: 1, y: 1 };
-        const squareView: SquareView = {
-            square: null,
-            squareSize,
-            color: COLORS.Beige,
-        };
+        const squareView: SquareView = new SquareView(null, squareSize);
         component.squareView = squareView;
         expect(component.getSquareSize()).toEqual(squareView.squareSize);
     });
 
     it('Square color initialization should assign color of SquareView', () => {
-        const squareView: SquareView = {
-            square: null,
-            squareSize: { x: 0, y: 0 },
-            color: COLORS.SquareDarkBlue,
+        const square = {
+            tile: null,
+            letterMultiplier: 2,
+            wordMultiplier: 1,
         };
+        const squareView: SquareView = new SquareView(null, { x: 0, y: 0 });
         component.squareView = squareView;
         // eslint-disable-next-line dot-notation
         component['initializeColor']();
         expect(component.style).toEqual({
-            'background-color': squareView.color,
+            'background-color': squareView.getColor(),
         });
     });
 });

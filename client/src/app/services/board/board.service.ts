@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Square } from '@app/classes/square';
+import { Multiplier, Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
+import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
 import { BOARD_SIZE } from '@app/constants/game';
 
 @Injectable({
@@ -24,19 +25,42 @@ export default class BoardService {
     }
 
     private initializeBoardGrid() {
+        const multiplierGrid: Multiplier[][] = this.readScoreMultiplierConfig();
         this.grid = [];
+        const center: Vec2 = { x: Math.floor(BoardService.size.x / 2), y: Math.floor(BoardService.size.y / 2) };
         for (let i = 0; i < BoardService.size.y; i++) {
             this.grid[i] = [];
             for (let j = 0; j < BoardService.size.x; j++) {
+                const isCenter = j === center.x && i === center.y;
                 const square = {
                     tile: null,
-                    letterMultiplier: 1,
-                    wordMultiplier: 1,
+                    multiplier: multiplierGrid[i][j],
                     isMultiplierPlayed: false,
+                    isCenter,
                 };
                 this.grid[i][j] = square;
             }
         }
+    }
+
+    private readScoreMultiplierConfig(): Multiplier[][] {
+        const multiplierGrid: Multiplier[][] = [];
+        for (const configRow of BOARD_CONFIG) {
+            const multiplierRow: Multiplier[] = [];
+            for (const squareConfig of configRow) {
+                multiplierRow.push(this.parseSquareConfig(squareConfig));
+            }
+            multiplierGrid.push(multiplierRow);
+        }
+        return multiplierGrid;
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    private parseSquareConfig(data: string): Multiplier {
+        if (!BOARD_CONFIG_MAP.get(data)) {
+            return null;
+        }
+        return BOARD_CONFIG_MAP.get(data) as Multiplier;
     }
     // private placeTile(position: Position, tile: Tile): boolean {
     //     throw new Error('Method not implemented.');
