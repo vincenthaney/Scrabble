@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WaitingPageComponent } from './waiting-page.component';
+import { WaitingPageComponent } from './join-waiting-page.component';
 
 describe('WaitingPageComponent', () => {
     let component: WaitingPageComponent;
