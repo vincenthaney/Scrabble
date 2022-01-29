@@ -5,4 +5,10 @@ import { Component } from '@angular/core';
     templateUrl: './waiting-page.component.html',
     styleUrls: ['./waiting-page.component.scss'],
 })
-export class WaitingPageComponent {}
+export class WaitingPageComponent {
+    waitingGameName: string = 'testName';
+    waitingGameType: string = 'testType';
+    waitingGameTimer: string = 'timer';
+    waitingGameDictionary: string = 'dictionary';
+    waitingPlayerName: string = 'waitingPlayer';
+}
