@@ -1,5 +1,16 @@
+
 <div class = "center" >
+    <div class="grid">
+        <div>Votre nom:</div>
+        <div>{{waitingPlayer.name}}</div>
+        <div>Type de partie:</div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
     <p>En attente que l'hôte vous accepte.</p>
-    <mat-progress-spinner class="spinner" mode="indeterminate"></mat-progress-spinner>
-    <img src="https://bit.ly/3m206ss" width="100" height="20" alt="Logo Scrabble" />
+    <mat-progress-bar class="progress" mode="indeterminate"></mat-progress-bar>
+    <button id="cancel" mat-flat-button color="primary" routerLink="./lobby">Annuler </button>
 </div>
