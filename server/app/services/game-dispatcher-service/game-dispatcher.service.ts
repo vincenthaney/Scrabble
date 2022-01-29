@@ -45,13 +45,16 @@ export class GameDispatcherService {
     joinMultiplayerGame(waitingGameId: string, playerId: string, playerName: string) {
         const waitingGame = this.getGameFromId(waitingGameId);
 
-        if (waitingGame.joinedPlayer === undefined) {
-            const joiningPlayer = new Player(playerId, playerName);
-            waitingGame.joinedPlayer = joiningPlayer;
-            // TODO: Inform initiating player that another is trying to join
-        } else {
+        if (waitingGame.joinedPlayer !== undefined) {
             throw new Error(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
         }
+        if (waitingGame.getConfig().player.name === playerName) {
+            throw new Error(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
+        }
+
+        const joiningPlayer = new Player(playerId, playerName);
+        waitingGame.joinedPlayer = joiningPlayer;
+        // TODO: Inform initiating player that another is trying to join
     }
 
     /**

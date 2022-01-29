@@ -35,7 +35,7 @@ export default class Game {
 
         game.player1 = config.player;
         game.player2 = config.player2;
-        game.roundManager = new RoundManager(config.maxRoundTime);
+        game.roundManager = new RoundManager(/* config.maxRoundTime */);
         game.wordsPlayed = [];
         game.gameType = config.gameType;
         game.tileReserve = new TileReserve();
