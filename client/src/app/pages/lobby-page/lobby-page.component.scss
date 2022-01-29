@@ -12,9 +12,12 @@
   flex-direction: column;
 }
 
-mat-form-field {
-  width:35%
+app-name-field {
+  width: 30%;
+
+
 }
+
 body{
   flex-grow: 1;
   overflow: auto;
@@ -35,7 +38,6 @@ form {
 .mat-divider{
   border-width: 2px;
   border-color: rgba(128, 128, 128, 0.233);
-  margin-top: -1em;
 }
 
 footer {
