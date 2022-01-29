@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { LobbyInfo } from '@app/classes/lobby-info';
 
 const VERSUS_ICON =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path fill="#222"' +
@@ -33,23 +34,15 @@ const GAME_TYPE_ICON =
     styleUrls: ['./lobby-info.component.scss'],
 })
 export class LobbyInfoComponent {
-    @Input() validName: boolean = false;
-
-    timer: number;
-    // gameMode: GameMode;
+    @Input() lobby: LobbyInfo;
     // dictionnaries: Dictionnaries[]
-    isDisabled: boolean;
-    isSelected: boolean;
-    lobbyID: number;
 
-    constructor(private router: Router, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+    constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private router: Router) {
         iconRegistry.addSvgIconLiteral('versus', sanitizer.bypassSecurityTrustHtml(VERSUS_ICON));
         iconRegistry.addSvgIconLiteral('game-type', sanitizer.bypassSecurityTrustHtml(GAME_TYPE_ICON));
-        this.validName = false;
     }
 
     joinLobby() {
         this.router.navigateByUrl('waiting');
-        //
     }
 }
