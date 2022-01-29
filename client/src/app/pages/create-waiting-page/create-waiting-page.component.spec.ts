@@ -1,26 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OnlinePlayer } from '@app/classes/player';
-import { WaitingRoomPageComponent } from './waiting-room-page.component';
+import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { WaitingRoomMessages } from './waiting-room-page.component.const';
+import { WaitingRoomMessages } from './create-waiting-page.component.const';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 
-describe('WaitingRoomPageComponent', () => {
-    let component: WaitingRoomPageComponent;
-    let fixture: ComponentFixture<WaitingRoomPageComponent>;
+describe('CreateWaitingPageComponent', () => {
+    let component: CreateWaitingPageComponent;
+    let fixture: ComponentFixture<CreateWaitingPageComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [WaitingRoomPageComponent],
+            declarations: [CreateWaitingPageComponent],
             imports: [MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
         }).compileComponents();
-        fixture = TestBed.createComponent(WaitingRoomPageComponent);
+        fixture = TestBed.createComponent(CreateWaitingPageComponent);
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(WaitingRoomPageComponent);
+        fixture = TestBed.createComponent(CreateWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

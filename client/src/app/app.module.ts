@@ -18,7 +18,7 @@ import { BoardComponent } from './components/board/board.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
-import { WaitingRoomPageComponent } from '@app/pages/waiting-room-page/waiting-room-page.component';
+import { CreateWaitingPageComponent } from '@app/pages/create-waiting-page/create-waiting-page.component';
 import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
 
 /**
@@ -42,7 +42,7 @@ import { DefaultDialogComponent } from './components/default-dialog/default-dial
         RackComponent,
         SurrenderDialogComponent,
         WaitingPageComponent,
-        WaitingRoomPageComponent,
+        CreateWaitingPageComponent,
         DefaultDialogComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],

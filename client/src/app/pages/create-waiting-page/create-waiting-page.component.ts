@@ -1,15 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { OnlinePlayer } from '@app/classes/player';
-import { WaitingRoomMessages } from './waiting-room-page.component.const';
+import { WaitingRoomMessages } from './create-waiting-page.component.const';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
-    selector: 'app-waiting-room-page',
-    templateUrl: './waiting-room-page.component.html',
-    styleUrls: ['./waiting-room-page.component.scss'],
+    selector: 'app-create-waiting-page',
+    templateUrl: './create-waiting-page.component.html',
+    styleUrls: ['./create-waiting-page.component.scss'],
 })
-export class WaitingRoomPageComponent {
+export class CreateWaitingPageComponent {
     @Input() opponent: OnlinePlayer | undefined;
     host: OnlinePlayer;
     waitingRoomMessage: string = WaitingRoomMessages.HostWaitingMessage;
