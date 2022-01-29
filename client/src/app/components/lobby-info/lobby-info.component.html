@@ -1,28 +1,24 @@
-<div class="container" (dblclick)="joinLobby()"> 
-    <div>
+<div class="container"> 
+    <div >
         <div class="info">
             <mat-icon svgIcon="versus" aria-hidden="false" aria-label="Versus icon"></mat-icon>
-            Adversaire: Justin 
-            <!--Adversaire: {{playerName}} -->
+            Adversaire: {{ lobby.playerName }}
         </div>
         <div class="info">
             <mat-icon svgIcon="game-type" aria-hidden="false" aria-label="game-type icon"></mat-icon>
-            Type de partie: Classique
-            <!-- Type de partie: {{GameMode}} -->
+            Type de partie: {{lobby.gameType}}
         </div>
     </div>
 
     <div>
         <div class="info">
             <span class="material-icons">timer</span>
-            Temps par tour: 1 min
-            <!-- Temps par tour: {{timer}} -->
+            Temps par tour: {{lobby.timer}}
         </div>
-
     </div>
    
     <div class="right-side">
-        <button  [disabled]="!validName"  mat-flat-button color="primary" (click)="joinLobby()">
+        <button mat-flat-button color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()">
             Joindre 
             <span class="material-icons">person_add</span>
         </button>
