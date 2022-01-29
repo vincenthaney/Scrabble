@@ -20,6 +20,7 @@ import { DefaultDialogComponent } from './components/default-dialog/default-dial
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
+import { IconComponent } from './components/icon/icon.component';
 
 /**
  * Main module that is used in main.ts.
@@ -44,6 +45,7 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         WaitingPageComponent,
         GameCreationPageComponent,
         DefaultDialogComponent,
+        IconComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
     providers: [],
