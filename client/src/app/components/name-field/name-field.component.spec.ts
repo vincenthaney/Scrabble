@@ -5,6 +5,10 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NameFieldComponent } from './name-field.component';
 
+const fakeNameChange = () => {
+    return false;
+};
+
 describe('NameFieldComponent', () => {
     let component: NameFieldComponent;
     let fixture: ComponentFixture<NameFieldComponent>;
@@ -34,9 +38,6 @@ describe('NameFieldComponent', () => {
     });
 
     it('onNameChange should emit isInputNameValid true with a valid name', () => {
-        const fakeNameChange = () => {
-            return false;
-        };
         const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
         component.formParameters.patchValue({ inputName: 'testName' });
         component.onNameChange('testName');
@@ -45,9 +46,6 @@ describe('NameFieldComponent', () => {
     });
 
     it('onNameChange should emit isInputNameValid false with an invalid name', () => {
-        const fakeNameChange = () => {
-            return false;
-        };
         const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
         component.formParameters.patchValue({ inputName: '!nval!dName' });
         component.onNameChange('!nval!dName');
