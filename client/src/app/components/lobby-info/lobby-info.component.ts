@@ -35,14 +35,14 @@ const GAME_TYPE_ICON =
     styleUrls: ['./lobby-info.component.scss'],
 })
 export class LobbyInfoComponent {
-    @Input() lobby: LobbyInfo = { lobbyID: 0, playerName: '', gameType: GameType.Classic, timer: 0, canJoin: false };
-    isHovered: boolean = false;
+    @Input() lobby: LobbyInfo;
     // dictionnaries: Dictionnaries[]
 
     // constructor(private router: Router) {
     constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private router: Router) {
         iconRegistry.addSvgIconLiteral('versus', sanitizer.bypassSecurityTrustHtml(VERSUS_ICON));
         iconRegistry.addSvgIconLiteral('game-type', sanitizer.bypassSecurityTrustHtml(GAME_TYPE_ICON));
+        this.lobby = { lobbyID: 0, playerName: '', gameType: GameType.Classic, timer: 0, canJoin: false };
     }
 
     async joinLobby() {
