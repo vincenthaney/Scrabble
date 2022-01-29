@@ -17,7 +17,9 @@
     </div>
    
     <div class="right-side">
-        <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()">
+
+        <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()" 
+        matTooltip="Veuillez entrer un nom valide différent de {{lobby.playerName}}" matTooltipClass="example-tooltip-red" [matTooltipDisabled]="lobby.canJoin">
             Joindre 
             <span class="material-icons">person_add</span>
         </button>

@@ -36,6 +36,7 @@ const GAME_TYPE_ICON =
 })
 export class LobbyInfoComponent {
     @Input() lobby: LobbyInfo = { lobbyID: 0, playerName: '', gameType: GameType.Classic, timer: 0, canJoin: false };
+    isHovered: boolean = false;
     // dictionnaries: Dictionnaries[]
 
     // constructor(private router: Router) {
