@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { GameType } from '@app/classes/game-type';
 import { LobbyInfo } from '@app/classes/lobby-info';
 
 const VERSUS_ICON =
@@ -34,9 +35,10 @@ const GAME_TYPE_ICON =
     styleUrls: ['./lobby-info.component.scss'],
 })
 export class LobbyInfoComponent {
-    @Input() lobby: LobbyInfo;
+    @Input() lobby: LobbyInfo = { lobbyID: 0, playerName: '', gameType: GameType.Classic, timer: 0, canJoin: false };
     // dictionnaries: Dictionnaries[]
 
+    // constructor(private router: Router) {
     constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private router: Router) {
         iconRegistry.addSvgIconLiteral('versus', sanitizer.bypassSecurityTrustHtml(VERSUS_ICON));
         iconRegistry.addSvgIconLiteral('game-type', sanitizer.bypassSecurityTrustHtml(GAME_TYPE_ICON));
