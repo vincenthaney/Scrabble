@@ -34,7 +34,7 @@ export class WaitingRoomPageComponent {
             data: {
                 // Data type is DefaultDialogParameters
                 title: 'Attention!',
-                content: opponentName + "le salon. Veuillez patientez le temps qu'un autre joueur veuille vous affronter.",
+                content: opponentName + "a rejoint le salon. Veuillez patientez le temps qu'un autre joueur veuille vous affronter.",
                 buttons: [
                     {
                         content: 'Retourner en attente.',
