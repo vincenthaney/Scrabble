@@ -19,8 +19,6 @@ import { GameCreationPageComponent } from './game-creation-page.component';
 })
 class TestComponent {}
 
-// let loader: HarnessLoader;
-
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
@@ -87,24 +85,13 @@ describe('GameCreationPageComponent', () => {
     //   expect(component.gameType).toEqual(component.GameType.Classic);
     // });
 
-    it('back button should reroute to home page', () => {
-        const backButton = fixture.debugElement.nativeElement.querySelector('#back-button');
-        const location: Location = TestBed.inject(Location);
-        const initLocation = location.path();
-        backButton.click();
-        fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/home');
-            expect(location.path() == initLocation).toBeFalse();
-        });
-    });
-
     it('initial value of form fields should be empty', async () => {
         const gameParametersForm = component.gameParameters;
         const initialFormValues = {
             inputTimer: '',
             inputDict: '',
             inputName: '',
-        }
+        };
         expect(gameParametersForm.value).toEqual(initialFormValues);
     });
 
@@ -151,23 +138,23 @@ describe('GameCreationPageComponent', () => {
         gameParametersForm.setValue(formValues);
         expect(gameParametersForm.valid).toBeFalsy();
     });
-    
+
     it('form should call onSubmit when submit button is clicked', async () => {
         const spy = spyOn(component, 'onSubmit');
         const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
         submitButton.click();
         expect(spy).toHaveBeenCalled();
     });
-    
+
     it('form should not call createGame on submit if invalid', async () => {
         const spy = spyOn(component, 'createGame');
 
         const gameParametersForm = component.gameParameters;
-        gameParametersForm.setErrors({'error': true});
+        gameParametersForm.setErrors({ error: true });
 
         const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
         submitButton.click();
-        
+
         expect(spy).not.toHaveBeenCalled();
     });
 
@@ -184,18 +171,36 @@ describe('GameCreationPageComponent', () => {
 
         const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
         submitButton.click();
-        
+
         expect(spy).toHaveBeenCalled();
     });
 
+    it('createGame button should reroute to waiting-room page if form is valid', async () => {
+        const location: Location = TestBed.inject(Location);
 
-    it('createGame button should reroute to home page', async () => {
+        const gameParametersForm = component.gameParameters;
+        const validInputs = {
+            inputTimer: '30',
+            inputDict: 'french-dict',
+            inputName: 'nom valide',
+        };
+        gameParametersForm.setValue(validInputs);
+
+        const backButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+        backButton.click();
+
+        return fixture.whenStable().then(() => {
+            expect(location.path()).toBe('/waiting-room');
+        });
+    });
+
+    it('back button should reroute to home page', async () => {
         const location: Location = TestBed.inject(Location);
 
         const backButton = fixture.debugElement.nativeElement.querySelector('#back-button');
         backButton.click();
-        
-        fixture.whenStable().then(() => {
+
+        return fixture.whenStable().then(() => {
             expect(location.path()).toBe('/home');
         });
     });
