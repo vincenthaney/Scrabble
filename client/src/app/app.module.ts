@@ -21,6 +21,7 @@ import { InformationBoxComponent } from './components/information-box/informatio
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 import { IconComponent } from './components/icon/icon.component';
+import { NameFieldComponent } from './components/name-field/name-field.component';
 
 /**
  * Main module that is used in main.ts.
@@ -46,6 +47,7 @@ import { IconComponent } from './components/icon/icon.component';
         GameCreationPageComponent,
         DefaultDialogComponent,
         IconComponent,
+        NameFieldComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
     providers: [],

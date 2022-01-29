@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-import { NAME_VALIDATION } from '@app/classes/name-validation';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -11,6 +11,8 @@ import { NAME_VALIDATION } from '@app/classes/name-validation';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent {
+    @ViewChild(NameFieldComponent) child: NameFieldComponent;
+    isNameValid: boolean = false;
     gameTypes = GameType;
     gameModes = GameMode;
 
@@ -19,26 +21,26 @@ export class GameCreationPageComponent {
 
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
-    dictoptions: string[];
+    dictOptions: string[];
 
     gameParameters = new FormGroup({
         inputTimer: new FormControl('', Validators.required),
         inputDict: new FormControl('', Validators.required),
-        inputName: new FormControl('', [
-            Validators.required,
-            Validators.pattern(NAME_VALIDATION.rule),
-            Validators.minLength(NAME_VALIDATION.minLength),
-            Validators.maxLength(NAME_VALIDATION.maxLength),
-        ]),
     });
 
     constructor(private router: Router) {}
 
     createGame() {
-        if (this.gameParameters.valid) {
+        if (this.gameParameters.valid && this.isNameValid) {
             // send new game request to server (?)
             // route to waiting room
             this.router.navigateByUrl('waiting');
+        } else {
+            this.child.formParameters.markAllAsTouched();
         }
+    }
+
+    onNameChange(isNameValid: boolean) {
+        this.isNameValid = isNameValid;
     }
 }
