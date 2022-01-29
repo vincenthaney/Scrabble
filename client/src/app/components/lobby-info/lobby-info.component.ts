@@ -44,7 +44,7 @@ export class LobbyInfoComponent {
         iconRegistry.addSvgIconLiteral('game-type', sanitizer.bypassSecurityTrustHtml(GAME_TYPE_ICON));
     }
 
-    joinLobby() {
-        this.router.navigateByUrl('waiting');
+    async joinLobby() {
+        await this.router.navigateByUrl('waiting');
     }
 }
