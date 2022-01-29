@@ -10,6 +10,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 describe('CreateWaitingPageComponent', () => {
     let component: CreateWaitingPageComponent;
     let fixture: ComponentFixture<CreateWaitingPageComponent>;
+    const testOpponent = new OnlinePlayer('testName');
+    testOpponent.name = 'testName';
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -23,6 +25,7 @@ describe('CreateWaitingPageComponent', () => {
         fixture = TestBed.createComponent(CreateWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        component.setOpponent(testOpponent);
     });
 
     it('should create', () => {
@@ -30,39 +33,27 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     it('waitingRoomMessage should change to {opponent name} + OpponentFoundMessage when an opponent joins the lobby', async () => {
-        const testOpponent = new OnlinePlayer('testName');
-        testOpponent.name = 'testName';
-        component.setOpponent(testOpponent);
         expect(component.waitingRoomMessage).toEqual(testOpponent.name + WaitingRoomMessages.OpponentFoundMessage);
     });
 
     it('waitingRoomMessage should change to HostWaitingMessage when an opponent leaves the lobby', async () => {
-        const testOpponent = new OnlinePlayer('testName');
-        testOpponent.name = 'testName';
-        component.setOpponent(testOpponent);
         component.disconnectOpponent(testOpponent.name);
         expect(component.waitingRoomMessage).toEqual(WaitingRoomMessages.HostWaitingMessage);
     });
 
     it('startButton should be enabled when an opponent joins the lobby', () => {
-        const testOpponent = new OnlinePlayer('testName');
-        component.setOpponent(testOpponent);
         fixture.detectChanges();
         const startGameButton = fixture.nativeElement.querySelector('#start-game-button');
         expect(startGameButton.disabled).toBeFalsy();
     });
 
     it('rejectButton should be enabled when an opponent joins the lobby', () => {
-        const testOpponent = new OnlinePlayer('testName');
-        component.setOpponent(testOpponent);
         fixture.detectChanges();
         const rejectButton = fixture.nativeElement.querySelector('#reject-button');
         expect(rejectButton.disabled).toBeFalsy();
     });
 
     it('startButton should be disabled when the opponent leaves the lobby', () => {
-        const testOpponent = new OnlinePlayer('testName');
-        component.setOpponent(testOpponent);
         component.disconnectOpponent(testOpponent.name);
         fixture.detectChanges();
         const startGameButton = fixture.nativeElement.querySelector('#start-game-button');
@@ -70,8 +61,6 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     it('reject button should be disabled when the opponent leaves the lobby', async () => {
-        const testOpponent = new OnlinePlayer('testName');
-        component.setOpponent(testOpponent);
         component.disconnectOpponent(testOpponent.name);
         fixture.detectChanges();
         const rejectButton = fixture.nativeElement.querySelector('#reject-button');
