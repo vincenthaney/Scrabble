@@ -1,24 +1,24 @@
 <div class = "center">
     <div class = "button-box">
         <div class="sameline center">
-            {{messageWaitingRoom}}
+            {{waitingRoomMessage}}
             <div *ngIf="!isOpponentFound">
                 <mat-progress-spinner id="spinnerOpponentFound" class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
             </div>
         </div>
-        <button id="start-game-button" class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
+        <button id="start-game-button" class="button" mat-flat-button color="primary" [disabled]="!isOpponentFound">
             Démarrer la partie
         </button>
     
-        <button id="reject-button" class="button" mat-flat-button color="primary" disabled="isOpponentFound()">
-            Rejeter adversaire
+        <button id="reject-button" class="button" mat-flat-button color="primary" [disabled]="!isOpponentFound">
+            Trouver un nouvel adversaire
         </button>
     
-        <button mat-flat-button class="button" color="primary" routerLink="game-creation">
+        <button mat-flat-button class="button" color="primary" [disabled]="isOpponentFound" routerLink="game-creation">
             Annuler la partie
         </button>
         
-        <button mat-flat-button class="button" color="primary" disabled="true">
+        <button mat-flat-button class="button" color="primary" [disabled]="isOpponentFound">
             Convertir en partie solo
         </button>
     

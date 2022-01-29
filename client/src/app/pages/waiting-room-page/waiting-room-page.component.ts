@@ -12,33 +12,29 @@ import { MatDialog } from '@angular/material/dialog';
 export class WaitingRoomPageComponent {
     @Input() opponent: OnlinePlayer | undefined;
     host: OnlinePlayer;
-    messageWaitingRoom: string = WaitingRoomMessages.HostWaitingMessage;
+    waitingRoomMessage: string = WaitingRoomMessages.HostWaitingMessage;
     isOpponentFound: boolean;
     constructor(public dialog: MatDialog) {}
 
-    setHost(host: OnlinePlayer) {
-        this.host = host;
-    }
-
     setOpponent(opponent: OnlinePlayer) {
         this.opponent = opponent;
-        this.messageWaitingRoom = this.opponent.name + WaitingRoomMessages.OpponentFoundMessage;
+        this.waitingRoomMessage = this.opponent.name + WaitingRoomMessages.OpponentFoundMessage;
         this.isOpponentFound = true;
     }
 
-    disconnectOpponent() {
+    disconnectOpponent(opponentName: string) {
+        this.warnHostOpponentLeft(opponentName);
         this.opponent = undefined;
-        this.messageWaitingRoom = WaitingRoomMessages.HostWaitingMessage;
+        this.waitingRoomMessage = WaitingRoomMessages.HostWaitingMessage;
         this.isOpponentFound = false;
-        this.warnHostOpponentLeft();
     }
 
-    warnHostOpponentLeft() {
+    warnHostOpponentLeft(opponentName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 // Data type is DefaultDialogParameters
                 title: 'Attention!',
-                content: "Votre adversaire a quitté le salon. S'il-vous-plaît, patientez le temps qu'un autre joueur veuille vous affronter.",
+                content: opponentName + "le salon. Veuillez patientez le temps qu'un autre joueur veuille vous affronter.",
                 buttons: [
                     {
                         content: 'Retourner en attente.',
