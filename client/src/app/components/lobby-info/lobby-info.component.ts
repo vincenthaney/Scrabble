@@ -4,6 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { GameType } from '@app/classes/game-type';
 import { LobbyInfo } from '@app/classes/lobby-info';
+import { convertTime } from '@app/classes/utils';
 import { VERSUS_ICON, GAME_TYPE_ICON } from './lobby-info-icons';
 
 @Component({
@@ -27,13 +28,6 @@ export class LobbyInfoComponent {
     }
 
     convertTime(): string {
-        const SECONDS_IN_MINUTE = 60;
-        const time = this.lobby.timer;
-        const minutes = Math.floor(time / SECONDS_IN_MINUTE);
-        const seconds = Math.floor(time % SECONDS_IN_MINUTE);
-        const minuteDisplay = minutes > 0 ? minutes + (minutes === 1 ? ' minute' : ' minutes') : '';
-        const textBetween = minutes > 0 && seconds > 0 ? ' et ' : '';
-        const secondsDisplay = seconds > 0 ? seconds + (seconds === 1 ? ' seconde' : ' secondes') : '';
-        return minuteDisplay + textBetween + secondsDisplay;
+        return convertTime(this.lobby.timer);
     }
 }
