@@ -1,30 +1,24 @@
-
 $info-box-max-width:1600px;
-$info-box-height: 120px;
-
-$board-width:800px;
-$board-height: $board-width;
-$board-proportion: 80%;
-$rack-proportion: 13%;
-$buttons-proportion: 7%;
-
-
-
+$board-width:1000px;
 $communication-box-min-width:300px;
 $communication-box-max-width:500px;
 
-$rack-height: 120px;
+$board-height-proportion: 80%;
+$rack-height-proportion: 13%;
+$buttons-height-proportion: 7%;
 
+$board-height: $board-width;
+$rack-height: 120px;
 $buttons-height: 50px;
+$info-box-height: 100px;
 
 $button-height: 30px;
 $button-width: 140px;
 
-
-// $a: $buttons-height * (100% - $info-box-height);
 button {
     width: $button-width;
 }
+
 #page-container {
     width: 100%;
     height: 100%;
@@ -35,31 +29,12 @@ button {
 #button-group {
     display: flex;
     justify-content: space-around;
-    height: 100%;
-    vertical-align: middle;
-    text-align: center;
     align-items: center;
 }
-
-#button-group button {
-    // height: $button-height;
-    // width: $button-width;
-    justify-items: center;
-    text-align: center;
-    justify-self: center;
-
-}
-
-@function pxtopercent($target, $parent: 16px) {
-    @return percentage($target / $parent);
-  }
   
 .text-button-container {
     display: flex;
-    vertical-align: middle;
     justify-content: space-around;
-    align-items: center;
-    // height: ;
     padding-bottom: 10px;
 }
 
@@ -69,34 +44,25 @@ button {
     justify-content: right;
 }
 
-.vertical-grid .grid-item-container {
-    height: 100%;
-    width: 100%;
-    max-width: 900px;
-    margin-left: auto;
-}
-
-.top-grid {
+.top-level-grid {
     display: grid;
     height: 100%;
     width: 100%;
     grid-template-rows: $info-box-height auto;
     justify-items: center;
     text-align: center;
-    justify-self: center;
     background-color: brown;
 }
 
-.bottom-grid {
+.horizontal-grid {
     display: grid;
-    grid-template-columns:  $board-width auto ;
+    grid-template-columns: $board-width auto ;
     height: 100%;
     width: 100%;
-    background-color: blueviolet;
 }
 
 @media screen and (min-width: ($board-width + $communication-box-max-width)) {
-    .bottom-grid {
+    .horizontal-grid {
         grid-template-columns:  $board-width  $communication-box-max-width;
         width: $board-width + $communication-box-max-width;
     }
@@ -104,49 +70,19 @@ button {
 
 .vertical-grid {
     display: grid;
-    grid-template-rows:  $board-proportion 0 $rack-proportion $buttons-proportion;
+    grid-template-rows:  $board-height-proportion 0 $rack-height-proportion $buttons-height-proportion;
     height: 100%;
     width: 100%;
-    max-width: $board-width;
     background-color: gray;
 }
 @media screen and (min-height: ($board-height + $rack-height + $buttons-height + $info-box-height )) {
     .vertical-grid {
         grid-template-rows: $board-height auto $rack-height $buttons-height;
-        // width: $board-width + $communication-box-max-width;
     }
-}
-
-.space-between {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    justify-content: space-between;
-    flex-direction: column;
-
-}
-
-body .board-section {
-    min-height: 455px;
-    width: calc(100vh - 144px);
-}
-
-.board-section {
-    align-items: flex-end;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 32px);
-    max-height: calc(100vh - 32px);
-    min-height: 375px;
-    min-width: 343px;
-    position: relative;
-    width: calc(100vh - 32px);
 }
 
 .sidebar-section {
     background-color: blue;
-    border-radius: .5rem;
     display: flex;
     flex: 1;
     flex-direction: column;
