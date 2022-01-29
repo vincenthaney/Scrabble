@@ -1,29 +1,21 @@
 <div class="container">
     <body>
         <h1>Sélection de partie</h1>
-        <div class="form-container">
+        <!-- <div class="form-container">
             <mat-form-field appearance="outline">
                 <mat-label>Nom d'utilisateur </mat-label>
                 <input matInput type="text" id="playerNameController" [formControl]="playerNameController" 
                 (ngModelChange)="onNameFieldChange($event)" placeholder="Michel Gagnon" value="Invité">
             </mat-form-field>
+        </div> -->
+        <div class="form-container">
+            <app-name-field (isInputNameValid)="onNameChange($event)"></app-name-field>
         </div>
            
         <mat-divider></mat-divider>
         <div class="grid-container">
             <div class="grid">
-                <app-lobby-info [validName]="playerNameController.valid"></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-                <app-lobby-info></app-lobby-info>
-
+                <app-lobby-info *ngFor="let lobby of lobbies" [lobby]="lobby" > </app-lobby-info> 
             </div>
         </div>
     </body>
