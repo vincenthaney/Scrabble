@@ -19,10 +19,11 @@ export class BoardComponent implements OnInit {
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
 
         this.gridSize = this.boardService.getGridSize();
-        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+
         if (!this.gridSize) {
             this.gridSize = UNDEFINED_GRID_SIZE;
         }
+        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
     ngOnInit() {

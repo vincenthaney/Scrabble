@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { DEFAULT_SQUARE_COLOR } from '@app/constants/game';
+import { DEFAULT_SQUARE_COLOR, UNDEFINED_TILE } from '@app/constants/game';
 
 @Component({
     selector: 'app-square',
@@ -32,7 +32,17 @@ export class SquareComponent implements OnInit, AfterViewInit {
     }
 
     getSquareSize(): Vec2 {
+        if (!this.squareView) {
+            return { x: -1, y: -1 };
+        }
         return this.squareView.squareSize;
+    }
+
+    getText(): string {
+        if (!this.squareView) {
+            return UNDEFINED_TILE.letter;
+        }
+        return this.squareView.getText();
     }
 
     private initializeStyle() {

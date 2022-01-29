@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UNDEFINED_GRID_SIZE } from '@app/classes/game-constants';
 import { Vec2 } from '@app/classes/vec2';
+import { UNDEFINED_GRID_SIZE } from '@app/constants/game';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
 import SpyObj = jasmine.SpyObj;

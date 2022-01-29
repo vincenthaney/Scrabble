@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { UNDEFINED_TILE } from '@app/classes/game-constants';
 import { Tile } from '@app/classes/tile';
+import { UNDEFINED_TILE } from '@app/constants/game';
 import { TileComponent } from './tile.component';
 
 describe('TileComponent', () => {
