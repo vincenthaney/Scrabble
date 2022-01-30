@@ -20,6 +20,9 @@ export default class BoardService {
     }
 
     set grid(grid: Square[][]) {
+        if (!grid) {
+            return;
+        }
         this.pGrid = grid;
     }
 

@@ -47,3 +47,5 @@ export const UNDEFINED_SQUARE: Square = {
     isMultiplierPlayed: false,
     isCenter: false,
 };
+
+export const VALID_MULTIPLIERS: number[] = [2, 3];
