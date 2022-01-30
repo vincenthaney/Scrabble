@@ -92,7 +92,7 @@ describe('Game', () => {
             game = await Game.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG);
         });
 
-        it('should retturn an id', () => {
+        it('should return an id', () => {
             expect(game.getId()).to.exist;
         });
 
@@ -137,7 +137,7 @@ describe('Game Type', () => {
         expect(GameType.Classic).to.equal('Classique');
     });
 
-    it('should contain Classic', () => {
+    it('should contain LOG2990', () => {
         expect(GameType.LOG2990).to.equal('LOG2990');
     });
 });
