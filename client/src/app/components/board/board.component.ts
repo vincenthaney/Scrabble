@@ -19,7 +19,6 @@ export class BoardComponent implements OnInit {
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
 
         this.gridSize = this.boardService.getGridSize();
-
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
