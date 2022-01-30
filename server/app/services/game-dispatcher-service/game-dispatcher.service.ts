@@ -42,7 +42,7 @@ export class GameDispatcherService {
      * @param playerName Name the player want to use
      */
 
-    joinMultiplayerGame(waitingGameId: string, playerId: string, playerName: string) {
+    requestJoinGame(waitingGameId: string, playerId: string, playerName: string) {
         const waitingGame = this.getGameFromId(waitingGameId);
 
         if (waitingGame.joinedPlayer !== undefined) {

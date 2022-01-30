@@ -87,23 +87,23 @@ describe('GameDispatcherService', () => {
         });
 
         it('should add the player to the waiting game', () => {
-            gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
 
             expect(waitingGame.joinedPlayer?.getId()).to.equal(DEFAULT_OPPONENT_ID);
             expect(waitingGame.joinedPlayer?.name).to.equal(DEFAULT_OPPONENT_NAME);
         });
 
         it('should not join if a player is already waiting', () => {
-            gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
 
             expect(() => {
-                gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID_2, DEFAULT_OPPONENT_NAME_2);
+                gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID_2, DEFAULT_OPPONENT_NAME_2);
             }).to.throw(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
         });
 
         it('should not join if initiating player have the same name', () => {
             expect(() => {
-                gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
+                gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
             }).to.throw(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
         });
     });
@@ -115,7 +115,7 @@ describe('GameDispatcherService', () => {
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
             spy = chai.spy.on(activeGameService, 'beginMultiplayerGame', async () => Promise.resolve());
-            gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
         it('should remove waitingGame', async () => {
@@ -162,7 +162,7 @@ describe('GameDispatcherService', () => {
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
             waitingGame = gameDispatcherService['waitingGames'][0];
-            gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
         it('should remove joinedPlayer from waitingGame', () => {
@@ -226,7 +226,7 @@ describe('GameDispatcherService', () => {
             for (let i = 0; i < NTH_GAMES; ++i) {
                 const id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
                 if (i < NTH_JOINED) {
-                    gameDispatcherService.joinMultiplayerGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+                    gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
                 }
             }
 
