@@ -218,7 +218,7 @@ describe('GameCreationPageComponent', () => {
             name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        expect(gameParametersForm.valid).toBeTruthy();
     });
 
     it('form should not be valid if timer is empty', () => {
