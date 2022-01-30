@@ -1,6 +1,6 @@
 import { MultiplierEffect } from './multiplier-effect';
 
-export default abstract class IScoreMultiplier {
+export default abstract class AbstractScoreMultiplier {
     protected multiplier: number;
     protected multiplierType: MultiplierEffect;
 
