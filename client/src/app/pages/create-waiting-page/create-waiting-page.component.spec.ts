@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OnlinePlayer } from '@app/classes/player';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { WaitingRoomMessages } from './create-waiting-page.component.const';
+import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -33,12 +33,12 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     it('waitingRoomMessage should change to {opponent name} + OpponentFoundMessage when an opponent joins the lobby', async () => {
-        expect(component.waitingRoomMessage).toEqual(testOpponent.name + WaitingRoomMessages.OpponentFoundMessage);
+        expect(component.waitingRoomMessage).toEqual(testOpponent.name + OPPONENT_FOUND_MESSAGE);
     });
 
     it('waitingRoomMessage should change to HostWaitingMessage when an opponent leaves the lobby', async () => {
         component.disconnectOpponent(testOpponent.name);
-        expect(component.waitingRoomMessage).toEqual(WaitingRoomMessages.HostWaitingMessage);
+        expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
     });
 
     it('startButton should be enabled when an opponent joins the lobby', () => {

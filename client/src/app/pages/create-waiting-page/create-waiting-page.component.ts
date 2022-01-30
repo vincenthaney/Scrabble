@@ -1,6 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { OnlinePlayer } from '@app/classes/player';
-import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
+import {
+    DIALOG_BUTTON_CONTENT,
+    DIALOG_CONTENT,
+    DIALOG_TITLE,
+    HOST_WAITING_MESSAGE,
+    OPPONENT_FOUND_MESSAGE,
+} from './create-waiting-page.component.const';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -33,11 +39,11 @@ export class CreateWaitingPageComponent {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 // Data type is DefaultDialogParameters
-                title: 'Attention!',
-                content: opponentName + "a rejoint le salon. Veuillez patientez le temps qu'un autre joueur veuille vous affronter.",
+                title: DIALOG_TITLE,
+                content: opponentName + DIALOG_CONTENT,
                 buttons: [
                     {
-                        content: 'Retourner en attente.',
+                        content: DIALOG_BUTTON_CONTENT,
                         closeDialog: true,
                     },
                 ],
