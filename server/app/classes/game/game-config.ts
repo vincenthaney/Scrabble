@@ -10,7 +10,7 @@ export interface GameConfigData {
 }
 
 export interface GameConfig {
-    player: Player;
+    player1: Player;
     gameType: GameType;
     maxRoundTime: number;
     dictionary: string;

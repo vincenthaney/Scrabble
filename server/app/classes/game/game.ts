@@ -29,7 +29,7 @@ export default class Game {
         const game = new Game();
 
         game.id = id;
-        game.player1 = config.player;
+        game.player1 = config.player1;
         game.player2 = config.player2;
         game.roundManager = new RoundManager(/* config.maxRoundTime */);
         game.wordsPlayed = [];
