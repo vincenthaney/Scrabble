@@ -11,7 +11,7 @@ export class Server {
     private static readonly baseDix: number = 10;
     private server: http.Server;
 
-    constructor(private readonly application: Application, private readonly socketService: SocketService) {}
+    constructor(private readonly application: Application, private socketService: SocketService) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
