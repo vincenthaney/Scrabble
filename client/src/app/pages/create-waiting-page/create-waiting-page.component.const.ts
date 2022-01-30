@@ -1,4 +1,2 @@
-export enum WaitingRoomMessages {
-    HostWaitingMessage = "En attente d'un adversaire.",
-    OpponentFoundMessage = 'a rejoint votre partie.',
-}
+export const HOST_WAITING_MESSAGE = "En attender d'un adversative.";
+export const OPPONENT_FOUND_MESSAGE = 'a rejoint votre partie.';
