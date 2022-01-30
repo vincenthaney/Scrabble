@@ -3,7 +3,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
-import { START_TILE_AMOUNT } from './game.const';
+import { START_TILES_AMOUNT } from './game.const';
 import Board from '@app/classes/board/board';
 import * as Errors from '@app/constants/errors';
 
@@ -39,8 +39,8 @@ export default class Game {
 
         await game.tileReserve.init();
 
-        game.player1.tiles = game.tileReserve.getTiles(START_TILE_AMOUNT);
-        game.player2.tiles = game.tileReserve.getTiles(START_TILE_AMOUNT);
+        game.player1.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
+        game.player2.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
 
         // game.roundManager.startRound(); TODO: start round
 
