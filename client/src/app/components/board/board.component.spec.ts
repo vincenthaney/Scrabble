@@ -114,7 +114,6 @@ describe('BoardComponent', () => {
                 expectedBoardSize.y,
             () => {
                 spyOn(boardService, 'getGridSize').and.returnValue(boardSize);
-                // spyOnProperty(boardService, 'grid', 'get').and.returnValue(mockGrid);
 
                 fixture = TestBed.createComponent(BoardComponent);
                 component = fixture.componentInstance;

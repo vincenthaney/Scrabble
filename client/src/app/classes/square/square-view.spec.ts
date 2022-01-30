@@ -11,19 +11,25 @@ interface ColorTestCase {
     expectedColor: COLORS;
 }
 
+interface GetTextTestCase {
+    testCaseText: string;
+    multiplier: AbstractScoreMultiplier;
+    expectedText: string;
+}
+
 class SquareViewWrapper {
-    psquare: Square;
+    pSquare: Square;
     squareView: SquareView;
 
     createSquareView() {
         this.squareView = new SquareView(this.square, SQUARE_SIZE);
     }
     get square(): Square {
-        return this.psquare;
+        return this.pSquare;
     }
 
     set square(square: Square) {
-        this.psquare = square;
+        this.pSquare = square;
     }
 }
 describe('SquareView', () => {
@@ -34,12 +40,18 @@ describe('SquareView', () => {
         { testCaseText: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedColor: COLORS.Word3x },
     ];
 
-    it('SquareView with no Square associated should throw error', () => {
+    const validTextTestCase: GetTextTestCase[] = [
+        { testCaseText: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedText: 'Lettre x 2' },
+        { testCaseText: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedText: 'Lettre x 3' },
+        { testCaseText: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedText: 'Mot x 2' },
+        { testCaseText: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedText: 'Mot x 3' },
+    ];
+
+    it('SquareView with no Square associated should throw error when getting color', () => {
         const squareViewWrapper = new SquareViewWrapper();
         spyOnProperty(squareViewWrapper, 'square', 'get').and.returnValue(null);
         squareViewWrapper.createSquareView();
 
-        // spyOnProperty(squareView, 'square').and.returnValue(null);
         expect(() => squareViewWrapper.squareView.getColor()).toThrowError(SQUARE_ERRORS.NO_SQUARE_FOR_SQUARE_VIEW);
     });
 
@@ -109,5 +121,42 @@ describe('SquareView', () => {
         };
         const squareView = new SquareView(square, SQUARE_SIZE);
         expect(() => squareView.getColor()).toThrowError(SQUARE_ERRORS.NO_COLOR_FOR_MULTIPLIER);
+    });
+
+    it('SquareView with no Square associated should throw error when getting text', () => {
+        const squareViewWrapper = new SquareViewWrapper();
+        spyOnProperty(squareViewWrapper, 'square', 'get').and.returnValue(null);
+        squareViewWrapper.createSquareView();
+
+        expect(() => squareViewWrapper.squareView.getText()).toThrowError(SQUARE_ERRORS.NO_SQUARE_FOR_SQUARE_VIEW);
+    });
+
+    it('SquareView with no square multiplier should return no text', () => {
+        const squareView = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
+        expect(squareView.getText()).toEqual('');
+    });
+
+    it('SquareView with square which is the center should return no text', () => {
+        const square = UNDEFINED_SQUARE;
+        square.isCenter = true;
+        const squareView = new SquareView(square, SQUARE_SIZE);
+        expect(squareView.getText()).toEqual('');
+    });
+
+    validTextTestCase.forEach((testCase: GetTextTestCase) => {
+        const testText = testCase.testCaseText;
+        const multiplier = testCase.multiplier;
+        const expectedText = testCase.expectedText;
+
+        it('SquareView with ' + testText + ' should have text: ' + expectedText, () => {
+            const square = {
+                tile: null,
+                multiplier,
+                isMultiplierPlayed: false,
+                isCenter: false,
+            };
+            const squareView = new SquareView(square, SQUARE_SIZE);
+            expect(squareView.getText()).toEqual(expectedText);
+        });
     });
 });
