@@ -15,8 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 // import { MatListModule } from '@angular/material/list';
 // import { MatMenuModule } from '@angular/material/menu';
 // import { MatPaginatorModule } from '@angular/material/paginator';
-// import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 // import { MatSidenavModule } from '@angular/material/sidenav';
@@ -48,8 +47,7 @@ const modules = [
     // MatListModule,
     // MatMenuModule,
     // MatPaginatorModule,
-    // MatProgressBarModule,
-    MatProgressSpinnerModule,
+    MatProgressBarModule,
     MatRadioModule,
     MatSelectModule,
     // MatSidenavModule,
