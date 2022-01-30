@@ -5,4 +5,12 @@ export class HttpException extends Error {
         super(message);
         this.name = 'HttpException';
     }
+
+    toObject() {
+        return {
+            status: this.status,
+            name: this.name,
+            message: this.message,
+        };
+    }
 }
