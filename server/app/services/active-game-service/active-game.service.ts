@@ -7,6 +7,10 @@ import * as Errors from '@app/constants/errors';
 export class ActiveGameService {
     private activeGames: Game[];
 
+    constructor() {
+        this.activeGames = [];
+    }
+
     /**
      * Creates the game and add it to the active games list
      *
