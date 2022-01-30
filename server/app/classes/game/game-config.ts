@@ -9,6 +9,10 @@ export interface GameConfigData {
     dictionary: string;
 }
 
+export interface SoloGameConfigData extends GameConfigData {
+    virtualPlayerName: string;
+}
+
 export interface GameConfig {
     player: Player;
     gameType: GameType;
@@ -18,8 +22,4 @@ export interface GameConfig {
 
 export interface MultiplayerGameConfig extends GameConfig {
     player2: Player;
-}
-
-export interface SoloGameConfig extends GameConfig {
-    virtualPlayerName: string;
 }
