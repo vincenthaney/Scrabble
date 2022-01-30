@@ -112,6 +112,25 @@ export class GameDispatcherService {
     }
 
     /**
+     * Let initiating player cancel a game
+     *
+     * @param waitingGameId Id of the game in the lobby
+     * @param playerId Id of the initiating player
+     */
+
+    cancelGame(waitingGameId: string, playerId: string) {
+        const waitingGame = this.getGameFromId(waitingGameId);
+
+        if (waitingGame.getConfig().player.getId() !== playerId) {
+            throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        }
+
+        // Remove game from wait
+        const index = this.waitingGames.indexOf(waitingGame);
+        this.waitingGames.splice(index, 1);
+    }
+
+    /**
      * Get all available lobby that the player can join
      *
      * @returns {WaitingGame[]} list of available lobby
