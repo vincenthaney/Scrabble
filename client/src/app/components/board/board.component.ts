@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { SquareView } from '@app/classes/square';
+import { Square, SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_GRID_SIZE } from '@app/constants/game';
+import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { BoardService } from '@app/services/';
 
 @Component({
@@ -20,9 +20,6 @@ export class BoardComponent implements OnInit {
 
         this.gridSize = this.boardService.getGridSize();
 
-        if (!this.gridSize) {
-            this.gridSize = UNDEFINED_GRID_SIZE;
-        }
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
@@ -35,7 +32,8 @@ export class BoardComponent implements OnInit {
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
-                const square = this.boardService.grid && this.boardService.grid[i] ? this.boardService.grid[i][j] : null;
+                const serviceGrid: Square[][] = this.boardService.grid;
+                const square: Square = serviceGrid[i] && serviceGrid[i][j] ? this.boardService.grid[i][j] : UNDEFINED_SQUARE;
                 const squareView: SquareView = new SquareView(square, SQUARE_SIZE);
                 this.squareGrid[i][j] = squareView;
             }

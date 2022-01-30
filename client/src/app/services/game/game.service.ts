@@ -11,14 +11,18 @@ export default class GameService {
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
     roundManagerService: RoundManagerService;
-    localPlayer: IPlayer;
     opponentPlayer: IPlayer;
     wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
     gameType: GameType;
+    private localPlayer: IPlayer;
 
     // playAction(action: Action): void {
     //     throw new Error('Method not implemented.');
     // }
+
+    getLocalPlayer(): IPlayer {
+        return this.localPlayer;
+    }
 
     isGameOver(): boolean {
         throw new Error('Method not implemented.');

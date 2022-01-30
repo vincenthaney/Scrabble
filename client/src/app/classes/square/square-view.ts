@@ -4,9 +4,9 @@ import { COLORS } from '@app/constants/colors';
 import { MultiplierEffect } from './multiplier-effect';
 
 export default class SquareView {
-    square: Square | null;
+    square: Square;
     squareSize: Vec2;
-    constructor(square: Square | null, squareSize: Vec2) {
+    constructor(square: Square, squareSize: Vec2) {
         this.square = square;
         this.squareSize = squareSize;
     }
@@ -36,10 +36,7 @@ export default class SquareView {
     }
 
     getText(): string {
-        if (!this.square || !this.square.multiplier) {
-            return '';
-        }
-        if (this.square.isCenter) {
+        if (!this.square.multiplier || this.square.isCenter) {
             return '';
         }
         const multiplierType: string = this.square.multiplier.getMultiplierType();

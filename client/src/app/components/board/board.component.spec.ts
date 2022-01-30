@@ -1,12 +1,25 @@
+/* eslint-disable dot-notation */
+import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Square, SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { UNDEFINED_GRID_SIZE } from '@app/constants/game';
+import { UNDEFINED_GRID_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
-import SpyObj = jasmine.SpyObj;
 
 describe('BoardComponent', () => {
-    let boardServiceSpy: SpyObj<BoardService>;
+    let boardService: BoardService;
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
 
@@ -30,14 +43,42 @@ describe('BoardComponent', () => {
         ],
     ];
 
+    const mockSquare: Square = {
+        tile: null,
+        multiplier: null,
+        isMultiplierPlayed: false,
+        isCenter: false,
+    };
+    const mockGrid: Square[][] = [].constructor(boardServiceGridSize.y).forEach((i: number) => {
+        mockGrid[i] = [];
+        [].constructor(boardServiceGridSize.x).forEach((j: number) => {
+            mockGrid[i][j] = mockSquare;
+        });
+    });
+
     beforeEach(async () => {
-        boardServiceSpy = jasmine.createSpyObj('BoardService', ['getGridSize']);
+        boardService = new BoardService();
     });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            imports: [
+                MatGridListModule,
+                MatCardModule,
+                MatProgressSpinnerModule,
+                MatIconModule,
+                MatButtonModule,
+                ReactiveFormsModule,
+                CommonModule,
+                MatInputModule,
+                BrowserAnimationsModule,
+                AppMaterialModule,
+                MatFormFieldModule,
+                FormsModule,
+                MatDialogModule,
+            ],
             declarations: [BoardComponent],
-            providers: [{ provide: BoardService, useValue: boardServiceSpy }],
+            providers: [{ provide: BoardService, useValue: boardService }],
         }).compileComponents();
     });
 
@@ -45,6 +86,10 @@ describe('BoardComponent', () => {
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+    });
+
+    afterEach(() => {
+        fixture.destroy();
     });
 
     it('should create', () => {
@@ -68,15 +113,21 @@ describe('BoardComponent', () => {
                 ' : ' +
                 expectedBoardSize.y,
             () => {
-                component.gridSize = boardSize;
+                spyOn(boardService, 'getGridSize').and.returnValue(boardSize);
+                // spyOnProperty(boardService, 'grid', 'get').and.returnValue(mockGrid);
+
+                fixture = TestBed.createComponent(BoardComponent);
+                component = fixture.componentInstance;
+                fixture.detectChanges();
+
                 // eslint-disable-next-line dot-notation
                 component['initializeBoard']();
 
                 const actualRowAmount = component.squareGrid.length;
 
-                /* 
+                /*
                     If the Grid size is supposed to be smaller or equal to 0,
-                    then each row of the grid will not be initialized. 
+                    then each row of the grid will not be initialized.
                     In that case, we assign null values to the actual column amount.
                     If the expected size is greater than 0, then the row length is defined
                 */
@@ -89,19 +140,38 @@ describe('BoardComponent', () => {
     });
 
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {
-        boardServiceSpy.getGridSize.and.returnValue(boardServiceGridSize);
-
-        /* 
-            We need to recreate the component so the mock on the service
-            applies when we create the component
-        */
-        fixture = TestBed.createComponent(BoardComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
         expect(component.gridSize).toEqual(boardServiceGridSize);
     });
 
     it('If BoardService returns no grid, component should have UNDEFINED_GRID_SIZE size', () => {
+        spyOnProperty(boardService, 'grid', 'get').and.returnValue(null);
+
+        fixture = TestBed.createComponent(BoardComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+
         expect(component.gridSize).toEqual(UNDEFINED_GRID_SIZE);
+    });
+
+    it('If BoardService returns grid with null squares, should assign UNDEFINED_SQUARE to board', () => {
+        const grid = [
+            [mockSquare, null],
+            [mockSquare, null],
+        ];
+        const expectedGrid = [
+            [mockSquare, UNDEFINED_SQUARE],
+            [mockSquare, UNDEFINED_SQUARE],
+        ];
+        spyOn(boardService, 'getGridSize').and.returnValue({ x: 2, y: 2 });
+        spyOnProperty(boardService, 'grid', 'get').and.returnValue(grid);
+
+        fixture = TestBed.createComponent(BoardComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+
+        const actualSquareGrid = component.squareGrid.map((row: SquareView[]) => {
+            return row.map((sv: SquareView) => sv.square);
+        });
+        expect(actualSquareGrid).toEqual(expectedGrid);
     });
 });

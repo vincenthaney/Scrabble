@@ -2,22 +2,30 @@ import { Injectable } from '@angular/core';
 import { Multiplier, Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
-import { BOARD_SIZE } from '@app/constants/game';
+import { BOARD_SIZE, UNDEFINED_GRID_SIZE } from '@app/constants/game';
 
 @Injectable({
     providedIn: 'root',
 })
 export default class BoardService {
     private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
-    grid: Square[][];
+    private pGrid: Square[][];
 
     constructor() {
         this.initializeBoardGrid();
     }
 
+    get grid(): Square[][] {
+        return this.pGrid;
+    }
+
+    set grid(grid: Square[][]) {
+        this.pGrid = grid;
+    }
+
     getGridSize(): Vec2 {
         if (!this.grid || !this.grid[0]) {
-            return { x: 0, y: 0 };
+            return UNDEFINED_GRID_SIZE;
         }
         const x = this.grid.length;
         const y = this.grid[0].length;

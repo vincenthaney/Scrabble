@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { DEFAULT_SQUARE_COLOR, UNDEFINED_TILE } from '@app/constants/game';
 
 @Component({
     selector: 'app-square',
@@ -32,31 +31,21 @@ export class SquareComponent implements OnInit, AfterViewInit {
     }
 
     getSquareSize(): Vec2 {
-        if (!this.squareView) {
-            return { x: -1, y: -1 };
-        }
         return this.squareView.squareSize;
     }
 
     getText(): string {
-        if (!this.squareView) {
-            return UNDEFINED_TILE.letter;
-        }
         return this.squareView.getText();
     }
 
     private initializeStyle() {
-        this.style = this.squareView
-            ? {
-                  'background-color': this.squareView.getColor(),
-              }
-            : {
-                  'background-color': DEFAULT_SQUARE_COLOR,
-              };
+        this.style = {
+            'background-color': this.squareView.getColor(),
+        };
     }
 
     private initializeClasses() {
-        if (!this.squareView || !this.squareView.square || !this.squareView.square.isCenter) return;
+        if (!this.squareView.square.isCenter) return;
         const textWrapper = this.button.nativeElement.getElementsByClassName('mat-button-wrapper')[0];
         const starDiv = this.renderer.createElement('div');
         const starElement = this.renderer.createElement('i');
