@@ -4,7 +4,7 @@ import { IconAnimation, IconName, IconPrefix, IconRotation, IconSize, IconStyle 
 @Component({
     selector: 'app-icon',
     templateUrl: './icon.component.html',
-    styleUrls: ['./icon.component.scss', '../../../assets/fontawesome/css/all.min.css'],
+    styleUrls: ['./icon.component.scss'],
 })
 export class IconComponent implements OnInit {
     @Input() icon: IconName;
