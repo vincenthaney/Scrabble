@@ -1,15 +1,14 @@
 import { Service } from 'typedi';
 import * as io from 'socket.io';
 import * as http from 'http';
-import { GameConfigData } from '@app/classes/game/game-config';
-import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import * as SocketError from './socket.service.error';
 
 @Service()
 export class SocketService {
     private sio?: io.Server;
     private sockets: Map<string, io.Socket>;
 
-    constructor(private gameDispatcherService: GameDispatcherService) {
+    constructor() {
         this.sockets = new Map();
     }
 
@@ -18,26 +17,13 @@ export class SocketService {
     }
 
     handleSockets(): void {
-        if (!this.isInitialized()) throw new Error('SocketService not initialized');
+        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
 
-        this.sio?.on('connection', (socket) => {
+        this.sio.on('connection', (socket) => {
             this.sockets.set(socket.id, socket);
 
             socket.emit('initialization', {
                 id: socket.id,
-            });
-
-            socket.on('create-game', (config: Omit<GameConfigData, 'playerId'>) => {
-                const completeConfig: GameConfigData = {
-                    ...config,
-                    playerId: socket.id,
-                };
-                const waitingGame = this.gameDispatcherService.createMultiplayerGame(completeConfig);
-                socket.emit('create-game-response', waitingGame);
-            });
-
-            socket.on('get-lobby', () => {
-                socket.emit('get-lobby-response', this.gameDispatcherService.getAvailableWaitingGames());
             });
 
             socket.on('disconnect', () => {
@@ -50,7 +36,7 @@ export class SocketService {
         const socket = this.sockets.get(id);
 
         if (socket) return socket;
-        throw new Error('Invalid ID for socket');
+        throw new Error(SocketError.INVALID_ID_FOR_SOCKET);
     }
 
     isInitialized(): boolean {
