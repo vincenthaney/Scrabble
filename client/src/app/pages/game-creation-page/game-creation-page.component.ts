@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
@@ -11,19 +11,17 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements OnInit {
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
-
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
     dictoptions: string[];
-
-    gameParameters = new FormGroup({
+    gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Solo, Validators.required),
-        level: new FormControl(VirtualPlayerLevel.Beginner),
+        level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         timer: new FormControl('', Validators.required),
         dict: new FormControl('', Validators.required),
         name: new FormControl('', [
@@ -36,8 +34,19 @@ export class GameCreationPageComponent {
 
     constructor(private router: Router) {}
 
+    ngOnInit() {
+        this.gameParameters.get('gameMode')?.valueChanges.subscribe((value) => {
+            if (value === this.gameModes.Solo) {
+                this.gameParameters?.get('level')?.setValidators([Validators.required]);
+            } else {
+                this.gameParameters?.get('level')?.clearValidators();
+            }
+            this.gameParameters?.get('level')?.updateValueAndValidity();
+        });
+    }
+
     onSubmit() {
-        if (this.gameParameters.valid) {
+        if (this.gameParameters?.valid) {
             this.createGame();
         }
     }
