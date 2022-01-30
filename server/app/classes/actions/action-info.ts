@@ -1,4 +1,4 @@
-import { Action } from '@app/classes/actions';
+import Action from './action';
 
 export default abstract class ActionInfo implements Action {
     willEndTurn(): boolean {
