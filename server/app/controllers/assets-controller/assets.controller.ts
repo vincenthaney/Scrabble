@@ -57,10 +57,7 @@ export class AssetsController {
             const dir = join(__dirname, '../../../assets');
             const filePath = join(dir, fileName);
 
-            if (fileName.length === 0) {
-                const error = new HttpException('File name is required', StatusCodes.BAD_REQUEST);
-                res.status(error.status).send(error.toObject());
-            } else if (existsSync(filePath)) {
+            if (existsSync(filePath)) {
                 res.status(StatusCodes.OK).sendFile(filePath);
             } else {
                 const error = new HttpException(`No file names "${fileName}" in directory "/assets"`, StatusCodes.NOT_FOUND);
