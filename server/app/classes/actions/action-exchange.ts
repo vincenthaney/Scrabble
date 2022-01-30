@@ -1,4 +1,4 @@
-import { ActionPlay } from '@app/classes/actions';
+import ActionPlay from './action-play';
 import { Tile } from '@app/classes/tile';
 
 export default class ActionExchange extends ActionPlay {
@@ -7,7 +7,6 @@ export default class ActionExchange extends ActionPlay {
     constructor(tilesToExchange: Tile[]) {
         super();
         this.tilesToExchange = tilesToExchange;
-        throw new Error('Method not implemented.');
     }
 
     execute(): void {

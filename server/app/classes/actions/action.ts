@@ -1,7 +1,7 @@
-export default interface Action {
-    willEndTurn(): boolean;
+export default abstract class Action {
+    abstract willEndTurn(): boolean;
     // messageColor: number; // TODO: potentially make a color enum
 
-    execute(): void;
-    getMessage(): string;
+    abstract execute(): void;
+    abstract getMessage(): string;
 }

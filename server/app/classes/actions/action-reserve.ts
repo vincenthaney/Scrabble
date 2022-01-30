@@ -1,4 +1,4 @@
-import { ActionInfo } from '@app/classes/actions';
+import ActionInfo from './action-info';
 
 export default class ActionReserve extends ActionInfo {
     execute(): void {

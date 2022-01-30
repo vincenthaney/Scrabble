@@ -1,4 +1,4 @@
-import { ActionPlay } from '@app/classes/actions';
+import ActionPlay from './action-play';
 import { Tile } from '@app/classes/tile';
 import { Orientation, Square } from '@app/classes/board';
 

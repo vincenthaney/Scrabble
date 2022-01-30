@@ -1,4 +1,4 @@
-import { ActionPlay } from '@app/classes/actions';
+import ActionPlay from './action-play';
 
 export default class ActionPass extends ActionPlay {
     execute(): void {
