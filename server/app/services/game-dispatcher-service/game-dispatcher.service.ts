@@ -86,7 +86,7 @@ export class GameDispatcherService {
             ...waitingGame.getConfig(),
             player2: waitingGame.joinedPlayer,
         };
-        return this.activeGameService.beginMultiplayerGame(config);
+        return this.activeGameService.beginMultiplayerGame(waitingGame.getId(), config);
     }
 
     /**

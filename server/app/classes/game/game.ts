@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import Player from '@app/classes/player/player';
 import RoundManager from '@app/classes/round/round-manager';
 import TileReserve from '@app/classes/tile/tile-reserve';
@@ -18,10 +17,6 @@ export default class Game {
     board: Board;
     private id: string;
 
-    private constructor() {
-        this.id = uuidv4();
-    }
-
     /**
      * Create a game from MultiplayerConfig
      *
@@ -30,9 +25,10 @@ export default class Game {
      * @returns {Game} game
      */
 
-    static async createMultiplayerGame(config: MultiplayerGameConfig): Promise<Game> {
+    static async createMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<Game> {
         const game = new Game();
 
+        game.id = id;
         game.player1 = config.player;
         game.player2 = config.player2;
         game.roundManager = new RoundManager(/* config.maxRoundTime */);

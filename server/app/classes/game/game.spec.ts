@@ -17,6 +17,7 @@ const expect = chai.expect;
 chai.use(spies);
 chai.use(chaiAsPromised);
 
+const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_1 = new Player('id1', 'player1');
 const DEFAULT_PLAYER_2 = new Player('id2', 'player2');
 const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
@@ -52,7 +53,7 @@ describe('Game', () => {
         let game: Game;
 
         beforeEach(async () => {
-            game = await Game.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG);
+            game = await Game.createMultiplayerGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
         });
 
         it('should create', () => {
@@ -89,7 +90,7 @@ describe('Game', () => {
         let game: Game;
 
         beforeEach(async () => {
-            game = await Game.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG);
+            game = await Game.createMultiplayerGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
         });
 
         it('should return an id', () => {

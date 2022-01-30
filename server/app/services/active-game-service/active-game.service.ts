@@ -18,8 +18,8 @@ export class ActiveGameService {
      * @returns {Game} created game
      */
 
-    async beginMultiplayerGame(config: MultiplayerGameConfig): Promise<Game> {
-        const game = await Game.createMultiplayerGame(config);
+    async beginMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<Game> {
+        const game = await Game.createMultiplayerGame(id, config);
         this.activeGames.push(game);
         return game;
     }
