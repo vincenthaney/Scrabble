@@ -121,13 +121,13 @@ describe('GameDispatcherService', () => {
         it('should remove waitingGame', async () => {
             expect(gameDispatcherService['waitingGames'].filter((g) => g.getId() === id)).to.not.be.empty;
 
-            await gameDispatcherService.acceptMultiplayerGame(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
+            await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
             expect(gameDispatcherService['waitingGames'].filter((g) => g.getId() === id)).to.be.empty;
         });
 
         it('should call beginMultiplayerGame', async () => {
-            await gameDispatcherService.acceptMultiplayerGame(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
+            await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
             expect(spy).to.have.been.called();
         });
@@ -135,7 +135,7 @@ describe('GameDispatcherService', () => {
         it(' should throw error when playerId is invalid', () => {
             const invalidId = 'invalidId';
 
-            return expect(gameDispatcherService.acceptMultiplayerGame(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.rejectedWith(
+            return expect(gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.rejectedWith(
                 Errors.INVALID_PLAYER_ID_FOR_GAME,
             );
         });
@@ -144,13 +144,13 @@ describe('GameDispatcherService', () => {
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
             return expect(
-                gameDispatcherService.acceptMultiplayerGame(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
+                gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
             ).to.be.rejectedWith(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it(' should throw error when playerId is invalid', () => {
             return expect(
-                gameDispatcherService.acceptMultiplayerGame(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2),
+                gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2),
             ).to.be.rejectedWith(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
         });
     });

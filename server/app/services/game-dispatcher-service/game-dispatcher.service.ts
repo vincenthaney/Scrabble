@@ -66,7 +66,7 @@ export class GameDispatcherService {
      * @returns {Game} game
      */
 
-    async acceptMultiplayerGame(waitingGameId: string, playerId: string, opponentName: string): Promise<Game> {
+    async acceptJoinRequest(waitingGameId: string, playerId: string, opponentName: string): Promise<Game> {
         const waitingGame = this.getGameFromId(waitingGameId);
 
         if (waitingGame.getConfig().player.getId() !== playerId) {
