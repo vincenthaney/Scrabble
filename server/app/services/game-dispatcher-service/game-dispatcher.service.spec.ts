@@ -101,7 +101,7 @@ describe('GameDispatcherService', () => {
             }).to.throw(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
         });
 
-        it('should not join if initiating player have the same name', () => {
+        it('should not join if initiating players have the same name', () => {
             expect(() => {
                 gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
             }).to.throw(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
