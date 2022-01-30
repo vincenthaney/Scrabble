@@ -1,7 +1,7 @@
 import { Tile } from '@app/classes/tile';
-import IScoreMultiplier from './i-score-multiplier';
+import AbstractScoreMultiplier from './abstract-score-multiplier';
 
-export type Multiplier = IScoreMultiplier | null;
+export type Multiplier = AbstractScoreMultiplier | null;
 export default interface Square {
     tile: Tile | null;
     multiplier: Multiplier;

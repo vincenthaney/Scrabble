@@ -4,7 +4,7 @@ import * as SQUARE_ERROR from './square-errors';
 
 export default abstract class AbstractScoreMultiplier {
     protected multiplier: number;
-    protected multiplierType: MultiplierEffect;
+    protected multiplierEffect: MultiplierEffect;
 
     constructor(multiplier: number) {
         if (!VALID_MULTIPLIERS.includes(multiplier)) {
@@ -16,6 +16,6 @@ export default abstract class AbstractScoreMultiplier {
         return this.multiplier;
     }
     getMultiplierEffect(): MultiplierEffect {
-        return this.multiplierType;
+        return this.multiplierEffect;
     }
 }
