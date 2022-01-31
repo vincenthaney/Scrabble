@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-import { NAME_VALIDATION } from '@app/classes/name-validation';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -12,24 +12,21 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit {
+    @ViewChild(NameFieldComponent) child: NameFieldComponent;
+    isNameValid: boolean = false;
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
-    dictoptions: string[];
+    dictOptions: string[];
+
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Solo, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         timer: new FormControl('', Validators.required),
         dict: new FormControl('', Validators.required),
-        name: new FormControl('', [
-            Validators.required,
-            Validators.pattern(NAME_VALIDATION.rule),
-            Validators.minLength(NAME_VALIDATION.minLength),
-            Validators.maxLength(NAME_VALIDATION.maxLength),
-        ]),
     });
 
     constructor(private router: Router) {}
@@ -45,9 +42,19 @@ export class GameCreationPageComponent implements OnInit {
         });
     }
 
+    onNameChange(isNameValid: boolean) {
+        this.isNameValid = isNameValid;
+    }
+
+    isFormValid(): boolean {
+        return this.gameParameters?.valid && (this.isNameValid || this.child.formParameters?.valid);
+    }
+
     onSubmit() {
-        if (this.gameParameters?.valid) {
+        if (this.isFormValid()) {
             this.createGame();
+        } else {
+            this.child.formParameters.markAllAsTouched();
         }
     }
 

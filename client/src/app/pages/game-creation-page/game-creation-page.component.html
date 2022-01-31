@@ -36,31 +36,13 @@
                         <mat-option value="default-dict">Par défaut (Français)</mat-option>
                     </mat-select>
                 </mat-form-field>
-
-                <mat-form-field appearance="outline" id="input-name">
-                    <mat-label floatLabel="always">Choisissez votre nom de joueur</mat-label>
-                    <input matInput type="text" formControlName="name" autocomplete="off">
-                </mat-form-field>
-                <span *ngIf="gameParameters.get('name')?.invalid && (gameParameters.get('name')?.dirty || gameParameters.get('name')?.touched)" class="alert-group">
-                    <mat-error *ngIf="gameParameters.get('name')?.errors?.['minlength']" class="alert">
-                        Votre nom doit contenir au moins 2 caractères.
-                    </mat-error>
-                    <mat-error *ngIf="gameParameters.get('name')?.errors?.['maxlength']" class="alert">
-                        Votre nom doit contenir au plus 20 caractères.
-                    </mat-error>
-                    <mat-error *ngIf="gameParameters.get('name')?.errors?.['pattern'] && !gameParameters.get('name')?.errors?.['maxlength'] && !gameParameters.get('name')?.errors?.['minlength']" class="alert">
-                        Votre nom ne peut contenir que des lettres et des chiffres.
-                    </mat-error>
-                </span>
+                <app-name-field (isInputNameValid)="onNameChange($event)"></app-name-field>
             </span>
-
             <span id="bottom-buttons">
                 <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>
                 <button mat-flat-button type="submit" id="create-game-button">Créer la partie</button>
             </span>
-
         </form>
-
-    </section>    
-
+    </section>
+    
 </span>
