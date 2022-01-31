@@ -26,6 +26,7 @@ import { IconComponent } from './components/icon/icon.component';
 import { CreateWaitingPageComponent } from '@app/pages/create-waiting-page/create-waiting-page.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
 
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.

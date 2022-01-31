@@ -1,18 +1,18 @@
 <div class="container"> 
     <div >
-        <div class="info">
-            <mat-icon svgIcon="versus" aria-hidden="false" aria-label="Versus icon"></mat-icon>
-            Adversaire: {{ lobby.playerName }}
+        <div class="info" id="opponent">
+            <app-icon icon="chess-rook"  size=lg></app-icon>
+            &nbsp; Adversaire: {{ lobby.playerName }}
         </div>
         <div class="info">
-            <mat-icon svgIcon="game-type" aria-hidden="false" aria-label="game-type icon"></mat-icon>
-            Type de partie: {{lobby.gameType}}
+            <app-icon icon="gamepad" size=lg> </app-icon>
+            &nbsp; Type de partie: {{lobby.gameType}}
         </div>
     </div>
     <div>
         <div class="info">
-            <span class="material-icons">timer</span>
-            Temps par tour: {{convertTime()}} 
+            <app-icon icon="hourglass-half" size=lg></app-icon>
+            &nbsp; Temps par tour: {{convertTime()}} 
 
         </div>
     </div>
@@ -21,8 +21,8 @@
 
         <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()" 
         matTooltip="Veuillez entrer un nom valide différent de {{lobby.playerName}}" matTooltipClass="example-tooltip-red" [matTooltipDisabled]="lobby.canJoin">
-            Joindre 
-            <span class="material-icons">person_add</span>
+        <app-icon icon="swords" size=lg></app-icon>
+        &nbsp; Joindre 
         </button>
     </div>   
 </div>
