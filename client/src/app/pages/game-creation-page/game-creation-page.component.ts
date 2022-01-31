@@ -13,7 +13,6 @@ import { NameFieldComponent } from '@app/components/name-field/name-field.compon
 })
 export class GameCreationPageComponent implements OnInit {
     @ViewChild(NameFieldComponent) child: NameFieldComponent;
-    isNameValid: boolean = false;
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
@@ -42,12 +41,8 @@ export class GameCreationPageComponent implements OnInit {
         });
     }
 
-    onNameChange(isNameValid: boolean) {
-        this.isNameValid = isNameValid;
-    }
-
     isFormValid(): boolean {
-        return this.gameParameters?.valid && (this.isNameValid || this.child.formParameters?.valid);
+        return this.gameParameters?.valid && this.child.formParameters?.valid;
     }
 
     onSubmit() {
@@ -60,6 +55,6 @@ export class GameCreationPageComponent implements OnInit {
 
     createGame() {
         // send new game request to server (?)
-        this.router.navigateByUrl('waiting-room');
+        this.router.navigateByUrl('create-waiting');
     }
 }
