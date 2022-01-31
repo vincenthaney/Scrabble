@@ -70,7 +70,7 @@ export default class Game {
      * @returns {Player} player with id
      */
 
-    getActivePlayer(playerId: string): Player {
+    getRequestingPlayer(playerId: string): Player {
         if (this.player1.getId() === playerId) return this.player1;
         if (this.player2.getId() === playerId) return this.player2;
         throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);

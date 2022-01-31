@@ -99,18 +99,18 @@ describe('Game', () => {
 
         describe('getActivePlayer', () => {
             it('should return player with same id (player 1)', () => {
-                const player = game.getActivePlayer(DEFAULT_PLAYER_1.getId());
+                const player = game.getRequestingPlayer(DEFAULT_PLAYER_1.getId());
                 expect(player).to.equal(DEFAULT_PLAYER_1);
             });
 
             it('should return player with same id (player 2)', () => {
-                const player = game.getActivePlayer(DEFAULT_PLAYER_2.getId());
+                const player = game.getRequestingPlayer(DEFAULT_PLAYER_2.getId());
                 expect(player).to.equal(DEFAULT_PLAYER_2);
             });
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getActivePlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getRequestingPlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
             });
         });
 
