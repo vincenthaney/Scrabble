@@ -78,6 +78,7 @@ describe('SquareView', () => {
     });
 
     it('SquareView with invalid score multiplier effect should throw error', () => {
+        // We need to mock the ScoreMultiplier to have invalid score multipliers
         const scoreMultiplierSpy = jasmine.createSpyObj(
             'AbstractScoreMultiplier',
             {
@@ -101,6 +102,7 @@ describe('SquareView', () => {
     });
 
     it('SquareView with invalid score multiplier should throw error', () => {
+        // We need to mock the ScoreMultiplier to have invalid score multipliers
         const scoreMultiplierSpy = jasmine.createSpyObj(
             'AbstractScoreMultiplier',
             {

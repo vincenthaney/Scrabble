@@ -66,13 +66,13 @@ export default class BoardService {
         return multiplierGrid;
     }
 
-    // eslint-disable-next-line no-unused-vars
     private parseSquareConfig(data: string): Multiplier {
         if (!BOARD_CONFIG_MAP.get(data)) {
             return null;
         }
         return BOARD_CONFIG_MAP.get(data) as Multiplier;
     }
+
     // private placeTile(position: Position, tile: Tile): boolean {
     //     throw new Error('Method not implemented.');
     // } // Verify if there is already a tile in that square

@@ -3,7 +3,7 @@ import { SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { UNDEFINED_SQUARE_SIZE, UNDEFINED_TILE } from '@app/constants/game';
 
-export interface CssStyle {
+export interface CssStyleProperty {
     key: string;
     value: string;
 }
@@ -15,8 +15,8 @@ export interface CssStyle {
 })
 export class SquareComponent implements OnInit, AfterViewInit {
     private static readonly starElementClasses: string[] = ['fa', 'fa-solid', 'fa-star'];
-    private static readonly starStyle: CssStyle[] = [{ key: 'font-size', value: '40px' }];
-    private static readonly starDivStyle: CssStyle[] = [
+    private static readonly starStyle: CssStyleProperty[] = [{ key: 'font-size', value: '40px' }];
+    private static readonly starDivStyle: CssStyleProperty[] = [
         { key: 'display', value: 'flex' },
         { key: 'align-items', value: 'center' },
         { key: 'justify-content', value: 'center' },
@@ -60,22 +60,25 @@ export class SquareComponent implements OnInit, AfterViewInit {
         /*
             We need to apply the classes and style dynamically because
             the mat-button creates the span for the button's text dynamically.
+            We start by creating the HTMLElements for the star
         */
         const textWrapper = this.button.nativeElement.getElementsByClassName('mat-button-wrapper')[0];
         const starDiv = this.renderer.createElement('div');
         const starElement = this.renderer.createElement('i');
 
+        // Then we apply the styles and classes for Font-Awesome
         this.applyStarStyleAndClasses(starDiv, starElement);
 
+        // Finally we add the elements to the DOM
         starDiv.appendChild(starElement);
         textWrapper.appendChild(starDiv);
     }
 
     private applyStarStyleAndClasses(starDiv: HTMLElement, starElement: HTMLElement) {
-        SquareComponent.starDivStyle.forEach((style: CssStyle) => {
+        SquareComponent.starDivStyle.forEach((style: CssStyleProperty) => {
             this.renderer.setStyle(starDiv, style.key, style.value);
         });
-        SquareComponent.starStyle.forEach((style: CssStyle) => this.renderer.setStyle(starElement, style.key, style.value));
+        SquareComponent.starStyle.forEach((style: CssStyleProperty) => this.renderer.setStyle(starElement, style.key, style.value));
         SquareComponent.starElementClasses.forEach((c) => starElement.classList.add(c));
     }
 }

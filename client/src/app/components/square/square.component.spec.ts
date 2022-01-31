@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable max-classes-per-file */
+/* eslint-disable */
 import { CommonModule } from '@angular/common';
 import { Component, Renderer2 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -18,7 +17,7 @@ import { SquareView } from '@app/classes/square';
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE, UNDEFINED_TILE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { CssStyle, SquareComponent } from './square.component';
+import { CssStyleProperty, SquareComponent } from './square.component';
 import SpyObj = jasmine.SpyObj;
 
 const fakeStyleFunc = (el: HTMLElement, styleKey: string, styleValue: string): void => {
@@ -68,13 +67,11 @@ describe('SquareComponent', () => {
         const squareWrapper = new SquareTestWrapper();
         squareWrapper.createComponent(rendererSpy);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(squareWrapper.squareComponent, 'initializeStyle').and.callFake(() => {
             return;
         });
 
         squareWrapper.squareComponent.ngOnInit();
-        // eslint-disable-next-line dot-notation
         expect(squareWrapper.squareComponent['initializeStyle']).toHaveBeenCalled();
     });
 
@@ -82,19 +79,16 @@ describe('SquareComponent', () => {
         const squareWrapper = new SquareTestWrapper();
         squareWrapper.createComponent(rendererSpy);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(squareWrapper.squareComponent, 'createStar').and.callFake(() => {
             return;
         });
 
         squareWrapper.squareComponent.ngAfterViewInit();
-        // eslint-disable-next-line dot-notation
         expect(squareWrapper.squareComponent['createStar']).toHaveBeenCalled();
     });
 
     it('getSquareSize should return UNDEFINED_SQUARE_SIZE if no SquareView is attached', () => {
         const squareWrapper = new SquareTestWrapper();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
         squareWrapper.createComponent(rendererSpy);
 
@@ -110,7 +104,6 @@ describe('SquareComponent', () => {
 
     it('getText should return UNDEFINED_TILE.letter if no SquareView is attached', () => {
         const squareWrapper = new SquareTestWrapper();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
         squareWrapper.createComponent(rendererSpy);
 
@@ -140,7 +133,6 @@ describe('SquareComponent', () => {
         const expectedColor = COLORS.Blue;
 
         spyOn(squareWrapper.squareComponent.squareView, 'getColor').and.returnValue(expectedColor);
-        // eslint-disable-next-line dot-notation
         squareWrapper.squareComponent['initializeStyle']();
 
         const actualColor = squareWrapper.squareComponent.style['background-color'];
@@ -152,13 +144,10 @@ describe('SquareComponent', () => {
         squareWrapper.createComponent(rendererSpy);
         squareWrapper.squareComponent.squareView.square.isCenter = false;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(squareWrapper.squareComponent, 'applyStarStyleAndClasses').and.callFake(() => {
             return;
         });
-        // eslint-disable-next-line dot-notation
         squareWrapper.squareComponent['createStar']();
-        // eslint-disable-next-line dot-notation
         expect(squareWrapper.squareComponent['applyStarStyleAndClasses']).not.toHaveBeenCalled();
     });
 
@@ -171,12 +160,10 @@ describe('SquareComponent', () => {
         const initialDivAmount = buttonWrapper.getElementsByTagName('div').length;
         const initialIAmount = buttonWrapper.getElementsByTagName('i').length;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOn<any>(component, 'applyStarStyleAndClasses').and.callFake(() => {
             return;
         });
 
-        // eslint-disable-next-line dot-notation
         component['createStar']();
         const actualDivAmount = buttonWrapper.getElementsByTagName('div').length;
         const actualIAmount = buttonWrapper.getElementsByTagName('i').length;
@@ -184,7 +171,6 @@ describe('SquareComponent', () => {
         const expectedDivAmount = initialDivAmount + 1;
         const expectedIAmount = initialIAmount + 1;
 
-        // eslint-disable-next-line dot-notation
         expect(actualDivAmount).toEqual(expectedDivAmount);
         expect(actualIAmount).toEqual(expectedIAmount);
     });
@@ -200,21 +186,18 @@ describe('SquareComponent', () => {
         const addedDiv = document.createElement('div');
         const addedI = document.createElement('i');
 
-        // eslint-disable-next-line dot-notation
         squareWrapper.squareComponent['applyStarStyleAndClasses'](addedDiv, addedI);
 
         // Getting the expected styles that should have been applied
-        // eslint-disable-next-line dot-notation
         const expectedDivStyle = SquareComponent['starDivStyle'];
-        // eslint-disable-next-line dot-notation
         const expectedStarStyle = SquareComponent['starStyle'];
 
         // Verify the setStyle method was called with the right styles
-        expectedDivStyle.forEach((cssStyle: CssStyle) => {
+        expectedDivStyle.forEach((cssStyle: CssStyleProperty) => {
             expect(rendererSpy.setStyle).toHaveBeenCalledWith(addedDiv, cssStyle.key, cssStyle.value);
         });
 
-        expectedStarStyle.forEach((cssStyle: CssStyle) => {
+        expectedStarStyle.forEach((cssStyle: CssStyleProperty) => {
             expect(rendererSpy.setStyle).toHaveBeenCalledWith(addedI, cssStyle.key, cssStyle.value);
         });
     });
@@ -234,19 +217,16 @@ describe('SquareComponent', () => {
         squareWrapper.squareComponent['applyStarStyleAndClasses'](addedDiv, addedI);
 
         // Getting the expected styles that should have been applied
-        // eslint-disable-next-line dot-notation
         const expectedDivStyle = SquareComponent['starDivStyle'];
-        // eslint-disable-next-line dot-notation
         const expectedStarStyle = SquareComponent['starStyle'];
-        // eslint-disable-next-line dot-notation
         const expectedStarClasses = SquareComponent['starElementClasses'];
 
         // Verify the setStyle method was called with the right styles
-        expectedDivStyle.forEach((cssStyle: CssStyle) => {
+        expectedDivStyle.forEach((cssStyle: CssStyleProperty) => {
             expect(addedDiv.style.getPropertyValue(cssStyle.key)).toEqual(cssStyle.value);
         });
 
-        expectedStarStyle.forEach((cssStyle: CssStyle) => {
+        expectedStarStyle.forEach((cssStyle: CssStyleProperty) => {
             expect(addedI.style.getPropertyValue(cssStyle.key)).toEqual(cssStyle.value);
         });
 

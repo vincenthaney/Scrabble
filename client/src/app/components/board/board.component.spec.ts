@@ -162,6 +162,9 @@ describe('BoardComponent', () => {
             [mockSquare, UNDEFINED_SQUARE],
         ];
         spyOn(boardService, 'getGridSize').and.returnValue({ x: 2, y: 2 });
+
+        // We need to spy on the property otherwise we cannot return a grid with null
+        // values because of TypeScript's type enforcing
         spyOnProperty(boardService, 'grid', 'get').and.returnValue(grid);
 
         fixture = TestBed.createComponent(BoardComponent);
