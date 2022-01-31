@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -13,17 +14,47 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Square, SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { UNDEFINED_GRID_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
+import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
 
+class MockBoardService {
+    static boardServiceGridSize: Vec2 = { x: 5, y: 5 };
+    static mockSquare: Square = {
+        tile: null,
+        multiplier: null,
+        wasMultiplierUsed: false,
+        isCenter: false,
+    };
+    pGrid: Square[][];
+
+    constructor() {
+        this.grid = [].constructor(MockBoardService.boardServiceGridSize.y).forEach((i: number) => {
+            this.grid[i] = [];
+            [].constructor(MockBoardService.boardServiceGridSize.x).forEach((j: number) => {
+                this.grid[i][j] = MockBoardService.mockSquare;
+            });
+        });
+    }
+
+    get grid(): Square[][] {
+        return this.pGrid;
+    }
+    set grid(grid: Square[][]) {
+        this.pGrid = grid;
+    }
+
+    getGridSize(): Vec2 {
+        return MockBoardService.boardServiceGridSize;
+    }
+}
+
 describe('BoardComponent', () => {
-    let boardService: BoardService;
+    let mockBoardService: MockBoardService;
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
 
-    const boardServiceGridSize: Vec2 = { x: 15, y: 15 };
     const boardSizesToTest = [
         [
             { x: -1, y: -1 },
@@ -43,23 +74,6 @@ describe('BoardComponent', () => {
         ],
     ];
 
-    const mockSquare: Square = {
-        tile: null,
-        multiplier: null,
-        wasMultiplierUsed: false,
-        isCenter: false,
-    };
-    const mockGrid: Square[][] = [].constructor(boardServiceGridSize.y).forEach((i: number) => {
-        mockGrid[i] = [];
-        [].constructor(boardServiceGridSize.x).forEach((j: number) => {
-            mockGrid[i][j] = mockSquare;
-        });
-    });
-
-    beforeEach(async () => {
-        boardService = new BoardService();
-    });
-
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [
@@ -78,7 +92,7 @@ describe('BoardComponent', () => {
                 MatDialogModule,
             ],
             declarations: [BoardComponent],
-            providers: [{ provide: BoardService, useValue: boardService }],
+            providers: [{ provide: BoardService, useClass: MockBoardService }, MockBoardService],
         }).compileComponents();
     });
 
@@ -86,6 +100,7 @@ describe('BoardComponent', () => {
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        mockBoardService = TestBed.inject(MockBoardService);
     });
 
     afterEach(() => {
@@ -113,13 +128,17 @@ describe('BoardComponent', () => {
                 ' : ' +
                 expectedBoardSize.y,
             () => {
-                spyOn(boardService, 'getGridSize').and.returnValue(boardSize);
+                spyOn<any>(mockBoardService, 'getGridSize').and.returnValue(boardSize);
+                // eslint-disable-next-line no-console
+                console.log('Grid: ' + mockBoardService.getGridSize().x);
+                // spyOnProperty(mockBoardService, 'grid', 'get').and.returnValue(MockBoardService.mockGrid);
 
                 fixture = TestBed.createComponent(BoardComponent);
                 component = fixture.componentInstance;
                 fixture.detectChanges();
 
-                // eslint-disable-next-line dot-notation
+                // eslint-disable-next-line no-console
+                console.log('Board: ' + component['boardService'].getGridSize().x);
                 component['initializeBoard']();
 
                 const actualRowAmount = component.squareGrid.length;
@@ -139,33 +158,32 @@ describe('BoardComponent', () => {
     });
 
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {
-        expect(component.gridSize).toEqual(boardServiceGridSize);
-    });
+        // fixture = TestBed.createComponent(BoardComponent);
+        // component = fixture.componentInstance;
+        // fixture.detectChanges();
+        // mockBoardService = TestBed.inject(MockBoardService);
+        // spyOn<any>(mockBoardService, 'getGridSize').and.returnValue(MockBoardService.boardServiceGridSize);
 
-    it('If BoardService returns no grid, component should have UNDEFINED_GRID_SIZE size', () => {
-        spyOnProperty(boardService, 'grid', 'get').and.returnValue(null);
-
-        fixture = TestBed.createComponent(BoardComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-
-        expect(component.gridSize).toEqual(UNDEFINED_GRID_SIZE);
+        // component.gridSize = component['boardService'].getGridSize();
+        // // eslint-disable-next-line no-console
+        // console.log('Test ' + component['boardService'].getGridSize());
+        expect(component.gridSize).toEqual(mockBoardService.getGridSize());
     });
 
     it('If BoardService returns grid with null squares, should assign UNDEFINED_SQUARE to board', () => {
         const grid = [
-            [mockSquare, null],
-            [mockSquare, null],
+            [MockBoardService.mockSquare, null],
+            [MockBoardService.mockSquare, null],
         ];
         const expectedGrid = [
-            [mockSquare, UNDEFINED_SQUARE],
-            [mockSquare, UNDEFINED_SQUARE],
+            [MockBoardService.mockSquare, UNDEFINED_SQUARE],
+            [MockBoardService.mockSquare, UNDEFINED_SQUARE],
         ];
-        spyOn(boardService, 'getGridSize').and.returnValue({ x: 2, y: 2 });
+        spyOn<any>(mockBoardService, 'getGridSize').and.returnValue({ x: 2, y: 2 });
 
         // We need to spy on the property otherwise we cannot return a grid with null
         // values because of TypeScript's type enforcing
-        spyOnProperty(boardService, 'grid', 'get').and.returnValue(grid);
+        spyOnProperty(mockBoardService, 'grid', 'get').and.returnValue(grid);
 
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
