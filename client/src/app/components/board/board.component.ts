@@ -41,6 +41,6 @@ export class BoardComponent implements OnInit {
 
     private getBoardServiceSquare(row: number, column: number) {
         const serviceGrid: Square[][] = this.boardService.grid;
-        return serviceGrid[row] && serviceGrid[row][column] ? this.boardService.grid[row][column] : UNDEFINED_SQUARE;
+        return serviceGrid[row] && serviceGrid[row][column] ? serviceGrid[row][column] : UNDEFINED_SQUARE;
     }
 }
