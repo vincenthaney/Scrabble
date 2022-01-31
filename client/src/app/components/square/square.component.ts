@@ -73,8 +73,6 @@ export class SquareComponent implements OnInit, AfterViewInit {
 
     private applyStarStyleAndClasses(starDiv: HTMLElement, starElement: HTMLElement) {
         SquareComponent.starDivStyle.forEach((style: CssStyle) => {
-            // eslint-disable-next-line no-console
-            console.log('apply');
             this.renderer.setStyle(starDiv, style.key, style.value);
         });
         SquareComponent.starStyle.forEach((style: CssStyle) => this.renderer.setStyle(starElement, style.key, style.value));

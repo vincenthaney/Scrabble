@@ -190,31 +190,20 @@ describe('SquareComponent', () => {
     });
 
     it('applyStarStyleAndClasses should call the renderer setStyle method', async () => {
-        // Creating the test components
-        // fixture = TestBed.createComponent(CenterSquareWrapperComponent);
-        // component = fixture.debugElement.children[0].componentInstance;
-        // fixture.detectChanges();
-
         const squareWrapper = new SquareTestWrapper();
         squareWrapper.createComponent(rendererSpy);
         squareWrapper.squareComponent.squareView.square.isCenter = true;
 
-        // Creating the HTMLElements for the star to show
-        // createStar() is already tested so we can use it, but we don't want
+        // Creating the HTMLElements to pass to the Renderer
         // to call applyStarStyleAndClasses() right now
 
         const addedDiv = document.createElement('div');
         const addedI = document.createElement('i');
 
-        // renderer = fixture.debugElement.injector.get(Renderer2);
-        // const renderer2 = fixture.componentRef.injector.get<Renderer2>(Renderer2 as Type<Renderer2>);
-        // and spy on it
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // const spy = spyOn<any>(renderer2, 'setStyle');
-        // fixture.detectChanges();
         // eslint-disable-next-line dot-notation
         squareWrapper.squareComponent['applyStarStyleAndClasses'](addedDiv, addedI);
 
+        // Getting the expected styles that should have been applied
         // eslint-disable-next-line dot-notation
         const expectedDivStyle = SquareComponent['starDivStyle'];
         // eslint-disable-next-line dot-notation
@@ -227,6 +216,42 @@ describe('SquareComponent', () => {
 
         expectedStarStyle.forEach((cssStyle: CssStyle) => {
             expect(rendererSpy.setStyle).toHaveBeenCalledWith(addedI, cssStyle.key, cssStyle.value);
+        });
+    });
+
+    it('applyStarStyleAndClasses should call set the styles and classes for the HTMLElements', async () => {
+        const squareWrapper = new SquareTestWrapper();
+        squareWrapper.createComponent(rendererSpy);
+        squareWrapper.squareComponent.squareView.square.isCenter = true;
+
+        // Creating the HTMLElements to pass to the Renderer
+        // to call applyStarStyleAndClasses() right now
+
+        const addedDiv = document.createElement('div');
+        const addedI = document.createElement('i');
+
+        // eslint-disable-next-line dot-notation
+        squareWrapper.squareComponent['applyStarStyleAndClasses'](addedDiv, addedI);
+
+        // Getting the expected styles that should have been applied
+        // eslint-disable-next-line dot-notation
+        const expectedDivStyle = SquareComponent['starDivStyle'];
+        // eslint-disable-next-line dot-notation
+        const expectedStarStyle = SquareComponent['starStyle'];
+        // eslint-disable-next-line dot-notation
+        const expectedStarClasses = SquareComponent['starElementClasses'];
+
+        // Verify the setStyle method was called with the right styles
+        expectedDivStyle.forEach((cssStyle: CssStyle) => {
+            expect(addedDiv.style.getPropertyValue(cssStyle.key)).toEqual(cssStyle.value);
+        });
+
+        expectedStarStyle.forEach((cssStyle: CssStyle) => {
+            expect(addedI.style.getPropertyValue(cssStyle.key)).toEqual(cssStyle.value);
+        });
+
+        expectedStarClasses.forEach((c) => {
+            expect(addedI.classList).toContain(c);
         });
     });
 });
