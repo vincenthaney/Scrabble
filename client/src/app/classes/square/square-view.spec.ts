@@ -69,7 +69,7 @@ describe('SquareView', () => {
             const square = {
                 tile: null,
                 multiplier,
-                isMultiplierPlayed: false,
+                wasMultiplierUsed: false,
                 isCenter: false,
             };
             const squareView = new SquareView(square, SQUARE_SIZE);
@@ -94,7 +94,7 @@ describe('SquareView', () => {
         const square = {
             tile: null,
             multiplier: nullMultiplierEffectSpy,
-            isMultiplierPlayed: false,
+            wasMultiplierUsed: false,
             isCenter: false,
         };
         const squareView = new SquareView(square, SQUARE_SIZE);
@@ -119,7 +119,7 @@ describe('SquareView', () => {
         const square = {
             tile: null,
             multiplier: negativeMultiplierSpy,
-            isMultiplierPlayed: false,
+            wasMultiplierUsed: false,
             isCenter: false,
         };
         const squareView = new SquareView(square, SQUARE_SIZE);
@@ -155,7 +155,7 @@ describe('SquareView', () => {
             const square = {
                 tile: null,
                 multiplier,
-                isMultiplierPlayed: false,
+                wasMultiplierUsed: false,
                 isCenter: false,
             };
             const squareView = new SquareView(square, SQUARE_SIZE);

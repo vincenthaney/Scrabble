@@ -97,7 +97,7 @@ describe('BoardComponent', () => {
     });
 
     boardSizesToTest.forEach((testCase) => {
-        const boardSize = testCase[0];
+        const boardSize: Vec2 = testCase[0];
         const expectedBoardSize: Vec2 = testCase[1];
 
         if (!expectedBoardSize) {
@@ -127,10 +127,10 @@ describe('BoardComponent', () => {
                 /*
                     If the Grid size is supposed to be smaller or equal to 0,
                     then each row of the grid will not be initialized.
-                    In that case, we assign null values to the actual column amount.
+                    So if the row is undefined, its length is 0
                     If the expected size is greater than 0, then the row length is defined
                 */
-                const actualColAmount = expectedBoardSize.y <= 0 ? 0 : component.squareGrid[0].length;
+                const actualColAmount = component.squareGrid[0] ? component.squareGrid[0].length : 0;
 
                 const actualBoardSize: Vec2 = { x: actualColAmount, y: actualRowAmount };
                 expect(actualBoardSize).toEqual(expectedBoardSize);

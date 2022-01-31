@@ -46,7 +46,7 @@ export default class BoardService {
                 const square = {
                     tile: null,
                     multiplier: multiplierGrid[i][j],
-                    isMultiplierPlayed: false,
+                    wasMultiplierUsed: false,
                     isCenter,
                 };
                 this.grid[i][j] = square;
