@@ -39,4 +39,8 @@ export class GameCreationPageComponent {
             this.child.formParameters.markAllAsTouched();
         }
     }
+
+    onNameChange(isNameValid: boolean) {
+        this.isNameValid = isNameValid;
+    }
 }
