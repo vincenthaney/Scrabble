@@ -1,13 +1,14 @@
 import { expect } from 'chai';
 import Player from './player';
 
+const ID = 'id';
 const DEFAULT_NAME = 'player';
 
-describe('Game', () => {
+describe('Player', () => {
     let player: Player;
 
     beforeEach(() => {
-        player = new Player(DEFAULT_NAME);
+        player = new Player(ID, DEFAULT_NAME);
     });
 
     it('should create', () => {
