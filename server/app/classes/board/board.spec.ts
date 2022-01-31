@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Board from './board';
 
-describe('Game', () => {
+describe('Board', () => {
     let board: Board;
 
     beforeEach(() => {
