@@ -4,6 +4,7 @@ import * as cors from 'cors';
 import * as express from 'express';
 import { StatusCodes } from 'http-status-codes';
 import * as logger from 'morgan';
+import { join } from 'path';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
@@ -30,6 +31,8 @@ export class Application {
 
         this.config();
 
+        this.setPublicDirectory();
+
         this.bindRoutes();
     }
 
@@ -48,6 +51,11 @@ export class Application {
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(cookieParser());
         this.app.use(cors());
+    }
+
+    private setPublicDirectory() {
+        const path = join(__dirname, '../public');
+        this.app.use('/public', express.static(path));
     }
 
     private errorHandling(): void {
