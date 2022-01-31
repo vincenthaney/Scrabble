@@ -30,12 +30,13 @@ class MockBoardService {
     pGrid: Square[][];
 
     constructor() {
-        this.grid = [].constructor(MockBoardService.boardServiceGridSize.y).forEach((i: number) => {
-            this.grid[i] = [];
-            [].constructor(MockBoardService.boardServiceGridSize.x).forEach((j: number) => {
-                this.grid[i][j] = MockBoardService.mockSquare;
-            });
-        });
+        this.grid = [];
+        for (let i = 0; i < this.getGridSize().y; i++) {
+            this.grid.push([]);
+            for (let j = 0; j < this.getGridSize().x; j++) {
+                this.grid[i].push(MockBoardService.mockSquare);
+            }
+        }
     }
 
     get grid(): Square[][] {
@@ -74,6 +75,10 @@ describe('BoardComponent', () => {
         ],
     ];
 
+    beforeEach(() => {
+        mockBoardService = new MockBoardService();
+    });
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [
@@ -92,7 +97,7 @@ describe('BoardComponent', () => {
                 MatDialogModule,
             ],
             declarations: [BoardComponent],
-            providers: [{ provide: BoardService, useClass: MockBoardService }, MockBoardService],
+            providers: [{ provide: BoardService, useValue: mockBoardService }, MockBoardService],
         }).compileComponents();
     });
 
@@ -100,11 +105,6 @@ describe('BoardComponent', () => {
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        mockBoardService = TestBed.inject(MockBoardService);
-    });
-
-    afterEach(() => {
-        fixture.destroy();
     });
 
     it('should create', () => {
@@ -129,16 +129,12 @@ describe('BoardComponent', () => {
                 expectedBoardSize.y,
             () => {
                 spyOn<any>(mockBoardService, 'getGridSize').and.returnValue(boardSize);
-                // eslint-disable-next-line no-console
-                console.log('Grid: ' + mockBoardService.getGridSize().x);
-                // spyOnProperty(mockBoardService, 'grid', 'get').and.returnValue(MockBoardService.mockGrid);
 
+                // Recreate the component so it reads the new grid size
                 fixture = TestBed.createComponent(BoardComponent);
                 component = fixture.componentInstance;
                 fixture.detectChanges();
 
-                // eslint-disable-next-line no-console
-                console.log('Board: ' + component['boardService'].getGridSize().x);
                 component['initializeBoard']();
 
                 const actualRowAmount = component.squareGrid.length;
@@ -158,15 +154,6 @@ describe('BoardComponent', () => {
     });
 
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {
-        // fixture = TestBed.createComponent(BoardComponent);
-        // component = fixture.componentInstance;
-        // fixture.detectChanges();
-        // mockBoardService = TestBed.inject(MockBoardService);
-        // spyOn<any>(mockBoardService, 'getGridSize').and.returnValue(MockBoardService.boardServiceGridSize);
-
-        // component.gridSize = component['boardService'].getGridSize();
-        // // eslint-disable-next-line no-console
-        // console.log('Test ' + component['boardService'].getGridSize());
         expect(component.gridSize).toEqual(mockBoardService.getGridSize());
     });
 

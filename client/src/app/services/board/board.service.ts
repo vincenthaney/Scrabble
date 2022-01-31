@@ -9,21 +9,10 @@ import { BOARD_SIZE, UNDEFINED_GRID_SIZE } from '@app/constants/game';
 })
 export default class BoardService {
     private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
-    private pGrid: Square[][];
+    grid: Square[][];
 
     constructor() {
         this.initializeBoardGrid();
-    }
-
-    get grid(): Square[][] {
-        return this.pGrid;
-    }
-
-    set grid(grid: Square[][]) {
-        if (!grid) {
-            return;
-        }
-        this.pGrid = grid;
     }
 
     getGridSize(): Vec2 {
