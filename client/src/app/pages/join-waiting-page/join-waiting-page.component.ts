@@ -17,4 +17,24 @@ export class JoinWaitingPageComponent {
     waitingGameTimer: string = 'timer';
     waitingGameDictionary: string = 'dictionary';
     waitingPlayerName: string = 'waitingPlayer';
+    constructor(public dialog: MatDialog, private router: Router) {}
+
+    playerHasBeenRejected(opponent: OnlinePlayer) {
+        const dialogRef = this.dialog.open(DefaultDialogComponent, {
+            data: {
+                // Data type is DefaultDialogParameters
+                title: DIALOG_TITLE,
+                content: opponent.name + DIALOG_CONTENT,
+                buttons: [
+                    {
+                        content: DIALOG_BUTTON_CONTENT,
+                        closeDialog: true,
+                    },
+                ],
+            },
+        });
+        dialogRef.afterClosed().subscribe(() => {
+            this.router.navigateByUrl('/lobby');
+        });
+    }
 }
