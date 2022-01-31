@@ -14,6 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
@@ -27,9 +28,22 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
 
+    const setValidValues = () => {
+        const gameParametersForm = component.gameParameters;
+        const formValues = {
+            gameType: component.gameTypes.Classic,
+            gameMode: component.gameModes.Solo,
+            level: component.virtualPlayerLevels.Beginner,
+            timer: '30',
+            dict: 'french-dict',
+        };
+        gameParametersForm.setValue(formValues);
+        component.child.formParameters.get('inputName')?.setValue('name');
+    };
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameCreationPageComponent, TestComponent],
+            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent],
             imports: [
                 AppMaterialModule,
                 BrowserAnimationsModule,
@@ -145,9 +159,10 @@ describe('GameCreationPageComponent', () => {
             level: component.virtualPlayerLevels.Beginner,
             timer: '',
             dict: '',
-            name: '',
         };
+
         expect(gameParametersForm.value).toEqual(initialFormValues);
+        expect(component.child.formParameters.get('inputName')?.value).toEqual('');
     });
 
     // Pensez-vous que he devrais l'enlever celui-là?
@@ -159,10 +174,11 @@ describe('GameCreationPageComponent', () => {
             level: '',
             timer: '',
             dict: '',
-            name: '',
         };
         gameParametersForm.setValue(initialFormValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('');
+
+        expect(component.isFormValid()).toBeFalsy();
     });
 
     it('form should be invalid if gameType is empty', async () => {
@@ -173,10 +189,11 @@ describe('GameCreationPageComponent', () => {
             level: component.virtualPlayerLevels.Beginner,
             timer: '30',
             dict: 'default-dict',
-            name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeFalsy();
     });
 
     it('form should be invalid if gameMode is empty', async () => {
@@ -187,10 +204,11 @@ describe('GameCreationPageComponent', () => {
             level: component.virtualPlayerLevels.Beginner,
             timer: '30',
             dict: 'default-dict',
-            name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeFalsy();
     });
 
     it('form should be invalid if level is empty while gameMode is solo', async () => {
@@ -201,10 +219,11 @@ describe('GameCreationPageComponent', () => {
             level: '',
             timer: '30',
             dict: 'default-dict',
-            name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeFalsy();
     });
 
     it('form should be valid if level is empty while gameMode is multiplayer', async () => {
@@ -215,10 +234,11 @@ describe('GameCreationPageComponent', () => {
             level: '',
             timer: '30',
             dict: 'default-dict',
-            name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeTruthy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeTruthy();
     });
 
     it('form should not be valid if timer is empty', () => {
@@ -229,10 +249,11 @@ describe('GameCreationPageComponent', () => {
             level: component.virtualPlayerLevels.Beginner,
             timer: '',
             dict: 'default-dict',
-            name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeFalsy();
     });
 
     it('form should not be valid if dict is empty', () => {
@@ -243,10 +264,11 @@ describe('GameCreationPageComponent', () => {
             level: component.virtualPlayerLevels.Beginner,
             timer: '30',
             dict: '',
-            name: 'something',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeFalsy();
     });
 
     it('form should not be valid if name is empty', () => {
@@ -256,17 +278,24 @@ describe('GameCreationPageComponent', () => {
             gameMode: component.gameModes.Solo,
             level: component.virtualPlayerLevels.Beginner,
             timer: '30',
-            dict: 'french-dict',
-            name: '',
+            dict: '',
         };
         gameParametersForm.setValue(formValues);
-        expect(gameParametersForm.valid).toBeFalsy();
+        component.child.formParameters.get('inputName')?.setValue('name');
+
+        expect(component.isFormValid()).toBeFalsy();
+    });
+
+    it('form should be valid if all required fields are filled', () => {
+        setValidValues();
+        expect(component.isFormValid()).toBeTruthy();
     });
 
     it('form should call onSubmit when submit button is clicked', async () => {
         const spy = spyOn(component, 'onSubmit');
         const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
         submitButton.click();
+
         expect(spy).toHaveBeenCalled();
     });
 
@@ -284,17 +313,7 @@ describe('GameCreationPageComponent', () => {
 
     it('form should call createGame on submit if valid', async () => {
         const spy = spyOn(component, 'createGame');
-
-        const gameParametersForm = component.gameParameters;
-        const validInputs = {
-            gameType: component.gameTypes.Classic,
-            gameMode: component.gameModes.Solo,
-            level: component.virtualPlayerLevels.Beginner,
-            timer: '30',
-            dict: 'french-dict',
-            name: 'nom valide',
-        };
-        gameParametersForm.setValue(validInputs);
+        setValidValues();
 
         const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
         submitButton.click();
@@ -304,17 +323,7 @@ describe('GameCreationPageComponent', () => {
 
     it('createGame button should reroute to waiting-room page if form is valid', async () => {
         const location: Location = TestBed.inject(Location);
-
-        const gameParametersForm = component.gameParameters;
-        const validInputs = {
-            gameType: component.gameTypes.Classic,
-            gameMode: component.gameModes.Solo,
-            level: component.virtualPlayerLevels.Beginner,
-            timer: '30',
-            dict: 'french-dict',
-            name: 'nom valide',
-        };
-        gameParametersForm.setValue(validInputs);
+        setValidValues();
 
         const backButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
         backButton.click();

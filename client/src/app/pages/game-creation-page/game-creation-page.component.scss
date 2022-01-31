@@ -24,7 +24,7 @@ mat-button-toggle-group, mat-button-toggle, mat-form-field, form, app-name-field
     width: 100%;
 }
 
-mat-label {
+form ~ mat-label {
     display: inline-block;
     width: 100%;
     text-align: left;
@@ -40,7 +40,7 @@ button {
     width: 160px;
     background-color: #0e520e;
     color: white;
-    height: 50px;
+    height: 40px;
     font-size: 1em;
 }
 
