@@ -38,7 +38,6 @@ describe('LobbyPageComponent', () => {
     });
 
     it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
-        component.isInputNameValid = true;
         component.nameField.formParameters.patchValue({ inputName: 'differentName' });
         component.validateName();
         for (const lobby of component.lobbies) {
@@ -46,17 +45,7 @@ describe('LobbyPageComponent', () => {
         }
     });
 
-    it('validateName should update canJoin attribute of the lobbies (use #2)', () => {
-        component.isInputNameValid = false;
-        component.nameField.formParameters.patchValue({ inputName: 'differentName' });
-        component.validateName();
-        for (const lobby of component.lobbies) {
-            expect(lobby.canJoin).toBeFalsy();
-        }
-    });
-
     it('validateName should update canJoin attribute of the lobbies ( use #3)', () => {
-        component.isInputNameValid = true;
         component.nameField.formParameters.patchValue({ inputName: 'Name1' });
         const expected = [false, true, true];
         component.validateName();
@@ -71,15 +60,7 @@ describe('LobbyPageComponent', () => {
             return false;
         };
         const spy = spyOn(component, 'validateName').and.callFake(fakeValidateName);
-        const expected = true;
-        component.onNameChange(expected);
+        component.onNameChange();
         expect(spy).toHaveBeenCalled();
-    });
-
-    it('onNameChange should update isInputNameValid', () => {
-        const expected = false;
-        component.isInputNameValid = true;
-        component.onNameChange(expected);
-        expect(component.isInputNameValid).toEqual(expected);
     });
 });
