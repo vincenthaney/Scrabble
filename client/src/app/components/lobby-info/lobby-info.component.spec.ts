@@ -11,11 +11,14 @@ import { AppMaterialModule } from '@app/modules/material.module';
 
 import { LobbyInfoComponent } from './lobby-info.component';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const fakeNavigate = () => {};
+
 describe('LobbyInfoComponent', () => {
     let component: LobbyInfoComponent;
     let fixture: ComponentFixture<LobbyInfoComponent>;
     const routerSpy = {
-        navigateByUrl: jasmine.createSpy('navigateByUrl'),
+        navigateByUrl: jasmine.createSpy('navigateByUrl').and.callFake(fakeNavigate),
     };
     beforeEach(async () => {
         await TestBed.configureTestingModule({
