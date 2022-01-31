@@ -4,7 +4,7 @@ import { MultiplierType } from './multiplier-type';
 export default interface Square {
     tile?: Tile;
     multiplier: number;
-    multiplierType: MultiplierType;
+    multiplierType?: MultiplierType;
     played: boolean;
     row: number;
     column: number;
