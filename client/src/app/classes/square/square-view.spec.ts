@@ -6,13 +6,13 @@ import { AbstractScoreMultiplier, LetterScoreMultiplier, Square, SquareView, Wor
 import * as SQUARE_ERRORS from './square-errors';
 
 interface ColorTestCase {
-    testCaseText: string;
+    multiplierName: string;
     multiplier: AbstractScoreMultiplier;
     expectedColor: COLORS;
 }
 
 interface GetTextTestCase {
-    testCaseText: string;
+    multiplierName: string;
     multiplier: AbstractScoreMultiplier;
     expectedText: string;
 }
@@ -34,17 +34,17 @@ class SquareViewWrapper {
 }
 describe('SquareView', () => {
     const validColorTestCases: ColorTestCase[] = [
-        { testCaseText: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedColor: COLORS.Letter2x },
-        { testCaseText: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedColor: COLORS.Letter3x },
-        { testCaseText: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedColor: COLORS.Word2x },
-        { testCaseText: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedColor: COLORS.Word3x },
+        { multiplierName: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedColor: COLORS.Letter2x },
+        { multiplierName: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedColor: COLORS.Letter3x },
+        { multiplierName: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedColor: COLORS.Word2x },
+        { multiplierName: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedColor: COLORS.Word3x },
     ];
 
     const validTextTestCase: GetTextTestCase[] = [
-        { testCaseText: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedText: 'Lettre x 2' },
-        { testCaseText: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedText: 'Lettre x 3' },
-        { testCaseText: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedText: 'Mot x 2' },
-        { testCaseText: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedText: 'Mot x 3' },
+        { multiplierName: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedText: 'Lettre x 2' },
+        { multiplierName: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedText: 'Lettre x 3' },
+        { multiplierName: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedText: 'Mot x 2' },
+        { multiplierName: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedText: 'Mot x 3' },
     ];
 
     it('SquareView with no Square associated should throw error when getting color', () => {
@@ -61,7 +61,7 @@ describe('SquareView', () => {
     });
 
     validColorTestCases.forEach((testCase: ColorTestCase) => {
-        const testText = testCase.testCaseText;
+        const testText = testCase.multiplierName;
         const multiplier = testCase.multiplier;
         const expectedColor = testCase.expectedColor;
 
@@ -79,7 +79,7 @@ describe('SquareView', () => {
 
     it('SquareView with invalid score multiplier effect should throw error', () => {
         // We need to mock the ScoreMultiplier to have invalid score multipliers
-        const scoreMultiplierSpy = jasmine.createSpyObj(
+        const nullMultiplierEffectSpy = jasmine.createSpyObj(
             'AbstractScoreMultiplier',
             {
                 getMultiplier: () => {
@@ -93,7 +93,7 @@ describe('SquareView', () => {
         );
         const square = {
             tile: null,
-            multiplier: scoreMultiplierSpy,
+            multiplier: nullMultiplierEffectSpy,
             isMultiplierPlayed: false,
             isCenter: false,
         };
@@ -103,13 +103,14 @@ describe('SquareView', () => {
 
     it('SquareView with invalid score multiplier should throw error', () => {
         // We need to mock the ScoreMultiplier to have invalid score multipliers
-        const scoreMultiplierSpy = jasmine.createSpyObj(
+        const negativeMultiplierSpy = jasmine.createSpyObj(
             'AbstractScoreMultiplier',
             {
                 getMultiplier: () => {
                     return -1;
                 },
                 getMultiplierEffect: () => {
+                    // We can create an actual MultiplierEffect since it won't impact the getMultiplier
                     return new LetterScoreMultiplier(2);
                 },
             },
@@ -117,7 +118,7 @@ describe('SquareView', () => {
         );
         const square = {
             tile: null,
-            multiplier: scoreMultiplierSpy,
+            multiplier: negativeMultiplierSpy,
             isMultiplierPlayed: false,
             isCenter: false,
         };
@@ -146,7 +147,7 @@ describe('SquareView', () => {
     });
 
     validTextTestCase.forEach((testCase: GetTextTestCase) => {
-        const testText = testCase.testCaseText;
+        const testText = testCase.multiplierName;
         const multiplier = testCase.multiplier;
         const expectedText = testCase.expectedText;
 

@@ -46,7 +46,7 @@ describe('BoardComponent', () => {
     const mockSquare: Square = {
         tile: null,
         multiplier: null,
-        isMultiplierPlayed: false,
+        wasMultiplierUsed: false,
         isCenter: false,
     };
     const mockGrid: Square[][] = [].constructor(boardServiceGridSize.y).forEach((i: number) => {

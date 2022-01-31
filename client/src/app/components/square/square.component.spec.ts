@@ -263,7 +263,7 @@ class CenterSquareWrapperComponent {
         {
             tile: null,
             multiplier: null,
-            isMultiplierPlayed: false,
+            wasMultiplierUsed: false,
             isCenter: true,
         },
         SQUARE_SIZE,

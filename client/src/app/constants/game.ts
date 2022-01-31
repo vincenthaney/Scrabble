@@ -44,7 +44,7 @@ export const UNDEFINED_SQUARE_SIZE: Vec2 = { x: -1, y: -1 };
 export const UNDEFINED_SQUARE: Square = {
     tile: null,
     multiplier: null,
-    isMultiplierPlayed: false,
+    wasMultiplierUsed: false,
     isCenter: false,
 };
 
