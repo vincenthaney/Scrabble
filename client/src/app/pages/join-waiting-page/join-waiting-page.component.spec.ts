@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WaitingPageComponent } from './waiting-page.component';
+import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
 describe('WaitingPageComponent', () => {
-    let component: WaitingPageComponent;
-    let fixture: ComponentFixture<WaitingPageComponent>;
+    let component: JoinWaitingPageComponent;
+    let fixture: ComponentFixture<JoinWaitingPageComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [WaitingPageComponent],
+            declarations: [JoinWaitingPageComponent],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(WaitingPageComponent);
+        fixture = TestBed.createComponent(JoinWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
