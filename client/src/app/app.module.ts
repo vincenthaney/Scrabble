@@ -26,7 +26,6 @@ import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component
 import { IconComponent } from './components/icon/icon.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
-import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -49,7 +48,6 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         CommunicationBoxComponent,
         BoardComponent,
         TileRackComponent,
-        SurrenderDialogComponent,
         LobbyPageComponent,
         LobbyInfoComponent,
         CreateWaitingPageComponent,
