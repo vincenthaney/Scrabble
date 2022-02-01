@@ -45,7 +45,7 @@ describe('LobbyPageComponent', () => {
         }
     });
 
-    it('validateName should update canJoin attribute of the lobbies ( use #3)', () => {
+    it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
         component.nameField.formParameters.patchValue({ inputName: 'Name1' });
         const expected = [false, true, true];
         component.validateName();

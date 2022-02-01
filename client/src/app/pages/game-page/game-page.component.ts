@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SurrenderDialogComponent } from '@app/components/surrender-dialog/surrender-dialog.component';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
@@ -9,16 +9,23 @@ import { SurrenderDialogComponent } from '@app/components/surrender-dialog/surre
 export class GamePageComponent {
     constructor(public surrenderDialog: MatDialog) {}
     openDialog() {
-        const surrenderDialogRef = this.surrenderDialog.open(SurrenderDialogComponent);
-        const subscriber = surrenderDialogRef.componentInstance.surrenderConfirmed.subscribe((result) => {
-            if (result) {
-                this.surrenderDialog.closeAll();
-                // TODO: Verify if possible to do it cleaner and hardcoded to /lobby rightnow
-                window.location.href = window.location.hostname + '#/lobby';
-            }
-        });
-        surrenderDialogRef.afterClosed().subscribe(() => {
-            subscriber.unsubscribe();
+        this.surrenderDialog.open(DefaultDialogComponent, {
+            data: {
+                title: 'Abandonner la partie',
+                content: 'Voulez-vous vraiment ABANDONNER?',
+                buttons: [
+                    {
+                        content: 'Abandonner la partie',
+                        redirect: '/home',
+                        style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
+                    },
+                    {
+                        content: 'Continuer la partie',
+                        closeDialog: true,
+                        style: 'background-color: rgb(231, 231, 231)',
+                    },
+                ],
+            },
         });
     }
 }
