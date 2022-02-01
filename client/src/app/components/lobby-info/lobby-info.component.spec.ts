@@ -22,9 +22,6 @@ export class TestComponent {}
 describe('LobbyInfoComponent', () => {
     let component: LobbyInfoComponent;
     let fixture: ComponentFixture<LobbyInfoComponent>;
-    // const routerSpy = {
-    //     navigateByUrl: jasmine.createSpy('navigateByUrl').and.callFake(fakeNavigate),
-    // };
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({

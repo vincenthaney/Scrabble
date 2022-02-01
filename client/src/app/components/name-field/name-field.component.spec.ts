@@ -67,7 +67,7 @@ describe('NameFieldComponent', () => {
         MESSAGE_NAME_NO_MATCH_REGEX,
         MESSAGE_NAME_NO_MATCH_REGEX,
     ];
-    const inputNames = ['a', 'abcdefghijklmnopqrstuvwxyz', '#sc!cy  name', '#', '!@#$%^&*()!@#$%^&*()!@#$%^&*', ' Michel', 'Michel  Gagnon'];
+    const inputNames = ['a', 'abcdefghijklmnopqrstuvwxyz', '#sp!cy  name', '#', '!@#$%^&*()!@#$%^&*()!@#$%^&*', ' Michel', 'Michel  Gagnon'];
     const testedCase = [
         'too short',
         'too long',
