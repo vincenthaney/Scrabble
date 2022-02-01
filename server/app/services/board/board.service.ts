@@ -1,12 +1,10 @@
-import { Injectable } from '@angular/core';
 import { Multiplier, Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
-import { BOARD_SIZE, UNDEFINED_GRID_SIZE } from '@app/constants/game';
+import { BOARD_SIZE, UNDEFINED_BOARD_SIZE } from '@app/constants/game';
+import { Service } from 'typedi';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Service()
 export default class BoardService {
     private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
     grid: Square[][];
@@ -17,7 +15,7 @@ export default class BoardService {
 
     getGridSize(): Vec2 {
         if (!this.grid || !this.grid[0]) {
-            return UNDEFINED_GRID_SIZE;
+            return UNDEFINED_BOARD_SIZE;
         }
         const x = this.grid.length;
         const y = this.grid[0].length;
