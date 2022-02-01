@@ -21,10 +21,11 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
+import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
+import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 import { IconComponent } from './components/icon/icon.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
-import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -47,7 +48,8 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         CommunicationBoxComponent,
         BoardComponent,
         TileRackComponent,
-        SurrenderDialogComponent,
+        LobbyPageComponent,
+        LobbyInfoComponent,
         CreateWaitingPageComponent,
         JoinWaitingPageComponent,
         GameCreationPageComponent,

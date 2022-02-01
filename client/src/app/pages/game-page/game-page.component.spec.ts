@@ -3,9 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BoardComponent } from '@app/components/board/board.component';
 import { CommunicationBoxComponent } from '@app/components/communication-box/communication-box.component';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { InformationBoxComponent } from '@app/components/information-box/information-box.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
-import { SurrenderDialogComponent } from '@app/components/surrender-dialog/surrender-dialog.component';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
@@ -25,11 +25,11 @@ describe('GamePageComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [
                 GamePageComponent,
-                SurrenderDialogComponent,
                 TileRackComponent,
                 InformationBoxComponent,
                 CommunicationBoxComponent,
                 BoardComponent,
+                DefaultDialogComponent,
             ],
             imports: [MatGridListModule],
             providers: [
