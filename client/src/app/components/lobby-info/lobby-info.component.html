@@ -18,12 +18,12 @@
     </div>
    
     <div class="right-side">
-
-        <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()" 
-        matTooltip="Veuillez entrer un nom valide différent de {{lobby.playerName}}" matTooltipClass="example-tooltip-red" [matTooltipDisabled]="lobby.canJoin">
-        <app-icon icon="swords" size=lg></app-icon>
-        &nbsp; Joindre 
-        </button>
+        <div class="button-container" matTooltip="Veuillez entrer un nom valide différent de {{lobby.playerName}}" matTooltipClass="example-tooltip-red" [matTooltipDisabled]="lobby.canJoin">
+            <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()">
+            <app-icon icon="swords" size=lg></app-icon>
+            &nbsp; Joindre 
+            </button>
+        </div>
     </div>   
 </div>
 
