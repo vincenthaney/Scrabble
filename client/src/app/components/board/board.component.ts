@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
@@ -10,7 +10,7 @@ import { BoardService } from '@app/services/';
     templateUrl: './board.component.html',
     styleUrls: ['./board.component.scss'],
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent {
     readonly marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
@@ -21,9 +21,6 @@ export class BoardComponent implements OnInit {
 
         this.gridSize = this.boardService.getGridSize();
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
-    }
-
-    ngOnInit() {
         this.initializeBoard();
     }
 
