@@ -6,15 +6,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
+import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppMaterialModule } from '@app/modules/material.module';
 
 import { LobbyInfoComponent } from './lobby-info.component';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-// const fakeNavigate = () => {};
 
 @Component({
     template: '',
@@ -33,6 +31,7 @@ describe('LobbyInfoComponent', () => {
             imports: [
                 MatIconModule,
                 MatButtonModule,
+                MatTooltipModule,
                 ReactiveFormsModule,
                 CommonModule,
                 MatInputModule,
@@ -70,5 +69,30 @@ describe('LobbyInfoComponent', () => {
         const EXPECTED_STRING = '1 minute et 30 secondes';
         component.lobby.timer = TIME;
         expect(component.convertTime()).toEqual(EXPECTED_STRING);
+    });
+
+    it('the tooltip should be disabled if you can join the lobby', async () => {
+        component.lobby.canJoin = true;
+        fixture.detectChanges();
+        const buttonContainer = fixture.debugElement.queryAll(By.css('.button-container'));
+        const errorTooltip = buttonContainer[0].injector.get<MatTooltip>(MatTooltip);
+        expect(errorTooltip.disabled).toBeTruthy();
+    });
+
+    it('the tooltip should be enabled if you cannot join the lobby', async () => {
+        component.lobby.canJoin = false;
+        fixture.detectChanges();
+        const buttonContainer = fixture.debugElement.queryAll(By.css('.button-container'));
+        const errorTooltip = buttonContainer[0].injector.get<MatTooltip>(MatTooltip);
+        expect(errorTooltip.disabled).toBeFalse();
+    });
+
+    it('the tooltip should show the correct message if you cannot join the lobby', async () => {
+        component.lobby.canJoin = false;
+        component.lobby.playerName = 'playername1';
+        fixture.detectChanges();
+        const buttonContainer = fixture.debugElement.queryAll(By.css('.button-container'));
+        const errorTooltip = buttonContainer[0].injector.get<MatTooltip>(MatTooltip);
+        expect(errorTooltip.message).toEqual(`Veuillez entrer un nom valide différent de ${component.lobby.playerName}`);
     });
 });
