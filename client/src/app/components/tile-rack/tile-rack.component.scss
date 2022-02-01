@@ -1,0 +1,47 @@
+.full-size {
+    width: 100%;
+    height: 100%;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#rack-grid {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    grid-template-rows: 100%;
+    align-self: center;
+}
+
+#rack-tile-card {
+    padding: 0px;
+    height: 100%;
+    background-color: brown;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    max-width: 600px;
+}
+
+.rack-card {
+    padding: 0px;
+    height: 100%;
+    background-color: brown;
+}
+
+#rack-button-container {
+    display: grid;
+    grid-template-rows: 50% 50%;
+    height: 100%;
+    padding: 0px;
+    border-radius: 3px;
+    align-items: center;
+}
+
+.btn-rack {
+    margin: 5px 50px;
+    padding: 0px;
+}
