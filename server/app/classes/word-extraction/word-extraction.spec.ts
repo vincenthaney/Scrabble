@@ -3,21 +3,7 @@
 // import { Tile } from '../tile';
 // import { WordExtraction } from './word-extraction';
 
-// const a: Tile;
-// interface mockSquare {
-//     tile?: Tile;
-//     row: number;
-//     column: number;
-// }
-
-// const mockBoardState: Board = {
-//     grid: [
-//         [{ tile: { letter: 'A', value: 1 }, row: 0, column: 0, multiplier: 2, multiplierType: 'letter', played: true }],
-//         [{ tile: { letter: 'A', value: 1 }, row: 0, column: 0, multiplier: 2, multiplierType: 'letter', played: true }],
-//         [{ tile: { letter: 'A', value: 1 }, row: 0, column: 0, multiplier: 2, multiplierType: 'letter', played: true }],
-//         [{ tile: { letter: 'A', value: 1 }, row: 0, column: 0, multiplier: 2, multiplierType: 'letter', played: true }],
-//     ],
-// };
+// const boardState: Board = {};
 
 // describe('WordExtraction', () => {
 //     let wordExtraction: WordExtraction;

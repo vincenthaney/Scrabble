@@ -9,6 +9,8 @@ const DEFAULT_SQUARE: Square = {
     multiplier: 1,
     multiplierType: 'letter',
     played: false,
+    row: 1,
+    column: 1,
 };
 
 describe('Action Clue', () => {
