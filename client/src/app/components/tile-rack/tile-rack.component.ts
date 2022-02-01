@@ -26,6 +26,9 @@ export class TileRackComponent implements OnInit {
                 { letter: 'B', value: 2 },
                 { letter: 'C', value: 3 },
                 { letter: 'D', value: 4 },
+                { letter: 'B', value: 2 },
+                { letter: 'C', value: 3 },
+                { letter: 'D', value: 4 },
             ],
         };
         if (!this.gameService.getLocalPlayer() || !this.gameService.getLocalPlayer().tiles) {
