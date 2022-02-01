@@ -9,15 +9,19 @@ import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
+import { CreateWaitingPageComponent } from '@app/pages/create-waiting-page/create-waiting-page.component';
+import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
+import { JoinWaitingPageComponent } from '@app/pages/join-waiting-page/join-waiting-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { WaitingPageComponent } from '@app/pages/waiting-page/waiting-page.component';
 import { BoardComponent } from './components/board/board.component';
 import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
+import { IconComponent } from './components/icon/icon.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
+import { NameFieldComponent } from './components/name-field/name-field.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
 
@@ -41,10 +45,23 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         BoardComponent,
         RackComponent,
         SurrenderDialogComponent,
-        WaitingPageComponent,
+        CreateWaitingPageComponent,
+        JoinWaitingPageComponent,
+        GameCreationPageComponent,
         DefaultDialogComponent,
+        IconComponent,
+        NameFieldComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule, ScrollingModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        ScrollingModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })

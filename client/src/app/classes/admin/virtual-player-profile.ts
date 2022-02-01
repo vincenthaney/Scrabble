@@ -1,9 +1,10 @@
 import { StorableModel } from '@app/classes/admin';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 export default class VirtualPlayerProfile extends StorableModel {
     name: string;
     isEditable: boolean;
-    level: string;
+    level: VirtualPlayerLevel;
 
     // constructor(name: string, isEditable: boolean, level: string) {
     //     super();

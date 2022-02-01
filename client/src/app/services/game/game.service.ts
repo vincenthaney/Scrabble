@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-// import { Action } from '@app/classes/actions';
 import { GameType } from '@app/classes/game-type';
-import { TileReserve } from '@app/classes/tile-reserve';
 import { RoundManagerService } from '@app/services/';
 
 @Injectable({
@@ -14,7 +12,6 @@ export default class GameHistoryService {
     roundManagerService: RoundManagerService;
     // player1: IPlayer;
     // player2: IPlayer;
-    tileReserve: TileReserve;
     wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
     gameType: GameType;
 
