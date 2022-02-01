@@ -5,6 +5,10 @@ export default class RoundManager {
     // private completedRounds: Round[];
     // private maxRoundTime: number;
 
+    // constructor(maxRoundTime: number) {
+    // this.maxRoundTime = maxRoundTime;
+    // }
+
     getStartGameTime(): Date {
         throw new Error('Method not implemented.');
     }

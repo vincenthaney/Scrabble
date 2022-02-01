@@ -20,6 +20,7 @@ import { DefaultDialogComponent } from './components/default-dialog/default-dial
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { RackComponent } from './components/rack/rack.component';
 import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
+import { IconComponent } from './components/icon/icon.component';
 import { CreateWaitingPageComponent } from '@app/pages/create-waiting-page/create-waiting-page.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
 
@@ -47,6 +48,7 @@ import { NameFieldComponent } from './components/name-field/name-field.component
         JoinWaitingPageComponent,
         GameCreationPageComponent,
         DefaultDialogComponent,
+        IconComponent,
         NameFieldComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
