@@ -1,1 +1,1 @@
-export const START_TILE_AMOUNT = 7;
+export const START_TILES_AMOUNT = 7;

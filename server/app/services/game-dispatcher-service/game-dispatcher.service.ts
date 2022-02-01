@@ -24,7 +24,7 @@ export class GameDispatcherService {
 
     createMultiplayerGame(configData: GameConfigData): string {
         const config: GameConfig = {
-            player: new Player(configData.playerId, configData.playerName),
+            player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
             maxRoundTime: configData.maxRoundTime,
             dictionary: configData.dictionary,
@@ -48,7 +48,7 @@ export class GameDispatcherService {
         if (waitingGame.joinedPlayer !== undefined) {
             throw new Error(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
         }
-        if (waitingGame.getConfig().player.name === playerName) {
+        if (waitingGame.getConfig().player1.name === playerName) {
             throw new Error(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
         }
 
@@ -69,7 +69,7 @@ export class GameDispatcherService {
     async acceptJoinRequest(waitingGameId: string, playerId: string, opponentName: string): Promise<Game> {
         const waitingGame = this.getGameFromId(waitingGameId);
 
-        if (waitingGame.getConfig().player.getId() !== playerId) {
+        if (waitingGame.getConfig().player1.getId() !== playerId) {
             throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingGame.joinedPlayer === undefined) {
             throw new Error(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
@@ -100,7 +100,7 @@ export class GameDispatcherService {
     rejectJoinRequest(waitingGameId: string, playerId: string, opponentName: string) {
         const waitingGame = this.getGameFromId(waitingGameId);
 
-        if (waitingGame.getConfig().player.getId() !== playerId) {
+        if (waitingGame.getConfig().player1.getId() !== playerId) {
             throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingGame.joinedPlayer === undefined) {
             throw new Error(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
@@ -121,7 +121,7 @@ export class GameDispatcherService {
     cancelGame(waitingGameId: string, playerId: string) {
         const waitingGame = this.getGameFromId(waitingGameId);
 
-        if (waitingGame.getConfig().player.getId() !== playerId) {
+        if (waitingGame.getConfig().player1.getId() !== playerId) {
             throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
         }
 
