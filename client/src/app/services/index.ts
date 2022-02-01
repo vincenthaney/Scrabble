@@ -1,3 +1,4 @@
+export { default as BoardService } from './board/board.service';
 export { default as GameHistoryService } from './game-history/game-history.service';
 export { default as GameService } from './game/game.service';
 export { default as HighScoreService } from './high-score/high-score.service';
