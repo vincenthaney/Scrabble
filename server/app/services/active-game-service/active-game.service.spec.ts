@@ -20,7 +20,7 @@ const DEFAULT_PLAYER_1 = new Player('id1', 'player1');
 const DEFAULT_PLAYER_2 = new Player('id2', 'player2');
 const DEFAULT_ID = 'gameId';
 const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
-    player: DEFAULT_PLAYER_1,
+    player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,

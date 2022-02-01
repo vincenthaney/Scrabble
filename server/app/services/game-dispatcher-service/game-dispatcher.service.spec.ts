@@ -65,8 +65,8 @@ describe('GameDispatcherService', () => {
         });
 
         it('should create a WaitingGame with same config', () => {
-            expect(waitingGame.getConfig().player.name).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
-            expect(waitingGame.getConfig().player.getId()).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
+            expect(waitingGame.getConfig().player1.name).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
+            expect(waitingGame.getConfig().player1.getId()).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
             expect(waitingGame.getConfig().gameType).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.gameType);
             expect(waitingGame.getConfig().maxRoundTime).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.maxRoundTime);
             expect(waitingGame.getConfig().dictionary).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.dictionary);

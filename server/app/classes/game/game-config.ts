@@ -14,7 +14,7 @@ export interface SoloGameConfigData extends GameConfigData {
 }
 
 export interface GameConfig {
-    player: Player;
+    player1: Player;
     gameType: GameType;
     maxRoundTime: number;
     dictionary: string;
