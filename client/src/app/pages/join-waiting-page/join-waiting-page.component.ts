@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
     styleUrls: ['./join-waiting-page.component.scss'],
 })
 export class JoinWaitingPageComponent {
-    state: GameRequestState.Waiting;
+    state: GameRequestState = GameRequestState.Waiting;
     waitingGameName: string = 'testName';
     waitingGameType: string = 'testType';
     waitingGameTimer: string = 'timer';
@@ -34,7 +34,8 @@ export class JoinWaitingPageComponent {
             },
         });
         dialogRef.afterClosed().subscribe(() => {
-            this.router.navigateByUrl('/lobby');
+            this.state = GameRequestState.Rejected;
+            this.router.navigateByUrl('lobby');
         });
     }
 }
