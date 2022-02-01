@@ -1,17 +1,39 @@
 import { expect } from 'chai';
-import { Board, Square, MultiplierType } from '../board';
+import { start } from 'repl';
+import { Board, Square, MultiplierType, Orientation, Position } from '../board';
 import { Tile } from '../tile';
 import { WordExtraction } from './word-extraction';
 
+const TILE_J: Tile = { letter: 'J', value: 1 };
+const TILE_A: Tile = { letter: 'A', value: 1 };
+const TILE_M: Tile = { letter: 'M', value: 1 };
+const TILE_B: Tile = { letter: 'B', value: 1 };
+const TILE_O: Tile = { letter: 'O', value: 1 };
+const TILE_N: Tile = { letter: 'N', value: 1 };
+const TILE_S: Tile = { letter: 'N', value: 1 };
+
+const WORD_JAMBON: Tile[] = [TILE_J, TILE_A, TILE_M, TILE_B, TILE_O, TILE_N];
+const WORD_NON: Tile[] = [TILE_N, TILE_O, TILE_N];
+const WORD_MA: Tile[] = [TILE_M, TILE_A];
+const WORD_BON: Tile[] = [TILE_B, TILE_O, TILE_N];
+
+const getTilesPlaced = (board: Board, tilesPlaced: Tile[], startPosition: Position, orientation: Orientation): Square[] => {
+    const locationWord: Square[] = [];
+    for (let i = 0; i < locationWord.length; i++) {
+        if (orientation === Orientation.Vertical) locationWord.push(board.grid[startPosition.row + i][startPosition.col]);
+        if (orientation === Orientation.Horizontal) locationWord.push(board.grid[startPosition.row][startPosition.col + i]);
+    }
+    return locationWord;
+};
 
 describe('WordExtraction', () => {
     let wordExtraction: WordExtraction;
-
+    let board: Board;
     beforeEach(async () => {
         wordExtraction = new WordExtraction();
-        const boardState = new Board();
+        board = new Board();
     });
-    let board: Board;
+    // let board: Board;
 
     /* eslint-disable no-console */
 
@@ -20,23 +42,38 @@ describe('WordExtraction', () => {
     /* eslint-disable no-unused-expressions */
     it('should create', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-        expect(board).to.exist;
+        expect(wordExtraction).to.exist;
     });
 
+    it('should return an empty array when the board is empty', () => {
+        expect(wordExtraction.extract(board, [board.grid[7][7]], Orientation.Vertical)).to.equal([]);
+    });
 
-    // it('should create a board with all empty squares', () => {
-    //     for (let i = 0; i < 15; i++) {
-    //         for (let j = 0; j < 15; i++) {
-    //             console.log(board.grid[i][j].tile);
-    //             expect(board.grid[i][j].tile).to.be.undefined;
-    //         }
-    //     }
-    // });
+    it('should return an empty array when the SquaresPlaced is empty', () => {
+        const startPosition = { row: 1, col: 12 };
+        const orientation = Orientation.Vertical;
+        board.placeWord(WORD_JAMBON, startPosition, orientation);
+        expect(wordExtraction.extract(board, [], orientation)).to.equal([]);
+    });
+
+    it('should return an empty array when the board does not haveis empty', () => {
+        const startPosition = { row: 1, col: 12 };
+        const orientation = Orientation.Vertical;
+        board.placeWord(WORD_JAMBON, startPosition, orientation);
+        expect(wordExtraction.extract(board, [], orientation)).to.equal([]);
+    });
+
+    it('should return a single word when the board contains only 1 word', () => {
+        const startPosition = { row: 1, col: 12 };
+        const orientation = Orientation.Vertical;
+        board.placeWord(WORD_JAMBON, startPosition, orientation);
+        const locationJambon = getTilesPlaced(board, WORD_JAMBON, startPosition, orientation);
+        expect(wordExtraction.extract(board, locationJambon, orientation)).to.equal(['JAMBON']);
+    });
 
     it('place Tile should place a Tile and return true at the desired Square', () => {
-        const targetPosition = { row: 5, col: 3 };
-        expect(board.placeTile(DEFAULT_TILE_A, targetPosition)).to.be.true;
-        expect(validateTile(board.grid[targetPosition.row][targetPosition.col].tile, DEFAULT_TILE_A)).to.be.true;
+        // const targetPosition = { row: 5, col: 3 };
+        // expect(board.placeTile(DEFAULT_TILE_A, targetPosition)).to.be.true;
+        // expect(validateTile(board.grid[targetPosition.row][targetPosition.col].tile, DEFAULT_TILE_A)).to.be.true;
     });
-
 });
