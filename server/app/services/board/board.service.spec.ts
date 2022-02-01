@@ -1,15 +1,22 @@
-import { TestBed } from '@angular/core/testing';
-import { BoardService } from '@app/services';
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import BoardService from './board.service';
+
+const expect = chai.expect;
+chai.use(spies);
+chai.use(chaiAsPromised);
 
 describe('BoardService', () => {
     let service: BoardService;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
-        service = TestBed.inject(BoardService);
+        service = new BoardService();
     });
 
     it('should be created', () => {
-        expect(service).toBeTruthy();
+        expect(service).to.exist;
     });
 });
