@@ -3,58 +3,46 @@
     
     <section id="game-parameters">
         <h1>Créez une partie</h1>
-        <mat-button-toggle-group color="primary" [(ngModel)]="gameType" name="gameTypes" aria-label="Game Type">
-            <mat-button-toggle id="log2990-button" [value]="gameTypes.Classic">{{gameTypes.Classic}}</mat-button-toggle>
-            <mat-button-toggle id="classic-button" [value]="gameTypes.LOG2990">{{gameTypes.LOG2990}}</mat-button-toggle>
-        </mat-button-toggle-group>
+        <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
+            <mat-label>Choisissez un type de partie</mat-label>
+            <mat-button-toggle-group formControlName="gameType" ngDefaultControl>
+                <mat-button-toggle id="classic-button" [value]="gameTypes.Classic">{{gameTypes.Classic}}</mat-button-toggle>
+                <mat-button-toggle id="log2990-button" [value]="gameTypes.LOG2990">{{gameTypes.LOG2990}}</mat-button-toggle>
+            </mat-button-toggle-group>
+            
+            <mat-label>Choisissez un mode de jeu</mat-label>
+            <mat-button-toggle-group formControlName="gameMode" ngDefaultControl>
+                <mat-button-toggle id="solo-button" [value]="gameModes.Solo">{{gameModes.Solo}}</mat-button-toggle>
+                <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{gameModes.Multiplayer}}</mat-button-toggle>
+            </mat-button-toggle-group>
 
-        <mat-button-toggle-group color="primary" [(ngModel)]="gameMode" name="gameModes" aria-label="Game Mode">
-            <mat-button-toggle id="solo-button" [value]="gameModes.Solo">{{gameModes.Solo}}</mat-button-toggle>
-            <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{gameModes.Multiplayer}}</mat-button-toggle>
-        </mat-button-toggle-group>
+            <mat-label id="level-label" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">Choisissez le niveau de votre adversaire virtuel</mat-label>
+            <mat-button-toggle-group id="level-buttons" formControlName="level" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
+                <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">{{virtualPlayerLevels.Beginner}}</mat-button-toggle>
+                <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert">{{virtualPlayerLevels.Expert}}</mat-button-toggle>
+            </mat-button-toggle-group>
 
-        <form [formGroup]="gameParameters" (ngSubmit)="createGame()">
             <span id="form-fields">
                 <mat-form-field appearance="outline">
-                    <mat-label>Temps par tour</mat-label>
-                    <mat-select formControlName="inputTimer">
+                    <mat-label floatLabel="always">Choisissez le temps par tour</mat-label>
+                    <mat-select formControlName="timer">
                         <mat-option value="60">1 minute</mat-option>
                     </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                    <mat-label>Dictionnaire utilisé</mat-label>
-                    <mat-select formControlName="inputDict">
+                    <mat-label floatLabel="always">Choisissez le dictionnaire à utiliser</mat-label>
+                    <mat-select formControlName="dict">
                         <mat-option value="default-dict">Par défaut (Français)</mat-option>
                     </mat-select>
                 </mat-form-field>
-
-                <mat-form-field appearance="outline" id="input-name">
-                    <mat-label>Nom du joueur</mat-label>
-                    <input matInput type="text" formControlName="inputName" autocomplete="off">
-                </mat-form-field>
-                <span *ngIf="gameParameters.get('inputName')?.invalid && (gameParameters.get('inputName')?.dirty || gameParameters.get('inputName')?.touched)" class="alert-group">
-                    <span *ngIf="gameParameters.get('inputName')?.errors?.['minlength']" class="alert">
-                        Votre nom doit contenir au moins 2 caractères.
-                    </span>
-                    <span *ngIf="gameParameters.get('inputName')?.errors?.['maxlength']" class="alert">
-                        Votre nom doit contenir au plus 20 caractères.
-                    </span>
-                    <span *ngIf="gameParameters.get('inputName')?.errors?.['pattern'] && !gameParameters.get('inputName')?.errors?.['maxlength'] && !gameParameters.get('inputName')?.errors?.['minlength']" class="alert">
-                        Votre nom ne peut contenir que des lettres et des chiffres.
-                    </span>
-                </span>
+                <app-name-field></app-name-field>
             </span>
-
             <span id="bottom-buttons">
                 <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>
                 <button mat-flat-button type="submit" id="create-game-button">Créer la partie</button>
             </span>
-
         </form>
-
     </section>
-
     
-
 </span>

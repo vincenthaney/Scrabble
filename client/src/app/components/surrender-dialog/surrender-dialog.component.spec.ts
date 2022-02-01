@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 import { SurrenderDialogComponent } from './surrender-dialog.component';
 
 describe('SurrenderDialogComponent', () => {
@@ -8,6 +9,7 @@ describe('SurrenderDialogComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [SurrenderDialogComponent],
+            imports: [MatDialogModule],
         }).compileComponents();
     });
 

@@ -1,23 +1,101 @@
-.full-size {
-    width: 100%;
-    height: 100%;
-}
-.space-between {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    justify-content: space-between;
-    flex-direction: column;
+$info-box-max-width:1600px;
+$board-width:1000px;
+$communication-box-min-width:300px;
+$communication-box-max-width:500px;
+
+$board-height-proportion: 80%;
+$rack-height-proportion: 13%;
+$buttons-height-proportion: 7%;
+
+$board-height: $board-width;
+$rack-height: 120px;
+$buttons-height: 50px;
+$info-box-height: 100px;
+
+$button-height: 30px;
+$button-width: 140px;
+
+button {
+    width: $button-width;
 }
 
-.center-both {
+#page-container {
+    width: 100%;
+    height: 100%;
+    max-width: $info-box-max-width;
+    margin: 0 auto;
+}
+
+#button-group {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
 }
-
-#text-button-container {
+  
+.text-button-container {
     display: flex;
-    justify-content: space-evenly;
-    padding-bottom: 2%;
+    justify-content: space-around;
+    padding-bottom: 10px;
+}
+
+.grid-item-container {
+    height: 100%;
+    width: 100%;
+    justify-content: right;
+}
+
+.top-level-grid {
+    display: grid;
+    height: 100%;
+    width: 100%;
+    grid-template-rows: $info-box-height auto;
+    justify-items: center;
+    text-align: center;
+    background-color: brown;
+}
+
+.horizontal-grid {
+    display: grid;
+    grid-template-columns: $board-width auto ;
+    height: 100%;
+    width: 100%;
+}
+
+@media screen and (min-width: ($board-width + $communication-box-max-width)) {
+    .horizontal-grid {
+        grid-template-columns:  $board-width  $communication-box-max-width;
+        width: $board-width + $communication-box-max-width;
+    }
+}
+
+.vertical-grid {
+    display: grid;
+    grid-template-rows:  $board-height-proportion 0 $rack-height-proportion $buttons-height-proportion;
+    height: 100%;
+    width: 100%;
+    background-color: gray;
+}
+@media screen and (min-height: ($board-height + $rack-height + $buttons-height + $info-box-height )) {
+    .vertical-grid {
+        grid-template-rows: $board-height auto $rack-height $buttons-height;
+    }
+}
+
+.sidebar-section {
+    background-color: blue;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    max-width: $communication-box-max-width;
+    min-width: $communication-box-min-width;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.communication-box-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
 }

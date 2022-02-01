@@ -1,0 +1,29 @@
+
+.grid{
+    width: 17%;
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+.align-right{
+    text-align: right;
+}
+
+.align-left{
+    text-align: left;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    gap: 2%;
+}
+
+mat-progress-bar {
+    width: 17%;
+    margin-bottom: 20px;
+}

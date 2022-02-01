@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { BoardComponent } from '@app/components/board/board.component';
 import { CommunicationBoxComponent } from '@app/components/communication-box/communication-box.component';
 import { InformationBoxComponent } from '@app/components/information-box/information-box.component';
-import { SurrenderDialogComponent } from '@app/components/surrender-dialog/surrender-dialog.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
+import { SurrenderDialogComponent } from '@app/components/surrender-dialog/surrender-dialog.component';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
@@ -30,6 +31,7 @@ describe('GamePageComponent', () => {
                 CommunicationBoxComponent,
                 BoardComponent,
             ],
+            imports: [MatGridListModule],
             providers: [
                 {
                     provide: MatDialog,
