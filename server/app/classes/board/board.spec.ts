@@ -73,11 +73,7 @@ describe('Board', () => {
 
     it('placeWord should place a single letter word and return true', () => {
         const startingSquare = { row: 5, col: 3 };
-        console.log(board.placeWord([DEFAULT_TILE_A], startingSquare, Orientation.Horizontal));
-        console.log(board.grid[startingSquare.row][startingSquare.col].tile);
-        expect(true).to.be.true;
-        console.log(board.grid[startingSquare.row][startingSquare.col]);
-        console.log(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_A));
+        expect(board.placeWord([DEFAULT_TILE_A], startingSquare, Orientation.Horizontal)).to.be.true;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_A)).to.be.true;
     });
 
@@ -85,32 +81,40 @@ describe('Board', () => {
         const startingSquare = { row: 5, col: 3 };
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.true;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_C)).to.be.true;
-        expect(validateTile(board.grid[startingSquare.row + 1][startingSquare.col].tile, DEFAULT_TILE_D)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 1].tile, DEFAULT_TILE_D)).to.be.true;
     });
 
     it('placeWord should place a vertical 3 word letter word and return true', () => {
         const startingSquare = { row: 5, col: 3 };
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Vertical)).to.be.true;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_C)).to.be.true;
-        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 1].tile, DEFAULT_TILE_A)).to.be.true;
-        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 2].tile, DEFAULT_TILE_D)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row + 1][startingSquare.col].tile, DEFAULT_TILE_A)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row + 2][startingSquare.col].tile, DEFAULT_TILE_D)).to.be.true;
     });
 
     it('placeWord should not place a letter if it would exceed the board dimensions and return false', () => {
-        const startingSquare = { row: 13, col: 3 };
-        expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Vertical)).to.be.false;
+        const startingSquare = { row: 9, col: 13 };
+        expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.false;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_C)).to.be.false;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 1].tile, DEFAULT_TILE_A)).to.be.false;
-        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 2].tile, DEFAULT_TILE_D)).to.be.false;
     });
 
-    // it('placeWord should not place a letter if it would exceed the board dimensions and return false', () => {
-    //     const startingSquare = { row: 13, col: 3 };
-    //     // board.grid[targetPosition.row][targetPosition.col].tile = DEFAULT_TILE_B;
+    it('placeWord should place the word and skip over a Square with a tile and return true', () => {
+        const startingSquare = { row: 8, col: 5 };
+        board.grid[startingSquare.row][startingSquare.col + 1].tile = DEFAULT_TILE_B;
+        expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_C)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 1].tile, DEFAULT_TILE_B)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 2].tile, DEFAULT_TILE_A)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 3].tile, DEFAULT_TILE_D)).to.be.true;
+    });
 
-    //     expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Vertical)).to.be.false;
-    //     expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_C)).to.be.false;
-    //     expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 1].tile, DEFAULT_TILE_A)).to.be.false;
-    //     expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 2].tile, DEFAULT_TILE_D)).to.be.false;
-    // });
+    it('placeWord should not place the word if the starting square is occupied and return false', () => {
+        const startingSquare = { row: 8, col: 5 };
+        board.grid[startingSquare.row][startingSquare.col].tile = DEFAULT_TILE_B;
+        expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.false;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_C)).to.be.false;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col].tile, DEFAULT_TILE_B)).to.be.true;
+        expect(validateTile(board.grid[startingSquare.row][startingSquare.col + 1].tile, DEFAULT_TILE_A)).to.be.false;
+    });
 });

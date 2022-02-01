@@ -36,8 +36,8 @@ export default class Board {
     }
 
     placeWord(tiles: Tile[], startPosition: Position, orientation: Orientation): boolean {
-        const actualPosition = startPosition;
-        if (tiles.length === 0) return false;
+        const actualPosition = { ...startPosition };
+        if (tiles.length === 0 || this.grid[startPosition.row][startPosition.col].tile) return false;
         const isVertical = orientation === Orientation.Vertical;
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
@@ -56,8 +56,6 @@ export default class Board {
         }
         for (const [square, tile] of validatedTiles) {
             square.tile = tile;
-            // eslint-disable-next-line no-console
-            console.log(square);
         }
         return true;
     }
