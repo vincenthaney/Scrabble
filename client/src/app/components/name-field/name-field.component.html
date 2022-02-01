@@ -6,15 +6,15 @@
     <span class="alert-group" *ngIf="formParameters.get('inputName')?.invalid &&
     (formParameters.get('inputName')?.dirty || formParameters.get('inputName')?.touched)">
         <mat-error class="alert" *ngIf="formParameters.get('inputName')?.errors?.['minlength']">
-            Votre nom doit contenir au moins 2 caractères.
+            {{errorNameTooShort}}
         </mat-error>
         <mat-error  class="alert"*ngIf="formParameters.get('inputName')?.errors?.['maxlength']">
-            Votre nom doit contenir au plus 20 caractères.
+            {{errorNameTooLong}}
         </mat-error>
         <mat-error class="alert" *ngIf="formParameters.get('inputName')?.errors?.pattern &&
         !formParameters.get('inputName')?.errors?.maxlength &&
         !formParameters.get('inputName')?.errors?.minlength">
-            Votre nom ne peut pas contenir de caractères spéciaux.
+           {{errorNameNoMatchRegex}}
         </mat-error>
     </span>
 </div>

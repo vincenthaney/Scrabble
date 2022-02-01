@@ -5,6 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NameFieldComponent } from './name-field.component';
+import { NAME_TOO_SHORT, NAME_TOO_LONG, NAME_NO_MATCH_REGEX } from '@app/constants/name-field';
 
 const fakeNameChange = () => {
     return false;
@@ -53,17 +54,18 @@ describe('NameFieldComponent', () => {
         expect(spy).toHaveBeenCalled();
         expect(component.isInputNameValid.emit).toHaveBeenCalledWith(false);
     });
-    const NAME_TOO_SHORT = ' Votre nom doit contenir au moins 2 caractères. ';
-    const NAME_TOO_LONG = ' Votre nom doit contenir au plus 20 caractères. ';
-    const NAME_NO_MATCH_REGEX = ' Votre nom ne peut pas contenir de caractères spéciaux. ';
+    // Html add a space on each side as it is the only text in the <mat-error> tag
+    const MESSAGE_NAME_TOO_SHORT = ' ' + NAME_TOO_SHORT + ' ';
+    const MESSAGE_NAME_TOO_LONG = ' ' + NAME_TOO_LONG + ' ';
+    const MESSAGE_NAME_NO_MATCH_REGEX = ' ' + NAME_NO_MATCH_REGEX + ' ';
     const expectedMessage = [
-        NAME_TOO_SHORT,
-        NAME_TOO_LONG,
-        NAME_NO_MATCH_REGEX,
-        NAME_TOO_SHORT,
-        NAME_TOO_LONG,
-        NAME_NO_MATCH_REGEX,
-        NAME_NO_MATCH_REGEX,
+        MESSAGE_NAME_TOO_SHORT,
+        MESSAGE_NAME_TOO_LONG,
+        MESSAGE_NAME_NO_MATCH_REGEX,
+        MESSAGE_NAME_TOO_SHORT,
+        MESSAGE_NAME_TOO_LONG,
+        MESSAGE_NAME_NO_MATCH_REGEX,
+        MESSAGE_NAME_NO_MATCH_REGEX,
     ];
     const inputNames = ['a', 'abcdefghijklmnopqrstuvwxyz', '#sc!cy  name', '#', '!@#$%^&*()!@#$%^&*()!@#$%^&*', ' Michel', 'Michel  Gagnon'];
     const testedCase = [
