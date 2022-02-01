@@ -2,6 +2,8 @@ import { Service } from 'typedi';
 import * as io from 'socket.io';
 import * as http from 'http';
 import * as SocketError from './socket.service.error';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 
 @Service()
 export class SocketService {
@@ -29,6 +31,9 @@ export class SocketService {
             socket.on('disconnect', () => {
                 this.sockets.delete(socket.id);
             });
+
+            new GameDispatcherController(socket);
+            new GamePlayController(socket);
         });
     }
 
