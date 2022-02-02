@@ -6,7 +6,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { SquareComponent } from '@app/components/square/square.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -41,7 +40,6 @@ import { MaterialPageComponent } from './pages/material-page/material-page.compo
         MainPageComponent,
         MaterialPageComponent,
         PlayAreaComponent,
-        SidebarComponent,
         HomePageComponent,
         SquareComponent,
         TileComponent,
