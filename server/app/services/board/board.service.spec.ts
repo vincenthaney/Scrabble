@@ -3,6 +3,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { AbstractScoreMultiplier, LetterScoreMultiplier, WordScoreMultiplier } from '@app/classes/square';
+import { Vec2 } from '@app/classes/vec2';
+import { BOARD_CONFIG } from '@app/constants/board-config';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -15,6 +17,20 @@ chai.use(chaiAsPromised);
 
 describe('BoardService', () => {
     let service: BoardService;
+
+    const boardConfigSize: Vec2 = {
+        x: BOARD_CONFIG.length,
+        y: BOARD_CONFIG[0] ? BOARD_CONFIG[0].length : 0,
+    };
+    const isBoardDefined = boardConfigSize.x > 0 && boardConfigSize.y > 0;
+    const isBoardDefinedTestCases: Map<Vec2, boolean> = new Map([
+        [{ x: -1, y: -1 }, false],
+        [{ x: 0, y: 0 }, isBoardDefined],
+        [{ x: boardConfigSize.x / 2, y: boardConfigSize.y / 2 }, isBoardDefined],
+        [{ x: boardConfigSize.x - 1, y: boardConfigSize.y - 1 }, isBoardDefined],
+        [{ x: boardConfigSize.x, y: boardConfigSize.y }, false],
+        [{ x: boardConfigSize.x + 1, y: boardConfigSize.y + 1 }, false],
+    ]);
 
     type MapTypes = AbstractScoreMultiplier | null | undefined;
     const boardConfigTestCases: Map<string, MapTypes> = new Map([
@@ -33,6 +49,13 @@ describe('BoardService', () => {
 
     it('should be created', () => {
         expect(service).to.exist;
+    });
+
+    isBoardDefinedTestCases.forEach((isDefined: boolean, position: Vec2) => {
+        const textToAdd: string = isDefined ? 'defined' : 'undefined';
+        it('Board Configuration at ' + position.x + '/' + position.y + ' should be ' + textToAdd, () => {
+            expect(service['isBoardConfigDefined'](position.x, position.y)).to.equal(isDefined);
+        });
     });
 
     boardConfigTestCases.forEach((value: MapTypes, key: string) => {

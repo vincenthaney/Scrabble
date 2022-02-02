@@ -1,31 +1,32 @@
-import { Multiplier } from '@app/classes/square';
-// import { Vec2 } from '@app/classes/vec2';
+import { Multiplier, Square } from '@app/classes/square';
+import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
-// import { BOARD_SIZE, UNDEFINED_BOARD_SIZE } from '@app/constants/game';
+import { BOARD_SIZE } from '@app/constants/game';
 import { Service } from 'typedi';
 import * as BOARD_ERROS from './board.service.error';
 
 @Service()
 export default class BoardService {
-    // private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
+    private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
 
-    // public initializeBoard(): Square[][] {
-    //     this.grid = [];
-    //     const center: Vec2 = { x: Math.floor(BoardService.size.x / 2), y: Math.floor(BoardService.size.y / 2) };
-    //     for (let i = 0; i < BoardService.size.y; i++) {
-    //         this.grid[i] = [];
-    //         for (let j = 0; j < BoardService.size.x; j++) {
-    //             const isCenter = j === center.x && i === center.y;
-    //             const square = {
-    //                 tile: null,
-    //                 multiplier: multiplierGrid[i][j],
-    //                 wasMultiplierUsed: false,
-    //                 isCenter,
-    //             };
-    //             this.grid[i][j] = square;
-    //         }
-    //     }
-    // }
+    initializeBoard(): Square[][] {
+        const grid: Square[][] = [];
+        const center: Vec2 = { x: Math.floor(BoardService.size.x / 2), y: Math.floor(BoardService.size.y / 2) };
+        for (let i = 0; i < BoardService.size.y; i++) {
+            grid[i] = [];
+            for (let j = 0; j < BoardService.size.x; j++) {
+                const isCenter = j === center.x && i === center.y;
+                const square = {
+                    tile: null,
+                    multiplier: this.readScoreMultiplierConfig(i, j),
+                    wasMultiplierUsed: false,
+                    isCenter,
+                };
+                grid[i][j] = square;
+            }
+        }
+        return grid;
+    }
     private readScoreMultiplierConfig(row: number, col: number): Multiplier {
         if (!this.isBoardConfigDefined(row, col)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(row, col));
         return this.parseSquareConfig(BOARD_CONFIG[row][col]);
@@ -39,7 +40,7 @@ export default class BoardService {
     }
 
     private isBoardConfigDefined(row: number, col: number): boolean {
-        return BOARD_CONFIG && BOARD_CONFIG[0] && BOARD_CONFIG.length > row && BOARD_CONFIG[0].length > col;
+        return BOARD_CONFIG && BOARD_CONFIG[0] && BOARD_CONFIG.length > row && BOARD_CONFIG[0].length > col && row >= 0 && col >= 0;
     }
     // private placeTile(position: Position, tile: Tile): boolean {
     //     throw new Error('Method not implemented.');
