@@ -1,3 +1,4 @@
+import { Board } from '@app/classes/board';
 import { Multiplier, Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
@@ -9,7 +10,7 @@ import * as BOARD_ERROS from './board.service.error';
 export default class BoardService {
     private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
 
-    initializeBoard(): Square[][] {
+    initializeBoard(): Board {
         const grid: Square[][] = [];
         const center: Vec2 = { x: Math.floor(BoardService.size.x / 2), y: Math.floor(BoardService.size.y / 2) };
         for (let i = 0; i < BoardService.size.y; i++) {
@@ -25,7 +26,7 @@ export default class BoardService {
                 grid[i][j] = square;
             }
         }
-        return grid;
+        return new Board(grid);
     }
     private readScoreMultiplierConfig(row: number, col: number): Multiplier {
         if (!this.isBoardConfigDefined(row, col)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(row, col));
