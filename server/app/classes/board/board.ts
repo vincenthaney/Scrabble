@@ -28,8 +28,8 @@ export default class Board {
     placeTile(tile: Tile, position: Position): boolean {
         // TODO: Change to cosntant form thom
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        if (position.col < 0 || position.col >= 15 || position.row < 0 || position.row >= 15) return false;
-        const targetSquare = this.grid[position.row][position.col];
+        if (position.column < 0 || position.column >= 15 || position.row < 0 || position.row >= 15) return false;
+        const targetSquare = this.grid[position.row][position.column];
         if (targetSquare.tile) return false;
         targetSquare.tile = tile;
         return true;
@@ -37,17 +37,17 @@ export default class Board {
 
     placeWord(tiles: Tile[], startPosition: Position, orientation: Orientation): boolean {
         const actualPosition = { ...startPosition };
-        if (tiles.length === 0 || this.grid[startPosition.row][startPosition.col].tile) return false;
+        if (tiles.length === 0 || this.grid[startPosition.row][startPosition.column].tile) return false;
         const isVertical = orientation === Orientation.Vertical;
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
         while (i < tiles.length) {
             // TODO: Change to cosntant form thom
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            if (actualPosition.col < 0 || actualPosition.col >= 15 || actualPosition.row < 0 || actualPosition.row >= 15) return false;
-            const targetSquare = this.grid[actualPosition.row][actualPosition.col];
+            if (actualPosition.column < 0 || actualPosition.column >= 15 || actualPosition.row < 0 || actualPosition.row >= 15) return false;
+            const targetSquare = this.grid[actualPosition.row][actualPosition.column];
             if (isVertical) actualPosition.row++;
-            else actualPosition.col++;
+            else actualPosition.column++;
             if (targetSquare.tile) continue;
             else {
                 validatedTiles.set(targetSquare, tiles[i]);
