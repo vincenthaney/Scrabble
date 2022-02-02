@@ -9,7 +9,17 @@ import { FormControl, FormGroup } from '@angular/forms';
 })
 export class CommunicationBoxComponent {
     message: string;
-    messages: string[] = ['message 1', 'message 2', 'message 3', 'message 4', 'message 5', 'message 6', 'message 7', 'message 8'];
+    messages: string[] = [
+        'message 1',
+        'message 2',
+        'message 3',
+        'message 4',
+        'message 5',
+        'message 6',
+        'message 7',
+        'message 8',
+        "je suis un message très long qui va sûrement prendre plus qu'une ligne à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
+    ];
 
     objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
