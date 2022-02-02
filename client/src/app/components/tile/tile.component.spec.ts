@@ -51,13 +51,13 @@ describe('TileComponent', () => {
     });
 
     it('Should return undefined tile if tile is undefined', () => {
-        expect(component.getTile()).toEqual(UNDEFINED_TILE);
+        expect(component.tile).toEqual(UNDEFINED_TILE);
     });
 
     it('Should return tile when tile is defined', () => {
         const expectedTile: Tile = { letter: 'A', value: 5 };
         // eslint-disable-next-line dot-notation
         component['tile'] = expectedTile;
-        expect(component.getTile()).toEqual(expectedTile);
+        expect(component.tile).toEqual(expectedTile);
     });
 });
