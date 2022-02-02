@@ -30,10 +30,19 @@ describe('Score Multiplier', () => {
         it('Creating WordScoreMultiplier with multiplier ' + multiplier + ' should be ' + isValid, () => {
             if (shouldCreate) {
                 expect(new WordScoreMultiplier(multiplier)).to.exist;
+                expect(new WordScoreMultiplier(multiplier).getMultiplier).to.equal(multiplier);
             } else {
                 expect(() => new WordScoreMultiplier(multiplier)).to.throw(SQUARE_ERRORS.INVALID_MULTIPLIER);
             }
         });
+    });
+
+    it('getMultiplier on LetterScoreMultiplier with multiplier of 2 should return 2', () => {
+        expect(new LetterScoreMultiplier(2).getMultiplier).to.equal(2);
+    });
+
+    it('getMultiplier on WordScoreMultiplier with multiplier of 2 should return 2', () => {
+        expect(new WordScoreMultiplier(2).getMultiplier).to.equal(2);
     });
 
     it('LetterScoreMultiplier should have MultiplierEffect: ' + MultiplierEffect.LETTER, () => {
