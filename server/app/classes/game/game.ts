@@ -1,13 +1,15 @@
+import Board from '@app/classes/board/board';
 import Player from '@app/classes/player/player';
 import RoundManager from '@app/classes/round/round-manager';
 import TileReserve from '@app/classes/tile/tile-reserve';
-import { MultiplayerGameConfig } from './game-config';
-import { GameType } from './game.type';
-import { START_TILES_AMOUNT } from './game.const';
-import Board from '@app/classes/board/board';
 import * as Errors from '@app/constants/errors';
+import BoardService from '@app/services/board/board.service';
+import { MultiplayerGameConfig } from './game-config';
+import { START_TILES_AMOUNT } from './game.const';
+import { GameType } from './game.type';
 
 export default class Game {
+    private static boardService: BoardService;
     player1: Player;
     player2: Player;
     roundManager: RoundManager;
@@ -16,6 +18,12 @@ export default class Game {
     tileReserve: TileReserve;
     board: Board;
     private id: string;
+
+    static injectServices(boardService: BoardService): void {
+        if (!Game.boardService) {
+            Game.boardService = boardService;
+        }
+    }
 
     /**
      * Create a game from MultiplayerConfig
@@ -35,7 +43,7 @@ export default class Game {
         game.wordsPlayed = [];
         game.gameType = config.gameType;
         game.tileReserve = new TileReserve();
-        game.board = new Board();
+        game.board = this.boardService.initializeBoard();
 
         await game.tileReserve.init();
 

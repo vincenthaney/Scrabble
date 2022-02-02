@@ -1,16 +1,18 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import Game from './game';
-import { GameType } from './game.type';
-import TileReserve from '@app/classes/tile/tile-reserve';
 import Player from '@app/classes/player/player';
-import { MultiplayerGameConfig } from './game-config';
 import { Tile } from '@app/classes/tile';
+import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
+import BoardService from '@app/services/board/board.service';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import Container from 'typedi';
+import Game from './game';
+import { MultiplayerGameConfig } from './game-config';
+import { GameType } from './game.type';
 
 const expect = chai.expect;
 
@@ -43,6 +45,9 @@ describe('Game', () => {
             this['referenceTiles'] = [...this['tiles']];
             return Promise.resolve();
         };
+
+        const boardService = Container.get(BoardService);
+        Game.injectServices(boardService);
     });
 
     afterEach(() => {

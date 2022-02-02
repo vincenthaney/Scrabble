@@ -1,14 +1,16 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { Orientation } from '@app/classes/board';
+import { Square } from '@app/classes/square';
 import { expect } from 'chai';
 import { ActionClue, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '.';
-import { Square, Orientation } from '@app/classes/board';
 
-const DEFAULT_SQUARE: Square = {
-    tile: undefined,
-    multiplier: 1,
-    multiplierType: 'letter',
-    played: false,
+export const DEFAULT_SQUARE: Square = {
+    tile: null,
+    position: { row: 0, col: 0 },
+    multiplier: null,
+    wasMultiplierUsed: false,
+    isCenter: false,
 };
 
 describe('Action Clue', () => {

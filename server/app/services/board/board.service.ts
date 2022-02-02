@@ -1,4 +1,4 @@
-import { Board } from '@app/classes/board';
+import { Board, Position } from '@app/classes/board';
 import { Multiplier, Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
@@ -12,14 +12,15 @@ export default class BoardService {
 
     initializeBoard(): Board {
         const grid: Square[][] = [];
-        const center: Vec2 = { x: Math.floor(BoardService.size.x / 2), y: Math.floor(BoardService.size.y / 2) };
+        const center: Position = { row: Math.floor(BoardService.size.x / 2), col: Math.floor(BoardService.size.y / 2) };
         for (let i = 0; i < BoardService.size.y; i++) {
             grid[i] = [];
             for (let j = 0; j < BoardService.size.x; j++) {
-                const isCenter = j === center.x && i === center.y;
+                const isCenter = j === center.row && i === center.col;
                 const square = {
                     tile: null,
-                    multiplier: this.readScoreMultiplierConfig(i, j),
+                    position: { row: i, col: j },
+                    multiplier: this.readScoreMultiplierConfig({ row: i, col: j }),
                     wasMultiplierUsed: false,
                     isCenter,
                 };
@@ -28,9 +29,9 @@ export default class BoardService {
         }
         return new Board(grid);
     }
-    private readScoreMultiplierConfig(row: number, col: number): Multiplier {
-        if (!this.isBoardConfigDefined(row, col)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(row, col));
-        return this.parseSquareConfig(BOARD_CONFIG[row][col]);
+    private readScoreMultiplierConfig(position: Position): Multiplier {
+        if (!this.isBoardConfigDefined(position)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(position));
+        return this.parseSquareConfig(BOARD_CONFIG[position.row][position.col]);
     }
 
     private parseSquareConfig(data: string): Multiplier {
@@ -40,8 +41,15 @@ export default class BoardService {
         return BOARD_CONFIG_MAP.get(data) as Multiplier;
     }
 
-    private isBoardConfigDefined(row: number, col: number): boolean {
-        return BOARD_CONFIG && BOARD_CONFIG[0] && BOARD_CONFIG.length > row && BOARD_CONFIG[0].length > col && row >= 0 && col >= 0;
+    private isBoardConfigDefined(position: Position): boolean {
+        return (
+            BOARD_CONFIG &&
+            BOARD_CONFIG[0] &&
+            BOARD_CONFIG.length > position.row &&
+            BOARD_CONFIG[0].length > position.col &&
+            position.row >= 0 &&
+            position.col >= 0
+        );
     }
     // private placeTile(position: Position, tile: Tile): boolean {
     //     throw new Error('Method not implemented.');
