@@ -1,26 +1,15 @@
-// import { Multiplier, Square } from '@app/classes/square';
+import { Multiplier } from '@app/classes/square';
 // import { Vec2 } from '@app/classes/vec2';
-// import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
+import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
 // import { BOARD_SIZE, UNDEFINED_BOARD_SIZE } from '@app/constants/game';
 import { Service } from 'typedi';
+import * as BOARD_ERROS from './board.service.error';
 
 @Service()
 export default class BoardService {
     // private static readonly size: Vec2 = { x: BOARD_SIZE.x, y: BOARD_SIZE.y };
-    // grid: Square[][];
-    // constructor() {
-    //     this.initializeBoardGrid();
-    // }
-    // getGridSize(): Vec2 {
-    //     if (!this.grid || !this.grid[0]) {
-    //         return UNDEFINED_BOARD_SIZE;
-    //     }
-    //     const x = this.grid.length;
-    //     const y = this.grid[0].length;
-    //     return { x, y };
-    // }
-    // private initializeBoardGrid() {
-    //     const multiplierGrid: Multiplier[][] = this.readScoreMultiplierConfig();
+
+    // public initializeBoard(): Square[][] {
     //     this.grid = [];
     //     const center: Vec2 = { x: Math.floor(BoardService.size.x / 2), y: Math.floor(BoardService.size.y / 2) };
     //     for (let i = 0; i < BoardService.size.y; i++) {
@@ -37,23 +26,21 @@ export default class BoardService {
     //         }
     //     }
     // }
-    // private readScoreMultiplierConfig(): Multiplier[][] {
-    //     const multiplierGrid: Multiplier[][] = [];
-    //     for (const configRow of BOARD_CONFIG) {
-    //         const multiplierRow: Multiplier[] = [];
-    //         for (const squareConfig of configRow) {
-    //             multiplierRow.push(this.parseSquareConfig(squareConfig));
-    //         }
-    //         multiplierGrid.push(multiplierRow);
-    //     }
-    //     return multiplierGrid;
-    // }
-    // private parseSquareConfig(data: string): Multiplier {
-    //     if (!BOARD_CONFIG_MAP.get(data)) {
-    //         return null;
-    //     }
-    //     return BOARD_CONFIG_MAP.get(data) as Multiplier;
-    // }
+    private readScoreMultiplierConfig(row: number, col: number): Multiplier {
+        if (!this.isBoardConfigDefined(row, col)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(row, col));
+        return this.parseSquareConfig(BOARD_CONFIG[row][col]);
+    }
+
+    private parseSquareConfig(data: string): Multiplier {
+        if (BOARD_CONFIG_MAP.get(data) === undefined) {
+            throw new Error(BOARD_ERROS.NO_MULTIPLIER_MAPPED_TO_INPUT(data));
+        }
+        return BOARD_CONFIG_MAP.get(data) as Multiplier;
+    }
+
+    private isBoardConfigDefined(row: number, col: number): boolean {
+        return BOARD_CONFIG && BOARD_CONFIG[0] && BOARD_CONFIG.length > row && BOARD_CONFIG[0].length > col;
+    }
     // private placeTile(position: Position, tile: Tile): boolean {
     //     throw new Error('Method not implemented.');
     // } // Verify if there is already a tile in that square
