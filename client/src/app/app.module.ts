@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,13 +19,14 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { JoinWaitingPageComponent } from '@app/pages/join-waiting-page/join-waiting-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
 import { IconComponent } from './components/icon/icon.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
+import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
-import { SurrenderDialogComponent } from './components/surrender-dialog/surrender-dialog.component';
+import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
+import { MaterialPageComponent } from './pages/material-page/material-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -47,7 +49,8 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         CommunicationBoxComponent,
         BoardComponent,
         TileRackComponent,
-        SurrenderDialogComponent,
+        LobbyPageComponent,
+        LobbyInfoComponent,
         CreateWaitingPageComponent,
         JoinWaitingPageComponent,
         GameCreationPageComponent,
@@ -55,7 +58,16 @@ import { SurrenderDialogComponent } from './components/surrender-dialog/surrende
         IconComponent,
         NameFieldComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, ReactiveFormsModule, HttpClientModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        ScrollingModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })

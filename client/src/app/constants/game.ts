@@ -33,7 +33,6 @@ export const LETTER_VALUES: LetterValue[] = [
     '*',
 ];
 
-export const BOARD_SIZE: Vec2 = { x: 15, y: 15 };
 export const SQUARE_SIZE: Vec2 = { x: 1, y: 1 };
 export const MARGIN_COLUMN_SIZE = 1;
 

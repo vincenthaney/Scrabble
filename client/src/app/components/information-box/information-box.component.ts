@@ -5,4 +5,7 @@ import { Component } from '@angular/core';
     templateUrl: './information-box.component.html',
     styleUrls: ['./information-box.component.scss'],
 })
-export class InformationBoxComponent {}
+export class InformationBoxComponent {
+    player1 = { name: 'Mathilde', score: 420 };
+    player2 = { name: 'Raphael', score: 69 };
+}
