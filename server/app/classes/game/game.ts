@@ -19,8 +19,12 @@ export default class Game {
     board: Board;
     private id: string;
 
+    static getBoardService(): BoardService {
+        return Game.boardService;
+    }
+
     static injectServices(boardService: BoardService): void {
-        if (!Game.boardService) {
+        if (!Game.getBoardService()) {
             Game.boardService = boardService;
         }
     }

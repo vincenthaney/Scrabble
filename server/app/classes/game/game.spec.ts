@@ -147,3 +147,22 @@ describe('Game Type', () => {
         expect(GameType.LOG2990).to.equal('LOG2990');
     });
 });
+
+describe('Game Service Injection', () => {
+    it('injectServices should set static Game BoardService', () => {
+        chai.spy.on(Game, 'getBoardService', () => null);
+        const boardService = Container.get(BoardService);
+
+        expect(Game['getBoardService']()).to.not.exist;
+        Game.injectServices(boardService);
+        chai.spy.restore();
+        expect(Game['getBoardService']()).to.equal(boardService);
+    });
+
+    it('injectServices should call getBoardService()', () => {
+        const boardService = Container.get(BoardService);
+        chai.spy.on(Game, 'getBoardService', () => boardService);
+        Game.injectServices(boardService);
+        expect(Game['getBoardService']).to.have.been.called;
+    });
+});
