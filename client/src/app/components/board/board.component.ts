@@ -11,33 +11,37 @@ import { BoardService } from '@app/services/';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent {
-    readonly marginLetters: LetterValue[];
+    marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
 
     constructor(private boardService: BoardService) {
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
-
-        this.gridSize = this.boardService.getGridSize();
+        this.initializeBoard(); // To remove
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
-        this.initializeBoard();
     }
 
     private initializeBoard() {
+        const abstractBoard: Square[][] = this.boardService.sendBoardToComponent();
+        if (!abstractBoard || !abstractBoard[0]) {
+            this.gridSize = { x: 0, y: 0 };
+            return;
+        }
+
+        this.gridSize = { x: abstractBoard.length, y: abstractBoard[0].length };
         this.squareGrid = [];
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
-                const square: Square = this.getBoardServiceSquare(i, j);
+                const square: Square = this.getBoardServiceSquare(abstractBoard, i, j);
                 const squareView: SquareView = new SquareView(square, SQUARE_SIZE);
                 this.squareGrid[i][j] = squareView;
             }
         }
     }
 
-    private getBoardServiceSquare(row: number, column: number) {
-        const serviceGrid: Square[][] = this.boardService.grid;
-        return serviceGrid[row] && serviceGrid[row][column] ? serviceGrid[row][column] : UNDEFINED_SQUARE;
+    private getBoardServiceSquare(abstractBoard: Square[][], row: number, column: number) {
+        return abstractBoard[row] && abstractBoard[row][column] ? abstractBoard[row][column] : UNDEFINED_SQUARE;
     }
 }
