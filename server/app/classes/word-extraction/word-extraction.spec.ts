@@ -1,8 +1,9 @@
 import { expect } from 'chai';
-import { Board, Orientation, Position } from '@app/classes/board';
+import { Board, Orientation, Position, Square } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from './word-extraction';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_POSITION_OUT_OF_BOARD, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
+import { SinonStubbedInstance } from 'sinon';
 
 const TILE_J: Tile = { letter: 'J', value: 1 };
 const TILE_A: Tile = { letter: 'A', value: 1 };
@@ -11,53 +12,47 @@ const TILE_B: Tile = { letter: 'B', value: 1 };
 const TILE_O: Tile = { letter: 'O', value: 1 };
 const TILE_N: Tile = { letter: 'N', value: 1 };
 // const TILE_S: Tile = { letter: 'N', value: 1 };
-
 const WORD_JAMBON: Tile[] = [TILE_J, TILE_A, TILE_M, TILE_B, TILE_O, TILE_N];
 // const WORD_NON: Tile[] = [TILE_N, TILE_O, TILE_N];
 // const WORD_MA: Tile[] = [TILE_M, TILE_A];
 const WORD_BON: Tile[] = [TILE_B, TILE_O, TILE_N];
+// SinonStubbedInstance
+// // const getTilesPlaced = (board: Board, tilesPlaced: Tile[], startPosition: Position, orientation: Orientation): Square[] => {
+// //     const locationWord: Square[] = [];
+// //     for (let i = 0; i < locationWord.length; i++) {
+// //         if (orientation === Orientation.Vertical) locationWord.push(board.grid[startPosition.row + i][startPosition.column]);
+// //         if (orientation === Orientation.Horizontal) locationWord.push(board.grid[startPosition.row][startPosition.column + i]);
+// //     }
+// //     return locationWord;
+// // };
 
-// const getTilesPlaced = (board: Board, tilesPlaced: Tile[], startPosition: Position, orientation: Orientation): Square[] => {
-//     const locationWord: Square[] = [];
-//     for (let i = 0; i < locationWord.length; i++) {
-//         if (orientation === Orientation.Vertical) locationWord.push(board.grid[startPosition.row + i][startPosition.column]);
-//         if (orientation === Orientation.Horizontal) locationWord.push(board.grid[startPosition.row][startPosition.column + i]);
+// class MockBoard {
+//     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+//     static boardGridSize: number = 6;
+//     static mockSquare: Square = {
+//         tile: undefined,
+//         multiplier: 1,
+//         multiplierType: undefined,
+//         played: false,
+//         row: 0,
+//         column: 0,
+//     };
+//     grid: Square[][];
+
+//     constructor() {
+//         this.grid = [];
+//         for (let i = 0; i < this.getGridSize(); i++) {
+//             this.grid.push([]);
+//             for (let j = 0; j < this.getGridSize(); j++) {
+//                 this.grid[i].push(MockBoard.mockSquare);
+//             }
+//         }
 //     }
-//     return locationWord;
-// };
 
-class MockBoardService {
-    static boardServiceGridSize: Vec2 = { x: 5, y: 5 };
-    static mockSquare: Square = {
-        tile: null,
-        multiplier: null,
-        wasMultiplierUsed: false,
-        isCenter: false,
-    };
-    pGrid: Square[][];
-
-    constructor() {
-        this.grid = [];
-        for (let i = 0; i < this.getGridSize().y; i++) {
-            this.grid.push([]);
-            for (let j = 0; j < this.getGridSize().x; j++) {
-                this.grid[i].push(MockBoardService.mockSquare);
-            }
-        }
-    }
-
-    get grid(): Square[][] {
-        return this.pGrid;
-    }
-    set grid(grid: Square[][]) {
-        this.pGrid = grid;
-    }
-
-    getGridSize(): Vec2 {
-        return MockBoardService.boardServiceGridSize;
-    }
-}
-
+//     getGridSize(): number {
+//         return MockBoard.boardGridSize;
+//     }
+// }
 
 describe('WordExtraction', () => {
     let wordExtraction: WordExtraction;
@@ -162,3 +157,12 @@ describe('WordExtraction', () => {
         // expect(validateTile(board.grid[targetPosition.row][targetPosition.column].tile, DEFAULT_TILE_A)).to.be.true;
     });
 });
+
+//  94
+
+// 109-110
+
+// 137
+// 151 121
+
+// 155
