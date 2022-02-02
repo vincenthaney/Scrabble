@@ -1,7 +1,8 @@
 import { expect } from 'chai';
-import { Board, Square, Orientation, Position } from '@app/classes/board';
+import { Board, Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from './word-extraction';
+import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_POSITION_OUT_OF_BOARD, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 
 const TILE_J: Tile = { letter: 'J', value: 1 };
 const TILE_A: Tile = { letter: 'A', value: 1 };
@@ -16,14 +17,14 @@ const WORD_JAMBON: Tile[] = [TILE_J, TILE_A, TILE_M, TILE_B, TILE_O, TILE_N];
 // const WORD_MA: Tile[] = [TILE_M, TILE_A];
 // const WORD_BON: Tile[] = [TILE_B, TILE_O, TILE_N];
 
-const getTilesPlaced = (board: Board, tilesPlaced: Tile[], startPosition: Position, orientation: Orientation): Square[] => {
-    const locationWord: Square[] = [];
-    for (let i = 0; i < locationWord.length; i++) {
-        if (orientation === Orientation.Vertical) locationWord.push(board.grid[startPosition.row + i][startPosition.col]);
-        if (orientation === Orientation.Horizontal) locationWord.push(board.grid[startPosition.row][startPosition.col + i]);
-    }
-    return locationWord;
-};
+// const getTilesPlaced = (board: Board, tilesPlaced: Tile[], startPosition: Position, orientation: Orientation): Square[] => {
+//     const locationWord: Square[] = [];
+//     for (let i = 0; i < locationWord.length; i++) {
+//         if (orientation === Orientation.Vertical) locationWord.push(board.grid[startPosition.row + i][startPosition.col]);
+//         if (orientation === Orientation.Horizontal) locationWord.push(board.grid[startPosition.row][startPosition.col + i]);
+//     }
+//     return locationWord;
+// };
 
 describe('WordExtraction', () => {
     let wordExtraction: WordExtraction;
@@ -44,40 +45,57 @@ describe('WordExtraction', () => {
         expect(wordExtraction).to.exist;
     });
 
-    it('should return an empty array when the board is empty', () => {
-        expect(wordExtraction.extract(board, [board.grid[7][7]], Orientation.Vertical)).to.equal([[]]);
-    });
-
-    it('should return an empty array when the SquaresPlaced is empty', () => {
-        const startPosition = { row: 1, col: 12 };
+    it('should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the board grid is an empty array', () => {
+        const startPosition: Position = { row: 1, col: 7 };
         const orientation = Orientation.Vertical;
-        board.placeWord(WORD_JAMBON, startPosition, orientation);
-        expect(wordExtraction.extract(board, [], orientation)).to.equal([[]]);
-    });
-
-    it('should return an empty array when the board has no grid', () => {
         board.grid = [[]];
-        const startPosition = { row: 1, col: 12 };
-        const orientation = Orientation.Vertical;
-        board.placeWord(WORD_JAMBON, startPosition, orientation);
-        expect(wordExtraction.extract(board, [board.grid[startPosition.row][startPosition.col]], orientation)).to.equal([[]]);
+        const result = () => wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation);
+        expect(result).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
     });
 
-    it('should return an empty array when the a squarePlace has no tile', () => {
-        board.grid = [[]];
+    it('should throw an EXTRACTION_TILES_INVALID when the TilesToPlace is empty', () => {
         const startPosition = { row: 1, col: 12 };
         const orientation = Orientation.Vertical;
-        board.placeWord(WORD_JAMBON, startPosition, orientation);
-        expect(wordExtraction.extract(board, , orientation)).to.equal([[]]);
+        const result = () => wordExtraction.extract(board, [], startPosition, orientation);
+        expect(result).to.throw(EXTRACTION_TILES_INVALID);
     });
 
-    it('should return a single word when the board is empty and you place only 1 word', () => {
+    it('should throw an EXTRACTION_TILES_INVALID when the TilesToPlace is too big', () => {
         const startPosition = { row: 1, col: 12 };
         const orientation = Orientation.Vertical;
-        board.placeWord(WORD_JAMBON, startPosition, orientation);
-        const locationJambon = getTilesPlaced(board, WORD_JAMBON, startPosition, orientation);
-        expect(wordExtraction.extract(board, locationJambon, orientation)).to.equal(['JAMBON']);
+        const BIG_WORD = WORD_JAMBON.concat(WORD_JAMBON).concat(WORD_JAMBON);
+        const result = () => wordExtraction.extract(board, BIG_WORD, startPosition, orientation);
+        expect(result).to.throw(EXTRACTION_TILES_INVALID);
     });
+
+    it('should throw an EXTRACTION_SQUARE_ALREADY_FILLED when the TileToPlace is too big', () => {
+        const startPosition = { row: 1, col: 12 };
+        board.grid[startPosition.row][startPosition.col].tile = TILE_O;
+        const orientation = Orientation.Vertical;
+        const result = () => wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation);
+        expect(result).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+    });
+
+    it('should return the word generated by the TilesToPlace when the board is empty', () => {
+        const startPosition: Position = { row: 1, col: 7 };
+        const orientation = Orientation.Vertical;
+        console.log(wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation));
+        expect(wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation)).to.equal([['JAMBON']]);
+    });
+
+    it('should return the word generated by the TilesToPlace when the board already has a word', () => {
+        const startPosition: Position = { row: 1, col: 7 };
+        const orientation = Orientation.Vertical;
+        console.log(wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation));
+        expect(wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation)).to.equal([['JAMBON']]);
+    });
+    // it('should return a single word when the board is empty and you place only 1 word', () => {
+    //     const startPosition = { row: 1, col: 12 };
+    //     const orientation = Orientation.Vertical;
+    //     board.placeWord(WORD_JAMBON, startPosition, orientation);
+    //     const locationJambon = getTilesPlaced(board, WORD_JAMBON, startPosition, orientation);
+    //     expect(wordExtraction.extract(board, locationJambon, orientation)).to.equal(['JAMBON']);
+    // });
 
     it('place Tile should place a Tile and return true at the desired Square', () => {
         // const targetPosition = { row: 5, col: 3 };
