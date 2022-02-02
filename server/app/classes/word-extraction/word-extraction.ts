@@ -18,15 +18,18 @@ export class WordExtraction {
     //         position.row >= 0 && position.col >= 0 && position.row <= board.grid.length - 1 && position.col <= board.grid[0].length - 1;
     //     return positionInBoard && board.grid[position.row][position.col].tile ? false : true;
     // }
-    
+
     // eslint-disable-next-line complexity
+
     extract(board: Board, tilesToPlace: Tile[], startPosition: Position, orientation: Orientation): LetterValue[][] {
         if (!this.verifySquare(board, startPosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         if (tilesToPlace.length < 1 || tilesToPlace.length > board.grid.length) throw new Error(EXTRACTION_TILES_INVALID);
-        let extractedWord;
         const actualPosition: Position = { row: startPosition.row, col: startPosition.col };
+        const beforePosition: Position = { row: startPosition.row, col: startPosition.col };
+
         const wordsCreated: LetterValue[][] = new Array();
         const newWord: LetterValue[] = new Array();
+
         let i = 0;
         while (i < tilesToPlace.length) {
             if (this.verifySquare(board, { row: actualPosition.row, col: actualPosition.col }, SHOULD_HAVE_A_TILE)) {
@@ -43,8 +46,7 @@ export class WordExtraction {
                     this.verifySquare(board, { row: actualPosition.row + 1, col: actualPosition.col }, SHOULD_HAVE_A_TILE) ||
                     this.verifySquare(board, { row: actualPosition.row - 1, col: actualPosition.col }, SHOULD_HAVE_A_TILE)
                 ) {
-                    extractedWord = this.extractVerticalWord(board, actualPosition, tilesToPlace[i]);
-                    if (extractedWord.length > 0) wordsCreated.push(extractedWord);
+                    wordsCreated.push(this.extractVerticalWord(board, actualPosition, tilesToPlace[i]));
                 }
                 actualPosition.col++;
             }
@@ -54,37 +56,71 @@ export class WordExtraction {
                     this.verifySquare(board, { row: actualPosition.row, col: actualPosition.col + 1 }, SHOULD_HAVE_A_TILE) ||
                     this.verifySquare(board, { row: actualPosition.row, col: actualPosition.col - 1 }, SHOULD_HAVE_A_TILE)
                 ) {
-                    extractedWord = this.extractHorizontalWord(board, actualPosition, tilesToPlace[i]);
-                    if (extractedWord.length > 0) wordsCreated.push(extractedWord);
+                    wordsCreated.push(this.extractHorizontalWord(board, actualPosition, tilesToPlace[i]));
                 }
                 actualPosition.row++;
             }
             newWord.push(tilesToPlace[i].letter);
             i++;
         }
-        wordsCreated.push(newWord);
+        let beforeWord;
+        let afterWord;
+        if (orientation === Orientation.Horizontal) {
+            actualPosition.col--;
+            beforeWord = this.extractLeftWord(board, beforePosition);
+            afterWord = this.extractRightWord(board, actualPosition);
+        } else {
+            actualPosition.row--;
+            beforeWord = this.extractUpWord(board, beforePosition);
+            afterWord = this.extractDownWord(board, actualPosition);
+        }
+
+        wordsCreated.push(beforeWord.concat(newWord).concat(afterWord));
         return wordsCreated;
     }
 
     private extractVerticalWord(board: Board, tilePosition: Position, addedTile: Tile): LetterValue[] {
+        const newWord = new Array(addedTile.letter);
+        const upWord = this.extractUpWord(board, tilePosition);
+        const downWord = this.extractDownWord(board, tilePosition);
+        return upWord.concat(newWord).concat(downWord);
+
+        // if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
+        // const squarePlaced = board.grid[tilePosition.row][tilePosition.col];
+        // const newWord = new Array(addedTile.letter);
+
+        // // go up until you find first empty square or the edge of the board
+        // let higherSquare = squarePlaced;
+        // if (tilePosition.row > 0) higherSquare = board.grid[squarePlaced.row - 1][squarePlaced.column];
+        // while (higherSquare.tile && higherSquare.row > 0) {
+        //     newWord.unshift(higherSquare.tile.letter);
+        //     higherSquare = board.grid[higherSquare.row - 1][higherSquare.column];
+        // }
+        // if (higherSquare.row === 0 && higherSquare.tile) {
+        //     newWord.unshift(higherSquare.tile.letter);
+        // }
+
+        // // go down until you find first empty square or the edge of the board
+        // let lowerSquare = squarePlaced;
+        // if (tilePosition.row < board.grid.length - 1) lowerSquare = board.grid[squarePlaced.row + 1][squarePlaced.column];
+        // while (lowerSquare.tile && lowerSquare.row < board.grid.length - 1) {
+        //     newWord.push(lowerSquare.tile.letter);
+        //     lowerSquare = board.grid[lowerSquare.row + 1][lowerSquare.column];
+        // }
+        // if (lowerSquare.row === board.grid.length - 1 && lowerSquare.tile) {
+        //     newWord.push(lowerSquare.tile.letter);
+        // }
+
+        // return newWord;
+    }
+
+    private extractDownWord(board: Board, tilePosition: Position): LetterValue[] {
         if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const squarePlaced = board.grid[tilePosition.row][tilePosition.col];
-        const newWord = new Array(addedTile.letter);
-
-        // go up until you find first empty square or the edge of the board
-        let higherSquare = squarePlaced;
-        if (tilePosition.row > 0) higherSquare = board.grid[squarePlaced.row - 1][squarePlaced.column];
-        while (higherSquare.tile && higherSquare.row > 0) {
-            newWord.unshift(higherSquare.tile.letter);
-            higherSquare = board.grid[higherSquare.row - 1][higherSquare.column];
-        }
-        if (higherSquare.row === 0 && higherSquare.tile) {
-            newWord.unshift(higherSquare.tile.letter);
-        }
-
+        const newWord = new Array();
         // go down until you find first empty square or the edge of the board
         let lowerSquare = squarePlaced;
-        if (tilePosition.row > 0) lowerSquare = board.grid[squarePlaced.row + 1][squarePlaced.column];
+        if (tilePosition.row < board.grid.length - 1) lowerSquare = board.grid[squarePlaced.row + 1][squarePlaced.column];
         while (lowerSquare.tile && lowerSquare.row < board.grid.length - 1) {
             newWord.push(lowerSquare.tile.letter);
             lowerSquare = board.grid[lowerSquare.row + 1][lowerSquare.column];
@@ -96,33 +132,86 @@ export class WordExtraction {
         return newWord;
     }
 
-    private extractHorizontalWord(board: Board, tilePosition: Position, addedTile: Tile): LetterValue[] {
+    private extractUpWord(board: Board, tilePosition: Position): LetterValue[] {
         if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const squarePlaced = board.grid[tilePosition.row][tilePosition.col];
-        const newWord = new Array(addedTile.letter);
+        const newWord = new Array();
 
-        // go left until you find first empty square or the edge of the board
+        // go up until you find first empty square or the edge of the board
         let higherSquare = squarePlaced;
-        if (tilePosition.col > 0) higherSquare = board.grid[squarePlaced.row][squarePlaced.column - 1];
-        while (higherSquare.tile && higherSquare.column > 0) {
+        if (tilePosition.row > 0) higherSquare = board.grid[squarePlaced.row - 1][squarePlaced.column];
+        while (higherSquare.tile && higherSquare.row > 0) {
             newWord.unshift(higherSquare.tile.letter);
-            higherSquare = board.grid[higherSquare.row][higherSquare.column - 1];
+            higherSquare = board.grid[higherSquare.row - 1][higherSquare.column];
         }
-        if (higherSquare.column === 0 && higherSquare.tile) {
+        if (higherSquare.row === 0 && higherSquare.tile) {
             newWord.unshift(higherSquare.tile.letter);
-        }
-
-        // go right until you find first empty square or the edge of the board
-        let lowerSquare = squarePlaced;
-        if (tilePosition.col > 0) lowerSquare = board.grid[squarePlaced.row][squarePlaced.column + 1];
-        while (lowerSquare.tile && lowerSquare.column < board.grid.length - 1) {
-            newWord.push(lowerSquare.tile.letter);
-            lowerSquare = board.grid[lowerSquare.row][lowerSquare.column + 1];
-        }
-        if (lowerSquare.column === board.grid.length - 1 && lowerSquare.tile) {
-            newWord.push(lowerSquare.tile.letter);
         }
         return newWord;
+    }
+    private extractHorizontalWord(board: Board, tilePosition: Position, addedTile: Tile): LetterValue[] {
+        const newWord = new Array(addedTile.letter);
+        const leftWord = this.extractLeftWord(board, tilePosition);
+        const rightWord = this.extractRightWord(board, tilePosition);
+        return leftWord.concat(newWord).concat(rightWord);
+    }
+    // let leftSquare = squarePlaced;
+    // if (tilePosition.col > 0) leftSquare = board.grid[squarePlaced.row][squarePlaced.column - 1];
+    // while (leftSquare.tile && leftSquare.column > 0) {
+    //     newWord.unshift(leftSquare.tile.letter);
+    //     leftSquare = board.grid[leftSquare.row][leftSquare.column - 1];
+    // }
+    // if (leftSquare.column === 0 && leftSquare.tile) {
+    //     newWord.unshift(leftSquare.tile.letter);
+    // }
+
+    // // go right until you find first empty square or the edge of the board
+    // let rightSquare = squarePlaced;
+    // if (tilePosition.col < board.grid[0].length - 1) rightSquare = board.grid[squarePlaced.row][squarePlaced.column + 1];
+    // while (rightSquare.tile && rightSquare.column < board.grid.length - 1) {
+    //     newWord.push(rightSquare.tile.letter);
+    //     rightSquare = board.grid[rightSquare.row][rightSquare.column + 1];
+    // }
+    // if (rightSquare.column === board.grid.length - 1 && rightSquare.tile) {
+    //     newWord.push(rightSquare.tile.letter);
+    // }
+    // return newWord;
+    // }
+
+    private extractLeftWord(board: Board, tilePosition: Position): LetterValue[] {
+        if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
+        const squarePlaced = board.grid[tilePosition.row][tilePosition.col];
+        const leftWord = new Array();
+
+        // go left until you find first empty square or the edge of the board
+        let leftSquare = squarePlaced;
+        if (tilePosition.col > 0) leftSquare = board.grid[squarePlaced.row][squarePlaced.column - 1];
+        while (leftSquare.tile && leftSquare.column > 0) {
+            leftWord.unshift(leftSquare.tile.letter);
+            leftSquare = board.grid[leftSquare.row][leftSquare.column - 1];
+        }
+        if (leftSquare.column === 0 && leftSquare.tile) {
+            leftWord.unshift(leftSquare.tile.letter);
+        }
+        return leftWord;
+    }
+
+    private extractRightWord(board: Board, tilePosition: Position): LetterValue[] {
+        if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
+        const squarePlaced = board.grid[tilePosition.row][tilePosition.col];
+        const rightWord = new Array();
+
+        // go right until you find first empty square or the edge of the board
+        let rightSquare = squarePlaced;
+        if (tilePosition.col < board.grid[0].length - 1) rightSquare = board.grid[squarePlaced.row][squarePlaced.column + 1];
+        while (rightSquare.tile && rightSquare.column < board.grid.length - 1) {
+            rightWord.push(rightSquare.tile.letter);
+            rightSquare = board.grid[rightSquare.row][rightSquare.column + 1];
+        }
+        if (rightSquare.column === board.grid.length - 1 && rightSquare.tile) {
+            rightWord.push(rightSquare.tile.letter);
+        }
+        return rightWord;
     }
 }
 // private extractHorizontalWord(board: Board, tilePosition: Position, addedTile: Tile): LetterValue[] {
