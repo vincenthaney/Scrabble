@@ -21,7 +21,7 @@ const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_1 = new Player('id1', 'player1');
 const DEFAULT_PLAYER_2 = new Player('id2', 'player2');
 const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
-    player: DEFAULT_PLAYER_1,
+    player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,
@@ -99,18 +99,18 @@ describe('Game', () => {
 
         describe('getActivePlayer', () => {
             it('should return player with same id (player 1)', () => {
-                const player = game.getActivePlayer(DEFAULT_PLAYER_1.getId());
+                const player = game.getRequestingPlayer(DEFAULT_PLAYER_1.getId());
                 expect(player).to.equal(DEFAULT_PLAYER_1);
             });
 
             it('should return player with same id (player 2)', () => {
-                const player = game.getActivePlayer(DEFAULT_PLAYER_2.getId());
+                const player = game.getRequestingPlayer(DEFAULT_PLAYER_2.getId());
                 expect(player).to.equal(DEFAULT_PLAYER_2);
             });
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getActivePlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getRequestingPlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
             });
         });
 

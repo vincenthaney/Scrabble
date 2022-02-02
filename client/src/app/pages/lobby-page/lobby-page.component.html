@@ -1,0 +1,19 @@
+<div class="container">
+    <body>
+        <h1>Sélection de partie</h1>
+        <div class="form-container">
+            <app-name-field (isInputNameValid)="onNameChange()"></app-name-field>
+        </div>
+           
+        <mat-divider></mat-divider>
+        <div class="grid-container">
+            <div class="grid">
+                <app-lobby-info *ngFor="let lobby of lobbies" [lobby]="lobby" > </app-lobby-info> 
+            </div>
+        </div>
+    </body>
+    <footer>
+        <button mat-flat-button color="primary" routerLink="/home">Retour à l'accueil</button> 
+    </footer>
+</div>
+
