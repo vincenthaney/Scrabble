@@ -12,17 +12,22 @@ import { BoardService } from '@app/services/';
 })
 export class BoardComponent {
     marginLetters: LetterValue[];
-    marginColumnSize: number;
+    readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
 
     constructor(private boardService: BoardService) {
+        this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.initializeBoard(); // To remove
+        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
     private initializeBoard() {
         const abstractBoard: Square[][] = this.boardService.sendBoardToComponent();
-        if (!abstractBoard || !abstractBoard[0]) return;
+        if (!abstractBoard || !abstractBoard[0]) {
+            this.gridSize = { x: 0, y: 0 };
+            return;
+        }
 
         this.gridSize = { x: abstractBoard.length, y: abstractBoard[0].length };
         this.squareGrid = [];
@@ -34,9 +39,6 @@ export class BoardComponent {
                 this.squareGrid[i][j] = squareView;
             }
         }
-
-        this.marginColumnSize = MARGIN_COLUMN_SIZE;
-        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
     private getBoardServiceSquare(abstractBoard: Square[][], row: number, column: number) {
