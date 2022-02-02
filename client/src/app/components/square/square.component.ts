@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { SquareView } from '@app/classes/square';
+import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { UNDEFINED_SQUARE_SIZE, UNDEFINED_TILE } from '@app/constants/game';
+import { UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 
 export interface CssStyleProperty {
     key: string;
@@ -13,26 +14,21 @@ export interface CssStyleProperty {
     templateUrl: './square.component.html',
     styleUrls: ['./square.component.scss'],
 })
-export class SquareComponent implements OnInit, AfterViewInit {
-    private static readonly starElementClasses: string[] = ['fa', 'fa-solid', 'fa-star'];
-    private static readonly starStyle: CssStyleProperty[] = [{ key: 'font-size', value: '40px' }];
-    private static readonly starDivStyle: CssStyleProperty[] = [
-        { key: 'display', value: 'flex' },
-        { key: 'align-items', value: 'center' },
-        { key: 'justify-content', value: 'center' },
-    ];
-
+export class SquareComponent implements OnInit {
     @Input() squareView: SquareView;
-    @ViewChild('squareButton', { static: false, read: ElementRef }) button: ElementRef<HTMLButtonElement>;
     style: { [key: string]: string } = {};
+    multiplierType: string | undefined;
+    multiplierValue: string | undefined;
 
-    constructor(private renderer: Renderer2) {}
     ngOnInit() {
+        this.setText();
         this.initializeStyle();
-    }
 
-    ngAfterViewInit() {
-        this.createStar();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        if (Math.floor(Math.random() * 10) === 0) {
+            const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            this.squareView.square.tile = { letter: ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length)) as LetterValue, value: 1 };
+        }
     }
 
     getSquareSize(): Vec2 {
@@ -42,43 +38,16 @@ export class SquareComponent implements OnInit, AfterViewInit {
         return this.squareView.squareSize;
     }
 
-    getText(): string {
-        if (!this.squareView) {
-            return UNDEFINED_TILE.letter;
-        }
-        return this.squareView.getText();
+    setText() {
+        // if (!this.squareView) {
+        //     return UNDEFINED_TILE.letter;
+        // }
+        [this.multiplierType, this.multiplierValue] = this.squareView.getText();
     }
 
     private initializeStyle() {
         this.style = {
             'background-color': this.squareView.getColor(),
         };
-    }
-
-    private createStar() {
-        if (!this.squareView.square.isCenter) return;
-        /*
-            We need to apply the classes and style dynamically because
-            the mat-button creates the span for the button's text dynamically.
-            We start by creating the HTMLElements for the star
-        */
-        const textWrapper = this.button.nativeElement.getElementsByClassName('mat-button-wrapper')[0];
-        const starDiv = this.renderer.createElement('div');
-        const starElement = this.renderer.createElement('i');
-
-        // Then we apply the styles and classes for Font-Awesome
-        this.applyStarStyleAndClasses(starDiv, starElement);
-
-        // Finally we add the elements to the DOM
-        starDiv.appendChild(starElement);
-        textWrapper.appendChild(starDiv);
-    }
-
-    private applyStarStyleAndClasses(starDiv: HTMLElement, starElement: HTMLElement) {
-        SquareComponent.starDivStyle.forEach((style: CssStyleProperty) => {
-            this.renderer.setStyle(starDiv, style.key, style.value);
-        });
-        SquareComponent.starStyle.forEach((style: CssStyleProperty) => this.renderer.setStyle(starElement, style.key, style.value));
-        SquareComponent.starElementClasses.forEach((c) => starElement.classList.add(c));
     }
 }

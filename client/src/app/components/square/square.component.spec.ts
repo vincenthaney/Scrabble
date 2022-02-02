@@ -107,7 +107,7 @@ describe('SquareComponent', () => {
         spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
         squareWrapper.createComponent(rendererSpy);
 
-        expect(squareWrapper.squareComponent.getText()).toBe(UNDEFINED_TILE.letter);
+        expect(squareWrapper.squareComponent.setText()).toBe(UNDEFINED_TILE.letter);
     });
 
     it('getText should call squareView.getText()', () => {
@@ -117,14 +117,14 @@ describe('SquareComponent', () => {
         const getTextSpy = spyOn(squareWrapper.squareComponent, 'getText').and.callFake(() => {
             return testText;
         });
-        expect(squareWrapper.squareComponent.getText()).toEqual(testText);
+        expect(squareWrapper.squareComponent.setText()).toEqual(testText);
         expect(getTextSpy).toHaveBeenCalled();
     });
 
     it('getText should return value of squareView.getText()', () => {
         const squareWrapper = new SquareTestWrapper();
         squareWrapper.createComponent(rendererSpy);
-        expect(squareWrapper.squareComponent.getText()).toEqual(squareWrapper.squareView.getText());
+        expect(squareWrapper.squareComponent.setText()).toEqual(squareWrapper.squareView.getText());
     });
 
     it('initializeStyle should set background-color', () => {

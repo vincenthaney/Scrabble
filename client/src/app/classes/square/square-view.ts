@@ -19,7 +19,7 @@ export default class SquareView {
             throw new Error(SQUARE_ERRORS.NO_SQUARE_FOR_SQUARE_VIEW);
         }
         if (!this.square.multiplier) {
-            return COLORS.Beige;
+            return COLORS.Gray;
         }
 
         const squareMultiplier: number = this.square.multiplier.getMultiplier();
@@ -35,17 +35,18 @@ export default class SquareView {
         throw new Error(SQUARE_ERRORS.NO_COLOR_FOR_MULTIPLIER);
     }
 
-    getText(): string {
+    getText(): [type: string | undefined, multiplier: string | undefined] {
         if (!this.square) {
             throw new Error(SQUARE_ERRORS.NO_SQUARE_FOR_SQUARE_VIEW);
         }
 
         if (!this.square.multiplier || this.square.isCenter) {
-            return '';
+            return [undefined, undefined];
         }
         const multiplierType: string = this.square.multiplier.getMultiplierEffect();
         const multiplier: number = this.square.multiplier.getMultiplier();
 
-        return `${multiplierType} x ${String(multiplier)}`;
+        // return `${multiplierType} x ${String(multiplier)}`;
+        return [multiplierType, `${multiplier}`];
     }
 }

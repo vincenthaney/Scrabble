@@ -19,6 +19,10 @@ button {
     width: $button-width;
 }
 
+::ng-deep body {
+    background: #f7f7f7;
+}
+
 #page-container {
     width: 100%;
     height: 100%;
@@ -51,7 +55,6 @@ button {
     grid-template-rows: $info-box-height auto;
     justify-items: center;
     text-align: center;
-    background-color: brown;
 }
 
 .horizontal-grid {
@@ -73,7 +76,6 @@ button {
     grid-template-rows: $board-height-proportion 0 $rack-height-proportion $buttons-height-proportion;
     height: 100%;
     width: 100%;
-    background-color: gray;
 }
 @media screen and (min-height: ($board-height + $rack-height + $buttons-height + $info-box-height )) {
     .vertical-grid {
@@ -82,7 +84,6 @@ button {
 }
 
 .sidebar-section {
-    background-color: blue;
     display: flex;
     flex: 1;
     flex-direction: column;
