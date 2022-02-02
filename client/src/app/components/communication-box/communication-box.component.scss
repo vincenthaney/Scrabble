@@ -2,18 +2,57 @@
     height: 200px;
     border: 1px solid black;
     background-color: white;
-  }
+    text-align: left;
+}
   
 .scroll-item {
-    height: 20px;
-  }
+    display: flex;
+    flex-wrap: wrap;
+}
 
 #objectives-container {
 
 }
 
+.input-zone {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    margin-bottom: 30px; 
+
+}
+
 input {
-    height: 20px;
+    width: calc(100% - 80px);
+    height: 32px;
+    padding: 0;
+    margin: 0;
+}
+
+#send-button {
+    width: 80px;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+}
+
+.text-button-container {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
+
+.text-buttons {
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-around;
+}
+
+.text-buttons button {
+    width: 40%;
+    text-align: center;
+    padding: 0;
 }
 
 mat-accordion {
@@ -22,5 +61,11 @@ mat-accordion {
 
 mat-expansion-panel-header {
     padding-left: 10px;
+    margin: 0;
 }
 
+mat-expansion-panel {
+    margin: 0;
+    text-align: left;
+    padding: 0;
+}
