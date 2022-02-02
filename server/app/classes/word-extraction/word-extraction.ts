@@ -2,8 +2,8 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_POSITION_OUT_OF_BOARD, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 
-const SHOULD_HAVE_A_TILE = true;
-const SHOULD_HAVE_NO_TILE = false;
+export const SHOULD_HAVE_A_TILE = true;
+export const SHOULD_HAVE_NO_TILE = false;
 
 export class WordExtraction {
     // Verifies if the position is valid and if the square at the given position in the board has a tile or not
