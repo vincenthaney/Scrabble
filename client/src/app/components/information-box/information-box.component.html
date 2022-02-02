@@ -1,1 +1,20 @@
-<p>information-box component!</p>
+<div id="outer-container">
+    <div id="inner-container">
+        <div class="player-info" id="player-info-1">
+            <p class="player-name">{{player1.name}}</p>
+            <p class="player-score">Pointage : {{player1.score}}</p>
+            <p class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
+        </div>
+
+        <div id="time-left-container">
+            <p>Temps restant au tour</p>
+            <p id="time-left">3:11</p>
+        </div>
+
+        <div class="player-info" id="player-info-2">
+            <p class="player-name">{{player2.name}}</p>
+            <p class="player-score">Pointage : {{player2.score}}</p>
+            <p class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
+        </div>
+    </div> 
+</div>
