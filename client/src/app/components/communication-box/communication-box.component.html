@@ -15,7 +15,7 @@
     </section>
 
     <section>
-        <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area">
+        <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
             <div class="scroll-item" *cdkVirtualFor="let msg of messages">{{msg}}</div>
         </cdk-virtual-scroll-viewport>
     </section>

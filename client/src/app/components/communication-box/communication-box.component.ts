@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
@@ -8,6 +9,8 @@ import { FormControl, FormGroup } from '@angular/forms';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunicationBoxComponent {
+    @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
+
     message: string;
     messages: string[] = [
         'message 1',
@@ -33,6 +36,16 @@ export class CommunicationBoxComponent {
         if (this.message) {
             this.messages = [...this.messages, this.message];
             this.messageForm.reset();
+            this.scrollToBottom();
         }
+    }
+
+    private scrollToBottom() {
+        setTimeout(() => {
+            this.scrollViewport.scrollTo({
+                bottom: 0,
+                behavior: 'auto',
+            });
+        }, 0);
     }
 }
