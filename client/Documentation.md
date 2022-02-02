@@ -33,6 +33,7 @@ MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])
 | `closeDialog` | `boolean \| undefined`    | Close the dialog when button is clicked                                    |
 | `action`      | `() => void \| undefined` | Function to execute when clicking on the button                            |
 | `redirect`    | `string \| undefined`     | Routing destination when clicking the button (this override `closeDialog`) |
+| `style`       | `string \| undefined`     | CSS style on the button                                                    |
 
 ### Usage
 ```typescript

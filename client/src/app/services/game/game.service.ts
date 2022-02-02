@@ -1,23 +1,28 @@
 import { Injectable } from '@angular/core';
 import { GameType } from '@app/classes/game-type';
+import { IPlayer } from '@app/classes/player';
 import { RoundManagerService } from '@app/services/';
 
 @Injectable({
     providedIn: 'root',
 })
-export default class GameHistoryService {
+export default class GameService {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
     roundManagerService: RoundManagerService;
-    // player1: IPlayer;
-    // player2: IPlayer;
+    opponentPlayer: IPlayer;
     wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
     gameType: GameType;
+    private localPlayer: IPlayer;
 
     // playAction(action: Action): void {
     //     throw new Error('Method not implemented.');
     // }
+
+    getLocalPlayer(): IPlayer {
+        return this.localPlayer;
+    }
 
     isGameOver(): boolean {
         throw new Error('Method not implemented.');

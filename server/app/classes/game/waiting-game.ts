@@ -16,6 +16,7 @@ export default class WaitingGame {
     getId() {
         return this.id;
     }
+
     getConfig() {
         return this.config;
     }

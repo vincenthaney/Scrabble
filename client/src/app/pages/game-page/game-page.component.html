@@ -10,10 +10,10 @@
                 </div>
                 <div></div>
                 <div class="grid-item-container">
-                    <app-rack ></app-rack>
+                    <app-tile-rack></app-tile-rack>
                 </div>
                 <div class="grid-item-container" id="button-group">
-                    <button mat-flat-button id="surrender-dialog-button"(click)="openDialog()" color="primary">Abandonner</button> 
+                    <button mat-flat-button id="surrender-dialog-button" (click)="openDialog()" color="primary">Abandonner</button>
                     <button mat-flat-button color="primary">Passer</button>
                     <button mat-flat-button color="primary">Placer</button>
                     <button mat-flat-button color="primary">Confirmer action</button>
@@ -22,7 +22,7 @@
             <div class="sidebar-section">
                 <div class="communication-box-container">
                     <app-communication-box></app-communication-box>
-                    <div class="text-button-container">        
+                    <div class="text-button-container">
                         <button mat-flat-button color="primary">Réduire la police</button>
                         <button mat-flat-button color="primary">Agrandir la police</button>
                     </div>
