@@ -2,10 +2,9 @@ import { Component, QueryList, ViewChildren } from '@angular/core';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { SquareComponent } from '@app/components/square/square.component';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { BoardService } from '@app/services/';
-// eslint-disable-next-line no-restricted-imports
-import { SquareComponent } from '../square/square.component';
 
 @Component({
     selector: 'app-board',
