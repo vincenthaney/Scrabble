@@ -1,11 +1,12 @@
 import { Tile } from '@app/classes/tile';
+import { Orientation } from '@app/classes/board';
 
 export type ActionType = 'place' | 'exchange' | 'pass';
 
 export interface ActionPlacePayload {
     tiles: Tile[];
     position: { column: number; row: number };
-    orientation: 'vertical' | 'horizontal';
+    orientation: Orientation;
 }
 
 export interface ActionExchangePayload {
