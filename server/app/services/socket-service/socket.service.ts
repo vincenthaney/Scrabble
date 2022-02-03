@@ -2,16 +2,15 @@ import { Service } from 'typedi';
 import * as io from 'socket.io';
 import * as http from 'http';
 import * as SocketError from './socket.service.error';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
-import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-
+import { HttpException } from '@app/classes/http.exception';
+import { StatusCodes } from 'http-status-codes';
 @Service()
 export class SocketService {
-    private sio?: io.Server;
-    private sockets: Map<string, io.Socket>;
+    sio?: io.Server;
+    private map: Map<string, io.Socket>;
 
     constructor() {
-        this.sockets = new Map();
+        this.map = new Map();
     }
 
     initialize(server: http.Server) {
@@ -22,29 +21,38 @@ export class SocketService {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.on('connection', (socket) => {
-            this.sockets.set(socket.id, socket);
+            this.map.set(socket.id, socket);
 
-            socket.emit('initialization', {
-                id: socket.id,
-            });
+            // eslint-disable-next-line no-console
+            console.log('new socket', socket.id);
 
+            socket.emit('initialization', { id: socket.id });
             socket.on('disconnect', () => {
-                this.sockets.delete(socket.id);
+                this.map.delete(socket.id);
             });
-
-            new GameDispatcherController(socket);
-            new GamePlayController(socket);
         });
     }
 
-    getSocket(id: string): io.Socket {
-        const socket = this.sockets.get(id);
+    addToRoom(socketId: string, room: string) {
+        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
 
-        if (socket) return socket;
-        throw new Error(SocketError.INVALID_ID_FOR_SOCKET);
+        const socket = this.getSocket(socketId);
+        socket.join(room);
+    }
+
+    deleteRoom(room: string) {
+        if (this.sio === undefined) throw new HttpException(SocketError.SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
+
+        this.sio.sockets.in(room).socketsLeave(room);
     }
 
     isInitialized(): boolean {
         return this.sio !== undefined;
+    }
+
+    getSocket(id: string): io.Socket {
+        const socket = this.map.get(id);
+        if (!socket) throw new HttpException(SocketError.INVALID_ID_FOR_SOCKET, StatusCodes.BAD_REQUEST);
+        return socket;
     }
 }
