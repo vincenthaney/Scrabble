@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Tile } from '@app/classes/tile';
 import { UNDEFINED_TILE } from '@app/constants/game';
 
-const AMOUNT_OF_BG = 4;
+const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
 
 @Component({
     selector: 'app-tile',
@@ -20,7 +20,7 @@ export class TileComponent {
     }
 
     getBgPath(): string {
-        const index = Math.floor(Math.random() * AMOUNT_OF_BG) + 1;
+        const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMG) + 1;
         return `/assets/img/tiles/bg_${index}.svg`;
     }
 }
