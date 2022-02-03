@@ -18,8 +18,8 @@ interface GetTextTestCase {
 }
 
 class SquareViewWrapper {
-    pSquare: Square;
     squareView: SquareView;
+    private pSquare: Square;
 
     createSquareView() {
         this.squareView = new SquareView(this.square, SQUARE_SIZE);
@@ -68,6 +68,7 @@ describe('SquareView', () => {
         it('SquareView with ' + testText + ' should be of color' + expectedColor, () => {
             const square = {
                 tile: null,
+                position: { row: 0, column: 0 },
                 multiplier,
                 wasMultiplierUsed: false,
                 isCenter: false,
@@ -93,6 +94,7 @@ describe('SquareView', () => {
         );
         const square = {
             tile: null,
+            position: { row: 0, column: 0 },
             multiplier: nullMultiplierEffectSpy,
             wasMultiplierUsed: false,
             isCenter: false,
@@ -118,6 +120,7 @@ describe('SquareView', () => {
         );
         const square = {
             tile: null,
+            position: { row: 0, column: 0 },
             multiplier: negativeMultiplierSpy,
             wasMultiplierUsed: false,
             isCenter: false,
@@ -154,6 +157,7 @@ describe('SquareView', () => {
         it('SquareView with ' + testText + ' should have text: ' + expectedText, () => {
             const square = {
                 tile: null,
+                position: { row: 0, column: 0 },
                 multiplier,
                 wasMultiplierUsed: false,
                 isCenter: false,

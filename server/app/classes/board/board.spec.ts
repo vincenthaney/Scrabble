@@ -5,7 +5,7 @@ describe('Board', () => {
     let board: Board;
 
     beforeEach(() => {
-        board = new Board();
+        board = new Board([]);
     });
 
     it('should create', () => {

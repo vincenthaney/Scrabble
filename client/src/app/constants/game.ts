@@ -42,6 +42,7 @@ export const UNDEFINED_GRID_SIZE: Vec2 = { x: -1, y: -1 };
 export const UNDEFINED_SQUARE_SIZE: Vec2 = { x: -1, y: -1 };
 export const UNDEFINED_SQUARE: Square = {
     tile: null,
+    position: { row: -1, column: -1 },
     multiplier: null,
     wasMultiplierUsed: false,
     isCenter: false,

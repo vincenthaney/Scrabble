@@ -6,13 +6,15 @@
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingGame from '@app/classes/game/waiting-game';
+import * as Errors from '@app/constants/errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
-import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import Container from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
 import * as GameDispatcherError from './game-dispatcher.service.error';
-import * as Errors from '@app/constants/errors';
 
 const expect = chai.expect;
 
@@ -39,7 +41,8 @@ describe('GameDispatcherService', () => {
     let gameDispatcherService: GameDispatcherService;
 
     beforeEach(() => {
-        activeGameService = new ActiveGameService();
+        const boardService = Container.get(BoardService);
+        activeGameService = new ActiveGameService(boardService);
         gameDispatcherService = new GameDispatcherService(activeGameService);
     });
 
