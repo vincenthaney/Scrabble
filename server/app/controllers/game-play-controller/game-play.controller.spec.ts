@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -10,6 +11,7 @@ import { GamePlayController } from './game-play.controller';
 import { Application } from '@app/app';
 import { StatusCodes } from 'http-status-codes';
 import { ActionData } from '@app/classes/communication/action-data';
+import { Server } from '@app/server';
 
 const expect = chai.expect;
 
@@ -46,14 +48,12 @@ describe('GamePlayController', () => {
 
         describe('POST /games/:gameId/player/:playerId/action', () => {
             it('should return NO_CONTENT', async () => {
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
                 return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {
                     throw new Error();
                 });
@@ -62,7 +62,6 @@ describe('GamePlayController', () => {
             });
 
             it('should call handlePlayAction', async () => {
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 const spy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
                 return supertest(expressApp)
@@ -76,9 +75,54 @@ describe('GamePlayController', () => {
 
     describe('handlePlayAction', () => {
         it('should call playAction', () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
+            chai.spy.on(gamePlayController, 'gameUpdate', () => {});
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
+            expect(spy).to.have.been.called();
+        });
+
+        it('should call gameUpdate', () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
+            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => {});
+            gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
+            expect(spy).to.have.been.called();
+        });
+
+        it('should throw if data.type is undefined', () => {
+            expect(() =>
+                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData),
+            ).to.throw();
+        });
+
+        it('should throw if data.payload is undefined', () => {
+            expect(() =>
+                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData),
+            ).to.throw();
+        });
+    });
+
+    describe('gameUpdate', () => {
+        it('should call sio.to with gameId', () => {
+            const appServer = Container.get(Server);
+            const server = appServer['server'];
+            gamePlayController['socketService'].initialize(server);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const sio = gamePlayController['socketService'].sio!;
+            const spy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            expect(spy).to.have.been.called();
+        });
+
+        it('should call sio.to.emit with gameId', () => {
+            const appServer = Container.get(Server);
+            const server = appServer['server'];
+            gamePlayController['socketService'].initialize(server);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const sio = gamePlayController['socketService'].sio!;
+            const toResponse = { emit: () => {} };
+            const spy = chai.spy.on(toResponse, 'emit');
+            chai.spy.on(sio, 'to', () => toResponse);
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
             expect(spy).to.have.been.called();
         });
     });
