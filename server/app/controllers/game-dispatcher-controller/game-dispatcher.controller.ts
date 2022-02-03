@@ -39,7 +39,7 @@ export class GameDispatcherController {
             try {
                 this.handleJoinGame(gameId, playerId, playerName);
 
-                return res.status(StatusCodes.NO_CONTENT).send();
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
                 HttpException.sendError(e, res);
             }
@@ -52,7 +52,7 @@ export class GameDispatcherController {
             try {
                 this.handleAcceptRequest(gameId, playerId, opponentName);
 
-                return res.status(StatusCodes.NO_CONTENT).send();
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
                 HttpException.sendError(e, res);
             }
