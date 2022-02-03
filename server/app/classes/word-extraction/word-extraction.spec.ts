@@ -1,6 +1,4 @@
 /* eslint-disable dot-notation */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable no-console */
 /* eslint-disable max-lines */
 import { expect, spy } from 'chai';
 import { Board, Orientation, Position, Square } from '@app/classes/board';
@@ -157,7 +155,9 @@ describe('WordExtraction', () => {
                 [board.grid[startPosition.row][startPosition.column + 1], TILE_A],
                 [board.grid[startPosition.row][startPosition.column + 2], TILE_M],
                 [board.grid[startPosition.row][startPosition.column + 3], TILE_B],
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 [board.grid[startPosition.row][startPosition.column + 4], TILE_O],
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 [board.grid[startPosition.row][startPosition.column + 5], TILE_N],
             ],
         ];
@@ -187,7 +187,9 @@ describe('WordExtraction', () => {
                 [board.grid[startPosition.row + 1][startPosition.column], TILE_A],
                 [board.grid[startPosition.row + 2][startPosition.column], TILE_M],
                 [board.grid[startPosition.row + 3][startPosition.column], TILE_B],
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 [board.grid[startPosition.row + 4][startPosition.column], TILE_O],
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                 [board.grid[startPosition.row + 5][startPosition.column], TILE_N],
             ],
         ];
@@ -369,6 +371,7 @@ describe('WordExtraction', () => {
     });
 
     it('extractDownWord should return the squares and tiles of the word down of the given empty position (Word on edge of board)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const startPosition = { row: board.grid.length - 4, column: 1 }; //     @
         board.grid[board.grid.length - 3][1].tile = TILE_B; //                  B
         board.grid[board.grid.length - 2][1].tile = TILE_O; //                  O

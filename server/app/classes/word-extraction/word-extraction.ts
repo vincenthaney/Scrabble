@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Board, Orientation, Position, Square } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_POSITION_OUT_OF_BOARD, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
@@ -12,8 +11,7 @@ export class WordExtraction {
         if (tilesToPlace.length < 1 || tilesToPlace.length > board.grid.length) throw new Error(EXTRACTION_TILES_INVALID);
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
-        const actualPosition: Position = { row: startPosition.row, column: startPosition.column };
-        const beforePosition: Position = { row: startPosition.row, column: startPosition.column };
+        const actualPosition: Position = { ...startPosition };
 
         let i = 0;
         while (i < tilesToPlace.length) {
@@ -58,11 +56,11 @@ export class WordExtraction {
         // actualPosition.row/column-- to go back 1 square to get the square of the last tileToPlace
         if (orientation === Orientation.Horizontal) {
             actualPosition.column--;
-            beforeWord = this.extractLeftWord(board, beforePosition);
+            beforeWord = this.extractLeftWord(board, startPosition);
             afterWord = this.extractRightWord(board, actualPosition);
         } else {
             actualPosition.row--;
-            beforeWord = this.extractUpWord(board, beforePosition);
+            beforeWord = this.extractUpWord(board, startPosition);
             afterWord = this.extractDownWord(board, actualPosition);
         }
 
