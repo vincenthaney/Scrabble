@@ -23,19 +23,19 @@ const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_DATA: ActionData = { type: 'exchange', payload: {} };
 
 describe('GamePlayController', () => {
-    let gamePlayController: GamePlayController;
+    let controller: GamePlayController;
 
     beforeEach(() => {
         Container.reset();
-        gamePlayController = Container.get(GamePlayController);
+        controller = Container.get(GamePlayController);
     });
 
     it('should create', () => {
-        expect(gamePlayController).to.exist;
+        expect(controller).to.exist;
     });
 
     it('router should be created', () => {
-        expect(gamePlayController.router).to.exist;
+        expect(controller.router).to.exist;
     });
 
     describe('configureRouter', () => {
@@ -48,13 +48,13 @@ describe('GamePlayController', () => {
 
         describe('POST /games/:gameId/player/:playerId/action', () => {
             it('should return NO_CONTENT', async () => {
-                chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
+                chai.spy.on(controller, 'handlePlayAction', () => {});
 
                 return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
-                chai.spy.on(gamePlayController, 'handlePlayAction', () => {
+                chai.spy.on(controller, 'handlePlayAction', () => {
                     throw new Error();
                 });
 
@@ -62,7 +62,7 @@ describe('GamePlayController', () => {
             });
 
             it('should call handlePlayAction', async () => {
-                const spy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
+                const spy = chai.spy.on(controller, 'handlePlayAction', () => {});
 
                 return supertest(expressApp)
                     .post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`)
@@ -75,28 +75,28 @@ describe('GamePlayController', () => {
 
     describe('handlePlayAction', () => {
         it('should call playAction', () => {
-            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
-            chai.spy.on(gamePlayController, 'gameUpdate', () => {});
-            gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
+            const spy = chai.spy.on(controller['gamePlayService'], 'playAction', () => {});
+            chai.spy.on(controller, 'gameUpdate', () => {});
+            controller['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
         });
 
         it('should call gameUpdate', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
-            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => {});
-            gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
+            chai.spy.on(controller['gamePlayService'], 'playAction', () => {});
+            const spy = chai.spy.on(controller, 'gameUpdate', () => {});
+            controller['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
         });
 
         it('should throw if data.type is undefined', () => {
             expect(() =>
-                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData),
+                controller['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData),
             ).to.throw();
         });
 
         it('should throw if data.payload is undefined', () => {
             expect(() =>
-                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData),
+                controller['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData),
             ).to.throw();
         });
     });
@@ -105,24 +105,24 @@ describe('GamePlayController', () => {
         it('should call sio.to with gameId', () => {
             const appServer = Container.get(Server);
             const server = appServer['server'];
-            gamePlayController['socketService'].initialize(server);
+            controller['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const sio = gamePlayController['socketService'].sio!;
+            const sio = controller['socketService'].sio!;
             const spy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            controller.gameUpdate(DEFAULT_GAME_ID, {});
             expect(spy).to.have.been.called();
         });
 
         it('should call sio.to.emit with gameId', () => {
             const appServer = Container.get(Server);
             const server = appServer['server'];
-            gamePlayController['socketService'].initialize(server);
+            controller['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const sio = gamePlayController['socketService'].sio!;
+            const sio = controller['socketService'].sio!;
             const toResponse = { emit: () => {} };
             const spy = chai.spy.on(toResponse, 'emit');
             chai.spy.on(sio, 'to', () => toResponse);
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            controller.gameUpdate(DEFAULT_GAME_ID, {});
             expect(spy).to.have.been.called();
         });
     });
