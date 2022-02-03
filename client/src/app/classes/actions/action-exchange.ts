@@ -1,12 +1,15 @@
 import { ActionPlay } from '@app/classes/actions';
-import { Tile } from '@app/classes/tile';
+
+export interface ActionExchangePayload {
+    lettersToExchange: string[];
+}
 
 export default class ActionExchange extends ActionPlay {
-    tilesToExchange: Tile[];
+    lettersToExchange: string[];
 
-    constructor(tilesToExchange: Tile[]) {
+    constructor(lettersToExchange: string[]) {
         super();
-        this.tilesToExchange = tilesToExchange;
+        this.lettersToExchange = lettersToExchange;
         throw new Error('Method not implemented.');
     }
 

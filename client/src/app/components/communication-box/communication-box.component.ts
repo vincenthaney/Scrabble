@@ -1,6 +1,7 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { InputParserService } from '@app/services';
 
 @Component({
     selector: 'app-communication-box',
@@ -28,12 +29,15 @@ export class CommunicationBoxComponent {
 
     lettersLeft: string[] = ['A : 2 ', 'B : 1 ', 'C : 2 ', 'D : 0 ', 'E : 4 '];
 
+    constructor(private inputParser: InputParserService) {}
+
     messageForm = new FormGroup({
         content: new FormControl(''),
     });
 
     sendMessage() {
         if (this.message) {
+            this.inputParser.parseInput(this.message);
             this.messages = [...this.messages, this.message];
             this.messageForm.reset();
             this.scrollToBottom();

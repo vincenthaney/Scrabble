@@ -21,7 +21,7 @@
     </section>
 
     <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
-        <input matInput type="text" formControlName="content" [(ngModel)]="message"/>
+        <input matInput type="text" formControlName="content" [(ngModel)]="message" autocomplete="off"/>
         <button id="send-button" stype="submit" mat-flat-button color="primary">Envoyer</button>
     </form>
 
