@@ -27,11 +27,8 @@ describe('WaitingPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    // tester dialog est ouvert
-
     it('should open the rejected dialog when player is rejected', () => {
         const spy = spyOn(component.dialog, 'open');
-        // const surrenderButton = fixture.debugElement.nativeElement.querySelector('#cancel');
         component.playerHasBeenRejected(testOpponent);
         expect(spy).toHaveBeenCalled();
     });
