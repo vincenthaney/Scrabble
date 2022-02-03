@@ -10,7 +10,7 @@ export class WordsVerificationService {
     activeDictionaries: Map<string, Set<string>>;
 
     constructor() {
-        this.openAllDictionaries();
+        this.loadAllDictionaries();
     }
 
     async fetchDictionary(): Promise<string[]> {
@@ -20,7 +20,7 @@ export class WordsVerificationService {
         return data.words;
     }
 
-    openAllDictionaries() {
+    loadAllDictionaries() {
         this.addDictionary();
     }
 
