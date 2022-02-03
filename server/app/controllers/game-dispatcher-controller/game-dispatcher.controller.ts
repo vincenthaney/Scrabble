@@ -19,7 +19,7 @@ export class GameDispatcherController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.post('/game/:playerId', (req: CreateGameRequest, res: Response) => {
+        this.router.post('/games/:playerId', (req: CreateGameRequest, res: Response) => {
             const { playerId } = req.params;
             const body: Omit<GameConfigData, 'playerId'> = req.body;
 
@@ -32,7 +32,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/game/:gameId/player/:playerId/join', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/player/:playerId/join', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { playerName }: { playerName: string } = req.body;
 
@@ -45,7 +45,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/game/:gameId/player/:playerId/accept', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/player/:playerId/accept', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
@@ -58,7 +58,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/game/:gameId/player/:playerId/reject', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/player/:playerId/reject', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
