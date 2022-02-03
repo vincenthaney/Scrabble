@@ -5,7 +5,7 @@
 
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
-import WaitingGame from '@app/classes/game/waiting-game';
+import WaitingRoom from '@app/classes/game/waiting-game';
 import * as Errors from '@app/constants/errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -52,7 +52,7 @@ describe('GameDispatcherService', () => {
 
     describe('createMultiplayerGame', () => {
         let id: string;
-        let waitingRoom: WaitingGame;
+        let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
@@ -78,7 +78,7 @@ describe('GameDispatcherService', () => {
 
     describe('joinMultiplayerGame', () => {
         let id: string;
-        let waitingRoom: WaitingGame;
+        let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
@@ -160,7 +160,7 @@ describe('GameDispatcherService', () => {
 
     describe('rejectJoinRequest', () => {
         let id: string;
-        let waitingRoom: WaitingGame;
+        let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
