@@ -26,9 +26,13 @@
     </form>
 
     <div class="text-button-container">
-        <div class="text-buttons">     
-            <button mat-flat-button color="primary">Réduire la police</button>
-            <button mat-flat-button color="primary">Agrandir la police</button>
-        </div>
+        <mat-card>
+            <span><app-icon icon="text-size"></app-icon> Taille de la police</span>
+            <div class="text-buttons">     
+                <button mat-flat-button color="primary"><app-icon icon="minus"></app-icon></button>
+                <button mat-flat-button color="primary"><app-icon icon="plus"></app-icon></button>
+            </div>
+        </mat-card>
+        
     </div>
 </div>
