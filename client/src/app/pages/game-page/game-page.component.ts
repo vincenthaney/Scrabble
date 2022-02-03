@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
+import { TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE } from '@app/constants/game';
 
 @Component({
     selector: 'app-game-page',
@@ -41,9 +42,9 @@ export class GamePageComponent {
         if (operation === 'smaller') {
             // this.boardComponent.gridSize.x = 10;
             // this.tileRackComponent.tiles.forEach((tile) => (tile.letter = 'A'));
-            if (this.tileRackComponent.fontSize > 1.2) this.tileRackComponent.fontSize -= 0.1;
+            if (this.tileRackComponent.fontSize > TILE_MIN_FONT_SIZE) this.tileRackComponent.fontSize -= 0.1;
         } else if (operation === 'larger') {
-            if (this.tileRackComponent.fontSize < 1.9) this.tileRackComponent.fontSize += 0.1;
+            if (this.tileRackComponent.fontSize < TILE_MAX_FONT_SIZE) this.tileRackComponent.fontSize += 0.1;
         }
     }
 }
