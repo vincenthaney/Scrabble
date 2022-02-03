@@ -24,6 +24,14 @@ describe('BoardService', () => {
         x: BOARD_CONFIG.length,
         y: BOARD_CONFIG[0] ? BOARD_CONFIG[0].length : 0,
     };
+
+    /*
+        If the board configuration size is smaller or equal to 0
+        then the board configuration will not be defined no matter
+        the square => isBoardDefined = false
+        If it is bigger than 0, then it will be defined at the 
+        different test cases below
+    */
     const isBoardDefined = boardConfigSize.x > 0 && boardConfigSize.y > 0;
     const isBoardDefinedTestCases: Map<Position, boolean> = new Map([
         [{ row: -1, column: -1 }, false],
