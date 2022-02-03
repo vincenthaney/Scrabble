@@ -163,24 +163,85 @@ describe('GameDispatcherController', () => {
     });
 
     describe('handleJoinGame', () => {
-        it('should call gameDispatcherService.requestJoinGame', () => {
-            chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
-            const spy = chai.spy.on(controller['gameDispatcherService'], 'requestJoinGame', () => {});
+        let emitSpy: unknown;
+        let requestSpy: unknown;
+
+        beforeEach(() => {
+            emitSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            requestSpy = chai.spy.on(controller['gameDispatcherService'], 'requestJoinGame', () => {});
+        });
+
+        it('should call socketService.emitToRoom', () => {
             controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
-            expect(spy).to.have.been.called();
+            expect(emitSpy).to.have.been.called();
         });
 
         it('should call gameDispatcherService.requestJoinGame', () => {
-            const spy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
-            chai.spy.on(controller['gameDispatcherService'], 'requestJoinGame', () => {});
             controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
-            expect(spy).to.have.been.called();
+            expect(requestSpy).to.have.been.called();
         });
 
         it('should throw if playerName is undefined', () => {
             expect(() => {
                 controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, undefined as unknown as string);
             }).to.throw(PLAYER_NAME_REQUIRED);
+        });
+    });
+
+    describe('handleAcceptRequest', () => {
+        let acceptSpy: unknown;
+        let addToRoomSpy: unknown;
+        let emitToRoomSpy: unknown;
+
+        beforeEach(() => {
+            acceptSpy = chai.spy.on(controller['gameDispatcherService'], 'acceptJoinRequest', async () => {
+                return Promise.resolve({ player2: { getId: () => DEFAULT_PLAYER_ID } });
+            });
+            addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
+            emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+        });
+
+        it('should call gameDispatcherService.acceptJoinRequest', async () => {
+            await controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            expect(acceptSpy).to.have.been.called();
+        });
+
+        it('should call socketService.addToRoom', async () => {
+            await controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            expect(addToRoomSpy).to.have.been.called();
+        });
+
+        it('should call socketService.emitToRoom', async () => {
+            await controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            expect(emitToRoomSpy).to.have.been.called();
+        });
+
+        it('should throw if playerName is undefined', () => {
+            expect(controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME, undefined as unknown as string)).to.eventually.be.rejected;
+        });
+    });
+
+    describe('handleRejectRequest', () => {
+        let rejectSpy: unknown;
+        let emitToSocketSpy: unknown;
+
+        beforeEach(() => {
+            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => DEFAULT_PLAYER_ID);
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+        });
+
+        it('should call gameDispatcherService.rejectJoinRequest', () => {
+            controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            expect(rejectSpy).to.have.been.called();
+        });
+
+        it('should call gameDispatcherService.rejectJoinRequest', () => {
+            controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+
+        it('should throw if playerName is undefined', () => {
+            expect(() => controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME, undefined as unknown as string)).to.throw();
         });
     });
 });
