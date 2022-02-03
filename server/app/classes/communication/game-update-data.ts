@@ -1,4 +1,4 @@
-import { Square } from '@app/classes/board';
+import { Square } from '@app/classes/square';
 import { PlayerData } from './player-data';
 
 export interface GameUpdateData {

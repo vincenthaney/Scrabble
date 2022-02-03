@@ -5,13 +5,13 @@
 
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
-import WaitingRoom from '@app/classes/game/waiting-game';
+import WaitingGame from '@app/classes/game/waiting-game';
+import * as Errors from '@app/constants/errors';
 import * as chai from 'chai';
-import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
 import { GameDispatcherService } from './game-dispatcher.service';
 import * as GameDispatcherError from './game-dispatcher.service.error';
-import * as Errors from '@app/constants/errors';
 import { Container } from 'typedi';
 
 const expect = chai.expect;
@@ -52,7 +52,7 @@ describe('GameDispatcherService', () => {
 
     describe('createMultiplayerGame', () => {
         let id: string;
-        let waitingRoom: WaitingRoom;
+        let waitingRoom: WaitingGame;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
@@ -78,7 +78,7 @@ describe('GameDispatcherService', () => {
 
     describe('joinMultiplayerGame', () => {
         let id: string;
-        let waitingRoom: WaitingRoom;
+        let waitingRoom: WaitingGame;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
@@ -160,7 +160,7 @@ describe('GameDispatcherService', () => {
 
     describe('rejectJoinRequest', () => {
         let id: string;
-        let waitingRoom: WaitingRoom;
+        let waitingRoom: WaitingGame;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);

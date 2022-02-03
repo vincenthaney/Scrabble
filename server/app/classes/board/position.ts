@@ -1,4 +1,4 @@
 export default interface Position {
-    col: number;
+    column: number;
     row: number;
 }

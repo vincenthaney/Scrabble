@@ -12,6 +12,7 @@ import { Application } from '@app/app';
 import { StatusCodes } from 'http-status-codes';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Server } from '@app/server';
+import { HttpException } from '@app/classes/http.exception';
 
 const expect = chai.expect;
 
@@ -21,6 +22,7 @@ chai.use(chaiAsPromised);
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_DATA: ActionData = { type: 'exchange', payload: {} };
+const DEFAULT_EXCEPTION = 'exception';
 
 describe('GamePlayController', () => {
     let gamePlayController: GamePlayController;
@@ -55,7 +57,7 @@ describe('GamePlayController', () => {
 
             it('should return BAD_REQUEST on error', async () => {
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {
-                    throw new Error();
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
                 return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.BAD_REQUEST);

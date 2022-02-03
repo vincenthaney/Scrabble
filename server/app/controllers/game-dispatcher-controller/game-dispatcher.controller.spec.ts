@@ -13,6 +13,7 @@ import { StatusCodes } from 'http-status-codes';
 import { GameType } from '@app/classes/game/game.type';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import { HttpException } from '@app/classes/http.exception';
 
 const expect = chai.expect;
 
@@ -29,6 +30,7 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     maxRoundTime: 1,
     dictionary: 'french',
 };
+const DEFAULT_EXCEPTION = 'exception';
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
@@ -61,9 +63,9 @@ describe('GameDispatcherController', () => {
                 return supertest(expressApp).post(`/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.CREATED);
             });
 
-            it('should return BAD_REQUEST on throw', async () => {
+            it('should return BAD_REQUEST on throw httpException', async () => {
                 chai.spy.on(controller, 'handleCreateGame', () => {
-                    throw new Error();
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
                 return supertest(expressApp).post(`/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.BAD_REQUEST);
@@ -79,7 +81,7 @@ describe('GameDispatcherController', () => {
 
             it('should return BAD_REQUEST on throw', async () => {
                 chai.spy.on(controller, 'handleJoinGame', () => {
-                    throw new Error();
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
                 return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
@@ -95,7 +97,7 @@ describe('GameDispatcherController', () => {
 
             it('should return BAD_REQUEST on throw', async () => {
                 chai.spy.on(controller, 'handleAcceptRequest', () => {
-                    throw new Error();
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
                 return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.BAD_REQUEST);
@@ -111,7 +113,7 @@ describe('GameDispatcherController', () => {
 
             it('should return BAD_REQUEST on throw', async () => {
                 chai.spy.on(controller, 'handleRejectRequest', () => {
-                    throw new Error();
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
                 return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
