@@ -7,12 +7,16 @@ import { Square } from '@app/classes/square';
     providedIn: 'root',
 })
 export default class BoardService {
+    boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
     boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
     // public setAbstractBoard(abstractBoard: Square[][]) {
     //     throw new Error('Method not implemented.');
     // }
 
-    updateBoard(board: Square[]) {
-        this.boardUpdateEvent.emit(board);
+    initializeBoard(board: Square[][]) {
+        this.boardInitializationEvent.emit(board);
+    }
+    updateBoard(squareUpdated: Square[]) {
+        this.boardUpdateEvent.emit(squareUpdated);
     }
 }

@@ -16,6 +16,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
+    boardInitializationSubscription: Subscription;
     boardUpdateSubscription: Subscription;
 
     constructor(private boardService: BoardService) {
@@ -24,14 +25,18 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.boardUpdateSubscription = this.boardService.boardUpdateEvent.subscribe((board: Square[][]) => this.renderBoard(board));
+        this.boardInitializationSubscription = this.boardService.boardInitializationEvent.subscribe((board: Square[][]) =>
+            this.initializeBoard(board),
+        );
+        this.boardUpdateSubscription = this.boardService.boardUpdateEvent.subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
     }
 
     ngOnDestroy() {
         this.boardUpdateSubscription.unsubscribe();
+        this.boardInitializationSubscription.unsubscribe();
     }
 
-    private renderBoard(board: Square[][]) {
+    private initializeBoard(board: Square[][]) {
         if (!board || !board[0]) {
             this.gridSize = { x: 0, y: 0 };
             return;
@@ -51,5 +56,13 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     private getBoardServiceSquare(board: Square[][], row: number, column: number) {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
+    }
+
+    private updateBoard(squaresToUpdate: Square[]) {
+        ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {
+            squaresToUpdate
+                .filter((square: Square) => square.position === squareView.square.position)
+                .map((sameSquare: Square) => (squareView.square = sameSquare));
+        });
     }
 }
