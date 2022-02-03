@@ -51,3 +51,4 @@ export const VALID_MULTIPLIERS: number[] = [2, 3];
 
 export const TILE_MIN_FONT_SIZE = 1.2;
 export const TILE_MAX_FONT_SIZE = 1.9;
+export const TILE_DEFAULT_FONT_SIZE = 1.5;

@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, QueryList, ViewChildren } from '@angular/core';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
+import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { BoardService } from '@app/services/';
+// eslint-disable-next-line no-restricted-imports
+import { SquareComponent } from '../square/square.component';
 
 @Component({
     selector: 'app-board',
@@ -11,6 +13,8 @@ import { BoardService } from '@app/services/';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent {
+    @ViewChildren('square') squareComponents: QueryList<SquareComponent>;
+
     marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
@@ -20,6 +24,18 @@ export class BoardComponent {
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.initializeBoard(); // To remove
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+    }
+
+    changeFontSize(operation: string) {
+        if (operation === 'smaller') {
+            this.squareComponents.forEach((squareComponent) => {
+                if (squareComponent.fontSize > TILE_MIN_FONT_SIZE) squareComponent.fontSize -= 0.1;
+            });
+        } else if (operation === 'larger') {
+            this.squareComponents.forEach((squareComponent) => {
+                if (squareComponent.fontSize < TILE_MAX_FONT_SIZE) squareComponent.fontSize += 0.1;
+            });
+        }
     }
 
     private initializeBoard() {

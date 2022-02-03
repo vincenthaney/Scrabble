@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Tile } from '@app/classes/tile';
+import { TILE_DEFAULT_FONT_SIZE } from '@app/constants/game';
 import { GameService } from '@app/services';
 
 @Component({
@@ -9,7 +10,7 @@ import { GameService } from '@app/services';
 })
 export class TileRackComponent implements OnInit {
     tiles: Tile[];
-    fontSize: number = 1.5;
+    fontSize: number = TILE_DEFAULT_FONT_SIZE;
 
     constructor(private gameService: GameService) {}
     ngOnInit() {

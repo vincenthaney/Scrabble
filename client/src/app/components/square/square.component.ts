@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
-import { UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
+import { TILE_DEFAULT_FONT_SIZE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 
 export interface CssStyleProperty {
     key: string;
@@ -18,6 +18,7 @@ export class SquareComponent implements OnInit {
     style: { [key: string]: string } = {};
     multiplierType: string | undefined;
     multiplierValue: string | undefined;
+    fontSize: number = TILE_DEFAULT_FONT_SIZE;
 
     ngOnInit() {
         this.setText();
@@ -38,6 +39,7 @@ export class SquareComponent implements OnInit {
     private initializeStyle() {
         this.style = {
             'background-color': this.squareView.getColor(),
+            'font-size': `${this.fontSize}em`,
         };
     }
 }

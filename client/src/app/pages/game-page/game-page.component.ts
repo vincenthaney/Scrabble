@@ -37,8 +37,9 @@ export class GamePageComponent {
         });
     }
 
-    changeFont(operation: string) {
+    changeFontSize(operation: string) {
         console.log(operation);
+        this.boardComponent.changeFontSize(operation);
         if (operation === 'smaller') {
             // this.boardComponent.gridSize.x = 10;
             // this.tileRackComponent.tiles.forEach((tile) => (tile.letter = 'A'));
