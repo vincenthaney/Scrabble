@@ -7,15 +7,9 @@ export interface PlayerData {
 }
 
 // TODO: How to make it different depending on player for some actions
-export interface MessageData {
-    message: string;
-    color: number;
-}
-
 export interface GameUpdateData {
     playerId: string;
     player?: PlayerData;
     isGameOver?: boolean;
     board?: (Square | undefined)[][];
-    message: MessageData;
 }

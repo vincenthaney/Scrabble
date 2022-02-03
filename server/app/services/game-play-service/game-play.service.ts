@@ -7,13 +7,13 @@ import { Tile } from '@app/classes/tile';
 export type ActionType = 'place' | 'exchange' | 'pass';
 
 export interface ActionPlacePayload {
-    tiles: Tile[];
+    tiles: string[];
     position: { column: number; row: number };
     orientation: 'vertical' | 'horizontal';
 }
 
 export interface ActionExchangePayload {
-    tiles: Tile[];
+    tiles: string[];
 }
 
 export interface ActionData<T extends unknown = unknown> {

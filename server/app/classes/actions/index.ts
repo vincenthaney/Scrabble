@@ -1,4 +1,4 @@
-export { default as ActionClue } from './action-clue';
+export { default as ActionClue } from './action-hint';
 export { default as ActionExchange } from './action-exchange';
 export { default as ActionHelp } from './action-help';
 export { default as ActionInfo } from './action-info';
