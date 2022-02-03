@@ -7,7 +7,7 @@ import { Square } from '@app/classes/square';
     providedIn: 'root',
 })
 export default class BoardService {
-    boardUpdateEvent: EventEmitter<Square[][]> = new EventEmitter();
+    boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
     // public setAbstractBoard(abstractBoard: Square[][]) {
     //     throw new Error('Method not implemented.');
     // }
