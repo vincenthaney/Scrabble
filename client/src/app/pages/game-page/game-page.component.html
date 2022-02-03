@@ -6,7 +6,7 @@
         <div class="horizontal-grid">
             <div class="vertical-grid">
                 <div class="grid-item-container">
-                    <app-board></app-board>
+                    <app-board #boardComponent></app-board>
                 </div>
                 <div></div>
                 <div class="grid-item-container">
@@ -22,6 +22,12 @@
             <div class="sidebar-section">
                 <div class="communication-box-container">
                     <app-communication-box></app-communication-box>
+                    <div class="text-button-container">
+                        <div class="text-buttons">     
+                            <button mat-flat-button color="primary" (click)="changeFont('smaller')">Réduire la police</button>
+                            <button mat-flat-button color="primary" (click)="changeFont('larger')">Agrandir la police</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

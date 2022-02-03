@@ -36,7 +36,7 @@ export class CommunicationBoxComponent {
         if (this.message) {
             this.messages = [...this.messages, this.message];
             this.messageForm.reset();
-            this.scrollToBottom();
+            this.scrollToBottom(); // use this function too to scroll to the bottom when a new message comes from server
         }
     }
 

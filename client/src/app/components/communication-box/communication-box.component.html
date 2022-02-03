@@ -21,14 +21,7 @@
     </section>
 
     <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
-        <input matInput type="text" formControlName="content" [(ngModel)]="message"/>
+        <input matInput type="text" formControlName="content" [(ngModel)]="message" autocomplete="off"/>
         <button id="send-button" stype="submit" mat-flat-button color="primary">Envoyer</button>
     </form>
-
-    <div class="text-button-container">
-        <div class="text-buttons">     
-            <button mat-flat-button color="primary">Réduire la police</button>
-            <button mat-flat-button color="primary">Agrandir la police</button>
-        </div>
-    </div>
 </div>

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 
 @Component({
@@ -8,7 +9,10 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
+    @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
+
     constructor(public surrenderDialog: MatDialog) {}
+
     openDialog() {
         this.surrenderDialog.open(DefaultDialogComponent, {
             data: {
@@ -28,5 +32,14 @@ export class GamePageComponent {
                 ],
             },
         });
+    }
+
+    changeFont(operation: string) {
+        console.log(operation);
+        if (operation === 'smaller') {
+            this.boardComponent.gridSize.x = 10;
+        } else if (operation === 'larger') {
+            $scope.
+        }
     }
 }

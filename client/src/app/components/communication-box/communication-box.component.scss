@@ -33,24 +33,6 @@ input {
     border-radius: 0;
 }
 
-.text-button-container {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-}
-
-.text-buttons {
-    width: 100%;
-    display: inline-flex;
-    justify-content: space-around;
-}
-
-.text-buttons button {
-    width: 40%;
-    text-align: center;
-    padding: 0;
-}
-
 mat-accordion {
     margin: 20px;
 }
