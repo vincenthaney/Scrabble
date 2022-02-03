@@ -10,7 +10,7 @@
                 </div>
                 <div></div>
                 <div class="grid-item-container">
-                    <app-tile-rack></app-tile-rack>
+                    <app-tile-rack #tileRackComponent></app-tile-rack>
                 </div>
                 <div class="grid-item-container" id="button-group">
                     <button mat-flat-button id="surrender-dialog-button"(click)="openDialog()" color="primary">Abandonner</button> 
@@ -23,10 +23,13 @@
                 <div class="communication-box-container">
                     <app-communication-box></app-communication-box>
                     <div class="text-button-container">
-                        <div class="text-buttons">     
-                            <button mat-flat-button color="primary" (click)="changeFont('smaller')">Réduire la police</button>
-                            <button mat-flat-button color="primary" (click)="changeFont('larger')">Agrandir la police</button>
-                        </div>
+                        <mat-card>
+                            <span><app-icon icon="text-size"></app-icon> Taille de la police</span>
+                            <div class="text-buttons">     
+                                <button mat-flat-button color="primary" (click)="changeFont('smaller')"><app-icon icon="minus"></app-icon></button>
+                                <button mat-flat-button color="primary" (click)="changeFont('larger')"><app-icon icon="plus"></app-icon></button>
+                            </div>
+                        </mat-card>                        
                     </div>
                 </div>
             </div>

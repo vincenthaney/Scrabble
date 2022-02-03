@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 
 @Component({
     selector: 'app-game-page',
@@ -10,6 +11,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 })
 export class GamePageComponent {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
+    @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
     constructor(public surrenderDialog: MatDialog) {}
 
@@ -37,9 +39,11 @@ export class GamePageComponent {
     changeFont(operation: string) {
         console.log(operation);
         if (operation === 'smaller') {
-            this.boardComponent.gridSize.x = 10;
+            // this.boardComponent.gridSize.x = 10;
+            // this.tileRackComponent.tiles.forEach((tile) => (tile.letter = 'A'));
+            if (this.tileRackComponent.fontSize > 1.2) this.tileRackComponent.fontSize -= 0.1;
         } else if (operation === 'larger') {
-            $scope.
+            if (this.tileRackComponent.fontSize < 1.9) this.tileRackComponent.fontSize += 0.1;
         }
     }
 }

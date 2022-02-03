@@ -9,6 +9,7 @@ import { GameService } from '@app/services';
 })
 export class TileRackComponent implements OnInit {
     tiles: Tile[];
+    fontSize: number = 1.5;
 
     constructor(private gameService: GameService) {}
     ngOnInit() {
