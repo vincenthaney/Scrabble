@@ -1,32 +1,39 @@
 import ActionPlay from './action-play';
 import { Tile } from '@app/classes/tile';
 // import { Game } from '@app/classes/game/game';
-import Player from '../player/player';
 import Game from '@app/classes/game/game';
-import { GameUpdateData, PlayerData } from '../game/game-update-data';
+import { GameUpdateData } from '@app/classes/game/game-update-data';
+import Player from '@app/classes/player/player';
 
 const INVALID_COMMAND = 'a';
 export default class ActionExchange extends ActionPlay {
-    tilesToExchange: Tile[];
+    lettersToExchange: string[];
 
-    constructor(tilesToExchange: Tile[]) {
+    constructor(lettersToExchange: string[]) {
         super();
-        this.tilesToExchange = tilesToExchange;
+        this.lettersToExchange = lettersToExchange;
     }
 
-    // eslint-disable-next-line no-unused-vars
     execute(game: Game, player: Player): GameUpdateData {
-        const containsAll = this.tilesToExchange.every((tile) => {
-            return player.tiles.includes(tile);
-        });
-        if (!containsAll) throw new Error(INVALID_COMMAND);
+        const copyLetters = { ...player.tiles };
+        const tilesToExchange: Tile[] = [];
 
-        const newTiles = player.tiles.filter((tile) => {
-            return !this.tilesToExchange.includes(tile);
-        });
-        newTiles.concat(game.tileReserve.swapTiles(this.tilesToExchange));
+        for (const letter of this.lettersToExchange) {
+            for (let i = copyLetters.length - 1; i >= 0; i--) {
+                if (copyLetters[i].letter === letter) {
+                    const tile = copyLetters.splice(i, 1);
+                    tilesToExchange.concat(tile);
+                    break;
+                }
+            }
+        }
 
-        const response: GameUpdateData = { playerId: player.getId(), player: { tiles: newTiles } };
+        if (tilesToExchange.length !== this.lettersToExchange.length) throw new Error(INVALID_COMMAND);
+
+        const newTiles = game.tileReserve.swapTiles(tilesToExchange);
+        player.tiles = copyLetters.concat(newTiles);
+
+        const response: GameUpdateData = { playerId: player.getId(), player: { tiles: player.tiles } };
         return response;
     }
 

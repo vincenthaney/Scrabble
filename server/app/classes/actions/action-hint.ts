@@ -3,7 +3,7 @@ import Game from '@app/classes/game/game';
 import { GameUpdateData } from '@app/classes/game/game-update-data';
 import Player from '@app/classes/player/player';
 
-export default class ActionHelp extends ActionInfo {
+export default class ActionHint extends ActionInfo {
     // eslint-disable-next-line no-unused-vars
     execute(game: Game, player: Player): GameUpdateData | void {
         throw new Error('Method not implemented.');
