@@ -26,9 +26,9 @@ export class GameDispatcherController {
             try {
                 const gameId = this.handleCreateGame({ playerId, ...body });
 
-                return res.status(StatusCodes.CREATED).send({ gameId });
+                res.status(StatusCodes.CREATED).send({ gameId });
             } catch (e) {
-                return res.status(StatusCodes.BAD_REQUEST).send(e);
+                HttpException.sendError(e, res);
             }
         });
 
@@ -41,7 +41,7 @@ export class GameDispatcherController {
 
                 return res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
-                return res.status(StatusCodes.BAD_REQUEST).send(e);
+                HttpException.sendError(e, res);
             }
         });
 
@@ -54,7 +54,7 @@ export class GameDispatcherController {
 
                 return res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
-                return res.status(StatusCodes.BAD_REQUEST).send(e);
+                HttpException.sendError(e, res);
             }
         });
 
@@ -67,7 +67,7 @@ export class GameDispatcherController {
 
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
-                res.status(StatusCodes.BAD_REQUEST).send(e);
+                HttpException.sendError(e, res);
             }
         });
     }

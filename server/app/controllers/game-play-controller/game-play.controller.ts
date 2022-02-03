@@ -31,7 +31,7 @@ export class GamePlayController {
                 this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
-                res.status(StatusCodes.BAD_REQUEST).send(e);
+                HttpException.sendError(e, res);
             }
         });
     }
