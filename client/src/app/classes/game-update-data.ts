@@ -6,4 +6,5 @@ export interface GameUpdateData {
     player2?: PlayerData;
     isGameOver?: boolean;
     board?: (Square | undefined)[][];
+    round?: unknown;
 }

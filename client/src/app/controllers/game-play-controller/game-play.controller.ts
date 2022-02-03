@@ -1,13 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActionType } from '@app/classes/actions';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
+import { ActionData } from '@app/classes/actions/action-data';
 import { GameUpdateData } from '@app/classes/game-update-data';
 import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
 import { GameService } from '@app/services';
 import { Observable } from 'rxjs';
 import * as io from 'socket.io';
 import { environment } from 'src/environments/environment';
+import { INVALID_ACTION_CALL } from './game-play.controller.errors';
 
 @Injectable({
     providedIn: 'root',
@@ -20,12 +20,15 @@ export class GamePlayController extends SocketController {
     }
 
     configureSocket(): void {
-        // this.on('play-action', this.handlePlayAction);
+        this.on('gameUpdate', (data: GameUpdateData) => this.gameService.handleGameUpdate(data));
     }
 
-    handlePlaceAction(playerId: string, payload: ActionPlacePayload): Observable<GameUpdateData> {
-        const endpoint = `${environment.serverUrl}/games/${this.getGameId()}/player/${playerId}/${ActionType.PLACE}`;
-        return this.http.post<GameUpdateData>(endpoint, payload);
+    handleAction(playerId: string, action: ActionData): Observable<GameUpdateData> {
+        if (!action || !playerId) {
+            throw new Error(INVALID_ACTION_CALL);
+        }
+        const endpoint = `${environment.serverUrl}/games/${this.getGameId()}/player/${playerId}/${action.type}`;
+        return this.http.post<GameUpdateData>(endpoint, action.payload);
     }
 
     getGameId(): string {
