@@ -12,15 +12,15 @@ export default class BoardService {
 
     initializeBoard(): Board {
         const grid: Square[][] = [];
-        const center: Position = { row: Math.floor(BoardService.size.x / 2), col: Math.floor(BoardService.size.y / 2) };
+        const center: Position = { row: Math.floor(BoardService.size.x / 2), column: Math.floor(BoardService.size.y / 2) };
         for (let i = 0; i < BoardService.size.y; i++) {
             grid[i] = [];
             for (let j = 0; j < BoardService.size.x; j++) {
-                const isCenter = j === center.row && i === center.col;
+                const isCenter = j === center.row && i === center.column;
                 const square = {
                     tile: null,
-                    position: { row: i, col: j },
-                    multiplier: this.readScoreMultiplierConfig({ row: i, col: j }),
+                    position: { row: i, column: j },
+                    multiplier: this.readScoreMultiplierConfig({ row: i, column: j }),
                     wasMultiplierUsed: false,
                     isCenter,
                 };
@@ -31,7 +31,7 @@ export default class BoardService {
     }
     private readScoreMultiplierConfig(position: Position): Multiplier {
         if (!this.isBoardConfigDefined(position)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(position));
-        return this.parseSquareConfig(BOARD_CONFIG[position.row][position.col]);
+        return this.parseSquareConfig(BOARD_CONFIG[position.row][position.column]);
     }
 
     private parseSquareConfig(data: string): Multiplier {
@@ -46,9 +46,9 @@ export default class BoardService {
             BOARD_CONFIG &&
             BOARD_CONFIG[0] &&
             BOARD_CONFIG.length > position.row &&
-            BOARD_CONFIG[0].length > position.col &&
+            BOARD_CONFIG[0].length > position.column &&
             position.row >= 0 &&
-            position.col >= 0
+            position.column >= 0
         );
     }
     // private placeTile(position: Position, tile: Tile): boolean {

@@ -262,7 +262,7 @@ class CenterSquareWrapperComponent {
     squareView = new SquareView(
         {
             tile: null,
-            position: { row: 0, col: 0 },
+            position: { row: 0, column: 0 },
             multiplier: null,
             wasMultiplierUsed: false,
             isCenter: true,
