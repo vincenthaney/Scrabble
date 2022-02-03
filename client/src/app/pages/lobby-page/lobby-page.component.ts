@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
-import { LobbyInfo } from '@app/classes/lobby-info';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 
 @Component({

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
-import { LobbyInfo } from '@app/classes/lobby-info';
 import { convertTime } from '@app/classes/utils';
 
 @Component({

@@ -1,6 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Message } from '@app/classes/message';
+import { Message } from '@app/classes/communication/message';
 import { CommunicationService } from '@app/services/communication.service';
 
 describe('CommunicationService', () => {
