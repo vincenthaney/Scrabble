@@ -44,6 +44,12 @@ export class SocketService {
         this.sio.sockets.in(room).socketsLeave(room);
     }
 
+    emitToRoom<T>(room: string, ev: string, ...args: T[]) {
+        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+
+        this.sio.to(room).emit(ev, args);
+    }
+
     isInitialized(): boolean {
         return this.sio !== undefined;
     }
@@ -52,5 +58,11 @@ export class SocketService {
         const socket = this.sockets.get(id);
         if (!socket) throw new HttpException(SocketError.INVALID_ID_FOR_SOCKET, StatusCodes.BAD_REQUEST);
         return socket;
+    }
+
+    emitToSocket<T>(id: string, ev: string, ...args: T[]) {
+        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+
+        this.getSocket(id).emit(ev, args);
     }
 }

@@ -14,6 +14,21 @@ const SERVER_URL = 'http://localhost:';
 
 const DEFAULT_ROOM = 'default_room';
 const INVALID_ID = 'invalid-id';
+const DEFAULT_EVENT = 'event';
+const DEFAULT_ARGS = 'data';
+
+const getSocketId = async (socket: Socket) => {
+    const DELAY = 5;
+    const MAX_DELAY = 500;
+
+    let i = 0;
+    while (socket.id === undefined) {
+        await delay(DELAY);
+        if (i * DELAY > MAX_DELAY) throw new Error('TIMEOUT');
+        i++;
+    }
+    return socket.id;
+};
 
 describe('SocketService', () => {
     describe('Initialized', () => {
@@ -61,10 +76,14 @@ describe('SocketService', () => {
 
         describe('getSocket', () => {
             let id: string;
+
             beforeEach(async () => {
                 await clientSocket.connect();
-                await delay(RESPONSE_DELAY);
-                id = clientSocket.id;
+                id = await getSocketId(clientSocket);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
             });
 
             it('should find socket when connected', () => {
@@ -82,8 +101,11 @@ describe('SocketService', () => {
             let id: string;
             beforeEach(async () => {
                 await clientSocket.connect();
-                await delay(RESPONSE_DELAY);
-                id = clientSocket.id;
+                id = await getSocketId(clientSocket);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
             });
 
             it('should add it to the room', () => {
@@ -97,8 +119,11 @@ describe('SocketService', () => {
             let id: string;
             beforeEach(async () => {
                 await clientSocket.connect();
-                await delay(RESPONSE_DELAY);
-                id = clientSocket.id;
+                id = await getSocketId(clientSocket);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
             });
 
             it('should remove it from the room', () => {
@@ -107,6 +132,69 @@ describe('SocketService', () => {
                 service.deleteRoom(DEFAULT_ROOM);
                 expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
                 expect(service.sio?.sockets.adapter.rooms.has(DEFAULT_ROOM)).to.be.false;
+            });
+        });
+
+        describe('emitToRoom', () => {
+            let id: string;
+
+            beforeEach(async () => {
+                await clientSocket.connect();
+                id = await getSocketId(clientSocket);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
+            });
+
+            it('should emit to room', async () => {
+                return new Promise((resolve) => {
+                    service.addToRoom(id, DEFAULT_ROOM);
+
+                    clientSocket.on(DEFAULT_EVENT, (args: unknown[]) => {
+                        expect(args[0]).to.equal(DEFAULT_ARGS);
+                        resolve();
+                    });
+
+                    service.emitToRoom(DEFAULT_ROOM, DEFAULT_EVENT, DEFAULT_ARGS);
+                });
+            });
+
+            it('should throw if sio is undefined', () => {
+                const sio = service.sio;
+                service.sio = undefined;
+                expect(() => service.emitToRoom(DEFAULT_ROOM, DEFAULT_EVENT, DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                service.sio = sio;
+            });
+        });
+
+        describe('emitToSocket', () => {
+            let id: string;
+
+            beforeEach(async () => {
+                await clientSocket.connect();
+                id = await getSocketId(clientSocket);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
+            });
+
+            it('should emit to socket', async () => {
+                return new Promise((resolve) => {
+                    clientSocket.on(DEFAULT_EVENT, (args: unknown[]) => {
+                        expect(args[0]).to.equal(DEFAULT_ARGS);
+                        resolve();
+                    });
+                    service.emitToSocket(id, DEFAULT_EVENT, DEFAULT_ARGS);
+                });
+            });
+
+            it('should throw if sio is undefined', () => {
+                const sio = service.sio;
+                service.sio = undefined;
+                expect(() => service.emitToSocket(id, DEFAULT_EVENT, DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                service.sio = sio;
             });
         });
     });
