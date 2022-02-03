@@ -1,7 +1,7 @@
 import Round from './round';
 
 export default class RoundManager {
-    // private currentRound: Round;
+    currentRound: Round;
     // private completedRounds: Round[];
     // private maxRoundTime: number;
 

@@ -88,4 +88,16 @@ export default class Game {
         if (this.player2.getId() === playerId) return this.player1;
         throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
     }
+
+    /**
+     * Get the activePlayer
+     *
+     * @returns {Player} activePlayer
+     */
+
+    getCurrentPlayer(): Player {
+        if (this.player1.getId() === this.roundManager.currentRound.player.getId()) return this.player1;
+        if (this.player2.getId() === this.roundManager.currentRound.player.getId()) return this.player2;
+        throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
+    }
 }
