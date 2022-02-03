@@ -1,5 +1,9 @@
 import { INVALID_WORD, MINIMUM_WORD_LEN } from '@app/constants/errors';
 import { Service } from 'typedi';
+import * as fs from 'fs';
+import { join } from 'path';
+import * as WordsVerificationConst from './words-verification.service.const';
+import { DictionaryData } from './words-verification.service.types';
 
 @Service()
 export class WordsVerificationService {
@@ -9,17 +13,20 @@ export class WordsVerificationService {
         this.openAllDictionaries();
     }
 
+    async fetchDictionary(): Promise<string[]> {
+        const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
+        const dataBuffer = await fs.promises.readFile(filePath, 'utf-8');
+        const data: DictionaryData = JSON.parse(dataBuffer);
+        return data.words;
+    }
+
     openAllDictionaries() {
         this.addDictionary();
     }
 
     // À mettre dans un service à part
-    addDictionary() {
-        const name = 'dictionary_log2990';
-        const fs = require('fs');
-        const rawData = fs.readFileSync('assets/dictionaries/dictionnary.json');
-        const dictionary = JSON.parse(rawData);
-        this.activeDictionaries[name] = new Set(dictionary.words);
+    async addDictionary() {
+        this.activeDictionaries[WordsVerificationConst.DICTIONARY_NAME] = new Set(await this.fetchDictionary());
     }
 
     verifyWords(words: string[][], dictionary: string) {
@@ -40,6 +47,7 @@ export class WordsVerificationService {
                 }
             }
         }
+        return words;
     }
 
     removeAccents(word: string) {
