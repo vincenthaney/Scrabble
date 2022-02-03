@@ -1,13 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
-import { Location } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
+import { OnlinePlayer } from '@app/classes/player';
 
 describe('WaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
+    const testOpponent = new OnlinePlayer('testName');
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -26,14 +27,12 @@ describe('WaitingPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('createGame button should reroute to waiting-room page if form is valid', async () => {
-        const location: Location = TestBed.inject(Location);
+    // tester dialog est ouvert
 
-        const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel');
-        cancelButton.click();
-
-        return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/lobby');
-        });
+    it('should open the rejected dialog when player is rejected', () => {
+        const spy = spyOn(component.dialog, 'open');
+        // const surrenderButton = fixture.debugElement.nativeElement.querySelector('#cancel');
+        component.playerHasBeenRejected(testOpponent);
+        expect(spy).toHaveBeenCalled();
     });
 });

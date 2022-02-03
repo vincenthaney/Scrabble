@@ -3,8 +3,6 @@ import { DIALOG_BUTTON_CONTENT, DIALOG_CONTENT, DIALOG_TITLE, GameRequestState }
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { OnlinePlayer } from '@app/classes/player';
-import { Router } from '@angular/router';
-
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -17,10 +15,10 @@ export class JoinWaitingPageComponent {
     waitingGameTimer: string = 'timer';
     waitingGameDictionary: string = 'dictionary';
     waitingPlayerName: string = 'waitingPlayer';
-    constructor(public dialog: MatDialog, private router: Router) {}
+    constructor(public dialog: MatDialog) {}
 
     playerHasBeenRejected(opponent: OnlinePlayer) {
-        const dialogRef = this.dialog.open(DefaultDialogComponent, {
+        this.dialog.open(DefaultDialogComponent, {
             data: {
                 // Data type is DefaultDialogParameters
                 title: DIALOG_TITLE,
@@ -28,14 +26,11 @@ export class JoinWaitingPageComponent {
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,
+                        redirect: '/lobby',
                         closeDialog: true,
                     },
                 ],
             },
-        });
-        dialogRef.afterClosed().subscribe(() => {
-            this.state = GameRequestState.Rejected;
-            this.router.navigateByUrl('lobby');
         });
     }
 }
