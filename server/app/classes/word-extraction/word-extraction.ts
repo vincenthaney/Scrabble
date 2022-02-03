@@ -7,15 +7,6 @@ export const SHOULD_HAVE_A_TILE = true;
 export const SHOULD_HAVE_NO_TILE = false;
 
 export class WordExtraction {
-    // Verifies if the position is valid and if the square at the given position in the board has a tile or not
-    verifySquare(board: Board, position: Position, shouldBeFilled: boolean): boolean {
-        if (position.row >= 0 && position.column >= 0 && position.row <= board.grid.length - 1 && position.column <= board.grid[0].length - 1) {
-            return board.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
-        } else {
-            throw new Error(EXTRACTION_POSITION_OUT_OF_BOARD);
-        }
-    }
-
     extract(board: Board, tilesToPlace: Tile[], startPosition: Position, orientation: Orientation): [Square, Tile][][] {
         if (!this.verifySquare(board, startPosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         if (tilesToPlace.length < 1 || tilesToPlace.length > board.grid.length) throw new Error(EXTRACTION_TILES_INVALID);
@@ -79,7 +70,16 @@ export class WordExtraction {
         return wordsCreated;
     }
 
-    extractVerticalWord(board: Board, tilePosition: Position, addedTile: Tile): [Square, Tile][] {
+    // Verifies if the position is valid and if the square at the given position in the board has a tile or not
+    private verifySquare(board: Board, position: Position, shouldBeFilled: boolean): boolean {
+        if (position.row >= 0 && position.column >= 0 && position.row <= board.grid.length - 1 && position.column <= board.grid[0].length - 1) {
+            return board.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
+        } else {
+            throw new Error(EXTRACTION_POSITION_OUT_OF_BOARD);
+        }
+    }
+
+    private extractVerticalWord(board: Board, tilePosition: Position, addedTile: Tile): [Square, Tile][] {
         const upWord = this.extractUpWord(board, tilePosition);
         const downWord = this.extractDownWord(board, tilePosition);
         const newWord = [[board.grid[tilePosition.row][tilePosition.column], addedTile]] as [Square, Tile][];
@@ -87,14 +87,14 @@ export class WordExtraction {
         return upWord.concat(newWord).concat(downWord);
     }
 
-    extractHorizontalWord(board: Board, tilePosition: Position, addedTile: Tile): [Square, Tile][] {
+    private extractHorizontalWord(board: Board, tilePosition: Position, addedTile: Tile): [Square, Tile][] {
         const leftWord = this.extractLeftWord(board, tilePosition);
         const rightWord = this.extractRightWord(board, tilePosition);
         const newWord = [[board.grid[tilePosition.row][tilePosition.column], addedTile]] as [Square, Tile][];
         return leftWord.concat(newWord).concat(rightWord);
     }
 
-    extractDownWord(board: Board, tilePosition: Position): [Square, Tile][] {
+    private extractDownWord(board: Board, tilePosition: Position): [Square, Tile][] {
         if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const squarePlaced = board.grid[tilePosition.row][tilePosition.column];
         const downWord: [Square, Tile][] = new Array<[Square, Tile]>();
@@ -113,7 +113,7 @@ export class WordExtraction {
         return downWord;
     }
 
-    extractUpWord(board: Board, tilePosition: Position): [Square, Tile][] {
+    private extractUpWord(board: Board, tilePosition: Position): [Square, Tile][] {
         if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const squarePlaced = board.grid[tilePosition.row][tilePosition.column];
         const upWord: [Square, Tile][] = [];
@@ -131,7 +131,7 @@ export class WordExtraction {
         return upWord;
     }
 
-    extractLeftWord(board: Board, tilePosition: Position): [Square, Tile][] {
+    private extractLeftWord(board: Board, tilePosition: Position): [Square, Tile][] {
         if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const squarePlaced = board.grid[tilePosition.row][tilePosition.column];
         const leftWord: [Square, Tile][] = [];
@@ -149,7 +149,7 @@ export class WordExtraction {
         return leftWord;
     }
 
-    extractRightWord(board: Board, tilePosition: Position): [Square, Tile][] {
+    private extractRightWord(board: Board, tilePosition: Position): [Square, Tile][] {
         if (!this.verifySquare(board, tilePosition, SHOULD_HAVE_NO_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const squarePlaced = board.grid[tilePosition.row][tilePosition.column];
         const rightWord: [Square, Tile][] = [];
