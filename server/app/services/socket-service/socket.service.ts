@@ -7,10 +7,10 @@ import { StatusCodes } from 'http-status-codes';
 @Service()
 export class SocketService {
     sio?: io.Server;
-    private map: Map<string, io.Socket>;
+    private sockets: Map<string, io.Socket>;
 
     constructor() {
-        this.map = new Map();
+        this.sockets = new Map();
     }
 
     initialize(server: http.Server) {
@@ -21,14 +21,12 @@ export class SocketService {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.on('connection', (socket) => {
-            this.map.set(socket.id, socket);
-
-            // eslint-disable-next-line no-console
-            console.log('new socket', socket.id);
+            this.sockets.set(socket.id, socket);
 
             socket.emit('initialization', { id: socket.id });
+
             socket.on('disconnect', () => {
-                this.map.delete(socket.id);
+                this.sockets.delete(socket.id);
             });
         });
     }
@@ -41,7 +39,7 @@ export class SocketService {
     }
 
     deleteRoom(room: string) {
-        if (this.sio === undefined) throw new HttpException(SocketError.SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
+        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.sockets.in(room).socketsLeave(room);
     }
@@ -51,7 +49,7 @@ export class SocketService {
     }
 
     getSocket(id: string): io.Socket {
-        const socket = this.map.get(id);
+        const socket = this.sockets.get(id);
         if (!socket) throw new HttpException(SocketError.INVALID_ID_FOR_SOCKET, StatusCodes.BAD_REQUEST);
         return socket;
     }

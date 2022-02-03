@@ -12,6 +12,9 @@ import * as SocketError from './socket.service.error';
 const RESPONSE_DELAY = 200;
 const SERVER_URL = 'http://localhost:';
 
+const DEFAULT_ROOM = 'default_room';
+const INVALID_ID = 'invalid-id';
+
 describe('SocketService', () => {
     describe('Initialized', () => {
         let service: SocketService;
@@ -74,6 +77,38 @@ describe('SocketService', () => {
                 expect(() => service.getSocket(invalidId)).to.throw(SocketError.INVALID_ID_FOR_SOCKET);
             });
         });
+
+        describe('addToRoom', () => {
+            let id: string;
+            beforeEach(async () => {
+                await clientSocket.connect();
+                await delay(RESPONSE_DELAY);
+                id = clientSocket.id;
+            });
+
+            it('should add it to the room', () => {
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
+                service.addToRoom(id, DEFAULT_ROOM);
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
+            });
+        });
+
+        describe('deleteRoom', () => {
+            let id: string;
+            beforeEach(async () => {
+                await clientSocket.connect();
+                await delay(RESPONSE_DELAY);
+                id = clientSocket.id;
+            });
+
+            it('should remove it from the room', () => {
+                service.addToRoom(id, DEFAULT_ROOM);
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
+                service.deleteRoom(DEFAULT_ROOM);
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
+                expect(service.sio?.sockets.adapter.rooms.has(DEFAULT_ROOM)).to.be.false;
+            });
+        });
     });
 
     describe('Not initialized', () => {
@@ -86,6 +121,18 @@ describe('SocketService', () => {
         describe('handleSockets', () => {
             it('should throw', () => {
                 expect(() => service.handleSockets()).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+            });
+        });
+
+        describe('addToRoom', () => {
+            it('should throw if ID is invalid', () => {
+                expect(() => service.addToRoom(INVALID_ID, DEFAULT_ROOM)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+            });
+        });
+
+        describe('deleteRoom', () => {
+            it('should throw if ID is invalid', () => {
+                expect(() => service.deleteRoom(INVALID_ID)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
             });
         });
     });
