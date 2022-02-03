@@ -107,7 +107,7 @@ describe('GamePlayController', () => {
             const server = appServer['server'];
             gamePlayController['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const sio = gamePlayController['socketService'].sio!;
+            const sio = gamePlayController['socketService']['sio']!;
             const spy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
             gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
             expect(spy).to.have.been.called();
@@ -118,7 +118,7 @@ describe('GamePlayController', () => {
             const server = appServer['server'];
             gamePlayController['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const sio = gamePlayController['socketService'].sio!;
+            const sio = gamePlayController['socketService']['sio']!;
             const toResponse = { emit: () => {} };
             const spy = chai.spy.on(toResponse, 'emit');
             chai.spy.on(sio, 'to', () => toResponse);

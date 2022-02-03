@@ -14,7 +14,6 @@ const SERVER_URL = 'http://localhost:';
 
 const DEFAULT_ROOM = 'default_room';
 const INVALID_ID = 'invalid-id';
-const DEFAULT_EVENT = 'event';
 const DEFAULT_ARGS = 'data';
 
 const getSocketId = async (socket: Socket) => {
@@ -131,7 +130,7 @@ describe('SocketService', () => {
                 expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
                 service.deleteRoom(DEFAULT_ROOM);
                 expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
-                expect(service.sio?.sockets.adapter.rooms.has(DEFAULT_ROOM)).to.be.false;
+                expect(service['sio']?.sockets.adapter.rooms.has(DEFAULT_ROOM)).to.be.false;
             });
         });
 
@@ -151,20 +150,20 @@ describe('SocketService', () => {
                 return new Promise((resolve) => {
                     service.addToRoom(id, DEFAULT_ROOM);
 
-                    clientSocket.on(DEFAULT_EVENT, (args: unknown[]) => {
+                    clientSocket.on('_test_event', (args: unknown[]) => {
                         expect(args[0]).to.equal(DEFAULT_ARGS);
                         resolve();
                     });
 
-                    service.emitToRoom(DEFAULT_ROOM, DEFAULT_EVENT, DEFAULT_ARGS);
+                    service.emitToRoom(DEFAULT_ROOM, '_test_event', DEFAULT_ARGS);
                 });
             });
 
             it('should throw if sio is undefined', () => {
-                const sio = service.sio;
-                service.sio = undefined;
-                expect(() => service.emitToRoom(DEFAULT_ROOM, DEFAULT_EVENT, DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
-                service.sio = sio;
+                const sio = service['sio'];
+                service['sio'] = undefined;
+                expect(() => service.emitToRoom(DEFAULT_ROOM, '_test_event', DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                service['sio'] = sio;
             });
         });
 
@@ -182,19 +181,19 @@ describe('SocketService', () => {
 
             it('should emit to socket', async () => {
                 return new Promise((resolve) => {
-                    clientSocket.on(DEFAULT_EVENT, (args: unknown[]) => {
+                    clientSocket.on('_test_event', (args: unknown[]) => {
                         expect(args[0]).to.equal(DEFAULT_ARGS);
                         resolve();
                     });
-                    service.emitToSocket(id, DEFAULT_EVENT, DEFAULT_ARGS);
+                    service.emitToSocket(id, '_test_event', DEFAULT_ARGS);
                 });
             });
 
             it('should throw if sio is undefined', () => {
-                const sio = service.sio;
-                service.sio = undefined;
-                expect(() => service.emitToSocket(id, DEFAULT_EVENT, DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
-                service.sio = sio;
+                const sio = service['sio'];
+                service['sio'] = undefined;
+                expect(() => service.emitToSocket(id, '_test_event', DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                service['sio'] = sio;
             });
         });
     });

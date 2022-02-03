@@ -1,7 +1,6 @@
 import { CreateGameRequest, GameRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
-import { JOIN_REQUEST, REJECTED, START_GAME } from '@app/constants/communication';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Router, Response } from 'express';
@@ -91,7 +90,7 @@ export class GameDispatcherController {
 
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
 
-        this.socketService.emitToRoom(gameId, JOIN_REQUEST, { opponentName: playerName });
+        this.socketService.emitToRoom(gameId, 'joinRequest', { opponentName: playerName });
     }
 
     private async handleAcceptRequest(gameId: string, playerId: string, playerName: string) {
@@ -100,7 +99,7 @@ export class GameDispatcherController {
         const game = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
 
         this.socketService.addToRoom(game.player2.getId(), gameId);
-        this.socketService.emitToRoom(gameId, START_GAME, { game });
+        this.socketService.emitToRoom(gameId, 'startGame', game);
     }
 
     private handleRejectRequest(gameId: string, playerId: string, playerName: string) {
@@ -108,6 +107,6 @@ export class GameDispatcherController {
 
         const rejectedPlayerId = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
 
-        this.socketService.getSocket(rejectedPlayerId).emit(REJECTED);
+        this.socketService.emitToSocket(rejectedPlayerId, 'rejected');
     }
 }

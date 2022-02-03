@@ -2,7 +2,6 @@ import { ActionData } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
-import { GAME_UPDATE } from '@app/constants/communication';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Response, Router } from 'express';
@@ -18,7 +17,7 @@ export class GamePlayController {
     }
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
-        this.socketService.sio?.to(gameId).emit(GAME_UPDATE, data);
+        this.socketService.emitToRoom(gameId, 'gameUpdate', data);
     }
 
     private configureRouter(): void {
