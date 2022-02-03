@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import RoundManager from './round-manager';
 
-describe('Game', () => {
+describe('RoundManager', () => {
     let roundManager: RoundManager;
 
     beforeEach(() => {

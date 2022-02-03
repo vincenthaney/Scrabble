@@ -32,6 +32,7 @@ export class DefaultDialogComponent {
                     closeDialog: btn.redirect ? true : btn.closeDialog ?? false,
                     action: btn.action,
                     redirect: btn.redirect,
+                    style: btn.style,
                 });
             });
         }

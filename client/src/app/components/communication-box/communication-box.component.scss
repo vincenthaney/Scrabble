@@ -1,0 +1,84 @@
+#outer-container {
+    padding: 0 0 0 12px;
+    box-sizing: border-box;
+}
+
+.scrolling-area {
+    height: 200px;
+    border: 1px solid black;
+    background-color: white;
+    text-align: left;
+}
+  
+.scroll-item {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.input-zone {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    margin-bottom: 30px; 
+
+}
+
+input {
+    width: calc(100% - 80px);
+    height: 32px;
+    padding: 0;
+    margin: 0;
+}
+
+#send-button {
+    width: 80px;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+}
+
+.text-button-container {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+
+    mat-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        span {
+            font-size: 1.15em;
+        }
+
+        .text-buttons {
+            display: inline-flex;
+            justify-content: space-around;
+    
+            button {
+                text-align: center;
+                padding: 0;
+
+                &:not(:last-child) {
+                    margin-right: 6px;
+                }
+            }
+        }
+    }
+}
+
+mat-accordion {
+    margin: 20px;
+}
+
+mat-expansion-panel-header {
+    padding-left: 10px;
+    margin: 0;
+}
+
+mat-expansion-panel {
+    margin: 0;
+    text-align: left;
+    padding: 0;
+}

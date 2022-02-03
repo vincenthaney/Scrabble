@@ -1,0 +1,42 @@
+#rack-grid {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    align-self: center;
+    gap: 6px;
+    padding: 6px;
+
+    #rack-card-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        #rack-tile-card {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+            justify-content: center;
+
+            .rack-tile {
+                height: 50px;
+                width: 50px;
+                transition: ease-in transform 0.1s;
+
+                &:not(:last-child) {
+                    margin-right: 12px;
+                }
+
+                &:hover {
+                    transform: translateY(-15%) scale(1.05);
+                    transition: ease-in transform 0.15s;
+                }
+            }
+        }
+    }
+
+    #rack-button-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+}

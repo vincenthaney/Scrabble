@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import Board from './board';
 
-describe('Game', () => {
+describe('Board', () => {
     let board: Board;
 
     beforeEach(() => {
-        board = new Board();
+        board = new Board([]);
     });
 
     it('should create', () => {

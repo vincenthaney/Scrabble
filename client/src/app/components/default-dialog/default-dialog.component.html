@@ -4,7 +4,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align='end'>
     <ng-container *ngFor="let btn of buttons">
-        <button  mat-button mat-dialog-close *ngIf='btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
-        <button  mat-button *ngIf='!btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
+        <button  [style]="btn.style" mat-button mat-dialog-close *ngIf='btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
+        <button  [style]="btn.style" mat-button *ngIf='!btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
     </ng-container> 
 </mat-dialog-actions>
