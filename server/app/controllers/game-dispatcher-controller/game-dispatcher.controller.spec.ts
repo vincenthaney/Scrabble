@@ -12,7 +12,7 @@ import { GameDispatcherController } from './game-dispatcher.controller';
 import { StatusCodes } from 'http-status-codes';
 import { GameType } from '@app/classes/game/game.type';
 import { GameConfigData } from '@app/classes/game/game-config';
-import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
 import { HttpException } from '@app/classes/http.exception';
 
 const expect = chai.expect;
@@ -162,6 +162,12 @@ describe('GameDispatcherController', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, dictionary: undefined };
             expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(DICTIONARY_REQUIRED);
         });
+
+        it('should throw if config.playerName is invalid', () => {
+            const playerName = '     ';
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
+        });
     });
 
     describe('handleJoinGame', () => {
@@ -187,6 +193,13 @@ describe('GameDispatcherController', () => {
             expect(() => {
                 controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, undefined as unknown as string);
             }).to.throw(PLAYER_NAME_REQUIRED);
+        });
+
+        it('should throw if playerName is invalid', () => {
+            const playerName = '     ';
+            expect(() => {
+                controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, playerName);
+            }).to.throw(NAME_IS_INVALID);
         });
     });
 

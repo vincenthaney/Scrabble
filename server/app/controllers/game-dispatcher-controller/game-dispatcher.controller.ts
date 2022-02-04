@@ -3,10 +3,11 @@ import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { validateName } from '@app/utils/validate-name';
 import { Router, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
 
 @Service()
 export class GameDispatcherController {
@@ -78,6 +79,8 @@ export class GameDispatcherController {
         if (config.maxRoundTime === undefined) throw new HttpException(MAX_ROUND_TIME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.dictionary === undefined) throw new HttpException(DICTIONARY_REQUIRED, StatusCodes.BAD_REQUEST);
 
+        if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
+
         const gameId = this.gameDispatcherService.createMultiplayerGame(config);
 
         this.socketService.addToRoom(config.playerId, gameId);
@@ -87,6 +90,7 @@ export class GameDispatcherController {
 
     private handleJoinGame(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
+        if (!validateName(playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
 
