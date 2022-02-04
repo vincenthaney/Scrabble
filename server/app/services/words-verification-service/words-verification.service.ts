@@ -30,7 +30,7 @@ export class WordsVerificationService {
         this.activeDictionaries[WordsVerificationConst.DICTIONARY_NAME] = new Set(await this.fetchDictionary());
     }
 
-    verifyWords(words: string[], dictionary: string) {
+    verifyWords(words: string[], dictionary: string): string[] {
         for (const word of words) {
             if (word.length > 0) {
                 this.removeAccents(word);

@@ -23,6 +23,11 @@ describe('WordsVerificationService', () => {
     });
 
     it('should contain dictionary', () => {
+        wordsVerificationService.addDictionary();
+        expect(wordsVerificationService.activeDictionaries.has('dictionary')).to.be.true;
+    });
+
+    it('should contain dictionary', () => {
         expect(wordsVerificationService.activeDictionaries.has('dictionary')).to.be.true;
     });
 
