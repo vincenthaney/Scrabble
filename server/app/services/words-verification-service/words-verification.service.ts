@@ -1,4 +1,4 @@
-import { INVALID_WORD, MINIMUM_WORD_LEN } from '@app/constants/errors';
+import { INVALID_WORD, MINIMUM_WORD_LEN, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { Service } from 'typedi';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -21,6 +21,7 @@ export class WordsVerificationService {
     }
 
     loadAllDictionaries() {
+        // À changer pour une lecture du répertoire de dictionnaires
         this.addDictionary();
     }
 
@@ -34,13 +35,13 @@ export class WordsVerificationService {
             if (!word) {
                 this.removeAccents(word);
                 if (words.length < MINIMUM_WORD_LEN) {
-                    throw new Error(INVALID_WORD);
+                    throw new Error(WORD_TOO_SHORT);
                 }
                 if (word.includes('-')) {
-                    throw new Error(INVALID_WORD);
+                    throw new Error(WORD_CONTAINS_HYPHEN);
                 }
                 if (word.includes("'")) {
-                    throw new Error(INVALID_WORD);
+                    throw new Error(WORD_CONTAINS_APOSTROPHE);
                 }
                 if (!this.activeDictionaries.get(dictionary)?.has(word)) {
                     throw new Error(INVALID_WORD);
