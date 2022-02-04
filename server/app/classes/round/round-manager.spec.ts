@@ -6,7 +6,7 @@ import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
 import Player from '@app/classes/player/player';
 import RoundManager from './round-manager';
-import { GAME_NOT_STARTED } from './round-manager-error';
+import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
 
 const expect = chai.expect;
 
@@ -74,7 +74,7 @@ describe('RoundManager', () => {
 
     describe('getStartGameTime', () => {
         it('should throw if no rounds completed', () => {
-            expect(() => roundManager.getStartGameTime()).to.throw(GAME_NOT_STARTED);
+            expect(() => roundManager.getStartGameTime()).to.throw(ERROR_GAME_NOT_STARTED);
         });
 
         it('should return start date of currentRound if completedRound is empty', () => {
