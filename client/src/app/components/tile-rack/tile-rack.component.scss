@@ -38,6 +38,8 @@ $tile-size: 50px;
         justify-content: space-around;
 
         button {
+            font-size: 0.95em;
+            
             &:not(:last-child) {
                 margin-bottom: 6px;
             }

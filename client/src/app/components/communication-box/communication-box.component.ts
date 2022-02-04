@@ -21,6 +21,8 @@ export class CommunicationBoxComponent {
         { text: 'message 2', sender: 'Mathilde', date: new Date(), class: 'me' },
         { text: 'message 3', sender: 'Raph', date: new Date(), class: 'opponent' },
         { text: 'message 4', sender: 'Mathilde', date: new Date(), class: 'me' },
+        { text: 'Raph a joué ARBRE', sender: '', date: new Date(), class: 'system' },
+        { text: 'message 5', sender: 'Raph', date: new Date(), class: 'opponent' },
         { text: 'message 5', sender: 'Raph', date: new Date(), class: 'opponent' },
         { text: 'message 6', sender: 'Mathilde', date: new Date(), class: 'me' },
         {

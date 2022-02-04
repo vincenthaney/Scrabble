@@ -1,11 +1,11 @@
-$spacing: 12px;
+$spacing: 8px;
 $border-color: rgb(228, 228, 228);
+$primary-color: #1b5e20;
 
 #outer-container {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     box-sizing: border-box;
 
     & > section:not(:last-child) {
@@ -57,30 +57,80 @@ $border-color: rgb(228, 228, 228);
                 overflow-x: scroll;
 
                 .scroll-item {
-                    padding: 3px 6px 6px 6px;
+                    padding: 0 12px;
 
                     p {
                         margin: 0;
 
-                        span.sender {
-                            font-weight: 500;
-                            margin-right: 6px;
-                        }
-                        span.date {
-                            font-size: 0.75em;
+                        &.date {
+                            text-align: center;
+                            font-size: 0.85em;
                             opacity: 0.55;
                         }
-
                         &.message {
-                            opacity: 0.9;
+                            width: fit-content;
+                            max-width: 80%;
+                            padding: 4px 12px;
+                            border-radius: 0.25em;
                         }
                     }
 
+                    &:first-child {
+                        margin-top: 12px;
+
+                        p.message {
+                            border-top-left-radius: 1em;
+                            border-top-right-radius: 1em;
+                        }
+                    }
+
+                    &.system {
+                        text-align: center;
+
+                        p.message {
+                            width: 100%;
+                            max-width: 100%;
+                            margin: 8px 0;
+                            opacity: 0.8;
+                        }
+
+                        & + .me p.message, & + .opponent p.message {
+                            border-top-left-radius: 1em;
+                            border-top-right-radius: 1em;
+                        }
+                    }
                     &.opponent {
-                        p {
-                            span.sender {
-                                color: green;
-                            }
+                        p.message {
+                            background: $primary-color;
+                            color: white;
+                            border-top-right-radius: 1em;
+                            border-bottom-right-radius: 1em;
+                        }
+
+                        & + .opponent {
+                            margin-top: 3px;
+                        }
+                        & + .me p.message {
+                            margin-top: 8px;
+                            border-top-left-radius: 1em;
+                            border-top-right-radius: 1em;
+                        }
+                    }
+                    &.me {
+                        p.message {
+                            margin-left: auto;
+                            background: rgb(216, 216, 216);
+                            border-top-left-radius: 1em;
+                            border-bottom-left-radius: 1em;
+                        }
+
+                        & + .me {
+                            margin-top: 3px;
+                        }
+                        & + .opponent p.message {
+                            margin-top: 8px;
+                            border-top-left-radius: 1em;
+                            border-top-right-radius: 1em;
                         }
                     }
                 }
@@ -123,6 +173,7 @@ $border-color: rgb(228, 228, 228);
 
                 button {
                     flex-grow: 1;
+                    font-size: 0.95em;
 
                     &:not(:last-child) {
                         margin-right: 12px;
