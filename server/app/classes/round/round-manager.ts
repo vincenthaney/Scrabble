@@ -1,6 +1,6 @@
 import Player from '@app/classes/player/player';
 import Round from './round';
-import { GAME_NOT_STARTED } from './round-manager-error';
+import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
 
 const SECONDS_TO_MILLISECONDS = 1000;
 
@@ -23,7 +23,7 @@ export default class RoundManager {
             if (this.currentRound) {
                 return this.currentRound.startTime;
             } else {
-                throw new Error(GAME_NOT_STARTED);
+                throw new Error(ERROR_GAME_NOT_STARTED);
             }
         } else {
             return this.completedRounds[0].startTime;
