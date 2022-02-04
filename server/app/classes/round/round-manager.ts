@@ -47,6 +47,10 @@ export default class RoundManager {
         });
     }
 
+    getCurrentRound() {
+        return this.currentRound;
+    }
+
     private getNextPlayer(): Player {
         if (this.currentRound === undefined) {
             // Randomly get a player
