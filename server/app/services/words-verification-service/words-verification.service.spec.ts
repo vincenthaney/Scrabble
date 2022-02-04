@@ -23,8 +23,7 @@ describe('GamePlayService', () => {
     });
 
     it('should not have any character with accent', () => {
-        const result = () => wordsVerificationService.removeAccents('àbçdé');
-        expect(result).to.be('abcde');
+        expect(wordsVerificationService.removeAccents('àbçdé')).to.equal('abcde');
     });
 
     it('should return error because word too short', () => {
@@ -45,5 +44,11 @@ describe('GamePlayService', () => {
     it('should return error because word is not in dictionary', () => {
         const result = () => wordsVerificationService.verifyWords([['ufdwihfewa']], DICTIONARY_NAME);
         expect(result).to.Throw(INVALID_WORD);
+    });
+
+    it('should return error because word is not in dictionary', () => {
+        const words = [['acagnarderait'], ['hydrolysates']];
+        const result = () => wordsVerificationService.verifyWords(words, DICTIONARY_NAME);
+        expect(result).to.equal(words);
     });
 });
