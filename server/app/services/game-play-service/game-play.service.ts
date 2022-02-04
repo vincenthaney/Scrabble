@@ -7,13 +7,13 @@ import { Tile } from '@app/classes/tile';
 export type ActionType = 'place' | 'exchange' | 'pass';
 
 export interface ActionPlacePayload {
-    tiles: string[];
+    tiles: tile[];
     position: { column: number; row: number };
     orientation: 'vertical' | 'horizontal';
 }
 
 export interface ActionExchangePayload {
-    tiles: string[];
+    tiles: tile[];
 }
 
 export interface ActionData<T extends unknown = unknown> {
@@ -53,6 +53,13 @@ export class GamePlayService {
             }
         }
         const updatedData = action.execute(game, game.getRequestingPlayer(playerId));
+        if (action.willEndTurn()) {
+            game.roundManager.nextRound();
+        }
+        if (game.isGameOver()) {
+            //
+        }
+        return updatedData;
         // const opponentId = game.getOpponentPlayer(playerId).getId();
         // this.socketService.getSocket(playerId).emit('event', 'args');
         // this.socketService.getSocket(opponentId).emit('event', 'args');
