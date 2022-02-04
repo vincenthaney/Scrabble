@@ -14,6 +14,32 @@ $border-color: rgb(228, 228, 228);
         margin-bottom: $spacing;
     }
 
+    section#objectives-container {
+        #tile-map {
+            .tile-map-content {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                flex-wrap: wrap;
+                
+                p {
+                    display: flex;
+                    margin: 0 8px 8px 8px;
+
+                    app-tile {
+                        height: 20px;
+                        width: 20px;
+                        font-size: 0.7em;
+                    }
+
+                    .separator {
+                        margin: 0 4px;
+                    }
+                }
+            }
+        }
+    }
+
     section#text-box-container {
         flex-grow: 1;
         display: flex;

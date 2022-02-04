@@ -1,8 +1,10 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { LetterValue } from '@app/classes/tile';
 
 type Message = { text: string; sender: string; date: Date; class: string };
+type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
     selector: 'app-communication-box',
@@ -44,7 +46,22 @@ export class CommunicationBoxComponent {
 
     objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
-    lettersLeft: string[] = ['A : 2 ', 'B : 1 ', 'C : 2 ', 'D : 0 ', 'E : 4 '];
+    lettersLeft: LetterMapItem[] = [
+        { letter: 'A', amount: 4 },
+        { letter: 'B', amount: 7 },
+        { letter: 'C', amount: 2 },
+        { letter: 'D', amount: 5 },
+        { letter: 'E', amount: 8 },
+        { letter: 'F', amount: 2 },
+        { letter: 'G', amount: 5 },
+        { letter: 'H', amount: 8 },
+        { letter: 'I', amount: 2 },
+        { letter: 'K', amount: 8 },
+        { letter: 'L', amount: 2 },
+        { letter: 'M', amount: 5 },
+        { letter: 'N', amount: 8 },
+        { letter: 'O', amount: 2 },
+    ];
 
     messageForm = new FormGroup({
         content: new FormControl(''),

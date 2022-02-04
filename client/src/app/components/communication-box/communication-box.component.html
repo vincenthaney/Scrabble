@@ -6,9 +6,15 @@
                 <div *ngFor="let obj of objectives">{{obj}}</div>
             </mat-expansion-panel> -->
 
-            <mat-expansion-panel>
+            <mat-expansion-panel id="tile-map" [expanded]="true">
                 <mat-expansion-panel-header>Tuiles restantes : {{lettersLeft.length}}</mat-expansion-panel-header>
-                <span *ngFor="let letter of lettersLeft">{{letter}}</span>
+                <div class="tile-map-content">
+                    <p *ngFor="let letter of lettersLeft">
+                        <app-tile [tile]="{ letter: letter.letter, value: 0 }" [hideValue]="true"></app-tile>
+                        <span class="separator">:</span>
+                        <span class="amount">{{ letter.amount }}</span>
+                    </p>
+                </div>
             </mat-expansion-panel>
         </mat-accordion>
     </section>
