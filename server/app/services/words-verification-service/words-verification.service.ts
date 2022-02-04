@@ -25,7 +25,7 @@ export class WordsVerificationService {
         this.addDictionary();
     }
 
-    // RODO: Create a separate service to manage dictionary importation
+    // TODO: Create a separate service to manage dictionary importation
     async addDictionary() {
         this.activeDictionaries[WordsVerificationConst.DICTIONARY_NAME] = new Set(await this.fetchDictionary());
     }

@@ -7,7 +7,7 @@ import { expect } from 'chai';
 import { WordsVerificationService } from './words-verification.service';
 import { DICTIONARY_NAME } from './words-verification.service.const';
 
-describe('GamePlayService', () => {
+describe('WordsVerificationService', () => {
     let wordsVerificationService: WordsVerificationService;
 
     beforeEach(() => {
@@ -20,6 +20,10 @@ describe('GamePlayService', () => {
 
     beforeEach(() => {
         wordsVerificationService = new WordsVerificationService();
+    });
+
+    it('should contain dictionary', () => {
+        expect(wordsVerificationService.activeDictionaries.has('dictionary')).to.be.true;
     });
 
     it('should not have any character with accent', () => {
@@ -41,12 +45,12 @@ describe('GamePlayService', () => {
         expect(result).to.Throw(WORD_CONTAINS_APOSTROPHE);
     });
 
-    it('should return error because word is not in dictionary', () => {
+    it('should return error if word is not in dictionary', () => {
         const result = () => wordsVerificationService.verifyWords(['ufdwihfewa'], DICTIONARY_NAME);
         expect(result).to.Throw(INVALID_WORD);
     });
 
-    it('should return error because word is not in dictionary', () => {
+    it('should be true when words are in the dictionary', () => {
         const words = ['acagnarderait', 'hydrolysates'];
         const result = () => wordsVerificationService.verifyWords(words, DICTIONARY_NAME);
         expect(result).to.equal(words);
