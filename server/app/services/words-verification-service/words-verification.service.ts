@@ -32,9 +32,9 @@ export class WordsVerificationService {
 
     verifyWords(words: string[][], dictionary: string) {
         for (const word in words) {
-            if (!word) {
+            if (word.length > 0) {
                 this.removeAccents(word);
-                if (words.length < MINIMUM_WORD_LEN) {
+                if (word.length < MINIMUM_WORD_LEN) {
                     throw new Error(WORD_TOO_SHORT);
                 }
                 if (word.includes('-')) {
