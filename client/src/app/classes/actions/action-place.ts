@@ -1,22 +1,23 @@
 import { ActionPlay } from '@app/classes/actions';
+import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Square } from '@app/classes/square';
+import { Tile } from '@app/classes/tile';
 
 export interface ActionPlacePayload {
-    letters: string[];
+    tiles: Tile[];
     startPosition: Position;
-    // eslint-disable-next-line max-len
-    orientation: string; // ne peut pas être une orientation parce sinon ça implique je je dois faire le traitement pour convertir la lettre en Orientation et traiter les erreurs dans le client
+    orientation: Orientation;
 }
 
 export default class ActionPlace extends ActionPlay {
-    lettersToPlace: string[];
+    tilesToPlace: Tile[];
     startingSquare: Square;
-    orientation: string;
+    orientation: Orientation;
 
-    constructor(lettersToPlace: string[], startingSquare: Square, orientation: string) {
+    constructor(tilesToPlace: Tile[], startingSquare: Square, orientation: Orientation) {
         super();
-        this.lettersToPlace = lettersToPlace;
+        this.tilesToPlace = tilesToPlace;
         this.startingSquare = startingSquare;
         this.orientation = orientation;
     }
