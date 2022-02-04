@@ -31,7 +31,7 @@ export class WordsVerificationService {
     }
 
     verifyWords(words: string[], dictionary: string) {
-        for (const word in words) {
+        for (const word of words) {
             if (word.length > 0) {
                 this.removeAccents(word);
                 if (word.length < MINIMUM_WORD_LENGTH) {
