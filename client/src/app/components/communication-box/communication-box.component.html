@@ -22,24 +22,14 @@
         <mat-card>
             <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
                 <div [class]="'scroll-item ' + msg.class" *cdkVirtualFor="let msg of messages">
-                    <!-- <p class="info">
-                        <span class="sender">{{ msg.sender }}</span>
-                        <span class="date">{{ msg.date.getHours() }}:{{ msg.date.getMinutes() }}</span>
-                    </p>
-                    <p class="message">{{ msg.text }}</p> -->
-                    <!-- <p class="info">
-                        <span class="sender">{{ msg.sender }}</span>
-                        <span class="message">{{ msg.text }}</span>
-                    </p> -->
                     <div class="message-container">
-                        <!-- <p class="date">{{ msg.date.getHours() }}:{{ msg.date.getMinutes() }}</p> -->
                         <p class="message">{{ msg.text }}</p>
                     </div>
                 </div>
             </cdk-virtual-scroll-viewport>
             <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
                 <input matInput type="text" formControlName="content" placeholder="Message..." [(ngModel)]="message"/>
-                <button id="send-button" stype="submit" mat-flat-button color="primary">Envoyer</button>
+                <button id="send-button" stype="submit" mat-flat-button color="primary"><app-icon icon="arrow-right"></app-icon></button>
             </form>
         </mat-card>
     </section>
