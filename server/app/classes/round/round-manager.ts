@@ -1,6 +1,9 @@
 import Round from './round';
 
 export default class RoundManager {
+    nextRound() {
+        throw new Error('Method not implemented.');
+    }
     currentRound: Round;
     // private completedRounds: Round[];
     // private maxRoundTime: number;
