@@ -21,16 +21,16 @@ export class WordsVerificationService {
     }
 
     loadAllDictionaries() {
-        // À changer pour une lecture du répertoire de dictionnaires
+        // TODO: Change this to upload all dictionaries within directory
         this.addDictionary();
     }
 
-    // À mettre dans un service à part
+    // RODO: Create a separate service to manage dictionary importation
     async addDictionary() {
         this.activeDictionaries[WordsVerificationConst.DICTIONARY_NAME] = new Set(await this.fetchDictionary());
     }
 
-    verifyWords(words: string[][], dictionary: string) {
+    verifyWords(words: string[], dictionary: string) {
         for (const word in words) {
             if (word.length > 0) {
                 this.removeAccents(word);

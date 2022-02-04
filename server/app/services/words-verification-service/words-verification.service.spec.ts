@@ -27,27 +27,27 @@ describe('GamePlayService', () => {
     });
 
     it('should return error because word too short', () => {
-        const result = () => wordsVerificationService.verifyWords([['a']], DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords(['a'], DICTIONARY_NAME);
         expect(result).to.Throw(WORD_TOO_SHORT);
     });
 
     it('should return error because word contains hyphen', () => {
-        const result = () => wordsVerificationService.verifyWords([['a-a']], DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords(['a-a'], DICTIONARY_NAME);
         expect(result).to.Throw(WORD_CONTAINS_HYPHEN);
     });
 
     it('should return error because word contains apostrophe', () => {
-        const result = () => wordsVerificationService.verifyWords([["aaaa'aaaa"]], DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords(["aaaa'aaaa"], DICTIONARY_NAME);
         expect(result).to.Throw(WORD_CONTAINS_APOSTROPHE);
     });
 
     it('should return error because word is not in dictionary', () => {
-        const result = () => wordsVerificationService.verifyWords([['ufdwihfewa']], DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords(['ufdwihfewa'], DICTIONARY_NAME);
         expect(result).to.Throw(INVALID_WORD);
     });
 
     it('should return error because word is not in dictionary', () => {
-        const words = [['acagnarderait'], ['hydrolysates']];
+        const words = ['acagnarderait', 'hydrolysates'];
         const result = () => wordsVerificationService.verifyWords(words, DICTIONARY_NAME);
         expect(result).to.equal(words);
     });
