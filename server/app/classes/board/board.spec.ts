@@ -3,7 +3,7 @@ import { Tile } from '@app/classes/tile';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
 import { Orientation, Position, Board } from '.';
 import { POSITION_OUT_OF_BOARD } from './board-errors';
-import { Square } from '../square';
+import { Square } from '@app/classes/square';
 import { BOARD_SIZE } from '@app/constants/game';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
@@ -37,13 +37,10 @@ describe('Board', () => {
         }
         board = new Board(grid);
     });
-    /* eslint-disable no-console */
 
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
     /* eslint-disable @typescript-eslint/no-unused-expressions */
     /* eslint-disable no-unused-expressions */
     it('should create', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
         expect(board).to.exist;
     });
 
