@@ -11,18 +11,23 @@ export default class Board {
     constructor(grid: Square[][]) {
         this.grid = grid;
     }
-
+    // Verifies if the position is valid and if the square at the given position in the board has a tile or not
+    verifySquare(position: Position, shouldBeFilled: boolean): boolean {
+        if (position.row >= 0 && position.column >= 0 && position.row <= this.grid.length - 1 && position.column <= this.grid[0].length - 1) {
+            return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
+        } else {
+            throw new Error(POSITION_OUT_OF_BOARD);
+        }
+    }
     placeTile(tile: Tile, position: Position): boolean {
-        if (position.row < 0 || position.row >= this.grid.length || position.column < 0 || position.column >= this.grid[0].length) return false;
-        const targetSquare = this.grid[position.row][position.column];
-        if (targetSquare.tile) return false;
-        targetSquare.tile = tile;
+        if (!this.verifySquare(position, SHOULD_HAVE_NO_TILE)) return false;
+        this.grid[position.row][position.column].tile = tile;
         return true;
     }
 
     placeWord(tiles: Tile[], startPosition: Position, orientation: Orientation): boolean {
         const actualPosition = { ...startPosition };
-        if (tiles.length === 0 || this.grid[startPosition.row][startPosition.column].tile) return false;
+        if (tiles.length === 0 || !this.verifySquare(startPosition, SHOULD_HAVE_NO_TILE)) return false;
         const isVertical = orientation === Orientation.Vertical;
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
@@ -48,14 +53,5 @@ export default class Board {
             square.tile = tile;
         }
         return true;
-    }
-
-    // Verifies if the position is valid and if the square at the given position in the board has a tile or not
-    verifySquare(position: Position, shouldBeFilled: boolean): boolean {
-        if (position.row >= 0 && position.column >= 0 && position.row <= this.grid.length - 1 && position.column <= this.grid[0].length - 1) {
-            return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
-        } else {
-            throw new Error(POSITION_OUT_OF_BOARD);
-        }
     }
 }
