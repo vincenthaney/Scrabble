@@ -52,6 +52,6 @@ describe('WordsVerificationService', () => {
 
     it('should be true when words are in the dictionary', () => {
         const words = ['acagnarderait', 'hydrolysates'];
-        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.equal(words);
+        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
 });
