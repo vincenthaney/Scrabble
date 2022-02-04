@@ -1,3 +1,8 @@
+#outer-container {
+    padding: 0 0 0 12px;
+    box-sizing: border-box;
+}
+
 .scrolling-area {
     height: 200px;
     border: 1px solid black;
@@ -37,18 +42,30 @@ input {
     position: absolute;
     bottom: 10px;
     width: 100%;
-}
 
-.text-buttons {
-    width: 100%;
-    display: inline-flex;
-    justify-content: space-around;
-}
+    mat-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
 
-.text-buttons button {
-    width: 40%;
-    text-align: center;
-    padding: 0;
+        span {
+            font-size: 1.15em;
+        }
+
+        .text-buttons {
+            display: inline-flex;
+            justify-content: space-around;
+    
+            button {
+                text-align: center;
+                padding: 0;
+
+                &:not(:last-child) {
+                    margin-right: 6px;
+                }
+            }
+        }
+    }
 }
 
 mat-accordion {

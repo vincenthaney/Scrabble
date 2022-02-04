@@ -14,12 +14,12 @@ interface ColorTestCase {
 interface GetTextTestCase {
     multiplierName: string;
     multiplier: AbstractScoreMultiplier;
-    expectedText: string;
+    expectedText: [string, string];
 }
 
 class SquareViewWrapper {
-    pSquare: Square;
     squareView: SquareView;
+    private pSquare: Square;
 
     createSquareView() {
         this.squareView = new SquareView(this.square, SQUARE_SIZE);
@@ -41,10 +41,10 @@ describe('SquareView', () => {
     ];
 
     const validTextTestCase: GetTextTestCase[] = [
-        { multiplierName: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedText: 'Lettre x 2' },
-        { multiplierName: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedText: 'Lettre x 3' },
-        { multiplierName: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedText: 'Mot x 2' },
-        { multiplierName: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedText: 'Mot x 3' },
+        { multiplierName: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedText: ['Lettre', '2'] },
+        { multiplierName: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedText: ['Lettre', '3'] },
+        { multiplierName: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedText: ['Mot', '2'] },
+        { multiplierName: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedText: ['Mot', '3'] },
     ];
 
     it('SquareView with no Square associated should throw error when getting color', () => {
@@ -57,7 +57,7 @@ describe('SquareView', () => {
 
     it('SquareView with no Square Multiplier should give default square color', () => {
         const squareView = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
-        expect(squareView.getColor()).toEqual(COLORS.Beige);
+        expect(squareView.getColor()).toEqual(COLORS.Gray);
     });
 
     validColorTestCases.forEach((testCase: ColorTestCase) => {
@@ -68,6 +68,7 @@ describe('SquareView', () => {
         it('SquareView with ' + testText + ' should be of color' + expectedColor, () => {
             const square = {
                 tile: null,
+                position: { row: 0, column: 0 },
                 multiplier,
                 wasMultiplierUsed: false,
                 isCenter: false,
@@ -93,6 +94,7 @@ describe('SquareView', () => {
         );
         const square = {
             tile: null,
+            position: { row: 0, column: 0 },
             multiplier: nullMultiplierEffectSpy,
             wasMultiplierUsed: false,
             isCenter: false,
@@ -118,6 +120,7 @@ describe('SquareView', () => {
         );
         const square = {
             tile: null,
+            position: { row: 0, column: 0 },
             multiplier: negativeMultiplierSpy,
             wasMultiplierUsed: false,
             isCenter: false,
@@ -136,14 +139,14 @@ describe('SquareView', () => {
 
     it('SquareView with no square multiplier should return no text', () => {
         const squareView = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
-        expect(squareView.getText()).toEqual('');
+        expect(squareView.getText()).toEqual([undefined, undefined]);
     });
 
     it('SquareView with square which is the center should return no text', () => {
         const square = UNDEFINED_SQUARE;
         square.isCenter = true;
         const squareView = new SquareView(square, SQUARE_SIZE);
-        expect(squareView.getText()).toEqual('');
+        expect(squareView.getText()).toEqual([undefined, undefined]);
     });
 
     validTextTestCase.forEach((testCase: GetTextTestCase) => {
@@ -154,6 +157,7 @@ describe('SquareView', () => {
         it('SquareView with ' + testText + ' should have text: ' + expectedText, () => {
             const square = {
                 tile: null,
+                position: { row: 0, column: 0 },
                 multiplier,
                 wasMultiplierUsed: false,
                 isCenter: false,

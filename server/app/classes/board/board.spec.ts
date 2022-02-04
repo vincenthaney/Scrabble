@@ -18,7 +18,7 @@ describe('Board', () => {
     let board: Board;
 
     beforeEach(() => {
-        board = new Board();
+        board = new Board([]);
     });
     /* eslint-disable no-console */
 

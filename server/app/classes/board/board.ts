@@ -1,6 +1,6 @@
 import { Orientation, Position } from './';
 import { Tile } from '@app/classes/tile';
-import Square from './square';
+import { Square } from '@app/classes/square';
 import { POSITION_OUT_OF_BOARD } from './board-errors';
 
 export const SHOULD_HAVE_A_TILE = true;
@@ -9,7 +9,6 @@ export default class Board {
     grid: Square[][];
 
     /* eslint-disable @typescript-eslint/no-magic-numbers */
-    // TODO: Change to correct
     constructor() {
         this.grid = [];
         for (let i = 0; i < 15; i++) {
@@ -20,12 +19,14 @@ export default class Board {
                     multiplier: 1,
                     multiplierType: undefined,
                     played: false,
-                    row: i,
-                    column: j,
+                    position: { row: i, column: j},
                 };
                 this.grid[i][j] = square;
             }
         }
+    }
+    constructor(grid: Square[][]) {
+        this.grid = grid;
     }
 
     placeTile(tile: Tile, position: Position): boolean {

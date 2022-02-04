@@ -1,6 +1,7 @@
-import ActionPlay from './action-play';
+import { Orientation } from '@app/classes/board';
+import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
-import { Orientation, Square } from '@app/classes/board';
+import ActionPlay from './action-play';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
