@@ -13,7 +13,6 @@ $primary-color: #1b5e20;
 
     #inner-container {
         width: 100%;
-        max-width: 1070px;
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
         gap: 24px;

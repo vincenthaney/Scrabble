@@ -8,15 +8,16 @@
                 <div class="grid-item-container">
                     <app-board></app-board>
                 </div>
-                <div></div>
                 <div class="grid-item-container">
                     <app-tile-rack></app-tile-rack>
                 </div>
                 <div class="grid-item-container" id="button-group">
-                    <button mat-flat-button id="surrender-dialog-button"(click)="openDialog()" color="primary">Abandonner</button> 
-                    <button mat-flat-button color="primary">Passer</button>
-                    <button mat-flat-button color="primary">Placer</button>
-                    <button mat-flat-button colors="primary">Confirmer action</button>
+                    <mat-card>
+                        <button mat-flat-button id="surrender-dialog-button"(click)="openDialog()" color="primary">Abandonner</button> 
+                        <button mat-flat-button color="primary">Passer</button>
+                        <button mat-flat-button color="primary">Placer</button>
+                        <button mat-flat-button colors="primary">Confirmer action</button>
+                    </mat-card>
                 </div>
             </div>
             <div class="sidebar-section">

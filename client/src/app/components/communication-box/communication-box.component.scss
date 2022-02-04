@@ -3,8 +3,6 @@ $border-color: rgb(228, 228, 228);
 
 #outer-container {
     height: 100%;
-    margin-left: $spacing;
-    padding-bottom: $spacing;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
