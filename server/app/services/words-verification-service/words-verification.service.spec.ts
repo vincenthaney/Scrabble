@@ -1,6 +1,8 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-import { WORD_TOO_SHORT } from '@app/constants/errors';
+// Lint dot-notation must be disabled to access private element
+/* eslint-disable dot-notation */
+// Lint no unused expression must be disabled to use chai syntax
+/* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
+import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { expect } from 'chai';
 import { WordsVerificationService } from './words-verification.service';
 import { DICTIONARY_NAME } from './words-verification.service.const';
@@ -21,22 +23,27 @@ describe('GamePlayService', () => {
     });
 
     it('should not have any character with accent', () => {
-        expect(wordsVerificationService.removeAccents('àbçdé')).to.be('abcde');
+        const result = () => wordsVerificationService.removeAccents('àbçdé');
+        expect(result).to.be('abcde');
     });
 
     it('should return error because word too short', () => {
-        expect(wordsVerificationService.verifyWords([['a']], DICTIONARY_NAME)).to.Throw(WORD_TOO_SHORT);
+        const result = () => wordsVerificationService.verifyWords([['a']], DICTIONARY_NAME);
+        expect(result).to.Throw(WORD_TOO_SHORT);
     });
 
     it('should return error because word contains hyphen', () => {
-        expect(wordsVerificationService.verifyWords([['ho-la']], DICTIONARY_NAME)).to.Throw(WORD_TOO_SHORT);
+        const result = () => wordsVerificationService.verifyWords([['a-a']], DICTIONARY_NAME);
+        expect(result).to.Throw(WORD_CONTAINS_HYPHEN);
     });
 
     it('should return error because word contains apostrophe', () => {
-        expect(wordsVerificationService.verifyWords([["ho'la"]], DICTIONARY_NAME)).to.Throw(WORD_TOO_SHORT);
+        const result = () => wordsVerificationService.verifyWords([["aaaa'aaaa"]], DICTIONARY_NAME);
+        expect(result).to.Throw(WORD_CONTAINS_APOSTROPHE);
     });
 
     it('should return error because word is not in dictionary', () => {
-        expect(wordsVerificationService.verifyWords([["ho'la"]], DICTIONARY_NAME)).to.Throw(WORD_TOO_SHORT);
+        const result = () => wordsVerificationService.verifyWords([['ufdwihfewa']], DICTIONARY_NAME);
+        expect(result).to.Throw(INVALID_WORD);
     });
 });
