@@ -7,31 +7,30 @@ import Player from '@app/classes/player/player';
 
 const INVALID_COMMAND = 'a';
 export default class ActionExchange extends ActionPlay {
-    lettersToExchange: string[];
+    tilesToExchange: Tile[];
 
-    constructor(lettersToExchange: string[]) {
+    constructor(tilesToExchange: Tile[]) {
         super();
-        this.lettersToExchange = lettersToExchange;
+        this.tilesToExchange = tilesToExchange;
     }
 
     execute(game: Game, player: Player): GameUpdateData {
-        const copyLetters = { ...player.tiles };
+        const unusedTiles = { ...player.tiles };
         const tilesToExchange: Tile[] = [];
 
-        for (const letter of this.lettersToExchange) {
-            for (let i = copyLetters.length - 1; i >= 0; i--) {
-                if (copyLetters[i].letter === letter) {
-                    const tile = copyLetters.splice(i, 1);
-                    tilesToExchange.concat(tile);
+        for (const tile of this.tilesToExchange) {
+            for (let i = unusedTiles.length - 1; i >= 0; i--) {
+                if (unusedTiles[i].letter === tile.letter && unusedTiles[i].value === tile.value) {
+                    tilesToExchange.concat(unusedTiles.splice(i, 1));
                     break;
                 }
             }
         }
 
-        if (tilesToExchange.length !== this.lettersToExchange.length) throw new Error(INVALID_COMMAND);
+        if (tilesToExchange.length !== this.tilesToExchange.length) throw new Error(INVALID_COMMAND);
 
         const newTiles = game.tileReserve.swapTiles(tilesToExchange);
-        player.tiles = copyLetters.concat(newTiles);
+        player.tiles = unusedTiles.concat(newTiles);
 
         const response: GameUpdateData = { playerId: player.getId(), player: { tiles: player.tiles } };
         return response;
