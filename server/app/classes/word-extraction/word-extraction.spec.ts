@@ -2,9 +2,11 @@
 /* eslint-disable max-lines */
 import { expect, spy } from 'chai';
 import { Board, Orientation, Position, Square } from '@app/classes/board';
+import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
+
 import { Tile } from '@app/classes/tile';
-import { WordExtraction, SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './word-extraction';
-import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_POSITION_OUT_OF_BOARD, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
+import { WordExtraction } from './word-extraction';
+import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -30,42 +32,12 @@ describe('WordExtraction', () => {
         expect(wordExtraction).to.exist;
     });
 
-    it('verifySquare should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the position is outside the array no matter if a tile is expected', () => {
-        const position: Position = { row: 1, column: 77 };
-        const result1 = () => wordExtraction['verifySquare'](board, position, SHOULD_HAVE_A_TILE);
-        expect(result1).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
-        const result2 = () => wordExtraction['verifySquare'](board, position, SHOULD_HAVE_NO_TILE);
-        expect(result2).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
-    });
-
-    it('verifySquare should return true when the position is valid and there is no tile as expected', () => {
-        const position: Position = { row: 1, column: 7 };
-        expect(wordExtraction['verifySquare'](board, position, SHOULD_HAVE_NO_TILE)).to.be.true;
-    });
-
-    it('verifySquare should return false when the position is valid but there a tile which was not expected', () => {
-        const position: Position = { row: 1, column: 7 };
-        board.grid[position.row][position.column].tile = TILE_O;
-        expect(wordExtraction['verifySquare'](board, position, SHOULD_HAVE_NO_TILE)).to.be.false;
-    });
-
-    it('verifySquare should return true when the position is valid and there a tile as expected', () => {
-        const position: Position = { row: 1, column: 7 };
-        board.grid[position.row][position.column].tile = TILE_O;
-        expect(wordExtraction['verifySquare'](board, position, SHOULD_HAVE_A_TILE)).to.be.true;
-    });
-
-    it('verifySquare should return false when the position is valid but there are no tile when one was expected', () => {
-        const position: Position = { row: 1, column: 7 };
-        expect(wordExtraction['verifySquare'](board, position, SHOULD_HAVE_A_TILE)).to.be.false;
-    });
-
     it('extract should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the board grid is an empty array', () => {
         const startPosition: Position = { row: 1, column: 7 };
         const orientation = Orientation.Vertical;
         board.grid = [[]];
         const result = () => wordExtraction.extract(board, WORD_JAMBON, startPosition, orientation);
-        expect(result).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
+        expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     it('extract should throw an EXTRACTION_TILES_INVALID when the TilesToPlace is empty', () => {
@@ -242,7 +214,7 @@ describe('WordExtraction', () => {
     it('extractLeftWord should throw an error if the given position is out of the board grid', () => {
         const startPosition = { row: -1, column: 100 };
         const result = () => wordExtraction['extractLeftWord'](board, startPosition);
-        expect(result).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
+        expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     /// /////////////////////
@@ -294,7 +266,7 @@ describe('WordExtraction', () => {
     it('extractRightWord should throw an error if the given position is out of the board grid', () => {
         const startPosition = { row: -1, column: 100 };
         const result = () => wordExtraction['extractRightWord'](board, startPosition);
-        expect(result).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
+        expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     it('extractUpWord should return the squares and tiles of the word up of the given empty position (Word middle of board)', () => {
@@ -344,7 +316,7 @@ describe('WordExtraction', () => {
     it('extractUpWord should throw an error if the given position is out of the board grid', () => {
         const startPosition = { row: -1, column: 100 };
         const result = () => wordExtraction['extractUpWord'](board, startPosition);
-        expect(result).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
+        expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     it('extractDownWord should return the squares and tiles of the word down of the given empty position (Word middle of board)', () => {
@@ -394,7 +366,7 @@ describe('WordExtraction', () => {
     it('extractDownWord should throw an error if the given position is out of the board grid', () => {
         const startPosition = { row: -1, column: 100 };
         const result = () => wordExtraction['extractDownWord'](board, startPosition);
-        expect(result).to.throw(EXTRACTION_POSITION_OUT_OF_BOARD);
+        expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     it('extractVerticalWord should return the squares and tiles of the following word {UpWord} + {tileToAdd} + {DownWord}', () => {
@@ -432,25 +404,4 @@ describe('WordExtraction', () => {
         expect(leftSpy).to.have.been.called.once;
         expect(rightSpy).to.have.been.called.once;
     });
-
-    // const verticalSpy = spy.on(WordExtraction, 'extractVerticalWord', () => 'v');
-    // const horizontalSpy = spy.on(WordExtraction, 'extractHorizontalWord', () => 'h');
-    // it('extractHorizontalWord should call extractLeftWord and extractRightWord', () => {
-    //     const rightSpy = spy.on(wordExtraction, 'extractRightWord', () => 'r');
-    //     const leftSpy = spy.on(wordExtraction, 'extractLeftWord', () => 'l');
-    //     const startPosition = { row: 3, column: 3 };
-    //     wordExtraction['extractHorizontalWord'](board, startPosition, TILE_A);
-    //     expect(leftSpy).to.have.been.called.once;
-    //     expect(rightSpy).to.have.been.called.once;
-    // });
-
-    // it('extractVerticalWord should call extractUpWord and extractDownWord', () => {
-    //     const downSpy = spy.on(wordExtraction, 'extractDownWord', () => 'd');
-    //     const upSpy = spy.on(wordExtraction, 'extractUpWord', () => 'u');
-    //     const startPosition = { row: 3, column: 3 };
-
-    //     wordExtraction['extractVerticalWord'](board, startPosition, TILE_A);
-    //     expect(upSpy).to.have.been.called.once;
-    //     expect(downSpy).to.have.been.called.once;
-    // });
 });

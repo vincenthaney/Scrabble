@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import { Tile } from '@app/classes/tile';
-import Board from './board';
-import { Orientation } from '.';
+import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
+import { Orientation, Position, Board } from '.';
+import { POSITION_OUT_OF_BOARD } from './board-errors';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
@@ -116,5 +117,35 @@ describe('Board', () => {
         expect(validateTile(board.grid[startingSquare.row][startingSquare.column].tile, DEFAULT_TILE_C)).to.be.false;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.column].tile, DEFAULT_TILE_B)).to.be.true;
         expect(validateTile(board.grid[startingSquare.row][startingSquare.column + 1].tile, DEFAULT_TILE_A)).to.be.false;
+    });
+
+    it('verifySquare should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the position is outside the array no matter if a tile is expected', () => {
+        const position: Position = { row: 1, column: 77 };
+        const result1 = () => board.verifySquare(position, SHOULD_HAVE_A_TILE);
+        expect(result1).to.throw(POSITION_OUT_OF_BOARD);
+        const result2 = () => board.verifySquare(position, SHOULD_HAVE_NO_TILE);
+        expect(result2).to.throw(POSITION_OUT_OF_BOARD);
+    });
+
+    it('verifySquare should return true when the position is valid and there is no tile as expected', () => {
+        const position: Position = { row: 1, column: 7 };
+        expect(board.verifySquare(position, SHOULD_HAVE_NO_TILE)).to.be.true;
+    });
+
+    it('verifySquare should return false when the position is valid but there a tile which was not expected', () => {
+        const position: Position = { row: 1, column: 7 };
+        board.grid[position.row][position.column].tile = DEFAULT_TILE_A;
+        expect(board.verifySquare(position, SHOULD_HAVE_NO_TILE)).to.be.false;
+    });
+
+    it('verifySquare should return true when the position is valid and there a tile as expected', () => {
+        const position: Position = { row: 1, column: 7 };
+        board.grid[position.row][position.column].tile = DEFAULT_TILE_A;
+        expect(board.verifySquare(position, SHOULD_HAVE_A_TILE)).to.be.true;
+    });
+
+    it('verifySquare should return false when the position is valid but there are no tile when one was expected', () => {
+        const position: Position = { row: 1, column: 7 };
+        expect(board.verifySquare(position, SHOULD_HAVE_A_TILE)).to.be.false;
     });
 });
