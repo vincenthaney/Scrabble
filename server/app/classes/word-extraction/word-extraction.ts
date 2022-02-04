@@ -1,4 +1,5 @@
-import { Board, Orientation, Position, Square } from '@app/classes/board';
+import { Board, Orientation, Position } from '@app/classes/board';
+import { Square } from '@app/classes/square';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from '@app/classes/board/board';
 
 import { Tile } from '@app/classes/tile';
@@ -88,13 +89,13 @@ export class WordExtraction {
         const downWord: [Square, Tile][] = new Array<[Square, Tile]>();
         // go down until you find first empty square or the edge of the board
         let lowerSquare = squarePlaced;
-        if (tilePosition.row < board.grid.length - 1) lowerSquare = board.grid[squarePlaced.row + 1][squarePlaced.column];
-        while (lowerSquare.tile && lowerSquare.row < board.grid.length - 1) {
+        if (tilePosition.row < board.grid.length - 1) lowerSquare = board.grid[squarePlaced.position.row + 1][squarePlaced.position.column];
+        while (lowerSquare.tile && lowerSquare.position.row < board.grid.length - 1) {
             downWord.push([lowerSquare, lowerSquare.tile]);
-            lowerSquare = board.grid[lowerSquare.row + 1][lowerSquare.column];
+            lowerSquare = board.grid[lowerSquare.position.row + 1][lowerSquare.position.column];
         }
 
-        if (lowerSquare.row === board.grid.length - 1 && lowerSquare.tile) {
+        if (lowerSquare.position.row === board.grid.length - 1 && lowerSquare.tile) {
             downWord.push([lowerSquare, lowerSquare.tile]);
         }
 
@@ -108,12 +109,12 @@ export class WordExtraction {
 
         // go up until you find first empty square or the edge of the board
         let higherSquare = squarePlaced;
-        if (tilePosition.row > 0) higherSquare = board.grid[squarePlaced.row - 1][squarePlaced.column];
-        while (higherSquare.tile && higherSquare.row > 0) {
+        if (tilePosition.row > 0) higherSquare = board.grid[squarePlaced.position.row - 1][squarePlaced.position.column];
+        while (higherSquare.tile && higherSquare.position.row > 0) {
             upWord.unshift([higherSquare, higherSquare.tile]);
-            higherSquare = board.grid[higherSquare.row - 1][higherSquare.column];
+            higherSquare = board.grid[higherSquare.position.row - 1][higherSquare.position.column];
         }
-        if (higherSquare.row === 0 && higherSquare.tile) {
+        if (higherSquare.position.row === 0 && higherSquare.tile) {
             upWord.unshift([higherSquare, higherSquare.tile]);
         }
         return upWord;
@@ -126,12 +127,12 @@ export class WordExtraction {
 
         // go left until you find first empty square or the edge of the board
         let leftSquare = squarePlaced;
-        if (tilePosition.column > 0) leftSquare = board.grid[squarePlaced.row][squarePlaced.column - 1];
-        while (leftSquare.tile && leftSquare.column > 0) {
+        if (tilePosition.column > 0) leftSquare = board.grid[squarePlaced.position.row][squarePlaced.position.column - 1];
+        while (leftSquare.tile && leftSquare.position.column > 0) {
             leftWord.unshift([leftSquare, leftSquare.tile]);
-            leftSquare = board.grid[leftSquare.row][leftSquare.column - 1];
+            leftSquare = board.grid[leftSquare.position.row][leftSquare.position.column - 1];
         }
-        if (leftSquare.column === 0 && leftSquare.tile) {
+        if (leftSquare.position.column === 0 && leftSquare.tile) {
             leftWord.unshift([leftSquare, leftSquare.tile]);
         }
         return leftWord;
@@ -144,12 +145,12 @@ export class WordExtraction {
 
         // go right until you find first empty square or the edge of the board
         let rightSquare = squarePlaced;
-        if (tilePosition.column < board.grid[0].length - 1) rightSquare = board.grid[squarePlaced.row][squarePlaced.column + 1];
-        while (rightSquare.tile && rightSquare.column < board.grid.length - 1) {
+        if (tilePosition.column < board.grid[0].length - 1) rightSquare = board.grid[squarePlaced.position.row][squarePlaced.position.column + 1];
+        while (rightSquare.tile && rightSquare.position.column < board.grid.length - 1) {
             rightWord.push([rightSquare, rightSquare.tile]);
-            rightSquare = board.grid[rightSquare.row][rightSquare.column + 1];
+            rightSquare = board.grid[rightSquare.position.row][rightSquare.position.column + 1];
         }
-        if (rightSquare.column === board.grid.length - 1 && rightSquare.tile) {
+        if (rightSquare.position.column === board.grid.length - 1 && rightSquare.tile) {
             rightWord.push([rightSquare, rightSquare.tile]);
         }
         return rightWord;

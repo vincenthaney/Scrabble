@@ -8,23 +8,6 @@ export const SHOULD_HAVE_NO_TILE = false;
 export default class Board {
     grid: Square[][];
 
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
-    constructor() {
-        this.grid = [];
-        for (let i = 0; i < 15; i++) {
-            this.grid[i] = [];
-            for (let j = 0; j < 15; j++) {
-                const square = {
-                    tile: undefined,
-                    multiplier: 1,
-                    multiplierType: undefined,
-                    played: false,
-                    position: { row: i, column: j},
-                };
-                this.grid[i][j] = square;
-            }
-        }
-    }
     constructor(grid: Square[][]) {
         this.grid = grid;
     }

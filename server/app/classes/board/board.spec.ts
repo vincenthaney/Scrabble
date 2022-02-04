@@ -3,22 +3,39 @@ import { Tile } from '@app/classes/tile';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
 import { Orientation, Position, Board } from '.';
 import { POSITION_OUT_OF_BOARD } from './board-errors';
+import { Square } from '../square';
+import { BOARD_SIZE } from '@app/constants/game';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
 const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
 const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
 
-const validateTile = (tileToValidate: Tile | undefined, tileExpected: Tile | undefined): boolean => {
+const validateTile = (tileToValidate: Tile | null, tileExpected: Tile | null): boolean => {
     if (!tileToValidate || !tileExpected) return false;
     return tileToValidate.letter === tileExpected.letter && tileToValidate.value === tileExpected.value;
 };
 
 describe('Board', () => {
     let board: Board;
+    let grid: Square[][];
 
     beforeEach(() => {
-        board = new Board([]);
+        grid = [];
+        for (let i = 0; i < BOARD_SIZE.y; i++) {
+            grid[i] = [];
+            for (let j = 0; j < BOARD_SIZE.x; j++) {
+                const square = {
+                    tile: null,
+                    position: { row: i, column: j },
+                    multiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                };
+                grid[i][j] = square;
+            }
+        }
+        board = new Board(grid);
     });
     /* eslint-disable no-console */
 
@@ -30,24 +47,6 @@ describe('Board', () => {
         expect(board).to.exist;
     });
 
-    // TODO: CHANGER POUR CONSTANTE THOM
-    it('should create a board with 15 columns', () => {
-        expect(board.grid.length).to.equal(15);
-    });
-
-    it('should create a board with 15 rows', () => {
-        expect(board.grid[0].length).to.equal(15);
-    });
-
-    // it('should create a board with all empty squares', () => {
-    //     for (let i = 0; i < 15; i++) {
-    //         for (let j = 0; j < 15; i++) {
-    //             console.log(board.grid[i][j].tile);
-    //             expect(board.grid[i][j].tile).to.be.undefined;
-    //         }
-    //     }
-    // });
-
     it('place Tile should place a Tile and return true at the desired Square', () => {
         const targetPosition = { row: 5, column: 3 };
         expect(board.placeTile(DEFAULT_TILE_A, targetPosition)).to.be.true;
@@ -55,12 +54,12 @@ describe('Board', () => {
     });
 
     it('place Tile should not place a Tile and return false if it is outside of the board', () => {
-        const targetPosition = { row: 16, column: 3 };
+        const targetPosition = { row: board.grid.length + 1, column: 3 };
         expect(board.placeTile(DEFAULT_TILE_A, targetPosition)).to.be.false;
     });
 
     it('place Tile should not place a Tile and return false if it is outside of the board', () => {
-        const targetPosition = { row: 6, column: 31 };
+        const targetPosition = { row: 6, column: board.grid[0].length + 1 };
         board.placeTile(DEFAULT_TILE_A, targetPosition);
     });
 
@@ -120,7 +119,7 @@ describe('Board', () => {
     });
 
     it('verifySquare should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the position is outside the array no matter if a tile is expected', () => {
-        const position: Position = { row: 1, column: 77 };
+        const position: Position = { row: 1, column: board.grid[0].length + 1 };
         const result1 = () => board.verifySquare(position, SHOULD_HAVE_A_TILE);
         expect(result1).to.throw(POSITION_OUT_OF_BOARD);
         const result2 = () => board.verifySquare(position, SHOULD_HAVE_NO_TILE);

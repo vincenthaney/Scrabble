@@ -4,7 +4,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
 import { BOARD_SIZE } from '@app/constants/game';
 import { Service } from 'typedi';
-import * as BOARD_ERROS from './board.service.error';
+import * as BOARD_ERRORS from './board.service.error';
 
 @Service()
 export default class BoardService {
@@ -30,13 +30,13 @@ export default class BoardService {
         return new Board(grid);
     }
     private readScoreMultiplierConfig(position: Position): Multiplier {
-        if (!this.isBoardConfigDefined(position)) throw new Error(BOARD_ERROS.BOARD_CONFIG_UNDEFINED_AT(position));
+        if (!this.isBoardConfigDefined(position)) throw new Error(BOARD_ERRORS.BOARD_CONFIG_UNDEFINED_AT(position));
         return this.parseSquareConfig(BOARD_CONFIG[position.row][position.column]);
     }
 
     private parseSquareConfig(data: string): Multiplier {
         if (BOARD_CONFIG_MAP.get(data) === undefined) {
-            throw new Error(BOARD_ERROS.NO_MULTIPLIER_MAPPED_TO_INPUT(data));
+            throw new Error(BOARD_ERRORS.NO_MULTIPLIER_MAPPED_TO_INPUT(data));
         }
         return BOARD_CONFIG_MAP.get(data) as Multiplier;
     }

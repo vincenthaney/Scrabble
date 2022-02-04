@@ -1,9 +1,11 @@
+/* eslint-disable no-console */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 import { expect, spy } from 'chai';
-import { Board, Orientation, Position, Square } from '@app/classes/board';
+import { Board, Orientation, Position } from '@app/classes/board';
+import { Square } from '@app/classes/square';
 import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
-
+import { BOARD_SIZE } from '@app/constants/game';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from './word-extraction';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
@@ -19,8 +21,23 @@ const WORD_BON: Tile[] = [TILE_B, TILE_O, TILE_N];
 
 describe('WordExtraction', () => {
     let board: Board;
+    let grid: Square[][];
     beforeEach(async () => {
-        board = new Board();
+        grid = [];
+        for (let i = 0; i < BOARD_SIZE.y; i++) {
+            grid[i] = [];
+            for (let j = 0; j < BOARD_SIZE.x; j++) {
+                const square = {
+                    tile: null,
+                    position: { row: i, column: j },
+                    multiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                };
+                grid[i][j] = square;
+            }
+        }
+        board = new Board(grid);
     });
 
     it('should create', () => {
@@ -31,6 +48,8 @@ describe('WordExtraction', () => {
     it('extract should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the board grid is an empty array', () => {
         const startPosition: Position = { row: 1, column: 7 };
         const orientation = Orientation.Vertical;
+        console.log(board);
+        console.log(board.grid);
         board.grid = [[]];
         const result = () => WordExtraction.extract(board, WORD_JAMBON, startPosition, orientation);
         expect(result).to.throw(POSITION_OUT_OF_BOARD);
