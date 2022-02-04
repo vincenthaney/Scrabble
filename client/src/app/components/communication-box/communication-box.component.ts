@@ -9,7 +9,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
 @Component({
     selector: 'app-communication-box',
     templateUrl: './communication-box.component.html',
-    styleUrls: ['./communication-box.component.scss'],
+    styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunicationBoxComponent {
