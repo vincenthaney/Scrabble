@@ -17,12 +17,15 @@ export class TileRackComponent implements OnInit {
 
     private initializeTileRack() {
         this.tiles = [];
-        if (!this.gameService.getLocalPlayer() || !this.gameService.getLocalPlayer().tiles) {
+        if (!this.gameService.getLocalPlayer() || !this.gameService.getLocalPlayer().getTiles()) {
             return;
         }
 
-        this.gameService.getLocalPlayer().tiles.forEach((tile: Tile) => {
-            this.tiles.push({ letter: tile.letter, value: tile.value });
-        });
+        this.gameService
+            .getLocalPlayer()
+            .getTiles()
+            .forEach((tile: Tile) => {
+                this.tiles.push({ letter: tile.letter, value: tile.value });
+            });
     }
 }

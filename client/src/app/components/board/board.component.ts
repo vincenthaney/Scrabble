@@ -43,7 +43,7 @@ export class BoardComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.gridSize = { x: board.length, y: board[0].length };
+        this.gridSize = { x: board[0].length, y: board.length };
         this.squareGrid = [];
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];

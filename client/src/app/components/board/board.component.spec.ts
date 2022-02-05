@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { CommonModule } from '@angular/common';
+import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,8 +23,10 @@ import { BoardComponent } from './board.component';
 class MockBoardService {
     static boardServiceGridSize: Vec2 = { x: 5, y: 5 };
     pGrid: Square[][];
+    boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
+    boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
 
-    constructor() {
+    createGrid() {
         this.grid = [];
         for (let i = 0; i < this.getGridSize().y; i++) {
             this.grid.push([]);
@@ -106,6 +109,8 @@ describe('BoardComponent', () => {
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        mockBoardService.createGrid();
+        component['initializeBoard'](mockBoardService.grid);
     });
 
     it('should create', () => {
@@ -130,24 +135,27 @@ describe('BoardComponent', () => {
                 expectedBoardSize.y,
             () => {
                 spyOn<any>(mockBoardService, 'getGridSize').and.returnValue(boardSize);
-
+                mockBoardService.createGrid();
                 // Recreate the component so it reads the new grid size
                 fixture = TestBed.createComponent(BoardComponent);
                 component = fixture.componentInstance;
                 fixture.detectChanges();
 
-                component['initializeBoard']();
+                component['initializeBoard'](mockBoardService.grid);
 
-                const actualRowAmount = component.squareGrid.length;
+                let actualRowAmount = 0;
+                let actualColAmount = 0;
 
-                /*
+                if (component.squareGrid) {
+                    actualRowAmount = component.squareGrid.length;
+                    /*
                     If the Grid size is supposed to be smaller or equal to 0,
                     then each row of the grid will not be initialized.
                     So if the row is undefined, its length is 0
                     If the expected size is greater than 0, then the row length is defined
                 */
-                const actualColAmount = component.squareGrid[0] ? component.squareGrid[0].length : 0;
-
+                    actualColAmount = component.squareGrid[0] ? component.squareGrid[0].length : 0;
+                }
                 const actualBoardSize: Vec2 = { x: actualColAmount, y: actualRowAmount };
                 expect(actualBoardSize).toEqual(expectedBoardSize);
             },
@@ -160,12 +168,12 @@ describe('BoardComponent', () => {
 
     it('If BoardService returns grid with null squares, should assign UNDEFINED_SQUARE to board', () => {
         const grid = [
-            [MockBoardService.mockSquare, null],
-            [MockBoardService.mockSquare, null],
+            [UNDEFINED_SQUARE, null],
+            [UNDEFINED_SQUARE, null],
         ];
         const expectedGrid = [
-            [MockBoardService.mockSquare, UNDEFINED_SQUARE],
-            [MockBoardService.mockSquare, UNDEFINED_SQUARE],
+            [UNDEFINED_SQUARE, UNDEFINED_SQUARE],
+            [UNDEFINED_SQUARE, UNDEFINED_SQUARE],
         ];
         spyOn<any>(mockBoardService, 'getGridSize').and.returnValue({ x: 2, y: 2 });
 
@@ -176,6 +184,7 @@ describe('BoardComponent', () => {
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        component['initializeBoard'](mockBoardService.grid);
 
         const actualSquareGrid = component.squareGrid.map((row: SquareView[]) => {
             return row.map((sv: SquareView) => sv.square);
