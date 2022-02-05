@@ -5,6 +5,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -28,7 +29,7 @@ export class GameCreationPageComponent implements OnInit {
         dict: new FormControl('', Validators.required),
     });
 
-    constructor(private router: Router) {}
+    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit() {
         this.gameParameters.get('gameMode')?.valueChanges.subscribe((value) => {
@@ -55,6 +56,7 @@ export class GameCreationPageComponent implements OnInit {
 
     createGame() {
         // send new game request to server (?)
-        this.router.navigateByUrl('create-waiting');
+        this.gameDispatcherService.handleCreateGame(this.child.playerName, this.gameParameters);
+        this.router.navigateByUrl('waiting-room');
     }
 }

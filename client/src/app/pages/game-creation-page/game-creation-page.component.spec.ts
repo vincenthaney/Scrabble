@@ -1,6 +1,7 @@
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { CommonModule, Location } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { GameCreationPageComponent } from './game-creation-page.component';
 
 @Component({
@@ -36,6 +38,7 @@ describe('GameCreationPageComponent', () => {
             declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent],
             imports: [
                 AppMaterialModule,
+                HttpClientModule,
                 BrowserAnimationsModule,
                 FormsModule,
                 ReactiveFormsModule,
@@ -46,12 +49,12 @@ describe('GameCreationPageComponent', () => {
                 MatSelectModule,
                 MatInputModule,
                 RouterTestingModule.withRoutes([
-                    { path: 'create-waiting', component: TestComponent },
+                    { path: 'waiting-room', component: TestComponent },
                     { path: 'home', component: TestComponent },
                     { path: 'game-creation', component: GameCreationPageComponent },
                 ]),
             ],
-            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness],
+            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness, GameDispatcherService],
         }).compileComponents();
     });
 
@@ -262,7 +265,7 @@ describe('GameCreationPageComponent', () => {
         createButton.click();
 
         return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/create-waiting');
+            expect(location.path()).toBe('/waiting-room');
         });
     });
 
