@@ -67,16 +67,17 @@ describe('ActionPlace', () => {
     it('Should call swapTiles with the correct TileArray', () => {
         action.execute(game as unknown as Game, DEFAULT_PLAYER_1);
         assert.calledWith(swapStub, VALID_TILES_TO_EXCHANGE);
-
     });
 
     it('Should call give the correct tiles to the player', () => {
+        action = new ActionExchange(VALID_TILES_TO_EXCHANGE);
         action.execute(game as unknown as Game, DEFAULT_PLAYER_1);
         const EXPECTED_TILES: Tile[] = [{ letter: 'a' as LetterValue, value: 1 }].concat(RETURNED_TILES);
         expect(game.player1.tiles).to.deep.equal(EXPECTED_TILES);
     });
 
     it('Should return the correct GameDataUpdate', () => {
+        action = new ActionExchange(VALID_TILES_TO_EXCHANGE);
         const result = action.execute(game as unknown as Game, DEFAULT_PLAYER_1);
         // TODO Clarify what to specify
         const EXPECTED_TILES: Tile[] = [{ letter: 'a' as LetterValue, value: 1 }].concat(RETURNED_TILES);
@@ -92,6 +93,7 @@ describe('ActionPlace', () => {
 
     for (const testCase of INVALID_CASES) {
         it('Should throw an INVALID_COMMAND error', () => {
+            action = new ActionExchange(testCase);
             const result = () => action.execute(game as unknown as Game, DEFAULT_PLAYER_1);
             // TODO Clarify what to specify
             expect(result).to.throw(INVALID_COMMAND);
