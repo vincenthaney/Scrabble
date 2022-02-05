@@ -127,4 +127,16 @@ describe('RoundManager', () => {
             expect(spy).to.have.been.called();
         });
     });
+
+    it('getCurrentRound should return the current currentRound', () => {
+        const CURRENT_ROUND = {
+            player: DEFAULT_PLAYER_1,
+            startTime: new Date(),
+            limitTime: new Date(),
+            completedTime: null,
+        };
+        roundManager['currentRound'] = CURRENT_ROUND;
+        roundManager.getCurrentRound();
+        expect(roundManager.getCurrentRound()).to.deep.equal(CURRENT_ROUND);
+    });
 });
