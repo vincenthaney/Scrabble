@@ -11,7 +11,7 @@
     </button>
 </div> -->
 
-<div class="tile" [style.background]="'url(' + bgPath + ')'" [style.fontSize]="fontSize">
+<div [class]="'tile' + (hideValue ? ' hide-value' : '')" [style.background]="'url(' + bgPath + ')'" [style.fontSize]="fontSize">
     <p class="letter">{{ tile.letter }}</p>
     <p class="value">{{ tile.value }}</p>
 </div>
