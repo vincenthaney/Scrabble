@@ -4,9 +4,11 @@ import { expect } from 'chai';
 import { ActionPlace } from '.';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { createStubInstance, SinonStubbedInstance, spy, assert } from 'sinon';
+import { createStubInstance, SinonStubbedInstance, spy, assert, stub } from 'sinon';
 import { Tile } from '@app/classes/tile';
-import { Orientation, Position, Square } from '../board';
+import { Orientation, Position } from '@app/classes/board';
+import { Square } from '@app/classes/square';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 
 // player1: Player;
 // player2: Player;
@@ -45,9 +47,18 @@ const DEFAULT_POSITION: Position = { row: 7, column: 7 };
 
 const DEFAULT_TILE_A = { letter: 'a', value: 1 };
 const DEFAULT_TILE_B = { letter: 'b', value: 3 };
-const DEFAULT_SQUARE_1 = { tile: null, };
+const DEFAULT_SQUARE_1 = { tile: null };
 
-const EXTRACT_RETURN: [Square, Tile][][] = [[[DEFAULT_SQUARE_1, DEFAULT_TILE_A],[DEFAULT_SQUARE_1, DEFAULT_TILE_B] ], [[DEFAULT_SQUARE_2, DEFAULT_TILE_A], [DEFAULT_SQUARE_1, DEFAULT_TILE_B]]];
+const EXTRACT_RETURN: [Square, Tile][][] = [
+    [
+        [DEFAULT_SQUARE_1, DEFAULT_TILE_A],
+        [DEFAULT_SQUARE_1, DEFAULT_TILE_B],
+    ],
+    [
+        [DEFAULT_SQUARE_2, DEFAULT_TILE_A],
+        [DEFAULT_SQUARE_1, DEFAULT_TILE_B],
+    ],
+];
 
 describe('ActionPlace', () => {
     let action: ActionPlace;
@@ -58,24 +69,24 @@ describe('ActionPlace', () => {
         game.player1.tiles = TILES_PLAYER_1;
     });
 
-        let game: SinonStubbedInstance<Game>;
-        let extractStub;
-        let validateStub;
-        let scoreComputeStub;
+    let game: SinonStubbedInstance<Game>;
+    let extractStub;
+    let validateStub;
+    let scoreComputeStub;
 
-        beforeEach(() => {
-            game = createStubInstance(Game);
-            // spy(game.tileReserve, 'swapTiles', () => { return RETURNED_TILES; });
-            extractStub = stub(WordExtraction, 'extract').callsFake(() => {
-                return EXTRACT_RETURN;
-            });
-
-            validateStub = stub(WordValidation, 'validate').callsFake(() => {
-                return true;
-            });
-            game.player1.tiles = TILES_PLAYER_1;
-            // game.tileReserve.swapTiles({ return [];});
+    beforeEach(() => {
+        game = createStubInstance(Game);
+        // spy(game.tileReserve, 'swapTiles', () => { return RETURNED_TILES; });
+        extractStub = stub(WordExtraction, 'extract').callsFake(() => {
+            return EXTRACT_RETURN;
         });
+
+        validateStub = stub(WordValidation, 'validate').callsFake(() => {
+            return true;
+        });
+        game.player1.tiles = TILES_PLAYER_1;
+        // game.tileReserve.swapTiles({ return [];});
+    });
 
     it('should create', () => {
         action = new ActionPlace(VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);

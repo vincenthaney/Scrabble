@@ -1,10 +1,10 @@
 import ActionPlay from './action-play';
-import { LetterValue, Tile } from '@app/classes/tile';
-import { Orientation, Position, Square, Square, Square } from '@app/classes/board';
+import { Tile } from '@app/classes/tile';
+import { Orientation, Position } from '@app/classes/board';
 import Game from '@app/classes/game/game';
 import { GameUpdateData } from '@app/classes/game/game-update-data';
 import Player from '@app/classes/player/player';
-import TileReserve from '../tile/tile-reserve';
+import { Square } from '@app/classes/square';
 
 export const WILDCARD_IN_PLACE_ACTION =
     "You can't place a wildcard ('*') on the board, it must have the Capital letter of the letter it will represent";
@@ -56,7 +56,7 @@ export default class ActionPlace extends ActionPlay {
             }
         }
 
-        if (tilesToPlace.length !== this.tilesToPlacepars.length) throw new Error(INVALID_COMMAND);
+        if (tilesToPlace.length !== this.tilesToPlace.length) throw new Error(INVALID_COMMAND);
         const createdWords: [Square, Tile][][] = WordExtraction.extract(game.board, tilesToPlace, this.startPosition, this.orientation);
         const wordsString: string[] = [];
         for (const word of createdWords) {

@@ -1,42 +1,93 @@
-#outer-container {
-    width: 100%;
+@import '../../style/utils.scss';
+
+$name-score-spacing: 12px;
+$primary-color: #1b5e20;
+
+#outer-container { 
+    @include no-select;
     height: 100%;
-}
-
-#inner-container {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    line-height: 7px;
-    margin: 15px 10vw;
-    vertical-align: middle;
     align-items: center;
-}
+    justify-content: center;
+    cursor: default;
 
-.player-info-container {
-    display: flex;
-    flex-direction: column;
-    vertical-align: middle;
-}
+    #inner-container {
+        width: 100%;
+        max-width: 1070px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 24px;
+        padding: 8px 12px;
+        box-sizing: border-box;
 
-.player-name {
-    font-size: 1.5em;
-    font-weight: 500;
-    padding-bottom: 5px;
-}
+        p {
+            @include no-select;
+            cursor: default;
+            margin: 0;
+            line-height: 1em;
+        }
 
-#player-info-2 {
-    text-align: right;
-}
+        .player-info {
+            flex-grow: 1;
 
-#time-left-container {
-    text-align: center;
-    border-color:black;
-    border-width: 5px;
-}
+            .player-name {
+                line-height: 1.2em;
+                font-size: 1.5em;
+                font-weight: 500;
+                margin-bottom: 3px;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
-#time-left {
-    font-size: 2em;
-    font-weight: 500;
-    margin-top: 15px;
+                .score {
+                    vertical-align: middle;
+                    font-weight: 400;
+                    background: $primary-color;
+                    color: white;
+                    font-size: 0.7em;
+                    padding: 0.2em 0.5em;
+                    border-radius: 20px;
+                }
+            }
+
+            &#player-info-1 {
+                text-align: left;
+
+                .player-name .score {
+                    margin-left: $name-score-spacing;
+                    font-weight: 400;
+                }
+            }
+            &#player-info-2 {
+                text-align: right;
+
+                .player-name .score {
+                    margin-right: $name-score-spacing;
+                    font-weight: 400;
+                }
+            }
+        }
+
+        #time-left-container {
+            #time-left {
+                font-size: 2em;
+                font-weight: 500;
+                margin-top: 4px;
+
+                .separator {
+                    @keyframes blinking {
+                        0% { visibility: visible; opacity: 1; }
+                        74% { visibility: visible; opacity: 1; }
+                        75% { visibility: hidden; opacity: 0; }
+                        100% { visibility: hidden; opacity: 0; }
+                    }
+
+                    animation-name: blinking;
+                    animation-duration: 1.2s;
+                    animation-iteration-count: infinite;
+                }
+            }
+        }
+    }
 }

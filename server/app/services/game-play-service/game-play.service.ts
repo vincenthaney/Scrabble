@@ -1,25 +1,11 @@
 import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { ActionData } from '@app/classes/communication/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+// import { HttpException } from '@app/classes/http.exception';
 import { Service } from 'typedi';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { Tile } from '@app/classes/tile';
 // import { SocketService } from '@app/services/socket-service/socket.service';
 
-export type ActionType = 'place' | 'exchange' | 'pass';
-
-export interface ActionPlacePayload {
-    tiles: tile[];
-    position: { column: number; row: number };
-    orientation: 'vertical' | 'horizontal';
-}
-
-export interface ActionExchangePayload {
-    tiles: tile[];
-}
-
-export interface ActionData<T extends unknown = unknown> {
-    type: ActionType;
-    payload: T;
-}
 const INVALID_COMMAND = 'The command is not one of the recognised commands. type !help for a list of possible commands';
 const NOT_PLAYER_TURN = 'It is not the turn of requesting player';
 
@@ -29,7 +15,7 @@ export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService) {}
 
     // playAction(gameId: string, playerId: string, action: Action) {  //GameUpdateData {
-    playAction(gameId: string, playerId: string, actionData: ActionData): void {
+    playAction(gameId: string, playerId: string, actionData: ActionData): GameUpdateData {
         const game = this.activeGameService.getGame(gameId, playerId);
         const currentPlayer = game.getCurrentPlayer();
         if (currentPlayer.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
