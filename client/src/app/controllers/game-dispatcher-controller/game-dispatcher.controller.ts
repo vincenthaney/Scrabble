@@ -11,6 +11,7 @@ export class GameDispatcherController extends SocketController {
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     constructor(private http: HttpClient) {
         super();
+        this.connect();
     }
 
     configureSocket(): void {
@@ -18,7 +19,7 @@ export class GameDispatcherController extends SocketController {
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfig): void {
-        const endpoint = `${environment.serverUrl}/games/`;
+        const endpoint = `${environment.serverUrl}/games/${this.getId()}`;
         this.http.post<{ id: string }>(endpoint, gameConfig).subscribe(); // Add handling of the lobby creation
     }
 
