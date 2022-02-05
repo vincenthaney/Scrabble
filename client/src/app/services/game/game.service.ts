@@ -18,11 +18,13 @@ export default class GameService {
     gameType: GameType;
     dictionnaryName: string;
     private gameId: string;
+    private localPlayerId: string;
 
     constructor(private boardService: BoardService, private roundManager: RoundManagerService) {}
 
-    initializeMultiplayerGame(startGameData: StartMultiplayerGameData) {
+    initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
         this.gameId = startGameData.gameId;
+        this.localPlayerId = localPlayerId;
         this.player1 = startGameData.player1;
         this.player2 = startGameData.player2;
         this.gameType = startGameData.gameType;
@@ -56,8 +58,9 @@ export default class GameService {
         return this.gameId;
     }
 
-    getLocalPlayer(): IPlayer {
-        return this.player1;
+    getLocalPlayer(): IPlayer | undefined {
+        if (!this.localPlayerId) return undefined;
+        return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
     }
 
     gameOver(): boolean {

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { GameService } from '@app/services';
 
@@ -17,15 +18,13 @@ export class TileRackComponent implements OnInit {
 
     private initializeTileRack() {
         this.tiles = [];
-        if (!this.gameService.getLocalPlayer() || !this.gameService.getLocalPlayer().getTiles()) {
+        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        if (!localPlayer || !localPlayer.getTiles()) {
             return;
         }
 
-        this.gameService
-            .getLocalPlayer()
-            .getTiles()
-            .forEach((tile: Tile) => {
-                this.tiles.push({ letter: tile.letter, value: tile.value });
-            });
+        localPlayer.getTiles().forEach((tile: Tile) => {
+            this.tiles.push({ letter: tile.letter, value: tile.value });
+        });
     }
 }

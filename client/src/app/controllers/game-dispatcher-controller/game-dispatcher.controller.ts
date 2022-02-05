@@ -19,7 +19,7 @@ export class GameDispatcherController extends SocketController {
 
     configureSocket(): void {
         this.on('joinRequest', (opponentName: string) => this.joinRequestEvent.emit(opponentName));
-        this.on('startGame', (startGameData: StartMultiplayerGameData) => this.gameService.initializeMultiplayerGame(startGameData));
+        this.on('startGame', (startGameData: StartMultiplayerGameData) => this.gameService.initializeMultiplayerGame(this.getId(), startGameData));
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
