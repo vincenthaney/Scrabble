@@ -55,8 +55,7 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     createGame() {
-        // send new game request to server (?)
-        this.gameDispatcherService.handleCreateGame(this.child.playerName, this.gameParameters);
         this.router.navigateByUrl('waiting-room');
+        this.gameDispatcherService.handleCreateGame(this.child.playerName, this.gameParameters);
     }
 }

@@ -19,6 +19,7 @@ import { NameFieldComponent } from '@app/components/name-field/name-field.compon
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { GameCreationPageComponent } from './game-creation-page.component';
+import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -30,8 +31,12 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
-
+    let gameDispatcherSpy: SpyObj<GameDispatcherService>;
     const EMPTY_VALUE = '';
+
+    beforeEach(() => {
+        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleCreateGame']);
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -54,7 +59,12 @@ describe('GameCreationPageComponent', () => {
                     { path: 'game-creation', component: GameCreationPageComponent },
                 ]),
             ],
-            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness, GameDispatcherService],
+            providers: [
+                MatButtonToggleHarness,
+                MatButtonHarness,
+                MatButtonToggleGroupHarness,
+                { provide: GameDispatcherService, useValue: gameDispatcherSpy },
+            ],
         }).compileComponents();
     });
 
@@ -267,6 +277,15 @@ describe('GameCreationPageComponent', () => {
         return fixture.whenStable().then(() => {
             expect(location.path()).toBe('/waiting-room');
         });
+    });
+
+    it('createGame button should send game to GameDispatcher service if valid', async () => {
+        setValidFormValues();
+
+        const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+        createButton.click();
+
+        expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
     });
 
     it('back button should reroute to home page', async () => {
