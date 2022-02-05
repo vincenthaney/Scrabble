@@ -52,6 +52,10 @@ export default class GameService {
         return this.gameId;
     }
 
+    getLocalPlayer(): IPlayer {
+        return this.player1;
+    }
+
     gameOver(): boolean {
         throw new Error('Method not implemented.');
     }

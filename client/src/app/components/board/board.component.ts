@@ -20,6 +20,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     boardUpdateSubscription: Subscription;
 
     constructor(private boardService: BoardService) {
+        this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }

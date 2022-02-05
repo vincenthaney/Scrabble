@@ -17,20 +17,6 @@ export class TileRackComponent implements OnInit {
 
     private initializeTileRack() {
         this.tiles = [];
-        // eslint-disable-next-line dot-notation
-        this.gameService['localPlayer'] = {
-            name: 'test',
-            score: 0,
-            tiles: [
-                { letter: 'A', value: 1 },
-                { letter: 'B', value: 2 },
-                { letter: 'C', value: 3 },
-                { letter: 'D', value: 4 },
-                { letter: 'B', value: 2 },
-                { letter: 'C', value: 3 },
-                { letter: 'D', value: 4 },
-            ],
-        };
         if (!this.gameService.getLocalPlayer() || !this.gameService.getLocalPlayer().tiles) {
             return;
         }
