@@ -1,13 +1,13 @@
 // Required for signature overload
 /* eslint-disable no-dupe-class-members */
 
-import { Service } from 'typedi';
-import * as io from 'socket.io';
-import * as http from 'http';
-import * as SocketError from './socket.service.error';
 import { HttpException } from '@app/classes/http.exception';
+import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
+import * as io from 'socket.io';
+import { Service } from 'typedi';
 import { GameUpdateEmitArgs, JoinRequestEmitArgs, RejectEmitArgs, SocketEmitEvents, StartGameEmitArgs } from './socket-types';
+import * as SocketError from './socket.service.error';
 
 @Service()
 export class SocketService {
@@ -27,7 +27,6 @@ export class SocketService {
 
         this.sio.on('connection', (socket) => {
             this.sockets.set(socket.id, socket);
-
             socket.emit('initialization', { id: socket.id });
 
             socket.on('disconnect', () => {
@@ -38,7 +37,6 @@ export class SocketService {
 
     addToRoom(socketId: string, room: string) {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
-
         const socket = this.getSocket(socketId);
         socket.join(room);
     }

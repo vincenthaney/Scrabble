@@ -4,7 +4,7 @@ import { HttpException } from '@app/classes/http.exception';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { validateName } from '@app/utils/validate-name';
-import { Router, Response } from 'express';
+import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';

@@ -30,7 +30,9 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.joinRequestSubscription.unsubscribe();
+        if (this.joinRequestSubscription) {
+            this.joinRequestSubscription.unsubscribe();
+        }
     }
 
     setOpponent(opponent: string) {

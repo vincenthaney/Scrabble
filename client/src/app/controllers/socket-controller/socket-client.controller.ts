@@ -9,8 +9,7 @@ export abstract class SocketController {
     }
 
     connect() {
-        this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
-        this.configureSocket();
+        this.socket = io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
     }
 
     disconnect() {

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { GameConfig } from '@app/classes/communication/game-config';
+import { GameConfigData } from '@app/classes/communication/game-config';
 import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
 import { environment } from 'src/environments/environment';
 
@@ -8,19 +8,23 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameDispatcherController extends SocketController {
+    createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     constructor(private http: HttpClient) {
         super();
         this.connect();
+        this.configureSocket();
     }
 
     configureSocket(): void {
         this.on('joinRequest', (opponentName: string) => this.joinRequestEvent.emit(opponentName));
     }
 
-    handleMultiplayerGameCreation(gameConfig: GameConfig): void {
+    handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.getId()}`;
-        this.http.post<{ id: string }>(endpoint, gameConfig).subscribe(); // Add handling of the lobby creation
+        this.http.post<{ gameId: string }>(endpoint, gameConfig).subscribe((response) => {
+            this.createGameEvent.emit(response.gameId);
+        });
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {

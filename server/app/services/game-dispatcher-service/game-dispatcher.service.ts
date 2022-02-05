@@ -1,13 +1,13 @@
+import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
 import WaitingRoom from '@app/classes/game/waiting-game';
-import { Service } from 'typedi';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import Player from '@app/classes/player/player';
-import * as GameDispatcherError from './game-dispatcher.service.error';
-import * as Errors from '@app/constants/errors';
-import Game from '@app/classes/game/game';
 import { HttpException } from '@app/classes/http.exception';
+import Player from '@app/classes/player/player';
+import * as Errors from '@app/constants/errors';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
+import * as GameDispatcherError from './game-dispatcher.service.error';
 
 @Service()
 export class GameDispatcherService {
@@ -101,7 +101,7 @@ export class GameDispatcherService {
      * @return rejected player id
      */
 
-    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string) {
+    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): string {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
