@@ -1,8 +1,9 @@
 import Game from '@app/classes/game/game';
-import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import WaitingRoom from '@app/classes/game/waiting-game';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
 import * as Errors from '@app/constants/errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { StatusCodes } from 'http-status-codes';
@@ -68,7 +69,7 @@ export class GameDispatcherService {
      * @returns {Game} game
      */
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<Game> {
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<StartMultiplayerGameData> {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
@@ -89,7 +90,9 @@ export class GameDispatcherService {
             player2: waitingRoom.joinedPlayer,
         };
 
-        return this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
+        const createdGame = await this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
+
+        return this.createStartGameData(createdGame);
     }
 
     /**
@@ -150,5 +153,24 @@ export class GameDispatcherService {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID);
+    }
+
+    private createStartGameData(createdGame: Game): StartMultiplayerGameData {
+        const tileReserve: TileReserveData[] = [];
+        createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
+        const startMultiplayerGameData: StartMultiplayerGameData = {
+            player1: createdGame.player1,
+            player2: createdGame.player2,
+            gameType: createdGame.gameType,
+            maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
+            dictionary: createdGame.dictionnaryName,
+            gameId: createdGame.getId(),
+            board: createdGame.board.grid,
+            tileReserve,
+            round: createdGame.roundManager.getCurrentRound(),
+        };
+        return startMultiplayerGameData;
     }
 }

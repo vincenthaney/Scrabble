@@ -17,6 +17,7 @@ export default class Game {
     gameType: GameType;
     tileReserve: TileReserve;
     board: Board;
+    dictionnaryName: string;
     private id: string;
 
     static getBoardService(): BoardService {
@@ -46,6 +47,7 @@ export default class Game {
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.wordsPlayed = [];
         game.gameType = config.gameType;
+        game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
 

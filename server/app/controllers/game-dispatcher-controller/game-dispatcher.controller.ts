@@ -100,10 +100,10 @@ export class GameDispatcherController {
     private async handleAcceptRequest(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
 
-        const game = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
+        const startGameData = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
 
-        this.socketService.addToRoom(game.player2.getId(), gameId);
-        this.socketService.emitToRoom(gameId, 'startGame', game);
+        this.socketService.addToRoom(startGameData.player2.getId(), gameId);
+        this.socketService.emitToRoom(gameId, 'startGame', startGameData);
     }
 
     private handleRejectRequest(gameId: string, playerId: string, playerName: string) {

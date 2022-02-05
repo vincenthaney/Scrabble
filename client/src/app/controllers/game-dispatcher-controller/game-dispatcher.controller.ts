@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { GameConfigData } from '@app/classes/communication/game-config';
+import { GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
+import { GameService } from '@app/services';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -10,7 +11,7 @@ import { environment } from 'src/environments/environment';
 export class GameDispatcherController extends SocketController {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private gameService: GameService) {
         super();
         this.connect();
         this.configureSocket();
@@ -18,6 +19,7 @@ export class GameDispatcherController extends SocketController {
 
     configureSocket(): void {
         this.on('joinRequest', (opponentName: string) => this.joinRequestEvent.emit(opponentName));
+        this.on('startGame', (startGameData: StartMultiplayerGameData) => this.gameService.initializeMultiplayerGame(startGameData));
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
@@ -31,6 +33,7 @@ export class GameDispatcherController extends SocketController {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/accept`;
         this.http.post(endpoint, opponentName).subscribe();
     }
+
     handleRejectionGameCreation(opponentName: string, gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/reject`;
         this.http.post(endpoint, opponentName).subscribe();

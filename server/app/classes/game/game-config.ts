@@ -1,4 +1,7 @@
 import Player from '@app/classes/player/player';
+import Round from '@app/classes/round/round';
+import { Square } from '@app/classes/square';
+import { TileReserveData } from '@app/classes/tile/tile.types';
 import { GameType } from './game.type';
 
 export interface GameConfigData {
@@ -22,4 +25,11 @@ export interface GameConfig {
 
 export interface MultiplayerGameConfig extends GameConfig {
     player2: Player;
+}
+
+export interface StartMultiplayerGameData extends MultiplayerGameConfig {
+    gameId: string;
+    board: Square[][];
+    tileReserve: TileReserveData[];
+    round: Round;
 }

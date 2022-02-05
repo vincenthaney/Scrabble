@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MultiplayerGameConfig } from '@app/classes/communication/game-config';
+import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameType } from '@app/classes/game-type';
 import { IPlayer } from '@app/classes/player';
@@ -21,13 +21,16 @@ export default class GameService {
 
     constructor(private boardService: BoardService, private roundManager: RoundManagerService) {}
 
-    initializeMultiplayerGame(gameId: string, multiplayerGameConfig: MultiplayerGameConfig) {
-        this.gameId = gameId;
-        this.player1 = multiplayerGameConfig.player1;
-        this.player2 = multiplayerGameConfig.player2;
-        this.gameType = multiplayerGameConfig.gameType;
-        this.dictionnaryName = multiplayerGameConfig.dictionaryName;
-        this.roundManager.maxRoundTime = multiplayerGameConfig.maxRoundTime;
+    initializeMultiplayerGame(startGameData: StartMultiplayerGameData) {
+        this.gameId = startGameData.gameId;
+        this.player1 = startGameData.player1;
+        this.player2 = startGameData.player2;
+        this.gameType = startGameData.gameType;
+        this.dictionnaryName = startGameData.dictionary;
+        this.roundManager.maxRoundTime = startGameData.maxRoundTime;
+        this.roundManager.currentRound = startGameData.round;
+        this.boardService.initializeBoard(startGameData.board);
+        this.roundManager.startRound();
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
@@ -41,7 +44,7 @@ export default class GameService {
             this.boardService.updateBoard(gameUpdateData.board);
         }
         if (gameUpdateData.round) {
-            // this.roundManagerService.updateRound(gameUpdateData.round);
+            this.roundManager.updateRound(gameUpdateData.round);
         }
         if (gameUpdateData.isGameOver) {
             this.gameOver();

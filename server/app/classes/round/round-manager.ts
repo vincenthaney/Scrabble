@@ -51,6 +51,10 @@ export default class RoundManager {
         return this.currentRound;
     }
 
+    getMaxRoundTime() {
+        return this.maxRoundTime;
+    }
+
     private getNextPlayer(): Player {
         if (this.currentRound === undefined) {
             // Randomly get a player
