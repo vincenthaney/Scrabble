@@ -1,28 +1,30 @@
-<div class = "center">
-    <div class = "button-box">
+<div class="center">
+    <div class="button-box">
         <div class="sameline center">
-            {{waitingRoomMessage}}
+            {{ waitingRoomMessage }}
             <div *ngIf="!isOpponentFound">
                 <mat-progress-spinner id="spinnerOpponentFound" class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
             </div>
         </div>
-        <button id="start-game-button" class="button" mat-flat-button color="primary" [disabled]="!isOpponentFound">
+        <button
+            id="start-game-button"
+            class="button"
+            mat-flat-button
+            color="primary"
+            [disabled]="!isOpponentFound"
+            (click)="confirmOpponentToServer()"
+        >
             Démarrer la partie
         </button>
-    
-        <button id="reject-button" class="button" mat-flat-button color="primary" [disabled]="!isOpponentFound">
+
+        <button id="reject-button" class="button" mat-flat-button color="primary" [disabled]="!isOpponentFound" (click)="confirmRejectionToServer()">
             Rejeter cet adversaire
         </button>
-    
-        <button id="convert-solo-button" mat-flat-button class="button" color="primary" [disabled]="isOpponentFound">
-            Convertir en partie solo
-        </button>
 
-        <button id="cancel-button" mat-flat-button class="button" color="primary" routerLink="game-creation">
-            Annuler la partie
-        </button>
-    
+        <button id="convert-solo-button" mat-flat-button class="button" color="primary" [disabled]="isOpponentFound">Convertir en partie solo</button>
+
+        <button id="cancel-button" mat-flat-button class="button" color="primary" routerLink="game-creation">Annuler la partie</button>
+
         <img class="image" src="https://bit.ly/3m206ss" width="100" height="20" alt="Logo Scrabble" />
     </div>
 </div>
-

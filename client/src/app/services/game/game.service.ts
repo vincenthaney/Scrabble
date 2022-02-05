@@ -4,6 +4,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameType } from '@app/classes/game-type';
 import { IPlayer } from '@app/classes/player';
 import { BoardService } from '@app/services/';
+import RoundManagerService from '@app/services/round-manager/round-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -18,7 +19,7 @@ export default class GameService {
     dictionnaryName: string;
     private gameId: string;
 
-    constructor(private boardService: BoardService) {}
+    constructor(private boardService: BoardService, private roundManager: RoundManagerService) {}
 
     initializeMultiplayerGame(gameId: string, multiplayerGameConfig: MultiplayerGameConfig) {
         this.gameId = gameId;
@@ -26,7 +27,7 @@ export default class GameService {
         this.player2 = multiplayerGameConfig.player2;
         this.gameType = multiplayerGameConfig.gameType;
         this.dictionnaryName = multiplayerGameConfig.dictionaryName;
-        // this.roundManagerService.maxRoundTime = multiplayerGameConfig.maxRoundTime;
+        this.roundManager.maxRoundTime = multiplayerGameConfig.maxRoundTime;
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {

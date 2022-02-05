@@ -1,12 +1,24 @@
-import * as io from 'socket.io';
+import { io, Socket } from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 export abstract class SocketController {
-    private socket: io.Socket;
+    private socket: Socket;
 
-    constructor(socket: io.Socket) {
-        this.socket = socket;
+    isSocketAlive() {
+        return this.socket && this.socket.connected;
+    }
 
+    connect() {
+        this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
         this.configureSocket();
+    }
+
+    disconnect() {
+        this.socket.disconnect();
+    }
+
+    getId(): string {
+        return this.socket.id;
     }
 
     on<T>(ev: string, handler: (arg: T) => void) {
