@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Player from '@app/classes/player/player';
 import { GameConfig } from './game-config';
 
-export default class WaitingGame {
+export default class WaitingRoom {
     joinedPlayer?: Player;
     private id: string;
     private config: GameConfig;

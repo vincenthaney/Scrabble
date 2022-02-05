@@ -5,16 +5,14 @@
 
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
-import WaitingGame from '@app/classes/game/waiting-game';
+import WaitingRoom from '@app/classes/game/waiting-game';
 import * as Errors from '@app/constants/errors';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import Container from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
 import * as GameDispatcherError from './game-dispatcher.service.error';
+import { Container } from 'typedi';
 
 const expect = chai.expect;
 
@@ -37,13 +35,11 @@ chai.use(spies);
 chai.use(chaiAsPromised);
 
 describe('GameDispatcherService', () => {
-    let activeGameService: ActiveGameService;
     let gameDispatcherService: GameDispatcherService;
 
     beforeEach(() => {
-        const boardService = Container.get(BoardService);
-        activeGameService = new ActiveGameService(boardService);
-        gameDispatcherService = new GameDispatcherService(activeGameService);
+        Container.reset();
+        gameDispatcherService = Container.get(GameDispatcherService);
     });
 
     it('should create', () => {
@@ -51,49 +47,49 @@ describe('GameDispatcherService', () => {
     });
 
     it('should initiate an empty WaitingRoom in list', () => {
-        expect(gameDispatcherService['waitingGames']).to.be.empty;
+        expect(gameDispatcherService['waitingRooms']).to.be.empty;
     });
 
     describe('createMultiplayerGame', () => {
         let id: string;
-        let waitingGame: WaitingGame;
+        let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
-            waitingGame = gameDispatcherService['waitingGames'][0];
+            waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
         });
 
-        it('should create a WaitingGame', () => {
-            expect(gameDispatcherService['waitingGames']).to.have.lengthOf(1);
+        it('should create a WaitingRoom', () => {
+            expect(gameDispatcherService['waitingRooms']).to.have.lengthOf(1);
         });
 
-        it('should create a WaitingGame with same config', () => {
-            expect(waitingGame.getConfig().player1.name).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
-            expect(waitingGame.getConfig().player1.getId()).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
-            expect(waitingGame.getConfig().gameType).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.gameType);
-            expect(waitingGame.getConfig().maxRoundTime).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.maxRoundTime);
-            expect(waitingGame.getConfig().dictionary).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.dictionary);
+        it('should create a WaitingRoom with same config', () => {
+            expect(waitingRoom.getConfig().player1.name).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
+            expect(waitingRoom.getConfig().player1.getId()).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
+            expect(waitingRoom.getConfig().gameType).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.gameType);
+            expect(waitingRoom.getConfig().maxRoundTime).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.maxRoundTime);
+            expect(waitingRoom.getConfig().dictionary).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.dictionary);
         });
 
         it('should return game id', () => {
-            expect(id).to.equal(waitingGame.getId());
+            expect(id).to.equal(waitingRoom.getId());
         });
     });
 
     describe('joinMultiplayerGame', () => {
         let id: string;
-        let waitingGame: WaitingGame;
+        let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
-            waitingGame = gameDispatcherService['waitingGames'][0];
+            waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
         });
 
         it('should add the player to the waiting game', () => {
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
 
-            expect(waitingGame.joinedPlayer?.getId()).to.equal(DEFAULT_OPPONENT_ID);
-            expect(waitingGame.joinedPlayer?.name).to.equal(DEFAULT_OPPONENT_NAME);
+            expect(waitingRoom.joinedPlayer?.getId()).to.equal(DEFAULT_OPPONENT_ID);
+            expect(waitingRoom.joinedPlayer?.name).to.equal(DEFAULT_OPPONENT_NAME);
         });
 
         it('should not join if a player is already waiting', () => {
@@ -117,16 +113,20 @@ describe('GameDispatcherService', () => {
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
-            spy = chai.spy.on(activeGameService, 'beginMultiplayerGame', async () => Promise.resolve());
+            spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () => Promise.resolve());
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
-        it('should remove waitingGame', async () => {
-            expect(gameDispatcherService['waitingGames'].filter((g) => g.getId() === id)).to.not.be.empty;
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should remove waitingRoom', async () => {
+            expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.not.be.empty;
 
             await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
-            expect(gameDispatcherService['waitingGames'].filter((g) => g.getId() === id)).to.be.empty;
+            expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.be.empty;
         });
 
         it('should call beginMultiplayerGame', async () => {
@@ -160,18 +160,18 @@ describe('GameDispatcherService', () => {
 
     describe('rejectJoinRequest', () => {
         let id: string;
-        let waitingGame: WaitingGame;
+        let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
-            waitingGame = gameDispatcherService['waitingGames'][0];
+            waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
-        it('should remove joinedPlayer from waitingGame', () => {
-            expect(waitingGame.joinedPlayer).to.not.be.undefined;
+        it('should remove joinedPlayer from waitingRoom', () => {
+            expect(waitingRoom.joinedPlayer).to.not.be.undefined;
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
-            expect(waitingGame.joinedPlayer).to.be.undefined;
+            expect(waitingRoom.joinedPlayer).to.be.undefined;
         });
 
         it('should throw if playerId is invalid', () => {
@@ -202,7 +202,7 @@ describe('GameDispatcherService', () => {
 
         it('should remove waiting game from list', () => {
             gameDispatcherService.cancelGame(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
-            expect(gameDispatcherService['waitingGames']).to.be.empty;
+            expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.be.empty;
         });
 
         it('should throw if playerId is invalid', () => {
@@ -211,7 +211,7 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    describe('getAvailableWaitingGames', () => {
+    describe('getAvailableWaitingRooms', () => {
         it('should return right amount', () => {
             const NTH_GAMES = 2;
 
@@ -219,7 +219,7 @@ describe('GameDispatcherService', () => {
                 gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
             }
 
-            expect(gameDispatcherService.getAvailableWaitingGames()).to.have.lengthOf(NTH_GAMES);
+            expect(gameDispatcherService.getAvailableWaitingRooms()).to.have.lengthOf(NTH_GAMES);
         });
 
         it('should not return games with joined player', () => {
@@ -233,7 +233,7 @@ describe('GameDispatcherService', () => {
                 }
             }
 
-            expect(gameDispatcherService.getAvailableWaitingGames()).to.have.lengthOf(NTH_GAMES - NTH_JOINED);
+            expect(gameDispatcherService.getAvailableWaitingRooms()).to.have.lengthOf(NTH_GAMES - NTH_JOINED);
         });
     });
 
@@ -244,7 +244,7 @@ describe('GameDispatcherService', () => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
         });
 
-        it('should find the waitingGame', () => {
+        it('should find the waitingRoom', () => {
             expect(gameDispatcherService['getGameFromId'](id)).to.exist;
         });
 
