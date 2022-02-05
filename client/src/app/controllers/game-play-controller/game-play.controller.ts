@@ -4,15 +4,15 @@ import { ActionData } from '@app/classes/actions/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
 import { GameService } from '@app/services';
-import * as io from 'socket.io';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GamePlayController extends SocketController {
-    constructor(private http: HttpClient, private gameService: GameService, socket: io.Socket) {
-        super(socket);
+    constructor(private http: HttpClient, private gameService: GameService) {
+        super();
+        this.connect();
     }
 
     configureSocket(): void {
