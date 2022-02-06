@@ -48,6 +48,12 @@ describe('WordsVerificationService', () => {
 
     it('should be true when words are in the dictionary', () => {
         const words = ['acagnarderait', 'hydrolysates'];
+
+        for (let i = 0; i < 3; i++) {
+            const index = Math.floor(Math.random() * wordsVerificationService.activeDictionaries['dictionary'].length);
+            // eslint-disable-next-line no-console
+            console.log(index);
+        }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
 });
