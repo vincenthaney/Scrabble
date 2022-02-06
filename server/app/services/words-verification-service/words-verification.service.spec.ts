@@ -28,8 +28,9 @@ describe('WordsVerificationService', () => {
     });
 
     it('should return error because word too short', () => {
+        const expectedError = new WordError(WORD_TOO_SHORT, 'a');
         const result = () => wordsVerificationService.verifyWords(['a'], DICTIONARY_NAME);
-        expect(result).to.Throw(new WordError(WORD_TOO_SHORT, 'a'));
+        expect(result).to.Throw(expectedError);
     });
 
     it('should return error because word contains hyphen', () => {
