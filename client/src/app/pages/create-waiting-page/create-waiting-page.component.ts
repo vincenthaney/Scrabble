@@ -58,6 +58,15 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
+    cancelGame() {
+        if (this.opponent) {
+            this.warnHostOpponentLeft(this.opponent);
+            this.opponent = undefined;
+            this.waitingRoomMessage = HOST_WAITING_MESSAGE;
+            this.isOpponentFound = false;
+        }
+    }
+
     warnHostOpponentLeft(opponentName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
@@ -75,6 +84,8 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmOpponentToServer() {
+        // eslint-disable-next-line no-console
+        console.log(this.opponent);
         if (this.opponent) {
             this.gameDispatcherService.handleConfirmation(this.opponent);
         }
