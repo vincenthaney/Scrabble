@@ -27,7 +27,7 @@ export class WordsVerificationService {
 
     // TODO: Create a separate service to manage dictionary importation
     async addDictionary() {
-        this.activeDictionaries[WordsVerificationConst.DICTIONARY_NAME] = new Set(await this.fetchDictionary());
+        this.activeDictionaries.set(WordsVerificationConst.DICTIONARY_NAME, new Set(await this.fetchDictionary()));
     }
 
     verifyWords(words: string[], dictionary: string): string[] {
