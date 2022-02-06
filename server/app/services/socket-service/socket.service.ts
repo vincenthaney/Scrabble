@@ -6,7 +6,7 @@ import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
-import { GameUpdateEmitArgs, JoinRequestEmitArgs, RejectEmitArgs, SocketEmitEvents, StartGameEmitArgs } from './socket-types';
+import { GameUpdateEmitArgs, JoinRequestEmitArgs, LobbiesUpdateEmitArgs, RejectEmitArgs, SocketEmitEvents, StartGameEmitArgs } from './socket-types';
 import * as SocketError from './socket.service.error';
 
 @Service()
@@ -72,6 +72,7 @@ export class SocketService {
     emitToSocket(id: string, ev: 'joinRequest', ...args: JoinRequestEmitArgs[]): void;
     emitToSocket(id: string, ev: 'startGame', ...args: StartGameEmitArgs[]): void;
     emitToSocket(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
+    emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
