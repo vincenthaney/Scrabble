@@ -46,16 +46,13 @@ describe('WordsVerificationService', () => {
         expect(result).to.Throw(INVALID_WORD);
     });
 
-    it('should be true when words are in the dictionary', () => {
+    it('should be true when words are in the dictionary', () => { 
         const words: string[] = [];
-        const dictionarySize = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME)?.size;
-        if (wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME) && dictionarySize) {
-            for (let i = 0; i < 3; i++) {
-                const randomIndex = Math.floor(Math.random() * dictionarySize);
-                // eslint-disable-next-line no-console
-                console.log(randomIndex);
-                words.join(wordsVerificationService.activeDictionaries[DICTIONARY_NAME]);
-            }
+        const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
+        if (dictionary) {
+            dictionary.forEach((word) => {
+                words.join(word);
+            });
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
