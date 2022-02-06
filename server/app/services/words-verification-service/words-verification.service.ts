@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import { join } from 'path';
 import * as WordsVerificationConst from './words-verification.service.const';
 import { DictionaryData } from './words-verification.service.types';
-import { WordError } from './words-verification.service.classes';
 
 @Service()
 export class WordsVerificationService {
@@ -37,16 +36,16 @@ export class WordsVerificationService {
             if (word.length > 0) {
                 this.removeAccents(word);
                 if (word.length < MINIMUM_WORD_LENGTH) {
-                    throw new WordError(WORD_TOO_SHORT, word);
+                    throw new Error(word + WORD_TOO_SHORT);
                 }
                 if (word.includes('-')) {
-                    throw new WordError(WORD_CONTAINS_HYPHEN, word);
+                    throw new Error(word + WORD_CONTAINS_HYPHEN);
                 }
                 if (word.includes("'")) {
-                    throw new WordError(WORD_CONTAINS_APOSTROPHE, word);
+                    throw new Error(word + WORD_CONTAINS_APOSTROPHE);
                 }
                 if (!this.activeDictionaries.get(dictionary)?.has(word)) {
-                    throw new WordError(INVALID_WORD, word);
+                    throw new Error(word + INVALID_WORD);
                 }
             }
         }
