@@ -14,7 +14,7 @@ export class WordsVerificationService {
         this.activeDictionaries = new Map<string, Set<string>>();
     }
 
-    async fetchDictionary(): Promise<string[]> {
+    fetchDictionary(): string[] {
         const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
         const dataBuffer = fs.readFileSync(filePath);
         const data: DictionaryData = JSON.parse(dataBuffer.toString());
