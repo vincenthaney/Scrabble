@@ -50,11 +50,12 @@ describe('WordsVerificationService', () => {
         const words: string[] = [];
         const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
         if (dictionary) {
-            dictionary.forEach((word) => {
+            for (const word of dictionary) {
                 if (words.length < 1) {
                     words.join(word);
+                    break;
                 }
-            });
+            }
             // eslint-disable-next-line no-console
             console.log(words);
         }
