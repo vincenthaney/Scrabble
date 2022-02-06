@@ -18,13 +18,13 @@ describe('WordsVerificationService', () => {
         expect(wordsVerificationService).to.exist;
     });
 
-    beforeEach(() => {
-        wordsVerificationService = new WordsVerificationService();
-    });
-
     it('should add dictionary to activeDictionary', () => {
         wordsVerificationService.addDictionary();
         expect(wordsVerificationService.activeDictionaries.has('dictionary')).to.be.true;
+    });
+
+    beforeEach(() => {
+        wordsVerificationService.addDictionary();
     });
 
     it('should contain dictionary', () => {
