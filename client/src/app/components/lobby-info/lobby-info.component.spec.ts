@@ -10,9 +10,9 @@ import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
-import { IconComponent } from '../icon/icon.component';
 import { LobbyInfoComponent } from './lobby-info.component';
 
 @Component({

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { HomePageComponent } from './home-page.component';
 
-
 describe('HomePageComponent', () => {
     let component: HomePageComponent;
     let fixture: ComponentFixture<HomePageComponent>;

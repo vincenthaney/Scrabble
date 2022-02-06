@@ -11,10 +11,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Tile } from '@app/classes/tile';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { TileComponent } from '@app/components/tile/tile.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
-import { IconComponent } from '../icon/icon.component';
-import { TileComponent } from '../tile/tile.component';
 import { TileRackComponent } from './tile-rack.component';
 
 import SpyObj = jasmine.SpyObj;
