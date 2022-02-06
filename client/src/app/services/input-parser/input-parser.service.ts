@@ -33,21 +33,27 @@ export default class InputParserService {
 
             switch (actionName) {
                 case 'placer':
+                    if (inputWords.length !== 3) throw new Error(INVALID_COMMAND);
                     this.controller.sendPlaceAction(this.createPlaceActionPayload(inputWords[1], inputWords[2]));
                     break;
                 case 'échanger':
+                    if (inputWords.length !== 2) throw new Error(INVALID_COMMAND);
                     this.controller.sendExchangeAction(this.createExchangeActionPayload(inputWords[1]));
                     break;
                 case 'passer':
+                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
                     this.controller.sendPassAction();
                     break;
                 case 'réserve':
+                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
                     this.controller.sendReserveAction();
                     break;
                 case 'indice':
+                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
                     this.controller.sendHintAction();
                     break;
                 case 'aide':
+                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
                     this.controller.sendHelpAction();
                     break;
                 default:
@@ -61,10 +67,9 @@ export default class InputParserService {
         // try catch invalid command
         const placeActionPayload: ActionPlacePayload = {
             tiles: this.parsePlaceLettersToTiles(lettersToPlace),
-            startPosition: this.getStartPosition(location.substring(0, location.length - 2)),
+            startPosition: this.getStartPosition(location.substring(0, location.length - 1)),
             orientation: this.getOrientation(location.charAt(location.length - 1)),
         };
-        console.log(placeActionPayload);
 
         return placeActionPayload;
     }
@@ -73,43 +78,52 @@ export default class InputParserService {
         const exchangeActionPayload: ActionExchangePayload = {
             tiles: this.parseExchangeLettersToTiles(lettersToExchange),
         };
-        console.log(exchangeActionPayload);
 
         return exchangeActionPayload;
     }
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
         const player: IPlayer = this.gameService.getLocalPlayer();
-        const playerTiles: Tile[] = { ...player.tiles };
+        const playerTiles: Tile[] = [];
+        player.tiles.forEach((tile) => {
+            playerTiles.push(new Tile(tile.letter, tile.value));
+        });
         const tilesToPlace: Tile[] = [];
 
         for (const letter of lettersToPlace) {
             for (let i = Object.values(playerTiles).length - 1; i >= 0; i--) {
                 if (playerTiles[i].letter.toLowerCase() === letter) {
-                    tilesToPlace.push(playerTiles[i]);
+                    tilesToPlace.push(playerTiles.splice(i, 1)[0]);
                     break;
-                } else if (playerTiles[i].letter.toLowerCase() === '*' && (letter.toLowerCase() as LetterValue)) {
-                    const tile = playerTiles[i];
-                    tile.letter = letter.toLowerCase() as LetterValue;
-                    tilesToPlace.push(tile);
+                } else if (playerTiles[i].letter === '*' && (letter as LetterValue) && letter === letter.toUpperCase()) {
+                    const tile = playerTiles.splice(i, 1)[0];
+                    tilesToPlace.push(new Tile(letter as LetterValue, tile.value));
                     break;
                 }
             }
         }
+
         if (tilesToPlace.length !== lettersToPlace.length) throw new Error(INVALID_COMMAND);
 
         return tilesToPlace;
     }
 
     private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
+        // user must type exchange letters in lower case
+        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new Error(INVALID_COMMAND);
+
         const player: IPlayer = this.gameService.getLocalPlayer();
-        const playerTiles: Tile[] = { ...player.tiles };
+        const playerTiles: Tile[] = [];
+        player.tiles.forEach((tile) => {
+            playerTiles.push(new Tile(tile.letter, tile.value));
+        });
+
         const tilesToExchange: Tile[] = [];
 
         for (const letter of lettersToExchange) {
             for (let i = Object.values(playerTiles).length - 1; i >= 0; i--) {
                 if (playerTiles[i].letter.toLowerCase() === letter) {
-                    const tile = playerTiles[i];
+                    const tile = playerTiles.splice(i, 1)[0];
                     tilesToExchange.push(tile);
                     break;
                 }
@@ -134,7 +148,6 @@ export default class InputParserService {
             row: inputRow,
             column: inputCol,
         };
-
         return inputStartPosition;
     }
 
