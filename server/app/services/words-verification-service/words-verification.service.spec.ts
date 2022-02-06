@@ -52,7 +52,7 @@ describe('WordsVerificationService', () => {
         if (dictionary) {
             for (const word of dictionary) {
                 if (words.length < 1) {
-                    words.join(word);
+                    words.push(word);
                     break;
                 }
             }
@@ -68,7 +68,7 @@ describe('WordsVerificationService', () => {
         if (dictionary) {
             dictionary.forEach((word) => {
                 if (words.length < 3) {
-                    words.join(word);
+                    words.push(word);
                 }
             });
             // eslint-disable-next-line no-console
