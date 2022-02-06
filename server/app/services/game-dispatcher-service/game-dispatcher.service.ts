@@ -1,6 +1,7 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
@@ -14,9 +15,11 @@ import * as GameDispatcherError from './game-dispatcher.service.error';
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
+    private lobbiesRoom: Room;
 
     constructor(private activeGameService: ActiveGameService) {
         this.waitingRooms = [];
+        this.lobbiesRoom = new Room();
     }
 
     /**
@@ -37,6 +40,10 @@ export class GameDispatcherService {
         this.waitingRooms.push(waitingRoom);
 
         return waitingRoom.getId();
+    }
+
+    getLobbiesRoom() {
+        return this.lobbiesRoom;
     }
 
     /**

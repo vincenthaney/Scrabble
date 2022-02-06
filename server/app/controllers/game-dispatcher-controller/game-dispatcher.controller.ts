@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
@@ -35,7 +36,6 @@ export class GameDispatcherController {
 
         this.router.get('/games/:playerId', (req: LobbiesRequest, res: Response) => {
             const { playerId } = req.params;
-
             try {
                 this.handleLobbiesRequest(playerId);
 
@@ -96,7 +96,7 @@ export class GameDispatcherController {
         const gameId = this.gameDispatcherService.createMultiplayerGame(config);
 
         this.socketService.addToRoom(config.playerId, gameId);
-
+        this.handleLobbiesUpdate();
         return gameId;
     }
 
@@ -105,8 +105,9 @@ export class GameDispatcherController {
         if (!validateName(playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
-
-        this.socketService.emitToRoom(gameId, 'joinRequest', { opponentName: playerName });
+        this.socketService.emitToRoom(gameId, 'joinRequest', { name: playerName });
+        this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
+        this.handleLobbiesUpdate();
     }
 
     private async handleAcceptRequest(gameId: string, playerId: string, playerName: string) {
@@ -124,11 +125,17 @@ export class GameDispatcherController {
         const rejectedPlayerId = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
 
         this.socketService.emitToSocket(rejectedPlayerId, 'rejected');
+        this.handleLobbiesUpdate();
     }
 
     private handleLobbiesRequest(playerId: string) {
         const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
-
+        this.socketService.addToRoom(playerId, this.gameDispatcherService.getLobbiesRoom().getId());
         this.socketService.emitToSocket(playerId, 'lobbiesUpdate', waitingRooms);
+    }
+
+    private handleLobbiesUpdate() {
+        const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
+        this.socketService.emitToRoom(this.gameDispatcherService.getLobbiesRoom().getId(), 'lobbiesUpdate', waitingRooms);
     }
 }
