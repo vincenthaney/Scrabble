@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { GameConfigData } from '@app/classes/communication/game-config';
-import { LobbyData } from '@app/classes/communication/lobby-data';
+import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subscription } from 'rxjs';
@@ -13,17 +13,26 @@ import { Subscription } from 'rxjs';
 export class GameDispatcherService {
     gameId: string;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
-    lobbyUpdateEvent: EventEmitter<LobbyData[]> = new EventEmitter();
+    lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
 
     createGameSubscription: Subscription;
     joinRequestSubscription: Subscription;
+    lobbiesUpdateSubscription: Subscription;
+    lobbyFullSubscription: Subscription;
+
     constructor(private gameDispatcherController: GameDispatcherController) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent.subscribe((gameId: string) => {
             this.gameId = gameId;
         });
         this.joinRequestSubscription = this.gameDispatcherController.joinRequestEvent.subscribe((opponentName: string) =>
             this.handleJoinRequest(opponentName),
+        );
+        this.lobbyFullSubscription = this.gameDispatcherController.lobbyFullEvent.subscribe((opponentName: string) =>
+            this.handleLobbyFull(opponentName),
+        );
+        this.lobbiesUpdateSubscription = this.gameDispatcherController.lobbiesUpdateEvent.subscribe((lobbies: LobbyInfo[]) =>
+            this.handleLobbiesUpdate(lobbies),
         );
     }
 
@@ -50,8 +59,8 @@ export class GameDispatcherService {
         this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
     }
 
-    handleLobbyUpdate(lobbies: LobbyData[]) {
-        this.lobbyUpdateEvent.emit(lobbies);
+    handleLobbiesUpdate(lobbies: LobbyInfo[]) {
+        this.lobbiesUpdateEvent.emit(lobbies);
     }
 
     handleLobbyFull(opponentName: string) {
@@ -60,5 +69,9 @@ export class GameDispatcherService {
 
     handleJoinLobby(gameId: string, playerName: string) {
         this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
+    }
+
+    handleLobbyListRequest() {
+        this.gameDispatcherController.handleLobbiesListRequest();
     }
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { LobbyData } from '@app/classes/communication/lobby-data';
+import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -17,7 +17,7 @@ import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONT
 export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
 
-    lobbyUpdateSubscription: Subscription;
+    lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
 
     // TODO: Receive LobbyInfo from server
@@ -48,16 +48,23 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         { lobbyId: '17', dictionary: '', playerName: 'Nom17', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
         { lobbyId: '18', dictionary: '', playerName: 'Nom18', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
     ];
-    constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
+    constructor(
+        private ref: ChangeDetectorRef,
+        public gameDispatcherService: GameDispatcherService,
+        public dialog: MatDialog,
+        private router: Router,
+    ) {
+        this.gameDispatcherService.handleLobbyListRequest();
+    }
 
     ngOnInit() {
-        this.lobbyUpdateSubscription = this.gameDispatcherService.lobbyUpdateEvent.subscribe((lobbies) => this.updateLobbies(lobbies));
+        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent.subscribe((lobbies) => this.updateLobbies(lobbies));
         this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent.subscribe((opponentName) => this.lobbyFullDialog(opponentName));
     }
 
     ngOnDestroy() {
-        if (this.lobbyUpdateSubscription) {
-            this.lobbyUpdateSubscription.unsubscribe();
+        if (this.lobbiesUpdateSubscription) {
+            this.lobbiesUpdateSubscription.unsubscribe();
         }
         if (this.lobbyFullSubscription) {
             this.lobbyFullSubscription.unsubscribe();
@@ -66,6 +73,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
 
     joinLobby(lobbyId: string) {
         if (lobbyId) {
+            this.router.navigateByUrl('join-waiting');
             this.gameDispatcherService.handleJoinLobby(lobbyId, this.nameField.formParameters.get('inputName')?.value);
         }
     }
@@ -78,7 +86,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    updateLobbies(lobbies: LobbyData[]): void {
+    updateLobbies(lobbies: LobbyInfo[]): void {
         this.lobbies = lobbies;
         this.validateName();
     }
