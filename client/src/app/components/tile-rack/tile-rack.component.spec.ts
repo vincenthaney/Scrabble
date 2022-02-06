@@ -13,6 +13,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Tile } from '@app/classes/tile';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
+import { IconComponent } from '../icon/icon.component';
+import { TileComponent } from '../tile/tile.component';
 import { TileRackComponent } from './tile-rack.component';
 
 import SpyObj = jasmine.SpyObj;
@@ -44,7 +46,7 @@ describe('TileRackComponent', () => {
                 FormsModule,
                 MatDialogModule,
             ],
-            declarations: [TileRackComponent],
+            declarations: [TileRackComponent, IconComponent, TileComponent],
             providers: [{ provide: GameService, useValue: gameServiceSpy }],
         }).compileComponents();
     });
