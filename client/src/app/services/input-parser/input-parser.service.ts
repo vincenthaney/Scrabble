@@ -11,7 +11,7 @@ import {
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
-    MIN_ROW_NUMBER,
+    MIN_ROW_NUMBER
 } from '@app/constants/game';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { GameService } from '..';
@@ -34,7 +34,12 @@ export default class InputParserService {
             switch (actionName) {
                 case 'placer':
                     if (inputWords.length !== 3) throw new Error(INVALID_COMMAND);
-                    this.controller.sendPlaceAction(this.createPlaceActionPayload(inputWords[1], inputWords[2]));
+
+                    if (inputWords[2].length === 1) {
+                        this.controller.sendPlaceAction(this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]));
+                    } else {
+                        this.controller.sendPlaceAction(this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]));
+                    }
                     break;
                 case 'échanger':
                     if (inputWords.length !== 2) throw new Error(INVALID_COMMAND);
@@ -63,7 +68,18 @@ export default class InputParserService {
         }
     }
 
-    private createPlaceActionPayload(location: string, lettersToPlace: string) {
+    private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string) {
+        // try catch invalid command
+        const placeActionPayload: ActionPlacePayload = {
+            tiles: this.parsePlaceLettersToTiles(lettersToPlace),
+            startPosition: this.getStartPosition(location),
+            orientation: Orientation.Horizontal,
+        };
+
+        return placeActionPayload;
+    }
+
+    private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string) {
         // try catch invalid command
         const placeActionPayload: ActionPlacePayload = {
             tiles: this.parsePlaceLettersToTiles(lettersToPlace),
