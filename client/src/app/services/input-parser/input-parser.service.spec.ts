@@ -18,6 +18,7 @@ describe('InputParserService', () => {
     const VALID_LETTERS_INPUT_SINGLE = 'a';
 
     const VALID_PLACE_INPUT = `!placer ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
+    const VALID_PLACE_INPUT_SINGLE = `!placer ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
     const VALID_EXCHANGE_INPUT = `!échanger ${VALID_LETTERS_INPUT_MULTI}`;
     const VALID_PASS_INPUT = '!passer';
     const VALID_RESERVE_INPUT = '!réserve';
@@ -133,8 +134,6 @@ describe('InputParserService', () => {
         ];
 
         for (let i = 0; i < validLetters.length; i++) {
-            console.log(validLetters[i]);
-            console.log(gameServiceSpy.getLocalPlayer().tiles);
             expect(service['parseExchangeLettersToTiles'](validLetters[i])).toEqual(expectedTiles[i]);
         }
     });
@@ -250,7 +249,7 @@ describe('InputParserService', () => {
     });
 
     it('parseInput should call sendPlaceAction if input is a valid place command (single letter)', () => {
-        service.parseInput(VALID_LETTERS_INPUT_SINGLE);
+        service.parseInput(VALID_PLACE_INPUT_SINGLE);
         expect(inputControllerSpy.sendPlaceAction).toHaveBeenCalledWith(EXPECTED_PLACE_PAYLOAD_SINGLE);
     });
 

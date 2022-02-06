@@ -11,7 +11,7 @@ import {
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
-    MIN_ROW_NUMBER
+    MIN_ROW_NUMBER,
 } from '@app/constants/game';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { GameService } from '..';
@@ -70,9 +70,17 @@ export default class InputParserService {
 
     private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string) {
         // try catch invalid command
+        const lastLocationChar = location.charAt(location.length - 1);
+        let positionString = '';
+        if (lastLocationChar.toLowerCase() === lastLocationChar.toUpperCase()) {
+            positionString = location;
+        } else {
+            positionString = location.substring(0, location.length - 1);
+        }
+
         const placeActionPayload: ActionPlacePayload = {
             tiles: this.parsePlaceLettersToTiles(lettersToPlace),
-            startPosition: this.getStartPosition(location),
+            startPosition: this.getStartPosition(positionString),
             orientation: Orientation.Horizontal,
         };
 
@@ -152,13 +160,19 @@ export default class InputParserService {
     }
 
     private getStartPosition(location: string): Position {
-        if (location.length > MAX_LOCATION_COMMAND_LENGTH || location.length < MIN_LOCATION_COMMAND_LENGTH) throw new Error(INVALID_COMMAND);
+        if (location.length > MAX_LOCATION_COMMAND_LENGTH || location.length < MIN_LOCATION_COMMAND_LENGTH) {
+            throw new Error(INVALID_COMMAND);
+        }
 
         const inputRow: number = location[0].charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
-        if (inputRow < MIN_ROW_NUMBER || inputRow > MAX_ROW_NUMBER) throw new Error(INVALID_COMMAND);
+        if (inputRow < MIN_ROW_NUMBER || inputRow > MAX_ROW_NUMBER) {
+            throw new Error(INVALID_COMMAND);
+        }
 
         const inputCol: number = +location.substring(1) - 1;
-        if (inputCol < MIN_COL_NUMBER || inputCol > MAX_COL_NUMBER) throw new Error(INVALID_COMMAND);
+        if (inputCol < MIN_COL_NUMBER || inputCol > MAX_COL_NUMBER) {
+            throw new Error(INVALID_COMMAND);
+        }
 
         const inputStartPosition: Position = {
             row: inputRow,
