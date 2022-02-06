@@ -46,13 +46,32 @@ describe('WordsVerificationService', () => {
         expect(result).to.Throw(INVALID_WORD);
     });
 
-    it('should be true when words are in the dictionary', () => { 
+    it('should be true when word is in the dictionary', () => {
         const words: string[] = [];
         const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
         if (dictionary) {
             dictionary.forEach((word) => {
-                words.join(word);
+                if (words.length < 1) {
+                    words.join(word);
+                }
             });
+            // eslint-disable-next-line no-console
+            console.log(words);
+        }
+        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
+    });
+
+    it('should be true when words are in the dictionary', () => {
+        const words: string[] = [];
+        const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
+        if (dictionary) {
+            dictionary.forEach((word) => {
+                if (words.length < 3) {
+                    words.join(word);
+                }
+            });
+            // eslint-disable-next-line no-console
+            console.log(words);
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
