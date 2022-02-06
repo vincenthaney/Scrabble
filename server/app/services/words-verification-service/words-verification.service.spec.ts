@@ -23,7 +23,9 @@ describe('WordsVerificationService', () => {
     });
 
     it('should not have any character with accent', () => {
-        expect(wordsVerificationService.removeAccents('àbçdé')).to.equal('abcde');
+        expect(wordsVerificationService.removeAccents('ŠšŽžÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìiíiîiïiñòóôõöùúûýÿ')).to.equal(
+            'SsZzAAAAAACEEEEIIIINOOOOOUUUUYaaaaaaceeeeiiiiiiiinooooouuuyy',
+        );
     });
 
     it('should return error because word too short', () => {
