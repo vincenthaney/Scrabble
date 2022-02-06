@@ -14,6 +14,8 @@ export class WordsVerificationService {
         this.loadAllDictionaries();
     }
 
+    // TODO: Add to dictionnaryService
+    // Will be removed during sprint 3
     fetchDictionary(): string[] {
         const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
         const dataBuffer = fs.readFileSync(filePath);
@@ -23,10 +25,12 @@ export class WordsVerificationService {
 
     async loadAllDictionaries() {
         // TODO: Change this to upload all dictionaries within directory
+        // Will be removed during sprint 3
         this.addDictionary();
     }
 
     // TODO: Create a separate service to manage dictionary importation
+    // Will be removed during sprint 3
     async addDictionary() {
         this.activeDictionaries.set(WordsVerificationConst.DICTIONARY_NAME, new Set(this.fetchDictionary()));
     }
