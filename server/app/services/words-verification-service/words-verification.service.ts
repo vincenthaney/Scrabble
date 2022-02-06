@@ -11,6 +11,7 @@ export class WordsVerificationService {
 
     constructor() {
         this.loadAllDictionaries();
+        this.activeDictionaries = new Map();
     }
 
     async fetchDictionary(): Promise<string[]> {
