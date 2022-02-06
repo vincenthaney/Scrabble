@@ -5,7 +5,7 @@
 
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
-import WaitingRoom from '@app/classes/game/waiting-game';
+import WaitingRoom from '@app/classes/game/waiting-room';
 import * as Errors from '@app/constants/errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

@@ -1,6 +1,7 @@
+import { LobbyData } from '@app/classes/communication/lobby-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
-import WaitingRoom from '@app/classes/game/waiting-game';
+import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
@@ -142,11 +143,24 @@ export class GameDispatcherService {
     /**
      * Get all available lobby that the player can join
      *
-     * @returns {WaitingRoom[]} list of available lobby
+     * @returns {LobbyData[]} list of available lobby
      */
 
     getAvailableWaitingRooms() {
-        return this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
+        const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
+        const lobbyData: LobbyData[] = [];
+        for (const room of waitingRooms) {
+            const config = room.getConfig();
+            lobbyData.push({
+                dictionary: config.dictionary,
+                playerName: config.player1.name,
+                maxRoundTime: config.maxRoundTime,
+                lobbyId: room.getId(),
+                gameType: config.gameType,
+            });
+        }
+
+        return lobbyData;
     }
 
     private getGameFromId(waitingRoomId: string): WaitingRoom {

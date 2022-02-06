@@ -1,4 +1,4 @@
-import { CreateGameRequest, GameRequest } from '@app/classes/communication/request';
+import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
@@ -28,6 +28,18 @@ export class GameDispatcherController {
                 const gameId = this.handleCreateGame({ playerId, ...body });
 
                 res.status(StatusCodes.CREATED).send({ gameId });
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+
+        this.router.get('/games/:playerId', (req: LobbiesRequest, res: Response) => {
+            const { playerId } = req.params;
+
+            try {
+                this.handleLobbiesRequest(playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
                 HttpException.sendError(e, res);
             }
@@ -112,5 +124,11 @@ export class GameDispatcherController {
         const rejectedPlayerId = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
 
         this.socketService.emitToSocket(rejectedPlayerId, 'rejected');
+    }
+
+    private handleLobbiesRequest(playerId: string) {
+        const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
+
+        this.socketService.emitToSocket(playerId, 'lobbiesUpdate', waitingRooms);
     }
 }
