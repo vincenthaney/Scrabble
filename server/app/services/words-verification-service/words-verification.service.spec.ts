@@ -29,23 +29,27 @@ describe('WordsVerificationService', () => {
     });
 
     it('should return error because word too short', () => {
-        const result = () => wordsVerificationService.verifyWords(['a'], DICTIONARY_NAME);
-        expect(result).to.Throw('a' + WORD_TOO_SHORT);
+        const testWord = 'a';
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
+        expect(result).to.Throw(testWord + WORD_TOO_SHORT);
     });
 
     it('should return error because word contains hyphen', () => {
-        const result = () => wordsVerificationService.verifyWords(['a-a'], DICTIONARY_NAME);
-        expect(result).to.Throw('a-a' + WORD_CONTAINS_HYPHEN);
+        const testWord = 'a-a';
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
+        expect(result).to.Throw(testWord + WORD_CONTAINS_HYPHEN);
     });
 
     it('should return error because word contains apostrophe', () => {
-        const result = () => wordsVerificationService.verifyWords(["aaaa'aaaa"], DICTIONARY_NAME);
-        expect(result).to.Throw("aaaa'aaaa" + WORD_CONTAINS_APOSTROPHE);
+        const testWord = "aaaa'aaaa";
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
+        expect(result).to.Throw(testWord + WORD_CONTAINS_APOSTROPHE);
     });
 
     it('should return error if word is not in dictionary', () => {
-        const result = () => wordsVerificationService.verifyWords(['ufdwihfewa'], DICTIONARY_NAME);
-        expect(result).to.Throw('ufdwihfewa' + INVALID_WORD);
+        const testWord = 'ufdwihfewa';
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
+        expect(result).to.Throw(testWord + INVALID_WORD);
     });
 
     it('should be true when word is in the dictionary', () => {
