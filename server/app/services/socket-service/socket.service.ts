@@ -51,6 +51,7 @@ export class SocketService {
     emitToRoom(id: string, ev: 'joinRequest', ...args: JoinRequestEmitArgs[]): void;
     emitToRoom(id: string, ev: 'startGame', ...args: StartGameEmitArgs[]): void;
     emitToRoom(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
+    emitToRoom(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]) {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
@@ -76,7 +77,8 @@ export class SocketService {
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
-
+        // eslint-disable-next-line no-console
+        console.log(args);
         this.getSocket(id).emit(ev, args);
     }
 }
