@@ -10,7 +10,7 @@ import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { ActiveGameService } from './active-game.service';
 
 const expect = chai.expect;
