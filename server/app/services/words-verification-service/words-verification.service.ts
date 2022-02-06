@@ -10,8 +10,8 @@ export class WordsVerificationService {
     activeDictionaries: Map<string, Set<string>>;
 
     constructor() {
-        this.loadAllDictionaries();
         this.activeDictionaries = new Map<string, Set<string>>();
+        this.loadAllDictionaries();
     }
 
     fetchDictionary(): string[] {
@@ -21,7 +21,7 @@ export class WordsVerificationService {
         return data.words;
     }
 
-    loadAllDictionaries() {
+    async loadAllDictionaries() {
         // TODO: Change this to upload all dictionaries within directory
         this.addDictionary();
     }
