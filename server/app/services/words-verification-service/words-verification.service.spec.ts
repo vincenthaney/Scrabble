@@ -53,8 +53,6 @@ describe('WordsVerificationService', () => {
         const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
         if (dictionary) {
             dictionary.forEach((word) => {
-                // eslint-disable-next-line no-console
-                console.log(words.length);
                 if (words.length < 1) {
                     words.join(word);
                 }
@@ -70,8 +68,6 @@ describe('WordsVerificationService', () => {
         const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
         if (dictionary) {
             dictionary.forEach((word) => {
-                // eslint-disable-next-line no-console
-                console.log(words.length);
                 if (words.length < 3) {
                     words.join(word);
                 }
