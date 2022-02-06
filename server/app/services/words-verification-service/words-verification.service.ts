@@ -11,13 +11,13 @@ export class WordsVerificationService {
 
     constructor() {
         this.loadAllDictionaries();
-        this.activeDictionaries = new Map();
+        this.activeDictionaries = new Map<string, Set<string>>();
     }
 
     async fetchDictionary(): Promise<string[]> {
         const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
-        const dataBuffer = await fs.promises.readFile(filePath, 'utf-8');
-        const data: DictionaryData = JSON.parse(dataBuffer);
+        const dataBuffer = fs.readFileSync(filePath);
+        const data: DictionaryData = JSON.parse(dataBuffer.toString());
         return data.words;
     }
 
