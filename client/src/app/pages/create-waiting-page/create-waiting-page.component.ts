@@ -1,5 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { OnlinePlayer } from '@app/classes/player';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CONTENT,
@@ -7,8 +10,6 @@ import {
     HOST_WAITING_MESSAGE,
     OPPONENT_FOUND_MESSAGE,
 } from './create-waiting-page.component.const';
-import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -17,6 +18,8 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class CreateWaitingPageComponent {
     @Input() opponent: OnlinePlayer | undefined;
+    @ViewChild(MatProgressSpinner, { static: false }) spinnerOpponentFound: MatProgressSpinner;
+
     host: OnlinePlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;

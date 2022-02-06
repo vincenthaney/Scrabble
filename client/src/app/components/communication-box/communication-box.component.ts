@@ -16,7 +16,6 @@ type LetterMapItem = { letter: LetterValue; amount: number };
 export class CommunicationBoxComponent {
     @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
-    message: string;
     messages: Message[] = [
         { text: 'message 1', sender: 'Mathilde', date: new Date(), class: 'me' },
         { text: 'message 2', sender: 'Mathilde', date: new Date(), class: 'me' },
@@ -60,9 +59,10 @@ export class CommunicationBoxComponent {
     constructor(private inputParser: InputParserService) {}
 
     sendMessage() {
-        if (this.message) {
-            this.inputParser.parseInput(this.message);
-            this.messages = [...this.messages, { text: this.message, sender: 'Mathilde', date: new Date(), class: 'me' }];
+        const message = this.messageForm.get('content')?.value;
+        if (message) {
+            this.inputParser.parseInput(message);
+            this.messages = [...this.messages, { text: message, sender: 'Mathilde', date: new Date(), class: 'me' }];
             this.messageForm.reset();
             this.scrollToBottom();
         }

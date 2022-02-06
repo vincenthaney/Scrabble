@@ -1,11 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { OnlinePlayer } from '@app/classes/player';
-import { CreateWaitingPageComponent } from './create-waiting-page.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { OnlinePlayer } from '@app/classes/player';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { CreateWaitingPageComponent } from './create-waiting-page.component';
+import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
 
 describe('CreateWaitingPageComponent', () => {
     let component: CreateWaitingPageComponent;
@@ -15,8 +17,8 @@ describe('CreateWaitingPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent],
-            imports: [MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
+            imports: [CommonModule, MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
         }).compileComponents();
         fixture = TestBed.createComponent(CreateWaitingPageComponent);
     });
