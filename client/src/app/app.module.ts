@@ -25,7 +25,6 @@ import { InformationBoxComponent } from './components/information-box/informatio
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
-import { MaterialPageComponent } from './pages/material-page/material-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -38,7 +37,6 @@ import { MaterialPageComponent } from './pages/material-page/material-page.compo
         AppComponent,
         GamePageComponent,
         MainPageComponent,
-        MaterialPageComponent,
         PlayAreaComponent,
         HomePageComponent,
         SquareComponent,

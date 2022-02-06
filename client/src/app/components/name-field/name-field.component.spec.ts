@@ -4,8 +4,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NAME_NO_MATCH_REGEX, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
 import { NameFieldComponent } from './name-field.component';
-import { NAME_TOO_SHORT, NAME_TOO_LONG, NAME_NO_MATCH_REGEX } from '@app/constants/name-field';
 
 const fakeNameChange = () => {
     return false;
@@ -78,8 +78,8 @@ describe('NameFieldComponent', () => {
         '2 spaces in a row',
     ];
     for (let i = 0; i < expectedMessage.length; i++) {
-        it(`an Invalid Name should be display the correct error message (${testedCase[i]})`, () => {
-            fixture.whenStable().then(() => {
+        it(`an Invalid Name should be display the correct error message (${testedCase[i]})`, async () => {
+            return fixture.whenStable().then(() => {
                 component.formParameters.get('inputName')?.setValue(inputNames[i]);
                 component.formParameters.get('inputName')?.markAsDirty();
                 fixture.detectChanges();
@@ -89,8 +89,8 @@ describe('NameFieldComponent', () => {
             });
         });
     }
-    it('a valid Name should not display an error message', () => {
-        fixture.whenStable().then(() => {
+    it('a valid Name should not display an error message', async () => {
+        return fixture.whenStable().then(() => {
             component.formParameters.get('inputName')?.setValue('Michel');
             component.formParameters.get('inputName')?.markAsDirty();
             fixture.detectChanges();
