@@ -11,7 +11,7 @@ import {
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
-    MIN_ROW_NUMBER
+    MIN_ROW_NUMBER,
 } from '@app/constants/game';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { GameService } from '..';
