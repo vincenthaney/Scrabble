@@ -1,10 +1,11 @@
+/* eslint-disable no-console */
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
+import { PlayerName } from '@app/classes/communication/player-name';
 import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
 import { GameService } from '@app/services';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -13,17 +14,26 @@ import { environment } from 'src/environments/environment';
 export class GameDispatcherController extends SocketController {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
-    constructor(private http: HttpClient, private gameService: GameService, private gameDispatcherService: GameDispatcherService) {
+    lobbyFullEvent: EventEmitter<string> = new EventEmitter();
+    lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
+
+    constructor(private http: HttpClient, private gameService: GameService) {
         super();
         this.connect();
         this.configureSocket();
     }
 
     configureSocket(): void {
-        this.on('joinRequest', (opponentName: string) => this.joinRequestEvent.emit(opponentName));
-        this.on('startGame', (startGameData: StartMultiplayerGameData) => this.gameService.initializeMultiplayerGame(this.getId(), startGameData));
-        this.on('lobbyUpdate', (lobbies: LobbyInfo[]) => this.gameDispatcherService.handleLobbyUpdate(lobbies));
-        this.on('lobbyFull', (opponentName: string) => this.gameDispatcherService.handleLobbyFull(opponentName));
+        this.on('joinRequest', (opponent: PlayerName[]) => {
+            this.joinRequestEvent.emit(opponent[0].name);
+        });
+        this.on('startGame', (startGameData: StartMultiplayerGameData[]) =>
+            this.gameService.initializeMultiplayerGame(this.getId(), startGameData[0]),
+        );
+        this.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
+            this.lobbiesUpdateEvent.emit(lobbies[0]);
+        });
+        this.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
@@ -34,24 +44,28 @@ export class GameDispatcherController extends SocketController {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
+        console.log(opponentName);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/accept`;
-        this.http.post(endpoint, opponentName).subscribe();
+        this.http.post(endpoint, { opponentName }).subscribe();
     }
 
     handleRejectionGameCreation(opponentName: string, gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/reject`;
-        this.http.post(endpoint, opponentName).subscribe();
+        this.http.post(endpoint, { opponentName }).subscribe();
     }
 
-    // Should there be a param for filter or is the filtering done client side?
+    handleCancel(opponentName: string, gameId: string): void {
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/cancel`;
+        this.http.delete(endpoint).subscribe();
+    }
+
     handleLobbiesListRequest(): void {
         const endpoint = `${environment.serverUrl}/games/${this.getId()}`;
         this.http.get(endpoint).subscribe();
     }
 
-    handleLobbyJoinRequest(playerName: string, gameId: string): void {
-        // games/gameId or lobbies/lobbyId??
+    handleLobbyJoinRequest(gameId: string, playerName: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/join`;
-        this.http.post(endpoint, playerName).subscribe();
+        this.http.post(endpoint, { playerName }).subscribe();
     }
 }
