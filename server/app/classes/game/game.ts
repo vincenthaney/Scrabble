@@ -43,7 +43,7 @@ export default class Game {
         game.id = id;
         game.player1 = config.player1;
         game.player2 = config.player2;
-        game.roundManager = new RoundManager(/* config.maxRoundTime */);
+        game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.wordsPlayed = [];
         game.gameType = config.gameType;
         game.tileReserve = new TileReserve();
@@ -54,7 +54,7 @@ export default class Game {
         game.player1.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
         game.player2.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
 
-        // game.roundManager.startRound(); TODO: start round
+        game.roundManager.nextRound();
 
         return game;
     }

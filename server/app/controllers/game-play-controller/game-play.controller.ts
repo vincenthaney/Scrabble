@@ -1,20 +1,46 @@
-// import * as io from 'socket.io';
-import { SocketController } from '@app/controllers/socket-controller/socket.controller';
-// import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { ActionData } from '@app/classes/communication/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { GameRequest } from '@app/classes/communication/request';
+import { HttpException } from '@app/classes/http.exception';
+import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
 
-export class GamePlayController extends SocketController {
-    // private readonly gamePlayService: GamePlayService;
+@Service()
+export class GamePlayController {
+    router: Router;
 
-    // constructor(socket: io.Socket, gamePlayService: GamePlayService) {
-    //     super(socket);
-    //     this.gamePlayService = gamePlayService;
-    // }
-
-    configureSocket(): void {
-        // this.on('play-action', this.handlePlayAction);
+    constructor(private readonly gamePlayService: GamePlayService, private readonly socketService: SocketService) {
+        this.configureRouter();
     }
 
-    // handlePlayAction(arg: PlayActionArg) {
-    //     // ...
-    // }
+    gameUpdate(gameId: string, data: GameUpdateData): void {
+        this.socketService.emitToRoom(gameId, 'gameUpdate', data);
+    }
+
+    private configureRouter(): void {
+        this.router = Router();
+
+        this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+            const data: ActionData = req.body;
+
+            try {
+                this.handlePlayAction(gameId, playerId, data);
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+    }
+
+    private handlePlayAction(gameId: string, playerId: string, data: ActionData) {
+        if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
+        if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
+
+        const updateData = this.gamePlayService.playAction(gameId, playerId, data);
+        this.gameUpdate(gameId, updateData);
+    }
 }

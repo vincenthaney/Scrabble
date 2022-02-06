@@ -12,6 +12,7 @@ const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
 export class TileComponent {
     @Input() tile: Tile | { letter: '?'; value: number } = UNDEFINED_TILE;
     @Input() fontSize: string = '1em';
+    @Input() hideValue: boolean = false;
     isPlayed: boolean = false;
     bgPath: string;
 

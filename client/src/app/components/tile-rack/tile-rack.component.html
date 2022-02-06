@@ -1,12 +1,11 @@
-<div id="rack-grid" class="full-size">
-    <div id="rack-card-container" align="center">
-        <mat-card id="rack-tile-card" class="rack-card">
+<div id="rack-grid">
+    <mat-card>
+        <div id="rack-card-container">
             <app-tile *ngFor="let tile of tiles" [tile]="tile" fontSize="1.5em" class="rack-tile"></app-tile>
-        </mat-card>
-    </div>
-    <div id="rack-button-container" class="rack-card">
-        <button mat-raised-button class="btn-rack" color="primary">Échanger</button>
-        <button mat-raised-button class="btn-rack" color="primary">Annuler</button>
-    </div>
+        </div>
+        <div id="rack-button-container" class="rack-card">
+            <button mat-raised-button class="btn-rack" color="primary"><app-icon icon="exchange"></app-icon> Échanger</button>
+            <button mat-raised-button class="btn-rack" color="primary"><app-icon icon="undo"></app-icon> Annuler</button>
+        </div>
+    </mat-card>
 </div>
- 
