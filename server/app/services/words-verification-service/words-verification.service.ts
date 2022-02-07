@@ -1,4 +1,11 @@
-import { INVALID_WORD, MINIMUM_WORD_LENGTH, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
+import {
+    INVALID_WORD,
+    MINIMUM_WORD_LENGTH,
+    WORD_CONTAINS_APOSTROPHE,
+    WORD_CONTAINS_ASTERISK,
+    WORD_CONTAINS_HYPHEN,
+    WORD_TOO_SHORT,
+} from '@app/constants/errors';
 import { Service } from 'typedi';
 import * as fs from 'fs';
 import { join } from 'path';

@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
-import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
+import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { expect } from 'chai';
 import { WordsVerificationService } from './words-verification.service';
 import { DICTIONARY_NAME } from './words-verification.service.const';
@@ -37,7 +37,7 @@ describe('WordsVerificationService', () => {
     it('should return error because word contains asterisk', () => {
         const testWord = 'ka*ak';
         const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
-        expect(result).to.Throw(testWord + WORD_CONTAINS_HYPHEN);
+        expect(result).to.Throw(testWord + WORD_CONTAINS_ASTERISK);
     });
 
     it('should return error because word contains hyphen', () => {
