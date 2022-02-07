@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { LobbyData } from '@app/classes/communication/lobby-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
@@ -129,6 +130,30 @@ export class GameDispatcherService {
     }
 
     /**
+     * Joining player leaving the lobby before being accepted or rejected
+     *
+     * @param waitingRoomId Id of the game in the lobby
+     * @param playerId Id of the initiating player
+     * @return host player Id and the leavingPlayer name
+     */
+
+    leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
+        // console.log(waitingRoomId);
+        // console.log(waitingRoom);
+        if (waitingRoom.joinedPlayer === undefined) {
+            throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        } else if (waitingRoom.joinedPlayer?.getId() !== playerId) {
+            throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        }
+        const leaverName = waitingRoom.joinedPlayer.name;
+        const hostPlayerId = waitingRoom.getConfig().player1.getId();
+        // console.log(hostPlayerId);
+
+        waitingRoom.joinedPlayer = undefined;
+        return [hostPlayerId, leaverName];
+    }
+    /**
      * Let initiating player cancel a game
      *
      * @param waitingRoomId Id of the game in the lobby
@@ -170,7 +195,7 @@ export class GameDispatcherService {
         return lobbyData;
     }
 
-    private getGameFromId(waitingRoomId: string): WaitingRoom {
+    getGameFromId(waitingRoomId: string): WaitingRoom {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID);

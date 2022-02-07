@@ -83,6 +83,57 @@ export class GameDispatcherController {
                 HttpException.sendError(e, res);
             }
         });
+
+        this.router.delete('/games/:gameId/player/:playerId/cancel', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+
+            try {
+                this.handleCancelGame(gameId, playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+
+        this.router.delete('/games/:gameId/player/:playerId/leave', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+
+            try {
+                this.handleLobbyLeave(gameId, playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+    }
+
+    private handleCancelGame(gameId: string, playerId: string) {
+        // console.log(gameId);
+        // console.log(playerId);
+        // console.log(this.gameDispatcherService.getLobbiesRoom());
+        // console.log(this.gameDispatcherService.getAvailableWaitingRooms());
+        const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
+        if (waitingRoom.joinedPlayer) {
+            this.socketService.emitToSocket(waitingRoom.joinedPlayer.getId(), 'canceledGame', { name: waitingRoom.getConfig().player1.name });
+        }
+        this.gameDispatcherService.cancelGame(gameId, playerId);
+
+        this.handleLobbiesUpdate();
+    }
+
+    private handleLobbyLeave(gameId: string, playerId: string) {
+        // console.log('joinerLeaveGameSERVERSIDE');
+        // console.log(gameId);
+        // console.log(playerId);
+        const result = this.gameDispatcherService.leaveLobbyRequest(playerId, gameId);
+        // console.log('RESULTAT');
+        // console.log(result[0]);
+        // console.log(result[1]);
+
+        this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
+        this.handleLobbiesUpdate();
     }
 
     private handleCreateGame(config: GameConfigData): string {
