@@ -14,6 +14,8 @@ import { environment } from 'src/environments/environment';
 export class GameDispatcherController extends SocketController {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
+    canceledGameEvent: EventEmitter<string> = new EventEmitter();
+    leaveLobbyEvent: EventEmitter<string> = new EventEmitter();
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
 
@@ -34,6 +36,12 @@ export class GameDispatcherController extends SocketController {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
         });
         this.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
+        this.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
+        this.on('joinerLeaveGame', (opponent: PlayerName[]) => {
+            console.log('joinerLeaveGameCLIENT');
+            console.log(opponent);
+            this.leaveLobbyEvent.emit(opponent[0].name);
+        });
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
@@ -54,8 +62,14 @@ export class GameDispatcherController extends SocketController {
         this.http.post(endpoint, { opponentName }).subscribe();
     }
 
-    handleCancel(opponentName: string, gameId: string): void {
+    handleCancelGame(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/cancel`;
+        this.http.delete(endpoint).subscribe();
+    }
+
+    handleLeaveLobby(gameId: string): void {
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/leave`;
+        // patch?
         this.http.delete(endpoint).subscribe();
     }
 
