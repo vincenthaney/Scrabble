@@ -1,16 +1,18 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import Game from './game';
-import { GameType } from './game.type';
-import TileReserve from '@app/classes/tile/tile-reserve';
 import Player from '@app/classes/player/player';
-import { MultiplayerGameConfig } from './game-config';
 import { Tile } from '@app/classes/tile';
+import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
+import BoardService from '@app/services/board/board.service';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { Container } from 'typedi';
+import Game from './game';
+import { MultiplayerGameConfig } from './game-config';
+import { GameType } from './game.type';
 
 const expect = chai.expect;
 
@@ -43,6 +45,9 @@ describe('Game', () => {
             this['referenceTiles'] = [...this['tiles']];
             return Promise.resolve();
         };
+
+        const boardService = Container.get(BoardService);
+        Game.injectServices(boardService);
     });
 
     afterEach(() => {
@@ -140,5 +145,24 @@ describe('Game Type', () => {
 
     it('should contain LOG2990', () => {
         expect(GameType.LOG2990).to.equal('LOG2990');
+    });
+});
+
+describe('Game Service Injection', () => {
+    it('injectServices should set static Game BoardService', () => {
+        chai.spy.on(Game, 'getBoardService', () => null);
+        const boardService = Container.get(BoardService);
+
+        expect(Game['getBoardService']()).to.not.exist;
+        Game.injectServices(boardService);
+        chai.spy.restore();
+        expect(Game['getBoardService']()).to.equal(boardService);
+    });
+
+    it('injectServices should call getBoardService()', () => {
+        const boardService = Container.get(BoardService);
+        chai.spy.on(Game, 'getBoardService', () => boardService);
+        Game.injectServices(boardService);
+        expect(Game['getBoardService']).to.have.been.called;
     });
 });

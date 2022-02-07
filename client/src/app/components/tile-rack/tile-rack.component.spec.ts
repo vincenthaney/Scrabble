@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Tile } from '@app/classes/tile';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { TileComponent } from '@app/components/tile/tile.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { TileRackComponent } from './tile-rack.component';
@@ -44,7 +46,7 @@ describe('TileRackComponent', () => {
                 FormsModule,
                 MatDialogModule,
             ],
-            declarations: [TileRackComponent],
+            declarations: [TileRackComponent, IconComponent, TileComponent],
             providers: [{ provide: GameService, useValue: gameServiceSpy }],
         }).compileComponents();
     });

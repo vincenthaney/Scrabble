@@ -1,10 +1,23 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LobbyPageComponent } from './lobby-page.component';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { LobbyPageComponent } from './lobby-page.component';
+
+@Component({
+    template: '',
+})
+export class TestComponent {}
 
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
@@ -12,9 +25,21 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [MatInputModule, MatFormFieldModule, MatDividerModule],
-
-            declarations: [LobbyPageComponent],
+            declarations: [LobbyPageComponent, NameFieldComponent, LobbyInfoComponent, IconComponent],
+            imports: [
+                MatInputModule,
+                MatFormFieldModule,
+                MatDividerModule,
+                MatDialogModule,
+                MatTooltipModule,
+                BrowserAnimationsModule,
+                FormsModule,
+                ReactiveFormsModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'waiting', component: TestComponent },
+                    { path: 'lobby', component: LobbyPageComponent },
+                ]),
+            ],
         }).compileComponents();
     });
 
@@ -49,7 +74,7 @@ describe('LobbyPageComponent', () => {
         component.nameField.formParameters.patchValue({ inputName: 'Name1' });
         const expected = [false, true, true];
         component.validateName();
-        expect(component.lobbies);
+        expect(component.lobbies).toBeTruthy();
         for (let i = 0; i++; i < component.lobbies.length) {
             expect(component.lobbies[i].canJoin).toEqual(expected[i]);
         }

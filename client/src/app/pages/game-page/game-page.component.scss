@@ -1,101 +1,72 @@
-$info-box-max-width: 1600px;
-$board-width: 700px;
-$communication-box-min-width: 300px;
-$communication-box-max-width: 500px;
+$spacing: 8px;
 
-$board-height-proportion: 80%;
-$rack-height-proportion: 13%;
-$buttons-height-proportion: 7%;
-
-$board-height: $board-width;
-$rack-height: 120px;
-$buttons-height: 50px;
-$info-box-height: 75px;
-
-$button-height: 30px;
-$button-width: 140px;
-
-button {
-    width: $button-width;
+::ng-deep body {
+    background: #f3f3f3;
 }
 
 #page-container {
-    width: 100%;
+    --board-size: 730px;
+    --max-width: 1100px;
+    
     height: 100%;
-    max-width: $info-box-max-width;
-    margin: 0 auto;
-}
 
-#button-group {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
+    .top-level-grid {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: $spacing 0;
+        box-sizing: border-box;
+        gap: $spacing;
 
-.text-button-container {
-    display: flex;
-    justify-content: space-around;
-    padding-bottom: 10px;
-}
+        .horizontal-grid {
+            display: grid;
+            grid-template-columns: var(--board-size) 1fr;
+            gap: $spacing;
 
-.grid-item-container {
-    height: 100%;
-    width: 100%;
-    justify-content: right;
-}
+            .vertical-grid {
+                display: grid;
+                grid-template-rows: 1fr auto auto;
+                gap: $spacing;
 
-.top-level-grid {
-    display: grid;
-    height: 100%;
-    width: 100%;
-    grid-template-rows: $info-box-height auto;
-    justify-items: center;
-    text-align: center;
-    background-color: brown;
-}
+                .grid-item-container {
+                    mat-card {
+                        padding: 12px 16px;
+                        display: flex;
 
-.horizontal-grid {
-    display: grid;
-    grid-template-columns: $board-width auto;
-    height: 100%;
-    width: 100%;
-}
+                        button {
+                            font-size: 0.95em;
+                            flex: 1 1 0px;
 
-@media screen and (min-width: ($board-width + $communication-box-max-width)) {
-    .horizontal-grid {
-        grid-template-columns: $board-width $communication-box-max-width;
-        width: $board-width + $communication-box-max-width;
+                            &:not(:last-child) {
+                                margin-right: $spacing;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .sidebar-section {
+                height: 100%;
+
+                .communication-box-container {
+                    height: 100%;
+                }
+            }
+        }
     }
-}
 
-.vertical-grid {
-    display: grid;
-    grid-template-rows: $board-height-proportion 0 $rack-height-proportion $buttons-height-proportion;
-    height: 100%;
-    width: 100%;
-    background-color: gray;
-}
-@media screen and (min-height: ($board-height + $rack-height + $buttons-height + $info-box-height )) {
-    .vertical-grid {
-        grid-template-rows: $board-height auto $rack-height $buttons-height;
+    @media screen and (max-height: 1000px) {
+        --board-size: 690px;
+        --max-width: 1050px;
     }
-}
-
-.sidebar-section {
-    background-color: blue;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    max-width: $communication-box-max-width;
-    min-width: $communication-box-min-width;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-}
-
-.communication-box-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    @media screen and (max-height: 950px) {
+        --board-size: 640px;
+        --max-width: 1000px;
+    }
+    @media screen and (max-height: 900px) {
+        --board-size: 610px;
+        --max-width: 950px;
+    }
 }

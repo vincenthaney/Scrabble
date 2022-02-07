@@ -8,6 +8,8 @@ import { join } from 'path';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { GamePlayController } from './controllers/game-play-controller/game-play.controller';
 
 @Service()
 export class Application {
@@ -15,7 +17,7 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor() {
+    constructor(private readonly gamePlayController: GamePlayController, private readonly gameDispatcherController: GameDispatcherController) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -37,6 +39,8 @@ export class Application {
     }
 
     bindRoutes(): void {
+        this.app.use('/', this.gamePlayController.router);
+        this.app.use('/', this.gameDispatcherController.router);
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
