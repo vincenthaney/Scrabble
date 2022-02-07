@@ -1,6 +1,10 @@
 import { ActionPlay } from '@app/classes/actions';
 import { Tile } from '@app/classes/tile';
 
+export interface ActionExchangePayload {
+    tiles: Tile[];
+}
+
 export default class ActionExchange extends ActionPlay {
     tilesToExchange: Tile[];
 

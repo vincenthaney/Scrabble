@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { JoinWaitingPageComponent } from './join-waiting-page.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { OnlinePlayer } from '@app/classes/player';
+import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
 describe('WaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
@@ -13,7 +14,7 @@ describe('WaitingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
+            imports: [MatProgressBarModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
         }).compileComponents();
     });
 
