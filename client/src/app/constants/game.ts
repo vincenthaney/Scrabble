@@ -49,3 +49,11 @@ export const UNDEFINED_SQUARE: Square = {
 };
 
 export const VALID_MULTIPLIERS: number[] = [2, 3];
+
+export const MIN_COL_NUMBER = 0;
+export const MAX_COL_NUMBER = 14;
+export const MIN_ROW_NUMBER = 0;
+export const MAX_ROW_NUMBER = 14;
+
+export const MAX_LOCATION_COMMAND_LENGTH = 3;
+export const MIN_LOCATION_COMMAND_LENGTH = 2;

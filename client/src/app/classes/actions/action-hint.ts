@@ -1,6 +1,6 @@
 import { ActionInfo } from '@app/classes/actions';
 
-export default class ActionClue extends ActionInfo {
+export default class ActionHint extends ActionInfo {
     execute(): void {
         throw new Error('Method not implemented.');
     }
