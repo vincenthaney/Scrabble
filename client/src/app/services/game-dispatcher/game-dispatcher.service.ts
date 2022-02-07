@@ -64,7 +64,7 @@ export class GameDispatcherService {
     handleCreateGame(playerName: string, gameParameters: FormGroup) {
         const gameConfig: GameConfigData = {
             playerName,
-            playerId: this.gameDispatcherController.getId(),
+            playerId: this.gameDispatcherController.socketService.getId(),
             gameType: gameParameters.get('gameType')?.value as GameType,
             maxRoundTime: gameParameters.get('timer')?.value as number,
             dictionary: gameParameters.get('dict')?.value as string,

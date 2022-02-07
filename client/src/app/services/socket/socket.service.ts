@@ -1,8 +1,23 @@
+import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
-export abstract class SocketController {
+@Injectable({
+    providedIn: 'root',
+})
+export class SocketService {
     private socket: Socket;
+
+    async initializeService(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                this.connect();
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
 
     isSocketAlive() {
         return this.socket && this.socket.connected;
@@ -27,6 +42,4 @@ export abstract class SocketController {
     emit<T>(ev: string, ...args: T[]) {
         this.socket.emit(ev, args);
     }
-
-    abstract configureSocket(): void;
 }
