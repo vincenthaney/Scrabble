@@ -1,17 +1,18 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LobbyPageComponent } from './lobby-page.component';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { MatDialog } from '@angular/material/dialog';
+import { SocketService } from '@app/services/socket/socket.service';
 import { of } from 'rxjs';
-import { RouterTestingModule } from '@angular/router/testing';
-import { Component } from '@angular/core';
+import { LobbyPageComponent } from './lobby-page.component';
 
 export class GameDispatcherServiceSpy extends GameDispatcherService {
     handleLobbyListRequest() {
@@ -43,7 +44,7 @@ describe('LobbyPageComponent', () => {
     let fixture: ComponentFixture<LobbyPageComponent>;
 
     const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLobbyListRequest', 'handleJoinLobby']);
-    
+
     gameDispatcherSpy.handleLobbyListRequest.and.callFake(() => {
         console.log('handleLobbyListRequest');
         return;
@@ -54,7 +55,6 @@ describe('LobbyPageComponent', () => {
     });
 
     beforeEach(async () => {
-
         await TestBed.configureTestingModule({
             imports: [
                 MatInputModule,
@@ -74,6 +74,7 @@ describe('LobbyPageComponent', () => {
                     provide: MatDialog,
                     useClass: MatDialogMock,
                 },
+                SocketService,
             ],
             declarations: [LobbyPageComponent],
         }).compileComponents();

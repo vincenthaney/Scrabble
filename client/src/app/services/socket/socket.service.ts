@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import * as SOCKET_ERROR from './socket.service.error';
 
 @Injectable({
     providedIn: 'root',
@@ -20,6 +21,9 @@ export class SocketService {
     }
 
     isSocketAlive() {
+        if (!this.socket) {
+            return;
+        }
         return this.socket && this.socket.connected;
     }
 
@@ -28,18 +32,30 @@ export class SocketService {
     }
 
     disconnect() {
+        if (!this.socket) {
+            return;
+        }
         this.socket.disconnect();
     }
 
     getId(): string {
+        if (!this.socket) {
+            return SOCKET_ERROR.SOCKET_ID_UNDEFINED;
+        }
         return this.socket.id;
     }
 
     on<T>(ev: string, handler: (arg: T) => void) {
+        if (!this.socket) {
+            return;
+        }
         this.socket.on(ev, handler);
     }
 
     emit<T>(ev: string, ...args: T[]) {
+        if (!this.socket) {
+            return;
+        }
         this.socket.emit(ev, args);
     }
 }
