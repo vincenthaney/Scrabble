@@ -1,4 +1,4 @@
-import { INVALID_WORD, MINIMUM_WORD_LENGTH, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
+import { INVALID_WORD, MINIMUM_WORD_LENGTH, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { Service } from 'typedi';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -40,6 +40,7 @@ export class WordsVerificationService {
             if (word.length > 0) {
                 this.removeAccents(word);
                 if (word.length < MINIMUM_WORD_LENGTH) throw new Error(word + WORD_TOO_SHORT);
+                if (word.includes('*')) throw new Error(word + WORD_CONTAINS_ASTERISK);
                 if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
                 if (word.includes("'")) throw new Error(word + WORD_CONTAINS_APOSTROPHE);
                 if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(word + INVALID_WORD);

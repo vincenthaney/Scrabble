@@ -34,6 +34,12 @@ describe('WordsVerificationService', () => {
         expect(result).to.Throw(testWord + WORD_TOO_SHORT);
     });
 
+    it('should return error because word contains asterisk', () => {
+        const testWord = 'ka*ak';
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
+        expect(result).to.Throw(testWord + WORD_CONTAINS_HYPHEN);
+    });
+
     it('should return error because word contains hyphen', () => {
         const testWord = 'a-a';
         const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
