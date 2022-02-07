@@ -1,4 +1,5 @@
-import { CreateGameRequest, GameRequest } from '@app/classes/communication/request';
+/* eslint-disable no-console */
+import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
@@ -28,6 +29,17 @@ export class GameDispatcherController {
                 const gameId = this.handleCreateGame({ playerId, ...body });
 
                 res.status(StatusCodes.CREATED).send({ gameId });
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+
+        this.router.get('/games/:playerId', (req: LobbiesRequest, res: Response) => {
+            const { playerId } = req.params;
+            try {
+                this.handleLobbiesRequest(playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
                 HttpException.sendError(e, res);
             }
@@ -71,6 +83,57 @@ export class GameDispatcherController {
                 HttpException.sendError(e, res);
             }
         });
+
+        this.router.delete('/games/:gameId/player/:playerId/cancel', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+
+            try {
+                this.handleCancelGame(gameId, playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+
+        this.router.delete('/games/:gameId/player/:playerId/leave', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+
+            try {
+                this.handleLobbyLeave(gameId, playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+    }
+
+    private handleCancelGame(gameId: string, playerId: string) {
+        // console.log(gameId);
+        // console.log(playerId);
+        // console.log(this.gameDispatcherService.getLobbiesRoom());
+        // console.log(this.gameDispatcherService.getAvailableWaitingRooms());
+        const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
+        if (waitingRoom.joinedPlayer) {
+            this.socketService.emitToSocket(waitingRoom.joinedPlayer.getId(), 'canceledGame', { name: waitingRoom.getConfig().player1.name });
+        }
+        this.gameDispatcherService.cancelGame(gameId, playerId);
+
+        this.handleLobbiesUpdate();
+    }
+
+    private handleLobbyLeave(gameId: string, playerId: string) {
+        // console.log('joinerLeaveGameSERVERSIDE');
+        // console.log(gameId);
+        // console.log(playerId);
+        const result = this.gameDispatcherService.leaveLobbyRequest(playerId, gameId);
+        // console.log('RESULTAT');
+        // console.log(result[0]);
+        // console.log(result[1]);
+
+        this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
+        this.handleLobbiesUpdate();
     }
 
     private handleCreateGame(config: GameConfigData): string {
@@ -84,17 +147,19 @@ export class GameDispatcherController {
         const gameId = this.gameDispatcherService.createMultiplayerGame(config);
 
         this.socketService.addToRoom(config.playerId, gameId);
-
+        this.handleLobbiesUpdate();
         return gameId;
     }
 
     private handleJoinGame(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (!validateName(playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
-
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
+        this.socketService.emitToRoom(gameId, 'joinRequest', { name: playerName });
 
-        this.socketService.emitToRoom(gameId, 'joinRequest', { opponentName: playerName });
+        // TODO: add back
+        // this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
+        this.handleLobbiesUpdate();
     }
 
     private async handleAcceptRequest(gameId: string, playerId: string, playerName: string) {
@@ -112,5 +177,17 @@ export class GameDispatcherController {
         const rejectedPlayerId = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
 
         this.socketService.emitToSocket(rejectedPlayerId, 'rejected');
+        this.handleLobbiesUpdate();
+    }
+
+    private handleLobbiesRequest(playerId: string) {
+        const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
+        this.socketService.addToRoom(playerId, this.gameDispatcherService.getLobbiesRoom().getId());
+        this.socketService.emitToSocket(playerId, 'lobbiesUpdate', waitingRooms);
+    }
+
+    private handleLobbiesUpdate() {
+        const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
+        this.socketService.emitToRoom(this.gameDispatcherService.getLobbiesRoom().getId(), 'lobbiesUpdate', waitingRooms);
     }
 }

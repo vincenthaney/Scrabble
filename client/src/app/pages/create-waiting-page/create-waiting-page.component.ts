@@ -20,6 +20,8 @@ import {
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponent: string | undefined;
     joinRequestSubscription: Subscription;
+    joinerLeaveGameSubscription: Subscription;
+
     host: OnlinePlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
@@ -27,11 +29,15 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName) => this.setOpponent(opponentName));
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.rejectOpponent(leaverName));
     }
 
     ngOnDestroy() {
         if (this.joinRequestSubscription) {
             this.joinRequestSubscription.unsubscribe();
+        }
+        if (this.joinerLeaveGameSubscription) {
+            this.joinerLeaveGameSubscription.unsubscribe();
         }
     }
 
@@ -49,13 +55,25 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    rejectOpponent() {
-        if (this.opponent) {
-            this.warnHostOpponentLeft(this.opponent);
-            this.opponent = undefined;
-            this.waitingRoomMessage = HOST_WAITING_MESSAGE;
-            this.isOpponentFound = false;
-        }
+    rejectOpponent(leaverName: string) {
+        // eslint-disable-next-line no-console
+        console.log('rejectOpponent-CLIENT');
+        this.warnHostOpponentLeft(leaverName);
+        this.opponent = undefined;
+        this.waitingRoomMessage = HOST_WAITING_MESSAGE;
+        this.isOpponentFound = false;
+    }
+
+    cancelGame() {
+        // eslint-disable-next-line no-console
+        console.log('CANCELGAME-CLIENT');
+        this.gameDispatcherService.handleCancelGame();
+        // if (this.opponent) {
+        //     this.warnHostOpponentLeft(this.opponent);
+        //     this.opponent = undefined;
+        //     this.waitingRoomMessage = HOST_WAITING_MESSAGE;
+        //     this.isOpponentFound = false;
+        // }
     }
 
     warnHostOpponentLeft(opponentName: string) {
@@ -75,6 +93,8 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmOpponentToServer() {
+        // eslint-disable-next-line no-console
+        console.log(this.opponent);
         if (this.opponent) {
             this.gameDispatcherService.handleConfirmation(this.opponent);
         }

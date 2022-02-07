@@ -1,4 +1,4 @@
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -52,19 +52,22 @@ describe('LobbyInfoComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('joinLobby should redirect to waiting page', async () => {
-        component.joinLobby();
-        const location: Location = TestBed.inject(Location);
-        return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/waiting');
+    it('clicking the join button should emit the lobbyId', async () => {
+        const spyEmit = spyOn(component.joinLobbyId, 'emit').and.callFake(() => {
+            return '';
         });
+        component.lobby.canJoin = true;
+        fixture.detectChanges();
+        const joinButton = fixture.debugElement.nativeElement.querySelector('#join-button');
+        joinButton.click();
+        expect(spyEmit).toHaveBeenCalled();
     });
 
     it('convertTime should output the correct string using the timer in Lobby', () => {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const TIME = 90;
         const EXPECTED_STRING = '1 minute et 30 secondes';
-        component.lobby.timer = TIME;
+        component.lobby.maxRoundTime = TIME;
         expect(component.convertTime()).toEqual(EXPECTED_STRING);
     });
 

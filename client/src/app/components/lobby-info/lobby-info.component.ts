@@ -1,5 +1,4 @@
-import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
 import { convertTime } from '@app/classes/utils';
@@ -11,17 +10,18 @@ import { convertTime } from '@app/classes/utils';
 })
 export class LobbyInfoComponent {
     @Input() lobby: LobbyInfo;
+    @Output() joinLobbyId = new EventEmitter<string>();
     // dictionnaries: Dictionnaries[]
 
-    constructor(private router: Router) {
-        this.lobby = { lobbyID: 0, playerName: '', gameType: GameType.Classic, timer: 0, canJoin: false };
+    constructor() {
+        this.lobby = { lobbyId: '0', dictionary: '', playerName: '', gameType: GameType.Classic, maxRoundTime: 0, canJoin: false };
     }
 
-    async joinLobby() {
-        await this.router.navigateByUrl('waiting');
+    joinLobby() {
+        this.joinLobbyId.emit(this.lobby.lobbyId);
     }
 
     convertTime(): string {
-        return convertTime(this.lobby.timer);
+        return convertTime(this.lobby.maxRoundTime);
     }
 }

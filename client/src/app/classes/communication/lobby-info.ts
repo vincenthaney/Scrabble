@@ -1,9 +1,5 @@
-import { GameType } from '../game-type';
+import { LobbyData } from './lobby-data';
 
-export interface LobbyInfo {
-    lobbyID: number;
-    playerName: string;
-    gameType: GameType;
-    timer: number;
-    canJoin: boolean;
+export interface LobbyInfo extends LobbyData {
+    canJoin?: boolean;
 }

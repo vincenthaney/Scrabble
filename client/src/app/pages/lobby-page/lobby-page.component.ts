@@ -1,47 +1,65 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { Subscription } from 'rxjs';
+import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2 } from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
 })
-export class LobbyPageComponent {
+export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
+
+    lobbiesUpdateSubscription: Subscription;
+    lobbyFullSubscription: Subscription;
 
     // TODO: Receive LobbyInfo from server
     lobbies: LobbyInfo[] = [
-        { lobbyID: 1, playerName: 'Nom1', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 2, playerName: 'Moyen Long', gameType: GameType.Classic, timer: 150, canJoin: false },
-        { lobbyID: 3, playerName: 'aa', gameType: GameType.LOG2990, timer: 90, canJoin: false },
-        { lobbyID: 4, playerName: 'Nom vraiment long', gameType: GameType.Classic, timer: 270, canJoin: false },
-        { lobbyID: 5, playerName: 'Nom5', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 6, playerName: 'Nom6', gameType: GameType.LOG2990, timer: 60, canJoin: false },
-        { lobbyID: 7, playerName: 'Nom7', gameType: GameType.LOG2990, timer: 60, canJoin: false },
-        { lobbyID: 8, playerName: 'Nom8', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 9, playerName: 'Nom9', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 10, playerName: 'Nom10', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 11, playerName: 'Nom11', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 12, playerName: 'Nom12', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 13, playerName: 'Nom13', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 14, playerName: 'Nom14', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 15, playerName: 'Nom15', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 16, playerName: 'Nom16', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 17, playerName: 'Nom17', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 18, playerName: 'Nom18', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 19, playerName: 'Nom19', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 20, playerName: 'Nom20', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 21, playerName: 'Nom21', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 22, playerName: 'Nom22', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 23, playerName: 'Nom23', gameType: GameType.Classic, timer: 60, canJoin: false },
+        {
+            lobbyId: '1',
+            dictionary: '',
+            playerName: 'Nom vraiment long',
+            gameType: GameType.Classic,
+            maxRoundTime: 270,
+            canJoin: false,
+        },
+        { lobbyId: '1', dictionary: '', playerName: 'Nom1', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
+        { lobbyId: '2', dictionary: '', playerName: 'Moyen Long', gameType: GameType.Classic, maxRoundTime: 150, canJoin: false },
+        { lobbyId: '3', dictionary: '', playerName: 'aa', gameType: GameType.LOG2990, maxRoundTime: 90, canJoin: false },
     ];
-    constructor(private ref: ChangeDetectorRef) {}
+    constructor(
+        private ref: ChangeDetectorRef,
+        public gameDispatcherService: GameDispatcherService,
+        public dialog: MatDialog,
+        private router: Router,
+    ) {}
+
+    ngOnInit() {
+        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent.subscribe((lobbies) => this.updateLobbies(lobbies));
+        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent.subscribe((opponentName) => this.lobbyFullDialog(opponentName));
+        this.gameDispatcherService.handleLobbyListRequest();
+    }
+
+    ngOnDestroy() {
+        if (this.lobbiesUpdateSubscription) {
+            this.lobbiesUpdateSubscription.unsubscribe();
+        }
+        if (this.lobbyFullSubscription) {
+            this.lobbyFullSubscription.unsubscribe();
+        }
+    }
+
     validateName(): void {
         for (const lobby of this.lobbies) {
             lobby.canJoin =
-                (this.nameField.formParameters.get('inputName')?.valid ? true : false) &&
+                (this.nameField.formParameters.get('inputName')?.valid as boolean) &&
                 this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
         }
     }
@@ -49,5 +67,31 @@ export class LobbyPageComponent {
     onNameChange() {
         this.validateName();
         this.ref.markForCheck();
+    }
+
+    updateLobbies(lobbies: LobbyInfo[]): void {
+        this.lobbies = lobbies;
+        this.validateName();
+    }
+
+    joinLobby(lobbyId: string) {
+        this.router.navigateByUrl('join-waiting');
+        this.gameDispatcherService.handleJoinLobby(lobbyId, this.nameField.formParameters.get('inputName')?.value);
+    }
+
+    lobbyFullDialog(opponentName: string) {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                // Data type is DefaultDialogParameters
+                title: DIALOG_TITLE,
+                content: DIALOG_CONTENT_PART_1 + opponentName + DIALOG_CONTENT_PART_2,
+                buttons: [
+                    {
+                        content: DIALOG_BUTTON_CONTENT,
+                        closeDialog: true,
+                    },
+                ],
+            },
+        });
     }
 }
