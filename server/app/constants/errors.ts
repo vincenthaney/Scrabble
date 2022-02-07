@@ -5,4 +5,4 @@ export const INVALID_WORD = 'Word not in dictionary';
 export const WORD_TOO_SHORT = ' Word too short';
 export const WORD_CONTAINS_HYPHEN = ' Word cannot contain hyphen';
 export const WORD_CONTAINS_APOSTROPHE = ' Word cannot contain apostrophe';
-export const WORD_CONTAINS_ASTERISK = 'Word cannot contain asterisk'
+export const WORD_CONTAINS_ASTERISK = 'Word cannot contain asterisk';
