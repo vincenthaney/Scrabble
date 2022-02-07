@@ -53,28 +53,33 @@ describe('WordsVerificationService', () => {
     });
 
     it('should be true when word is in the dictionary', () => {
+        const wordsCount = 1;
         const words: string[] = [];
         const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
+
         if (dictionary) {
-            for (const word of dictionary) {
-                if (words.length < 1) {
-                    words.push(word);
-                    break;
-                }
+            const dictionaryIterator = dictionary[Symbol.iterator]();
+            let i = 0;
+            while (i < wordsCount) {
+                words.push(dictionaryIterator.next().value);
+                i++;
             }
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
 
     it('should be true when words are in the dictionary', () => {
+        const wordsCount = 4;
         const words: string[] = [];
         const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
+
         if (dictionary) {
-            dictionary.forEach((word) => {
-                if (words.length < 3) {
-                    words.push(word);
-                }
-            });
+            const dictionaryIterator = dictionary[Symbol.iterator]();
+            let i = 0;
+            while (i < wordsCount) {
+                words.push(dictionaryIterator.next().value);
+                i++;
+            }
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });

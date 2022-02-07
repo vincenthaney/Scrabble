@@ -39,18 +39,10 @@ export class WordsVerificationService {
         for (const word of words) {
             if (word.length > 0) {
                 this.removeAccents(word);
-                if (word.length < MINIMUM_WORD_LENGTH) {
-                    throw new Error(word + WORD_TOO_SHORT);
-                }
-                if (word.includes('-')) {
-                    throw new Error(word + WORD_CONTAINS_HYPHEN);
-                }
-                if (word.includes("'")) {
-                    throw new Error(word + WORD_CONTAINS_APOSTROPHE);
-                }
-                if (!this.activeDictionaries.get(dictionary)?.has(word)) {
-                    throw new Error(word + INVALID_WORD);
-                }
+                if (word.length < MINIMUM_WORD_LENGTH) throw new Error(word + WORD_TOO_SHORT);
+                if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
+                if (word.includes("'")) throw new Error(word + WORD_CONTAINS_APOSTROPHE);
+                if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(word + INVALID_WORD);
             }
         }
         return words;
