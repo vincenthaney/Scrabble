@@ -32,4 +32,17 @@ describe('WaitingPageComponent', () => {
         component.playerHasBeenRejected(testOpponent);
         expect(spy).toHaveBeenCalled();
     });
+
+    it('should open the cancel dialog when host cancels the game', () => {
+        const spy = spyOn(component.dialog, 'open');
+        component.hostHasCanceled(testOpponent.name);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
+        const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLeaveLobby']);
+        const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
+        cancelButton.click();
+        expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();
+    });
 });
