@@ -39,14 +39,28 @@ export class GameDispatcherService {
         this.canceledGameSubscription = this.gameDispatcherController.canceledGameEvent.subscribe((hostName: string) =>
             this.handleCanceledGame(hostName),
         );
-        this.joinerLeaveGameSubscription = this.gameDispatcherController.canceledGameEvent.subscribe((leaverName: string) =>
+        this.joinerLeaveGameSubscription = this.gameDispatcherController.joinerLeaveGameEvent.subscribe((leaverName: string) =>
             this.handleJoinerLeaveGame(leaverName),
         );
         this.lobbiesUpdateSubscription = this.gameDispatcherController.lobbiesUpdateEvent.subscribe((lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
     }
+    // Joiner event
+    handleJoinLobby(gameId: string, playerName: string) {
+        this.gameId = gameId;
+        this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
+    }
 
+    handleLobbyListRequest() {
+        this.gameDispatcherController.handleLobbiesListRequest();
+    }
+
+    handleLeaveLobby() {
+        if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
+        else throw new Error(UNDEFINED_GAME_ID);
+        this.gameId = undefined;
+    }
     handleCreateGame(playerName: string, gameParameters: FormGroup) {
         const gameConfig: GameConfigData = {
             playerName,
@@ -56,10 +70,6 @@ export class GameDispatcherService {
             dictionary: gameParameters.get('dict')?.value as string,
         };
         this.gameDispatcherController.handleMultiplayerGameCreation(gameConfig);
-    }
-
-    handleJoinRequest(opponentName: string) {
-        this.joinRequestEvent.emit(opponentName);
     }
 
     handleCancelGame() {
@@ -79,6 +89,10 @@ export class GameDispatcherService {
         this.gameId = undefined;
     }
 
+    handleJoinRequest(opponentName: string) {
+        this.joinRequestEvent.emit(opponentName);
+    }
+
     handleLobbiesUpdate(lobbies: LobbyInfo[]) {
         this.lobbiesUpdateEvent.emit(lobbies);
     }
@@ -95,22 +109,5 @@ export class GameDispatcherService {
 
     handleJoinerLeaveGame(leaverName: string) {
         this.joinerLeaveGameEvent.emit(leaverName);
-    }
-
-    handleJoinLobby(gameId: string, playerName: string) {
-        this.gameId = gameId;
-        this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
-    }
-
-    handleLobbyListRequest() {
-        this.gameDispatcherController.handleLobbiesListRequest();
-    }
-
-    handleLeaveLobby() {
-        // TODO: To fix: this.gameId is undefined because never set (only set when you create the game.)
-        // we need it to know which game he is in to notify Host.
-        if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
-        else throw new Error(UNDEFINED_GAME_ID);
-        this.gameId = undefined;
     }
 }

@@ -18,6 +18,7 @@ export class GameDispatcherController extends SocketController {
     leaveLobbyEvent: EventEmitter<string> = new EventEmitter();
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
+    joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
 
     constructor(private http: HttpClient, private gameService: GameService) {
         super();
@@ -40,7 +41,7 @@ export class GameDispatcherController extends SocketController {
         this.on('joinerLeaveGame', (opponent: PlayerName[]) => {
             console.log('joinerLeaveGameCLIENT');
             console.log(opponent);
-            this.leaveLobbyEvent.emit(opponent[0].name);
+            this.joinerLeaveGameEvent.emit(opponent[0].name);
         });
     }
 

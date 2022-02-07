@@ -154,10 +154,11 @@ export class GameDispatcherController {
     private handleJoinGame(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (!validateName(playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
-
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
         this.socketService.emitToRoom(gameId, 'joinRequest', { name: playerName });
-        this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
+
+        // TODO: add back
+        // this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
         this.handleLobbiesUpdate();
     }
 

@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+/* eslint-disable no-console */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LobbyPageComponent } from './lobby-page.component';
 import { MatInputModule } from '@angular/material/input';
@@ -5,15 +7,74 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { GameType } from '@app/classes/game-type';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { MatDialog } from '@angular/material/dialog';
+import { of } from 'rxjs';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Component } from '@angular/core';
 
+export class GameDispatcherServiceSpy extends GameDispatcherService {
+    handleLobbyListRequest() {
+        // eslint-disable-next-line no-console
+        console.log('handleLobbyListRequest');
+        return;
+    }
+    handleJoinLobby() {
+        return;
+    }
+    // lobbiesUpdateEvent: {subscribe: createSpy('lobbiesUpdateEvent subscribe')};
+    // lobbiesUpdateEvent
+}
+
+@Component({
+    template: '',
+})
+class TestComponent {}
+
+export class MatDialogMock {
+    open() {
+        return {
+            afterClosed: () => of({}),
+        };
+    }
+}
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
     let fixture: ComponentFixture<LobbyPageComponent>;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            imports: [MatInputModule, MatFormFieldModule, MatDividerModule],
+    const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLobbyListRequest', 'handleJoinLobby']);
+    
+    gameDispatcherSpy.handleLobbyListRequest.and.callFake(() => {
+        console.log('handleLobbyListRequest');
+        return;
+    });
+    gameDispatcherSpy.handleJoinLobby.and.callFake(() => {
+        console.log('handleLobbyListRequest');
+        return;
+    });
 
+    beforeEach(async () => {
+
+        await TestBed.configureTestingModule({
+            imports: [
+                MatInputModule,
+                MatFormFieldModule,
+                MatDividerModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'waiting-room', component: TestComponent },
+                    { path: 'home', component: TestComponent },
+                ]),
+            ],
+            providers: [
+                {
+                    provide: GameDispatcherService,
+                    useValue: gameDispatcherSpy,
+                },
+                {
+                    provide: MatDialog,
+                    useClass: MatDialogMock,
+                },
+            ],
             declarations: [LobbyPageComponent],
         }).compileComponents();
     });
@@ -26,9 +87,9 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(() => {
         component.lobbies = [
-            { lobbyID: 1, playerName: 'Name1', gameType: GameType.Classic, timer: 60, canJoin: false },
-            { lobbyID: 2, playerName: 'Name2', gameType: GameType.Classic, timer: 60, canJoin: true },
-            { lobbyID: 3, playerName: 'Name3', gameType: GameType.LOG2990, timer: 90, canJoin: false },
+            { lobbyId: '1', playerName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
+            { lobbyId: '2', playerName: 'Name2', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: true },
+            { lobbyId: '3', playerName: 'Name3', gameType: GameType.LOG2990, dictionary: 'default', maxRoundTime: 90, canJoin: false },
         ];
         component.nameField = new NameFieldComponent();
     });
@@ -62,5 +123,20 @@ describe('LobbyPageComponent', () => {
         const spy = spyOn(component, 'validateName').and.callFake(fakeValidateName);
         component.onNameChange();
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('updateLobbies should call validateName', () => {
+        const fakeValidateName = () => {
+            return false;
+        };
+        const spy = spyOn(component, 'validateName').and.callFake(fakeValidateName);
+        component.updateLobbies(component.lobbies);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('joinLobby should send to GameDispatcher service to join a lobby', async () => {
+        // const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleJoinLobby']);
+        component.joinLobby(component.lobbies[0].lobbyId);
+        expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();
     });
 });

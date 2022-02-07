@@ -7,7 +7,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
-import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2 } from './lobby-page.components.const';
+import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2 } from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',
@@ -33,33 +33,18 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         { lobbyId: '1', dictionary: '', playerName: 'Nom1', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
         { lobbyId: '2', dictionary: '', playerName: 'Moyen Long', gameType: GameType.Classic, maxRoundTime: 150, canJoin: false },
         { lobbyId: '3', dictionary: '', playerName: 'aa', gameType: GameType.LOG2990, maxRoundTime: 90, canJoin: false },
-        { lobbyId: '5', dictionary: '', playerName: 'Nom5', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '6', dictionary: '', playerName: 'Nom6', gameType: GameType.LOG2990, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '7', dictionary: '', playerName: 'Nom7', gameType: GameType.LOG2990, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '8', dictionary: '', playerName: 'Nom8', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '9', dictionary: '', playerName: 'Nom9', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '10', dictionary: '', playerName: 'Nom10', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '11', dictionary: '', playerName: 'Nom11', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '12', dictionary: '', playerName: 'Nom12', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '13', dictionary: '', playerName: 'Nom13', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '14', dictionary: '', playerName: 'Nom14', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '15', dictionary: '', playerName: 'Nom15', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '16', dictionary: '', playerName: 'Nom16', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '17', dictionary: '', playerName: 'Nom17', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '18', dictionary: '', playerName: 'Nom18', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
     ];
     constructor(
         private ref: ChangeDetectorRef,
         public gameDispatcherService: GameDispatcherService,
         public dialog: MatDialog,
         private router: Router,
-    ) {
-        this.gameDispatcherService.handleLobbyListRequest();
-    }
+    ) {}
 
     ngOnInit() {
         this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent.subscribe((lobbies) => this.updateLobbies(lobbies));
         this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent.subscribe((opponentName) => this.lobbyFullDialog(opponentName));
+        this.gameDispatcherService.handleLobbyListRequest();
     }
 
     ngOnDestroy() {
@@ -71,24 +56,27 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    joinLobby(lobbyId: string) {
-        if (lobbyId) {
-            this.router.navigateByUrl('join-waiting');
-            this.gameDispatcherService.handleJoinLobby(lobbyId, this.nameField.formParameters.get('inputName')?.value);
-        }
-    }
-
     validateName(): void {
         for (const lobby of this.lobbies) {
             lobby.canJoin =
-                (this.nameField.formParameters.get('inputName')?.valid ? true : false) &&
+                (this.nameField.formParameters.get('inputName')?.valid as boolean) &&
                 this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
         }
+    }
+
+    onNameChange() {
+        this.validateName();
+        this.ref.markForCheck();
     }
 
     updateLobbies(lobbies: LobbyInfo[]): void {
         this.lobbies = lobbies;
         this.validateName();
+    }
+
+    joinLobby(lobbyId: string) {
+        this.router.navigateByUrl('join-waiting');
+        this.gameDispatcherService.handleJoinLobby(lobbyId, this.nameField.formParameters.get('inputName')?.value);
     }
 
     lobbyFullDialog(opponentName: string) {
@@ -105,10 +93,5 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
                 ],
             },
         });
-    }
-
-    onNameChange() {
-        this.validateName();
-        this.ref.markForCheck();
     }
 }
