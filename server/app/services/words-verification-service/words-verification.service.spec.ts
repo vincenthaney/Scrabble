@@ -5,13 +5,40 @@
 import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { expect } from 'chai';
 import { WordsVerificationService } from './words-verification.service';
-import { DICTIONARY_NAME } from './words-verification.service.const';
+import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from './words-verification.service.const';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { join } from 'path';
+import { DictionaryData } from './words-verification.service.types';
+import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+
+chai.use(spies);
+chai.use(chaiAsPromised);
+
+const mockDictionary: DictionaryData = {
+    title: 'My dummy dictionary',
+    description: 'Dictionary takes one "n"',
+    words: ['this', 'dummy', 'dictionary', 'gave', 'me', 'pain', 'and', 'misery'],
+};
+
+// mockPaths must be of type any because keys must be dynamic
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockPaths: any = [];
+mockPaths[join(__dirname, DICTIONARY_RELATIVE_PATH, DICTIONARY_NAME)] = JSON.stringify(mockDictionary);
 
 describe('WordsVerificationService', () => {
     let wordsVerificationService: WordsVerificationService;
-
+    let fetchSpy: unknown;
     beforeEach(() => {
+        mock(mockPaths);
         wordsVerificationService = new WordsVerificationService();
+        fetchSpy = chai.spy.on(wordsVerificationService, 'fetchDictionary');
+    });
+
+    afterEach(() => {
+        chai.spy.restore();
+        mock.restore();
     });
 
     it('should create', () => {
@@ -20,6 +47,11 @@ describe('WordsVerificationService', () => {
 
     it('should contain dictionary', () => {
         expect(wordsVerificationService.activeDictionaries.has(DICTIONARY_NAME)).to.be.true;
+    });
+
+    it('should return the content of dictionnary.words', () => {
+        const filePath = join(__dirname, DICTIONARY_RELATIVE_PATH);
+        expect(wordsVerificationService.fetchDictionary(DICTIONARY_NAME, filePath)).to.deep.equal(mockDictionary.words);
     });
 
     it('should not have any character with accent', () => {
@@ -70,8 +102,6 @@ describe('WordsVerificationService', () => {
                 words.push(dictionaryIterator.next().value);
                 i++;
             }
-            // eslint-disable-next-line no-console
-            console.log(words);
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
@@ -88,8 +118,6 @@ describe('WordsVerificationService', () => {
                 words.push(dictionaryIterator.next().value);
                 i++;
             }
-            // eslint-disable-next-line no-console
-            console.log(words);
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
