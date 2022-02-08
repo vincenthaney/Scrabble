@@ -93,7 +93,7 @@ describe('SquareComponent', () => {
         const getTextSpy = spyOn(squareWrapper.squareView, 'getText').and.returnValue([undefined, undefined]);
 
         squareWrapper.squareComponent.setText();
-        
+
         expect(getTextSpy).toHaveBeenCalled();
     });
 
@@ -108,7 +108,6 @@ describe('SquareComponent', () => {
         const actualColor = squareWrapper.squareComponent.style['background-color'];
         expect(actualColor).toEqual(expectedColor);
     });
-
 });
 
 export class SquareTestWrapper {
@@ -138,7 +137,7 @@ class CenterSquareWrapperComponent {
         {
             tile: null,
             position: { row: 0, column: 0 },
-            multiplier: null,
+            scoreMultiplier: null,
             wasMultiplierUsed: false,
             isCenter: true,
         },
