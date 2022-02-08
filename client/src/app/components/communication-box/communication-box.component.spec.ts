@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { TileComponent } from '@app/components/tile/tile.component';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { CommunicationBoxComponent } from './communication-box.component';
 
 describe('CommunicationBoxComponent', () => {
@@ -7,7 +10,8 @@ describe('CommunicationBoxComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CommunicationBoxComponent],
+            declarations: [CommunicationBoxComponent, TileComponent, IconComponent],
+            imports: [MatCardModule],
         }).compileComponents();
     });
 

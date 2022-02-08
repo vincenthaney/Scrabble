@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { InformationBoxComponent } from './information-box.component';
 
 describe('InformationBoxComponent', () => {
@@ -8,6 +9,7 @@ describe('InformationBoxComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [InformationBoxComponent],
+            imports: [MatCardModule],
         }).compileComponents();
     });
 

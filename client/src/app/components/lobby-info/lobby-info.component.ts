@@ -10,7 +10,6 @@ import { convertTime } from '@app/classes/utils';
 export class LobbyInfoComponent {
     @Input() lobby: LobbyInfo;
     @Output() joinLobbyId = new EventEmitter<string>();
-    // dictionnaries: Dictionnaries[]
 
     joinLobby() {
         this.joinLobbyId.emit(this.lobby.lobbyId);

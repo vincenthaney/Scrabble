@@ -13,6 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { IconComponent } from '@app/components/icon/icon.component';
 
 import { LobbyInfoComponent } from './lobby-info.component';
 
@@ -49,7 +50,7 @@ describe('LobbyInfoComponent', () => {
                 FormsModule,
                 RouterTestingModule.withRoutes([{ path: 'waiting', component: TestComponent }]),
             ],
-            declarations: [LobbyInfoComponent],
+            declarations: [LobbyInfoComponent, IconComponent],
         }).compileComponents();
     });
 
