@@ -8,7 +8,8 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
-import { INVALID_COMMAND } from './command-errors';
+import { CommandErrorMessages } from './command-error-messages';
+import { CommandError } from './command-errors';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE = 'this is a regular message';
@@ -79,13 +80,13 @@ describe('InputParserService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('getOrientation should throw invalid command if orientation string is invalid', () => {
+    it('getOrientation should throw error if orientation string is invalid', () => {
         const invalidOrientationStrings: string[] = ['vh', 'H', 'V', 'j', 'K', '*', '8'];
 
         for (const invalidOrientationString of invalidOrientationStrings) {
             expect(() => {
                 service['getOrientation'](invalidOrientationString);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrow(new CommandError(CommandErrorMessages.BAD_SYNTAX));
         }
     });
 
@@ -96,13 +97,25 @@ describe('InputParserService', () => {
         expect(service['getOrientation'](validLocationStrings[1])).toBe(Orientation.Horizontal);
     });
 
-    it('getStartPosition should throw invalid command if location string is invalid', () => {
-        const invalidLocationStrings: string[] = ['abcde', 'g', 'a143', 'A12', 'B3', '%4', 'a17', 'f0', 'o0', '14a'];
+    it('getStartPosition should throw error if location string is invalid', () => {
+        const invalidLocations: string[] = ['abcde', 'g', 'a143', 'A12', 'B3', '%4', 'a17', 'f0', 'o0', '14a'];
+        const errorMessages: CommandErrorMessages[] = [
+            CommandErrorMessages.BAD_SYNTAX,
+            CommandErrorMessages.BAD_SYNTAX,
+            CommandErrorMessages.BAD_SYNTAX,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+        ];
 
-        for (const invalidLocationString of invalidLocationStrings) {
+        for (let i = 0; i < invalidLocations.length; i++) {
             expect(() => {
-                service['getStartPosition'](invalidLocationString);
-            }).toThrowError(INVALID_COMMAND);
+                service['getStartPosition'](invalidLocations[i]);
+            }).toThrow(new CommandError(errorMessages[i]));
         }
     });
 
@@ -138,13 +151,20 @@ describe('InputParserService', () => {
         }
     });
 
-    it('parseExchangeLettersToTiles should throw INVALID_COMMAND with invalid input', () => {
+    it('parseExchangeLettersToTiles should throw error with invalid input', () => {
         const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
+        const errorMessages: CommandErrorMessages[] = [
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.BAD_SYNTAX,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+        ];
 
-        for (const invalidInput of invalidLetters) {
+        for (let i = 0; i < invalidLetters.length; i++) {
             expect(() => {
-                service['parseExchangeLettersToTiles'](invalidInput);
-            }).toThrowError(INVALID_COMMAND);
+                service['parseExchangeLettersToTiles'](invalidLetters[i]);
+            }).toThrow(new CommandError(errorMessages[i]));
         }
     });
 
@@ -163,12 +183,21 @@ describe('InputParserService', () => {
         }
     });
 
-    it('parsePlaceLettersToTiles should throw INVALID_COMMAND with invalid input', () => {
+    it('parsePlaceLettersToTiles should throw error with invalid input', () => {
         const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
-        for (const invalidInput of invalidLetters) {
+        const errorMessages: CommandErrorMessages[] = [
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+            CommandErrorMessages.IMPOSSIBLE_COMMAND,
+        ];
+
+        for (let i = 0; i < invalidLetters.length; i++) {
             expect(() => {
-                service['parsePlaceLettersToTiles'](invalidInput);
-            }).toThrowError(INVALID_COMMAND);
+                service['parsePlaceLettersToTiles'](invalidLetters[i]);
+            }).toThrow(new CommandError(errorMessages[i]));
         }
     });
 
@@ -283,7 +312,7 @@ describe('InputParserService', () => {
         expect(inputControllerSpy.sendHelpAction).toHaveBeenCalled();
     });
 
-    it('parseInput should throw INVALID_COMMAND if commands have incorrect lengths', () => {
+    it('parseInput should throw error if commands have incorrect lengths', () => {
         const invalidCommands = [
             '!placer abc',
             '!échanger one two three',
@@ -296,7 +325,13 @@ describe('InputParserService', () => {
         for (const invalidCommand of invalidCommands) {
             expect(() => {
                 service.parseInput(invalidCommand);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrow(new CommandError(CommandErrorMessages.BAD_SYNTAX));
         }
+    });
+
+    it('parseInput should throw error if command does not exist', () => {
+        expect(() => {
+            service.parseInput('!trouver un ami');
+        }).toThrow(new CommandError(CommandErrorMessages.INVALID_ENTRY));
     });
 });

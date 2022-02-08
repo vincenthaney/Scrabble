@@ -11,11 +11,12 @@ import {
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
-    MIN_ROW_NUMBER,
+    MIN_ROW_NUMBER
 } from '@app/constants/game';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { GameService } from '..';
-import { INVALID_COMMAND } from './command-errors';
+import { CommandErrorMessages } from './command-error-messages';
+import { CommandError } from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -31,40 +32,51 @@ export default class InputParserService {
             const inputWords: string[] = input.substring(1).split(' ');
             const actionName: string = inputWords[0];
 
-            switch (actionName) {
-                case 'placer':
-                    if (inputWords.length !== 3) throw new Error(INVALID_COMMAND);
-
-                    if (inputWords[2].length === 1) {
-                        this.controller.sendPlaceAction(this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]));
-                    } else {
-                        this.controller.sendPlaceAction(this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]));
-                    }
-                    break;
-                case 'échanger':
-                    if (inputWords.length !== 2) throw new Error(INVALID_COMMAND);
-                    this.controller.sendExchangeAction(this.createExchangeActionPayload(inputWords[1]));
-                    break;
-                case 'passer':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendPassAction();
-                    break;
-                case 'réserve':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendReserveAction();
-                    break;
-                case 'indice':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendHintAction();
-                    break;
-                case 'aide':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendHelpAction();
-                    break;
-                default:
+            try {
+                this.parseCommand(actionName, inputWords);
+            } catch (e) {
+                if (e instanceof CommandError) {
+                    // print message d'erreur dans console joueur
+                }
             }
         } else {
             this.controller.sendMessage(input);
+        }
+    }
+
+    private parseCommand(actionName: string, inputWords: string[]) {
+        switch (actionName) {
+            case 'placer':
+                if (inputWords.length !== 3) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+
+                if (inputWords[2].length === 1) {
+                    this.controller.sendPlaceAction(this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]));
+                } else {
+                    this.controller.sendPlaceAction(this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]));
+                }
+                break;
+            case 'échanger':
+                if (inputWords.length !== 2) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                this.controller.sendExchangeAction(this.createExchangeActionPayload(inputWords[1]));
+                break;
+            case 'passer':
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                this.controller.sendPassAction();
+                break;
+            case 'réserve':
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                this.controller.sendReserveAction();
+                break;
+            case 'indice':
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                this.controller.sendHintAction();
+                break;
+            case 'aide':
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                this.controller.sendHelpAction();
+                break;
+            default:
+                throw new CommandError(CommandErrorMessages.INVALID_ENTRY);
         }
     }
 
@@ -127,14 +139,14 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToPlace.length !== lettersToPlace.length) throw new Error(INVALID_COMMAND);
+        if (tilesToPlace.length !== lettersToPlace.length) throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
 
         return tilesToPlace;
     }
 
     private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
         // user must type exchange letters in lower case
-        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new Error(INVALID_COMMAND);
+        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
 
         const player: IPlayer = this.gameService.getLocalPlayer();
         const playerTiles: Tile[] = [];
@@ -154,24 +166,24 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToExchange.length !== lettersToExchange.length) throw new Error(INVALID_COMMAND);
+        if (tilesToExchange.length !== lettersToExchange.length) throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
 
         return tilesToExchange;
     }
 
     private getStartPosition(location: string): Position {
         if (location.length > MAX_LOCATION_COMMAND_LENGTH || location.length < MIN_LOCATION_COMMAND_LENGTH) {
-            throw new Error(INVALID_COMMAND);
+            throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
         }
 
         const inputRow: number = location[0].charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
         if (inputRow < MIN_ROW_NUMBER || inputRow > MAX_ROW_NUMBER) {
-            throw new Error(INVALID_COMMAND);
+            throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
         }
 
         const inputCol: number = +location.substring(1) - 1;
         if (inputCol < MIN_COL_NUMBER || inputCol > MAX_COL_NUMBER) {
-            throw new Error(INVALID_COMMAND);
+            throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
         }
 
         const inputStartPosition: Position = {
@@ -182,10 +194,10 @@ export default class InputParserService {
     }
 
     private getOrientation(orientationString: string): Orientation {
-        if (orientationString.length !== 1) throw new Error(INVALID_COMMAND);
+        if (orientationString.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
 
         if (orientationString === 'h') return Orientation.Horizontal;
         else if (orientationString === 'v') return Orientation.Vertical;
-        else throw new Error(INVALID_COMMAND);
+        else throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
     }
 }

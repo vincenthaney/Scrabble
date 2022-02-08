@@ -9,7 +9,10 @@ import { ActionPlacePayload } from '@app/classes/actions/action-place';
     providedIn: 'root',
 })
 export class InputControllerService {
+    constructor(private readonly socketService: SocketService) {}
+
     sendPlaceAction(payload: ActionPlacePayload) {}
+
     sendExchangeAction(payload: ActionExchangePayload) {}
     sendPassAction() {}
     sendReserveAction() {}

@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
+import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameType } from '@app/classes/game-type';
 import { IPlayer } from '@app/classes/player';
-import { RoundManagerService } from '@app/services/';
+import { BoardService } from '@app/services/';
+import RoundManagerService from '@app/services/round-manager/round-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -10,21 +13,57 @@ export default class GameService {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
-    roundManagerService: RoundManagerService;
-    opponentPlayer: IPlayer;
-    wordsPlayed: string[]; // TODO: Check if useful when implementing word extraction
+    player1: IPlayer;
+    player2: IPlayer;
     gameType: GameType;
-    private localPlayer: IPlayer;
+    dictionnaryName: string;
+    private gameId: string;
+    private localPlayerId: string;
 
-    // playAction(action: Action): void {
-    //     throw new Error('Method not implemented.');
-    // }
+    constructor(private boardService: BoardService, private roundManager: RoundManagerService) {}
 
-    getLocalPlayer(): IPlayer {
-        return this.localPlayer;
+    initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
+        this.gameId = startGameData.gameId;
+        this.localPlayerId = localPlayerId;
+        this.player1 = startGameData.player1;
+        this.player2 = startGameData.player2;
+        this.gameType = startGameData.gameType;
+        this.dictionnaryName = startGameData.dictionary;
+        this.roundManager.maxRoundTime = startGameData.maxRoundTime;
+        this.roundManager.currentRound = startGameData.round;
+        this.boardService.initializeBoard(startGameData.board);
+        this.roundManager.startRound();
     }
 
-    isGameOver(): boolean {
+    handleGameUpdate(gameUpdateData: GameUpdateData): void {
+        if (gameUpdateData.player1) {
+            this.player1.updatePlayerData(gameUpdateData.player1);
+        }
+        if (gameUpdateData.player2) {
+            this.player2.updatePlayerData(gameUpdateData.player2);
+        }
+        if (gameUpdateData.board) {
+            this.boardService.updateBoard(gameUpdateData.board);
+        }
+        if (gameUpdateData.round) {
+            this.roundManager.updateRound(gameUpdateData.round);
+        }
+        if (gameUpdateData.isGameOver) {
+            this.gameOver();
+        }
+        throw new Error('Method not implemented.');
+    }
+
+    getGameId(): string {
+        return this.gameId;
+    }
+
+    getLocalPlayer(): IPlayer | undefined {
+        if (!this.localPlayerId) return undefined;
+        return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
+    }
+
+    gameOver(): boolean {
         throw new Error('Method not implemented.');
     }
 
