@@ -1,20 +1,26 @@
-import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
-import WaitingRoom from '@app/classes/game/waiting-game';
-import { Service } from 'typedi';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import Player from '@app/classes/player/player';
-import * as GameDispatcherError from './game-dispatcher.service.error';
-import * as Errors from '@app/constants/errors';
+/* eslint-disable no-console */
+import { LobbyData } from '@app/classes/communication/lobby-data';
 import Game from '@app/classes/game/game';
+import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import Room from '@app/classes/game/room';
+import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
+import Player from '@app/classes/player/player';
+import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
+import * as Errors from '@app/constants/errors';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
+import * as GameDispatcherError from './game-dispatcher.service.error';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
+    private lobbiesRoom: Room;
 
     constructor(private activeGameService: ActiveGameService) {
         this.waitingRooms = [];
+        this.lobbiesRoom = new Room();
     }
 
     /**
@@ -37,6 +43,10 @@ export class GameDispatcherService {
         return waitingRoom.getId();
     }
 
+    getLobbiesRoom() {
+        return this.lobbiesRoom;
+    }
+
     /**
      * The second player ask the initiating player to join their game
      *
@@ -47,7 +57,7 @@ export class GameDispatcherService {
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
-
+        // TODO: Add emit
         if (waitingRoom.joinedPlayer !== undefined) {
             throw new HttpException(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
         }
@@ -68,7 +78,7 @@ export class GameDispatcherService {
      * @returns {Game} game
      */
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<Game> {
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<StartMultiplayerGameData> {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
@@ -89,7 +99,9 @@ export class GameDispatcherService {
             player2: waitingRoom.joinedPlayer,
         };
 
-        return this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
+        const createdGame = await this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
+
+        return this.createStartGameData(createdGame);
     }
 
     /**
@@ -101,7 +113,7 @@ export class GameDispatcherService {
      * @return rejected player id
      */
 
-    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string) {
+    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): string {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
@@ -117,6 +129,30 @@ export class GameDispatcherService {
         return rejectedPlayerId;
     }
 
+    /**
+     * Joining player leaving the lobby before being accepted or rejected
+     *
+     * @param waitingRoomId Id of the game in the lobby
+     * @param playerId Id of the initiating player
+     * @return host player Id and the leavingPlayer name
+     */
+
+    leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
+        // console.log(waitingRoomId);
+        // console.log(waitingRoom);
+        if (waitingRoom.joinedPlayer === undefined) {
+            throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        } else if (waitingRoom.joinedPlayer?.getId() !== playerId) {
+            throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        }
+        const leaverName = waitingRoom.joinedPlayer.name;
+        const hostPlayerId = waitingRoom.getConfig().player1.getId();
+        // console.log(hostPlayerId);
+
+        waitingRoom.joinedPlayer = undefined;
+        return [hostPlayerId, leaverName];
+    }
     /**
      * Let initiating player cancel a game
      *
@@ -139,16 +175,48 @@ export class GameDispatcherService {
     /**
      * Get all available lobby that the player can join
      *
-     * @returns {WaitingRoom[]} list of available lobby
+     * @returns {LobbyData[]} list of available lobby
      */
 
     getAvailableWaitingRooms() {
-        return this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
+        const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
+        const lobbyData: LobbyData[] = [];
+        for (const room of waitingRooms) {
+            const config = room.getConfig();
+            lobbyData.push({
+                dictionary: config.dictionary,
+                playerName: config.player1.name,
+                maxRoundTime: config.maxRoundTime,
+                lobbyId: room.getId(),
+                gameType: config.gameType,
+            });
+        }
+
+        return lobbyData;
     }
 
-    private getGameFromId(waitingRoomId: string): WaitingRoom {
+    getGameFromId(waitingRoomId: string): WaitingRoom {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID);
+    }
+
+    private createStartGameData(createdGame: Game): StartMultiplayerGameData {
+        const tileReserve: TileReserveData[] = [];
+        createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
+        const startMultiplayerGameData: StartMultiplayerGameData = {
+            player1: createdGame.player1,
+            player2: createdGame.player2,
+            gameType: createdGame.gameType,
+            maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
+            dictionary: createdGame.dictionnaryName,
+            gameId: createdGame.getId(),
+            board: createdGame.board.grid,
+            tileReserve,
+            round: createdGame.roundManager.getCurrentRound(),
+        };
+        return startMultiplayerGameData;
     }
 }

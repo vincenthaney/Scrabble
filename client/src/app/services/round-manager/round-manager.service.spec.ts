@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { RoundManagerService } from '@app/services';
+import RoundManagerService from '@app/services/round-manager/round-manager.service';
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;

@@ -9,6 +9,12 @@ export default class RoundManagerService {
     completedRounds: Round[];
     maxRoundTime: number;
 
+    updateRound(round: Round): void {
+        this.completedRounds.push(this.currentRound);
+        this.currentRound = round;
+        this.startRound();
+    }
+
     getStartGameTime(): Date {
         return this.completedRounds[0].startTime;
     }

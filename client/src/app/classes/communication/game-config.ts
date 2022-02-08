@@ -1,8 +1,8 @@
+import { GameType } from '@app/classes/game-type';
 import Player from '@app/classes/player/player';
-import Round from '@app/classes/round/round';
+import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { GameType } from './game.type';
 
 export interface GameConfigData {
     playerName: string;

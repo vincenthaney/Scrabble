@@ -8,3 +8,5 @@ export interface GameRequestParams {
 export type GameRequest = Request & { params: GameRequestParams };
 
 export type CreateGameRequest = Request & { params: { playerId: string } };
+
+export type LobbiesRequest = Request & { params: { playerId: string } };

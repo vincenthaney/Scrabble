@@ -4,6 +4,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { OnlinePlayer } from '@app/classes/player';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
 describe('WaitingPageComponent', () => {
@@ -15,6 +17,7 @@ describe('WaitingPageComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
             imports: [MatProgressBarModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
+            providers: [GameDispatcherService, SocketService],
         }).compileComponents();
     });
 
@@ -32,5 +35,18 @@ describe('WaitingPageComponent', () => {
         const spy = spyOn(component.dialog, 'open');
         component.playerHasBeenRejected(testOpponent);
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should open the cancel dialog when host cancels the game', () => {
+        const spy = spyOn(component.dialog, 'open');
+        component.hostHasCanceled(testOpponent.name);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
+        const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLeaveLobby']);
+        const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
+        cancelButton.click();
+        expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();
     });
 });

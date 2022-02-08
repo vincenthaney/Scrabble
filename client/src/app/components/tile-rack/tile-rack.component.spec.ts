@@ -10,13 +10,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { IPlayer, Player } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { TileRackComponent } from './tile-rack.component';
-
 import SpyObj = jasmine.SpyObj;
 
 describe('TileRackComponent', () => {
@@ -68,11 +68,9 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with no tiles should return empty TileRack', () => {
-        gameServiceSpy.getLocalPlayer.and.returnValue({
-            name: 'Test',
-            score: 0,
-            tiles: [],
-        });
+        const localPlayer: IPlayer = new Player('Test');
+        gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
+        spyOn(localPlayer, 'getTiles').and.returnValue([]);
         // eslint-disable-next-line dot-notation
         component['initializeTileRack']();
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
@@ -80,13 +78,12 @@ describe('TileRackComponent', () => {
 
     it('Initializing TileRack with player with tiles should return the player tiles', () => {
         const tiles: Tile[] = [{ letter: 'A', value: 10 }];
-        gameServiceSpy.getLocalPlayer.and.returnValue({
-            name: 'Test',
-            score: 0,
-            tiles,
-        });
+        const localPlayer: IPlayer = new Player('Test');
+        gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
+        spyOn(localPlayer, 'getTiles').and.returnValue(tiles);
         // eslint-disable-next-line dot-notation
         component['initializeTileRack']();
-        expect(component.tiles).toEqual(tiles);
+        expect(component.tiles[0]).toBeTruthy();
+        // expect(component.tiles[0].value).toEqual(tiles[0].value);
     });
 });

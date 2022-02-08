@@ -36,3 +36,8 @@ export interface TileData {
 export interface LetterDistributionData {
     tiles: TileData[];
 }
+
+export interface TileReserveData {
+    letter: LetterValue;
+    amount: number;
+}

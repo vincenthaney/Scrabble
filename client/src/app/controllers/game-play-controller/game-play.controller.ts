@@ -1,34 +1,29 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActionType } from '@app/classes/actions';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
-import { GameUpdateData } from '@app/classes/game-update-data';
-import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
+import { ActionData } from '@app/classes/actions/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameService } from '@app/services';
-import { Observable } from 'rxjs';
-import * as io from 'socket.io';
+import { SocketService } from '@app/services/socket/socket.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GamePlayController extends SocketController {
-    private gameId: string;
-
-    constructor(private http: HttpClient, private gameService: GameService, socket: io.Socket) {
-        super(socket);
+export class GamePlayController {
+    constructor(private http: HttpClient, public socketService: SocketService, private gameService: GameService) {
+        this.configureSocket();
     }
 
     configureSocket(): void {
-        // this.on('play-action', this.handlePlayAction);
+        this.socketService.on('gameUpdate', (data: GameUpdateData) => this.gameService.handleGameUpdate(data));
     }
 
-    handlePlaceAction(playerId: string, payload: ActionPlacePayload): Observable<GameUpdateData> {
-        const endpoint = `${environment.serverUrl}/games/${this.getGameId()}/player/${playerId}/${ActionType.PLACE}`;
-        return this.http.post<GameUpdateData>(endpoint, payload);
+    handleAction(playerId: string, action: ActionData) {
+        const endpoint = `${environment.serverUrl}/games/${this.getGameId()}/player/${playerId}/${action.type}`;
+        this.http.post(endpoint, action.payload).subscribe();
     }
 
     getGameId(): string {
-        return this.gameId;
+        return this.gameService.getGameId();
     }
 }
