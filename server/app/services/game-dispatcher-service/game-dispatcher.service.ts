@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { LobbyData } from '@app/classes/communication/lobby-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
@@ -139,8 +138,6 @@ export class GameDispatcherService {
 
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
         const waitingRoom = this.getGameFromId(waitingRoomId);
-        // console.log(waitingRoomId);
-        // console.log(waitingRoom);
         if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer?.getId() !== playerId) {
@@ -148,7 +145,6 @@ export class GameDispatcherService {
         }
         const leaverName = waitingRoom.joinedPlayer.name;
         const hostPlayerId = waitingRoom.getConfig().player1.getId();
-        // console.log(hostPlayerId);
 
         waitingRoom.joinedPlayer = undefined;
         return [hostPlayerId, leaverName];
