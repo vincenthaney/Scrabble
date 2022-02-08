@@ -29,7 +29,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.rejectOpponent(leaverName));
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.opponentLeft(leaverName));
     }
 
     ngOnDestroy() {
@@ -55,29 +55,15 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    rejectOpponent(leaverName: string) {
-        this.warnHostOpponentLeft(leaverName);
+    opponentLeft(leaverName: string) {
         this.opponent = undefined;
         this.waitingRoomMessage = HOST_WAITING_MESSAGE;
         this.isOpponentFound = false;
-    }
 
-    cancelGame() {
-        this.gameDispatcherService.handleCancelGame();
-        // if (this.opponent) {
-        //     this.warnHostOpponentLeft(this.opponent);
-        //     this.opponent = undefined;
-        //     this.waitingRoomMessage = HOST_WAITING_MESSAGE;
-        //     this.isOpponentFound = false;
-        // }
-    }
-
-    warnHostOpponentLeft(opponentName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_TITLE,
-                content: opponentName + DIALOG_CONTENT,
+                content: leaverName + DIALOG_CONTENT,
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,
@@ -88,6 +74,10 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         });
     }
 
+    cancelGame() {
+        this.gameDispatcherService.handleCancelGame();
+    }
+
     confirmOpponentToServer() {
         if (this.opponent) {
             this.gameDispatcherService.handleConfirmation(this.opponent);
@@ -96,8 +86,8 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     confirmRejectionToServer() {
         if (this.opponent) {
+            this.disconnectOpponent();
             this.gameDispatcherService.handleRejection(this.opponent);
         }
-        this.disconnectOpponent();
     }
 }

@@ -1,24 +1,38 @@
 import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { SocketService } from '@app/services/socket/socket.service';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
+
+@Component({
+    template: '',
+})
+class TestComponent {}
 
 describe('CreateWaitingPageComponent', () => {
     let component: CreateWaitingPageComponent;
     let fixture: ComponentFixture<CreateWaitingPageComponent>;
-    const testOpponent = 'testname';
-
+    const testOpponentName = 'testname';
+    let gameDispatcherServiceMock: GameDispatcherService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [CreateWaitingPageComponent],
-            imports: [HttpClientModule, MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
-            providers: [GameDispatcherService, SocketService],
+            imports: [
+                HttpClientModule,
+                MatProgressSpinnerModule,
+                MatDialogModule,
+                BrowserAnimationsModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'game-creation', component: TestComponent },
+                    { path: 'waiting-room', component: CreateWaitingPageComponent },
+                ]),
+            ],
+            providers: [GameDispatcherService],
         }).compileComponents();
         fixture = TestBed.createComponent(CreateWaitingPageComponent);
     });
@@ -27,48 +41,63 @@ describe('CreateWaitingPageComponent', () => {
         fixture = TestBed.createComponent(CreateWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
+    });
+
+    beforeEach(() => {
+        component.waitingRoomMessage = 'initialwaitingRoomMessage';
+        component.opponent = 'initialopponent';
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('waitingRoomMessage should change to {opponent name} + OpponentFoundMessage when an opponent joins the lobby', async () => {
-        component.setOpponent(testOpponent);
-        expect(component.waitingRoomMessage).toEqual(testOpponent + OPPONENT_FOUND_MESSAGE);
+    it('waitingRoomMessage should change the attributes according to the opponent name', async () => {
+        component.setOpponent(testOpponentName);
+        expect(component.waitingRoomMessage).toEqual(testOpponentName + OPPONENT_FOUND_MESSAGE);
+        expect(component.isOpponentFound).toEqual(true);
+        expect(component.opponent).toEqual(testOpponentName);
     });
 
     it('waitingRoomMessage should change to HostWaitingMessage when an opponent leaves the lobby', async () => {
-        component.setOpponent(testOpponent);
+        component.isOpponentFound = true;
         component.disconnectOpponent();
         expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
+        expect(component.isOpponentFound).toEqual(false);
+        expect(component.opponent).toEqual(undefined);
     });
 
-    it('startButton should be enabled when an opponent joins the lobby', () => {
-        component.setOpponent(testOpponent);
+    it('disconnectOpponent should not change anything if there is no opponent', async () => {
+        component.opponent = undefined;
+        const beforeMessage = component.waitingRoomMessage;
+        component.disconnectOpponent();
+        expect(component.waitingRoomMessage).toEqual(beforeMessage);
+    });
+
+    it('startButton should be enabled when an opponent is found', () => {
+        component.isOpponentFound = true;
         fixture.detectChanges();
         const startGameButton = fixture.nativeElement.querySelector('#start-game-button');
         expect(startGameButton.disabled).toBeFalsy();
     });
 
-    it('rejectButton should be enabled when an opponent joins the lobby', () => {
-        component.setOpponent(testOpponent);
+    it('rejectButton should be enabled when an opponent is found', () => {
+        component.isOpponentFound = true;
         fixture.detectChanges();
         const rejectButton = fixture.nativeElement.querySelector('#reject-button');
         expect(rejectButton.disabled).toBeFalsy();
     });
 
-    it('startButton should be disabled when the opponent leaves the lobby', () => {
-        component.setOpponent(testOpponent);
-        component.disconnectOpponent();
+    it('startButton should be disabled when no opponent is found', () => {
+        component.isOpponentFound = false;
         fixture.detectChanges();
         const startGameButton = fixture.nativeElement.querySelector('#start-game-button');
         expect(startGameButton.disabled).toBeTruthy();
     });
 
-    it('reject button should be disabled when the opponent leaves the lobby', async () => {
-        component.setOpponent(testOpponent);
-        component.disconnectOpponent();
+    it('reject button should be disabled  when no opponent is found', async () => {
+        component.isOpponentFound = false;
         fixture.detectChanges();
         const rejectButton = fixture.nativeElement.querySelector('#reject-button');
         expect(rejectButton.disabled).toBeTruthy();
@@ -92,5 +121,84 @@ describe('CreateWaitingPageComponent', () => {
     it('cancelButton should be enabled when the game is created and no opponent has joined it.', () => {
         const cancelButtonButton = fixture.nativeElement.querySelector('#cancel-button');
         expect(cancelButtonButton.disabled).toBeFalsy();
+    });
+
+    it('opponentLeft set the attributes correctly  and open the dialog', () => {
+        const spy = spyOn(component.dialog, 'open');
+        component.opponentLeft('leaver');
+        expect(spy).toHaveBeenCalled();
+        expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
+        expect(component.isOpponentFound).toEqual(false);
+        expect(component.opponent).toEqual(undefined);
+    });
+
+    it('clicking on the cancelButton call handleCancelGame()', () => {
+        component.isOpponentFound = true;
+        fixture.detectChanges();
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {
+            return;
+        });
+        const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
+        cancelButton.click();
+        expect(gameDispatcherSpy).toHaveBeenCalled();
+    });
+    it('clicking on the rejectButton should call handleRejection() if an opponent is found', () => {
+        component.isOpponentFound = true;
+        fixture.detectChanges();
+        const spyDisconnect = spyOn(component, 'disconnectOpponent');
+
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection')
+            .withArgs(component.opponent as string)
+            .and.callFake(() => {
+                return;
+            });
+        const rejectButton = fixture.debugElement.nativeElement.querySelector('#reject-button');
+        rejectButton.click();
+        expect(spyDisconnect).toHaveBeenCalled();
+        expect(gameDispatcherSpy).toHaveBeenCalled();
+    });
+
+    it('clicking on the rejectButton with no opponent should not call handleRejection() and disconnectOpponent', () => {
+        component.isOpponentFound = false;
+        component.opponent = undefined;
+        fixture.detectChanges();
+        const spyDisconnect = spyOn(component, 'disconnectOpponent');
+
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection').and.callFake(() => {
+            return;
+        });
+        const rejectButton = fixture.debugElement.nativeElement.querySelector('#reject-button');
+        rejectButton.click();
+        expect(spyDisconnect).not.toHaveBeenCalled();
+        expect(gameDispatcherSpy).not.toHaveBeenCalled();
+    });
+
+    it('clicking on the startGame Button should call confirmOpponentToServer() if an opponent is found', () => {
+        component.isOpponentFound = true;
+        fixture.detectChanges();
+
+        const gameDispatcherSpy = spyOn(TestBed.inject(GameDispatcherService), 'handleConfirmation').and.callFake(() => {
+            return;
+        });
+
+        const startGameButton = fixture.debugElement.nativeElement.querySelector('#start-game-button');
+        startGameButton.click();
+
+        expect(gameDispatcherSpy).toHaveBeenCalledWith(component.opponent as string);
+    });
+
+    it('clicking on the startGame Button should not call confirmOpponentToServer() if there is no opponent', () => {
+        component.isOpponentFound = false;
+        component.opponent = undefined;
+        fixture.detectChanges();
+
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConfirmation').and.callFake(() => {
+            return;
+        });
+
+        const startGameButton = fixture.debugElement.nativeElement.querySelector('#start-game-button');
+        startGameButton.click();
+
+        expect(gameDispatcherSpy).not.toHaveBeenCalled();
     });
 });
