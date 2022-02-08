@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -29,6 +30,8 @@ const TEST_LOBBY = {
     canJoin: false,
 };
 
+
+
 describe('LobbyInfoComponent', () => {
     let component: LobbyInfoComponent;
     let fixture: ComponentFixture<LobbyInfoComponent>;
@@ -55,11 +58,8 @@ describe('LobbyInfoComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(LobbyInfoComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
-    });
-
-    beforeEach(() => {
         component.lobby = TEST_LOBBY;
+        fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -67,6 +67,7 @@ describe('LobbyInfoComponent', () => {
     });
 
     it('clicking the join button should emit the lobbyId', async () => {
+        console.log(component.lobby);
         const spyEmit = spyOn(component.joinLobbyId, 'emit').and.callFake(() => {
             return '';
         });
