@@ -19,7 +19,7 @@ export default class RoundManagerService {
         return this.completedRounds[0].startTime;
     }
     startRound(): void {
-        throw new Error('Method not implemented.');
+        // throw new Error('Method not implemented.');
     }
     finishRound(): void {
         throw new Error('Method not implemented.');

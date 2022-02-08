@@ -6,9 +6,11 @@ export default abstract class IPlayer {
     score: number;
     private tiles: Tile[];
 
-    constructor(name: string) {
+    constructor(id: string, name: string, tiles: Tile[]) {
+        this.id = id;
         this.name = name;
         this.score = 0;
+        this.tiles = [...tiles];
     }
 
     getTiles(): Tile[] {

@@ -51,7 +51,6 @@ export class GameDispatcherController {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
-        console.log(opponentName);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
