@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { IPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { GameService } from '@app/services';
@@ -9,12 +9,16 @@ import { Subscription } from 'rxjs';
     templateUrl: './tile-rack.component.html',
     styleUrls: ['./tile-rack.component.scss'],
 })
-export class TileRackComponent {
+export class TileRackComponent implements OnDestroy {
     tiles: Tile[];
     startGameSubscription: Subscription;
 
     constructor(private gameService: GameService) {
         this.startGameSubscription = this.gameService.startGameEvent.subscribe(() => this.initializeTileRack());
+    }
+
+    ngOnDestroy() {
+        this.startGameSubscription.unsubscribe();
     }
 
     private initializeTileRack() {
