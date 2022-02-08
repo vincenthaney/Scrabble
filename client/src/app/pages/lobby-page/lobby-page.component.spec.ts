@@ -31,15 +31,6 @@ describe('LobbyPageComponent', () => {
     let fixture: ComponentFixture<LobbyPageComponent>;
     let gameDispatcherServiceMock: GameDispatcherService;
 
-    // const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLobbyListRequest', 'handleJoinLobby']);
-
-    // gameDispatcherSpy.handleLobbyListRequest.and.callFake(() => {
-    //     return;
-    // });
-    // gameDispatcherSpy.handleJoinLobby.and.callFake(() => {
-    //     return;
-    // });
-
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [
@@ -131,5 +122,35 @@ describe('LobbyPageComponent', () => {
         const spy = spyOn(component.dialog, 'open');
         component.lobbyFullDialog('leaver');
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('ngOnInit should subscribe to gameDispatcherService lobbiesUpdateEvent and lobbyFullEvent', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribeLobbyUpdateEvent = spyOn(gameDispatcherServiceMock.lobbiesUpdateEvent, 'subscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribeLobbyFullEvent = spyOn(gameDispatcherServiceMock.lobbyFullEvent, 'subscribe').and.returnValue(of(true) as any);
+        component.ngOnInit();
+        expect(spySubscribeLobbyUpdateEvent).toHaveBeenCalled();
+        expect(spySubscribeLobbyFullEvent).toHaveBeenCalled();
+    });
+
+    it('updateLobbies should be called when lobbiesUpdateEvent is emittted', () => {
+        const emitLobbies = [
+            { lobbyId: '1', playerName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
+        ];
+        const spySetOpponent = spyOn(component, 'updateLobbies').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.lobbiesUpdateEvent.emit(emitLobbies);
+        expect(spySetOpponent).toHaveBeenCalledWith(emitLobbies);
+    });
+
+    it('lobbyFullDialog should be called when lobbyFullEvent is emittted', () => {
+        const emitName = 'weirdName';
+        const spyOpponentLeft = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.lobbyFullEvent.emit(emitName);
+        expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
     });
 });

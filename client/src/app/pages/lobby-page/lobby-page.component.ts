@@ -82,7 +82,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbyFullDialog(opponentName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_TITLE,
                 content: DIALOG_CONTENT_PART_1 + opponentName + DIALOG_CONTENT_PART_2,
                 buttons: [
