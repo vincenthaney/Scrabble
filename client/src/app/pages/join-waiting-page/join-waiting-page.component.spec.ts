@@ -1,12 +1,19 @@
 import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { OnlinePlayer } from '@app/classes/player';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
+
+@Component({
+    template: '',
+})
+class TestComponent {}
 
 describe('JoinWaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
@@ -16,7 +23,16 @@ describe('JoinWaitingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([]), HttpClientModule],
+            imports: [
+                MatDialogModule,
+                MatProgressBarModule,
+                BrowserAnimationsModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'lobby', component: TestComponent },
+                    { path: 'join-waiting', component: JoinWaitingPageComponent },
+                ]),
+                HttpClientModule,
+            ],
             providers: [GameDispatcherService, SocketService],
         }).compileComponents();
     });

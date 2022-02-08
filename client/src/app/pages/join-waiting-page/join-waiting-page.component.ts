@@ -53,7 +53,6 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     playerHasBeenRejected(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_REJECT_TITLE,
                 content: hostName + DIALOG_REJECT_CONTENT,
                 buttons: [
@@ -70,7 +69,6 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     hostHasCanceled(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_CANCEL_TITLE,
                 content: hostName + DIALOG_CANCEL_CONTENT,
                 buttons: [
