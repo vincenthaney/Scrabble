@@ -49,7 +49,7 @@ describe('WordsVerificationService', () => {
         expect(wordsVerificationService.activeDictionaries.has(DICTIONARY_NAME)).to.be.true;
     });
 
-    it('should call fetchDictionary method', () => {
+    it('loadAllDictionaries should call fetchDictionary method', () => {
         wordsVerificationService.loadAllDictionaries();
         expect(fetchSpy).to.have.been.called();
     });
