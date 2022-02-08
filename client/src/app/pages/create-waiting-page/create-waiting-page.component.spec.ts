@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
 
@@ -200,5 +201,33 @@ describe('CreateWaitingPageComponent', () => {
         startGameButton.click();
 
         expect(gameDispatcherSpy).not.toHaveBeenCalled();
+    });
+
+    it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribejoinRequestEvent = spyOn(gameDispatcherServiceMock.joinRequestEvent, 'subscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribejoinerLeaveGameEvent = spyOn(gameDispatcherServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
+        component.ngOnInit();
+        expect(spySubscribejoinRequestEvent).toHaveBeenCalled();
+        expect(spySubscribejoinerLeaveGameEvent).toHaveBeenCalled();
+    });
+
+    it('setOpponent should be called when joinRequestEvent is emittted', () => {
+        const emitName = 'weirdName';
+        const spySetOpponent = spyOn(component, 'setOpponent').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.joinRequestEvent.emit(emitName);
+        expect(spySetOpponent).toHaveBeenCalledWith(emitName);
+    });
+
+    it('opponentLeft should be called when joinerLeaveGameEvent is emittted', () => {
+        const emitName = 'weirdName';
+        const spyOpponentLeft = spyOn(component, 'opponentLeft').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.joinerLeaveGameEvent.emit(emitName);
+        expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
     });
 });

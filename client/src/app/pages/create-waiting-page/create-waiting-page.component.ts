@@ -4,6 +4,7 @@ import { OnlinePlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CONTENT,
@@ -28,8 +29,12 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit() {
-        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.opponentLeft(leaverName));
+        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
+            .pipe(take(1))
+            .subscribe((opponentName) => this.setOpponent(opponentName));
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent
+            .pipe(take(1))
+            .subscribe((leaverName) => this.opponentLeft(leaverName));
     }
 
     ngOnDestroy() {
