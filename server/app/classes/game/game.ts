@@ -106,5 +106,19 @@ export default class Game {
     isGameOver(): boolean {
         return this.player1.tiles.length === 0 || this.player2.tiles.length === 0 || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
+
+    /**
+     * Check if the player is maked as Player1 in the game instance.
+     *
+     * @param arg player or player id
+     * @returns if the player is player 1
+     */
+
+    isPlayer1(arg: string | Player): boolean {
+        if (arg instanceof Player) {
+            return this.player1.getId() === arg.getId();
+        } else {
+            return this.player1.getId() === arg;
+        }
     }
 }
