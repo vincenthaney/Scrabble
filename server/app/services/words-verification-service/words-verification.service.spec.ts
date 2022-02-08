@@ -70,6 +70,8 @@ describe('WordsVerificationService', () => {
                 words.push(dictionaryIterator.next().value);
                 i++;
             }
+            // eslint-disable-next-line no-console
+            console.log(words);
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });
@@ -86,6 +88,8 @@ describe('WordsVerificationService', () => {
                 words.push(dictionaryIterator.next().value);
                 i++;
             }
+            // eslint-disable-next-line no-console
+            console.log(words);
         }
         expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
     });

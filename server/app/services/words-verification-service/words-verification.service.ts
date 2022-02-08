@@ -23,23 +23,19 @@ export class WordsVerificationService {
 
     // TODO: Add to dictionnaryService
     // Will be removed during sprint 3
-    fetchDictionary(): string[] {
-        const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
-        const dataBuffer = fs.readFileSync(filePath);
+    fetchDictionary(dictionaryName: string, filePath: string): string[] {
+        const dataBuffer = fs.readFileSync(join(filePath, dictionaryName));
         const data: DictionaryData = JSON.parse(dataBuffer.toString());
         return data.words;
     }
 
-    async loadAllDictionaries() {
+    loadAllDictionaries() {
         // TODO: Change this to upload all dictionaries within directory
         // Will be removed during sprint 3
-        this.addDictionary();
-    }
-
-    // TODO: Create a separate service to manage dictionary importation
-    // Will be removed during sprint 3
-    async addDictionary() {
-        this.activeDictionaries.set(WordsVerificationConst.DICTIONARY_NAME, new Set(this.fetchDictionary()));
+        const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
+        fs.readdirSync(filePath).forEach((dictionary) => {
+            this.activeDictionaries.set(WordsVerificationConst.DICTIONARY_NAME, new Set(this.fetchDictionary(dictionary, filePath)));
+        });
     }
 
     verifyWords(words: string[], dictionary: string): string[] {

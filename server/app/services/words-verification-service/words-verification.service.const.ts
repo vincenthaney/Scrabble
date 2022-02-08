@@ -1,2 +1,2 @@
-export const DICTIONARY_RELATIVE_PATH = '../../../assets/dictionaries/dictionnary.json';
-export const DICTIONARY_NAME = 'dictionary';
+export const DICTIONARY_RELATIVE_PATH = '../../../assets/dictionaries/';
+export const DICTIONARY_NAME = 'dictionnary.json';
