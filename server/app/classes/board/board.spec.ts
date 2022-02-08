@@ -6,10 +6,10 @@ import { POSITION_OUT_OF_BOARD } from './board-errors';
 import { Square } from '@app/classes/square';
 import { BOARD_SIZE } from '@app/constants/game';
 
-const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
-const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
-const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
-const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
+const DEFAULT_TILE_A: Tile = { letter: 'a', value: 1 };
+const DEFAULT_TILE_B: Tile = { letter: 'b', value: 2 };
+const DEFAULT_TILE_C: Tile = { letter: 'c', value: 3 };
+const DEFAULT_TILE_D: Tile = { letter: 'd', value: 4 };
 
 describe('Board', () => {
     let board: Board;
