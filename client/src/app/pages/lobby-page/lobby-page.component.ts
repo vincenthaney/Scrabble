@@ -7,7 +7,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
-import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2 } from './lobby-page.component.const';
+import { DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2, DIALOG_TITLE } from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',

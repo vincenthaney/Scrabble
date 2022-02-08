@@ -16,10 +16,10 @@ import {
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { GameService } from '..';
 import { CommandErrorMessages } from './command-error-messages';
-import { CommandError } from './command-errors';
+import CommandError from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
-
+6;
 @Injectable({
     providedIn: 'root',
 })
@@ -121,7 +121,7 @@ export default class InputParserService {
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
         const player: IPlayer = this.gameService.getLocalPlayer();
         const playerTiles: Tile[] = [];
-        player.tiles.forEach((tile) => {
+        player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
         const tilesToPlace: Tile[] = [];
@@ -150,7 +150,7 @@ export default class InputParserService {
 
         const player: IPlayer = this.gameService.getLocalPlayer();
         const playerTiles: Tile[] = [];
-        player.tiles.forEach((tile) => {
+        player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
 

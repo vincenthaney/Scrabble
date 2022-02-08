@@ -1,17 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { OnlinePlayer } from '@app/classes/player';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { Subscription } from 'rxjs';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CANCEL_CONTENT,
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
     DIALOG_REJECT_TITLE,
-    GameRequestState,
+    GameRequestState
 } from './join-waiting-page.component.const';
-import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { OnlinePlayer } from '@app/classes/player';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { Subscription } from 'rxjs';
+
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
