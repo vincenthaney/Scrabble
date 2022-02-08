@@ -1,10 +1,13 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { PlayerData } from '@app/classes/communication/player-data';
 import { GameType } from '@app/classes/game-type';
-import { IPlayer } from '@app/classes/player';
+import { IPlayer, Player } from '@app/classes/player';
 import { BoardService } from '@app/services/';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import * as GAME_ERRORS from './game.service.error';
 
 @Injectable({
     providedIn: 'root',
@@ -17,22 +20,30 @@ export default class GameService {
     player2: IPlayer;
     gameType: GameType;
     dictionnaryName: string;
+    startGameEvent: EventEmitter<void> = new EventEmitter();
     private gameId: string;
     private localPlayerId: string;
 
-    constructor(private boardService: BoardService, private roundManager: RoundManagerService) {}
+    constructor(private router: Router, private boardService: BoardService, private roundManager: RoundManagerService) {}
 
-    initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
+    async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
+        await this.router.navigateByUrl('game');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
-        this.player1 = startGameData.player1;
-        this.player2 = startGameData.player2;
+        this.player1 = this.initializePlayer(startGameData.player1);
+        this.player2 = this.initializePlayer(startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
         this.roundManager.currentRound = startGameData.round;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
+        this.startGameEvent.emit();
+    }
+
+    initializePlayer(playerData: PlayerData): IPlayer {
+        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(GAME_ERRORS.MSSING_PLAYER_DATA_TO_INITIALIZE);
+        return new Player(playerData.id, playerData.name, playerData.tiles);
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
@@ -51,7 +62,6 @@ export default class GameService {
         if (gameUpdateData.isGameOver) {
             this.gameOver();
         }
-        throw new Error('Method not implemented.');
     }
 
     getGameId(): string {
