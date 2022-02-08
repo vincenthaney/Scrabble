@@ -101,6 +101,11 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmRejectionToServer() {
+        // eslint-disable-next-line no-console
+        console.log('confirmRejectCLIENT- component');
+        // eslint-disable-next-line no-console
+        console.log(this.opponent);
+
         if (this.opponent) {
             this.gameDispatcherService.handleRejection(this.opponent);
         }
