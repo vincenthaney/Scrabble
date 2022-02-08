@@ -38,7 +38,7 @@ export class WordsVerificationService {
         });
     }
 
-    verifyWords(words: string[], dictionary: string): string[] {
+    verifyWords(words: string[], dictionary: string): boolean {
         for (const word of words) {
             if (word.length > 0) {
                 this.removeAccents(word);
@@ -49,7 +49,7 @@ export class WordsVerificationService {
                 if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(word + INVALID_WORD);
             }
         }
-        return words;
+        return true;
     }
 
     removeAccents(word: string) {
