@@ -30,7 +30,7 @@ export class WordsVerificationService {
     }
 
     loadAllDictionaries() {
-        // TODO: Change this to upload all dictionaries within directory
+        // TODO: Change this to upload all dictionaries from mongoDB
         // Will be removed during sprint 3
         const filePath = join(__dirname, WordsVerificationConst.DICTIONARY_RELATIVE_PATH);
         fs.readdirSync(filePath).forEach((dictionary) => {
