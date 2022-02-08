@@ -124,6 +124,6 @@ describe('WordsVerificationService', () => {
                 i++;
             }
         }
-        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.deep.equal(words);
+        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.be.true;
     });
 });
