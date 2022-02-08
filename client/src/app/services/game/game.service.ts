@@ -5,6 +5,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { GameType } from '@app/classes/game-type';
 import { IPlayer, Player } from '@app/classes/player';
+import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BoardService } from '@app/services/';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import * as GAME_ERRORS from './game.service.error';
@@ -24,7 +25,15 @@ export default class GameService {
     private gameId: string;
     private localPlayerId: string;
 
-    constructor(private router: Router, private boardService: BoardService, private roundManager: RoundManagerService) {}
+    constructor(
+        private router: Router,
+        private boardService: BoardService,
+        private roundManager: RoundManagerService,
+        private gameplayController: GamePlayController,
+    ) {
+        this.roundManager.gameId = this.gameId;
+        this.gameplayController.gameUpdateData.subscribe((data: GameUpdateData) => this.handleGameUpdate(data));
+    }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
         await this.router.navigateByUrl('game');
@@ -34,6 +43,7 @@ export default class GameService {
         this.player2 = this.initializePlayer(startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
+        this.roundManager.gameId = startGameData.gameId;
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
         this.roundManager.currentRound = startGameData.round;
         this.boardService.initializeBoard(startGameData.board);

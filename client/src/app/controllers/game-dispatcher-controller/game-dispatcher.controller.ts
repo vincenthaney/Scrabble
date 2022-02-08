@@ -28,7 +28,7 @@ export class GameDispatcherController {
         this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
             this.joinRequestEvent.emit(opponent[0].name);
         });
-        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) =>
+        this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
             this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
         );
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
