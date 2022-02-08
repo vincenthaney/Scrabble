@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { GameService } from '@app/services';
 
 @Component({
     selector: 'app-game-page',
@@ -8,7 +9,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(public surrenderDialog: MatDialog) {}
+    constructor(public surrenderDialog: MatDialog, public gameService: GameService) {}
     openDialog() {
         this.surrenderDialog.open(DefaultDialogComponent, {
             data: {

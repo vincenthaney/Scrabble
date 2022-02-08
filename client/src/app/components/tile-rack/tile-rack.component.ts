@@ -13,7 +13,7 @@ export class TileRackComponent implements OnDestroy {
     tiles: Tile[];
     startGameSubscription: Subscription;
 
-    constructor(private gameService: GameService) {
+    constructor(public gameService: GameService) {
         this.startGameSubscription = this.gameService.startGameEvent.subscribe(() => this.initializeTileRack());
     }
 

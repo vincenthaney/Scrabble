@@ -1,22 +1,28 @@
 <div id="outer-container">
     <mat-card id="inner-container">
         <div class="player-info" id="player-info-1">
-            <p class="player-name">{{player1.name}}<span class="score">{{ player1.score }} pts</span></p>
-            <p class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
+            <p class="player-name">
+                {{ player1.name }}<span class="score">{{ player1.score }} pts</span>
+            </p>
+            <p class="tiles-left">Tuiles restantes : 7</p>
+            <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
         </div>
 
         <div id="time-left-container">
             <p>Temps restant au tour</p>
             <p id="time-left">
-                <span class="minutes">3</span>
+                <span class="minutes">{{ timer.minutes }}</span>
                 <span class="separator">:</span>
-                <span class="seconds">11</span>
+                <span class="seconds">{{ getTimerSeconds() }}</span>
             </p>
         </div>
 
         <div class="player-info" id="player-info-2">
-            <p class="player-name"><span class="score">{{ player2.score }} pts</span>{{player2.name}}</p>
-            <p class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
+            <p class="player-name">
+                <span class="score">{{ player2.score }} pts</span>{{ player2.name }}
+            </p>
+            <p class="tiles-left">Tuiles restantes : 7</p>
+            <!--use *ngIf to verify if player has less than 8 tiles left when implementedqui vérifie le nombre de tuiles du player quand ce sera implémenté-->
         </div>
-    </mat-card> 
+    </mat-card>
 </div>
