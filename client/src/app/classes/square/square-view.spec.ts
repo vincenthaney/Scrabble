@@ -2,18 +2,19 @@
 /* eslint-disable dot-notation */
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
-import { AbstractScoreMultiplier, LetterScoreMultiplier, Square, SquareView, WordScoreMultiplier } from '.';
+import { ScoreMultiplier, Square, SquareView } from '.';
+import { MultiplierEffect } from './score-multiplier';
 import * as SQUARE_ERRORS from './square-errors';
 
 interface ColorTestCase {
     multiplierName: string;
-    multiplier: AbstractScoreMultiplier;
+    multiplier: ScoreMultiplier;
     expectedColor: COLORS;
 }
 
 interface GetTextTestCase {
     multiplierName: string;
-    multiplier: AbstractScoreMultiplier;
+    multiplier: ScoreMultiplier;
     expectedText: [string, string];
 }
 
@@ -34,17 +35,41 @@ class SquareViewWrapper {
 }
 describe('SquareView', () => {
     const validColorTestCases: ColorTestCase[] = [
-        { multiplierName: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedColor: COLORS.Letter2x },
-        { multiplierName: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedColor: COLORS.Letter3x },
-        { multiplierName: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedColor: COLORS.Word2x },
-        { multiplierName: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedColor: COLORS.Word3x },
+        {
+            multiplierName: '2x Letter Multiplier',
+            multiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER },
+            expectedColor: COLORS.Letter2x,
+        },
+        {
+            multiplierName: '3x Letter Multiplier',
+            multiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.LETTER },
+            expectedColor: COLORS.Letter3x,
+        },
+        {
+            multiplierName: '2x Word Multiplier',
+            multiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD },
+            expectedColor: COLORS.Word2x,
+        },
+        {
+            multiplierName: '3x Word Multiplier',
+            multiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
+            expectedColor: COLORS.Word3x,
+        },
     ];
 
     const validTextTestCase: GetTextTestCase[] = [
-        { multiplierName: '2x Letter Multiplier', multiplier: new LetterScoreMultiplier(2), expectedText: ['Lettre', '2'] },
-        { multiplierName: '3x Letter Multiplier', multiplier: new LetterScoreMultiplier(3), expectedText: ['Lettre', '3'] },
-        { multiplierName: '2x Word Multiplier', multiplier: new WordScoreMultiplier(2), expectedText: ['Mot', '2'] },
-        { multiplierName: '3x Word Multiplier', multiplier: new WordScoreMultiplier(3), expectedText: ['Mot', '3'] },
+        {
+            multiplierName: '2x Letter Multiplier',
+            multiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER },
+            expectedText: ['Lettre', '2'],
+        },
+        {
+            multiplierName: '3x Letter Multiplier',
+            multiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.LETTER },
+            expectedText: ['Lettre', '3'],
+        },
+        { multiplierName: '2x Word Multiplier', multiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }, expectedText: ['Mot', '2'] },
+        { multiplierName: '3x Word Multiplier', multiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD }, expectedText: ['Mot', '3'] },
     ];
 
     it('SquareView with no Square associated should throw error when getting color', () => {
@@ -69,7 +94,7 @@ describe('SquareView', () => {
             const square = {
                 tile: null,
                 position: { row: 0, column: 0 },
-                multiplier,
+                scoreMultiplier: multiplier,
                 wasMultiplierUsed: false,
                 isCenter: false,
             };
@@ -95,7 +120,7 @@ describe('SquareView', () => {
         const square = {
             tile: null,
             position: { row: 0, column: 0 },
-            multiplier: nullMultiplierEffectSpy,
+            scoreMultiplier: nullMultiplierEffectSpy,
             wasMultiplierUsed: false,
             isCenter: false,
         };
@@ -121,7 +146,7 @@ describe('SquareView', () => {
         const square = {
             tile: null,
             position: { row: 0, column: 0 },
-            multiplier: negativeMultiplierSpy,
+            scoreMultiplier: negativeMultiplierSpy,
             wasMultiplierUsed: false,
             isCenter: false,
         };
@@ -158,7 +183,7 @@ describe('SquareView', () => {
             const square = {
                 tile: null,
                 position: { row: 0, column: 0 },
-                multiplier,
+                scoreMultiplier: multiplier,
                 wasMultiplierUsed: false,
                 isCenter: false,
             };
