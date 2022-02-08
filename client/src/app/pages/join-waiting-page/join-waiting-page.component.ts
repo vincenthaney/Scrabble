@@ -10,9 +10,9 @@ import {
 } from './join-waiting-page.component.const';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -28,6 +28,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     waitingGameTimer: string = 'timer';
     waitingGameDictionary: string = 'dictionary';
     waitingPlayerName: string = 'waitingPlayer';
+    waitingOpponentName: string = 'hostPlayer';
 
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
@@ -35,12 +36,12 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         if (!this.canceledGameSubscription) {
             this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
                 .pipe(take(1))
-                .subscribe((hostName) => this.hostHasCanceled(hostName));
+                .subscribe((hostName: string) => this.hostHasCanceled(hostName));
         }
         if (!this.joinerRejectedSubscription) {
             this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
                 .pipe(take(1))
-                .subscribe((hostName) => this.playerHasBeenRejected(hostName));
+                .subscribe((hostName: string) => this.playerRejected(hostName));
         }
     }
 
@@ -50,7 +51,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    playerHasBeenRejected(hostName: string) {
+    playerRejected(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_REJECT_TITLE,

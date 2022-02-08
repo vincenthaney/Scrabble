@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
+import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,20 +11,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { SocketService } from '@app/services/socket/socket.service';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
-
-export class GameDispatcherServiceSpy extends GameDispatcherService {
-    handleLobbyListRequest() {
-        return;
-    }
-    handleJoinLobby() {
-        return;
-    }
-    // lobbiesUpdateEvent: {subscribe: createSpy('lobbiesUpdateEvent subscribe')};
-    // lobbiesUpdateEvent
-}
 
 @Component({
     template: '',
@@ -40,15 +29,16 @@ export class MatDialogMock {
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
     let fixture: ComponentFixture<LobbyPageComponent>;
+    let gameDispatcherServiceMock: GameDispatcherService;
 
-    const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLobbyListRequest', 'handleJoinLobby']);
+    // const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLobbyListRequest', 'handleJoinLobby']);
 
-    gameDispatcherSpy.handleLobbyListRequest.and.callFake(() => {
-        return;
-    });
-    gameDispatcherSpy.handleJoinLobby.and.callFake(() => {
-        return;
-    });
+    // gameDispatcherSpy.handleLobbyListRequest.and.callFake(() => {
+    //     return;
+    // });
+    // gameDispatcherSpy.handleJoinLobby.and.callFake(() => {
+    //     return;
+    // });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -56,21 +46,18 @@ describe('LobbyPageComponent', () => {
                 MatInputModule,
                 MatFormFieldModule,
                 MatDividerModule,
+                HttpClientModule,
                 RouterTestingModule.withRoutes([
-                    { path: 'waiting-room', component: TestComponent },
-                    { path: 'home', component: TestComponent },
+                    { path: 'join-waiting', component: TestComponent },
+                    { path: 'lobby', component: LobbyPageComponent },
                 ]),
             ],
             providers: [
-                {
-                    provide: GameDispatcherService,
-                    useValue: gameDispatcherSpy,
-                },
+                GameDispatcherService,
                 {
                     provide: MatDialog,
                     useClass: MatDialogMock,
                 },
-                SocketService,
             ],
             declarations: [LobbyPageComponent],
         }).compileComponents();
@@ -80,6 +67,7 @@ describe('LobbyPageComponent', () => {
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
     });
 
     beforeEach(() => {
@@ -131,9 +119,17 @@ describe('LobbyPageComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('joinLobby should send to GameDispatcher service to join a lobby', async () => {
-        // const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleJoinLobby']);
+    it('joinLobby should send to GameDispatcher service to join a lobby', () => {
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleJoinLobby').and.callFake(() => {
+            return;
+        });
         component.joinLobby(component.lobbies[0].lobbyId);
-        expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();
+        expect(gameDispatcherSpy).toHaveBeenCalled();
+    });
+
+    it('lobbyFullDialog should open the dialog component', () => {
+        const spy = spyOn(component.dialog, 'open');
+        component.lobbyFullDialog('leaver');
+        expect(spy).toHaveBeenCalled();
     });
 });

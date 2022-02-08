@@ -5,9 +5,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { OnlinePlayer } from '@app/classes/player';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { SocketService } from '@app/services/socket/socket.service';
+import { of } from 'rxjs';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
 @Component({
@@ -18,7 +17,8 @@ class TestComponent {}
 describe('JoinWaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
-    const testOpponent = new OnlinePlayer('testName');
+    const opponentName = 'testName';
+    let gameDispatcherServiceMock: GameDispatcherService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -27,13 +27,13 @@ describe('JoinWaitingPageComponent', () => {
                 MatDialogModule,
                 MatProgressBarModule,
                 BrowserAnimationsModule,
+                HttpClientModule,
                 RouterTestingModule.withRoutes([
                     { path: 'lobby', component: TestComponent },
                     { path: 'join-waiting', component: JoinWaitingPageComponent },
                 ]),
-                HttpClientModule,
             ],
-            providers: [GameDispatcherService, SocketService],
+            providers: [GameDispatcherService],
         }).compileComponents();
     });
 
@@ -41,31 +41,63 @@ describe('JoinWaitingPageComponent', () => {
         fixture = TestBed.createComponent(JoinWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should open the rejected dialog when player is rejected', () => {
+    it('playerRejected should open the rejected dialog when player is rejected', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.playerHasBeenRejected(testOpponent.name);
+        component.playerRejected(opponentName);
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should open the cancel dialog when host cancels the game', () => {
+    it('hostHasCanceled should open the cancel dialog when host cancels the game', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.hostHasCanceled(testOpponent.name);
+        component.hostHasCanceled(opponentName);
         expect(spy).toHaveBeenCalled();
     });
 
     it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
-        const gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
         const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
             return;
         });
         const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
         cancelButton.click();
         expect(gameDispatcherSpy).toHaveBeenCalled();
+    });
+
+    it('ngOnInit should subscribe to gameDispatcherService canceledGameEvent and joinerRejectedEvent', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribeCanceledGameEvent = spyOn(gameDispatcherServiceMock.canceledGameEvent, 'subscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribeJoinerRejectedEvent = spyOn(gameDispatcherServiceMock.joinerRejectedEvent, 'subscribe').and.returnValue(of(true) as any);
+        // Create a new component to once spies have been applied
+        fixture = TestBed.createComponent(JoinWaitingPageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+
+        expect(spySubscribeCanceledGameEvent).toHaveBeenCalled();
+        expect(spySubscribeJoinerRejectedEvent).toHaveBeenCalled();
+    });
+
+    it('hostHasCanceled should be called when canceledGameEvent is emittted', () => {
+        const emitName = 'weirdName';
+        const spyHostHasCanceled = spyOn(component, 'hostHasCanceled').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.canceledGameEvent.emit(emitName);
+        expect(spyHostHasCanceled).toHaveBeenCalledWith(emitName);
+    });
+
+    it('playerRejected should be called when joinerRejectedEvent is emittted', () => {
+        const emitName = 'weirdName';
+        const spyPlayerRejected = spyOn(component, 'playerRejected').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.joinerRejectedEvent.emit(emitName);
+        expect(spyPlayerRejected).toHaveBeenCalledWith(emitName);
     });
 });

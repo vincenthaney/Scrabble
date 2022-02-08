@@ -1,7 +1,8 @@
+/* eslint-disable max-classes-per-file */
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -14,6 +15,14 @@ import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-p
     template: '',
 })
 class TestComponent {}
+
+export class MatDialogMock {
+    open() {
+        return {
+            afterClosed: () => of({}),
+        };
+    }
+}
 
 describe('CreateWaitingPageComponent', () => {
     let component: CreateWaitingPageComponent;
@@ -33,9 +42,14 @@ describe('CreateWaitingPageComponent', () => {
                     { path: 'waiting-room', component: CreateWaitingPageComponent },
                 ]),
             ],
-            providers: [GameDispatcherService],
+            providers: [
+                GameDispatcherService,
+                {
+                    provide: MatDialog,
+                    useClass: MatDialogMock,
+                },
+            ],
         }).compileComponents();
-        fixture = TestBed.createComponent(CreateWaitingPageComponent);
     });
 
     beforeEach(() => {
