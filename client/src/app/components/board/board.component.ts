@@ -23,12 +23,14 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+        this.boardInitializationSubscription = this.boardService.boardInitializationEvent.subscribe((board: Square[][]) => {
+            {
+                this.initializeBoard(board);
+            }
+        });
     }
 
     ngOnInit() {
-        this.boardInitializationSubscription = this.boardService.boardInitializationEvent.subscribe((board: Square[][]) =>
-            this.initializeBoard(board),
-        );
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent.subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
     }
 
@@ -53,6 +55,7 @@ export class BoardComponent implements OnInit, OnDestroy {
                 this.squareGrid[i][j] = squareView;
             }
         }
+        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
     private getBoardServiceSquare(board: Square[][], row: number, column: number) {
