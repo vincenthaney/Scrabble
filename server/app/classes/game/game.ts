@@ -56,7 +56,7 @@ export default class Game {
         game.player1.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
         game.player2.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
 
-        game.roundManager.nextRound();
+        game.roundManager.beginRound();
 
         return game;
     }
