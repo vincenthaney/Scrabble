@@ -1,4 +1,4 @@
-import { LetterScoreMultiplier, WordScoreMultiplier } from '@app/classes/square';
+import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Multiplier } from '@app/classes/square/square';
 
 export const BOARD_CONFIG: string[][] = [
@@ -21,9 +21,9 @@ export const BOARD_CONFIG: string[][] = [
 
 export const BOARD_CONFIG_MAP: Map<string, Multiplier> = new Map([
     ['x', null],
-    ['L2', new LetterScoreMultiplier(2)],
-    ['L3', new LetterScoreMultiplier(3)],
-    ['W2', new WordScoreMultiplier(2)],
-    ['W3', new WordScoreMultiplier(3)],
-    ['S', new LetterScoreMultiplier(2)],
+    ['L2', { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER }],
+    ['L3', { multiplier: 3, multiplierEffect: MultiplierEffect.LETTER }],
+    ['W2', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
+    ['W3', { multiplier: 3, multiplierEffect: MultiplierEffect.WORD }],
+    ['S', { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER }],
 ]);
