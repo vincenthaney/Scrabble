@@ -4,14 +4,14 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { PlayerName } from '@app/classes/communication/player-name';
-import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
 import { GameService } from '@app/services';
+import { SocketService } from '@app/services/socket/socket.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GameDispatcherController extends SocketController {
+export class GameDispatcherController {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
@@ -21,28 +21,26 @@ export class GameDispatcherController extends SocketController {
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
-    constructor(private http: HttpClient, private gameService: GameService) {
-        super();
-        this.connect();
+    constructor(private http: HttpClient, public socketService: SocketService, private gameService: GameService) {
         this.configureSocket();
     }
 
     configureSocket(): void {
-        this.on('joinRequest', (opponent: PlayerName[]) => {
+        this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
             this.joinRequestEvent.emit(opponent[0].name);
         });
-        this.on('startGame', (startGameData: StartMultiplayerGameData[]) =>
-            this.gameService.initializeMultiplayerGame(this.getId(), startGameData[0]),
+        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) =>
+            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
         );
-        this.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
+        this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
         });
-        this.on('rejected', (hostName: PlayerName[]) => {
+        this.socketService.on('rejected', (hostName: PlayerName[]) => {
             this.joinerRejectedEvent.emit(hostName[0].name);
         });
-        this.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
-        this.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
-        this.on('joinerLeaveGame', (opponent: PlayerName[]) => {
+        this.socketService.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
+        this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
+        this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
             console.log('joinerLeaveGameCLIENT');
             console.log(opponent);
             this.joinerLeaveGameEvent.emit(opponent[0].name);
@@ -50,7 +48,7 @@ export class GameDispatcherController extends SocketController {
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
-        const endpoint = `${environment.serverUrl}/games/${this.getId()}`;
+        const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
         this.http.post<{ gameId: string }>(endpoint, gameConfig).subscribe((response) => {
             this.createGameEvent.emit(response.gameId);
         });
@@ -58,7 +56,7 @@ export class GameDispatcherController extends SocketController {
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
         console.log(opponentName);
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/accept`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
 
@@ -70,13 +68,13 @@ export class GameDispatcherController extends SocketController {
         // eslint-disable-next-line no-console
         console.log(`gameId ${gameId}`);
         // eslint-disable-next-line no-console
-        console.log(`socketId ${this.getId()}`);
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/reject`;
+        console.log(`socketId ${this.socketService.getId()}`);
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/reject`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
 
     handleCancelGame(gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/cancel`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/cancel`;
         this.http.delete(endpoint).subscribe();
     }
 
@@ -86,19 +84,19 @@ export class GameDispatcherController extends SocketController {
         // eslint-disable-next-line no-console
         console.log(`gameId ${gameId}`);
         // eslint-disable-next-line no-console
-        console.log(`socketId ${this.getId()}`);
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/leave`;
+        console.log(`socketId ${this.socketService.getId()}`);
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
         // patch?
         this.http.delete(endpoint).subscribe();
     }
 
     handleLobbiesListRequest(): void {
-        const endpoint = `${environment.serverUrl}/games/${this.getId()}`;
+        const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
         this.http.get(endpoint).subscribe();
     }
 
     handleLobbyJoinRequest(gameId: string, playerName: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/join`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/join`;
         this.http.post(endpoint, { playerName }).subscribe();
     }
 }

@@ -1,9 +1,12 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { JoinWaitingPageComponent } from './join-waiting-page.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { OnlinePlayer } from '@app/classes/player';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { SocketService } from '@app/services/socket/socket.service';
+import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
 describe('WaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
@@ -13,7 +16,8 @@ describe('WaitingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
+            imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([]), HttpClientModule],
+            providers: [GameDispatcherService, SocketService],
         }).compileComponents();
     });
 
