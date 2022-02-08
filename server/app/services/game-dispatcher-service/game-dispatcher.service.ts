@@ -55,7 +55,7 @@ export class GameDispatcherService {
      * @param playerName Name the player want to use
      */
 
-    requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
+    requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         // TODO: Add emit
         if (waitingRoom.joinedPlayer !== undefined) {
@@ -67,6 +67,7 @@ export class GameDispatcherService {
 
         const joiningPlayer = new Player(playerId, playerName);
         waitingRoom.joinedPlayer = joiningPlayer;
+        return waitingRoom.getConfig();
     }
 
     /**
