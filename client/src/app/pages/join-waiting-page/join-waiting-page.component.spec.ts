@@ -8,7 +8,7 @@ import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispat
 import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
-describe('WaitingPageComponent', () => {
+describe('JoinWaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
     const testOpponent = new OnlinePlayer('testName');
@@ -33,7 +33,7 @@ describe('WaitingPageComponent', () => {
 
     it('should open the rejected dialog when player is rejected', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.playerHasBeenRejected(testOpponent);
+        component.playerHasBeenRejected(testOpponent.name);
         expect(spy).toHaveBeenCalled();
     });
 

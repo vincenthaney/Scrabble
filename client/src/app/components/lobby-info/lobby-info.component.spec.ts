@@ -10,6 +10,7 @@ import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GameType } from '@app/classes/game-type';
 import { AppMaterialModule } from '@app/modules/material.module';
 
 import { LobbyInfoComponent } from './lobby-info.component';
@@ -18,6 +19,15 @@ import { LobbyInfoComponent } from './lobby-info.component';
     template: '',
 })
 export class TestComponent {}
+
+const TEST_LOBBY = {
+    lobbyId: 'lobbyId',
+    playerName: 'playerName',
+    gameType: GameType.Classic,
+    maxRoundTime: 1,
+    dictionary: '',
+    canJoin: false,
+};
 
 describe('LobbyInfoComponent', () => {
     let component: LobbyInfoComponent;
@@ -46,6 +56,10 @@ describe('LobbyInfoComponent', () => {
         fixture = TestBed.createComponent(LobbyInfoComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+    });
+
+    beforeEach(() => {
+        component.lobby = TEST_LOBBY;
     });
 
     it('should create', () => {
@@ -88,8 +102,6 @@ describe('LobbyInfoComponent', () => {
     });
 
     it('the tooltip should show the correct message if you cannot join the lobby', async () => {
-        component.lobby.canJoin = false;
-        component.lobby.playerName = 'playername1';
         fixture.detectChanges();
         const buttonContainer = fixture.debugElement.queryAll(By.css('.button-container'));
         const errorTooltip = buttonContainer[0].injector.get<MatTooltip>(MatTooltip);
