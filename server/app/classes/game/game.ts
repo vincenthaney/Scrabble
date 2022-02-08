@@ -8,6 +8,8 @@ import { MultiplayerGameConfig } from './game-config';
 import { START_TILES_AMOUNT } from './game.const';
 import { GameType } from './game.type';
 
+export const GAME_OVER_PASS_THRESHOLD = 6;
+
 export default class Game {
     private static boardService: BoardService;
     player1: Player;
