@@ -102,7 +102,7 @@ export default class Game {
     }
 
     isGameOver(): boolean {
-        if (this.player1.tiles.length === 0 || this.player2.tiles.length === 0 || this.roundManager.passCounter() >= 6) return true;
-        else return false;
+        return this.player1.tiles.length === 0 || this.player2.tiles.length === 0 || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
+    }
     }
 }
