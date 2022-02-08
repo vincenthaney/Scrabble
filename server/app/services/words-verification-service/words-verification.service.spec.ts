@@ -49,6 +49,11 @@ describe('WordsVerificationService', () => {
         expect(wordsVerificationService.activeDictionaries.has(DICTIONARY_NAME)).to.be.true;
     });
 
+    it('should call fetchDictionary method', () => {
+        wordsVerificationService.loadAllDictionaries();
+        expect(fetchSpy).to.have.been.called();
+    });
+
     it('should return the content of dictionnary.words', () => {
         const filePath = join(__dirname, DICTIONARY_RELATIVE_PATH);
         expect(wordsVerificationService.fetchDictionary(DICTIONARY_NAME, filePath)).to.deep.equal(mockDictionary.words);
