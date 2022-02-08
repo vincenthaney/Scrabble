@@ -108,7 +108,7 @@ describe('WordsVerificationService', () => {
                 i++;
             }
         }
-        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.be.true;
+        expect(() => wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.not.throw();
     });
 
     it('should be true when words are in the dictionary', () => {
@@ -124,6 +124,6 @@ describe('WordsVerificationService', () => {
                 i++;
             }
         }
-        expect(wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.be.true;
+        expect(() => wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.not.throw();
     });
 });
