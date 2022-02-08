@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
     DIALOG_BUTTON_CONTENT,
@@ -9,9 +10,9 @@ import {
 } from './join-waiting-page.component.const';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { OnlinePlayer } from '@app/classes/player';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -19,6 +20,7 @@ import { Subscription } from 'rxjs';
 })
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     canceledGameSubscription: Subscription;
+    joinerRejectedSubscription: Subscription;
 
     state: GameRequestState = GameRequestState.Waiting;
     waitingGameName: string = 'testName';
@@ -30,7 +32,19 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit() {
-        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent.subscribe((hostName) => this.hostHasCanceled(hostName));
+        console.log('NGONINIT');
+        if (!this.canceledGameSubscription) {
+            this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
+                .pipe(take(1))
+                .subscribe((hostName) => this.hostHasCanceled(hostName));
+        }
+        if (!this.joinerRejectedSubscription) {
+            console.log('joinerRejectedSubscription');
+
+            this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
+                .pipe(take(1))
+                .subscribe((hostName) => this.playerHasBeenRejected(hostName));
+        }
     }
 
     ngOnDestroy() {
@@ -39,12 +53,12 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    playerHasBeenRejected(opponent: OnlinePlayer) {
+    playerHasBeenRejected(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 // Data type is DefaultDialogParameters
                 title: DIALOG_REJECT_TITLE,
-                content: opponent.name + DIALOG_REJECT_CONTENT,
+                content: hostName + DIALOG_REJECT_CONTENT,
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,

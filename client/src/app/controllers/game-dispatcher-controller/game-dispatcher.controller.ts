@@ -19,6 +19,7 @@ export class GameDispatcherController extends SocketController {
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
+    joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
     constructor(private http: HttpClient, private gameService: GameService) {
         super();
@@ -35,6 +36,9 @@ export class GameDispatcherController extends SocketController {
         );
         this.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
+        });
+        this.on('rejected', (hostName: PlayerName[]) => {
+            this.joinerRejectedEvent.emit(hostName[0].name);
         });
         this.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
         this.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
@@ -59,6 +63,14 @@ export class GameDispatcherController extends SocketController {
     }
 
     handleRejectionGameCreation(opponentName: string, gameId: string): void {
+        // eslint-disable-next-line no-console
+        console.log('handleRejectionCLIENT- controller');
+        // eslint-disable-next-line no-console
+        console.log(`opponentName  ${opponentName}`);
+        // eslint-disable-next-line no-console
+        console.log(`gameId ${gameId}`);
+        // eslint-disable-next-line no-console
+        console.log(`socketId ${this.getId()}`);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/reject`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
@@ -69,6 +81,12 @@ export class GameDispatcherController extends SocketController {
     }
 
     handleLeaveLobby(gameId: string): void {
+        // eslint-disable-next-line no-console
+        console.log('handleLeaveLobby CLIENT- controller');
+        // eslint-disable-next-line no-console
+        console.log(`gameId ${gameId}`);
+        // eslint-disable-next-line no-console
+        console.log(`socketId ${this.getId()}`);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.getId()}/leave`;
         // patch?
         this.http.delete(endpoint).subscribe();
