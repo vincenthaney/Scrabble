@@ -34,7 +34,7 @@ class MockBoardService {
                 const mockSquare: Square = {
                     tile: null,
                     position: { row: i, column: j },
-                    multiplier: null,
+                    scoreMultiplier: null,
                     wasMultiplierUsed: false,
                     isCenter: false,
                 };
