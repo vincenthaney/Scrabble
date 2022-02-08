@@ -51,15 +51,7 @@ export class GameDispatcherService {
             this.handleJoinerRejected(hostName),
         );
     }
-    // Joiner event
     handleJoinLobby(gameId: string, playerName: string) {
-        // eslint-disable-next-line no-console
-        console.log('handleJoinLobby CLIENT- service');
-        // eslint-disable-next-line no-console
-        console.log(`gameId AVANT JOIN  ${this.gameId}`);
-        this.gameId = gameId;
-        // eslint-disable-next-line no-console
-        console.log(`gameId APRES JOIN  ${this.gameId}`);
         this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
     }
 
@@ -68,10 +60,6 @@ export class GameDispatcherService {
     }
 
     handleLeaveLobby() {
-        // eslint-disable-next-line no-console
-        console.log('handleLeaveLobby CLIENT- service');
-        // eslint-disable-next-line no-console
-        console.log(`gameId  ${this.gameId}`);
         if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
         this.gameId = undefined;
@@ -99,12 +87,6 @@ export class GameDispatcherService {
     }
 
     handleRejection(opponentName: string) {
-        // eslint-disable-next-line no-console
-        console.log('handleRejectionCLIENT- service');
-        // eslint-disable-next-line no-console
-        console.log(opponentName);
-        // eslint-disable-next-line no-console
-        console.log(this.gameId);
         if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
     }

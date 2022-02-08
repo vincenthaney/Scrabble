@@ -41,8 +41,6 @@ export class GameDispatcherController {
         this.socketService.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
         this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
         this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
-            console.log('joinerLeaveGameCLIENT');
-            console.log(opponent);
             this.joinerLeaveGameEvent.emit(opponent[0].name);
         });
     }
@@ -55,20 +53,11 @@ export class GameDispatcherController {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
-        console.log(opponentName);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
 
     handleRejectionGameCreation(opponentName: string, gameId: string): void {
-        // eslint-disable-next-line no-console
-        console.log('handleRejectionCLIENT- controller');
-        // eslint-disable-next-line no-console
-        console.log(`opponentName  ${opponentName}`);
-        // eslint-disable-next-line no-console
-        console.log(`gameId ${gameId}`);
-        // eslint-disable-next-line no-console
-        console.log(`socketId ${this.socketService.getId()}`);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/reject`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
@@ -79,12 +68,6 @@ export class GameDispatcherController {
     }
 
     handleLeaveLobby(gameId: string): void {
-        // eslint-disable-next-line no-console
-        console.log('handleLeaveLobby CLIENT- controller');
-        // eslint-disable-next-line no-console
-        console.log(`gameId ${gameId}`);
-        // eslint-disable-next-line no-console
-        console.log(`socketId ${this.socketService.getId()}`);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
         // patch?
         this.http.delete(endpoint).subscribe();

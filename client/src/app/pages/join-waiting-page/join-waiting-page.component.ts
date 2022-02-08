@@ -32,15 +32,12 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit() {
-        console.log('NGONINIT');
         if (!this.canceledGameSubscription) {
             this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
                 .pipe(take(1))
                 .subscribe((hostName) => this.hostHasCanceled(hostName));
         }
         if (!this.joinerRejectedSubscription) {
-            console.log('joinerRejectedSubscription');
-
             this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
                 .pipe(take(1))
                 .subscribe((hostName) => this.playerHasBeenRejected(hostName));

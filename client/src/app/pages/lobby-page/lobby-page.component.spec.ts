@@ -16,8 +16,6 @@ import { LobbyPageComponent } from './lobby-page.component';
 
 export class GameDispatcherServiceSpy extends GameDispatcherService {
     handleLobbyListRequest() {
-        // eslint-disable-next-line no-console
-        console.log('handleLobbyListRequest');
         return;
     }
     handleJoinLobby() {
@@ -46,11 +44,9 @@ describe('LobbyPageComponent', () => {
     const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLobbyListRequest', 'handleJoinLobby']);
 
     gameDispatcherSpy.handleLobbyListRequest.and.callFake(() => {
-        console.log('handleLobbyListRequest');
         return;
     });
     gameDispatcherSpy.handleJoinLobby.and.callFake(() => {
-        console.log('handleLobbyListRequest');
         return;
     });
 
