@@ -18,6 +18,7 @@ export class GameDispatcherService {
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
+    joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
     createGameSubscription: Subscription;
     joinRequestSubscription: Subscription;
@@ -25,6 +26,7 @@ export class GameDispatcherService {
     lobbyFullSubscription: Subscription;
     canceledGameSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
+    joinerRejectedSubscription: Subscription;
 
     constructor(private gameDispatcherController: GameDispatcherController) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent.subscribe((gameId: string) => {
@@ -45,10 +47,19 @@ export class GameDispatcherService {
         this.lobbiesUpdateSubscription = this.gameDispatcherController.lobbiesUpdateEvent.subscribe((lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
+        this.joinerRejectedSubscription = this.gameDispatcherController.joinerRejectedEvent.subscribe((hostName: string) =>
+            this.handleJoinerRejected(hostName),
+        );
     }
     // Joiner event
     handleJoinLobby(gameId: string, playerName: string) {
+        // eslint-disable-next-line no-console
+        console.log('handleJoinLobby CLIENT- service');
+        // eslint-disable-next-line no-console
+        console.log(`gameId AVANT JOIN  ${this.gameId}`);
         this.gameId = gameId;
+        // eslint-disable-next-line no-console
+        console.log(`gameId APRES JOIN  ${this.gameId}`);
         this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
     }
 
@@ -57,6 +68,10 @@ export class GameDispatcherService {
     }
 
     handleLeaveLobby() {
+        // eslint-disable-next-line no-console
+        console.log('handleLeaveLobby CLIENT- service');
+        // eslint-disable-next-line no-console
+        console.log(`gameId  ${this.gameId}`);
         if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
         this.gameId = undefined;
@@ -84,9 +99,18 @@ export class GameDispatcherService {
     }
 
     handleRejection(opponentName: string) {
+        // eslint-disable-next-line no-console
+        console.log('handleRejectionCLIENT- service');
+        // eslint-disable-next-line no-console
+        console.log(opponentName);
+        // eslint-disable-next-line no-console
+        console.log(this.gameId);
         if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
-        this.gameId = undefined;
+    }
+
+    handleJoinerRejected(hostName: string) {
+        this.joinerRejectedEvent.emit(hostName);
     }
 
     handleJoinRequest(opponentName: string) {

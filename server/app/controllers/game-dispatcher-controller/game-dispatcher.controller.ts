@@ -124,13 +124,11 @@ export class GameDispatcherController {
     }
 
     private handleLobbyLeave(gameId: string, playerId: string) {
-        // console.log('joinerLeaveGameSERVERSIDE');
-        // console.log(gameId);
-        // console.log(playerId);
-        const result = this.gameDispatcherService.leaveLobbyRequest(playerId, gameId);
-        // console.log('RESULTAT');
-        // console.log(result[0]);
-        // console.log(result[1]);
+        console.log('handleLobbyLeave SERVER- controller');
+        console.log(`senderId  ${playerId}`);
+        console.log(`gameId ${gameId}`);
+        const result = this.gameDispatcherService.leaveLobbyRequest(gameId, playerId);
+        console.log(`result ${result}`);
 
         this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
         this.handleLobbiesUpdate();
@@ -173,10 +171,15 @@ export class GameDispatcherController {
 
     private handleRejectRequest(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
+        console.log('handleRejectRequest SERVER- controller');
+        console.log(`senderName  ${playerName}`);
+        console.log(`senderId  ${playerId}`);
+        console.log(`gameId ${gameId}`);
 
-        const rejectedPlayerId = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
+        const rejectedPlayer = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
+        console.log(`rejectedPlayer ${rejectedPlayer}`);
 
-        this.socketService.emitToSocket(rejectedPlayerId, 'rejected');
+        this.socketService.emitToSocket(rejectedPlayer.getId(), 'rejected', { name: rejectedPlayer.name });
         this.handleLobbiesUpdate();
     }
 

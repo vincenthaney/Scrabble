@@ -113,7 +113,7 @@ export class GameDispatcherService {
      * @return rejected player id
      */
 
-    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): string {
+    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Player {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
@@ -124,9 +124,9 @@ export class GameDispatcherService {
             throw new HttpException(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
-        const rejectedPlayerId = waitingRoom.joinedPlayer.getId();
+        const rejectedPlayer = waitingRoom.joinedPlayer;
         waitingRoom.joinedPlayer = undefined;
-        return rejectedPlayerId;
+        return rejectedPlayer;
     }
 
     /**
