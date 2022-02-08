@@ -44,9 +44,12 @@ describe('JoinWaitingPageComponent', () => {
     });
 
     it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
-        const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLeaveLobby']);
+        const gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
+            return;
+        });
         const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
         cancelButton.click();
-        expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();
+        expect(gameDispatcherSpy).toHaveBeenCalled();
     });
 });

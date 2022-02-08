@@ -30,8 +30,6 @@ const TEST_LOBBY = {
     canJoin: false,
 };
 
-
-
 describe('LobbyInfoComponent', () => {
     let component: LobbyInfoComponent;
     let fixture: ComponentFixture<LobbyInfoComponent>;
@@ -67,7 +65,6 @@ describe('LobbyInfoComponent', () => {
     });
 
     it('clicking the join button should emit the lobbyId', async () => {
-        console.log(component.lobby);
         const spyEmit = spyOn(component.joinLobbyId, 'emit').and.callFake(() => {
             return '';
         });
@@ -103,6 +100,7 @@ describe('LobbyInfoComponent', () => {
     });
 
     it('the tooltip should show the correct message if you cannot join the lobby', async () => {
+        component.lobby.canJoin = false;
         fixture.detectChanges();
         const buttonContainer = fixture.debugElement.queryAll(By.css('.button-container'));
         const errorTooltip = buttonContainer[0].injector.get<MatTooltip>(MatTooltip);
