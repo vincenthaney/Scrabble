@@ -4,7 +4,7 @@ export default abstract class IPlayer {
     id: string;
     name: string;
     score: number;
-    private tiles: Tile[];
+    tiles: Tile[];
 
     constructor(name: string) {
         this.name = name;

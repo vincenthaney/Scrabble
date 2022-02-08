@@ -1,15 +1,29 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { ActionExchangePayload } from '@app/classes/actions/action-exchange';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
+import { ActionExchangePayload, ActionPlacePayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
+import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
 import { CommandErrorMessages } from './command-error-messages';
-import { CommandError } from './command-errors';
+import CommandError from './command-errors';
+
+export class GameServiceSpy extends GameService {
+    handleLobbyListRequest() {
+        // eslint-disable-next-line no-console
+        console.log('handleLobbyListRequest');
+        return;
+    }
+    handleJoinLobby() {
+        return;
+    }
+    // lobbiesUpdateEvent: {subscribe: createSpy('lobbiesUpdateEvent subscribe')};
+    // lobbiesUpdateEvent
+}
 
 describe('InputParserService', () => {
     const VALID_MESSAGE = 'this is a regular message';
@@ -50,20 +64,30 @@ describe('InputParserService', () => {
         'sendHelpAction',
         'sendMessage',
     ]);
+
+    const testPlayerTiles = [
+        new Tile('A' as LetterValue, 1),
+        new Tile('B' as LetterValue, 1),
+        new Tile('C' as LetterValue, 1),
+        new Tile('C' as LetterValue, 1),
+        new Tile('E' as LetterValue, 1),
+        new Tile('E' as LetterValue, 1),
+        new Tile('*' as LetterValue, 0),
+    ];
+
     const gameServiceSpy: jasmine.SpyObj<GameService> = jasmine.createSpyObj('GameService', ['getLocalPlayer']);
     gameServiceSpy.getLocalPlayer.and.returnValue({
+        id: '123456789',
         name: 'testPlayer',
         score: 200,
-        tiles: [
-            new Tile('A' as LetterValue, 1),
-            new Tile('B' as LetterValue, 1),
-            new Tile('C' as LetterValue, 1),
-            new Tile('C' as LetterValue, 1),
-            new Tile('E' as LetterValue, 1),
-            new Tile('E' as LetterValue, 1),
-            new Tile('*' as LetterValue, 0),
-        ],
+        tiles: testPlayerTiles,
+        getTiles: () => {
+            return testPlayerTiles;
+        },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        updatePlayerData: () => {},
     });
+    gameServiceSpy.getLocalPlayer.and.returnValue(new Player('test player'));
 
     beforeEach(() => {
         TestBed.configureTestingModule({

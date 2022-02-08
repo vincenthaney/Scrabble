@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
 import { Injectable } from '@angular/core';
-import { ActionExchangePayload } from '@app/classes/actions/action-exchange';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
+import { ActionExchangePayload, ActionPlacePayload } from '@app/classes/actions/action-data';
+import { SocketService } from '@app/services/socket/socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -11,7 +11,9 @@ import { ActionPlacePayload } from '@app/classes/actions/action-place';
 export class InputControllerService {
     constructor(private readonly socketService: SocketService) {}
 
-    sendPlaceAction(payload: ActionPlacePayload) {}
+    sendPlaceAction(payload: ActionPlacePayload) {
+        this.socketService.connect();
+    }
 
     sendExchangeAction(payload: ActionExchangePayload) {}
     sendPassAction() {}

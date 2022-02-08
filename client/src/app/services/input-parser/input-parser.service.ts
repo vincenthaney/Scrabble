@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionExchangePayload } from '@app/classes/actions/action-exchange';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
+import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { IPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
@@ -13,18 +12,18 @@ import {
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER
 } from '@app/constants/game';
-import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
+import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '..';
 import { CommandErrorMessages } from './command-error-messages';
 import CommandError from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
-6;
+
 @Injectable({
     providedIn: 'root',
 })
 export default class InputParserService {
-    constructor(private controller: InputControllerService, private gameService: GameService) {}
+    constructor(private controller: GamePlayController, private gameService: GameService) {}
 
     parseInput(input: string): void {
         if (input[0] === '!') {
@@ -45,42 +44,67 @@ export default class InputParserService {
     }
 
     private parseCommand(actionName: string, inputWords: string[]) {
+        let playerId: string;
+        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof IPlayer) {
+            playerId = localPlayer.id;
+        } else {
+            throw new Error('Current player could not be found');
+        }
+        let actionData: ActionData;
+
         switch (actionName) {
             case 'placer':
                 if (inputWords.length !== 3) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
 
                 if (inputWords[2].length === 1) {
-                    this.controller.sendPlaceAction(this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]));
+                    actionData = {
+                        type: ActionType.PLACE,
+                        payload: this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]),
+                    };
                 } else {
-                    this.controller.sendPlaceAction(this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]));
+                    actionData = {
+                        type: ActionType.PLACE,
+                        payload: this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]),
+                    };
                 }
+                this.controller.handleAction(playerId, actionData);
                 break;
             case 'échanger':
                 if (inputWords.length !== 2) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
-                this.controller.sendExchangeAction(this.createExchangeActionPayload(inputWords[1]));
+
+                actionData = {
+                    type: ActionType.EXCHANGE,
+                    payload: this.createExchangeActionPayload(inputWords[1]),
+                };
+                this.controller.handleAction(playerId, actionData);
                 break;
             case 'passer':
                 if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
-                this.controller.sendPassAction();
+                actionData = {
+                    type: ActionType.PASS,
+                    payload: {},
+                };
+                this.controller.handleAction(playerId, actionData);
                 break;
             case 'réserve':
                 if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
-                this.controller.sendReserveAction();
+                // this.controller.sendReserveAction();
                 break;
             case 'indice':
                 if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
-                this.controller.sendHintAction();
+                // this.controller.sendHintAction();
                 break;
             case 'aide':
                 if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
-                this.controller.sendHelpAction();
+                // this.controller.sendHelpAction();
                 break;
             default:
                 throw new CommandError(CommandErrorMessages.INVALID_ENTRY);
         }
     }
 
-    private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string) {
+    private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string): ActionPlacePayload {
         // try catch invalid command
         const lastLocationChar = location.charAt(location.length - 1);
         let positionString = '';
@@ -99,7 +123,7 @@ export default class InputParserService {
         return placeActionPayload;
     }
 
-    private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string) {
+    private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string): ActionPlacePayload {
         // try catch invalid command
         const placeActionPayload: ActionPlacePayload = {
             tiles: this.parsePlaceLettersToTiles(lettersToPlace),
@@ -110,7 +134,7 @@ export default class InputParserService {
         return placeActionPayload;
     }
 
-    private createExchangeActionPayload(lettersToExchange: string) {
+    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
         const exchangeActionPayload: ActionExchangePayload = {
             tiles: this.parseExchangeLettersToTiles(lettersToExchange),
         };
@@ -119,7 +143,14 @@ export default class InputParserService {
     }
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
-        const player: IPlayer = this.gameService.getLocalPlayer();
+        let player: IPlayer;
+        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof IPlayer) {
+            player = localPlayer;
+        } else {
+            throw new Error('Current player could not be found');
+        }
+
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
@@ -148,7 +179,14 @@ export default class InputParserService {
         // user must type exchange letters in lower case
         if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
 
-        const player: IPlayer = this.gameService.getLocalPlayer();
+        let player: IPlayer;
+        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof IPlayer) {
+            player = localPlayer;
+        } else {
+            throw new Error('Current player could not be found');
+        }
+
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));

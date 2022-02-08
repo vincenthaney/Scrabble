@@ -26,4 +26,6 @@ export class GamePlayController {
     getGameId(): string {
         return this.gameService.getGameId();
     }
+
+    sendMessage(message: string) {}
 }
