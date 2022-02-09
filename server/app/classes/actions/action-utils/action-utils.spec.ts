@@ -93,5 +93,19 @@ describe('ActionUtils', () => {
 
             expect(result).to.equal(expected);
         });
+
+        it('should return -1 when allowWildcard is false', () => {
+            const tiles: Tile[] = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+                { letter: '*', value: 0 },
+            ];
+            const tile: Tile = { letter: 'Z', value: 0 };
+
+            const expected = -1;
+            const result = ActionUtils.getIndexOfTile(tiles, tile, false);
+
+            expect(result).to.equal(expected);
+        });
     });
 });
