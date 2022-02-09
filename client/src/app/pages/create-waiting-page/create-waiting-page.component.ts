@@ -1,10 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router, NavigationStart } from '@angular/router';
 import { OnlinePlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CONTENT,
@@ -22,19 +22,25 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponent: string | undefined;
     joinRequestSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
+    routingSubscription: Subscription;
 
     host: OnlinePlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
-    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
+    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
 
     ngOnInit() {
-        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
-            .pipe(take(1))
-            .subscribe((opponentName) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent
-            .pipe(take(1))
-            .subscribe((leaverName) => this.opponentLeft(leaverName));
+        this.routingSubscription = this.router.events.subscribe((event) => {
+            if (event instanceof NavigationStart) {
+                this.routerChangeMethod(event.url);
+            }
+        });
+        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName) => this.setOpponent(opponentName));
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.opponentLeft(leaverName));
+    }
+
+    routerChangeMethod(url: string) {
+        if (url !== '/game') this.gameDispatcherService.handleCancelGame();
     }
 
     ngOnDestroy() {
@@ -43,6 +49,9 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         }
         if (this.joinerLeaveGameSubscription) {
             this.joinerLeaveGameSubscription.unsubscribe();
+        }
+        if (this.routingSubscription) {
+            this.routingSubscription.unsubscribe();
         }
     }
 
@@ -79,10 +88,6 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    cancelGame() {
-        this.gameDispatcherService.handleCancelGame();
-    }
-
     confirmOpponentToServer() {
         if (this.opponent) {
             this.gameDispatcherService.handleConfirmation(this.opponent);
@@ -91,8 +96,8 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     confirmRejectionToServer() {
         if (this.opponent) {
-            this.disconnectOpponent();
             this.gameDispatcherService.handleRejection(this.opponent);
+            this.disconnectOpponent();
         }
     }
 }
