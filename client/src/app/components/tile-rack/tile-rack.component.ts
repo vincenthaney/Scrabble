@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { IPlayer } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { GameService } from '@app/services';
 import { Subscription } from 'rxjs';
@@ -27,7 +27,7 @@ export class TileRackComponent implements OnDestroy {
 
     private initializeTileRack() {
         this.tiles = [];
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
         if (!localPlayer || !localPlayer.getTiles()) {
             return;
         }

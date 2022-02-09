@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
 import { IResetableService } from '@app/classes/i-resetable-service';
-import { IPlayer } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { convertTime } from '@app/classes/utils';
@@ -43,7 +43,7 @@ export default class RoundManagerService implements IResetableService {
         this.startRound();
     }
 
-    getActivePlayer(): IPlayer {
+    getActivePlayer(): AbstractPlayer {
         if (!this.currentRound) {
             throw new Error(ROUND_ERROR.NO_CURRENT_ROUND);
         }

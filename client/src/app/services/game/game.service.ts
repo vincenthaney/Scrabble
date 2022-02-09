@@ -4,7 +4,7 @@ import { StartMultiplayerGameData } from '@app/classes/communication/game-config
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { GameType } from '@app/classes/game-type';
-import { IPlayer, Player } from '@app/classes/player';
+import { AbstractPlayer, Player } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BoardService } from '@app/services/';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -17,8 +17,8 @@ export default class GameService {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
-    player1: IPlayer;
-    player2: IPlayer;
+    player1: AbstractPlayer;
+    player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
     startGameEvent: EventEmitter<void> = new EventEmitter();
@@ -51,7 +51,7 @@ export default class GameService {
         this.startGameEvent.emit();
     }
 
-    initializePlayer(playerData: PlayerData): IPlayer {
+    initializePlayer(playerData: PlayerData): AbstractPlayer {
         if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(GAME_ERRORS.MSSING_PLAYER_DATA_TO_INITIALIZE);
         return new Player(playerData.id, playerData.name, playerData.tiles);
     }
@@ -87,7 +87,7 @@ export default class GameService {
         return this.gameId;
     }
 
-    getLocalPlayer(): IPlayer | undefined {
+    getLocalPlayer(): AbstractPlayer | undefined {
         if (!this.localPlayerId) return undefined;
         return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
     }

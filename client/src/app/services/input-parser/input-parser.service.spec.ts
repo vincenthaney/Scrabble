@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActionExchangePayload } from '@app/classes/actions/action-exchange';
 import { ActionPlacePayload } from '@app/classes/actions/action-place';
 import { Orientation } from '@app/classes/orientation';
+import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
@@ -50,19 +51,17 @@ describe('InputParserService', () => {
         'sendMessage',
     ]);
     const gameServiceSpy: jasmine.SpyObj<GameService> = jasmine.createSpyObj('GameService', ['getLocalPlayer']);
-    gameServiceSpy.getLocalPlayer.and.returnValue({
-        name: 'testPlayer',
-        score: 200,
-        tiles: [
-            new Tile('A' as LetterValue, 1),
-            new Tile('B' as LetterValue, 1),
-            new Tile('C' as LetterValue, 1),
-            new Tile('C' as LetterValue, 1),
-            new Tile('E' as LetterValue, 1),
-            new Tile('E' as LetterValue, 1),
-            new Tile('*' as LetterValue, 0),
-        ],
-    });
+    const player: Player = new Player('', 'testPlayer', [
+        new Tile('A' as LetterValue, 1),
+        new Tile('B' as LetterValue, 1),
+        new Tile('C' as LetterValue, 1),
+        new Tile('C' as LetterValue, 1),
+        new Tile('E' as LetterValue, 1),
+        new Tile('E' as LetterValue, 1),
+        new Tile('*' as LetterValue, 0),
+    ]);
+    player.score = 200;
+    gameServiceSpy.getLocalPlayer.and.returnValue(player);
 
     beforeEach(() => {
         TestBed.configureTestingModule({
