@@ -62,14 +62,18 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     updateActivePlayerBorder(): void {
-        if (!this.player1Div || !this.player2Div || !this.roundManager.getActivePlayer()) return;
+        try {
+            if (!this.player1Div || !this.player2Div || !this.roundManager.getActivePlayer()) return;
 
-        if (this.roundManager.getActivePlayer().id === this.gameService.player1.id) {
-            this.player1Div.nativeElement.classList.add(this.activePlayerBorderClass);
-            this.player2Div.nativeElement.classList.remove(this.activePlayerBorderClass);
-        } else if (this.roundManager.getActivePlayer().id === this.gameService.player2.id) {
-            this.player2Div.nativeElement.classList.add(this.activePlayerBorderClass);
-            this.player1Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+            if (this.roundManager.getActivePlayer().id === this.gameService.player1.id) {
+                this.player1Div.nativeElement.classList.add(this.activePlayerBorderClass);
+                this.player2Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+            } else if (this.roundManager.getActivePlayer().id === this.gameService.player2.id) {
+                this.player2Div.nativeElement.classList.add(this.activePlayerBorderClass);
+                this.player1Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+            }
+        } catch (_) {
+            return;
         }
     }
 }

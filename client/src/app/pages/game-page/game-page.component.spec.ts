@@ -8,8 +8,10 @@ import { CommunicationBoxComponent } from '@app/components/communication-box/com
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { InformationBoxComponent } from '@app/components/information-box/information-box.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
+import { GameService } from '@app/services';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
+import SpyObj = jasmine.SpyObj;
 
 export class MatDialogMock {
     open() {
@@ -22,6 +24,11 @@ export class MatDialogMock {
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
+    let gameServiceSpy: SpyObj<GameService>;
+
+    beforeEach(() => {
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['isLocalPlayerPlaying']);
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -38,6 +45,10 @@ describe('GamePageComponent', () => {
                 {
                     provide: MatDialog,
                     useClass: MatDialogMock,
+                },
+                {
+                    provide: GameService,
+                    useValue: gameServiceSpy,
                 },
             ],
         }).compileComponents();
