@@ -22,8 +22,6 @@ describe('ActionPass', () => {
         action = new ActionPass(gameStub.player1, gameStub as unknown as Game);
     });
 
-    // describe('execute', () => {});
-
     describe('getMessage', () => {
         it('should return message', () => {
             expect(action.getMessage()).to.exist;
