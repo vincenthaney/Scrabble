@@ -6,7 +6,6 @@ import Player from '@app/classes/player/player';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 
-// const INVALID_COMMAND = 'a';
 export default class ActionExchange extends ActionPlay {
     tilesToExchange: Tile[];
 
