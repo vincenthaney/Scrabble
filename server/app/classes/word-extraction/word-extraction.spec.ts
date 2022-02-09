@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 import { expect, spy } from 'chai';
@@ -48,8 +47,6 @@ describe('WordExtraction', () => {
     it('extract should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the board grid is an empty array', () => {
         const startPosition: Position = { row: 1, column: 7 };
         const orientation = Orientation.Vertical;
-        console.log(board);
-        console.log(board.grid);
         board.grid = [[]];
         const result = () => WordExtraction.extract(board, WORD_JAMBON, startPosition, orientation);
         expect(result).to.throw(POSITION_OUT_OF_BOARD);
