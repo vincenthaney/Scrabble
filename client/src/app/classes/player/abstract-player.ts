@@ -1,6 +1,6 @@
 import { PlayerData } from '@app/classes/communication/player-data';
 import { Tile } from '@app/classes/tile';
-export default abstract class IPlayer {
+export default abstract class AbstractPlayer {
     id: string;
     name: string;
     score: number;
