@@ -8,7 +8,7 @@ import Player from '@app/classes/player/player';
 import RoundManager from './round-manager';
 import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { Action, ActionPass } from '@app/classes/actions';
+import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
 import { Round } from './round';
 import Game from '@app/classes/game/game';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
@@ -162,6 +162,22 @@ describe('RoundManager', () => {
             roundManager['saveCompletedRound'](round, actionPlayed);
 
             expect(roundManager.getPassCounter()).to.equal(initial);
+        });
+
+        it('should reset to 0 if play something other than ActionPass', () => {
+            const initial = 0;
+            roundManager['passCounter'] = initial;
+            const round: Round = { player: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date() };
+
+            const actionPass: Action = new ActionPass(round.player, gameStub as unknown as Game);
+            roundManager['saveCompletedRound'](round, actionPass);
+
+            expect(roundManager.getPassCounter()).to.equal(initial + 1);
+
+            const actionExchange: Action = new ActionExchange(round.player, gameStub as unknown as Game, []);
+            roundManager['saveCompletedRound'](round, actionExchange);
+
+            expect(roundManager.getPassCounter()).to.equal(0);
         });
     });
 

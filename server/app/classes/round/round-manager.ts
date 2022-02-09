@@ -64,6 +64,7 @@ export default class RoundManager {
     private saveCompletedRound(round: Round, actionPlayed: Action) {
         const now = new Date();
         if (actionPlayed instanceof ActionPass) this.passCounter++;
+        else this.passCounter = 0;
         this.completedRounds.push({ ...round, completedTime: now, actionPlayed });
     }
 
