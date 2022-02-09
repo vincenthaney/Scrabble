@@ -1,4 +1,5 @@
 import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -8,6 +9,11 @@ import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispat
 import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
 import SpyObj = jasmine.SpyObj;
+
+@Component({
+    template: '',
+})
+export class TestComponent {}
 
 describe('JoinWaitingPage', () => {
     let component: JoinWaitingPageComponent;
@@ -22,7 +28,12 @@ describe('JoinWaitingPage', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([]), HttpClientModule],
+            imports: [
+                MatDialogModule,
+                BrowserAnimationsModule,
+                RouterTestingModule.withRoutes([{ path: 'lobby', component: TestComponent }]),
+                HttpClientModule,
+            ],
             providers: [{ provide: GameDispatcherService, useValue: gameDispatcherSpy }, SocketService],
         }).compileComponents();
     });
