@@ -36,6 +36,13 @@ describe('ActionReserve', () => {
         it('should exists', () => {
             expect(action.getMessage()).to.exist;
         });
+
+        it('should be correct format', () => {
+            const arr: [letter: LetterValue, amount: number][] = Array.from(DEFAULT_MAP, ([v, k]) => [v, k]);
+            const expected = arr.map(([letter, amount]) => `${letter}: ${amount}`).join(', ');
+
+            expect(action.getMessage()).to.equal(expected);
+        });
     });
 
     describe('getOpponentMessage', () => {
