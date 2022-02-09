@@ -9,6 +9,7 @@ import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as ROUND_ERROR from './round-manager.service.errors';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -54,6 +55,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     startRound(): void {
+        clearTimeout(this.timeout);
         this.timeout = setTimeout(() => this.roundTimeout(), this.maxRoundTime * SECONDS_TO_MILLISECONDS);
         this.startTimer();
     }
@@ -63,8 +65,6 @@ export default class RoundManagerService implements IResetableService {
     }
 
     roundTimeout(): void {
-        // eslint-disable-next-line no-console
-        console.log('rond timeout');
         const actionPass: ActionData = {
             type: ActionType.PASS,
             payload: {},
