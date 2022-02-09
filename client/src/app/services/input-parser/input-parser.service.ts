@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { Message, MessageTypes } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { IPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
@@ -13,6 +14,7 @@ import {
     MIN_ROW_NUMBER
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { GameService } from '..';
 import { CommandErrorMessages } from './command-error-messages';
 import CommandError from './command-errors';
@@ -23,7 +25,19 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
     providedIn: 'root',
 })
 export default class InputParserService {
+    newMessageData: Observable<Message>;
+    private newMessageValue = new BehaviorSubject<Message>({
+        content: 'Début de la partie',
+        sender: 'System',
+        date: new Date(),
+        type: MessageTypes.System,
+    });
+
     constructor(private controller: GamePlayController, private gameService: GameService) {}
+
+    emitNewMessage(newMessage: Message): void {
+        this.newMessageValue.next(newMessage);
+    }
 
     parseInput(input: string): void {
         if (input[0] === '!') {
@@ -39,7 +53,13 @@ export default class InputParserService {
                 }
             }
         } else {
-            this.controller.sendMessage(input);
+            // à changer
+            this.controller.sendMessage(this.gameService.getGameId(), {
+                content: 'Début de la partie',
+                sender: 'System',
+                date: new Date(),
+                type: MessageTypes.System,
+            });
         }
     }
 
@@ -51,6 +71,7 @@ export default class InputParserService {
         } else {
             throw new Error('Current player could not be found');
         }
+        const gameId: string = this.gameService.getGameId();
         let actionData: ActionData;
 
         switch (actionName) {
@@ -68,7 +89,7 @@ export default class InputParserService {
                         payload: this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]),
                     };
                 }
-                this.controller.handleAction(playerId, actionData);
+                this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'échanger':
                 if (inputWords.length !== 2) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
@@ -77,7 +98,7 @@ export default class InputParserService {
                     type: ActionType.EXCHANGE,
                     payload: this.createExchangeActionPayload(inputWords[1]),
                 };
-                this.controller.handleAction(playerId, actionData);
+                this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'passer':
                 if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
@@ -85,7 +106,7 @@ export default class InputParserService {
                     type: ActionType.PASS,
                     payload: {},
                 };
-                this.controller.handleAction(playerId, actionData);
+                this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'réserve':
                 if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
