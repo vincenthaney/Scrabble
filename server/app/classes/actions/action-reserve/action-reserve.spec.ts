@@ -38,8 +38,7 @@ describe('ActionReserve', () => {
         });
 
         it('should be correct format', () => {
-            const arr: [letter: LetterValue, amount: number][] = Array.from(DEFAULT_MAP, ([v, k]) => [v, k]);
-            const expected = arr.map(([letter, amount]) => `${letter}: ${amount}`).join(', ');
+            const expected = 'A: 0, B: 0\nTotal: 0';
 
             expect(action.getMessage()).to.equal(expected);
         });
