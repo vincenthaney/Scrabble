@@ -3,7 +3,7 @@ import { Timer } from '@app/classes/timer';
 import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { Observable, Subject, Subscription, timer as createTimer } from 'rxjs';
+import { Observable, Subject, Subscription, timer as timerCreationFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'app-information-box',
@@ -49,7 +49,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
     startTimer(timer: Timer) {
         this.timer = timer;
-        this.timerSource = createTimer(0, SECONDS_TO_MILLISECONDS);
+        this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
         this.timerSubscription = this.timerSource.subscribe(() => this.timer.decrement());
         this.updateActivePlayerBorder();
     }
@@ -75,5 +75,9 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         } catch (_) {
             return;
         }
+    }
+
+    private createTimer(length: number): Observable<number> {
+        return timerCreationFunction(0, length);
     }
 }
