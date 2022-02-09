@@ -15,19 +15,23 @@ export class GamePlayService {
     playAction(gameId: string, playerId: string, actionData: ActionData): GameUpdateData | void {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
+
         if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
 
         const action: Action = this.getAction(player, game, actionData);
         let updatedData: void | GameUpdateData = action.execute();
+
         if (action.willEndTurn()) {
             const nextRound = game.roundManager.nextRound(action);
             if (updatedData) updatedData.round = nextRound;
             else updatedData = { round: nextRound };
         }
+
         if (game.isGameOver()) {
             if (updatedData) updatedData.isGameOver = true;
             else updatedData = { isGameOver: true };
         }
+
         return updatedData;
     }
 
