@@ -13,7 +13,7 @@ export const HELP_ACTIONS: HelpAction[] = [
     {
         command: 'echanger',
         usage: '<lettres>',
-        description: 'changer des lettres pour des nouvelles',
+        description: 'changer des lettres de son chevalet pour des lettres de la réserve',
     },
     {
         command: 'passer',
