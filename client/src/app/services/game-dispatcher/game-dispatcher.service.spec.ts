@@ -20,7 +20,7 @@ const TEST_GAME_PARAMETERS = {
     gameMode: GameMode.Solo,
     level: VirtualPlayerLevel.Beginner,
     timer: '60',
-    dict: 'français',
+    dictionary: 'français',
 };
 
 const TEST_FORM: FormGroup = new FormGroup({
@@ -97,7 +97,7 @@ describe('GameDispatcherService', () => {
             playerId: TEST_PLAYER_ID,
             gameType: TEST_GAME_PARAMETERS.gameType,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            dictionary: TEST_GAME_PARAMETERS.dict,
+            dictionary: TEST_GAME_PARAMETERS.dictionary,
         };
 
         service.handleCreateGame(TEST_PLAYER_NAME, TEST_FORM);

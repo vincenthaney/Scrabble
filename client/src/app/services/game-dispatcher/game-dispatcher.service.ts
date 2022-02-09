@@ -69,7 +69,7 @@ export class GameDispatcherService {
             playerId: this.gameDispatcherController.socketService.getId(),
             gameType: gameParameters.get('gameType')?.value as GameType,
             maxRoundTime: gameParameters.get('timer')?.value as number,
-            dictionary: gameParameters.get('dict')?.value as string,
+            dictionary: gameParameters.get('dictionary')?.value as string,
         };
         this.gameDispatcherController.handleMultiplayerGameCreation(gameConfig);
     }
