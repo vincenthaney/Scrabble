@@ -33,4 +33,8 @@ export default class ActionExchange extends ActionPlay {
     getMessage(): string {
         return `${this.player.name} a échangé les tuiles ${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter), '')}.`;
     }
+    getOpponentMessage(): string {
+        const moreThanOne = this.tilesToExchange.length > 1;
+        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}.`;
+    }
 }
