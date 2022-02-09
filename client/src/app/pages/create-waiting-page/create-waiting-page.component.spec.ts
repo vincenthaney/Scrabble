@@ -218,8 +218,7 @@ describe('CreateWaitingPageComponent', () => {
         expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
     });
 
-    it('ngOnDestroy should unsubscribe to gameDispatcherService joinRequestEvent \
-    and joinerLeaveGameEvent and router events if it was subscribed to it', () => {
+    it('ngOnDestroy should unsubscribe all subscriptions', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyUnsubscribeJoinRequestEvent = spyOn(component.joinRequestSubscription, 'unsubscribe').and.returnValue(of(true) as any);
         const spyUnsubscribeJoinerLeaveGameEvent = spyOn(component.joinerLeaveGameSubscription, 'unsubscribe').and.returnValue(

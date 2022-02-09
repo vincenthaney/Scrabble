@@ -31,6 +31,7 @@ export class GameCreationPageComponent implements OnInit {
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
+    // TODO: Check if this causes memory leak
     ngOnInit() {
         this.gameParameters.get('gameMode')?.valueChanges.subscribe((value) => {
             if (value === this.gameModes.Solo) {

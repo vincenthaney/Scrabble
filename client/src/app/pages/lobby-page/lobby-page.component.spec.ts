@@ -153,4 +153,15 @@ describe('LobbyPageComponent', () => {
         gameDispatcherServiceMock.lobbyFullEvent.emit(emitName);
         expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
     });
+
+    it('ngOnDestroy should unsubscribe all subscriptions', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeUpdateEvent = spyOn(component.lobbiesUpdateSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeLobbyFullEvent = spyOn(component.lobbyFullSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+
+        component.ngOnDestroy();
+        expect(spyUnsubscribeUpdateEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeLobbyFullEvent).toHaveBeenCalled();
+    });
 });

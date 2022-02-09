@@ -108,4 +108,19 @@ describe('JoinWaitingPageComponent', () => {
         component.onBeforeUnload();
         expect(spyHandleLeaveLobby).toHaveBeenCalled();
     });
+
+    it('ngOnDestroy should unsubscribe all subscriptions', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeCancelEvent = spyOn(component.canceledGameSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeRoutingEvent = spyOn(component.routingSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        const spyUnsubscribeJoinerRejectedEvent = spyOn(component.joinerRejectedSubscription, 'unsubscribe').and.returnValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            of(true) as any,
+        );
+        component.ngOnDestroy();
+        expect(spyUnsubscribeCancelEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeRoutingEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeJoinerRejectedEvent).toHaveBeenCalled();
+    });
 });

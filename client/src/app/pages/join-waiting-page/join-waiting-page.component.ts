@@ -9,8 +9,8 @@ import {
 } from './join-waiting-page.component.const';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Router, NavigationStart } from '@angular/router';
 @Component({
@@ -22,6 +22,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     canceledGameSubscription: Subscription;
     joinerRejectedSubscription: Subscription;
     routingSubscription: Subscription;
+    componentDestroyed$: Subject<boolean> = new Subject();
 
     state: GameRequestState = GameRequestState.Waiting;
     waitingGameName: string = 'testName';
@@ -39,7 +40,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.routingSubscription = this.router.events.subscribe((event) => {
+        this.routingSubscription = this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
             if (event instanceof NavigationStart) {
                 this.routerChangeMethod(event.url);
             }
@@ -47,25 +48,18 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
 
         if (!this.canceledGameSubscription) {
             this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
-                .pipe(take(1))
+                .pipe(takeUntil(this.componentDestroyed$))
                 .subscribe((hostName: string) => this.hostHasCanceled(hostName));
         }
         if (!this.joinerRejectedSubscription) {
             this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
-                .pipe(take(1))
+                .pipe(takeUntil(this.componentDestroyed$))
                 .subscribe((hostName: string) => this.playerRejected(hostName));
         }
     }
     ngOnDestroy() {
-        if (this.canceledGameSubscription) {
-            this.canceledGameSubscription.unsubscribe();
-        }
-        if (this.joinerRejectedSubscription) {
-            this.joinerRejectedSubscription.unsubscribe();
-        }
-        if (this.routingSubscription) {
-            this.routingSubscription.unsubscribe();
-        }
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     routerChangeMethod(url: string) {
