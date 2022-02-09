@@ -40,8 +40,8 @@ class MockRoundManager {
 }
 
 class MockGameService {
-    pPlayer1: AbstractPlayer;
-    pPlayer2: AbstractPlayer;
+    pPlayer1: AbstractPlayer = new Player('id1', 'name1', []);
+    pPlayer2: AbstractPlayer = new Player('id2', 'name2', []);
 
     get player1(): AbstractPlayer {
         return this.pPlayer1;
@@ -99,8 +99,6 @@ describe('InformationBoxComponent', () => {
     });
 
     it('ngOnInit should subscribe to RoundManager timer property', () => {
-        spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
-
         const timerObs = new Observable<Timer>();
         const pipedObservable = timerObs.pipe();
         const pipedSpy = spyOn(pipedObservable, 'subscribe');
@@ -121,7 +119,6 @@ describe('InformationBoxComponent', () => {
     });
 
     it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
-        spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
         component.ngOnInit();
         // eslint-disable-next-line deprecation/deprecation
