@@ -1,4 +1,12 @@
+export enum MessageTypes {
+    Player1,
+    Player2,
+    System,
+}
+
 export interface Message {
-    title: string;
-    body: string;
+    content: string;
+    sender: string;
+    date: Date;
+    type: MessageTypes;
 }
