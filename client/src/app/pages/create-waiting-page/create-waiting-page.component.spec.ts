@@ -40,6 +40,7 @@ describe('CreateWaitingPageComponent', () => {
                 RouterTestingModule.withRoutes([
                     { path: 'game-creation', component: TestComponent },
                     { path: 'waiting-room', component: CreateWaitingPageComponent },
+                    { path: 'game', component: TestComponent },
                 ]),
             ],
             providers: [
@@ -147,16 +148,6 @@ describe('CreateWaitingPageComponent', () => {
         expect(component.opponent).toEqual(undefined);
     });
 
-    it('clicking on the cancelButton call handleCancelGame()', () => {
-        component.isOpponentFound = true;
-        fixture.detectChanges();
-        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {
-            return;
-        });
-        const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
-        cancelButton.click();
-        expect(gameDispatcherSpy).toHaveBeenCalled();
-    });
     it('clicking on the rejectButton should call handleRejection() if an opponent is found', () => {
         component.isOpponentFound = true;
         fixture.detectChanges();
@@ -217,17 +208,18 @@ describe('CreateWaitingPageComponent', () => {
         expect(gameDispatcherSpy).not.toHaveBeenCalled();
     });
 
-    it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent', () => {
+    it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spySubscribejoinRequestEvent = spyOn(gameDispatcherServiceMock.joinRequestEvent, 'subscribe').and.returnValue(of(true) as any);
+        const spySubscribeJoinRequestEvent = spyOn(gameDispatcherServiceMock.joinRequestEvent, 'subscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spySubscribejoinerLeaveGameEvent = spyOn(gameDispatcherServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
+        const spySubscribeJoinerLeaveGameEvent = spyOn(gameDispatcherServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
         component.ngOnInit();
-        expect(spySubscribejoinRequestEvent).toHaveBeenCalled();
-        expect(spySubscribejoinerLeaveGameEvent).toHaveBeenCalled();
+        expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
+        expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
     });
 
-    it('ngOnDestroy should unsubscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent if it was subscribed to it', () => {
+    it('ngOnDestroy should unsubscribe to gameDispatcherService joinRequestEvent \
+    and joinerLeaveGameEvent and router events if it was subscribed to it', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyUnsubscribeJoinRequestEvent = spyOn(component.joinRequestSubscription, 'unsubscribe').and.returnValue(of(true) as any);
         const spyUnsubscribeJoinerLeaveGameEvent = spyOn(component.joinerLeaveGameSubscription, 'unsubscribe').and.returnValue(
@@ -237,6 +229,25 @@ describe('CreateWaitingPageComponent', () => {
         component.ngOnDestroy();
         expect(spyUnsubscribeJoinRequestEvent).toHaveBeenCalled();
         expect(spyUnsubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+    });
+
+    it('ngOnDestroy should call handleCancelGame if the isStartingGame is false', () => {
+        component.isStartingGame = false;
+        fixture.detectChanges();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeJoinRequestEvent = spyOn(component.joinRequestSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        const spyUnsubscribeJoinerLeaveGameEvent = spyOn(component.joinerLeaveGameSubscription, 'unsubscribe').and.returnValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            of(true) as any,
+        );
+        const spyCancelGame = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {
+            return;
+        });
+
+        component.ngOnDestroy();
+        expect(spyUnsubscribeJoinRequestEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+        expect(spyCancelGame).toHaveBeenCalled();
     });
 
     it('setOpponent should be called when joinRequestEvent is emittted', () => {
