@@ -27,6 +27,8 @@ export class GamePlayController {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
 
+            // eslint-disable-next-line no-console
+            console.log(data);
             try {
                 this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();

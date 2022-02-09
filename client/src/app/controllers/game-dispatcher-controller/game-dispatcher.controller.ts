@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
@@ -37,8 +36,6 @@ export class GameDispatcherController {
         this.socketService.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
         this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
         this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
-            console.log('joinerLeaveGameCLIENT');
-            console.log(opponent);
             this.joinerLeaveGameEvent.emit(opponent[0].name);
         });
     }

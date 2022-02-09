@@ -66,8 +66,6 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     rejectOpponent(leaverName: string) {
-        // eslint-disable-next-line no-console
-        console.log('rejectOpponent-CLIENT');
         this.warnHostOpponentLeft(leaverName);
         this.opponent = undefined;
         this.waitingRoomMessage = HOST_WAITING_MESSAGE;
@@ -75,15 +73,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     cancelGame() {
-        // eslint-disable-next-line no-console
-        console.log('CANCELGAME-CLIENT');
         this.gameDispatcherService.handleCancelGame();
-        // if (this.opponent) {
-        //     this.warnHostOpponentLeft(this.opponent);
-        //     this.opponent = undefined;
-        //     this.waitingRoomMessage = HOST_WAITING_MESSAGE;
-        //     this.isOpponentFound = false;
-        // }
     }
 
     warnHostOpponentLeft(opponentName: string) {
@@ -103,8 +93,6 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmOpponentToServer() {
-        // eslint-disable-next-line no-console
-        console.log(this.opponent);
         if (this.opponent) {
             this.gameDispatcherService.handleConfirmation(this.opponent);
         }

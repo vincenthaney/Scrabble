@@ -24,6 +24,6 @@ export class GamePlayController {
 
     handleAction(gameId: string, playerId: string, action: ActionData) {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/action`;
-        this.http.post(endpoint, action.payload).subscribe();
+        this.http.post(endpoint, action).subscribe();
     }
 }
