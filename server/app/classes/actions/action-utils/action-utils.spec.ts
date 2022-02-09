@@ -28,10 +28,10 @@ describe('ActionUtils', () => {
 
             player.tiles = playerTiles;
 
-            const [resTilesToPlace, resUnplayedTiles] = ActionUtils.getTilesFromPlayer(tilesToPlay, player);
+            const [resultTilesToPlace, resultUnplayedTiles] = ActionUtils.getTilesFromPlayer(tilesToPlay, player);
 
-            expect(tilesToPlay.every((t) => resTilesToPlace.some((t2) => t.letter === t2.letter && t.value === t2.value))).to.be.true;
-            expect(unplayedTilesExpected.every((t) => resUnplayedTiles.some((t2) => t.letter === t2.letter && t.value === t2.value))).to.be.true;
+            expect(tilesToPlay.every((t) => resultTilesToPlace.some((t2) => t.letter === t2.letter && t.value === t2.value))).to.be.true;
+            expect(unplayedTilesExpected.every((t) => resultUnplayedTiles.some((t2) => t.letter === t2.letter && t.value === t2.value))).to.be.true;
         });
 
         it("should throw if playing letter the player doesn't have", () => {
