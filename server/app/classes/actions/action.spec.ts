@@ -8,7 +8,7 @@ import { ActionClue, ActionExchange, ActionHelp, ActionPass, ActionPlace, Action
 export const DEFAULT_SQUARE: Square = {
     tile: null,
     position: { row: 0, column: 0 },
-    multiplier: null,
+    scoreMultiplier: null,
     wasMultiplierUsed: false,
     isCenter: false,
 };

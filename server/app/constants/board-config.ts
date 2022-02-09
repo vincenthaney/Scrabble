@@ -25,5 +25,5 @@ export const BOARD_CONFIG_MAP: Map<string, Multiplier> = new Map([
     ['L3', { multiplier: 3, multiplierEffect: MultiplierEffect.LETTER }],
     ['W2', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
     ['W3', { multiplier: 3, multiplierEffect: MultiplierEffect.WORD }],
-    ['S', { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER }],
+    ['S', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
 ]);

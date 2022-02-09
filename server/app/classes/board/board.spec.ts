@@ -1,10 +1,10 @@
-import { expect } from 'chai';
-import { Tile } from '@app/classes/tile';
-import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
-import { Orientation, Position, Board } from '.';
-import { POSITION_OUT_OF_BOARD } from './board-errors';
 import { Square } from '@app/classes/square';
+import { Tile } from '@app/classes/tile';
 import { BOARD_SIZE } from '@app/constants/game';
+import { expect } from 'chai';
+import { Board, Orientation, Position } from '.';
+import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
+import { POSITION_OUT_OF_BOARD } from './board-errors';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
@@ -23,7 +23,7 @@ describe('Board', () => {
                 const square = {
                     tile: null,
                     position: { row: i, column: j },
-                    multiplier: null,
+                    scoreMultiplier: null,
                     wasMultiplierUsed: false,
                     isCenter: false,
                 };

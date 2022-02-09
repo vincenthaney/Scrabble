@@ -3,7 +3,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board, Position } from '@app/classes/board';
-import { AbstractScoreMultiplier, LetterScoreMultiplier, Square, WordScoreMultiplier } from '@app/classes/square';
+import { Square } from '@app/classes/square';
+import ScoreMultiplier, { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG } from '@app/constants/board-config';
 import { BOARD_SIZE } from '@app/constants/game';
@@ -42,14 +43,14 @@ describe('BoardService', () => {
         [{ row: boardConfigSize.x + 1, column: boardConfigSize.y + 1 }, false],
     ]);
 
-    type MapTypes = AbstractScoreMultiplier | null | undefined;
+    type MapTypes = ScoreMultiplier | null | undefined;
     const boardConfigTestCases: Map<string, MapTypes> = new Map([
         ['x', null],
-        ['L2', new LetterScoreMultiplier(2)],
-        ['L3', new LetterScoreMultiplier(3)],
-        ['W2', new WordScoreMultiplier(2)],
-        ['W3', new WordScoreMultiplier(3)],
-        ['S', new LetterScoreMultiplier(2)],
+        ['L2', { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER }],
+        ['L3', { multiplier: 3, multiplierEffect: MultiplierEffect.LETTER }],
+        ['W2', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
+        ['W3', { multiplier: 3, multiplierEffect: MultiplierEffect.WORD }],
+        ['S', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
         ['?', undefined],
         ['undefined', undefined],
     ]);
@@ -57,18 +58,30 @@ describe('BoardService', () => {
     const boardInitializationTestCases: Map<Position, Square | undefined> = new Map([
         [
             { row: 0, column: 0 },
-            { tile: null, position: { row: 0, column: 0 }, multiplier: new WordScoreMultiplier(3), wasMultiplierUsed: false, isCenter: false },
+            {
+                tile: null,
+                position: { row: 0, column: 0 },
+                scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
+                wasMultiplierUsed: false,
+                isCenter: false,
+            },
         ],
         [
             { row: 1, column: 1 },
-            { tile: null, position: { row: 1, column: 1 }, multiplier: new WordScoreMultiplier(2), wasMultiplierUsed: false, isCenter: false },
+            {
+                tile: null,
+                position: { row: 1, column: 1 },
+                scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD },
+                wasMultiplierUsed: false,
+                isCenter: false,
+            },
         ],
         [
             { row: BOARD_SIZE.x - 1, column: 0 },
             {
                 tile: null,
                 position: { row: BOARD_SIZE.x - 1, column: 0 },
-                multiplier: new WordScoreMultiplier(3),
+                scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
@@ -79,7 +92,7 @@ describe('BoardService', () => {
             {
                 tile: null,
                 position: { row: 0, column: BOARD_SIZE.y - 1 },
-                multiplier: new WordScoreMultiplier(3),
+                scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
@@ -90,7 +103,7 @@ describe('BoardService', () => {
             {
                 tile: null,
                 position: { row: BOARD_SIZE.x - 1, column: BOARD_SIZE.y - 1 },
-                multiplier: new WordScoreMultiplier(3),
+                scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
@@ -131,8 +144,13 @@ describe('BoardService', () => {
 
     it('Reading board config at valid position should return appropriate multiplier', () => {
         chai.spy.on(service, 'isBoardConfigDefined', () => true);
-        chai.spy.on(service, 'parseSquareConfig', () => new LetterScoreMultiplier(2));
-        expect(service['readScoreMultiplierConfig']({ row: 5, column: 5 })).to.deep.equal(new LetterScoreMultiplier(2));
+        chai.spy.on(service, 'parseSquareConfig', () => {
+            return { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER };
+        });
+        expect(service['readScoreMultiplierConfig']({ row: 5, column: 5 })).to.deep.equal({
+            multiplier: 2,
+            multiplierEffect: MultiplierEffect.LETTER,
+        });
     });
 
     it('Initializing board should put center at the center of the board', () => {
@@ -155,7 +173,7 @@ describe('BoardService', () => {
         const testText = value ? '' : 'NOT';
         it('Created board should ' + testText + ' have a square at ' + position.row + '/' + position.column, () => {
             if (value) {
-                chai.spy.on(service, 'readScoreMultiplierConfig', () => value.multiplier);
+                chai.spy.on(service, 'readScoreMultiplierConfig', () => value.scoreMultiplier);
             }
             const board: Board = service.initializeBoard();
 
