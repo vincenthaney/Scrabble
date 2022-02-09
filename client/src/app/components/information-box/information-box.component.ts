@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Timer } from '@app/classes/timer';
 import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
@@ -10,7 +10,10 @@ import { takeUntil } from 'rxjs/operators';
     templateUrl: './information-box.component.html',
     styleUrls: ['./information-box.component.scss'],
 })
-export class InformationBoxComponent implements OnDestroy {
+export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit {
+    @ViewChild('player1Div', { static: false }) private player1Div: ElementRef<HTMLDivElement>;
+    @ViewChild('player2Div', { static: false }) private player2Div: ElementRef<HTMLDivElement>;
+
     player1 = { name: 'Mathilde', score: 420 };
     player2 = { name: 'Raphael', score: 69 };
     timer: Timer;
@@ -18,11 +21,18 @@ export class InformationBoxComponent implements OnDestroy {
     timerSubscription: Subscription;
     endRoundSubscription: Subscription;
     private ngUnsubscribe: Subject<void>;
+    private activePlayerBorderClass = 'active-player';
 
-    constructor(private roundManager: RoundManagerService, public gameService: GameService) {
+    constructor(private roundManager: RoundManagerService, public gameService: GameService) {}
+
+    ngOnInit() {
         this.ngUnsubscribe = new Subject();
         this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => this.startTimer(timer));
-        this.endRoundSubscription = roundManager.endRoundEvent.subscribe(() => this.endRound());
+        this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
+    }
+
+    ngAfterViewInit() {
+        this.updateActivePlayerBorder();
     }
 
     ngOnDestroy(): void {
@@ -36,6 +46,7 @@ export class InformationBoxComponent implements OnDestroy {
         this.timer = timer;
         this.timerSource = createTimer(0, SECONDS_TO_MILLISECONDS);
         this.timerSubscription = this.timerSource.subscribe(() => this.timer.decrement());
+        this.updateActivePlayerBorder();
     }
 
     endRound() {
@@ -45,7 +56,15 @@ export class InformationBoxComponent implements OnDestroy {
         }
     }
 
-    getTimerSeconds(): string {
-        return this.timer.seconds.toString().padStart(2, '0');
+    updateActivePlayerBorder(): void {
+        if (!this.player1Div || !this.player2Div || !this.roundManager.getCurrentPlayer()) return;
+
+        if (this.roundManager.getCurrentPlayer().id === this.gameService.player1.id) {
+            this.player1Div.nativeElement.classList.add(this.activePlayerBorderClass);
+            this.player2Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+        } else if (this.roundManager.getCurrentPlayer().id === this.gameService.player2.id) {
+            this.player2Div.nativeElement.classList.add(this.activePlayerBorderClass);
+            this.player1Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+        }
     }
 }

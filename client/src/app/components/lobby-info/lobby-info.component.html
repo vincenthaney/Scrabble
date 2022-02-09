@@ -12,7 +12,7 @@
     <div>
         <div class="info">
             <app-icon icon="hourglass-half" size="lg"></app-icon>
-            &nbsp; Temps par tour: {{ convertTime().minutes }} : {{ convertTime().seconds }}
+            &nbsp; Temps par tour: {{ convertTime().minutes }} : {{ convertTime().getTimerSecondsPadded() }}
         </div>
     </div>
 

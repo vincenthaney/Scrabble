@@ -14,4 +14,8 @@ export class Timer {
             this.seconds = 60;
         }
     }
+
+    getTimerSecondsPadded(): string {
+        return this.seconds.toString().padStart(2, '0');
+    }
 }
