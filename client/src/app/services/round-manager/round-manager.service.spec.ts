@@ -1,11 +1,22 @@
+import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import SpyObj = jasmine.SpyObj;
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
+    let gameDispatcherControllerSpy: SpyObj<GameDispatcherController>;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
+        gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
+    });
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [HttpClientModule],
+            providers: [{ provide: GameDispatcherController, useValue: gameDispatcherControllerSpy }],
+        });
         service = TestBed.inject(RoundManagerService);
     });
 

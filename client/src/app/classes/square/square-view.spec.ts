@@ -138,10 +138,10 @@ describe('SquareView', () => {
                 },
                 getMultiplierEffect: () => {
                     // We can create an actual MultiplierEffect since it won't impact the getMultiplier
-                    return new LetterScoreMultiplier(2);
+                    return { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER };
                 },
             },
-            { multiplier: -1, multiplierEffect: new LetterScoreMultiplier(2) },
+            { multiplier: -1, multiplierEffect: { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER } },
         );
         const square = {
             tile: null,

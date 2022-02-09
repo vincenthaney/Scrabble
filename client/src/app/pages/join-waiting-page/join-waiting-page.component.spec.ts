@@ -11,7 +11,7 @@ import { JoinWaitingPageComponent } from './join-waiting-page.component';
 describe('WaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
-    const testOpponent = new OnlinePlayer('testName');
+    const testOpponent = new OnlinePlayer('', 'testName', []);
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({

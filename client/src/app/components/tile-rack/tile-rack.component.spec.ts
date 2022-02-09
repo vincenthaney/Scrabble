@@ -66,7 +66,7 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with no tiles should return empty TileRack', () => {
-        const localPlayer: IPlayer = new Player('Test');
+        const localPlayer: IPlayer = new Player('', 'Test', []);
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
         // eslint-disable-next-line dot-notation
@@ -76,7 +76,7 @@ describe('TileRackComponent', () => {
 
     it('Initializing TileRack with player with tiles should return the player tiles', () => {
         const tiles: Tile[] = [{ letter: 'A', value: 10 }];
-        const localPlayer: IPlayer = new Player('Test');
+        const localPlayer: IPlayer = new Player('', 'Test', []);
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue(tiles);
         // eslint-disable-next-line dot-notation
