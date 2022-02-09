@@ -185,7 +185,7 @@ describe('GamePlayService', () => {
             expect(() => gamePlayService.getAction(player, game, type, payload)).to.throw(INVALID_PAYLOAD);
         });
 
-        it("should throw if place payload doesn't have position", () => {
+        it("should throw if place payload doesn't have orientation", () => {
             const type = 'place';
             const payload: Omit<ActionPlacePayload, 'orientation'> = {
                 tiles: [],
