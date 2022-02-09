@@ -157,4 +157,30 @@ describe('ActionExchange', () => {
             expect(action.getMessage()).to.exist;
         });
     });
+
+    describe('getOpponentMessage', () => {
+        let action: ActionExchange;
+
+        beforeEach(() => {
+            action = new ActionExchange(game.player1, game, []);
+        });
+
+        it('should return message', () => {
+            expect(action.getOpponentMessage()).to.exist;
+        });
+
+        it('should be different from getMessage', () => {
+            expect(action.getOpponentMessage()).to.not.equal(action.getMessage());
+        });
+
+        it("should have 'tuile' plural if more than one tiles to exchange", () => {
+            action.tilesToExchange = PLAYER_TILES;
+            expect(action.getOpponentMessage()).to.include('tuiles.');
+        });
+
+        it("should have 'tuile' singular if one tile to exchange", () => {
+            action.tilesToExchange = [PLAYER_TILES[0]];
+            expect(action.getOpponentMessage()).to.include('tuile.');
+        });
+    });
 });
