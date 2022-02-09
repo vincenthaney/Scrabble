@@ -61,7 +61,7 @@ describe('LobbyPageComponent', () => {
                 MatFormFieldModule,
                 MatDividerModule,
                 RouterTestingModule.withRoutes([
-                    { path: 'waiting-room', component: TestComponent },
+                    { path: 'join-waiting', component: TestComponent },
                     { path: 'home', component: TestComponent },
                 ]),
             ],
