@@ -1,6 +1,6 @@
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Component, Input, ViewChild, OnDestroy, OnInit } from '@angular/core';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { OnlinePlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
@@ -20,18 +20,26 @@ import {
 })
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponent: string | undefined;
+    @ViewChild(MatProgressSpinner, { static: false }) spinnerOpponentFound: MatProgressSpinner;
+
     joinRequestSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
 
-    @ViewChild(MatProgressSpinner, { static: false }) spinnerOpponentFound: MatProgressSpinner;
     host: OnlinePlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit() {
-        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.rejectOpponent(leaverName));
+        if (!this.gameDispatcherService.joinRequestEvent) return;
+        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName: string) =>
+            this.setOpponent(opponentName),
+        );
+
+        if (!this.gameDispatcherService.joinerLeaveGameEvent) return;
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName: string) =>
+            this.rejectOpponent(leaverName),
+        );
     }
 
     ngOnDestroy() {

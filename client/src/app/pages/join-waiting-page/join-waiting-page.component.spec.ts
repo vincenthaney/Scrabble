@@ -29,7 +29,13 @@ describe('JoinWaitingPage', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [MatProgressBarModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([{ path: 'lobby', component: TestComponent }]), HttpClientModule],
+            imports: [
+                MatProgressBarModule,
+                MatDialogModule,
+                BrowserAnimationsModule,
+                RouterTestingModule.withRoutes([{ path: 'lobby', component: TestComponent }]),
+                HttpClientModule,
+            ],
             providers: [{ provide: GameDispatcherService, useValue: gameDispatcherSpy }, SocketService],
         }).compileComponents();
     });

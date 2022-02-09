@@ -1,21 +1,21 @@
-import { HttpClientModule } from '@angular/common/http';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 import { BoardComponent } from '@app/components/board/board.component';
 import { CommunicationBoxComponent } from '@app/components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { InformationBoxComponent } from '@app/components/information-box/information-box.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
-import { GameService } from '@app/services';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { GameService } from '@app/services';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -58,7 +58,7 @@ describe('GamePageComponent', () => {
                 FormsModule,
                 ScrollingModule,
                 RouterTestingModule.withRoutes([]),
-                HttpClientModule
+                HttpClientModule,
             ],
             providers: [
                 {

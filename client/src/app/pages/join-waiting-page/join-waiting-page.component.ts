@@ -31,7 +31,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         if (!this.gameDispatcherService.canceledGameEvent) return;
-        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent.subscribe((hostName) => this.hostHasCanceled(hostName));
+        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent.subscribe((hostName: string) => this.hostHasCanceled(hostName));
     }
 
     ngOnDestroy() {
