@@ -7,7 +7,6 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { SocketService } from '@app/services/socket/socket.service';
-import { UNDEFINED_GAME_ID } from './game-dispatcher-errors';
 import { GameDispatcherService } from './game-dispatcher.service';
 
 const BASE_GAME_ID = 'baseGameId';
@@ -28,7 +27,7 @@ const TEST_FORM: FormGroup = new FormGroup({
     gameMode: new FormControl(GameMode.Solo, Validators.required),
     level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
     timer: new FormControl('', Validators.required),
-    dict: new FormControl('', Validators.required),
+    dictionary: new FormControl('', Validators.required),
 });
 TEST_FORM.setValue(TEST_GAME_PARAMETERS);
 
@@ -78,12 +77,6 @@ describe('GameDispatcherService', () => {
         expect(service.gameId).toEqual(undefined);
     });
 
-    it('handleLeaveLobby should throw UNDEFINED_GAME_ID when gameId is undefined', () => {
-        service.gameId = undefined;
-        const result = () => service.handleLeaveLobby();
-        expect(result).toThrowError(UNDEFINED_GAME_ID);
-    });
-
     // eslint-disable-next-line max-len
     it('handleCreateGame should call gameDispatcherController.handleMultiplayerGameCreation with the correct parameters and put gameId to undefined', () => {
         const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleMultiplayerGameCreation').and.callFake(() => {
@@ -113,12 +106,6 @@ describe('GameDispatcherService', () => {
         expect(service.gameId).toEqual(undefined);
     });
 
-    it('handleCancelGame should throw UNDEFINED_GAME_ID when gameId is undefined', () => {
-        service.gameId = undefined;
-        const result = () => service.handleCancelGame();
-        expect(result).toThrowError(UNDEFINED_GAME_ID);
-    });
-
     it('handleConfirmation should call gameDispatcherController.handleConfirmationGameCreation with the correct parameters', () => {
         const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleConfirmationGameCreation').and.callFake(() => {
             return;
@@ -127,34 +114,13 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
     });
 
-    it('handleConfirmation should throw UNDEFINED_GAME_ID when gameId is undefined', () => {
-        service.gameId = undefined;
-        const result = () => service.handleConfirmation(TEST_PLAYER_NAME);
-        expect(result).toThrowError(UNDEFINED_GAME_ID);
-    });
-
-    it('handleRejection should call gameDispatcherController.handleRejection with the correct parameters and put gameId to undefined', () => {
+    it('handleRejection should call gameDispatcherController.handleRejectionGameCreation\
+     with the correct parameters and put gameId to undefined', () => {
         const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleRejectionGameCreation').and.callFake(() => {
             return;
         });
         service.handleRejection(TEST_PLAYER_NAME);
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
-        expect(service.gameId).toEqual(undefined);
-    });
-
-    it('handleRejection should throw UNDEFINED_GAME_ID when gameId is undefined', () => {
-        service.gameId = undefined;
-        const result = () => service.handleRejection(TEST_PLAYER_NAME);
-        expect(result).toThrowError(UNDEFINED_GAME_ID);
-    });
-
-    it('handleRejection should call gameDispatcherController.handleRejection with the correct parameters and put gameId to undefined', () => {
-        const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleRejectionGameCreation').and.callFake(() => {
-            return;
-        });
-        service.handleRejection(TEST_PLAYER_NAME);
-        expect(spyHandleLobbyJoinRequest).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
-        expect(service.gameId).toEqual(undefined);
     });
 
     it('handleJoinRequest should emit the opponentName with joinRequestEvent', () => {
