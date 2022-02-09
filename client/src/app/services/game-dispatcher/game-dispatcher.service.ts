@@ -27,21 +27,27 @@ export class GameDispatcherService {
     joinerLeaveGameSubscription: Subscription;
 
     constructor(private gameDispatcherController: GameDispatcherController) {
+        if (!this.gameDispatcherController.createGameEvent) return;
         this.createGameSubscription = this.gameDispatcherController.createGameEvent.subscribe((gameId: string) => {
             this.gameId = gameId;
         });
+        if (!this.gameDispatcherController.joinRequestEvent) return;
         this.joinRequestSubscription = this.gameDispatcherController.joinRequestEvent.subscribe((opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
+        if (!this.gameDispatcherController.lobbyFullEvent) return;
         this.lobbyFullSubscription = this.gameDispatcherController.lobbyFullEvent.subscribe((opponentName: string) =>
             this.handleLobbyFull(opponentName),
         );
+        if (!this.gameDispatcherController.canceledGameEvent) return;
         this.canceledGameSubscription = this.gameDispatcherController.canceledGameEvent.subscribe((hostName: string) =>
             this.handleCanceledGame(hostName),
         );
+        if (!this.gameDispatcherController.joinerLeaveGameEvent) return;
         this.joinerLeaveGameSubscription = this.gameDispatcherController.joinerLeaveGameEvent.subscribe((leaverName: string) =>
             this.handleJoinerLeaveGame(leaverName),
         );
+        if (!this.gameDispatcherController.lobbiesUpdateEvent) return;
         this.lobbiesUpdateSubscription = this.gameDispatcherController.lobbiesUpdateEvent.subscribe((lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
