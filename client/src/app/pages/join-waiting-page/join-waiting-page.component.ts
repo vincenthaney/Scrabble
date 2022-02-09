@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CANCEL_CONTENT,
@@ -32,6 +32,11 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     waitingOpponentName: string = 'hostPlayer';
 
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
+    // TODO: Fix if player goes to /game or change attribute when game starts
+    @HostListener('window:beforeunload')
+    onBeforeUnload() {
+        this.gameDispatcherService.handleLeaveLobby();
+    }
 
     ngOnInit() {
         this.routingSubscription = this.router.events.subscribe((event) => {
@@ -62,8 +67,11 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
             this.routingSubscription.unsubscribe();
         }
     }
+
     routerChangeMethod(url: string) {
-        if (url !== '/game') this.gameDispatcherService.handleLeaveLobby();
+        if (url !== '/game') {
+            this.gameDispatcherService.handleLeaveLobby();
+        }
     }
 
     playerRejected(hostName: string) {

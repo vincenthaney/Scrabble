@@ -100,4 +100,12 @@ describe('JoinWaitingPageComponent', () => {
         gameDispatcherServiceMock.joinerRejectedEvent.emit(emitName);
         expect(spyPlayerRejected).toHaveBeenCalledWith(emitName);
     });
+
+    it('onBeforeUnload should call be handleLeaveLobby', () => {
+        const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
+            return;
+        });
+        component.onBeforeUnload();
+        expect(spyHandleLeaveLobby).toHaveBeenCalled();
+    });
 });
