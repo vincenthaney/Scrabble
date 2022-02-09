@@ -27,8 +27,13 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
     ngOnInit() {
         this.ngUnsubscribe = new Subject();
-        this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => this.startTimer(timer));
-        this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
+        this.timer = new Timer(0, 0);
+        if (this.roundManager.timer) {
+            this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => this.startTimer(timer));
+        }
+        if (this.roundManager.endRoundEvent) {
+            this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
+        }
     }
 
     ngAfterViewInit() {
@@ -57,12 +62,12 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     updateActivePlayerBorder(): void {
-        if (!this.player1Div || !this.player2Div || !this.roundManager.getCurrentPlayer()) return;
+        if (!this.player1Div || !this.player2Div || !this.roundManager.getActivePlayer()) return;
 
-        if (this.roundManager.getCurrentPlayer().id === this.gameService.player1.id) {
+        if (this.roundManager.getActivePlayer().id === this.gameService.player1.id) {
             this.player1Div.nativeElement.classList.add(this.activePlayerBorderClass);
             this.player2Div.nativeElement.classList.remove(this.activePlayerBorderClass);
-        } else if (this.roundManager.getCurrentPlayer().id === this.gameService.player2.id) {
+        } else if (this.roundManager.getActivePlayer().id === this.gameService.player2.id) {
             this.player2Div.nativeElement.classList.add(this.activePlayerBorderClass);
             this.player1Div.nativeElement.classList.remove(this.activePlayerBorderClass);
         }

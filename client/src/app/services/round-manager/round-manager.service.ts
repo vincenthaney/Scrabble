@@ -43,7 +43,7 @@ export default class RoundManagerService implements IResetableService {
         this.startRound();
     }
 
-    getCurrentPlayer(): IPlayer {
+    getActivePlayer(): IPlayer {
         if (!this.currentRound) {
             throw new Error(ROUND_ERROR.NO_CURRENT_ROUND);
         }
@@ -70,6 +70,6 @@ export default class RoundManagerService implements IResetableService {
             payload: {},
         };
         this.endRoundEvent.emit();
-        this.gameplayController.handleAction(this.gameId, this.getCurrentPlayer().id, actionPass);
+        this.gameplayController.handleAction(this.gameId, this.getActivePlayer().id, actionPass);
     }
 }

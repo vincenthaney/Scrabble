@@ -75,8 +75,8 @@ export default class GameService {
     }
 
     isLocalPlayerPlaying(): boolean {
-        if (!this.localPlayerId || !this.roundManager.getCurrentPlayer()) return false;
-        return this.localPlayerId === this.roundManager.getCurrentPlayer().id;
+        if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
+        return this.localPlayerId === this.roundManager.getActivePlayer().id;
     }
 
     getGameId(): string {
