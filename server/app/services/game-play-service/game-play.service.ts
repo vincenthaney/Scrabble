@@ -17,7 +17,7 @@ export class GamePlayService {
         const player = game.getRequestingPlayer(playerId);
         if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
 
-        const action: Action = this.getAction(player, game, actionData.type, actionData.payload);
+        const action: Action = this.getAction(player, game, actionData);
         let updatedData: void | GameUpdateData = action.execute();
         if (action.willEndTurn()) {
             const nextRound = game.roundManager.nextRound(action);
@@ -31,11 +31,11 @@ export class GamePlayService {
         return updatedData;
     }
 
-    getAction(player: Player, game: Game, type: string, payload: unknown): Action {
+    getAction(player: Player, game: Game, actionData: ActionData): Action {
         let action: Action;
-        switch (type) {
+        switch (actionData.type) {
             case 'place': {
-                const content = payload as ActionPlacePayload;
+                const content = actionData.payload as ActionPlacePayload;
                 if (content.tiles === undefined || !Array.isArray(content.tiles)) throw new Error(INVALID_PAYLOAD);
                 if (content.position === undefined) throw new Error(INVALID_PAYLOAD);
                 if (content.orientation === undefined) throw new Error(INVALID_PAYLOAD);
@@ -43,7 +43,7 @@ export class GamePlayService {
                 break;
             }
             case 'exchange': {
-                const content = payload as ActionExchangePayload;
+                const content = actionData.payload as ActionExchangePayload;
                 if (content.tiles === undefined || !Array.isArray(content.tiles)) throw new Error(INVALID_PAYLOAD);
                 action = new ActionExchange(player, game, content.tiles);
                 break;
