@@ -21,6 +21,6 @@ export default abstract class AbstractPlayer {
         this.id = playerData.id ? playerData.id : this.id;
         this.name = playerData.name ? playerData.name : this.name;
         this.score = playerData.score ? playerData.score : this.score;
-        this.tiles = playerData.tiles ? playerData.tiles : this.tiles;
+        this.tiles = playerData.tiles ? [...playerData.tiles] : this.tiles;
     }
 }
