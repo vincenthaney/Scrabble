@@ -7,17 +7,23 @@ import { OnlinePlayer } from '@app/classes/player';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
+import SpyObj = jasmine.SpyObj;
 
-describe('WaitingPageComponent', () => {
+describe('JoinWaitingPage', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
+    let gameDispatcherSpy: SpyObj<GameDispatcherService>;
     const testOpponent = new OnlinePlayer('', 'testName', []);
+
+    beforeEach(() => {
+        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLeaveLobby']);
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
             imports: [MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([]), HttpClientModule],
-            providers: [GameDispatcherService, SocketService],
+            providers: [{ provide: GameDispatcherService, useValue: gameDispatcherSpy }, SocketService],
         }).compileComponents();
     });
 
@@ -44,7 +50,9 @@ describe('WaitingPageComponent', () => {
     });
 
     it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
-        const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLeaveLobby']);
+        gameDispatcherSpy.handleLeaveLobby.and.callFake(() => {
+            return;
+        });
         const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
         cancelButton.click();
         expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();

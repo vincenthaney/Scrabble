@@ -1,4 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { OnlinePlayer } from '@app/classes/player';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { Subscription } from 'rxjs';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CANCEL_CONTENT,
@@ -7,11 +12,6 @@ import {
     DIALOG_REJECT_TITLE,
     GameRequestState,
 } from './join-waiting-page.component.const';
-import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { OnlinePlayer } from '@app/classes/player';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -30,6 +30,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit() {
+        if (!this.gameDispatcherService.canceledGameEvent) return;
         this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent.subscribe((hostName) => this.hostHasCanceled(hostName));
     }
 
