@@ -26,7 +26,6 @@ export class GameDispatcherService {
     lobbyFullSubscription: Subscription;
     canceledGameSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
-    joinerRejectedSubscription: Subscription;
 
     constructor(private gameDispatcherController: GameDispatcherController) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent.subscribe((gameId: string) => {
@@ -47,11 +46,10 @@ export class GameDispatcherService {
         this.lobbiesUpdateSubscription = this.gameDispatcherController.lobbiesUpdateEvent.subscribe((lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
-        this.joinerRejectedSubscription = this.gameDispatcherController.joinerRejectedEvent.subscribe((hostName: string) =>
-            this.handleJoinerRejected(hostName),
-        );
     }
+
     handleJoinLobby(gameId: string, playerName: string) {
+        this.gameId = gameId;
         this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
     }
 
@@ -60,6 +58,7 @@ export class GameDispatcherService {
     }
 
     handleLeaveLobby() {
+        // we need it to know which game he is in to notify Host.
         if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
         this.gameId = undefined;
@@ -89,10 +88,7 @@ export class GameDispatcherService {
     handleRejection(opponentName: string) {
         if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
-    }
-
-    handleJoinerRejected(hostName: string) {
-        this.joinerRejectedEvent.emit(hostName);
+        this.gameId = undefined;
     }
 
     handleJoinRequest(opponentName: string) {

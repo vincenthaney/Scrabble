@@ -227,6 +227,18 @@ describe('CreateWaitingPageComponent', () => {
         expect(spySubscribejoinerLeaveGameEvent).toHaveBeenCalled();
     });
 
+    it('ngOnDestroy should unsubscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent if it was subscribed to it', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeJoinRequestEvent = spyOn(component.joinRequestSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        const spyUnsubscribeJoinerLeaveGameEvent = spyOn(component.joinerLeaveGameSubscription, 'unsubscribe').and.returnValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            of(true) as any,
+        );
+        component.ngOnDestroy();
+        expect(spyUnsubscribeJoinRequestEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+    });
+
     it('setOpponent should be called when joinRequestEvent is emittted', () => {
         const emitName = 'weirdName';
         const spySetOpponent = spyOn(component, 'setOpponent').and.callFake(() => {
