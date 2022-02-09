@@ -23,6 +23,8 @@ const PLAYER_TILES: Tile[] = [
     { letter: 'B', value: 0 },
     { letter: 'C', value: 0 },
 ];
+const TILES_TO_EXCHANGE = [PLAYER_TILES[1]];
+const TILES_NOT_TO_EXCHANGE = [PLAYER_TILES[0], PLAYER_TILES[2]];
 
 describe('ActionExchange', () => {
     let gameStub: SinonStubbedInstance<Game>;
@@ -68,11 +70,9 @@ describe('ActionExchange', () => {
         });
 
         it('should return a player with tiles', () => {
-            const tilesToExchange = [PLAYER_TILES[1]];
-            const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
-            getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
+            getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
             gameStub.isPlayer1.returns(true);
 
@@ -84,11 +84,9 @@ describe('ActionExchange', () => {
         });
 
         it('should return a player with tiles (player 2)', () => {
-            const tilesToExchange = [PLAYER_TILES[1]];
-            const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
-            getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
+            getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
             gameStub.isPlayer1.returns(false);
 
@@ -100,12 +98,10 @@ describe('ActionExchange', () => {
         });
 
         it('should return a player with same amount as before', () => {
-            const tilesToExchange = [PLAYER_TILES[1]];
-            const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
             const initialTilesAmount = game.player1.tiles.length;
 
-            getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
+            getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
             gameStub.isPlayer1.returns(true);
 
@@ -116,26 +112,28 @@ describe('ActionExchange', () => {
         });
 
         it('should return a player with not exchanged tiles', () => {
-            const tilesToExchange = [PLAYER_TILES[1]];
-            const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
-            getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
+            getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
             gameStub.isPlayer1.returns(true);
 
             const action = new ActionExchange(game.player1, game, []);
             const result = action.execute();
 
-            expect(tilesNotToExchange.every((t) => result.player1!.tiles!.some((t2) => t.letter === t2.letter && t.value === t2.value))).to.be.true;
+            expect(
+                TILES_NOT_TO_EXCHANGE.every((t) =>
+                    result.player1!.tiles!.some((t2) => {
+                        return t.letter === t2.letter && t.value === t2.value;
+                    }),
+                ),
+            ).to.be.true;
         });
 
         it('should return a player with new tiles', () => {
-            const tilesToExchange = [PLAYER_TILES[1]];
-            const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
-            getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
+            getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
             gameStub.isPlayer1.returns(true);
 
