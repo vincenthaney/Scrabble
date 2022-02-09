@@ -19,14 +19,14 @@ export class GameCreationPageComponent implements OnInit {
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
-    dictOptions: string[];
+    dictionaryOptions: string[];
 
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Solo, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         timer: new FormControl('', Validators.required),
-        dict: new FormControl('', Validators.required),
+        dictionary: new FormControl('', Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}

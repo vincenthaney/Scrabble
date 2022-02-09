@@ -83,7 +83,7 @@ describe('GameCreationPageComponent', () => {
             gameMode: component.gameModes.Solo,
             level: component.virtualPlayerLevels.Beginner,
             timer: '60',
-            dict: 'français',
+            dictionary: 'français',
         };
         gameParametersForm.setValue(formValues);
         component.child.formParameters.get('inputName')?.setValue('valid name');
@@ -174,7 +174,7 @@ describe('GameCreationPageComponent', () => {
             gameMode: component.gameModes.Solo,
             level: component.virtualPlayerLevels.Beginner,
             timer: EMPTY_VALUE,
-            dict: EMPTY_VALUE,
+            dictionary: EMPTY_VALUE,
         };
         const defaultNameValue = EMPTY_VALUE;
 
@@ -223,9 +223,9 @@ describe('GameCreationPageComponent', () => {
         expect(component.isFormValid()).toBeFalsy();
     });
 
-    it('form should not be valid if dict is empty', () => {
+    it('form should not be valid if dictionary is empty', () => {
         setValidFormValues();
-        gameParameters.get('dict')?.setValue(EMPTY_VALUE);
+        gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
 
         expect(component.isFormValid()).toBeFalsy();
     });
