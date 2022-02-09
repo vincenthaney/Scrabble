@@ -1,4 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
 import { IResetableService } from '@app/classes/i-resetable-service';
 import { AbstractPlayer } from '@app/classes/player';
@@ -23,7 +24,7 @@ export default class RoundManagerService implements IResetableService {
     endRoundEvent: EventEmitter<void>;
     private timerSource: BehaviorSubject<Timer>;
 
-    constructor(private gameplayController: GamePlayController) {
+    constructor(private gameplayController: GamePlayController, private router: Router) {
         this.timerSource = new BehaviorSubject<Timer>(new Timer(0, 0));
         this.timer = this.timerSource.asObservable();
         this.endRoundEvent = new EventEmitter();
@@ -65,6 +66,8 @@ export default class RoundManagerService implements IResetableService {
     }
 
     roundTimeout(): void {
+        if (this.router.url !== '/game') return;
+
         const actionPass: ActionData = {
             type: ActionType.PASS,
             payload: {},
