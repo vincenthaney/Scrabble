@@ -32,16 +32,15 @@ describe('ActionReserve', () => {
         action = new ActionReserve(gameStub.player1, gameStub as unknown as Game);
     });
 
-    describe('execute', () => {
-        it('should call getTilesLeftPerLetter', () => {
-            action.execute();
-            expect(tileReserveStub.getTilesLeftPerLetter.called).to.be.true;
+    describe('getMessage', () => {
+        it('should exists', () => {
+            expect(action.getMessage()).to.exist;
         });
     });
 
-    describe('getMessage', () => {
+    describe('getOpponentMessage', () => {
         it('should return undefined', () => {
-            expect(action.getMessage()).to.be.undefined;
+            expect(action.getOpponentMessage()).to.be.undefined;
         });
     });
 });
