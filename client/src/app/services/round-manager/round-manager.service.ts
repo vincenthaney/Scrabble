@@ -16,6 +16,7 @@ import * as ROUND_ERROR from './round-manager.service.errors';
 })
 export default class RoundManagerService implements IResetableService {
     gameId: string;
+    localPlayerId: string;
     currentRound: Round;
     completedRounds: Round[];
     maxRoundTime: number;
@@ -51,6 +52,10 @@ export default class RoundManagerService implements IResetableService {
         return this.currentRound.player;
     }
 
+    isActivePlayerLocalPlayer(): boolean {
+        return this.getActivePlayer().id === this.localPlayerId;
+    }
+
     getStartGameTime(): Date {
         return this.completedRounds[0].startTime;
     }
@@ -66,7 +71,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     roundTimeout(): void {
-        if (this.router.url !== '/game') return;
+        if (this.router.url !== '/game' || !this.isActivePlayerLocalPlayer()) return;
 
         const actionPass: ActionData = {
             type: ActionType.PASS,

@@ -44,6 +44,7 @@ export default class GameService {
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
         this.roundManager.gameId = startGameData.gameId;
+        this.roundManager.localPlayerId = this.localPlayerId;
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
         this.roundManager.currentRound = startGameData.round;
         this.boardService.initializeBoard(startGameData.board);
