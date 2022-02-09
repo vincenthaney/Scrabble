@@ -21,7 +21,8 @@ export default class GameService {
     player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
-    startGameEvent: EventEmitter<void> = new EventEmitter();
+    startGameEvent: EventEmitter<void>;
+
     private gameId: string;
     private localPlayerId: string;
 
@@ -32,6 +33,7 @@ export default class GameService {
         private gameplayController: GamePlayController,
     ) {
         this.roundManager.gameId = this.gameId;
+        this.startGameEvent = new EventEmitter();
         this.gameplayController.gameUpdateData.subscribe((data: GameUpdateData) => this.handleGameUpdate(data));
     }
 

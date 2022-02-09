@@ -1,10 +1,11 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Timer } from '@app/classes/timer';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Observable, Subject, Subscription, timer as timerCreationFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
 @Component({
     selector: 'app-information-box',
     templateUrl: './information-box.component.html',
@@ -14,8 +15,8 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     @ViewChild('player1Div', { static: false }) private player1Div: ElementRef<HTMLDivElement>;
     @ViewChild('player2Div', { static: false }) private player2Div: ElementRef<HTMLDivElement>;
 
-    player1 = { name: 'Mathilde', score: 420 };
-    player2 = { name: 'Raphael', score: 69 };
+    readonly maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
+
     timer: Timer;
     timerSource: Observable<number>;
     timerSubscription: Subscription;
@@ -28,12 +29,11 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     ngOnInit() {
         this.ngUnsubscribe = new Subject();
         this.timer = new Timer(0, 0);
-        if (this.roundManager.timer) {
-            this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => this.startTimer(timer));
-        }
-        if (this.roundManager.endRoundEvent) {
-            this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
-        }
+        if (!this.roundManager.timer) return;
+        this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => this.startTimer(timer));
+
+        if (!this.roundManager.endRoundEvent) return;
+        this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
     }
 
     ngAfterViewInit() {
