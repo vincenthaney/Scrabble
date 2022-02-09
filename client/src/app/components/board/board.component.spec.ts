@@ -191,4 +191,106 @@ describe('BoardComponent', () => {
         });
         expect(actualSquareGrid).toEqual(expectedGrid);
     });
+
+    it('BoardService initialization event should initialize board', () => {
+        const initSpy = spyOn<any>(component, 'initializeBoard');
+        mockBoardService.boardInitializationEvent.emit(mockBoardService.grid);
+        expect(initSpy).toHaveBeenCalledWith(mockBoardService.grid);
+    });
+
+    it('BoardService update event should update board', () => {
+        const updateSpy = spyOn<any>(component, 'updateBoard');
+        mockBoardService.boardUpdateEvent.emit(mockBoardService.grid[0]);
+        expect(updateSpy).toHaveBeenCalledWith(mockBoardService.grid[0]);
+    });
+
+    it('Update Board with no squares in argument should return false', () => {
+        expect(component['updateBoard']([])).toBeFalsy();
+    });
+
+    it('Update Board with more squares that in the grid should return false', () => {
+        const squaresToUpdate: Square[] = Array.from(Array(component.gridSize.x * component.gridSize.y + 1), () => UNDEFINED_SQUARE);
+        expect(component['updateBoard'](squaresToUpdate)).toBeFalsy();
+    });
+
+    it('Update Board with with one square should only change that square', () => {
+        const currentSquareView: SquareView = component.squareGrid[0][0];
+        const squaresToUpdate: Square[] = [
+            {
+                tile: null,
+                position: { row: 0, column: 0 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: !currentSquareView.square.wasMultiplierUsed,
+                isCenter: false,
+            },
+        ];
+        component['updateBoard'](squaresToUpdate);
+        expect(component.squareGrid[0][0].square).toEqual(squaresToUpdate[0]);
+    });
+
+    it('Update Board with with multiple squares should change all the squares', () => {
+        const squaresToUpdate: Square[] = [
+            {
+                tile: null,
+                position: { row: 0, column: 0 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: true,
+                isCenter: false,
+            },
+            {
+                tile: null,
+                position: { row: 1, column: 0 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: false,
+                isCenter: true,
+            },
+            {
+                tile: { letter: 'A', value: 0 },
+                position: { row: 0, column: 1 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: false,
+                isCenter: false,
+            },
+        ];
+        component['updateBoard'](squaresToUpdate);
+        expect(component.squareGrid[0][0].square).toEqual(squaresToUpdate[0]);
+        expect(component.squareGrid[1][0].square).toEqual(squaresToUpdate[1]);
+        expect(component.squareGrid[0][1].square).toEqual(squaresToUpdate[2]);
+    });
+
+    it('Update Board with with squares not in the board should not update the board', () => {
+        const initBoard = [...component.squareGrid];
+        const squaresToUpdate: Square[] = [
+            {
+                tile: null,
+                position: { row: component.gridSize.x + 1, column: 0 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: true,
+                isCenter: false,
+            },
+            {
+                tile: null,
+                position: { row: 1, column: component.gridSize.y + 1 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: false,
+                isCenter: true,
+            },
+            {
+                tile: { letter: 'A', value: 0 },
+                position: { row: component.gridSize.x + 1, column: component.gridSize.y + 1 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: false,
+                isCenter: false,
+            },
+            {
+                tile: { letter: 'Z', value: 1 },
+                position: { row: -1, column: -1 },
+                scoreMultiplier: null,
+                wasMultiplierUsed: false,
+                isCenter: false,
+            },
+        ];
+        component['updateBoard'](squaresToUpdate);
+        expect(component.squareGrid).toEqual(initBoard);
+    });
 });

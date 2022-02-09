@@ -62,11 +62,17 @@ export class BoardComponent implements OnInit, OnDestroy {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 
-    private updateBoard(squaresToUpdate: Square[]) {
+    private updateBoard(squaresToUpdate: Square[]): boolean {
+        if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
+
         ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {
             squaresToUpdate
-                .filter((square: Square) => square.position === squareView.square.position)
+                .filter(
+                    (square: Square) =>
+                        square.position.row === squareView.square.position.row && square.position.column === squareView.square.position.column,
+                )
                 .map((sameSquare: Square) => (squareView.square = sameSquare));
         });
+        return true;
     }
 }
