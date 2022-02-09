@@ -19,9 +19,9 @@ chai.use(chaiAsPromised);
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
 const PLAYER_TILES: Tile[] = [
-    { letter: 'a', value: 0 },
-    { letter: 'b', value: 0 },
-    { letter: 'c', value: 0 },
+    { letter: 'A', value: 0 },
+    { letter: 'B', value: 0 },
+    { letter: 'C', value: 0 },
 ];
 
 describe('ActionExchange', () => {
@@ -70,7 +70,7 @@ describe('ActionExchange', () => {
         it('should return a player with tiles', () => {
             const tilesToExchange = [PLAYER_TILES[1]];
             const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
-            const tilesToReceive: Tile[] = [{ letter: 'z', value: 0 }];
+            const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
@@ -86,7 +86,7 @@ describe('ActionExchange', () => {
         it('should return a player with tiles (player 2)', () => {
             const tilesToExchange = [PLAYER_TILES[1]];
             const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
-            const tilesToReceive: Tile[] = [{ letter: 'z', value: 0 }];
+            const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
@@ -102,7 +102,7 @@ describe('ActionExchange', () => {
         it('should return a player with same amount as before', () => {
             const tilesToExchange = [PLAYER_TILES[1]];
             const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
-            const tilesToReceive: Tile[] = [{ letter: 'z', value: 0 }];
+            const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
             const initialTilesAmount = game.player1.tiles.length;
 
             getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
@@ -118,7 +118,7 @@ describe('ActionExchange', () => {
         it('should return a player with not exchanged tiles', () => {
             const tilesToExchange = [PLAYER_TILES[1]];
             const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
-            const tilesToReceive: Tile[] = [{ letter: 'z', value: 0 }];
+            const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
             tileReserveStub.swapTiles.returns(tilesToReceive);
@@ -133,7 +133,7 @@ describe('ActionExchange', () => {
         it('should return a player with new tiles', () => {
             const tilesToExchange = [PLAYER_TILES[1]];
             const tilesNotToExchange = [PLAYER_TILES[0], PLAYER_TILES[2]];
-            const tilesToReceive: Tile[] = [{ letter: 'z', value: 0 }];
+            const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([tilesToExchange, tilesNotToExchange]);
             tileReserveStub.swapTiles.returns(tilesToReceive);

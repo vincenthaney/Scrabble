@@ -10,9 +10,9 @@ import Tile from './tile';
 
 const mockLetterDistribution: LetterDistributionData = {
     tiles: [
-        { letter: 'a', amount: 5, score: 1 },
-        { letter: 'b', amount: 5, score: 1 },
-        { letter: 'c', amount: 5, score: 1 },
+        { letter: 'A', amount: 5, score: 1 },
+        { letter: 'B', amount: 5, score: 1 },
+        { letter: 'C', amount: 5, score: 1 },
     ],
 };
 

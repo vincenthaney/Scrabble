@@ -31,7 +31,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
     maxRoundTime: 1,
     dictionary: 'francais',
 };
-const DEFAULT_TILE: Tile = { letter: 'a', value: 1 };
+const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
 const DEFAULT_AMOUNT_OF_TILES = 25;
 
 const DEFAULT_PLAYER_1_ID = '1';
@@ -158,12 +158,12 @@ describe('Game', () => {
             game.player2 = player2Stub as unknown as Player;
 
             game.player1.tiles = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
             ];
             game.player2.tiles = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
             ];
 
             roundManagerStub.getPassCounter.returns(0);

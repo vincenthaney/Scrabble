@@ -27,22 +27,22 @@ const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
 const INITIAL_SCORE = DEFAULT_PLAYER_1.score;
 const TILES_PLAYER_1: Tile[] = [
-    { letter: 'a', value: 1 },
-    { letter: 'a', value: 1 },
-    { letter: 'c', value: 1 },
+    { letter: 'A', value: 1 },
+    { letter: 'A', value: 1 },
+    { letter: 'C', value: 1 },
     { letter: '*', value: 0 },
 ];
 const VALID_TILES_TO_PLACE: Tile[] = [
-    { letter: 'a', value: 1 },
-    { letter: 'f', value: 0 },
-    { letter: 'c', value: 1 },
+    { letter: 'A', value: 1 },
+    { letter: 'F', value: 0 },
+    { letter: 'C', value: 1 },
 ];
 
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
 const DEFAULT_POSITION: Position = { row: 7, column: 7 };
 
-const DEFAULT_TILE_A: Tile = { letter: 'a', value: 1 };
-const DEFAULT_TILE_B: Tile = { letter: 'b', value: 3 };
+const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
+const DEFAULT_TILE_B: Tile = { letter: 'B', value: 3 };
 const DEFAULT_SQUARE_1: Square = { tile: null, position: { row: 0, column: 0 }, multiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_2: Square = { tile: null, position: { row: 0, column: 1 }, multiplier: null, wasMultiplierUsed: false, isCenter: false };
 
@@ -60,8 +60,8 @@ const UPDATE_BOARD_RETURN: (Square | undefined)[][] = [
     ],
 ];
 const GET_TILES_RETURN: Tile[] = [
-    { letter: 'y', value: 10 },
-    { letter: 'z', value: 10 },
+    { letter: 'Y', value: 10 },
+    { letter: 'Z', value: 10 },
 ];
 const BOARD: Square[][] = [
     [

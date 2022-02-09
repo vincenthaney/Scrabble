@@ -10,12 +10,12 @@ import { expect, spy } from 'chai';
 import { WordExtraction } from './word-extraction';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 
-const TILE_J: Tile = { letter: 'j', value: 1 };
-const TILE_A: Tile = { letter: 'a', value: 1 };
-const TILE_M: Tile = { letter: 'm', value: 1 };
-const TILE_B: Tile = { letter: 'b', value: 1 };
-const TILE_O: Tile = { letter: 'o', value: 1 };
-const TILE_N: Tile = { letter: 'n', value: 1 };
+const TILE_J: Tile = { letter: 'J', value: 1 };
+const TILE_A: Tile = { letter: 'A', value: 1 };
+const TILE_M: Tile = { letter: 'M', value: 1 };
+const TILE_B: Tile = { letter: 'B', value: 1 };
+const TILE_O: Tile = { letter: 'O', value: 1 };
+const TILE_N: Tile = { letter: 'N', value: 1 };
 const WORD_JAMBON: Tile[] = [TILE_J, TILE_A, TILE_M, TILE_B, TILE_O, TILE_N];
 const WORD_BON: Tile[] = [TILE_B, TILE_O, TILE_N];
 

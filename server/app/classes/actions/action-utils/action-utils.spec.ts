@@ -20,8 +20,8 @@ describe('ActionUtils', () => {
 
         it('should return tiles to place and unplayed tiles', () => {
             const playerTiles: Tile[] = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
             ];
             const tilesToPlay: Tile[] = [playerTiles[0]];
             const unplayedTilesExpected: Tile[] = [playerTiles[1]];
@@ -36,10 +36,10 @@ describe('ActionUtils', () => {
 
         it("should throw if playing letter the player doesn't have", () => {
             const playerTiles: Tile[] = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
             ];
-            const tilesToPlay: Tile[] = [{ letter: 'c', value: 0 }];
+            const tilesToPlay: Tile[] = [{ letter: 'C', value: 0 }];
 
             player.tiles = playerTiles;
 
@@ -55,9 +55,9 @@ describe('ActionUtils', () => {
     describe('getIndexOfTile', () => {
         it('should return index of tile in array', () => {
             const tiles: Tile[] = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
-                { letter: 'c', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+                { letter: 'C', value: 0 },
             ];
 
             const expected = 1;
@@ -68,11 +68,11 @@ describe('ActionUtils', () => {
 
         it('should return index of wildcard when tile not in array', () => {
             const tiles: Tile[] = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
                 { letter: '*', value: 0 },
             ];
-            const tile: Tile = { letter: 'z', value: 0 };
+            const tile: Tile = { letter: 'Z', value: 0 };
 
             const expected = 2;
             const result = ActionUtils.getIndexOfTile(tiles, tile);
@@ -82,11 +82,11 @@ describe('ActionUtils', () => {
 
         it('should return -1 when tile not in array', () => {
             const tiles: Tile[] = [
-                { letter: 'a', value: 0 },
-                { letter: 'b', value: 0 },
-                { letter: 'c', value: 0 },
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+                { letter: 'C', value: 0 },
             ];
-            const tile: Tile = { letter: 'z', value: 0 };
+            const tile: Tile = { letter: 'Z', value: 0 };
 
             const expected = -1;
             const result = ActionUtils.getIndexOfTile(tiles, tile);

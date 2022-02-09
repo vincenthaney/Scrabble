@@ -10,8 +10,8 @@ import { expect } from 'chai';
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_MAP = new Map<LetterValue, number>([
-    ['a', 0],
-    ['b', 0],
+    ['A', 0],
+    ['B', 0],
 ]);
 
 describe('ActionReserve', () => {
