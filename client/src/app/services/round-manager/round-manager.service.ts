@@ -1,5 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { IResetableService } from '@app/classes/i-resetable-service';
 import { IPlayer } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
@@ -11,11 +12,12 @@ import * as ROUND_ERROR from './round-manager.service.errors';
 @Injectable({
     providedIn: 'root',
 })
-export default class RoundManagerService {
+export default class RoundManagerService implements IResetableService {
     gameId: string;
     currentRound: Round;
     completedRounds: Round[];
     maxRoundTime: number;
+    timeout: ReturnType<typeof setTimeout>;
     timer: Observable<Timer>;
     endRoundEvent: EventEmitter<void>;
     private timerSource: BehaviorSubject<Timer>;
@@ -25,6 +27,14 @@ export default class RoundManagerService {
         this.timer = this.timerSource.asObservable();
         this.endRoundEvent = new EventEmitter();
     }
+
+    resetServiceData(): void {
+        this.gameId = '';
+        this.completedRounds = [];
+        this.maxRoundTime = 0;
+        clearTimeout(this.timeout);
+    }
+
     updateRound(round: Round): void {
         this.currentRound.completedTime = round.startTime;
         this.completedRounds.push(this.currentRound);
@@ -44,15 +54,11 @@ export default class RoundManagerService {
     }
 
     startRound(): void {
-        // eslint-disable-next-line no-console
-        console.log('start rond: ' + this.maxRoundTime);
-        setTimeout(() => this.roundTimeout(), this.maxRoundTime * SECONDS_TO_MILLISECONDS);
+        this.timeout = setTimeout(() => this.roundTimeout(), this.maxRoundTime * SECONDS_TO_MILLISECONDS);
         this.startTimer();
     }
 
     startTimer(): void {
-        // eslint-disable-next-line no-console
-        console.log('start timer');
         this.timerSource.next(convertTime(this.maxRoundTime));
     }
 
