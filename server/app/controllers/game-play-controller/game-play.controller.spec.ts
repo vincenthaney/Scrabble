@@ -13,6 +13,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Server } from '@app/server';
 import { HttpException } from '@app/classes/http.exception';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 
 const expect = chai.expect;
 
@@ -77,17 +78,24 @@ describe('GamePlayController', () => {
 
     describe('handlePlayAction', () => {
         it('should call playAction', () => {
-            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
-            chai.spy.on(gamePlayController, 'gameUpdate', () => {});
+            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => ({}));
+            chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
         });
 
-        it('should call gameUpdate', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
-            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => {});
+        it('should call gameUpdate if updateData exists', () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => ({}));
+            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
+        });
+
+        it("should not call gameUpdate if updateData doesn't exists", () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => undefined);
+            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
+            gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
+            expect(spy).to.not.have.been.called();
         });
 
         it('should throw if data.type is undefined', () => {
@@ -111,7 +119,7 @@ describe('GamePlayController', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
             const spy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
             expect(spy).to.have.been.called();
         });
 
@@ -124,7 +132,7 @@ describe('GamePlayController', () => {
             const toResponse = { emit: () => {} };
             const spy = chai.spy.on(toResponse, 'emit');
             chai.spy.on(sio, 'to', () => toResponse);
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
             expect(spy).to.have.been.called();
         });
     });

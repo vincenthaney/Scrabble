@@ -17,13 +17,6 @@ export class GameDispatcherService {
         this.waitingRooms = [];
     }
 
-    /**
-     * Add the configuration into the waiting game list
-     *
-     * @param {GameConfigData} configData Necessary information to create the game
-     * @return {string} Waiting game id
-     */
-
     createMultiplayerGame(configData: GameConfigData): string {
         const config: GameConfig = {
             player1: new Player(configData.playerId, configData.playerName),
@@ -36,14 +29,6 @@ export class GameDispatcherService {
 
         return waitingRoom.getId();
     }
-
-    /**
-     * The second player ask the initiating player to join their game
-     *
-     * @param {string} waitingRoomId Id of the game in the lobby
-     * @param playerId Id of the player asking to join
-     * @param playerName Name the player want to use
-     */
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
@@ -58,15 +43,6 @@ export class GameDispatcherService {
         const joiningPlayer = new Player(playerId, playerName);
         waitingRoom.joinedPlayer = joiningPlayer;
     }
-
-    /**
-     * The initiating player accept their opponent and the game starts
-     *
-     * @param waitingRoomId Id of the game in the lobby
-     * @param playerId Id of the initiating player
-     * @param opponentName Opponent name
-     * @returns {Game} game
-     */
 
     async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<Game> {
         const waitingRoom = this.getGameFromId(waitingRoomId);
@@ -92,15 +68,6 @@ export class GameDispatcherService {
         return this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
     }
 
-    /**
-     * Reject a player trying to join your game
-     *
-     * @param waitingRoomId Id of the game in the lobby
-     * @param playerId Id of the initiating player
-     * @param opponentName Opponent name
-     * @return rejected player id
-     */
-
     rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
@@ -117,13 +84,6 @@ export class GameDispatcherService {
         return rejectedPlayerId;
     }
 
-    /**
-     * Let initiating player cancel a game
-     *
-     * @param waitingRoomId Id of the game in the lobby
-     * @param playerId Id of the initiating player
-     */
-
     cancelGame(waitingRoomId: string, playerId: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
@@ -135,12 +95,6 @@ export class GameDispatcherService {
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
     }
-
-    /**
-     * Get all available lobby that the player can join
-     *
-     * @returns {WaitingRoom[]} list of available lobby
-     */
 
     getAvailableWaitingRooms() {
         return this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
