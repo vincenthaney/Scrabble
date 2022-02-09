@@ -9,7 +9,7 @@ import { expect } from 'chai';
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
 
-describe('ActionReserve', () => {
+describe('ActionHelp', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let action: ActionHelp;
 
@@ -27,8 +27,14 @@ describe('ActionReserve', () => {
     });
 
     describe('getMessage', () => {
+        it('should exists', () => {
+            expect(action.getMessage()).to.exist;
+        });
+    });
+
+    describe('getOpponentMessage', () => {
         it('should return undefined', () => {
-            expect(action.getMessage()).to.be.undefined;
+            expect(action.getOpponentMessage()).to.be.undefined;
         });
     });
 });
