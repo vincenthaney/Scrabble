@@ -2,6 +2,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import { MatCardModule } from '@angular/material/card';
 import { InformationBoxComponent } from './information-box.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -18,7 +19,7 @@ describe('InformationBoxComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [HttpClientModule],
+            imports: [HttpClientModule, MatCardModule],
             declarations: [InformationBoxComponent],
             providers: [
                 { provide: GameService, useValue: gameServiceSpy },

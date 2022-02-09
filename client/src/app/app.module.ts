@@ -39,7 +39,6 @@ import { SocketService } from './services/socket/socket.service';
         AppComponent,
         GamePageComponent,
         MainPageComponent,
-        MaterialPageComponent,
         PlayAreaComponent,
         HomePageComponent,
         SquareComponent,

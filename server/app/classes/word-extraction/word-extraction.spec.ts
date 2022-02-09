@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
-import { expect, spy } from 'chai';
 import { Board, Orientation, Position } from '@app/classes/board';
-import { Square } from '@app/classes/square';
 import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
-import { BOARD_SIZE } from '@app/constants/game';
+import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
+import { BOARD_SIZE } from '@app/constants/game';
+import { expect, spy } from 'chai';
 import { WordExtraction } from './word-extraction';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 
@@ -48,8 +48,6 @@ describe('WordExtraction', () => {
     it('extract should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the board grid is an empty array', () => {
         const startPosition: Position = { row: 1, column: 7 };
         const orientation = Orientation.Vertical;
-        console.log(board);
-        console.log(board.grid);
         board.grid = [[]];
         const result = () => WordExtraction.extract(board, WORD_JAMBON, startPosition, orientation);
         expect(result).to.throw(POSITION_OUT_OF_BOARD);

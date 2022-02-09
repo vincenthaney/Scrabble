@@ -1,11 +1,11 @@
-import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { SocketService } from '@app/services/socket/socket.service';
+import { OnlinePlayer } from '@app/classes/player';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
 
@@ -16,9 +16,9 @@ describe('CreateWaitingPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent],
-            imports: [HttpClientModule, MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
             providers: [GameDispatcherService, SocketService],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
+            imports: [CommonModule, MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
         }).compileComponents();
         fixture = TestBed.createComponent(CreateWaitingPageComponent);
     });

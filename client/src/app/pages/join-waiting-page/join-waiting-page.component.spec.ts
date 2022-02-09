@@ -2,6 +2,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { OnlinePlayer } from '@app/classes/player';
@@ -28,12 +29,7 @@ describe('JoinWaitingPage', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [
-                MatDialogModule,
-                BrowserAnimationsModule,
-                RouterTestingModule.withRoutes([{ path: 'lobby', component: TestComponent }]),
-                HttpClientModule,
-            ],
+            imports: [MatProgressBarModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([{ path: 'lobby', component: TestComponent }]), HttpClientModule],
             providers: [{ provide: GameDispatcherService, useValue: gameDispatcherSpy }, SocketService],
         }).compileComponents();
     });

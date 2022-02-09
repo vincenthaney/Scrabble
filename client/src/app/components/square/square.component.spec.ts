@@ -16,6 +16,7 @@ import { SquareView } from '@app/classes/square';
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { IconComponent } from '../icon/icon.component';
 import { SquareComponent } from './square.component';
 
 describe('SquareComponent', () => {
@@ -39,7 +40,7 @@ describe('SquareComponent', () => {
                 FormsModule,
                 MatDialogModule,
             ],
-            declarations: [SquareComponent, CenterSquareWrapperComponent],
+            declarations: [SquareComponent, CenterSquareWrapperComponent, IconComponent],
             providers: [Renderer2],
         }).compileComponents();
     });

@@ -1,5 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
+import { Component, Input, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { OnlinePlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
@@ -22,6 +23,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     joinRequestSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
 
+    @ViewChild(MatProgressSpinner, { static: false }) spinnerOpponentFound: MatProgressSpinner;
     host: OnlinePlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
