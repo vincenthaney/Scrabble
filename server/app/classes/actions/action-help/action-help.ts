@@ -1,11 +1,9 @@
 import ActionInfo from '@app/classes/actions/action-info';
+import { HELP_ACTIONS } from './action-help-const';
 
 export default class ActionHelp extends ActionInfo {
     getMessage(): string {
-        return 'placer: jouer un mot (!placer <ligne><colonne>[(h|v)] <lettres>)\n\
-             echanger: changer des lettres pour des nouvelles (!echanger <lettres>)\n\
-             passer: passer son tour (!passer)\n\
-             reserve: affiche les lettres dans la réserve (!reserve)';
+        return HELP_ACTIONS.map((action) => `!${action.command}${action.usage ? ' ' + action.usage : ''}: ${action.description}`).join('\n');
     }
     getOpponentMessage(): string | undefined {
         return undefined;
