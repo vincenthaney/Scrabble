@@ -29,4 +29,10 @@ describe('ActionPass', () => {
             expect(action.getMessage()).to.exist;
         });
     });
+
+    describe('getOpponentMessage', () => {
+        it('should equal getMessage', () => {
+            expect(action.getOpponentMessage()).to.equal(action.getMessage());
+        });
+    });
 });
