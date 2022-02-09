@@ -36,30 +36,35 @@ export class GamePlayService {
     }
 
     getAction(player: Player, game: Game, actionData: ActionData): Action {
-        let action: Action;
         switch (actionData.type) {
             case 'place': {
-                const content = actionData.payload as ActionPlacePayload;
-                if (content.tiles === undefined || !Array.isArray(content.tiles)) throw new Error(INVALID_PAYLOAD);
-                if (content.position === undefined) throw new Error(INVALID_PAYLOAD);
-                if (content.orientation === undefined) throw new Error(INVALID_PAYLOAD);
-                action = new ActionPlace(player, game, content.tiles, content.position, content.orientation);
-                break;
+                const payload = this.getActionPlacePayload(actionData);
+                return new ActionPlace(player, game, payload.tiles, payload.position, payload.orientation);
             }
             case 'exchange': {
-                const content = actionData.payload as ActionExchangePayload;
-                if (content.tiles === undefined || !Array.isArray(content.tiles)) throw new Error(INVALID_PAYLOAD);
-                action = new ActionExchange(player, game, content.tiles);
-                break;
+                const payload = this.getActionExchangePayload(actionData);
+                return new ActionExchange(player, game, payload.tiles);
             }
             case 'pass': {
-                action = new ActionPass(player, game);
-                break;
+                return new ActionPass(player, game);
             }
             default: {
                 throw Error(INVALID_COMMAND);
             }
         }
-        return action;
+    }
+
+    getActionPlacePayload(actionData: ActionData) {
+        const payload = actionData.payload as ActionPlacePayload;
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.position === undefined) throw new Error(INVALID_PAYLOAD);
+        if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
+        return payload;
+    }
+
+    getActionExchangePayload(actionData: ActionData) {
+        const payload = actionData.payload as ActionExchangePayload;
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        return payload;
     }
 }
