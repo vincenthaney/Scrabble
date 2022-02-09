@@ -61,9 +61,9 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
-    updateActivePlayerBorder(): void {
+    updateActivePlayerBorder(): boolean {
         try {
-            if (!this.player1Div || !this.player2Div || !this.roundManager.getActivePlayer()) return;
+            if (!this.player1Div || !this.player2Div || !this.roundManager.getActivePlayer()) return false;
 
             if (this.roundManager.getActivePlayer().id === this.gameService.player1.id) {
                 this.player1Div.nativeElement.classList.add(this.activePlayerBorderClass);
@@ -72,8 +72,9 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
                 this.player2Div.nativeElement.classList.add(this.activePlayerBorderClass);
                 this.player1Div.nativeElement.classList.remove(this.activePlayerBorderClass);
             }
+            return true;
         } catch (_) {
-            return;
+            return false;
         }
     }
 
