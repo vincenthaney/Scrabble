@@ -1,6 +1,8 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { RouterTestingModule } from '@angular/router/testing';
 import { BoardComponent } from '@app/components/board/board.component';
 import { CommunicationBoxComponent } from '@app/components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -31,7 +33,7 @@ describe('GamePageComponent', () => {
                 BoardComponent,
                 DefaultDialogComponent,
             ],
-            imports: [MatGridListModule],
+            imports: [MatGridListModule, RouterTestingModule.withRoutes([]), HttpClientModule],
             providers: [
                 {
                     provide: MatDialog,
