@@ -138,6 +138,6 @@ describe('LobbyPageComponent', () => {
     it('joinLobby should send to GameDispatcher service to join a lobby', async () => {
         // const gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleJoinLobby']);
         component.joinLobby(component.lobbies[0].lobbyId);
-        expect(gameDispatcherSpy.handleLeaveLobby).toHaveBeenCalled();
+        expect(gameDispatcherSpy.handleJoinLobby).toHaveBeenCalled();
     });
 });
