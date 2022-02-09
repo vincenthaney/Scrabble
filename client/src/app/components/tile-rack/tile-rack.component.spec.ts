@@ -24,7 +24,7 @@ describe('TileRackComponent', () => {
     let fixture: ComponentFixture<TileRackComponent>;
 
     beforeEach(async () => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['getLocalPlayer']);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['getLocalPlayer', 'isLocalPlayerPlaying']);
     });
 
     beforeEach(async () => {
