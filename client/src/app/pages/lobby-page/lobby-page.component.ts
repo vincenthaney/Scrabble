@@ -6,7 +6,8 @@ import { GameType } from '@app/classes/game-type';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2 } from './lobby-page.component.const';
 
 @Component({
@@ -19,7 +20,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
 
     lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
-
+    componentDestroyed$: Subject<boolean> = new Subject();
     // TODO: Receive LobbyInfo from server
     lobbies: LobbyInfo[] = [
         {
@@ -42,18 +43,18 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit() {
-        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent.subscribe((lobbies) => this.updateLobbies(lobbies));
-        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent.subscribe((opponentName) => this.lobbyFullDialog(opponentName));
+        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((lobbies) => this.updateLobbies(lobbies));
+        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((opponentName) => this.lobbyFullDialog(opponentName));
         this.gameDispatcherService.handleLobbyListRequest();
     }
 
     ngOnDestroy() {
-        if (this.lobbiesUpdateSubscription) {
-            this.lobbiesUpdateSubscription.unsubscribe();
-        }
-        if (this.lobbyFullSubscription) {
-            this.lobbyFullSubscription.unsubscribe();
-        }
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     validateName(): void {
