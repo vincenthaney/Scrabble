@@ -1,10 +1,10 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Message, MessageTypes } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
-import { InputParserService } from '@app/services';
+import { GameService, InputParserService } from '@app/services';
 
-type Message = { text: string; sender: string; date: Date; class: string };
 type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
@@ -17,20 +17,22 @@ export class CommunicationBoxComponent {
     @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: Message[] = [
-        { text: 'message 1', sender: 'Mathilde', date: new Date(), class: 'me' },
-        { text: 'message 2', sender: 'Mathilde', date: new Date(), class: 'me' },
-        { text: 'message 3', sender: 'Raph', date: new Date(), class: 'opponent' },
-        { text: 'message 4', sender: 'Mathilde', date: new Date(), class: 'me' },
-        { text: 'Raph a joué ARBRE', sender: '', date: new Date(), class: 'system' },
-        { text: 'message 5', sender: 'Raph', date: new Date(), class: 'opponent' },
-        { text: 'message 5', sender: 'Raph', date: new Date(), class: 'opponent' },
-        { text: 'message 6', sender: 'Mathilde', date: new Date(), class: 'me' },
+        { content: 'message 1', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
+        { content: 'message 2', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
+        { content: 'message 3', sender: 'Raph', date: new Date(), type: MessageTypes.Player2 },
+        { content: 'message 4', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
+        { content: 'Raph a joué ARBRE', sender: '', date: new Date(), type: MessageTypes.System },
+        { content: 'message 5', sender: 'Raph', date: new Date(), type: MessageTypes.Player2 },
+        { content: 'message 5', sender: 'Raph', date: new Date(), type: MessageTypes.Player2 },
+        { content: 'message 6', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
         {
             // eslint-disable-next-line max-len
-            text: "je suis un message très long qui va sûrement prendre plus qu'une ligne à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
+            content:
+                "je suis un message très long qui va sûrement prendre plus qu'une ligne \
+                à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
             sender: 'Raph',
             date: new Date(),
-            class: 'opponent',
+            type: MessageTypes.Player2,
         },
     ];
     messageForm = new FormGroup({
@@ -56,13 +58,15 @@ export class CommunicationBoxComponent {
         { letter: 'O', amount: 2 },
     ];
 
-    constructor(private inputParser: InputParserService) {}
+    constructor(private inputParser: InputParserService, private gameService: GameService) {
+        this.gameService.newMessageValue.subscribe((newMessage) => this.messages.push(newMessage));
+    }
 
     sendMessage() {
         const message = this.messageForm.get('content')?.value;
         if (message) {
             this.inputParser.parseInput(message);
-            this.messages = [...this.messages, { text: message, sender: 'Mathilde', date: new Date(), class: 'me' }];
+            this.messages = [...this.messages, { content: message, sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 }];
             this.messageForm.reset();
             this.scrollToBottom();
         }
