@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 import { expect } from 'chai';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
-import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
+import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { Container } from 'typedi';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import Game from '@app/classes/game/game';
@@ -137,7 +137,9 @@ describe('GamePlayService', () => {
 
     describe('getAction', () => {
         it('should fail when type is invalid', () => {
-            expect(() => gamePlayService.getAction(player, game, INVALID_ACTION_TYPE, {})).to.throw(INVALID_COMMAND);
+            expect(() => {
+                gamePlayService.getAction(player, game, { type: INVALID_ACTION_TYPE as unknown as ActionType, payload: {} });
+            }).to.throw(INVALID_COMMAND);
         });
 
         it('should return action of type ActionPlace when type is place', () => {
@@ -147,7 +149,7 @@ describe('GamePlayService', () => {
                 position: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
-            const action = gamePlayService.getAction(player, game, type, payload);
+            const action = gamePlayService.getAction(player, game, { type, payload });
             expect(action).to.be.instanceOf(ActionPlace);
         });
 
@@ -156,14 +158,14 @@ describe('GamePlayService', () => {
             const payload: ActionExchangePayload = {
                 tiles: [],
             };
-            const action = gamePlayService.getAction(player, game, type, payload);
+            const action = gamePlayService.getAction(player, game, { type, payload });
             expect(action).to.be.instanceOf(ActionExchange);
         });
 
         it('should return action of type ActionPass when type is pass', () => {
             const type = 'pass';
             const payload = {};
-            const action = gamePlayService.getAction(player, game, type, payload);
+            const action = gamePlayService.getAction(player, game, { type, payload });
             expect(action).to.be.instanceOf(ActionPass);
         });
 
@@ -173,7 +175,7 @@ describe('GamePlayService', () => {
                 position: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
-            expect(() => gamePlayService.getAction(player, game, type, payload)).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have position", () => {
@@ -182,7 +184,7 @@ describe('GamePlayService', () => {
                 tiles: [],
                 orientation: Orientation.Horizontal,
             };
-            expect(() => gamePlayService.getAction(player, game, type, payload)).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have orientation", () => {
@@ -191,13 +193,13 @@ describe('GamePlayService', () => {
                 tiles: [],
                 position: { column: 0, row: 0 },
             };
-            expect(() => gamePlayService.getAction(player, game, type, payload)).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if exchange payload doesn't have tiles", () => {
             const type = 'exchange';
             const payload: Omit<ActionExchangePayload, 'tiles'> = {};
-            expect(() => gamePlayService.getAction(player, game, type, payload)).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });
     });
 });
