@@ -72,14 +72,15 @@ describe('DefaultDialogComponent', () => {
             }
         });
 
-        it('should call handleButtonClick when a button is clicked', () => {
+        it('should call handleButtonClick when a button is clicked', (done) => {
             const index = 0;
-            spyOn(component, 'handleButtonClick');
+            const spy = spyOn(component, 'handleButtonClick');
             const button = fixture.debugElement.nativeElement.querySelector(`button:nth-child(${index + 1})`);
             button.click();
 
             fixture.whenStable().then(() => {
-                expect(component.handleButtonClick).toHaveBeenCalledWith(component.buttons[index]);
+                expect(spy).toHaveBeenCalledWith(component.buttons[index]);
+                done();
             });
         });
 
