@@ -1,21 +1,70 @@
-// import { Action } from '@app/classes/actions';
-import { ActionData } from '@app/classes/communication/action-data';
+/* eslint-disable no-dupe-class-members */
+import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { HttpException } from '@app/classes/http.exception';
 import { Service } from 'typedi';
-// import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-// import { SocketService } from '@app/services/socket-service/socket.service';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import Player from '@app/classes/player/player';
+import Game from '@app/classes/game/game';
+import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
 
 @Service()
 export class GamePlayService {
-    // constructor(private readonly activeGameService: ActiveGameService, private readonly socketService: SocketService) {}
+    constructor(private readonly activeGameService: ActiveGameService) {}
 
-    // eslint-disable-next-line no-unused-vars
-    playAction(gameId: string, playerId: string, action: ActionData): GameUpdateData {
-        throw new HttpException('Method not implemented');
-        // const game = this.activeGameService.getGame(gameId, playerId);
-        // const opponentId = game.getOpponentPlayer(playerId).getId();
-        // this.socketService.getSocket(playerId).emit('event', 'args');
-        // this.socketService.getSocket(opponentId).emit('event', 'args');
+    playAction(gameId: string, playerId: string, actionData: ActionData): GameUpdateData | void {
+        const game = this.activeGameService.getGame(gameId, playerId);
+        const player = game.getRequestingPlayer(playerId);
+
+        if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
+
+        const action: Action = this.getAction(player, game, actionData);
+        let updatedData: void | GameUpdateData = action.execute();
+
+        if (action.willEndTurn()) {
+            const nextRound = game.roundManager.nextRound(action);
+            if (updatedData) updatedData.round = nextRound;
+            else updatedData = { round: nextRound };
+        }
+
+        if (game.isGameOver()) {
+            if (updatedData) updatedData.isGameOver = true;
+            else updatedData = { isGameOver: true };
+        }
+
+        return updatedData;
+    }
+
+    getAction(player: Player, game: Game, actionData: ActionData): Action {
+        switch (actionData.type) {
+            case 'place': {
+                const payload = this.getActionPlacePayload(actionData);
+                return new ActionPlace(player, game, payload.tiles, payload.position, payload.orientation);
+            }
+            case 'exchange': {
+                const payload = this.getActionExchangePayload(actionData);
+                return new ActionExchange(player, game, payload.tiles);
+            }
+            case 'pass': {
+                return new ActionPass(player, game);
+            }
+            default: {
+                throw Error(INVALID_COMMAND);
+            }
+        }
+    }
+
+    getActionPlacePayload(actionData: ActionData) {
+        const payload = actionData.payload as ActionPlacePayload;
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.position === undefined) throw new Error(INVALID_PAYLOAD);
+        if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
+        return payload;
+    }
+
+    getActionExchangePayload(actionData: ActionData) {
+        const payload = actionData.payload as ActionExchangePayload;
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        return payload;
     }
 }

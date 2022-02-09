@@ -2,17 +2,18 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { Application } from '@app/app';
+import { ActionData } from '@app/classes/communication/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { HttpException } from '@app/classes/http.exception';
+import { Server } from '@app/server';
 import * as chai from 'chai';
-import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { StatusCodes } from 'http-status-codes';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GamePlayController } from './game-play.controller';
-import { Application } from '@app/app';
-import { StatusCodes } from 'http-status-codes';
-import { ActionData } from '@app/classes/communication/action-data';
-import { Server } from '@app/server';
-import { HttpException } from '@app/classes/http.exception';
 
 const expect = chai.expect;
 
@@ -52,7 +53,7 @@ describe('GamePlayController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -60,14 +61,14 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.BAD_REQUEST);
             });
 
             it('should call handlePlayAction', async () => {
                 const spy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
                 return supertest(expressApp)
-                    .post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`)
                     .then(() => {
                         expect(spy).to.have.been.called();
                     });
@@ -77,17 +78,24 @@ describe('GamePlayController', () => {
 
     describe('handlePlayAction', () => {
         it('should call playAction', () => {
-            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
-            chai.spy.on(gamePlayController, 'gameUpdate', () => {});
+            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => ({}));
+            chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
         });
 
-        it('should call gameUpdate', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => {});
-            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => {});
+        it('should call gameUpdate if updateData exists', () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => ({}));
+            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
+        });
+
+        it("should not call gameUpdate if updateData doesn't exists", () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => undefined);
+            const spy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
+            gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
+            expect(spy).to.not.have.been.called();
         });
 
         it('should throw if data.type is undefined', () => {
@@ -111,7 +119,7 @@ describe('GamePlayController', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
             const spy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
             expect(spy).to.have.been.called();
         });
 
@@ -124,7 +132,7 @@ describe('GamePlayController', () => {
             const toResponse = { emit: () => {} };
             const spy = chai.spy.on(toResponse, 'emit');
             chai.spy.on(sio, 'to', () => toResponse);
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {});
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
             expect(spy).to.have.been.called();
         });
     });

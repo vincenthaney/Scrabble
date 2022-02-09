@@ -1,9 +1,13 @@
 import Player from '@app/classes/player/player';
+import { Action } from '@app/classes/actions';
 
-export default interface Round {
+export interface Round {
     player: Player;
     startTime: Date;
     limitTime: Date;
-    completedTime: Date | null;
-    // actionPlayed: IAction | null;
+}
+
+export interface CompletedRound extends Round {
+    completedTime: Date;
+    actionPlayed: Action;
 }

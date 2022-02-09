@@ -7,6 +7,11 @@ import * as chaiAsPromised from 'chai-as-promised';
 import Player from '@app/classes/player/player';
 import RoundManager from './round-manager';
 import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
+import { Round } from './round';
+import Game from '@app/classes/game/game';
+import ActionHint from '@app/classes/actions/action-hint/action-hint';
 
 const expect = chai.expect;
 
@@ -22,9 +27,15 @@ const DEFAULT_DATE = new Date('June 29, 2001');
 
 describe('RoundManager', () => {
     let roundManager: RoundManager;
+    let actionStub: SinonStubbedInstance<Action>;
+    let action: Action;
+    let gameStub: SinonStubbedInstance<Game>;
 
     beforeEach(() => {
         roundManager = new RoundManager(DEFAULT_MAX_ROUND_TIME, DEFAULT_PLAYER_1, DEFAULT_PLAYER_2);
+        actionStub = createStubInstance(ActionPass);
+        action = actionStub as unknown as Action;
+        gameStub = createStubInstance(Game);
     });
 
     it('should create', () => {
@@ -50,7 +61,6 @@ describe('RoundManager', () => {
                 player: DEFAULT_PLAYER_1,
                 startTime: new Date(),
                 limitTime: new Date(),
-                completedTime: null,
             };
 
             const player = roundManager['getNextPlayer']();
@@ -63,7 +73,6 @@ describe('RoundManager', () => {
                 player: DEFAULT_PLAYER_2,
                 startTime: new Date(),
                 limitTime: new Date(),
-                completedTime: null,
             };
 
             const player = roundManager['getNextPlayer']();
@@ -82,7 +91,6 @@ describe('RoundManager', () => {
                 player: DEFAULT_PLAYER_1,
                 startTime: DEFAULT_DATE,
                 limitTime: new Date(),
-                completedTime: null,
             };
 
             expect(roundManager['completedRounds']).to.be.empty;
@@ -98,7 +106,8 @@ describe('RoundManager', () => {
                     player: DEFAULT_PLAYER_1,
                     startTime: date,
                     limitTime: new Date(),
-                    completedTime: null,
+                    completedTime: new Date(),
+                    actionPlayed: action,
                 });
             }
 
@@ -110,7 +119,7 @@ describe('RoundManager', () => {
     describe('nextRound', () => {
         it('should call getNextPlayer', () => {
             const spy = chai.spy.on(roundManager, 'getNextPlayer', () => DEFAULT_PLAYER_1);
-            roundManager.nextRound();
+            roundManager.nextRound(action);
             expect(spy).to.have.been.called();
         });
 
@@ -119,12 +128,56 @@ describe('RoundManager', () => {
                 player: DEFAULT_PLAYER_1,
                 startTime: new Date(),
                 limitTime: new Date(),
-                completedTime: null,
             };
             const spy = chai.spy.on(roundManager['completedRounds'], 'push');
-            roundManager.nextRound();
+            roundManager.nextRound(action);
 
             expect(spy).to.have.been.called();
+        });
+    });
+
+    describe('getPassCounter', () => {
+        it('should return passCounter', () => {
+            const expected = 8008135;
+            roundManager['passCounter'] = expected;
+            expect(roundManager.getPassCounter()).to.equal(expected);
+        });
+    });
+
+    describe('saveCompletedRound', () => {
+        it('should increment counter when action played is ActionPass', () => {
+            const initial = 0;
+            roundManager['passCounter'] = initial;
+            const round: Round = { player: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date() };
+            const actionPlayed: Action = new ActionPass(round.player, gameStub as unknown as Game);
+            roundManager['saveCompletedRound'](round, actionPlayed);
+
+            expect(roundManager.getPassCounter()).to.equal(initial + 1);
+        });
+        it('should not increment counter when action played is not ActionPass', () => {
+            const initial = 0;
+            roundManager['passCounter'] = initial;
+            const round: Round = { player: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date() };
+            const actionPlayed: Action = new ActionHint(round.player, gameStub as unknown as Game);
+            roundManager['saveCompletedRound'](round, actionPlayed);
+
+            expect(roundManager.getPassCounter()).to.equal(initial);
+        });
+
+        it('should reset to 0 if play something other than ActionPass', () => {
+            const initial = 0;
+            roundManager['passCounter'] = initial;
+            const round: Round = { player: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date() };
+
+            const actionPass: Action = new ActionPass(round.player, gameStub as unknown as Game);
+            roundManager['saveCompletedRound'](round, actionPass);
+
+            expect(roundManager.getPassCounter()).to.equal(initial + 1);
+
+            const actionExchange: Action = new ActionExchange(round.player, gameStub as unknown as Game, []);
+            roundManager['saveCompletedRound'](round, actionExchange);
+
+            expect(roundManager.getPassCounter()).to.equal(0);
         });
     });
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
-import { GameConfig, GameConfigData } from '@app/classes/game/game-config';
+import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -50,9 +50,9 @@ export class GameDispatcherController {
             const { playerName }: { playerName: string } = req.body;
 
             try {
-                const gameConfig: GameConfig = this.handleJoinGame(gameId, playerId, playerName);
+                this.handleJoinGame(gameId, playerId, playerName);
 
-                res.status(StatusCodes.OK).send(gameConfig);
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
                 HttpException.sendError(e, res);
             }
@@ -151,16 +151,15 @@ export class GameDispatcherController {
         return gameId;
     }
 
-    private handleJoinGame(gameId: string, playerId: string, playerName: string): GameConfig {
+    private handleJoinGame(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (!validateName(playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
-        const gameConfig: GameConfig = this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
+        this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
         this.socketService.emitToRoom(gameId, 'joinRequest', { name: playerName });
 
         // TODO: add back
         // this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
         this.handleLobbiesUpdate();
-        return gameConfig;
     }
 
     private async handleAcceptRequest(gameId: string, playerId: string, playerName: string) {
