@@ -31,4 +31,10 @@ describe('ActionReserve', () => {
             expect(action.getMessage()).to.be.undefined;
         });
     });
+
+    describe('getOpponentMessage', () => {
+        it('should return undefined', () => {
+            expect(action.getOpponentMessage()).to.be.undefined;
+        });
+    });
 });
