@@ -6,7 +6,6 @@ import { GameType } from '@app/classes/game-type';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subscription } from 'rxjs';
 import { UNDEFINED_GAME_ID } from './game-dispatcher-errors';
-// import 'mock-fs';
 
 @Injectable({
     providedIn: 'root',
@@ -26,6 +25,7 @@ export class GameDispatcherService {
     lobbyFullSubscription: Subscription;
     canceledGameSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
+    joinerRejectedSubscription: Subscription;
 
     constructor(private gameDispatcherController: GameDispatcherController) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent.subscribe((gameId: string) => {
@@ -43,6 +43,9 @@ export class GameDispatcherService {
         this.joinerLeaveGameSubscription = this.gameDispatcherController.joinerLeaveGameEvent.subscribe((leaverName: string) =>
             this.handleJoinerLeaveGame(leaverName),
         );
+        this.joinerRejectedSubscription = this.gameDispatcherController.joinerRejectedEvent.subscribe((hostName: string) =>
+            this.handleJoinerRejected(hostName),
+        );
         this.lobbiesUpdateSubscription = this.gameDispatcherController.lobbiesUpdateEvent.subscribe((lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
@@ -58,7 +61,6 @@ export class GameDispatcherService {
     }
 
     handleLeaveLobby() {
-        // we need it to know which game he is in to notify Host.
         if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
         this.gameId = undefined;
@@ -88,11 +90,15 @@ export class GameDispatcherService {
     handleRejection(opponentName: string) {
         if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
         else throw new Error(UNDEFINED_GAME_ID);
-        this.gameId = undefined;
     }
 
     handleJoinRequest(opponentName: string) {
         this.joinRequestEvent.emit(opponentName);
+    }
+
+    handleJoinerRejected(hostName: string) {
+        this.joinerRejectedEvent.emit(hostName);
+        this.gameId = undefined;
     }
 
     handleLobbiesUpdate(lobbies: LobbyInfo[]) {
