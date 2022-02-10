@@ -29,7 +29,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         this.ngUnsubscribe = new Subject();
         this.timer = new Timer(0, 0);
         if (!this.roundManager.timer) return;
-        this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => this.startTimer(timer));
+        this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => {
+            this.startTimer(timer);
+            this.updateActivePlayerBorder();
+        });
 
         if (!this.roundManager.endRoundEvent) return;
         this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
@@ -50,7 +53,6 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         this.timer = timer;
         this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
         this.timerSubscription = this.timerSource.subscribe(() => this.timer.decrement());
-        this.updateActivePlayerBorder();
     }
 
     endRound() {
