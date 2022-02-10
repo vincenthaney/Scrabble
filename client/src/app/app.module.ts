@@ -23,7 +23,7 @@ import { InformationBoxComponent } from './components/information-box/informatio
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
-import { SocketService } from './services/socket/socket.service';
+import { SocketService } from './services';
 
 /**
  * Main module that is used in main.ts.
