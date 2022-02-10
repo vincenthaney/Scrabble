@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { Timer } from '@app/classes/timer';
 import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
@@ -12,8 +12,8 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./information-box.component.scss'],
 })
 export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit {
-    @ViewChild('player1Div', { static: false }) private player1Div: ElementRef<HTMLDivElement>;
-    @ViewChild('player2Div', { static: false }) private player2Div: ElementRef<HTMLDivElement>;
+    isPlayer1Active: boolean;
+    isPlayer2Active: boolean;
 
     readonly maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
 
@@ -22,7 +22,6 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     timerSubscription: Subscription;
     endRoundSubscription: Subscription;
     private ngUnsubscribe: Subject<void>;
-    private activePlayerBorderClass = 'active-player';
 
     constructor(private roundManager: RoundManagerService, public gameService: GameService) {}
 
@@ -63,14 +62,14 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
     updateActivePlayerBorder(): boolean {
         try {
-            if (!this.player1Div || !this.player2Div || !this.roundManager.getActivePlayer()) return false;
+            if (!this.roundManager.getActivePlayer()) return false;
 
             if (this.roundManager.getActivePlayer().id === this.gameService.player1.id) {
-                this.player1Div.nativeElement.classList.add(this.activePlayerBorderClass);
-                this.player2Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+                this.isPlayer1Active = true;
+                this.isPlayer2Active = false;
             } else if (this.roundManager.getActivePlayer().id === this.gameService.player2.id) {
-                this.player2Div.nativeElement.classList.add(this.activePlayerBorderClass);
-                this.player1Div.nativeElement.classList.remove(this.activePlayerBorderClass);
+                this.isPlayer2Active = true;
+                this.isPlayer1Active = false;
             }
             return true;
         } catch (_) {

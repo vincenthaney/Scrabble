@@ -1,6 +1,6 @@
 <div id="outer-container">
     <mat-card id="inner-container">
-        <div #player1Div class="player-info" id="player-info-1">
+        <div [ngClass]="{ 'active-player': isPlayer1Active }" class="player-info" id="player-info-1">
             <p class="player-name">
                 {{ gameService.player1.name }}<span class="score">{{ gameService.player1.score }} pts</span>
             </p>
@@ -18,7 +18,7 @@
             </p>
         </div>
 
-        <div #player2Div class="player-info" id="player-info-2">
+        <div [ngClass]="{ 'active-player': isPlayer2Active }" class="player-info" id="player-info-2">
             <p class="player-name">
                 <span class="score">{{ gameService.player2.score }} pts</span>{{ gameService.player2.name }}
             </p>
