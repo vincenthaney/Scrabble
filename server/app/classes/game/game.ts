@@ -76,7 +76,20 @@ export default class Game {
     }
 
     isGameOver(): boolean {
-        return this.player1.tiles.length === 0 || this.player2.tiles.length === 0 || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
+        return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
+    }
+
+    endOfGame() {
+        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
+            this.player1.score -= this.player1.getTileRackPoints();
+            this.player2.score -= this.player2.getTileRackPoints();
+        } else if (!this.player1.hasTilesLeft()) {
+            this.player1.score += this.player2.getTileRackPoints();
+            this.player2.score -= this.player2.getTileRackPoints();
+        } else if (!this.player2.hasTilesLeft()) {
+            this.player1.score -= this.player1.getTileRackPoints();
+            this.player2.score += this.player1.getTileRackPoints();
+        }
     }
 
     isPlayer1(arg: string | Player): boolean {

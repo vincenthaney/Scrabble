@@ -28,6 +28,7 @@ export class GamePlayService {
         }
 
         if (game.isGameOver()) {
+            game.endOfGame();
             if (updatedData) updatedData.isGameOver = true;
             else updatedData = { isGameOver: true };
         }

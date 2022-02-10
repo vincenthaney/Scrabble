@@ -156,15 +156,8 @@ describe('Game', () => {
             game.roundManager = roundManagerStub as unknown as RoundManager;
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
-
-            game.player1.tiles = [
-                { letter: 'A', value: 0 },
-                { letter: 'B', value: 0 },
-            ];
-            game.player2.tiles = [
-                { letter: 'A', value: 0 },
-                { letter: 'B', value: 0 },
-            ];
+            player1Stub.hasTilesLeft.returns(true);
+            player2Stub.hasTilesLeft.returns(true);
 
             roundManagerStub.getPassCounter.returns(0);
         });
@@ -172,31 +165,89 @@ describe('Game', () => {
         it('should not be gameOver passCount lower than threshold and both players have tiles', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
             expect(game.isGameOver()).to.be.false;
-            expect(game.player1.tiles).to.not.be.empty;
-            expect(game.player2.tiles).to.not.be.empty;
         });
 
         it('should be gameOver passCount is equal to threshold', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+
             expect(game.isGameOver()).to.be.true;
-            expect(game.player1.tiles).to.not.be.empty;
-            expect(game.player2.tiles).to.not.be.empty;
         });
 
         it('should be gameOver when player 1 has no tiles', () => {
-            game.player1.tiles = [];
+            player1Stub.hasTilesLeft.returns(false);
             expect(game.isGameOver()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
-            expect(game.player2.tiles).to.not.be.empty;
         });
 
         it('should gameOver when player 2 has no tiles', () => {
-            game.player2.tiles = [];
+            player2Stub.hasTilesLeft.returns(false);
             expect(game.isGameOver()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
-            expect(game.player1.tiles).to.not.be.empty;
         });
     });
+
+   ////////////////// 
+    describe('endOfGame', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        const PLAYER_1_SCORE = 20;
+        const PLAYER_2_SCORE = 40;
+        const PLAYER_1_TILE_SCORE = 6;
+        const PLAYER_2_TILE_SCORE = 14;
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+
+            game.player1.tiles = [
+                { letter: 'A', value: 2 },
+                { letter: 'B', value: 4 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 6 },
+                { letter: 'B', value: 8 },
+            ];
+
+            game.player1.score = PLAYER_1_SCORE;
+            game.player2.score = PLAYER_2_SCORE;
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+        });
+
+        it('should deduct points from both player if the getPassCounter is exceeded', () => {
+            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+            game.endOfGame();
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+        });
+
+        it('should deduct points from player2 and add them to player1 if player 1 has no tiles', () => {
+            roundManagerStub.getPassCounter.returns(0);
+            player1Stub.hasTilesLeft.returns(false);
+            game.endOfGame();
+
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+        });
+
+        it('should deduct points from player1 and add them to player2 if player 2 has no tiles', () => {
+            roundManagerStub.getPassCounter.returns(0);
+            player2Stub.hasTilesLeft.returns(false);
+            game.endOfGame();
+
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+        });
+    });
+/////////////////////////
 
     describe('isPlayer1', () => {
         let game: Game;

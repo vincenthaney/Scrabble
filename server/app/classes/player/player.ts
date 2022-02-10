@@ -16,4 +16,12 @@ export default class Player {
     getId() {
         return this.id;
     }
+
+    getTileRackPoints(): number {
+        return this.tiles.reduce((prev, next) => (prev += next.value), 0);
+    }
+
+    hasTilesLeft(): boolean {
+        return this.tiles.length > 0;
+    }
 }
