@@ -4,6 +4,7 @@ import { SHOULD_HAVE_A_TILE } from '@app/classes/board/board';
 import { Tile } from '@app/classes/tile';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
+import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
 
 export class WordExtraction {
     constructor(private board: Board) {}
@@ -25,6 +26,7 @@ export class WordExtraction {
 
         let i = 0;
         while (i < tilesToPlace.length) {
+            if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
             if (navigator.verify(SHOULD_HAVE_A_TILE)) {
                 // The square already has a letter, this means that the at index i must be placed in next square
                 // We know that square has a tile because it was checked in the if
