@@ -2,7 +2,11 @@
     <mat-card id="inner-container">
         <div [ngClass]="{ 'active-player': isPlayer1Active }" class="player-info" id="player-info-1">
             <p class="player-name">
-                {{ getPlayer1().name }}<span class="score">{{ getPlayer1().score }} pts</span>
+                <span [matTooltip]="'Vous êtes ' + getPlayer1().name" [matTooltipDisabled]="!isPlayer1" class="name">
+                    <app-icon *ngIf="isPlayer1" [icon]="localPlayerIcon" styling="solid"></app-icon>
+                    {{ getPlayer1().name }}
+                </span>
+                <span class="score">{{ getPlayer1().score }} pts</span>
             </p>
             <p *ngIf="getPlayer1().getTiles().length < maxTilesPerPlayer" class="tiles-left">
                 Tuiles restantes : {{ getPlayer1().getTiles().length }}
@@ -20,7 +24,10 @@
 
         <div [ngClass]="{ 'active-player': isPlayer2Active }" class="player-info" id="player-info-2">
             <p class="player-name">
-                <span class="score">{{ getPlayer2().score }} pts</span>{{ getPlayer2().name }}
+                <span class="score">{{ getPlayer2().score }} pts</span><span [matTooltip]="'Vous êtes ' + getPlayer2().name" [matTooltipDisabled]="isPlayer1" class="name">
+                    {{ getPlayer2().name }}
+                    <app-icon *ngIf="!isPlayer1" [icon]="localPlayerIcon" styling="solid"></app-icon>
+                </span>
             </p>
             <p *ngIf="getPlayer2().getTiles().length < maxTilesPerPlayer" class="tiles-left">
                 Tuiles restantes : {{ getPlayer2().getTiles().length }}
