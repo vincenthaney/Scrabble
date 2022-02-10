@@ -1,8 +1,8 @@
 import { GameType } from '@app/classes/game-type';
-import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { PlayerData } from './player-data';
 
 export interface GameConfigData {
     playerName: string;
@@ -17,14 +17,14 @@ export interface SoloGameConfigData extends GameConfigData {
 }
 
 export interface GameConfig {
-    player1: Player;
+    player1: PlayerData;
     gameType: GameType;
     maxRoundTime: number;
     dictionary: string;
 }
 
 export interface MultiplayerGameConfig extends GameConfig {
-    player2: Player;
+    player2: PlayerData;
 }
 
 export interface StartMultiplayerGameData extends MultiplayerGameConfig {

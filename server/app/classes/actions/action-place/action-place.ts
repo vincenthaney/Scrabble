@@ -1,14 +1,14 @@
-import ActionPlay from '@app/classes/actions/action-play';
-import { Orientation, Position } from '@app/classes/board';
-import Game from '@app/classes/game/game';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import Player from '@app/classes/player/player';
-import { Tile } from '@app/classes/tile';
-import { Square } from '@app/classes/square';
-import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { PlayerData } from '@app/classes/communication/player-data';
 import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
+import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
+import { Orientation, Position } from '@app/classes/board';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { PlayerData } from '@app/classes/communication/player-data';
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import { Square } from '@app/classes/square';
+import { Tile } from '@app/classes/tile';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 
 // TODO: CHANGE THESE WITH THE REAL THINGS
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-unused-vars
@@ -57,16 +57,15 @@ export default class ActionPlace extends ActionPlay {
         return response;
     }
 
-    updateBoard(words: [Square, Tile][][], game: Game): (Square | undefined)[][] {
-        const boardSize = game.board.grid.length;
-        const board: (Square | undefined)[][] = Array(boardSize).fill(Array(boardSize).fill(undefined));
+    updateBoard(words: [Square, Tile][][], game: Game): Square[] {
+        const board: Square[] = [];
 
         for (const word of words) {
             for (const [square, tile] of word) {
                 if (!square.tile) {
                     square.tile = tile;
                     const position = square.position;
-                    board[position.row][position.column] = square;
+                    board.push(square);
                     game.board.placeTile(tile, position);
                 }
             }

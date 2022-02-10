@@ -1,7 +1,6 @@
-/* eslint-disable no-console */
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { PlayerName } from '@app/classes/communication/player-name';
 import { GameService } from '@app/services';
@@ -19,6 +18,7 @@ export class GameDispatcherController {
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
+    joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
     constructor(private http: HttpClient, public socketService: SocketService, private gameService: GameService) {
         this.configureSocket();
@@ -28,17 +28,18 @@ export class GameDispatcherController {
         this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
             this.joinRequestEvent.emit(opponent[0].name);
         });
-        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) =>
+        this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
             this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
         );
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
         });
+        this.socketService.on('rejected', (hostName: PlayerName[]) => {
+            this.joinerRejectedEvent.emit(hostName[0].name);
+        });
         this.socketService.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
         this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
         this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
-            console.log('joinerLeaveGameCLIENT');
-            console.log(opponent);
             this.joinerLeaveGameEvent.emit(opponent[0].name);
         });
     }
@@ -51,7 +52,6 @@ export class GameDispatcherController {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
-        console.log(opponentName);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
@@ -68,7 +68,6 @@ export class GameDispatcherController {
 
     handleLeaveLobby(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
-        // patch?
         this.http.delete(endpoint).subscribe();
     }
 
@@ -77,8 +76,8 @@ export class GameDispatcherController {
         this.http.get(endpoint).subscribe();
     }
 
-    handleLobbyJoinRequest(gameId: string, playerName: string): void {
+    handleLobbyJoinRequest(gameId: string, playerName: string) {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/join`;
-        this.http.post(endpoint, { playerName }).subscribe();
+        this.http.post<GameConfig>(endpoint, { playerName }).subscribe();
     }
 }

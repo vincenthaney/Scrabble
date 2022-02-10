@@ -1,12 +1,12 @@
 import { Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
-import AbstractScoreMultiplier from './abstract-score-multiplier';
+import ScoreMultiplier from './score-multiplier';
 
-export type Multiplier = AbstractScoreMultiplier | null;
+export type Multiplier = ScoreMultiplier | null;
 export default interface Square {
     tile: Tile | null;
     position: Position;
-    multiplier: Multiplier;
+    scoreMultiplier: Multiplier;
     wasMultiplierUsed: boolean;
     isCenter: boolean;
 }

@@ -1,3 +1,4 @@
+import { Player } from '@app/classes/player';
 import { Square } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
@@ -43,12 +44,12 @@ export const UNDEFINED_SQUARE_SIZE: Vec2 = { x: -1, y: -1 };
 export const UNDEFINED_SQUARE: Square = {
     tile: null,
     position: { row: -1, column: -1 },
-    multiplier: null,
+    scoreMultiplier: null,
     wasMultiplierUsed: false,
     isCenter: false,
 };
 
-export const VALID_MULTIPLIERS: number[] = [2, 3];
+export const SECONDS_TO_MILLISECONDS = 1000;
 
 export const MIN_COL_NUMBER = 0;
 export const MAX_COL_NUMBER = 14;
@@ -59,3 +60,7 @@ export const MAX_LOCATION_COMMAND_LENGTH = 3;
 export const MIN_LOCATION_COMMAND_LENGTH = 2;
 
 export const MAX_INPUT_LENGTH = 512;
+
+export const MAX_TILE_PER_PLAYER = 7;
+
+export const DEFAULT_PLAYER = new Player('id', 'name', []);

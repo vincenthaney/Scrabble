@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
-import { IPlayer } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import {
@@ -160,7 +160,7 @@ export default class InputParserService {
     }
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
-        const player: IPlayer = this.getLocalPlayer();
+        const player: AbstractPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
@@ -189,7 +189,7 @@ export default class InputParserService {
         // user must type exchange letters in lower case
         if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
 
-        const player: IPlayer = this.getLocalPlayer();
+        const player: AbstractPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
@@ -243,9 +243,8 @@ export default class InputParserService {
 
     private getLocalPlayerId(): string {
         let playerId: string;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        console.log(localPlayer);
-        if (localPlayer instanceof IPlayer) {
+        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof AbstractPlayer) {
             playerId = localPlayer.id;
         } else {
             throw new Error('Current player could not be found');
@@ -254,10 +253,10 @@ export default class InputParserService {
         return playerId;
     }
 
-    private getLocalPlayer(): IPlayer {
-        let player: IPlayer;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof IPlayer) {
+    private getLocalPlayer(): AbstractPlayer {
+        let player: AbstractPlayer;
+        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof AbstractPlayer) {
             player = localPlayer;
         } else {
             throw new Error('Current player could not be found');

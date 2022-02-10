@@ -1,10 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { OnlinePlayer } from '@app/classes/player';
+import { Router } from '@angular/router';
+import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CONTENT,
@@ -20,27 +21,29 @@ import {
 })
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponentName: string | undefined;
-    @ViewChild(MatProgressSpinner, { static: false }) spinnerOpponentFound: MatProgressSpinner;
+    isStartingGame: boolean = false;
     joinRequestSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
-
-    host: OnlinePlayer;
+    componentDestroyed$: Subject<boolean> = new Subject();
+    host: AbstractPlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
-    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
+    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
 
-    ngOnInit() {
-        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName) => this.rejectOpponent(leaverName));
+    @HostListener('window:beforeunload')
+    ngOnDestroy() {
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
+        if (!this.isStartingGame) this.gameDispatcherService.handleCancelGame();
     }
 
-    ngOnDestroy() {
-        if (this.joinRequestSubscription) {
-            this.joinRequestSubscription.unsubscribe();
-        }
-        if (this.joinerLeaveGameSubscription) {
-            this.joinerLeaveGameSubscription.unsubscribe();
-        }
+    ngOnInit() {
+        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((opponentName: string) => this.setOpponent(opponentName));
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((leaverName: string) => this.opponentLeft(leaverName));
     }
 
     setOpponent(opponentName: string) {
@@ -57,33 +60,15 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    rejectOpponent(leaverName: string) {
-        // eslint-disable-next-line no-console
-        console.log('rejectOpponent-CLIENT');
-        this.warnHostOpponentLeft(leaverName);
+    opponentLeft(leaverName: string) {
         this.opponentName = undefined;
         this.waitingRoomMessage = HOST_WAITING_MESSAGE;
         this.isOpponentFound = false;
-    }
 
-    cancelGame() {
-        // eslint-disable-next-line no-console
-        console.log('CANCELGAME-CLIENT');
-        this.gameDispatcherService.handleCancelGame();
-        // if (this.opponent) {
-        //     this.warnHostOpponentLeft(this.opponent);
-        //     this.opponent = undefined;
-        //     this.waitingRoomMessage = HOST_WAITING_MESSAGE;
-        //     this.isOpponentFound = false;
-        // }
-    }
-
-    warnHostOpponentLeft(opponentName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_TITLE,
-                content: opponentName + DIALOG_CONTENT,
+                content: leaverName + DIALOG_CONTENT,
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,
@@ -95,8 +80,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmOpponentToServer() {
-        // eslint-disable-next-line no-console
-        console.log(this.opponentName);
+        this.isStartingGame = true;
         if (this.opponentName) {
             this.gameDispatcherService.handleConfirmation(this.opponentName);
         }
@@ -105,7 +89,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     confirmRejectionToServer() {
         if (this.opponentName) {
             this.gameDispatcherService.handleRejection(this.opponentName);
+            this.disconnectOpponent();
         }
-        this.disconnectOpponent();
     }
 }

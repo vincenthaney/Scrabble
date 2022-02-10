@@ -1,14 +1,16 @@
 import { PlayerData } from '@app/classes/communication/player-data';
 import { Tile } from '@app/classes/tile';
-export default abstract class IPlayer {
+export default abstract class AbstractPlayer {
     id: string;
     name: string;
     score: number;
     tiles: Tile[];
 
-    constructor(name: string) {
+    constructor(id: string, name: string, tiles: Tile[]) {
+        this.id = id;
         this.name = name;
         this.score = 0;
+        this.tiles = [...tiles];
     }
 
     getTiles(): Tile[] {
@@ -19,6 +21,6 @@ export default abstract class IPlayer {
         this.id = playerData.id ? playerData.id : this.id;
         this.name = playerData.name ? playerData.name : this.name;
         this.score = playerData.score ? playerData.score : this.score;
-        this.tiles = playerData.tiles ? playerData.tiles : this.tiles;
+        this.tiles = playerData.tiles ? [...playerData.tiles] : this.tiles;
     }
 }

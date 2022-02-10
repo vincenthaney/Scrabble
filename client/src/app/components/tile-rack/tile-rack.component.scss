@@ -37,11 +37,15 @@ $tile-size: 50px;
         flex-direction: column;
         justify-content: space-around;
 
-        button {
+        & > button, & > div {
             font-size: 0.95em;
             
             &:not(:last-child) {
                 margin-bottom: 6px;
+            }
+
+            & > button {
+                width: 100%;
             }
         }
     }

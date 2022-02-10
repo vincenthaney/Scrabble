@@ -3,13 +3,16 @@
     <mat-progress-bar class="progress" mode="indeterminate"></mat-progress-bar>
     <div class="grid">
         <div class="align-left">Votre nom:</div>
-        <div class="align-right">{{ waitingPlayerName }}</div>
+        <div class="align-right">{{ currentName }}</div>
+        <div class="align-left">Votre adversaire:</div>
+        <div class="align-right">{{ currentLobby.playerName }}</div>
         <div class="align-left">Type de partie:</div>
-        <div class="align-right">{{ waitingGameType }}</div>
+        <div class="align-right">{{ currentLobby.gameType }}</div>
         <div class="align-left">Temps par tour:</div>
-        <div class="align-right">{{ waitingGameTimer }}</div>
+        <div class="align-right">{{ currentLobby.maxRoundTime }}</div>
         <div class="align-left">Dictionnaire:</div>
-        <div class="align-right">{{ waitingGameDictionary }}</div>
+        <div class="align-right">{{ currentLobby.dictionary }}</div>
     </div>
-    <button id="cancel-button" mat-flat-button color="primary" (click)="joiningPlayerLeave()" [routerLink]="'/lobby'">Annuler</button>
+    <button id="cancel-button" mat-flat-button color="primary" [routerLink]="'/lobby'">Annuler</button>
+
 </div>

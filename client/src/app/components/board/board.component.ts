@@ -16,7 +16,6 @@ export class BoardComponent implements OnInit, OnDestroy {
     readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
-    boardInitializationSubscription: Subscription;
     boardUpdateSubscription: Subscription;
 
     constructor(private boardService: BoardService) {
@@ -26,15 +25,12 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.boardInitializationSubscription = this.boardService.boardInitializationEvent.subscribe((board: Square[][]) =>
-            this.initializeBoard(board),
-        );
+        this.initializeBoard(this.boardService.initialBoard);
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent.subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
     }
 
     ngOnDestroy() {
         this.boardUpdateSubscription.unsubscribe();
-        this.boardInitializationSubscription.unsubscribe();
     }
 
     private initializeBoard(board: Square[][]) {
@@ -53,17 +49,30 @@ export class BoardComponent implements OnInit, OnDestroy {
                 this.squareGrid[i][j] = squareView;
             }
         }
+        this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
     private getBoardServiceSquare(board: Square[][], row: number, column: number) {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 
-    private updateBoard(squaresToUpdate: Square[]) {
+    private updateBoard(squaresToUpdate: Square[]): boolean {
+        if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
+
+        /* 
+            We flatten the 2D grid so it becomes a 1D array of SquareView
+            Then, we check for each SquareView if it's square property's position 
+            matches one of the square in "squareToUpate".
+            If so, we change the board's square to be the updated square
+        */
         ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {
             squaresToUpdate
-                .filter((square: Square) => square.position === squareView.square.position)
+                .filter(
+                    (square: Square) =>
+                        square.position.row === squareView.square.position.row && square.position.column === squareView.square.position.column,
+                )
                 .map((sameSquare: Square) => (squareView.square = sameSquare));
         });
+        return true;
     }
 }

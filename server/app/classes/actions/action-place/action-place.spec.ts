@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import { ActionPlace } from '..';
-import Game from '@app/classes/game/game';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { Tile, TileReserve } from '@app/classes/tile';
-import { Board, Orientation, Position } from '@app/classes/board';
-import Player from '@app/classes/player/player';
-import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { ScoreComputer, WordValidator } from './action-place';
-import { Square } from '@app/classes/square';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { PlayerData } from '@app/classes/communication/player-data';
 import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
+import { Board, Orientation, Position } from '@app/classes/board';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { PlayerData } from '@app/classes/communication/player-data';
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import { Square } from '@app/classes/square';
+import { Tile, TileReserve } from '@app/classes/tile';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { ActionPlace } from '..';
+import { ScoreComputer, WordValidator } from './action-place';
 
 const expect = chai.expect;
 
@@ -43,8 +43,8 @@ const DEFAULT_POSITION: Position = { row: 7, column: 7 };
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 3 };
-const DEFAULT_SQUARE_1: Square = { tile: null, position: { row: 0, column: 0 }, multiplier: null, wasMultiplierUsed: false, isCenter: false };
-const DEFAULT_SQUARE_2: Square = { tile: null, position: { row: 0, column: 1 }, multiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_1: Square = { tile: null, position: { row: 0, column: 0 }, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_2: Square = { tile: null, position: { row: 0, column: 1 }, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 
 const EXTRACT_RETURN: [Square, Tile][][] = [
     [
@@ -205,10 +205,11 @@ describe('ActionPlace', () => {
             for (const changes of EXTRACT_RETURN) {
                 for (const [square, tile] of changes) {
                     const { row, column } = square.position;
-                    expect(result[row][column]).to.exist;
-                    expect(result[row][column]!.tile).to.exist;
-                    expect(result[row][column]!.tile!.letter).to.equal(tile.letter);
-                    expect(result[row][column]!.tile!.value).to.equal(tile.value);
+                    const resultSquare: Square = result.filter((s: Square) => s.position.row === row && s.position.column === column)[0];
+                    expect(resultSquare).to.exist;
+                    expect(resultSquare!.tile).to.exist;
+                    expect(resultSquare!.tile!.letter).to.equal(tile.letter);
+                    expect(resultSquare!.tile!.value).to.equal(tile.value);
                 }
             }
         });
@@ -219,7 +220,7 @@ describe('ActionPlace', () => {
             copiedExtractReturn.forEach((row) => row.forEach(([square, tile]) => (square.tile = tile)));
             const result = action.updateBoard(EXTRACT_RETURN, game);
 
-            expect(result.every((row) => row.every((square) => square === undefined))).to.be.true;
+            expect(result).to.be.empty;
         });
     });
 

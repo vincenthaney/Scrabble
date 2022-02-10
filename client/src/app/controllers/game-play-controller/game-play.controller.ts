@@ -33,7 +33,6 @@ export class GamePlayController {
     }
 
     sendMessage(gameId: string, playerId: string, message: Message) {
-        console.log(message);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/message`;
         this.http.post(endpoint, message).subscribe();
     }

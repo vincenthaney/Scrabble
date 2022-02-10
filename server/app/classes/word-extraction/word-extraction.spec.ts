@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 import { Board, Orientation, Position } from '@app/classes/board';
@@ -30,7 +29,7 @@ describe('WordExtraction', () => {
                 const square = {
                     tile: null,
                     position: { row: i, column: j },
-                    multiplier: null,
+                    scoreMultiplier: null,
                     wasMultiplierUsed: false,
                     isCenter: false,
                 };

@@ -92,8 +92,6 @@ export class SocketService {
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
-        // eslint-disable-next-line no-console
-        console.log(args);
         this.getSocket(id).emit(ev, args);
     }
 }
