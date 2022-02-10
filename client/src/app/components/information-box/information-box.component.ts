@@ -37,7 +37,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         if (!this.roundManager.timer) return;
         this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
             this.startTimer(timer);
-            this.updateActivePlayerBorder(activePlayer);
+            this.updateActivePlayerBorder(activePlayer); 
         });
 
         if (!this.roundManager.endRoundEvent) return;
