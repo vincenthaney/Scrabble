@@ -30,9 +30,9 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         this.ngUnsubscribe = new Subject();
         this.timer = new Timer(0, 0);
         if (!this.roundManager.timer) return;
-        this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe((timer: Timer) => {
+        this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
             this.startTimer(timer);
-            this.updateActivePlayerBorder();
+            this.updateActivePlayerBorder(activePlayer);
         });
 
         if (!this.roundManager.endRoundEvent) return;
@@ -40,7 +40,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngAfterViewInit() {
-        this.updateActivePlayerBorder();
+        this.updateActivePlayerBorder(this.roundManager.getActivePlayer());
     }
 
     ngOnDestroy(): void {
@@ -63,20 +63,13 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
-    updateActivePlayerBorder(): boolean {
-        try {
-            if (!this.roundManager.getActivePlayer()) return false;
-
-            if (this.roundManager.getActivePlayer().id === this.gameService.player1.id) {
-                this.isPlayer1Active = true;
-                this.isPlayer2Active = false;
-            } else if (this.roundManager.getActivePlayer().id === this.gameService.player2.id) {
-                this.isPlayer2Active = true;
-                this.isPlayer1Active = false;
-            }
-            return true;
-        } catch (_) {
-            return false;
+    updateActivePlayerBorder(activePlayer: AbstractPlayer): void {
+        if (activePlayer.id === this.gameService.player1.id) {
+            this.isPlayer1Active = true;
+            this.isPlayer2Active = false;
+        } else if (activePlayer.id === this.gameService.player2.id) {
+            this.isPlayer2Active = true;
+            this.isPlayer1Active = false;
         }
     }
 

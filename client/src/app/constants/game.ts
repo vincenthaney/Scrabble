@@ -1,3 +1,4 @@
+import { Player } from '@app/classes/player';
 import { Square } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
@@ -59,3 +60,5 @@ export const MAX_LOCATION_COMMAND_LENGTH = 3;
 export const MIN_LOCATION_COMMAND_LENGTH = 2;
 
 export const MAX_TILE_PER_PLAYER = 7;
+
+export const DEFAULT_PLAYER = new Player('id', 'name', []);

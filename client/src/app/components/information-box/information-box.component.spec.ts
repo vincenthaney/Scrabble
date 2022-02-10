@@ -7,23 +7,26 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
 import { InformationBoxComponent } from './information-box.component';
 
 class MockRoundManager {
-    pTimerSource: BehaviorSubject<Timer> = new BehaviorSubject<Timer>(new Timer(0, 0));
-    pTimer: Observable<Timer>;
+    pTimerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([
+        new Timer(0, 0),
+        DEFAULT_PLAYER,
+    ]);
+    pTimer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
     pEndRoundEvent: EventEmitter<void> = new EventEmitter();
     pActivePlayer: AbstractPlayer = new Player('mockId', 'mockName', []);
 
-    get timerSource(): BehaviorSubject<Timer> {
+    get timerSource(): BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> {
         return this.pTimerSource;
     }
 
-    get timer(): Observable<Timer> {
+    get timer(): Observable<[timer: Timer, activePlayer: AbstractPlayer]> {
         return this.timerSource.asObservable();
     }
     get endRoundEvent(): EventEmitter<void> {
@@ -116,7 +119,7 @@ describe('InformationBoxComponent', () => {
             return false;
         });
         const newTimer = new Timer(1, 0);
-        mockRoundManager.timerSource.next(newTimer);
+        mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
         expect(startTimerSpy).toHaveBeenCalledWith(newTimer);
     });
 
@@ -128,7 +131,7 @@ describe('InformationBoxComponent', () => {
             return false;
         });
         const newTimer = new Timer(1, 0);
-        mockRoundManager.timerSource.next(newTimer);
+        mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
         expect(updateBorderSpy).toHaveBeenCalled();
     });
 
@@ -216,24 +219,14 @@ describe('InformationBoxComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('updateActivePlayerBorder should return false if there is no activePlayer', () => {
-        spyOnProperty<any>(mockRoundManager, 'activePlayer', 'get').and.returnValue(null);
-
-        const result = component.updateActivePlayerBorder();
-
-        expect(result).toBeFalse();
-    });
-
     it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
         const player1 = new Player('1', 'Player1', []);
         const player2 = new Player('2', 'Player2', []);
-        spyOnProperty<any>(mockRoundManager, 'activePlayer', 'get').and.returnValue(player1);
         spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
         spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
 
-        const result = component.updateActivePlayerBorder();
+        component.updateActivePlayerBorder(player1);
 
-        expect(result).toBeTrue();
         expect(component.isPlayer1Active).toBeTrue();
         expect(component.isPlayer2Active).toBeFalse();
     });
@@ -241,13 +234,11 @@ describe('InformationBoxComponent', () => {
     it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
         const player1 = new Player('1', 'Player1', []);
         const player2 = new Player('2', 'Player2', []);
-        spyOnProperty<any>(mockRoundManager, 'activePlayer', 'get').and.returnValue(player2);
         spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
         spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
 
-        const result = component.updateActivePlayerBorder();
+        component.updateActivePlayerBorder(player2);
 
-        expect(result).toBeTrue();
         expect(component.isPlayer2Active).toBeTrue();
         expect(component.isPlayer1Active).toBeFalse();
     });

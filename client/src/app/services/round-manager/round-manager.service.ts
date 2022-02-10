@@ -5,7 +5,7 @@ import { IResetableService } from '@app/classes/i-resetable-service';
 import { AbstractPlayer } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
 import * as ROUND_ERROR from './round-manager.service.errors';
@@ -20,12 +20,12 @@ export default class RoundManagerService implements IResetableService {
     completedRounds: Round[];
     maxRoundTime: number;
     timeout: ReturnType<typeof setTimeout>;
-    timer: Observable<Timer>;
+    timer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
     endRoundEvent: EventEmitter<void>;
-    private timerSource: BehaviorSubject<Timer>;
+    private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
 
     constructor(private gameplayController: GamePlayController, private router: Router) {
-        this.timerSource = new BehaviorSubject<Timer>(new Timer(0, 0));
+        this.timerSource = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([new Timer(0, 0), DEFAULT_PLAYER]);
         this.timer = this.timerSource.asObservable();
         this.endRoundEvent = new EventEmitter();
     }
@@ -66,7 +66,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     startTimer(): void {
-        this.timerSource.next(Timer.convertTime(this.maxRoundTime));
+        this.timerSource.next([Timer.convertTime(this.maxRoundTime), this.getActivePlayer()]);
     }
 
     roundTimeout(): void {
