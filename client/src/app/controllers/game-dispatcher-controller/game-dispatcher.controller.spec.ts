@@ -12,6 +12,7 @@ import { GameType } from '@app/classes/game-type';
 import { of } from 'rxjs';
 
 const DEFAULT_PLAYER_NAME = 'grogars';
+const DEFAULT_GAME_ID = 'grogarsID';
 const DEFAULT_OPPONENT_NAME: PlayerName[] = [{ name: DEFAULT_PLAYER_NAME }];
 const DEFAULT_GAME_DATA: GameConfigData = {
     playerName: DEFAULT_PLAYER_NAME,
@@ -94,20 +95,34 @@ describe('GameDispatcherController', () => {
         expect(joinerLeaveSpy).toHaveBeenCalled();
     });
     // // ////////////////////////////////////////////////
-    it('handleMultiplayerGameCreation POST', () => {
+    it('handleMultiplayerGameCreation should post', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
         controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleMultiplayerGameCreation EMIT', () => {
+    it('handleMultiplayerGameCreation should emit to createGameEvent', () => {
+        const fakeObservable = of<string>('fakeResponse');
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
         const createGameSpy = spyOn(controller.createGameEvent, 'emit').and.callThrough();
         controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
         expect(createGameSpy).toHaveBeenCalled();
     });
 
-    it('handleConfirmationGameCreation', () => {
+    it('handleConfirmationGameCreation should post', () => {
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        controller.handleConfirmationGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
+
+    it('handleConfirmationGameCreation should subscribe', () => {
+        // eslint-disable-next-line dot-notation
+        const createGameSpy = spyOn(controller['http'].post, subscribe()).and.callThrough();
+        controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+        expect(createGameSpy).toHaveBeenCalled();
         expect(controller).toBeTruthy();
     });
 
