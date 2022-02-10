@@ -2,13 +2,12 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@ang
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
-import { GameType } from '@app/classes/game-type';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2 } from './lobby-page.component.const';
+import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART } from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',
@@ -21,20 +20,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
-    // TODO: Receive LobbyInfo from server
-    lobbies: LobbyInfo[] = [
-        {
-            lobbyId: '1',
-            dictionary: '',
-            playerName: 'Nom vraiment long',
-            gameType: GameType.Classic,
-            maxRoundTime: 270,
-            canJoin: false,
-        },
-        { lobbyId: '1', dictionary: '', playerName: 'Nom1', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '2', dictionary: '', playerName: 'Moyen Long', gameType: GameType.Classic, maxRoundTime: 150, canJoin: false },
-        { lobbyId: '3', dictionary: '', playerName: 'aa', gameType: GameType.LOG2990, maxRoundTime: 90, canJoin: false },
-    ];
+    lobbies: LobbyInfo[];
     constructor(
         private ref: ChangeDetectorRef,
         public gameDispatcherService: GameDispatcherService,
@@ -87,7 +73,9 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_TITLE,
-                content: DIALOG_CONTENT_PART_1 + opponentName + DIALOG_CONTENT_PART_2,
+                // content: string. DIALOG_CONTENT_PART_1 + opponentName + DIALOG_CONTENT_PART_2,
+                content: DIALOG_CONTENT_PART.replace('%s', opponentName),
+
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,
