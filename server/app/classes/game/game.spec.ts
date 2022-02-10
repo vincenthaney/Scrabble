@@ -186,7 +186,6 @@ describe('Game', () => {
         });
     });
 
-   ////////////////// 
     describe('endOfGame', () => {
         let game: Game;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
@@ -247,7 +246,6 @@ describe('Game', () => {
             expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
         });
     });
-/////////////////////////
 
     describe('isPlayer1', () => {
         let game: Game;

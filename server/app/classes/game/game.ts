@@ -5,7 +5,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig } from './game-config';
-import { START_TILES_AMOUNT } from './game.const';
+import { START_TILES_AMOUNT, SYSTEM_MESSAGE_ID } from './game.const';
 import { GameType } from './game.type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -90,6 +90,22 @@ export default class Game {
             this.player1.score -= this.player1.getTileRackPoints();
             this.player2.score += this.player1.getTileRackPoints();
         }
+    }
+
+    // TODO: RETURN LES MESSAGES ET EMIT A ???
+    endGameMessage() {
+        const message1 = { content: 'Fin de partie - lettres restantes', senderId: SYSTEM_MESSAGE_ID };
+        const message2 = { content: this.player1.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
+        const message3 = { content: this.player2.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
+        let winner: string;
+        if (this.player1.score > this.player2.score) {
+            winner = this.player1.name;
+        } else if (this.player1.score < this.player2.score) {
+            winner = this.player2.name;
+        } else {
+            winner = this.player1.name + ' et ' + this.player2.name;
+        }
+        const message4 = { content: `Félicatations à ${winner} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
     }
 
     isPlayer1(arg: string | Player): boolean {

@@ -24,4 +24,8 @@ export default class Player {
     hasTilesLeft(): boolean {
         return this.tiles.length > 0;
     }
+
+    endGameMessage(): string {
+        return `${this.name} : ${this.tiles.reduce((prev, next) => (prev += next.letter), '')}`;
+    }
 }
