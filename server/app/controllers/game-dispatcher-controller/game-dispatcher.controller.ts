@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
@@ -120,7 +119,7 @@ export class GameDispatcherController {
     }
 
     private handleLobbyLeave(gameId: string, playerId: string) {
-        const result = this.gameDispatcherService.leaveLobbyRequest(playerId, gameId);
+        const result = this.gameDispatcherService.leaveLobbyRequest(gameId, playerId);
 
         this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
         this.handleLobbiesUpdate();
@@ -147,8 +146,7 @@ export class GameDispatcherController {
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
         this.socketService.emitToRoom(gameId, 'joinRequest', { name: playerName });
 
-        // TODO: add back
-        // this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
+        this.socketService.getSocket(playerId).leave(this.gameDispatcherService.getLobbiesRoom().getId());
         this.handleLobbiesUpdate();
     }
 
@@ -163,10 +161,8 @@ export class GameDispatcherController {
 
     private handleRejectRequest(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
-
-        const rejectedPlayerId = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
-
-        this.socketService.emitToSocket(rejectedPlayerId, 'rejected');
+        const rejectedPlayer = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
+        this.socketService.emitToSocket(rejectedPlayer.getId(), 'rejected', { name: rejectedPlayer.name });
         this.handleLobbiesUpdate();
     }
 

@@ -17,6 +17,7 @@ export class GameDispatcherController {
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
+    joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
     constructor(private http: HttpClient, public socketService: SocketService, private gameService: GameService) {
         this.configureSocket();
@@ -31,6 +32,9 @@ export class GameDispatcherController {
         );
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
+        });
+        this.socketService.on('rejected', (hostName: PlayerName[]) => {
+            this.joinerRejectedEvent.emit(hostName[0].name);
         });
         this.socketService.on('lobbyFull', (opponent: PlayerName[]) => this.lobbyFullEvent.emit(opponent[0].name));
         this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));

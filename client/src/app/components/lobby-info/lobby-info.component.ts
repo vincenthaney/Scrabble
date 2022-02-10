@@ -12,14 +12,13 @@ export class LobbyInfoComponent implements OnInit {
     @Input() lobby: LobbyInfo;
     @Output() joinLobbyId = new EventEmitter<string>();
     roundTime: Timer;
-    // dictionnaries: Dictionnaries[]
 
     constructor() {
         this.lobby = { lobbyId: '0', dictionary: '', playerName: '', gameType: GameType.Classic, maxRoundTime: 0, canJoin: false };
         this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 

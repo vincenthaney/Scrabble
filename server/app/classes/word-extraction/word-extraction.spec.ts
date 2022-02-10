@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 import { Board, Orientation, Position } from '@app/classes/board';
