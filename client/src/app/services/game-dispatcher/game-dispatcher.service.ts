@@ -13,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 export class GameDispatcherService implements OnDestroy {
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameId: string | undefined;
-    currentLobby: LobbyInfo;
+    currentLobby: LobbyInfo | undefined;
     currentName: string;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
@@ -60,7 +60,13 @@ export class GameDispatcherService implements OnDestroy {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }
-    // handleJoinLobby(gameId: string, playerName: string) {
+
+    resetData() {
+        this.currentLobby = undefined;
+        this.currentName = '';
+        this.gameId = undefined;
+    }
+
     handleJoinLobby(lobby: LobbyInfo, playerName: string) {
         this.currentLobby = lobby;
         this.currentName = playerName;
@@ -74,7 +80,7 @@ export class GameDispatcherService implements OnDestroy {
 
     handleLeaveLobby() {
         if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
-        this.gameId = undefined;
+        this.resetData();
     }
     handleCreateGame(playerName: string, gameParameters: FormGroup) {
         const gameConfig: GameConfigData = {
@@ -89,7 +95,7 @@ export class GameDispatcherService implements OnDestroy {
 
     handleCancelGame() {
         if (this.gameId) this.gameDispatcherController.handleCancelGame(this.gameId);
-        this.gameId = undefined;
+        this.resetData();
     }
 
     handleConfirmation(opponentName: string) {
@@ -106,7 +112,7 @@ export class GameDispatcherService implements OnDestroy {
 
     handleJoinerRejected(hostName: string) {
         this.joinerRejectedEvent.emit(hostName);
-        this.gameId = undefined;
+        this.resetData();
     }
 
     handleLobbiesUpdate(lobbies: LobbyInfo[]) {
@@ -115,12 +121,12 @@ export class GameDispatcherService implements OnDestroy {
 
     handleLobbyFull(opponentName: string) {
         this.lobbyFullEvent.emit(opponentName);
-        this.gameId = undefined;
+        this.resetData();
     }
 
     handleCanceledGame(hostName: string) {
         this.canceledGameEvent.emit(hostName);
-        this.gameId = undefined;
+        this.resetData();
     }
 
     handleJoinerLeaveGame(leaverName: string) {
