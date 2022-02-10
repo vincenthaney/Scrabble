@@ -6,10 +6,13 @@ import { Application } from '@app/app';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import { HttpException } from '@app/classes/http.exception';
+import Player from '@app/classes/player/player';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
+import { createStubInstance } from 'sinon';
+import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
@@ -180,6 +183,12 @@ describe('GameDispatcherController', () => {
         beforeEach(() => {
             emitSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
             requestSpy = chai.spy.on(controller['gameDispatcherService'], 'requestJoinGame', () => {});
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+            const stubSocket = createStubInstance(Socket);
+            stubSocket.leave.returns();
+            chai.spy.on(controller['socketService'], 'getSocket', () => {
+                return stubSocket;
+            });
         });
 
         it('should call socketService.emitToRoom', () => {
@@ -242,9 +251,11 @@ describe('GameDispatcherController', () => {
     describe('handleRejectRequest', () => {
         let rejectSpy: unknown;
         let emitToSocketSpy: unknown;
+        const playerStub = createStubInstance(Player);
+        playerStub.getId.returns('1');
 
         beforeEach(() => {
-            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => DEFAULT_PLAYER_ID);
+            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => playerStub);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
         });
 

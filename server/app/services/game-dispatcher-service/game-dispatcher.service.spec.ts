@@ -117,14 +117,21 @@ describe('GameDispatcherService', () => {
     describe('acceptJoinRequest', () => {
         let id: string;
         let spy: unknown;
+        let gameStub: SinonStubbedInstance<Game>;
+        let tileReserveStub: SinonStubbedInstance<TileReserve>;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
-            spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () => Promise.resolve());
+            tileReserveStub = createStubInstance(TileReserve);
+            tileReserveStub.init.returns(Promise.resolve());
+            gameStub = createStubInstance(Game);
+            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+            spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () =>
+                Promise.resolve(gameStub as unknown as Game),
+            );
             spy = chai.spy.on(gameDispatcherService, 'createStartGameData', () => {
                 return;
             });
-
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
