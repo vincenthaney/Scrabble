@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@ang
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
-import { GameType } from '@app/classes/game-type';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
@@ -21,19 +20,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbyFullSubscription: Subscription;
 
     // TODO: Receive LobbyInfo from server
-    lobbies: LobbyInfo[] = [
-        {
-            lobbyId: '1',
-            dictionary: '',
-            playerName: 'Nom vraiment long',
-            gameType: GameType.Classic,
-            maxRoundTime: 270,
-            canJoin: false,
-        },
-        { lobbyId: '1', dictionary: '', playerName: 'Nom1', gameType: GameType.Classic, maxRoundTime: 60, canJoin: false },
-        { lobbyId: '2', dictionary: '', playerName: 'Moyen Long', gameType: GameType.Classic, maxRoundTime: 150, canJoin: false },
-        { lobbyId: '3', dictionary: '', playerName: 'aa', gameType: GameType.LOG2990, maxRoundTime: 90, canJoin: false },
-    ];
+    lobbies: LobbyInfo[] = [];
     constructor(
         private ref: ChangeDetectorRef,
         public gameDispatcherService: GameDispatcherService,
