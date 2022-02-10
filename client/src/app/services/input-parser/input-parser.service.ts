@@ -14,7 +14,7 @@ import {
     MIN_ROW_NUMBER
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { GameService } from '..';
 import { CommandErrorMessages } from './command-error-messages';
 import CommandError from './command-errors';
@@ -25,7 +25,6 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
     providedIn: 'root',
 })
 export default class InputParserService {
-    newMessageData: Observable<Message>;
     private newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
         senderId: 'System',
@@ -49,14 +48,17 @@ export default class InputParserService {
                 this.parseCommand(actionName, inputWords);
             } catch (e) {
                 if (e instanceof CommandError) {
-                    // print message d'erreur dans console joueur
+                    this.newMessageValue.next({
+                        content: `La commande ${input} est invalide`,
+                        senderId: 'System',
+                        date: new Date(),
+                    });
                 }
             }
         } else {
-            // à changer
             this.controller.sendMessage(this.gameService.getGameId(), playerId, {
                 content: input,
-                senderId: this.getLocalPlayer().name,
+                senderId: this.getLocalPlayer().id,
                 date: new Date(),
             });
         }
