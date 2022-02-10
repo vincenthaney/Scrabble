@@ -5,7 +5,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BoardComponent } from '@app/components/board/board.component';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
 import { SquareComponent } from '@app/components/square/square.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -38,7 +37,6 @@ import { SocketService } from './services/socket/socket.service';
         AppComponent,
         GamePageComponent,
         MainPageComponent,
-        PlayAreaComponent,
         HomePageComponent,
         SquareComponent,
         TileComponent,
