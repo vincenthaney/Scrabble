@@ -23,7 +23,7 @@ export class ScoreCalculatorService {
 
     private letterValue(tile: Tile, square: Square): number {
         if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.LETTER && !square.wasMultiplierUsed) {
-            return tile.value * square.scoreMultiplier?.multiplier;
+            return tile.value * square.scoreMultiplier.multiplier;
         } else {
             return tile.value;
         }
@@ -31,7 +31,7 @@ export class ScoreCalculatorService {
 
     private wordMultiplier(square: Square): number {
         if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.WORD && !square.wasMultiplierUsed) {
-            return square.scoreMultiplier?.multiplier;
+            return square.scoreMultiplier.multiplier;
         } else {
             return DEFAULT_MULTIPLIER;
         }
