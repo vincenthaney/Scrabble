@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { LobbyInfo } from '@app/classes/communication/lobby-info';
+import { LobbyInfo } from '@app/classes/communication/';
 import { GameType } from '@app/classes/game-type';
 import { Timer } from '@app/classes/timer';
 

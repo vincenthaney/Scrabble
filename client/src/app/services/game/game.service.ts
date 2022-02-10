@@ -1,8 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { PlayerData } from '@app/classes/communication/player-data';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';

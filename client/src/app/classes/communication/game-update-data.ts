@@ -1,8 +1,8 @@
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
-import { PlayerData } from './player-data';
+import { PlayerData } from './';
 
-export interface GameUpdateData {
+export default interface GameUpdateData {
     player1?: PlayerData;
     player2?: PlayerData;
     isGameOver?: boolean;

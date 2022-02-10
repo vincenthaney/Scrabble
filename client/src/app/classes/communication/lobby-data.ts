@@ -1,6 +1,6 @@
 import { GameType } from '@app/classes/game-type';
 
-export interface LobbyData {
+export default interface LobbyData {
     lobbyId: string;
     playerName: string;
     gameType: GameType;
