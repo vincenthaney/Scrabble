@@ -73,10 +73,6 @@ export default class GameService {
         this.newMessageValue.next(newMessage);
     }
 
-    updateNewMessage(newMessage: Message) {
-        this.newMessageValue.next(newMessage);
-    }
-
     getGameId(): string {
         return this.gameId;
     }

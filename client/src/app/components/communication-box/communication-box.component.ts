@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
@@ -13,7 +13,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent implements OnInit {
+export class CommunicationBoxComponent {
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: Message[] = [
@@ -57,13 +57,7 @@ export class CommunicationBoxComponent implements OnInit {
         { letter: 'O', amount: 2 },
     ];
 
-    constructor(private inputParser: InputParserService, private gameService: GameService) {}
-
-    ngOnInit() {
-        this.subscribeToNewMessage();
-    }
-
-    subscribeToNewMessage() {
+    constructor(private inputParser: InputParserService, private gameService: GameService) {
         this.gameService.newMessageValue.subscribe((newMessage) => {
             this.messages.push(newMessage);
         });
@@ -71,9 +65,8 @@ export class CommunicationBoxComponent implements OnInit {
 
     onSendMessage() {
         const message = this.messageForm.get('content')?.value;
-        if (message.length > 0) {
+        if (message && message.length > 0) {
             this.inputParser.parseInput(message);
-            // this.messages = [...this.messages, { content: message, senderId: 'Mathilde', date: new Date() }];
             this.messageForm.reset();
             this.scrollToBottom();
         }

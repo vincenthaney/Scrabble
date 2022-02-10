@@ -7,20 +7,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Message } from '@app/classes/communication/message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { GameService, InputParserService } from '@app/services';
-import { BehaviorSubject } from 'rxjs';
 import { CommunicationBoxComponent } from './communication-box.component';
-
-class MockGameService extends GameService {
-    newMessageValue: BehaviorSubject<Message>;
-
-    handleNewMessage(newMessage: Message): void {
-        this.newMessageValue.next(newMessage);
-    }
-}
 
 describe('CommunicationBoxComponent', () => {
     let component: CommunicationBoxComponent;
@@ -30,7 +20,7 @@ describe('CommunicationBoxComponent', () => {
     let virtualScrollSpy: jasmine.SpyObj<CdkVirtualScrollViewport>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let scrollToBottomSpy: jasmine.Spy<any>;
-    let mockGameService: MockGameService;
+    let gameServiceSpy: GameService;
 
     beforeEach(async () => {
         inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput', 'emitNewMessage']);
@@ -59,10 +49,11 @@ describe('CommunicationBoxComponent', () => {
             providers: [
                 { provide: InputParserService, useValue: inputParserSpy },
                 { provide: CdkVirtualScrollViewport, useValue: virtualScrollSpy },
-                { provide: GameService, useClass: MockGameService },
+                GameService,
             ],
         }).compileComponents();
-        mockGameService = TestBed.inject(MockGameService);
+
+        gameServiceSpy = TestBed.inject(GameService);
     });
 
     beforeEach(() => {
@@ -110,21 +101,14 @@ describe('CommunicationBoxComponent', () => {
         expect(scrollToBottomSpy).not.toHaveBeenCalled();
     });
 
-    it('should subscribe to inputParserService', () => {
-        component.subscribeToNewMessage();
+    it('should subscribe to inputParserService and receive its new messages', () => {
         const messagesLengthBefore: number = component.messages.length;
-        console.log('length before' + messagesLengthBefore);
-        console.log(component.messages);
-        0;
-        mockGameService.handleNewMessage({
-            content: 'newMessage',
+        gameServiceSpy.handleNewMessage({
+            content: 'new message',
             senderId: 'System',
             date: new Date(),
         });
-
         const messagesLengthAfter: number = component.messages.length;
-        console.log('length after' + messagesLengthAfter);
-        console.log(component.messages);
         expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
     });
 });
