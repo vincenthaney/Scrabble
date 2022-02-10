@@ -51,7 +51,6 @@ export default class GameService {
         this.roundManager.currentRound = startGameData.round;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
-        this.updateTileRackEvent.emit();
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
@@ -80,12 +79,8 @@ export default class GameService {
     }
 
     isLocalPlayerPlaying(): boolean {
-        try {
-            if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
-            return this.localPlayerId === this.roundManager.getActivePlayer().id;
-        } catch (err) {
-            return false;
-        }
+        if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
+        return this.localPlayerId === this.roundManager.getActivePlayer().id;
     }
 
     getGameId(): string {
