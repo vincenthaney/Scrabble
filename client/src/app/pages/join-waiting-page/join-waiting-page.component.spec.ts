@@ -125,7 +125,7 @@ describe('JoinWaitingPageComponent', () => {
         expect(spyHandleLeaveLobby).toHaveBeenCalled();
     });
 
-    it('routerChangeMethod should not call handleLeaveLobby if the url is diffrent from /game ', () => {
+    it('routerChangeMethod should not call handleLeaveLobby if the url is /game ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.returnValue(of(true) as any);
         // Create a new component once spies have been applied

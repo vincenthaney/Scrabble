@@ -59,7 +59,7 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalledWith(TEST_LOBBIES[0].lobbyId, TEST_PLAYER_NAME);
     });
 
-    it('handleLobbyListRequest should call gameDispatcherController.handleLobbiesListRequest with the correct parameters', () => {
+    it('handleLobbyListRequest should call gameDispatcherController.handleLobbiesListRequest', () => {
         const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleLobbiesListRequest').and.callFake(() => {
             return;
         });
@@ -67,8 +67,7 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should call gameDispatcherController.handleLobbiesListRequest \
-    with the correct parameters and put gameId to undefined', () => {
+    it('handleLeaveLobby should call gameDispatcherController.handleLobbiesListRequest and put gameId to undefined', () => {
         const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleLeaveLobby').and.callFake(() => {
             return;
         });

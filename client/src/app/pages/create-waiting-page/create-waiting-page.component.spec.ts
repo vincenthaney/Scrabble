@@ -63,8 +63,8 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     beforeEach(() => {
-        component.waitingRoomMessage = 'initialwaitingRoomMessage';
-        component.opponent = 'initialopponent';
+        component.waitingRoomMessage = 'initialWaitingRoomMessage';
+        component.opponent = 'initialOpponent';
     });
 
     it('should create', () => {
