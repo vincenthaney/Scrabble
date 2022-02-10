@@ -161,8 +161,8 @@ export class GameDispatcherController {
 
     private handleRejectRequest(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
-        const rejectedPlayer = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
-        this.socketService.emitToSocket(rejectedPlayer.getId(), 'rejected', { name: rejectedPlayer.name });
+        const [rejectedPlayer, hostName] = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
+        this.socketService.emitToSocket(rejectedPlayer.getId(), 'rejected', { name: hostName });
         this.handleLobbiesUpdate();
     }
 
