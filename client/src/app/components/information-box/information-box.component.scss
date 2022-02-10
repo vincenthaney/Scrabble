@@ -3,7 +3,7 @@
 $name-score-spacing: 12px;
 $primary-color: #1b5e20;
 
-#outer-container { 
+#outer-container {
     @include no-select;
     height: 100%;
     display: flex;
@@ -50,8 +50,20 @@ $primary-color: #1b5e20;
                 }
             }
 
+            &.active-player {
+                border-color: burlywood;
+                border-radius: 3px;
+                border-width: 2px;
+                border-style: solid;
+            }
+
             &#player-info-1 {
                 text-align: left;
+
+                &.active-player {
+                    margin-right: 50%;
+                    padding-left: 5px;
+                }
 
                 .player-name .score {
                     margin-left: $name-score-spacing;
@@ -60,6 +72,11 @@ $primary-color: #1b5e20;
             }
             &#player-info-2 {
                 text-align: right;
+
+                &.active-player {
+                    margin-left: 50%;
+                    padding-right: 5px;
+                }
 
                 .player-name .score {
                     margin-right: $name-score-spacing;
@@ -77,10 +94,22 @@ $primary-color: #1b5e20;
 
                 .separator {
                     @keyframes blinking {
-                        0% { visibility: visible; opacity: 1; }
-                        74% { visibility: visible; opacity: 1; }
-                        75% { visibility: hidden; opacity: 0; }
-                        100% { visibility: hidden; opacity: 0; }
+                        0% {
+                            visibility: visible;
+                            opacity: 1;
+                        }
+                        74% {
+                            visibility: visible;
+                            opacity: 1;
+                        }
+                        75% {
+                            visibility: hidden;
+                            opacity: 0;
+                        }
+                        100% {
+                            visibility: hidden;
+                            opacity: 0;
+                        }
                     }
 
                     animation-name: blinking;

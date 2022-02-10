@@ -5,17 +5,17 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingRoom from '@app/classes/game/waiting-room';
+import Player from '@app/classes/player/player';
 import * as Errors from '@app/constants/errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import { Container } from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
 import * as GameDispatcherError from './game-dispatcher.service.error';
-import { Container } from 'typedi';
-import Game from '@app/classes/game/game';
-import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
@@ -28,6 +28,14 @@ const expect = chai.expect;
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
     playerId: 'id',
     playerName: 'player',
+    gameType: GameType.Classic,
+    maxRoundTime: 1,
+    dictionary: 'francais',
+};
+
+const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
+    player1: new Player('1', 'player1'),
+    player2: new Player('2', 'player2'),
     gameType: GameType.Classic,
     maxRoundTime: 1,
     dictionary: 'francais',

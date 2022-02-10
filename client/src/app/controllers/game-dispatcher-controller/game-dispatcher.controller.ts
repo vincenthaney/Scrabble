@@ -1,7 +1,6 @@
-/* eslint-disable no-console */
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
-import { GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { PlayerName } from '@app/classes/communication/player-name';
 import { GameService } from '@app/services';
@@ -29,7 +28,7 @@ export class GameDispatcherController {
         this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
             this.joinRequestEvent.emit(opponent[0].name);
         });
-        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) =>
+        this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
             this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
         );
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
@@ -69,7 +68,6 @@ export class GameDispatcherController {
 
     handleLeaveLobby(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
-        // patch?
         this.http.delete(endpoint).subscribe();
     }
 
@@ -78,8 +76,8 @@ export class GameDispatcherController {
         this.http.get(endpoint).subscribe();
     }
 
-    handleLobbyJoinRequest(gameId: string, playerName: string): void {
+    handleLobbyJoinRequest(gameId: string, playerName: string) {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/join`;
-        this.http.post(endpoint, { playerName }).subscribe();
+        this.http.post<GameConfig>(endpoint, { playerName }).subscribe();
     }
 }

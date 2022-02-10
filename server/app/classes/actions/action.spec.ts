@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
-import { ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { expect } from 'chai';
+import { ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
 
 describe('Action', () => {
     describe('ActionPlay', () => {

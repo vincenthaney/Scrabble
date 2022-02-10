@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActionExchangePayload } from '@app/classes/actions/action-exchange';
 import { ActionPlacePayload } from '@app/classes/actions/action-place';
 import { Orientation } from '@app/classes/orientation';
-import { IPlayer } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import {
@@ -14,6 +14,7 @@ import {
     MIN_ROW_NUMBER,
 } from '@app/constants/game';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
+import * as GAME_SERVICE_ERROR from '@app/services/game/game.service.error';
 import { GameService } from '..';
 import { INVALID_COMMAND } from './command-errors';
 
@@ -107,15 +108,11 @@ export default class InputParserService {
     }
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
-        let player: IPlayer;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof IPlayer) {
-            player = localPlayer;
-        } else {
-            throw new Error('Current player could not be found');
-        }
+        const player: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+        if (!player) throw new Error(GAME_SERVICE_ERROR.NO_LOCAL_PLAYER);
+
         const playerTiles: Tile[] = [];
-        player.getTiles().forEach((tile) => {
+        player.getTiles().forEach((tile: Tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
         const tilesToPlace: Tile[] = [];
@@ -141,17 +138,11 @@ export default class InputParserService {
     private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
         // user must type exchange letters in lower case
         if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new Error(INVALID_COMMAND);
-
-        let player: IPlayer;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof IPlayer) {
-            player = localPlayer;
-        } else {
-            throw new Error('Current player could not be found');
-        }
+        const player: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+        if (!player) throw new Error(GAME_SERVICE_ERROR.NO_LOCAL_PLAYER);
 
         const playerTiles: Tile[] = [];
-        player.getTiles().forEach((tile) => {
+        player.getTiles().forEach((tile: Tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
 

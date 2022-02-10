@@ -1,7 +1,7 @@
 import Game from '@app/classes/game/game';
 import { MultiplayerGameConfig } from '@app/classes/game/game-config';
-import * as Errors from '@app/constants/errors';
 import { HttpException } from '@app/classes/http.exception';
+import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import { Service } from 'typedi';
 

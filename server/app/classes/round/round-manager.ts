@@ -1,5 +1,5 @@
-import Player from '@app/classes/player/player';
 import { Action, ActionPass } from '@app/classes/actions';
+import Player from '@app/classes/player/player';
 import { CompletedRound, Round } from './round';
 import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
 
@@ -57,11 +57,11 @@ export default class RoundManager {
         return this.currentRound;
     }
 
-    getMaxRoundTime(): number {
+    getMaxRoundTime() {
         return this.maxRoundTime;
     }
 
-    getPassCounter(): number {
+    getPassCounter() {
         return this.passCounter;
     }
 

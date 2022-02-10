@@ -29,7 +29,7 @@ describe('WordExtraction', () => {
                 const square = {
                     tile: null,
                     position: { row: i, column: j },
-                    multiplier: null,
+                    scoreMultiplier: null,
                     wasMultiplierUsed: false,
                     isCenter: false,
                 };

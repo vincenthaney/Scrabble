@@ -1,5 +1,6 @@
 import { Board, Position } from '@app/classes/board';
-import { Multiplier, Square } from '@app/classes/square';
+import { Square } from '@app/classes/square';
+import { Multiplier } from '@app/classes/square/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
 import { BOARD_SIZE } from '@app/constants/game';
@@ -20,7 +21,7 @@ export default class BoardService {
                 const square = {
                     tile: null,
                     position: { row: i, column: j },
-                    multiplier: this.readScoreMultiplierConfig({ row: i, column: j }),
+                    scoreMultiplier: this.readScoreMultiplierConfig({ row: i, column: j }),
                     wasMultiplierUsed: false,
                     isCenter,
                 };

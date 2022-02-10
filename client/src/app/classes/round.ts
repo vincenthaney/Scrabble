@@ -1,5 +1,7 @@
+import { AbstractPlayer } from './player';
+
 export interface Round {
-    // player : IPlayer;
+    player: AbstractPlayer;
     startTime: Date;
     limitTime: Date;
     completedTime: Date | null;

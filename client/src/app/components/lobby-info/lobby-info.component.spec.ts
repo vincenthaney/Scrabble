@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -11,6 +12,7 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
+import { Timer } from '@app/classes/timer';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
@@ -81,9 +83,9 @@ describe('LobbyInfoComponent', () => {
     it('convertTime should output the correct string using the timer in Lobby', () => {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const TIME = 90;
-        const EXPECTED_STRING = '1 minute et 30 secondes';
+        const EXPECTED_TIME = new Timer(1, 30);
         component.lobby.maxRoundTime = TIME;
-        expect(component.convertTime()).toEqual(EXPECTED_STRING);
+        expect(component.roundTime).toEqual(EXPECTED_TIME);
     });
 
     it('the tooltip should be disabled if you can join the lobby', async () => {
