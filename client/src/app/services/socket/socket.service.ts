@@ -20,10 +20,7 @@ export class SocketService {
         });
     }
 
-    isSocketAlive() {
-        if (!this.socket) {
-            return;
-        }
+    isSocketAlive(): boolean {
         return this.socket && this.socket.connected;
     }
 
