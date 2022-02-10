@@ -1,7 +1,7 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Message, MessageTypes } from '@app/classes/communication/message';
+import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
 import { GameService, InputParserService } from '@app/services';
 
@@ -17,22 +17,21 @@ export class CommunicationBoxComponent {
     @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: Message[] = [
-        { content: 'message 1', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
-        { content: 'message 2', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
-        { content: 'message 3', sender: 'Raph', date: new Date(), type: MessageTypes.Player2 },
-        { content: 'message 4', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
-        { content: 'Raph a joué ARBRE', sender: '', date: new Date(), type: MessageTypes.System },
-        { content: 'message 5', sender: 'Raph', date: new Date(), type: MessageTypes.Player2 },
-        { content: 'message 5', sender: 'Raph', date: new Date(), type: MessageTypes.Player2 },
-        { content: 'message 6', sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 },
+        { content: 'message 1', senderId: 'Mathilde', date: new Date() },
+        { content: 'message 2', senderId: 'Mathilde', date: new Date() },
+        { content: 'message 3', senderId: 'Raph', date: new Date() },
+        { content: 'message 4', senderId: 'Mathilde', date: new Date() },
+        { content: 'Raph a joué ARBRE', senderId: '', date: new Date() },
+        { content: 'message 5', senderId: 'Raph', date: new Date() },
+        { content: 'message 5', senderId: 'Raph', date: new Date() },
+        { content: 'message 6', senderId: 'Mathilde', date: new Date() },
         {
             // eslint-disable-next-line max-len
             content:
                 "je suis un message très long qui va sûrement prendre plus qu'une ligne \
                 à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
-            sender: 'Raph',
+            senderId: 'Raph',
             date: new Date(),
-            type: MessageTypes.Player2,
         },
     ];
     messageForm = new FormGroup({
@@ -66,7 +65,7 @@ export class CommunicationBoxComponent {
         const message = this.messageForm.get('content')?.value;
         if (message) {
             this.inputParser.parseInput(message);
-            this.messages = [...this.messages, { content: message, sender: 'Mathilde', date: new Date(), type: MessageTypes.Player1 }];
+            this.messages = [...this.messages, { content: message, senderId: 'Mathilde', date: new Date() }];
             this.messageForm.reset();
             this.scrollToBottom();
         }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
-import { Message, MessageTypes } from '@app/classes/communication/message';
+import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { IPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
@@ -28,9 +28,8 @@ export default class InputParserService {
     newMessageData: Observable<Message>;
     private newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
-        sender: 'System',
+        senderId: 'System',
         date: new Date(),
-        type: MessageTypes.System,
     });
 
     constructor(private controller: GamePlayController, private gameService: GameService) {}
@@ -57,9 +56,8 @@ export default class InputParserService {
             // à changer
             this.controller.sendMessage(this.gameService.getGameId(), playerId, {
                 content: input,
-                sender: this.getLocalPlayer().name,
+                senderId: this.getLocalPlayer().name,
                 date: new Date(),
-                type: MessageTypes.System,
             });
         }
     }

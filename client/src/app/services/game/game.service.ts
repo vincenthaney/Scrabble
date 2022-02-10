@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { Message, MessageTypes } from '@app/classes/communication/message';
+import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IPlayer } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
@@ -23,9 +23,8 @@ export default class GameService {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
     newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
-        sender: 'System',
+        senderId: 'System',
         date: new Date(),
-        type: MessageTypes.System,
     });
     private gameId: string;
     private localPlayerId: string;
