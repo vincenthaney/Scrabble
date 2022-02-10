@@ -1,8 +1,3 @@
-export enum GameRequestState {
-    Waiting = 'waiting',
-    Accepted = 'accepted',
-    Rejected = 'rejected',
-}
 export const DIALOG_BUTTON_CONTENT = 'Retourner à la sélection de parties.';
 export const DIALOG_REJECT_TITLE = 'Rejeté';
 export const DIALOG_REJECT_CONTENT = ' vous a rejeté de la partie.';

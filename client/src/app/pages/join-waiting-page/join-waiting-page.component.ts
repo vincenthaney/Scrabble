@@ -5,7 +5,6 @@ import {
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
     DIALOG_REJECT_TITLE,
-    GameRequestState,
 } from './join-waiting-page.component.const';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,6 +12,7 @@ import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Router, NavigationStart } from '@angular/router';
+import { LobbyInfo } from '@app/classes/communication/lobby-info';
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -23,14 +23,8 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     joinerRejectedSubscription: Subscription;
     routingSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
-
-    state: GameRequestState = GameRequestState.Waiting;
-    waitingGameName: string = 'testName';
-    waitingGameType: string = 'testType';
-    waitingGameTimer: string = 'timer';
-    waitingGameDictionary: string = 'dictionary';
-    waitingPlayerName: string = 'waitingPlayer';
-    waitingOpponentName: string = 'hostPlayer';
+    currentLobby: LobbyInfo;
+    currentName: string;
 
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
     // TODO: Fix if player goes to /game or change attribute when game starts
@@ -40,6 +34,9 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.currentLobby = this.gameDispatcherService.currentLobby;
+        this.currentName = this.gameDispatcherService.currentName;
+
         this.routingSubscription = this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
             if (event instanceof NavigationStart) {
                 this.routerChangeMethod(event.url);

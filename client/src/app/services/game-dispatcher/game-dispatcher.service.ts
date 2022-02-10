@@ -13,6 +13,8 @@ import { takeUntil } from 'rxjs/operators';
 export class GameDispatcherService implements OnDestroy {
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameId: string | undefined;
+    currentLobby: LobbyInfo;
+    currentName: string;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
     lobbyFullEvent: EventEmitter<string> = new EventEmitter();
@@ -58,9 +60,12 @@ export class GameDispatcherService implements OnDestroy {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }
-    handleJoinLobby(gameId: string, playerName: string) {
-        this.gameId = gameId;
-        this.gameDispatcherController.handleLobbyJoinRequest(gameId, playerName);
+    // handleJoinLobby(gameId: string, playerName: string) {
+    handleJoinLobby(lobby: LobbyInfo, playerName: string) {
+        this.currentLobby = lobby;
+        this.currentName = playerName;
+        this.gameId = lobby.lobbyId;
+        this.gameDispatcherController.handleLobbyJoinRequest(this.gameId, playerName);
     }
 
     handleLobbyListRequest() {

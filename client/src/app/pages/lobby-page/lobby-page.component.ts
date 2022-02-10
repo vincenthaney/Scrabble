@@ -77,7 +77,10 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
 
     joinLobby(lobbyId: string) {
         this.router.navigateByUrl('join-waiting');
-        this.gameDispatcherService.handleJoinLobby(lobbyId, this.nameField.formParameters.get('inputName')?.value);
+        this.gameDispatcherService.handleJoinLobby(
+            this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
+            this.nameField.formParameters.get('inputName')?.value,
+        );
     }
 
     lobbyFullDialog(opponentName: string) {
