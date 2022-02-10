@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 // Lint dot-notation must be disabled to access private element
 /* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
@@ -294,10 +295,6 @@ describe('GameDispatcherService', () => {
 
     // //////////////
     describe('leaveLobbyRequest', () => {
-
-
-
-
         let id: string;
         let waitingRoom: WaitingRoom;
 
@@ -330,16 +327,15 @@ describe('GameDispatcherService', () => {
             ]);
         });
     });
-
 });
 
-const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
-    playerId: 'id',
-    playerName: 'player',
-    gameType: GameType.Classic,
-    maxRoundTime: 1,
-    dictionary: 'francais',
-};
+// const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
+//     playerId: 'id',
+//     playerName: 'player',
+//     gameType: GameType.Classic,
+//     maxRoundTime: 1,
+//     dictionary: 'francais',
+// };
 
 // private createStartGameData(createdGame: Game): StartMultiplayerGameData {
 //     const tileReserve: TileReserveData[] = [];

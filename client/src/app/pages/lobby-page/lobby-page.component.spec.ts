@@ -1,14 +1,18 @@
 /* eslint-disable max-classes-per-file */
-/* eslint-disable no-console */
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { of } from 'rxjs';
@@ -33,11 +37,17 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            declarations: [LobbyPageComponent, NameFieldComponent, LobbyInfoComponent, IconComponent],
             imports: [
                 MatInputModule,
                 MatFormFieldModule,
                 MatDividerModule,
                 HttpClientModule,
+                MatDialogModule,
+                MatTooltipModule,
+                BrowserAnimationsModule,
+                FormsModule,
+                ReactiveFormsModule,
                 RouterTestingModule.withRoutes([
                     { path: 'join-waiting', component: TestComponent },
                     { path: 'lobby', component: LobbyPageComponent },
@@ -50,7 +60,6 @@ describe('LobbyPageComponent', () => {
                     useClass: MatDialogMock,
                 },
             ],
-            declarations: [LobbyPageComponent],
         }).compileComponents();
     });
 
@@ -86,7 +95,7 @@ describe('LobbyPageComponent', () => {
         component.nameField.formParameters.patchValue({ inputName: 'Name1' });
         const expected = [false, true, true];
         component.validateName();
-        expect(component.lobbies);
+        expect(component.lobbies).toBeTruthy();
         for (let i = 0; i++; i < component.lobbies.length) {
             expect(component.lobbies[i].canJoin).toEqual(expected[i]);
         }

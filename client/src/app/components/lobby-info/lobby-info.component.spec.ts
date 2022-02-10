@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -14,7 +13,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { IconComponent } from '@app/components/icon/icon.component';
-
+import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { LobbyInfoComponent } from './lobby-info.component';
 
 @Component({
@@ -48,7 +47,10 @@ describe('LobbyInfoComponent', () => {
                 AppMaterialModule,
                 MatFormFieldModule,
                 FormsModule,
-                RouterTestingModule.withRoutes([{ path: 'waiting', component: TestComponent }]),
+                RouterTestingModule.withRoutes([
+                    { path: 'waiting', component: TestComponent },
+                    { path: 'lobby', component: LobbyPageComponent },
+                ]),
             ],
             declarations: [LobbyInfoComponent, IconComponent],
         }).compileComponents();

@@ -1,10 +1,7 @@
 import Action from './action';
 
-export default abstract class ActionPlay implements Action {
+export default abstract class ActionPlay extends Action {
     willEndTurn(): boolean {
         return true;
     }
-
-    abstract execute(): void;
-    abstract getMessage(): string;
 }

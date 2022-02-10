@@ -6,7 +6,7 @@ import { Tile } from '@app/classes/tile';
 
 export interface ActionPlacePayload {
     tiles: Tile[];
-    position: Position;
+    startPosition: Position;
     orientation: Orientation;
 }
 

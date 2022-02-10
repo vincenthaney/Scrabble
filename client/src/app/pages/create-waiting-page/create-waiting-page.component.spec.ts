@@ -10,7 +10,8 @@ import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispat
 import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
-
+import { CommonModule } from '@angular/common';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 @Component({
     template: '',
 })
@@ -31,11 +32,12 @@ describe('CreateWaitingPageComponent', () => {
     let gameDispatcherServiceMock: GameDispatcherService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
             imports: [
                 HttpClientModule,
                 MatProgressSpinnerModule,
                 MatDialogModule,
+                CommonModule,
                 BrowserAnimationsModule,
                 RouterTestingModule.withRoutes([
                     { path: 'game-creation', component: TestComponent },

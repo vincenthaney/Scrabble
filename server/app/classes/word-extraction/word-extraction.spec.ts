@@ -1,11 +1,11 @@
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
-import { expect, spy } from 'chai';
 import { Board, Orientation, Position } from '@app/classes/board';
-import { Square } from '@app/classes/square';
 import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
-import { BOARD_SIZE } from '@app/constants/game';
+import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
+import { BOARD_SIZE } from '@app/constants/game';
+import { expect, spy } from 'chai';
 import { WordExtraction } from './word-extraction';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
 

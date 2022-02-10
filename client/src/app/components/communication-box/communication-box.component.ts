@@ -2,6 +2,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { LetterValue } from '@app/classes/tile';
+import { InputParserService } from '@app/services';
 
 type Message = { text: string; sender: string; date: Date; class: string };
 type LetterMapItem = { letter: LetterValue; amount: number };
@@ -15,7 +16,6 @@ type LetterMapItem = { letter: LetterValue; amount: number };
 export class CommunicationBoxComponent {
     @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
-    message: string;
     messages: Message[] = [
         { text: 'message 1', sender: 'Mathilde', date: new Date(), class: 'me' },
         { text: 'message 2', sender: 'Mathilde', date: new Date(), class: 'me' },
@@ -33,18 +33,9 @@ export class CommunicationBoxComponent {
             class: 'opponent',
         },
     ];
-    // message: string;
-    // messages: string[] = [
-    //     'message 1',
-    //     'message 2',
-    //     'message 3',
-    //     'message 4',
-    //     'message 5',
-    //     'message 6',
-    //     'message 7',
-    //     'message 8',
-    //     "je suis un message très long qui va sûrement prendre plus qu'une ligne à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
-    // ];
+    messageForm = new FormGroup({
+        content: new FormControl(''),
+    });
 
     objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
@@ -65,13 +56,13 @@ export class CommunicationBoxComponent {
         { letter: 'O', amount: 2 },
     ];
 
-    messageForm = new FormGroup({
-        content: new FormControl(''),
-    });
+    constructor(private inputParser: InputParserService) {}
 
     sendMessage() {
-        if (this.message) {
-            this.messages = [...this.messages, { text: this.message, sender: 'Mathilde', date: new Date(), class: 'me' }];
+        const message = this.messageForm.get('content')?.value;
+        if (message) {
+            this.inputParser.parseInput(message);
+            this.messages = [...this.messages, { text: message, sender: 'Mathilde', date: new Date(), class: 'me' }];
             this.messageForm.reset();
             this.scrollToBottom();
         }
