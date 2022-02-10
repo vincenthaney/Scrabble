@@ -39,7 +39,7 @@ export class WordExtraction {
             newWord.push([navigator.square, tilesToPlace[i]]);
 
             // Add the words created in the opposite Orientation of the move
-            const oppositeOrientation = orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Vertical;
+            const oppositeOrientation = orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
             if (navigator.verifyNeighbors(oppositeOrientation, SHOULD_HAVE_A_TILE)) {
                 wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, tilesToPlace[i]));
             }
