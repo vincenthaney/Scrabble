@@ -5,7 +5,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { OnlinePlayer } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
@@ -20,7 +20,7 @@ describe('JoinWaitingPage', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
     let gameDispatcherSpy: SpyObj<GameDispatcherService>;
-    const testOpponent = new OnlinePlayer('', 'testName', []);
+    const testOpponent = new Player('', 'testName', []);
 
     beforeEach(() => {
         gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleLeaveLobby']);
