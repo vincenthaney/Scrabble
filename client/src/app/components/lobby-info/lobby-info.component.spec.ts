@@ -85,6 +85,7 @@ describe('LobbyInfoComponent', () => {
         const TIME = 90;
         const EXPECTED_TIME = new Timer(1, 30);
         component.lobby.maxRoundTime = TIME;
+        component.ngOnInit();
         expect(component.roundTime).toEqual(EXPECTED_TIME);
     });
 

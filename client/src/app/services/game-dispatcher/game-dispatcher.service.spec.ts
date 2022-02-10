@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -36,7 +37,7 @@ describe('GameDispatcherService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule],
+            imports: [HttpClientModule, RouterTestingModule],
             providers: [GameDispatcherController, SocketService],
         });
         service = TestBed.inject(GameDispatcherService);
@@ -66,8 +67,8 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
     });
 
-    // eslint-disable-next-line max-len
-    it('handleLeaveLobby should call gameDispatcherController.handleLobbiesListRequest with the correct parameters and put gameId to undefined', () => {
+    it('handleLeaveLobby should call gameDispatcherController.handleLobbiesListRequest \
+    with the correct parameters and put gameId to undefined', () => {
         const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleLeaveLobby').and.callFake(() => {
             return;
         });

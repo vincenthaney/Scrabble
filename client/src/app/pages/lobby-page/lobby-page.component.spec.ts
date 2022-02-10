@@ -64,10 +64,17 @@ describe('LobbyPageComponent', () => {
     });
 
     beforeEach(() => {
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
+        spyOn(gameDispatcherServiceMock, 'handleLobbyListRequest').and.callFake(() => {
+            return [
+                { lobbyId: '1', playerName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
+                { lobbyId: '2', playerName: 'Name2', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: true },
+                { lobbyId: '3', playerName: 'Name3', gameType: GameType.LOG2990, dictionary: 'default', maxRoundTime: 90, canJoin: false },
+            ];
+        });
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
     });
 
     beforeEach(() => {
