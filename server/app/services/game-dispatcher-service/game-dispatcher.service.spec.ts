@@ -33,14 +33,6 @@ const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
     dictionary: 'francais',
 };
 
-const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
-    player1: new Player('1', 'player1'),
-    player2: new Player('2', 'player2'),
-    gameType: GameType.Classic,
-    maxRoundTime: 1,
-    dictionary: 'francais',
-};
-
 const DEFAULT_OPPONENT_ID = 'opponent_id';
 const DEFAULT_OPPONENT_NAME = 'opponent';
 const DEFAULT_OPPONENT_ID_2 = 'opponent_id_2';
