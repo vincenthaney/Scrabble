@@ -1,5 +1,6 @@
 import { ActionData } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
@@ -34,6 +35,18 @@ export class GamePlayController {
                 HttpException.sendError(e, res);
             }
         });
+
+        this.router.post('/games/:gameId/player/:playerId/message', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+            const message: Message = req.body;
+
+            try {
+                this.handleNewMessage(gameId, playerId, message);
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
     }
 
     private handlePlayAction(gameId: string, playerId: string, data: ActionData) {
@@ -42,5 +55,16 @@ export class GamePlayController {
 
         const updateData = this.gamePlayService.playAction(gameId, playerId, data);
         this.gameUpdate(gameId, updateData);
+    }
+
+    private handleNewMessage(gameId: string, playerId: string, message: Message) {
+        if (message.type === undefined) throw new HttpException('message type is required', StatusCodes.BAD_REQUEST);
+        if (message.date === undefined) throw new HttpException('send date is required', StatusCodes.BAD_REQUEST);
+        if (message.sender === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
+        if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
+
+        console.log('truc');
+        // const updateData = this.gamePlayService.playAction(gameId, playerId, data);
+        // this.gameUpdate(gameId, updateData);
     }
 }

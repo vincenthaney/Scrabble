@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -18,7 +19,14 @@ describe('CreateWaitingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
-            imports: [CommonModule, MatProgressSpinnerModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
+            imports: [
+                CommonModule,
+                MatProgressSpinnerModule,
+                MatDialogModule,
+                BrowserAnimationsModule,
+                HttpClientTestingModule,
+                RouterTestingModule.withRoutes([]),
+            ],
             providers: [GameDispatcherService, SocketService],
         }).compileComponents();
         fixture = TestBed.createComponent(CreateWaitingPageComponent);

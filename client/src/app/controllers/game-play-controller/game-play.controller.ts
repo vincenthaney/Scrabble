@@ -31,12 +31,13 @@ export class GamePlayController {
     }
 
     sendAction(gameId: string, playerId: string, action: ActionData) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/${action.type}`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/action`;
         this.http.post(endpoint, action.payload).subscribe();
     }
 
-    sendMessage(gameId: string, message: Message) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/message`;
+    sendMessage(gameId: string, playerId: string, message: Message) {
+        console.log(message);
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/message`;
         this.http.post(endpoint, message).subscribe();
     }
 }

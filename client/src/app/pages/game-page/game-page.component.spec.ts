@@ -1,4 +1,5 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -48,6 +49,7 @@ describe('GamePageComponent', () => {
                 ReactiveFormsModule,
                 FormsModule,
                 ScrollingModule,
+                HttpClientTestingModule,
             ],
             providers: [
                 {

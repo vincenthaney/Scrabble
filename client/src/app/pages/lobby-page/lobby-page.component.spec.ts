@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -72,10 +73,11 @@ describe('LobbyPageComponent', () => {
                     BrowserAnimationsModule,
                     FormsModule,
                     ReactiveFormsModule,
+                    HttpClientTestingModule,
                     RouterTestingModule.withRoutes([
-                        { path: 'waiting', component: TestComponent },
+                        { path: 'create-waiting', component: TestComponent },
                         { path: 'lobby', component: LobbyPageComponent },
-                        { path: 'waiting-room', component: TestComponent },
+                        { path: 'join-waiting', component: TestComponent },
                         { path: 'home', component: TestComponent },
                     ]),
                 ],

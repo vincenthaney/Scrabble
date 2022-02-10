@@ -1,3 +1,5 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -8,7 +10,12 @@ import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispat
 import { SocketService } from '@app/services/socket/socket.service';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
 
-describe('WaitingPageComponent', () => {
+@Component({
+    template: '',
+})
+export class TestComponent {}
+
+describe('JoinWaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
     const testOpponent = new OnlinePlayer('testName');
@@ -16,7 +23,13 @@ describe('WaitingPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
-            imports: [MatProgressBarModule, MatDialogModule, BrowserAnimationsModule, RouterTestingModule.withRoutes([])],
+            imports: [
+                MatProgressBarModule,
+                MatDialogModule,
+                BrowserAnimationsModule,
+                RouterTestingModule.withRoutes([{ path: 'lobby', component: TestComponent }]),
+                HttpClientTestingModule,
+            ],
             providers: [GameDispatcherService, SocketService],
         }).compileComponents();
     });

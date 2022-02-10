@@ -40,6 +40,7 @@ export default class InputParserService {
     }
 
     parseInput(input: string): void {
+        const playerId = this.getLocalPlayerId();
         if (input[0] === '!') {
             // it is an action
             const inputWords: string[] = input.substring(1).split(' ');
@@ -54,9 +55,9 @@ export default class InputParserService {
             }
         } else {
             // à changer
-            this.controller.sendMessage(this.gameService.getGameId(), {
-                content: 'Début de la partie',
-                sender: 'System',
+            this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                content: input,
+                sender: this.getLocalPlayer().name,
                 date: new Date(),
                 type: MessageTypes.System,
             });
@@ -64,13 +65,7 @@ export default class InputParserService {
     }
 
     private parseCommand(actionName: string, inputWords: string[]) {
-        let playerId: string;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof IPlayer) {
-            playerId = localPlayer.id;
-        } else {
-            throw new Error('Current player could not be found');
-        }
+        const playerId = this.getLocalPlayerId();
         const gameId: string = this.gameService.getGameId();
         let actionData: ActionData;
 
@@ -126,7 +121,6 @@ export default class InputParserService {
     }
 
     private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string): ActionPlacePayload {
-        // try catch invalid command
         const lastLocationChar = location.charAt(location.length - 1);
         let positionString = '';
         if (lastLocationChar.toLowerCase() === lastLocationChar.toUpperCase()) {
@@ -145,7 +139,6 @@ export default class InputParserService {
     }
 
     private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string): ActionPlacePayload {
-        // try catch invalid command
         const placeActionPayload: ActionPlacePayload = {
             tiles: this.parsePlaceLettersToTiles(lettersToPlace),
             startPosition: this.getStartPosition(location.substring(0, location.length - 1)),
@@ -164,14 +157,7 @@ export default class InputParserService {
     }
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
-        let player: IPlayer;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof IPlayer) {
-            player = localPlayer;
-        } else {
-            throw new Error('Current player could not be found');
-        }
-
+        const player: IPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
@@ -200,19 +186,11 @@ export default class InputParserService {
         // user must type exchange letters in lower case
         if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
 
-        let player: IPlayer;
-        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof IPlayer) {
-            player = localPlayer;
-        } else {
-            throw new Error('Current player could not be found');
-        }
-
+        const player: IPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
-
         const tilesToExchange: Tile[] = [];
 
         for (const letter of lettersToExchange) {
@@ -258,5 +236,30 @@ export default class InputParserService {
         if (orientationString === 'h') return Orientation.Horizontal;
         else if (orientationString === 'v') return Orientation.Vertical;
         else throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+    }
+
+    private getLocalPlayerId(): string {
+        let playerId: string;
+        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        console.log(localPlayer);
+        if (localPlayer instanceof IPlayer) {
+            playerId = localPlayer.id;
+        } else {
+            throw new Error('Current player could not be found');
+        }
+
+        return playerId;
+    }
+
+    private getLocalPlayer(): IPlayer {
+        let player: IPlayer;
+        const localPlayer: IPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof IPlayer) {
+            player = localPlayer;
+        } else {
+            throw new Error('Current player could not be found');
+        }
+
+        return player;
     }
 }
