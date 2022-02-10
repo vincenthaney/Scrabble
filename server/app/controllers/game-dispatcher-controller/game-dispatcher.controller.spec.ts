@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-expressions */
@@ -5,6 +6,8 @@
 import { Application } from '@app/app';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
+import Room from '@app/classes/game/room';
+import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import * as chai from 'chai';
@@ -327,6 +330,74 @@ describe('GameDispatcherController', () => {
 
         it('should throw if playerName is undefined', () => {
             expect(() => controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME, undefined as unknown as string)).to.throw();
+        });
+    });
+
+    describe('handleLobbiesRequest', () => {
+        let getAvailableRoomsSpy: unknown;
+        let addToRoomSpy: unknown;
+        let emitToSocketSpy: unknown;
+        const lobbyStub = createStubInstance(Room);
+        lobbyStub.getId.returns('1');
+
+        beforeEach(() => {
+            chai.spy.on(controller['gameDispatcherService'], 'getLobbiesRoom', () => lobbyStub);
+            getAvailableRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'getAvailableWaitingRooms', () => lobbyStub);
+            addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            controller['handleLobbiesRequest'](DEFAULT_PLAYER_ID);
+        });
+
+        it('should call gameDispatcherService.getAvailableWaitingRooms', () => {
+            expect(getAvailableRoomsSpy).to.have.been.called();
+        });
+
+        it('should call socketService.addToRoom', () => {
+            expect(addToRoomSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, lobbyStub.getId());
+        });
+
+        it('should call socketService.emitToSocket', () => {
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleCancelGame', () => {
+        let getGameFromIdSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let cancelGameSpy: unknown;
+        let handleLobbiesUpdateSpy: unknown;
+        const waitingRoomStub = createStubInstance(WaitingRoom);
+
+        beforeEach(() => {
+            getGameFromIdSpy = chai.spy.on(controller['gameDispatcherService'], 'getGameFromId', () => waitingRoomStub);
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            cancelGameSpy = chai.spy.on(controller['gameDispatcherService'], 'cancelGame', () => {});
+            handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+            waitingRoomStub.joinedPlayer = undefined;
+        });
+
+        it('should call gameDispatcherService.getGameFromId', () => {
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(getGameFromIdSpy).to.have.been.called.with(DEFAULT_GAME_ID);
+        });
+
+        it('should call socketService.emitToSocket', () => {
+            waitingRoomStub.joinedPlayer = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            chai.spy.on(waitingRoomStub, 'getConfig', () => {
+                return { player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME) };
+            });
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+
+        it('should call gameDispatcherService.cancelGame', () => {
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(cancelGameSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+
+        it('should call handleLobbiesUpdate', () => {
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(handleLobbiesUpdateSpy).to.have.been.called();
         });
     });
 });
