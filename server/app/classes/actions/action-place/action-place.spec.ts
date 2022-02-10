@@ -205,10 +205,11 @@ describe('ActionPlace', () => {
             for (const changes of EXTRACT_RETURN) {
                 for (const [square, tile] of changes) {
                     const { row, column } = square.position;
-                    expect(result[row][column]).to.exist;
-                    expect(result[row][column]!.tile).to.exist;
-                    expect(result[row][column]!.tile!.letter).to.equal(tile.letter);
-                    expect(result[row][column]!.tile!.value).to.equal(tile.value);
+                    const resultSquare: Square = result.filter((s: Square) => s.position.row === row && s.position.column === column)[0];
+                    expect(resultSquare).to.exist;
+                    expect(resultSquare!.tile).to.exist;
+                    expect(resultSquare!.tile!.letter).to.equal(tile.letter);
+                    expect(resultSquare!.tile!.value).to.equal(tile.value);
                 }
             }
         });
@@ -219,7 +220,7 @@ describe('ActionPlace', () => {
             copiedExtractReturn.forEach((row) => row.forEach(([square, tile]) => (square.tile = tile)));
             const result = action.updateBoard(EXTRACT_RETURN, game);
 
-            expect(result.every((square) => square === undefined)).to.be.true;
+            expect(result).to.be.empty;
         });
     });
 
