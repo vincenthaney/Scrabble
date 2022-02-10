@@ -65,6 +65,7 @@ export class GamePlayController {
         if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
 
         console.log('truc');
+        this.socketService.emitToRoom(gameId, 'newMessage', message);
         // const updateData = this.gamePlayService.playAction(gameId, playerId, data);
         // this.gameUpdate(gameId, updateData);
     }
