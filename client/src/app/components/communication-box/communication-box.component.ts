@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
@@ -15,7 +15,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent {
+export class CommunicationBoxComponent implements OnInit {
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: VisualMessage[] = [
@@ -60,11 +60,12 @@ export class CommunicationBoxComponent {
         { letter: 'O', amount: 2 },
     ];
 
-    constructor(private inputParser: InputParserService, private gameService: GameService) {
+    constructor(private inputParser: InputParserService, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {}
+
+    ngOnInit() {
         this.gameService.newMessageValue.subscribe((newMessage) => {
-            this.messages.push(this.createVisualMessage(newMessage));
+            this.onReceiveNewMessage(newMessage);
         });
-        console.log(this.messages);
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
@@ -82,11 +83,15 @@ export class CommunicationBoxComponent {
     onSendMessage() {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0) {
-            console.log('nouveau message! : ' + message);
             this.inputParser.parseInput(message);
             this.messageForm.reset();
-            this.scrollToBottom();
         }
+    }
+
+    onReceiveNewMessage(newMessage: Message) {
+        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
+        this.changeDetectorRef.detectChanges();
+        this.scrollToBottom();
     }
 
     private scrollToBottom(): void {

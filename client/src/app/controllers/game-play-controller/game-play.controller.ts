@@ -24,7 +24,9 @@ export class GamePlayController {
 
     configureSocket(): void {
         this.socketService.on('gameUpdate', (newData: GameUpdateData) => this.gameUpdateValue.next(newData));
-        this.socketService.on('newMessage', (newMessage: Message) => this.newMessageValue.next(newMessage));
+        this.socketService.on('newMessage', (newMessage: Message[]) => {
+            this.newMessageValue.next(newMessage[0]);
+        });
     }
 
     sendAction(gameId: string, playerId: string, action: ActionData) {
