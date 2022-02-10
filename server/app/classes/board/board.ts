@@ -31,10 +31,21 @@ export default class Board {
     }
 
     verifyNeighbors(position: Position, orientation: Orientation, shouldBeFilled: boolean = true) {
-        return (
-            this.verifySquare(position.copy().backward(orientation), shouldBeFilled) ||
-            this.verifySquare(position.copy().forward(orientation), shouldBeFilled)
-        );
+        let backward: boolean;
+        let forward: boolean;
+
+        try {
+            backward = this.verifySquare(position.copy().backward(orientation), shouldBeFilled);
+        } catch (e) {
+            backward = !shouldBeFilled;
+        }
+        try {
+            forward = this.verifySquare(position.copy().forward(orientation), shouldBeFilled);
+        } catch (e) {
+            forward = !shouldBeFilled;
+        }
+
+        return backward || forward;
     }
 
     placeTile(tile: Tile, position: Position): boolean {
