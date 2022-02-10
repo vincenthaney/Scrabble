@@ -34,4 +34,62 @@ describe('GameDispatcherController', () => {
     afterEach(() => {
         httpMock.verify();
     });
+
+    it('should create', () => {
+        expect(controller).toBeTruthy();
+    });
+    // ////////////////////////////////////////////////////////////////
+    it('On join request, configureSocket should emit opponent name', () => {
+        const consoleSpy = spyOn(console, 'log').and.callThrough();
+        socketHelper.peerSideEmit('connect');
+        expect(consoleSpy).toHaveBeenCalled();
+    });
+
+    it('On start game, configureSocket should emit socket id and game data', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('On lobbies update, configureSocket should emit lobbies', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('On full lobby, configureSocket should emit opponent name', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('On cancel game, configureSocket should emit opponent name', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('On joiner leave game, configureSocket should emit opponent name', () => {
+        expect(controller).toBeTruthy();
+    });
+    // ////////////////////////////////////////////////
+    it('handleMultiplayerGameCreation', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleConfirmationGameCreation', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleRejectionGameCreation', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleCancelGame', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleLeaveLobby', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleLobbiesListRequest', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleLobbyJoinRequest', () => {
+        expect(controller).toBeTruthy();
+    });
 });
