@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -6,12 +7,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from './create-waiting-page.component.const';
-import { CommonModule } from '@angular/common';
-import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 @Component({
     template: '',
 })

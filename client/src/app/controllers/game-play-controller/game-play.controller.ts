@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { SocketService } from '@app/services/socket/socket.service';
+import { GameUpdateData } from '@app/classes/communication/';
+import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 

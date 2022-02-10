@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { LobbyInfo } from '@app/classes/communication/lobby-info';
+import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART } from './lobby-page.component.const';
+import { DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART, DIALOG_TITLE } from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',

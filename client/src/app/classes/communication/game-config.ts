@@ -2,7 +2,7 @@ import { GameType } from '@app/classes/game-type';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { PlayerData } from './player-data';
+import { PlayerData } from './';
 
 export interface GameConfigData {
     playerName: string;

@@ -17,7 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 

@@ -1,3 +1,3 @@
-export interface PlayerName {
+export default interface PlayerName {
     name?: string;
 }
