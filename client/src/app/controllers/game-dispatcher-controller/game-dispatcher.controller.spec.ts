@@ -6,11 +6,20 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { PlayerName } from '@app/classes/communication/player-name';
 import { Socket } from 'socket.io-client';
-import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameConfigData } from '@app/classes/communication/game-config';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GameType } from '@app/classes/game-type';
+import { of } from 'rxjs';
 
-const DEFAULT_OPPONENT_NAME: PlayerName[] = [{ name: 'grogars' }];
-const DEFAULT_GAME_DATA: StartMultiplayerGameData[] = [];
+const DEFAULT_PLAYER_NAME = 'grogars';
+const DEFAULT_OPPONENT_NAME: PlayerName[] = [{ name: DEFAULT_PLAYER_NAME }];
+const DEFAULT_GAME_DATA: GameConfigData = {
+    playerName: DEFAULT_PLAYER_NAME,
+    playerId: 'tessId',
+    gameType: GameType.Classic,
+    maxRoundTime: 0,
+    dictionary: '',
+};
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
@@ -85,31 +94,40 @@ describe('GameDispatcherController', () => {
         expect(joinerLeaveSpy).toHaveBeenCalled();
     });
     // // ////////////////////////////////////////////////
-    // it('handleMultiplayerGameCreation', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleMultiplayerGameCreation POST', () => {
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
 
-    // it('handleConfirmationGameCreation', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleMultiplayerGameCreation EMIT', () => {
+        const createGameSpy = spyOn(controller.createGameEvent, 'emit').and.callThrough();
+        controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+        expect(createGameSpy).toHaveBeenCalled();
+    });
 
-    // it('handleRejectionGameCreation', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleConfirmationGameCreation', () => {
+        expect(controller).toBeTruthy();
+    });
 
-    // it('handleCancelGame', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleRejectionGameCreation', () => {
+        expect(controller).toBeTruthy();
+    });
 
-    // it('handleLeaveLobby', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleCancelGame', () => {
+        expect(controller).toBeTruthy();
+    });
 
-    // it('handleLobbiesListRequest', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleLeaveLobby', () => {
+        expect(controller).toBeTruthy();
+    });
 
-    // it('handleLobbyJoinRequest', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('handleLobbiesListRequest', () => {
+        expect(controller).toBeTruthy();
+    });
+
+    it('handleLobbyJoinRequest', () => {
+        expect(controller).toBeTruthy();
+    });
 });
