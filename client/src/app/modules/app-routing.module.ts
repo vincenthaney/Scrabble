@@ -6,11 +6,9 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { JoinWaitingPageComponent } from '@app/pages/join-waiting-page/join-waiting-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'main', component: MainPageComponent },
     { path: 'home', component: HomePageComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'game-creation', component: GameCreationPageComponent },

@@ -16,7 +16,6 @@ import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-cr
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { JoinWaitingPageComponent } from '@app/pages/join-waiting-page/join-waiting-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CommunicationBoxComponent } from './components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
 import { IconComponent } from './components/icon/icon.component';
@@ -36,7 +35,6 @@ import { SocketService } from './services/socket/socket.service';
     declarations: [
         AppComponent,
         GamePageComponent,
-        MainPageComponent,
         HomePageComponent,
         SquareComponent,
         TileComponent,
