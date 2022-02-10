@@ -2,6 +2,6 @@ import { ActiveGameService } from '@app/services/active-game-service/active-game
 import { Service } from 'typedi';
 
 @Service()
-export class GamePlayService {
+export class MessageService {
     constructor(private readonly activeGameService: ActiveGameService) {}
 }

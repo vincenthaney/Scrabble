@@ -60,9 +60,8 @@ export class GamePlayController {
     }
 
     private handleNewMessage(gameId: string, playerId: string, message: Message) {
-        if (message.type === undefined) throw new HttpException('message type is required', StatusCodes.BAD_REQUEST);
         if (message.date === undefined) throw new HttpException('send date is required', StatusCodes.BAD_REQUEST);
-        if (message.sender === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
+        if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
         if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
 
         console.log('truc');
