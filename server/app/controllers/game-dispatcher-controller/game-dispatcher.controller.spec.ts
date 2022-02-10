@@ -400,4 +400,59 @@ describe('GameDispatcherController', () => {
             expect(handleLobbiesUpdateSpy).to.have.been.called();
         });
     });
+
+    describe('handleLobbyLeave', () => {
+        let leaveLobbyRequestSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let handleLobbiesUpdateSpy: unknown;
+
+        beforeEach(() => {
+            leaveLobbyRequestSpy = chai.spy.on(controller['gameDispatcherService'], 'leaveLobbyRequest', () => {
+                return [DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME];
+            });
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+            controller['handleLobbyLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+
+        it('should call gameDispatcherService.leaveLobbyRequest', () => {
+            expect(leaveLobbyRequestSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+
+        it('should call socketService.emitToSocket', () => {
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+
+        it('should call handleLobbiesUpdate', () => {
+            expect(handleLobbiesUpdateSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleLobbiesUpdate', () => {
+        let getAvailableRoomsSpy: unknown;
+        let emitToRoomSpy: unknown;
+        let getLobbiesRoomSpy: unknown;
+        const lobbyRoomStub = createStubInstance(Room);
+
+        beforeEach(() => {
+            getAvailableRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'getAvailableWaitingRooms', () => {});
+            emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            getLobbiesRoomSpy = chai.spy.on(controller['gameDispatcherService'], 'getLobbiesRoom', () => {
+                return lobbyRoomStub;
+            });
+            controller['handleLobbiesUpdate']();
+        });
+
+        it('should call gameDispatcherService.getAvailableWaitingRooms', () => {
+            expect(getAvailableRoomsSpy).to.have.been.called();
+        });
+
+        it('should call socketService.emitToRoom', () => {
+            expect(emitToRoomSpy).to.have.been.called();
+        });
+
+        it('should call gameDispatcherService.getLobbiesRoom', () => {
+            expect(getLobbiesRoomSpy).to.have.been.called();
+        });
+    });
 });
