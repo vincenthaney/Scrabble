@@ -1,4 +1,5 @@
 export const NO_GAME_FOUND_WITH_ID = 'No game could be found with id';
+export const NO_OPPONENT_IN_WAITING_GAME = 'No opponent is waiting for the game';
 export const INVALID_PLAYER_ID_FOR_GAME = 'Invalid player id for game';
 export const MINIMUM_WORD_LENGTH = 2;
 export const INVALID_WORD = ' Word not in dictionary';
