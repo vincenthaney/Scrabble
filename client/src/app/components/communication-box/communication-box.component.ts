@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
@@ -13,8 +13,8 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent {
-    @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
+export class CommunicationBoxComponent implements OnInit {
+    @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: Message[] = [
         { content: 'message 1', senderId: 'Mathilde', date: new Date() },
@@ -57,13 +57,21 @@ export class CommunicationBoxComponent {
         { letter: 'O', amount: 2 },
     ];
 
-    constructor(private inputParser: InputParserService, private gameService: GameService) {
-        this.gameService.newMessageValue.subscribe((newMessage) => this.messages.push(newMessage));
+    constructor(private inputParser: InputParserService, private gameService: GameService) {}
+
+    ngOnInit() {
+        this.subscribeToNewMessage();
     }
 
-    sendMessage() {
+    subscribeToNewMessage() {
+        this.gameService.newMessageValue.subscribe((newMessage) => {
+            this.messages.push(newMessage);
+        });
+    }
+
+    onSendMessage() {
         const message = this.messageForm.get('content')?.value;
-        if (message) {
+        if (message.length > 0) {
             this.inputParser.parseInput(message);
             // this.messages = [...this.messages, { content: message, senderId: 'Mathilde', date: new Date() }];
             this.messageForm.reset();
@@ -71,7 +79,7 @@ export class CommunicationBoxComponent {
         }
     }
 
-    private scrollToBottom() {
+    private scrollToBottom(): void {
         setTimeout(() => {
             this.scrollViewport.scrollTo({
                 bottom: 0,

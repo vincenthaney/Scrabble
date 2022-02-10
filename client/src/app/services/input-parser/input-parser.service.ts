@@ -31,7 +31,11 @@ export default class InputParserService {
         date: new Date(),
     });
 
-    constructor(private controller: GamePlayController, private gameService: GameService) {}
+    constructor(private controller: GamePlayController, private gameService: GameService) {
+        this.gameService.newMessageValue.subscribe((newMessage) => {
+            this.emitNewMessage(newMessage);
+        });
+    }
 
     emitNewMessage(newMessage: Message): void {
         this.newMessageValue.next(newMessage);
