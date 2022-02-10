@@ -2,10 +2,10 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
+import { VisualMessage, VisualMessageClasses } from '@app/classes/communication/visual-message';
 import { LetterValue } from '@app/classes/tile';
 import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
-import { VisualMessage, VisualMessageClasses } from './visual-message';
 
 type LetterMapItem = { letter: LetterValue; amount: number };
 
@@ -19,21 +19,20 @@ export class CommunicationBoxComponent implements OnInit {
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: VisualMessage[] = [
-        { content: 'message 1', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
-        { content: 'message 2', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
-        { content: 'message 3', senderId: 'Raph', date: new Date(), class: VisualMessageClasses.Opponent },
-        { content: 'message 4', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
-        { content: 'Raph a joué ARBRE', senderId: '', date: new Date(), class: VisualMessageClasses.System },
-        { content: 'message 5', senderId: 'Raph', date: new Date(), class: VisualMessageClasses.Opponent },
-        { content: 'message 5', senderId: 'Raph', date: new Date(), class: VisualMessageClasses.Opponent },
-        { content: 'message 6', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
+        { content: 'message 1', senderId: 'Mathilde', class: VisualMessageClasses.Me },
+        { content: 'message 2', senderId: 'Mathilde', class: VisualMessageClasses.Me },
+        { content: 'message 3', senderId: 'Raph', class: VisualMessageClasses.Opponent },
+        { content: 'message 4', senderId: 'Mathilde', class: VisualMessageClasses.Me },
+        { content: 'Raph a joué ARBRE', senderId: '', class: VisualMessageClasses.System },
+        { content: 'message 5', senderId: 'Raph', class: VisualMessageClasses.Opponent },
+        { content: 'message 5', senderId: 'Raph', class: VisualMessageClasses.Opponent },
+        { content: 'message 6', senderId: 'Mathilde', class: VisualMessageClasses.Me },
         {
             // eslint-disable-next-line max-len
             content:
                 "je suis un message très long qui va sûrement prendre plus qu'une ligne \
                 à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
             senderId: 'Raph',
-            date: new Date(),
             class: VisualMessageClasses.Opponent,
         },
     ];
@@ -92,6 +91,7 @@ export class CommunicationBoxComponent implements OnInit {
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
+        console.log(this.messages);
     }
 
     private scrollToBottom(): void {

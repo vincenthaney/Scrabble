@@ -4,6 +4,7 @@ import { StartMultiplayerGameData } from '@app/classes/communication/game-config
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { PlayerData } from '@app/classes/communication/player-data';
+import { VisualMessageClasses } from '@app/classes/communication/visual-message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
@@ -26,8 +27,7 @@ export default class GameService {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
     newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
-        senderId: 'System',
-        date: new Date(),
+        senderId: VisualMessageClasses.System,
     });
     updateTileRackEvent: EventEmitter<void>;
     private gameId: string;

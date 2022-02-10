@@ -28,7 +28,6 @@ export default class InputParserService {
     private newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
         senderId: 'System',
-        date: new Date(),
     });
 
     constructor(private controller: GamePlayController, private gameService: GameService) {
@@ -55,7 +54,6 @@ export default class InputParserService {
                     this.newMessageValue.next({
                         content: `La commande ${input} est invalide`,
                         senderId: 'System',
-                        date: new Date(),
                     });
                 }
             }
@@ -63,7 +61,6 @@ export default class InputParserService {
         this.controller.sendMessage(this.gameService.getGameId(), playerId, {
             content: input,
             senderId: this.getLocalPlayer().id,
-            date: new Date(),
         });
     }
 
