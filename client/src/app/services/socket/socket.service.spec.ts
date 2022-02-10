@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { SocketService } from './socket.service';
+import { SocketService } from '@app/services/';
 
 describe('SocketService', () => {
     let service: SocketService;

@@ -5,7 +5,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -19,18 +19,19 @@ export class GameCreationPageComponent implements OnInit {
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
-    dictOptions: string[];
+    dictionaryOptions: string[];
 
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Solo, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         timer: new FormControl('', Validators.required),
-        dict: new FormControl('', Validators.required),
+        dictionary: new FormControl('', Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
+    // TODO: Check if this causes memory leak
     ngOnInit() {
         this.gameParameters.get('gameMode')?.valueChanges.subscribe((value) => {
             if (value === this.gameModes.Solo) {

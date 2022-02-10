@@ -1,16 +1,17 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { OnlinePlayer } from '@app/classes/player';
+import { NavigationStart, Router } from '@angular/router';
+import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { Subscription } from 'rxjs';
+import { GameDispatcherService } from '@app/services/';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CANCEL_CONTENT,
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
     DIALOG_REJECT_TITLE,
-    GameRequestState,
 } from './join-waiting-page.component.const';
 @Component({
     selector: 'app-waiting-page',
@@ -19,33 +20,52 @@ import {
 })
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     canceledGameSubscription: Subscription;
+    joinerRejectedSubscription: Subscription;
+    routingSubscription: Subscription;
+    componentDestroyed$: Subject<boolean> = new Subject();
+    currentLobby: LobbyInfo;
+    currentName: string;
 
-    state: GameRequestState = GameRequestState.Waiting;
-    waitingGameName: string = 'testName';
-    waitingGameType: string = 'testType';
-    waitingGameTimer: string = 'timer';
-    waitingGameDictionary: string = 'dictionary';
-    waitingPlayerName: string = 'waitingPlayer';
-
-    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
-
-    ngOnInit() {
-        if (!this.gameDispatcherService.canceledGameEvent) return;
-        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent.subscribe((hostName: string) => this.hostHasCanceled(hostName));
+    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
+    // TODO: Fix if player goes to /game or change attribute when game starts
+    @HostListener('window:beforeunload')
+    onBeforeUnload() {
+        this.gameDispatcherService.handleLeaveLobby();
     }
 
+    ngOnInit() {
+        if (this.gameDispatcherService.currentLobby) this.currentLobby = this.gameDispatcherService.currentLobby;
+        this.currentName = this.gameDispatcherService.currentName;
+
+        this.routingSubscription = this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
+            if (event instanceof NavigationStart) {
+                this.routerChangeMethod(event.url);
+            }
+        });
+
+        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((hostName: string) => this.hostHasCanceled(hostName));
+        this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((hostName: string) => this.playerRejected(hostName));
+    }
     ngOnDestroy() {
-        if (this.canceledGameSubscription) {
-            this.canceledGameSubscription.unsubscribe();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
+    }
+
+    routerChangeMethod(url: string) {
+        if (url !== '/game') {
+            this.gameDispatcherService.handleLeaveLobby();
         }
     }
 
-    playerHasBeenRejected(opponent: OnlinePlayer) {
+    playerRejected(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_REJECT_TITLE,
-                content: opponent.name + DIALOG_REJECT_CONTENT,
+                content: hostName + DIALOG_REJECT_CONTENT,
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,
@@ -60,7 +80,6 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     hostHasCanceled(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                // Data type is DefaultDialogParameters
                 title: DIALOG_CANCEL_TITLE,
                 content: hostName + DIALOG_CANCEL_CONTENT,
                 buttons: [
@@ -72,9 +91,5 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
                 ],
             },
         });
-    }
-
-    joiningPlayerLeave() {
-        this.gameDispatcherService.handleLeaveLobby();
     }
 }

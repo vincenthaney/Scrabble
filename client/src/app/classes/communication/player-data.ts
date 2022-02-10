@@ -1,6 +1,6 @@
 import { Tile } from '@app/classes/tile';
 
-export interface PlayerData {
+export default interface PlayerData {
     name?: string;
     id?: string;
     score?: number;

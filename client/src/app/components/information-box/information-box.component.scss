@@ -28,16 +28,27 @@ $primary-color: #1b5e20;
 
         .player-info {
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
 
             .player-name {
                 line-height: 1.2em;
                 font-size: 1.5em;
                 font-weight: 500;
-                margin-bottom: 3px;
                 width: 100%;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+
+                span.name {
+                    display: inline-flex;
+                    align-items: center;
+                    app-icon {
+                        font-size: 0.75em;
+                        color: $primary-color;
+                    }
+                }
 
                 .score {
                     vertical-align: middle;
@@ -48,11 +59,15 @@ $primary-color: #1b5e20;
                     padding: 0.2em 0.5em;
                     border-radius: 20px;
                 }
+
+                &:not(:last-child) {
+                    margin-bottom: 3px;
+                }
             }
 
             &.active-player {
                 border-color: burlywood;
-                border-radius: 3px;
+                border-radius: 4px;
                 border-width: 2px;
                 border-style: solid;
             }
@@ -65,9 +80,14 @@ $primary-color: #1b5e20;
                     padding-left: 5px;
                 }
 
-                .player-name .score {
-                    margin-left: $name-score-spacing;
-                    font-weight: 400;
+                .player-name {
+                    .score {
+                        margin-left: $name-score-spacing;
+                        font-weight: 400;
+                    }
+                    span.name app-icon {
+                        margin-right: 0.35em;
+                    }
                 }
             }
             &#player-info-2 {
@@ -78,9 +98,14 @@ $primary-color: #1b5e20;
                     padding-right: 5px;
                 }
 
-                .player-name .score {
-                    margin-right: $name-score-spacing;
-                    font-weight: 400;
+                .player-name {
+                    .score {
+                        margin-right: $name-score-spacing;
+                        font-weight: 400;
+                    }
+                    span.name app-icon {
+                        margin-left: 0.35em;
+                    }
                 }
             }
         }
