@@ -23,13 +23,6 @@ export class GameDispatcherService {
         this.lobbiesRoom = new Room();
     }
 
-    /**
-     * Add the configuration into the waiting game list
-     *
-     * @param {GameConfigData} configData Necessary information to create the game
-     * @return {string} Waiting game id
-     */
-
     createMultiplayerGame(configData: GameConfigData): string {
         const config: GameConfig = {
             player1: new Player(configData.playerId, configData.playerName),

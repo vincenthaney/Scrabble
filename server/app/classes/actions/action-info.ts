@@ -1,10 +1,12 @@
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Action from './action';
 
-export default abstract class ActionInfo implements Action {
+export default abstract class ActionInfo extends Action {
+    execute(): void | GameUpdateData {
+        /* Nothing to execute in ActionInfo */
+    }
+
     willEndTurn(): boolean {
         return false;
     }
-
-    abstract execute(): void;
-    abstract getMessage(): string;
 }

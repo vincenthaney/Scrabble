@@ -54,7 +54,9 @@ export class GamePlayController {
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         const updateData = this.gamePlayService.playAction(gameId, playerId, data);
-        this.gameUpdate(gameId, updateData);
+        if (updateData) {
+            this.gameUpdate(gameId, updateData);
+        }
     }
 
     private handleNewMessage(gameId: string, playerId: string, message: Message) {
