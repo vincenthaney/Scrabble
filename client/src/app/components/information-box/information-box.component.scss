@@ -50,14 +50,17 @@ $primary-color: #1b5e20;
                 }
             }
 
+            &.active-player {
+                border-color: burlywood;
+                border-radius: 3px;
+                border-width: 2px;
+                border-style: solid;
+            }
+
             &#player-info-1 {
                 text-align: left;
 
                 &.active-player {
-                    border-color: burlywood;
-                    border-radius: 3px;
-                    border-width: 2px;
-                    border-style: solid;
                     margin-right: 50%;
                     padding-left: 5px;
                 }
@@ -71,10 +74,6 @@ $primary-color: #1b5e20;
                 text-align: right;
 
                 &.active-player {
-                    border-color: burlywood;
-                    border-radius: 3px;
-                    border-width: 2px;
-                    border-style: solid;
                     margin-left: 50%;
                     padding-right: 5px;
                 }
