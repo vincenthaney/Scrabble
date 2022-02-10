@@ -65,6 +65,12 @@ export class BoardComponent implements OnInit, OnDestroy {
     private updateBoard(squaresToUpdate: Square[]): boolean {
         if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
 
+        /* 
+            We flatten the 2D grid so it becomes a 1D array of SquareView
+            Then, we check for each SquareView if it's square property's position 
+            matches one of the square in "squareToUpate".
+            If so, we change the board's square to be the updated square
+        */
         ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {
             squaresToUpdate
                 .filter(
