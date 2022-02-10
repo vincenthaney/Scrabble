@@ -2,6 +2,7 @@ import { Orientation, Position } from './';
 import { Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
 import { POSITION_OUT_OF_BOARD } from './board-errors';
+import BoardNavigator from './board-navigator';
 import { Vec2 } from '@app/classes/vec2';
 
 export const SHOULD_HAVE_A_TILE = true;
@@ -23,6 +24,10 @@ export default class Board {
 
     getSquare(position: Position) {
         return this.grid[position.row][position.column];
+    }
+
+    navigate(position: Position) {
+        return new BoardNavigator(this, position);
     }
 
     verifyNeighbors(position: Position, orientation: Orientation, shouldBeFilled: boolean = true) {
