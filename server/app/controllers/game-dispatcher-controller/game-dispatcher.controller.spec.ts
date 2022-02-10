@@ -138,6 +138,44 @@ describe('GameDispatcherController', () => {
                 return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
             });
         });
+
+        describe('/games/:gameId/player/:playerId/cancel', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleCancelGame', () => {});
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw', async () => {
+                chai.spy.on(controller, 'handleCancelGame', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
+        describe('/games/:gameId/player/:playerId/leave', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleLobbyLeave', () => {});
+
+                return supertest(expressApp).delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`).expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw', async () => {
+                chai.spy.on(controller, 'handleLobbyLeave', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`)
+                    .expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
     });
 
     describe('handleCreateGame', () => {
