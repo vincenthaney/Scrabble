@@ -2,7 +2,7 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { SHOULD_HAVE_A_TILE } from '@app/classes/board/board';
 import { Tile } from '@app/classes/tile';
-import { EXTRACTION_SQUARE_ALREADY_FILLED, EXTRACTION_TILES_INVALID } from './word-extraction-errors';
+import { EXTRACTION_SQUARE_ALREADY_FILLED } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
 import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
 
@@ -44,9 +44,10 @@ export class WordExtraction {
                 wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, tilesToPlace[i]));
             }
 
-            navigator.forward(orientation);
             i++;
+            navigator.forward(orientation);
         }
+        navigator.backward(orientation);
 
         const beforeWord = this.extractWordInDirection(orientation, Direction.Backward, startPosition);
         const afterWord = this.extractWordInDirection(orientation, Direction.Forward, navigator.position);
