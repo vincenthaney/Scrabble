@@ -27,9 +27,9 @@
                     </div>
                 </div>
             </cdk-virtual-scroll-viewport>
-            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
+            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
                 <input matInput type="text" formControlName="content" placeholder="Message..."/>
-                <button id="send-button" stype="submit" mat-flat-button color="primary"><app-icon icon="arrow-right"></app-icon></button>
+                <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="!messageForm.get('content')?.valid"><app-icon icon="arrow-right"></app-icon></button>
             </form>
         </mat-card>
     </section>
