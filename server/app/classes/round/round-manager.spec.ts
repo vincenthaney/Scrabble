@@ -144,6 +144,14 @@ describe('RoundManager', () => {
         });
     });
 
+    describe('getMaxRoundTimer', () => {
+        it('should return passCounter', () => {
+            const expected = 8008135;
+            roundManager['maxRoundTime'] = expected;
+            expect(roundManager.getMaxRoundTime()).to.equal(expected);
+        });
+    });
+
     describe('saveCompletedRound', () => {
         it('should increment counter when action played is ActionPass', () => {
             const initial = 0;
