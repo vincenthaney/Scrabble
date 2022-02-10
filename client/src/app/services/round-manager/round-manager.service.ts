@@ -45,6 +45,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     getActivePlayer(): AbstractPlayer {
+        console.log(this.currentRound);
         if (!this.currentRound) {
             throw new Error(ROUND_ERROR.NO_CURRENT_ROUND);
         }

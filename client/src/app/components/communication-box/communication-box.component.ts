@@ -5,6 +5,7 @@ import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
 import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
+import { VisualMessage, VisualMessageClasses } from './visual-message';
 
 type LetterMapItem = { letter: LetterValue; amount: number };
 
@@ -17,15 +18,15 @@ type LetterMapItem = { letter: LetterValue; amount: number };
 export class CommunicationBoxComponent {
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
-    messages: Message[] = [
-        { content: 'message 1', senderId: 'Mathilde', date: new Date() },
-        { content: 'message 2', senderId: 'Mathilde', date: new Date() },
-        { content: 'message 3', senderId: 'Raph', date: new Date() },
-        { content: 'message 4', senderId: 'Mathilde', date: new Date() },
-        { content: 'Raph a joué ARBRE', senderId: '', date: new Date() },
-        { content: 'message 5', senderId: 'Raph', date: new Date() },
-        { content: 'message 5', senderId: 'Raph', date: new Date() },
-        { content: 'message 6', senderId: 'Mathilde', date: new Date() },
+    messages: VisualMessage[] = [
+        { content: 'message 1', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
+        { content: 'message 2', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
+        { content: 'message 3', senderId: 'Raph', date: new Date(), class: VisualMessageClasses.Opponent },
+        { content: 'message 4', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
+        { content: 'Raph a joué ARBRE', senderId: '', date: new Date(), class: VisualMessageClasses.System },
+        { content: 'message 5', senderId: 'Raph', date: new Date(), class: VisualMessageClasses.Opponent },
+        { content: 'message 5', senderId: 'Raph', date: new Date(), class: VisualMessageClasses.Opponent },
+        { content: 'message 6', senderId: 'Mathilde', date: new Date(), class: VisualMessageClasses.Me },
         {
             // eslint-disable-next-line max-len
             content:
@@ -33,6 +34,7 @@ export class CommunicationBoxComponent {
                 à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
             senderId: 'Raph',
             date: new Date(),
+            class: VisualMessageClasses.Opponent,
         },
     ];
     messageForm = new FormGroup({
@@ -60,13 +62,27 @@ export class CommunicationBoxComponent {
 
     constructor(private inputParser: InputParserService, private gameService: GameService) {
         this.gameService.newMessageValue.subscribe((newMessage) => {
-            this.messages.push(newMessage);
+            this.messages.push(this.createVisualMessage(newMessage));
         });
+        console.log(this.messages);
+    }
+
+    createVisualMessage(newMessage: Message): VisualMessage {
+        let messageClass: VisualMessageClasses;
+        if (newMessage.senderId === this.gameService.getLocalPlayer()?.id) {
+            messageClass = VisualMessageClasses.Me;
+        } else if (newMessage.senderId === VisualMessageClasses.System) {
+            messageClass = VisualMessageClasses.System;
+        } else {
+            messageClass = VisualMessageClasses.Opponent;
+        }
+        return { ...newMessage, class: messageClass };
     }
 
     onSendMessage() {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0) {
+            console.log('nouveau message! : ' + message);
             this.inputParser.parseInput(message);
             this.messageForm.reset();
             this.scrollToBottom();
