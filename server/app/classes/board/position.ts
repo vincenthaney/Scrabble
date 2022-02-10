@@ -21,8 +21,8 @@ export default class Position {
     }
 
     move(orientation: Orientation, direction: Direction, distance: number = 1): Position {
-        if (orientation === Orientation.Horizontal) this.row += direction * distance;
-        else this.column += direction * distance;
+        if (orientation === Orientation.Horizontal) this.column += direction * distance;
+        else this.row += direction * distance;
         return this;
     }
 
