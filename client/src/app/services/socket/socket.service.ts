@@ -39,9 +39,8 @@ export class SocketService {
     }
 
     getId(): string {
-        if (!this.socket) {
-            return SOCKET_ERROR.SOCKET_ID_UNDEFINED;
-        }
+        if (!this.socket) throw new Error(SOCKET_ERROR.SOCKET_ID_UNDEFINED);
+
         return this.socket.id;
     }
 
