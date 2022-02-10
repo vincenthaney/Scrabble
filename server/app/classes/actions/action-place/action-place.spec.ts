@@ -219,7 +219,7 @@ describe('ActionPlace', () => {
             copiedExtractReturn.forEach((row) => row.forEach(([square, tile]) => (square.tile = tile)));
             const result = action.updateBoard(EXTRACT_RETURN, game);
 
-            expect(result.every((row) => row.every((square) => square === undefined))).to.be.true;
+            expect(result.every((square) => square === undefined)).to.be.true;
         });
     });
 
