@@ -74,7 +74,8 @@ describe('LobbyInfoComponent', () => {
         const TIME = 90;
         const EXPECTED_TIME = new Timer(1, 30);
         component.lobby.maxRoundTime = TIME;
-        expect(component.convertTime()).toEqual(EXPECTED_TIME);
+        component.ngOnInit();
+        expect(component.roundTime).toEqual(EXPECTED_TIME);
     });
 
     it('the tooltip should be disabled if you can join the lobby', async () => {

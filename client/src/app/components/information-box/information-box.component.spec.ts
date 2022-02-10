@@ -112,9 +112,24 @@ describe('InformationBoxComponent', () => {
         const startTimerSpy = spyOn(component, 'startTimer').and.callFake(() => {
             return;
         });
+        spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            return false;
+        });
         const newTimer = new Timer(1, 0);
         mockRoundManager.timerSource.next(newTimer);
         expect(startTimerSpy).toHaveBeenCalledWith(newTimer);
+    });
+
+    it('ngOnInit timer subscription should call updateActivePlayerBorder', () => {
+        spyOn(component, 'startTimer').and.callFake(() => {
+            return;
+        });
+        const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            return false;
+        });
+        const newTimer = new Timer(1, 0);
+        mockRoundManager.timerSource.next(newTimer);
+        expect(updateBorderSpy).toHaveBeenCalled();
     });
 
     it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
@@ -189,15 +204,6 @@ describe('InformationBoxComponent', () => {
         expect(component.timerSubscription).toBeTruthy();
     });
 
-    it('StartTimer should call updateActivePlayerBorder', () => {
-        const updateSpy = spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
-            return false;
-        });
-        const newTimer: Timer = new Timer(1, 0);
-        component.startTimer(newTimer);
-        expect(updateSpy).toHaveBeenCalled();
-    });
-
     it('EndRound should set Timer to 0:00', () => {
         component.endRound();
         expect(component.timer).toEqual(new Timer(0, 0));
@@ -228,8 +234,8 @@ describe('InformationBoxComponent', () => {
         const result = component.updateActivePlayerBorder();
 
         expect(result).toBeTrue();
-        expect(component['player1Div'].nativeElement.classList).toContain(component['activePlayerBorderClass']);
-        expect(component['player2Div'].nativeElement.classList).not.toContain(component['activePlayerBorderClass']);
+        expect(component.isPlayer1Active).toBeTrue();
+        expect(component.isPlayer2Active).toBeFalse();
     });
 
     it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
@@ -242,8 +248,8 @@ describe('InformationBoxComponent', () => {
         const result = component.updateActivePlayerBorder();
 
         expect(result).toBeTrue();
-        expect(component['player2Div'].nativeElement.classList).toContain(component['activePlayerBorderClass']);
-        expect(component['player1Div'].nativeElement.classList).not.toContain(component['activePlayerBorderClass']);
+        expect(component.isPlayer2Active).toBeTrue();
+        expect(component.isPlayer1Active).toBeFalse();
     });
 
     it('CreateTimer should return timer from rxjs', () => {
