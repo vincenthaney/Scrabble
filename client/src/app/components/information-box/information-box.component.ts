@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
@@ -23,7 +24,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     endRoundSubscription: Subscription;
     private ngUnsubscribe: Subject<void>;
 
-    constructor(private roundManager: RoundManagerService, public gameService: GameService) {}
+    constructor(private roundManager: RoundManagerService, private gameService: GameService) {}
 
     ngOnInit() {
         this.ngUnsubscribe = new Subject();
@@ -77,6 +78,16 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         } catch (_) {
             return false;
         }
+    }
+
+    getPlayer1(): AbstractPlayer {
+        if (!this.gameService.player1) return new Player('', 'Player1', []);
+        return this.gameService.player1;
+    }
+
+    getPlayer2(): AbstractPlayer {
+        if (!this.gameService.player2) return new Player('', 'Player2', []);
+        return this.gameService.player2;
     }
 
     private createTimer(length: number): Observable<number> {
