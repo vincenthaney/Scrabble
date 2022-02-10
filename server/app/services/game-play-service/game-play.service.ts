@@ -2,22 +2,25 @@
 import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { Service } from 'typedi';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import Player from '@app/classes/player/player';
 import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import { Tile } from '@app/classes/tile';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { Service } from 'typedi';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
 
 @Service()
 export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService) {}
 
-    playAction(gameId: string, playerId: string, actionData: ActionData): GameUpdateData | void {
+    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, string, string] {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
         if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
 
+        const localPlayerFeedback = this.getLocalPlayerFeedback(player, actionData);
+        const opponentFeedback = this.getOpponentFeedback(player, actionData);
         const action: Action = this.getAction(player, game, actionData);
         let updatedData: void | GameUpdateData = action.execute();
 
@@ -32,7 +35,7 @@ export class GamePlayService {
             else updatedData = { isGameOver: true };
         }
 
-        return updatedData;
+        return [updatedData, localPlayerFeedback, opponentFeedback];
     }
 
     getAction(player: Player, game: Game, actionData: ActionData): Action {
@@ -47,6 +50,44 @@ export class GamePlayService {
             }
             case 'pass': {
                 return new ActionPass(player, game);
+            }
+            default: {
+                throw Error(INVALID_COMMAND);
+            }
+        }
+    }
+
+    getLocalPlayerFeedback(player: Player, actionData: ActionData): string {
+        switch (actionData.type) {
+            case 'place': {
+                const payload = this.getActionPlacePayload(actionData);
+                return `Vous avez placé ${payload.tiles.map((tile: Tile) => tile.letter).join(', ')}`;
+            }
+            case 'exchange': {
+                const payload = this.getActionExchangePayload(actionData);
+                return `Vous avez échangé ${payload.tiles.map((tile: Tile) => tile.letter).join(', ')}`;
+            }
+            case 'pass': {
+                return 'Vous avez passé votre tour';
+            }
+            default: {
+                throw Error(INVALID_COMMAND);
+            }
+        }
+    }
+
+    getOpponentFeedback(player: Player, actionData: ActionData): string {
+        switch (actionData.type) {
+            case 'place': {
+                const payload = this.getActionPlacePayload(actionData);
+                return `${player.name} a placé ${payload.tiles.map((tile: Tile) => tile.letter).join(', ')}`;
+            }
+            case 'exchange': {
+                const payload = this.getActionExchangePayload(actionData);
+                return `${player.name} a échangé ${payload.tiles.length} tuiles`;
+            }
+            case 'pass': {
+                return `${player.name} a passé son tour`;
             }
             default: {
                 throw Error(INVALID_COMMAND);
