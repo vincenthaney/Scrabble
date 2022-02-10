@@ -1,7 +1,7 @@
 import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { OnlinePlayer } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subject, Subscription } from 'rxjs';
@@ -25,7 +25,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     joinRequestSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
-    host: OnlinePlayer;
+    host: AbstractPlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
