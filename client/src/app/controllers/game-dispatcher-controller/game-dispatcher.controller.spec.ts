@@ -1,20 +1,22 @@
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { TestBed } from '@angular/core/testing';
-import SpyObj = jasmine.SpyObj;
 import { GameService } from '@app/services';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SocketService } from '@app/services/socket/socket.service';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { PlayerName } from '@app/classes/communication/player-name';
 import { Socket } from 'socket.io-client';
+import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { RouterTestingModule } from '@angular/router/testing';
 
 const DEFAULT_OPPONENT_NAME: PlayerName[] = [{ name: 'grogars' }];
+const DEFAULT_GAME_DATA: StartMultiplayerGameData[] = [];
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
     let httpMock: HttpTestingController;
     let socketServiceMock: SocketService;
-    let gameServiceMock: SpyObj<GameService>;
+    let gameServiceMock: GameService;
     let socketHelper: SocketTestHelper;
 
     beforeEach(async () => {
@@ -23,15 +25,12 @@ describe('GameDispatcherController', () => {
         // eslint-disable-next-line dot-notation
         socketServiceMock['socket'] = socketHelper as unknown as Socket;
         await TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
-            providers: [
-                GameDispatcherController,
-                { provide: SocketService, useValue: socketServiceMock },
-                { provide: GameService, useValue: gameServiceMock },
-            ],
+            imports: [HttpClientTestingModule, RouterTestingModule],
+            providers: [GameDispatcherController, { provide: SocketService, useValue: socketServiceMock }, GameService],
         });
         controller = TestBed.inject(GameDispatcherController);
         httpMock = TestBed.inject(HttpTestingController);
+        gameServiceMock = TestBed.inject(GameService);
     });
 
     afterEach(() => {
@@ -48,25 +47,43 @@ describe('GameDispatcherController', () => {
         expect(joinRequestSpy).toHaveBeenCalled();
     });
 
-    // it('On start game, configureSocket should emit socket id and game data', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('On start game, configureSocket should emit socket id and game data', async () => {
+        const startGameRequestSpy = spyOn(gameServiceMock, 'initializeMultiplayerGame').and.callFake(async () => {
+            return;
+        });
+        socketHelper.peerSideEmit('startGame', DEFAULT_GAME_DATA);
+        expect(startGameRequestSpy).toHaveBeenCalled();
+    });
 
-    // it('On lobbies update, configureSocket should emit lobbies', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('On lobbies update, configureSocket should emit hostName', () => {
+        const lobbiesUpdateSpy = spyOn(controller.lobbiesUpdateEvent, 'emit').and.callThrough();
+        socketHelper.peerSideEmit('lobbiesUpdate', DEFAULT_OPPONENT_NAME);
+        expect(lobbiesUpdateSpy).toHaveBeenCalled();
+    });
 
-    // it('On full lobby, configureSocket should emit opponent name', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('On rejected, configureSocket should emit lobbies', () => {
+        const rejectedSpy = spyOn(controller.joinerRejectedEvent, 'emit').and.callThrough();
+        socketHelper.peerSideEmit('rejected', DEFAULT_OPPONENT_NAME);
+        expect(rejectedSpy).toHaveBeenCalled();
+    });
 
-    // it('On cancel game, configureSocket should emit opponent name', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('On full lobby, configureSocket should emit opponent name', () => {
+        const lobbyFullSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callThrough();
+        socketHelper.peerSideEmit('lobbyFull', DEFAULT_OPPONENT_NAME);
+        expect(lobbyFullSpy).toHaveBeenCalled();
+    });
 
-    // it('On joiner leave game, configureSocket should emit opponent name', () => {
-    //     expect(controller).toBeTruthy();
-    // });
+    it('On cancel game, configureSocket should emit opponent name', () => {
+        const cancelGameSpy = spyOn(controller.canceledGameEvent, 'emit').and.callThrough();
+        socketHelper.peerSideEmit('canceledGame', DEFAULT_OPPONENT_NAME);
+        expect(cancelGameSpy).toHaveBeenCalled();
+    });
+
+    it('On joiner leave game, configureSocket should emit opponent name', () => {
+        const joinerLeaveSpy = spyOn(controller.joinerLeaveGameEvent, 'emit').and.callThrough();
+        socketHelper.peerSideEmit('joinerLeaveGame', DEFAULT_OPPONENT_NAME);
+        expect(joinerLeaveSpy).toHaveBeenCalled();
+    });
     // // ////////////////////////////////////////////////
     // it('handleMultiplayerGameCreation', () => {
     //     expect(controller).toBeTruthy();
