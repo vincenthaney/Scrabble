@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -15,6 +16,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
+import { SYSTEM_MESSAGE_ID } from './game.const';
 
 const expect = chai.expect;
 
@@ -244,6 +246,72 @@ describe('Game', () => {
 
             expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
             expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+        });
+    });
+    /////////////////////////
+    // TODO: ADD TESTS ACCORDING TO MATHILDE INSSTRUCTIONS
+    // describe('endGameMessage', () => {
+    //     let game: Game;
+    //     let player1Stub: SinonStubbedInstance<Player>;
+    //     let player2Stub: SinonStubbedInstance<Player>;
+    //     const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
+    //     const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
+
+    //     beforeEach(() => {
+    //         game = new Game();
+    //         roundManagerStub = createStubInstance(RoundManager);
+    //         player1Stub = createStubInstance(Player);
+    //         player2Stub = createStubInstance(Player);
+    //         game.player1 = player1Stub as unknown as Player;
+    //         game.player2 = player2Stub as unknown as Player;
+    //         player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
+    //         player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
+    //     });
+
+    //     it('should return the message ', () => {
+    //         game.endGameMessage();
+    //     });
+    // });
+
+    describe('congratulateWinner', () => {
+        let game: Game;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        const PLAYER_1_NAME = 'VINCENT';
+        const PLAYER_2_NAME = 'MATHILDE';
+        const HIGH_SCORE = 100;
+        const LOW_SCORE = 1;
+
+        beforeEach(() => {
+            game = new Game();
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+            player1Stub.name = PLAYER_1_NAME;
+            player2Stub.name = PLAYER_2_NAME;
+        });
+
+        it('should congratulate player 1 if he has a higher score ', () => {
+            player1Stub.score = HIGH_SCORE;
+            player2Stub.score = LOW_SCORE;
+            const expectedMessage = { content: `Félicatations à ${PLAYER_1_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+        });
+        it('should congratulate player 2 if he has a higher score ', () => {
+            player1Stub.score = LOW_SCORE;
+            player2Stub.score = HIGH_SCORE;
+            const expectedMessage = { content: `Félicatations à ${PLAYER_2_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+        });
+        it('should congratulate player 1 if he has a higher score ', () => {
+            player1Stub.score = HIGH_SCORE;
+            player2Stub.score = HIGH_SCORE;
+            const expectedMessage = {
+                content: `Félicatations à ${PLAYER_1_NAME} et ${PLAYER_2_NAME} pour votre victoire!`,
+                senderId: SYSTEM_MESSAGE_ID,
+            };
+            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
     });
 

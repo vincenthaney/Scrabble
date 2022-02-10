@@ -94,9 +94,14 @@ export default class Game {
 
     // TODO: RETURN LES MESSAGES ET EMIT A ???
     endGameMessage() {
-        const message1 = { content: 'Fin de partie - lettres restantes', senderId: SYSTEM_MESSAGE_ID };
-        const message2 = { content: this.player1.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
-        const message3 = { content: this.player2.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
+        // const message1 = { content: 'Fin de partie - lettres restantes', senderId: SYSTEM_MESSAGE_ID };
+        // const message2 = { content: this.player1.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
+        // const message3 = { content: this.player2.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
+        // const message4 = this.congratulateWinner();
+    }
+
+    // TODO: USE MATHILDE MESSAGE
+    congratulateWinner(): { content: string; senderId: string } {
         let winner: string;
         if (this.player1.score > this.player2.score) {
             winner = this.player1.name;
@@ -105,7 +110,7 @@ export default class Game {
         } else {
             winner = this.player1.name + ' et ' + this.player2.name;
         }
-        const message4 = { content: `Félicatations à ${winner} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+        return { content: `Félicatations à ${winner} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
     }
 
     isPlayer1(arg: string | Player): boolean {
