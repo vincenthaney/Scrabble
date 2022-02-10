@@ -14,18 +14,16 @@ export class TileRackComponent implements OnDestroy {
     startGameSubscription: Subscription;
 
     constructor(public gameService: GameService) {
-        if (this.gameService.startGameEvent) {
-            this.startGameSubscription = this.gameService.startGameEvent.subscribe(() => this.initializeTileRack());
-        }
+        if (!this.gameService.updateTileRackEvent) return;
+        this.startGameSubscription = this.gameService.updateTileRackEvent.subscribe(() => this.updateTileRack());
     }
 
     ngOnDestroy() {
-        if (this.startGameSubscription) {
-            this.startGameSubscription.unsubscribe();
-        }
+        if (!this.startGameSubscription) return;
+        this.startGameSubscription.unsubscribe();
     }
 
-    private initializeTileRack() {
+    private updateTileRack() {
         this.tiles = [];
         const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
         if (!localPlayer || !localPlayer.getTiles()) {

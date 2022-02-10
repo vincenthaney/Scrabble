@@ -21,7 +21,7 @@ export default class GameService {
     player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
-    startGameEvent: EventEmitter<void>;
+    updateTileRackEvent: EventEmitter<void>;
 
     private gameId: string;
     private localPlayerId: string;
@@ -33,7 +33,7 @@ export default class GameService {
         private gameplayController: GamePlayController,
     ) {
         this.roundManager.gameId = this.gameId;
-        this.startGameEvent = new EventEmitter();
+        this.updateTileRackEvent = new EventEmitter();
         this.gameplayController.gameUpdateData.subscribe((data: GameUpdateData) => this.handleGameUpdate(data));
     }
 
@@ -51,7 +51,7 @@ export default class GameService {
         this.roundManager.currentRound = startGameData.round;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
-        this.startGameEvent.emit();
+        this.updateTileRackEvent.emit();
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
@@ -62,9 +62,11 @@ export default class GameService {
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.player1) {
             this.player1.updatePlayerData(gameUpdateData.player1);
+            this.updateTileRackEvent.emit();
         }
         if (gameUpdateData.player2) {
             this.player2.updatePlayerData(gameUpdateData.player2);
+            this.updateTileRackEvent.emit();
         }
         if (gameUpdateData.board) {
             this.boardService.updateBoard(gameUpdateData.board);
