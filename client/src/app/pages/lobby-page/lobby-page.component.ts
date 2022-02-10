@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services/';
 import { Subscription } from 'rxjs';
 import { DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART_1, DIALOG_CONTENT_PART_2, DIALOG_TITLE } from './lobby-page.component.const';
 

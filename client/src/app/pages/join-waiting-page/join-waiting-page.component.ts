@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services/';
 import { Subscription } from 'rxjs';
 import {
     DIALOG_BUTTON_CONTENT,

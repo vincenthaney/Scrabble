@@ -5,7 +5,7 @@ import { StartMultiplayerGameData } from '@app/classes/communication/game-config
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { BoardService } from '@app/services/';
+import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import * as GAME_ERRORS from './game.service.error';
 

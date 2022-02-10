@@ -14,8 +14,7 @@ import { GameType } from '@app/classes/game-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
-import { SocketService } from '@app/services/socket/socket.service';
+import { GameDispatcherService, SocketService } from '@app/services/';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
 

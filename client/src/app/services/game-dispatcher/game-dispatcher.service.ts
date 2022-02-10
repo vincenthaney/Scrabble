@@ -10,7 +10,7 @@ import { UNDEFINED_GAME_ID } from './game-dispatcher-errors';
 @Injectable({
     providedIn: 'root',
 })
-export class GameDispatcherService {
+export default class GameDispatcherService {
     gameId: string | undefined;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
