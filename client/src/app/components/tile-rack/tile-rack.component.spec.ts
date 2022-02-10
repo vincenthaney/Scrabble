@@ -22,7 +22,7 @@ import { GameService } from '@app/services';
 import { TileRackComponent } from './tile-rack.component';
 
 class MockGameService {
-    startGameEvent: EventEmitter<void> = new EventEmitter();
+    updateTileRackEvent: EventEmitter<void> = new EventEmitter();
     getLocalPlayer(): AbstractPlayer | undefined {
         return new Player('id', 'name', []);
     }
@@ -71,20 +71,20 @@ describe('TileRackComponent', () => {
     });
 
     it('should call initializeTileRack when startGameEvent is received', () => {
-        const spy = spyOn<any>(component, 'initializeTileRack');
-        mockGameService.startGameEvent.emit();
+        const spy = spyOn<any>(component, 'updateTileRack');
+        mockGameService.updateTileRackEvent.emit();
         expect(spy).toHaveBeenCalled();
     });
 
     it('ngOnDestroy should unsubscribe from startGameEvent', () => {
-        const spy = spyOn<any>(component.startGameSubscription, 'unsubscribe');
+        const spy = spyOn<any>(component.updateTileRackSubscription, 'unsubscribe');
         component.ngOnDestroy();
         expect(spy).toHaveBeenCalled();
     });
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
         spyOn(mockGameService, 'getLocalPlayer').and.returnValue(undefined);
-        component['initializeTileRack']();
+        component['updateTileRack']();
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
 
@@ -94,7 +94,7 @@ describe('TileRackComponent', () => {
         spyOn(mockGameService, 'getLocalPlayer').and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
 
-        component['initializeTileRack']();
+        component['updateTileRack']();
 
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
@@ -106,7 +106,7 @@ describe('TileRackComponent', () => {
         spyOn(mockGameService, 'getLocalPlayer').and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue(tiles);
 
-        component['initializeTileRack']();
+        component['updateTileRack']();
 
         expect(component.tiles[0]).toBeTruthy();
     });

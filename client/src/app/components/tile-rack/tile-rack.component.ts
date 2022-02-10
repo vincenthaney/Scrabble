@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { GameService } from '@app/services';
@@ -9,18 +9,21 @@ import { Subscription } from 'rxjs';
     templateUrl: './tile-rack.component.html',
     styleUrls: ['./tile-rack.component.scss'],
 })
-export class TileRackComponent implements OnDestroy {
+export class TileRackComponent implements OnInit, OnDestroy {
     tiles: Tile[];
-    startGameSubscription: Subscription;
+    updateTileRackSubscription: Subscription;
 
-    constructor(public gameService: GameService) {
+    constructor(public gameService: GameService) {}
+
+    ngOnInit() {
+        this.updateTileRack();
         if (!this.gameService.updateTileRackEvent) return;
-        this.startGameSubscription = this.gameService.updateTileRackEvent.subscribe(() => this.updateTileRack());
+        this.updateTileRackSubscription = this.gameService.updateTileRackEvent.subscribe(() => this.updateTileRack());
     }
 
     ngOnDestroy() {
-        if (!this.startGameSubscription) return;
-        this.startGameSubscription.unsubscribe();
+        if (!this.updateTileRackSubscription) return;
+        this.updateTileRackSubscription.unsubscribe();
     }
 
     private updateTileRack() {
