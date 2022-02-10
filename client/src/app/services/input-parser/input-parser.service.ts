@@ -59,13 +59,12 @@ export default class InputParserService {
                     });
                 }
             }
-        } else {
-            this.controller.sendMessage(this.gameService.getGameId(), playerId, {
-                content: input,
-                senderId: this.getLocalPlayer().id,
-                date: new Date(),
-            });
         }
+        this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+            content: input,
+            senderId: this.getLocalPlayer().id,
+            date: new Date(),
+        });
     }
 
     private parseCommand(actionName: string, inputWords: string[]) {

@@ -57,3 +57,5 @@ export const MAX_ROW_NUMBER = 14;
 
 export const MAX_LOCATION_COMMAND_LENGTH = 3;
 export const MIN_LOCATION_COMMAND_LENGTH = 2;
+
+export const MAX_INPUT_LENGTH = 512;

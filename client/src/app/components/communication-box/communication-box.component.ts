@@ -1,8 +1,9 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
+import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 
 type LetterMapItem = { letter: LetterValue; amount: number };
@@ -35,7 +36,7 @@ export class CommunicationBoxComponent {
         },
     ];
     messageForm = new FormGroup({
-        content: new FormControl(''),
+        content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
     // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
