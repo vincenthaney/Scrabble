@@ -1,41 +1,38 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { GameService } from '@app/services';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-tile-rack',
     templateUrl: './tile-rack.component.html',
     styleUrls: ['./tile-rack.component.scss'],
 })
-export class TileRackComponent implements OnInit {
+export class TileRackComponent implements OnInit, OnDestroy {
     tiles: Tile[];
+    updateTileRackSubscription: Subscription;
 
-    constructor(private gameService: GameService) {}
+    constructor(public gameService: GameService) {}
+
     ngOnInit() {
-        this.initializeTileRack();
+        this.updateTileRack();
+        if (!this.gameService.updateTileRackEvent) return;
+        this.updateTileRackSubscription = this.gameService.updateTileRackEvent.subscribe(() => this.updateTileRack());
     }
 
-    private initializeTileRack() {
+    ngOnDestroy() {
+        if (!this.updateTileRackSubscription) return;
+        this.updateTileRackSubscription.unsubscribe();
+    }
+
+    private updateTileRack() {
         this.tiles = [];
-        // eslint-disable-next-line dot-notation
-        this.gameService['localPlayer'] = {
-            name: 'test',
-            score: 0,
-            tiles: [
-                { letter: 'A', value: 1 },
-                { letter: 'B', value: 2 },
-                { letter: 'C', value: 3 },
-                { letter: 'D', value: 4 },
-                { letter: 'B', value: 2 },
-                { letter: 'C', value: 3 },
-                { letter: 'D', value: 4 },
-            ],
-        };
-        if (!this.gameService.getLocalPlayer() || !this.gameService.getLocalPlayer().tiles) {
+        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+        if (!localPlayer || !localPlayer.getTiles()) {
             return;
         }
-
-        this.gameService.getLocalPlayer().tiles.forEach((tile: Tile) => {
+        localPlayer.getTiles().forEach((tile: Tile) => {
             this.tiles.push({ letter: tile.letter, value: tile.value });
         });
     }

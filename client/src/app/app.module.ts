@@ -1,6 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -25,6 +25,7 @@ import { InformationBoxComponent } from './components/information-box/informatio
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
+import { SocketService } from './services/socket/socket.service';
 
 /**
  * Main module that is used in main.ts.
@@ -64,7 +65,15 @@ import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
         HttpClientModule,
         ScrollingModule,
     ],
-    providers: [],
+    providers: [
+        SocketService,
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (socketService: SocketService) => async () => socketService.initializeService(),
+            deps: [SocketService],
+            multi: true,
+        },
+    ],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

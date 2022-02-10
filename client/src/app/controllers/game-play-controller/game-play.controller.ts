@@ -1,34 +1,29 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActionType } from '@app/classes/actions';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
-import { GameUpdateData } from '@app/classes/game-update-data';
-import { SocketController } from '@app/controllers/socket-controller/socket-client.controller';
-import { GameService } from '@app/services';
-import { Observable } from 'rxjs';
-import * as io from 'socket.io';
+import { ActionData } from '@app/classes/actions/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { SocketService } from '@app/services/socket/socket.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GamePlayController extends SocketController {
-    private gameId: string;
-
-    constructor(private http: HttpClient, private gameService: GameService, socket: io.Socket) {
-        super(socket);
+export class GamePlayController {
+    gameUpdateData: Observable<GameUpdateData>;
+    private gameUpdateSource: BehaviorSubject<GameUpdateData>;
+    constructor(private http: HttpClient, public socketService: SocketService) {
+        this.gameUpdateSource = new BehaviorSubject<GameUpdateData>({});
+        this.gameUpdateData = this.gameUpdateSource.asObservable();
+        this.configureSocket();
     }
 
     configureSocket(): void {
-        // this.on('play-action', this.handlePlayAction);
+        this.socketService.on('gameUpdate', (data: GameUpdateData) => this.gameUpdateSource.next(data));
     }
 
-    handlePlaceAction(playerId: string, payload: ActionPlacePayload): Observable<GameUpdateData> {
-        const endpoint = `${environment.serverUrl}/games/${this.getGameId()}/player/${playerId}/${ActionType.PLACE}`;
-        return this.http.post<GameUpdateData>(endpoint, payload);
-    }
-
-    getGameId(): string {
-        return this.gameId;
+    handleAction(gameId: string, playerId: string, action: ActionData) {
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/action`;
+        this.http.post(endpoint, action).subscribe();
     }
 }

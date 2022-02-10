@@ -1,3 +1,3 @@
-import IPlayer from './iplayer';
+import AbstractPlayer from './abstract-player';
 
-export default abstract class Opponent extends IPlayer {}
+export default abstract class Opponent extends AbstractPlayer {}

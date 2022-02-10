@@ -1,18 +1,19 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Square } from '@app/classes/square';
-// import { Square } from '@app/classes/square';
-// import { Vec2 } from '@app/classes/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
 export default class BoardService {
-    private abstractBoard: Square[][];
-    // public setAbstractBoard(abstractBoard: Square[][]) {
-    //     throw new Error('Method not implemented.');
-    // }
+    initialBoard: Square[][];
+    boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
+    boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
 
-    sendBoardToComponent(): Square[][] {
-        return this.abstractBoard;
+    initializeBoard(board: Square[][]) {
+        this.initialBoard = [...board];
+    }
+
+    updateBoard(squareUpdated: Square[]) {
+        this.boardUpdateEvent.emit(squareUpdated);
     }
 }

@@ -2,18 +2,18 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { Application } from '@app/app';
+import { ActionData } from '@app/classes/communication/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { HttpException } from '@app/classes/http.exception';
+import { Server } from '@app/server';
 import * as chai from 'chai';
-import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { StatusCodes } from 'http-status-codes';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GamePlayController } from './game-play.controller';
-import { Application } from '@app/app';
-import { StatusCodes } from 'http-status-codes';
-import { ActionData } from '@app/classes/communication/action-data';
-import { Server } from '@app/server';
-import { HttpException } from '@app/classes/http.exception';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
 
 const expect = chai.expect;
 
@@ -53,7 +53,7 @@ describe('GamePlayController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -61,14 +61,14 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.BAD_REQUEST);
             });
 
             it('should call handlePlayAction', async () => {
                 const spy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
                 return supertest(expressApp)
-                    .post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`)
                     .then(() => {
                         expect(spy).to.have.been.called();
                     });

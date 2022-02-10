@@ -39,8 +39,8 @@ export class Application {
     }
 
     bindRoutes(): void {
-        this.app.use('/', this.gamePlayController.router);
-        this.app.use('/', this.gameDispatcherController.router);
+        this.app.use('/api', this.gamePlayController.router);
+        this.app.use('/api', this.gameDispatcherController.router);
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');

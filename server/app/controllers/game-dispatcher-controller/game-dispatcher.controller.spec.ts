@@ -2,18 +2,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import * as supertest from 'supertest';
 import { Application } from '@app/app';
-import { Container } from 'typedi';
-import { GameDispatcherController } from './game-dispatcher.controller';
-import { StatusCodes } from 'http-status-codes';
-import { GameType } from '@app/classes/game/game.type';
 import { GameConfigData } from '@app/classes/game/game-config';
-import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import { GameType } from '@app/classes/game/game.type';
 import { HttpException } from '@app/classes/http.exception';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { StatusCodes } from 'http-status-codes';
+import * as supertest from 'supertest';
+import { Container } from 'typedi';
+import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import { GameDispatcherController } from './game-dispatcher.controller';
 
 const expect = chai.expect;
 
@@ -60,7 +60,7 @@ describe('GameDispatcherController', () => {
             it('should return CREATED', async () => {
                 chai.spy.on(controller, 'handleCreateGame', () => {});
 
-                return supertest(expressApp).post(`/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.CREATED);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.CREATED);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -68,7 +68,7 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.BAD_REQUEST);
             });
         });
 
@@ -76,7 +76,7 @@ describe('GameDispatcherController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleJoinGame', () => {});
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -84,7 +84,7 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
             });
         });
 
@@ -92,7 +92,7 @@ describe('GameDispatcherController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleAcceptRequest', () => {});
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -100,7 +100,7 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.BAD_REQUEST);
             });
         });
 
@@ -108,7 +108,7 @@ describe('GameDispatcherController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleRejectRequest', () => {});
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -116,7 +116,7 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
             });
         });
     });
@@ -125,6 +125,7 @@ describe('GameDispatcherController', () => {
         it('should return game id', () => {
             chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             const id = controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
             expect(id).to.equal(DEFAULT_GAME_ID);
         });
@@ -132,6 +133,7 @@ describe('GameDispatcherController', () => {
         it('should call gameDispatcherService.createMultiplayerGame', () => {
             chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             const spy = chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
             expect(spy).to.have.been.called();
         });
@@ -139,6 +141,7 @@ describe('GameDispatcherController', () => {
         it('should call socketService.addToRoom', () => {
             const spy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
             expect(spy).to.have.been.called();
         });
@@ -246,11 +249,13 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call gameDispatcherService.rejectJoinRequest', () => {
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
             expect(rejectSpy).to.have.been.called();
         });
 
         it('should call gameDispatcherService.rejectJoinRequest', () => {
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
             expect(emitToSocketSpy).to.have.been.called();
         });

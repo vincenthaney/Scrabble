@@ -1,8 +1,9 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { OnlinePlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { Subscription } from 'rxjs';
 import {
     DIALOG_BUTTON_CONTENT,
     DIALOG_CONTENT,
@@ -16,26 +17,61 @@ import {
     templateUrl: './create-waiting-page.component.html',
     styleUrls: ['./create-waiting-page.component.scss'],
 })
-export class CreateWaitingPageComponent {
-    @Input() opponent: OnlinePlayer | undefined;
-    @ViewChild(MatProgressSpinner, { static: false }) spinnerOpponentFound: MatProgressSpinner;
+export class CreateWaitingPageComponent implements OnInit, OnDestroy {
+    @Input() opponent: string | undefined;
+
+    joinRequestSubscription: Subscription;
+    joinerLeaveGameSubscription: Subscription;
 
     host: OnlinePlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
-    constructor(public dialog: MatDialog) {}
+    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService) {}
 
-    setOpponent(opponent: OnlinePlayer) {
+    ngOnInit() {
+        if (!this.gameDispatcherService.joinRequestEvent) return;
+        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent.subscribe((opponentName: string) =>
+            this.setOpponent(opponentName),
+        );
+
+        if (!this.gameDispatcherService.joinerLeaveGameEvent) return;
+        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent.subscribe((leaverName: string) =>
+            this.rejectOpponent(leaverName),
+        );
+    }
+
+    ngOnDestroy() {
+        if (this.joinRequestSubscription) {
+            this.joinRequestSubscription.unsubscribe();
+        }
+        if (this.joinerLeaveGameSubscription) {
+            this.joinerLeaveGameSubscription.unsubscribe();
+        }
+    }
+
+    setOpponent(opponent: string) {
         this.opponent = opponent;
-        this.waitingRoomMessage = this.opponent.name + OPPONENT_FOUND_MESSAGE;
+        this.waitingRoomMessage = this.opponent + OPPONENT_FOUND_MESSAGE;
         this.isOpponentFound = true;
     }
 
-    disconnectOpponent(opponentName: string) {
-        this.warnHostOpponentLeft(opponentName);
+    disconnectOpponent() {
+        if (this.opponent) {
+            this.opponent = undefined;
+            this.waitingRoomMessage = HOST_WAITING_MESSAGE;
+            this.isOpponentFound = false;
+        }
+    }
+
+    rejectOpponent(leaverName: string) {
+        this.warnHostOpponentLeft(leaverName);
         this.opponent = undefined;
         this.waitingRoomMessage = HOST_WAITING_MESSAGE;
         this.isOpponentFound = false;
+    }
+
+    cancelGame() {
+        this.gameDispatcherService.handleCancelGame();
     }
 
     warnHostOpponentLeft(opponentName: string) {
@@ -52,5 +88,18 @@ export class CreateWaitingPageComponent {
                 ],
             },
         });
+    }
+
+    confirmOpponentToServer() {
+        if (this.opponent) {
+            this.gameDispatcherService.handleConfirmation(this.opponent);
+        }
+    }
+
+    confirmRejectionToServer() {
+        if (this.opponent) {
+            this.gameDispatcherService.handleRejection(this.opponent);
+        }
+        this.disconnectOpponent();
     }
 }

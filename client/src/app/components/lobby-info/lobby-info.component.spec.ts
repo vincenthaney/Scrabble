@@ -1,4 +1,5 @@
-import { CommonModule, Location } from '@angular/common';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,6 +11,7 @@ import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Timer } from '@app/classes/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
@@ -56,20 +58,24 @@ describe('LobbyInfoComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('joinLobby should redirect to waiting page', async () => {
-        component.joinLobby();
-        const location: Location = TestBed.inject(Location);
-        return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/waiting');
+    it('clicking the join button should emit the lobbyId', async () => {
+        const spyEmit = spyOn(component.joinLobbyId, 'emit').and.callFake(() => {
+            return '';
         });
+        component.lobby.canJoin = true;
+        fixture.detectChanges();
+        const joinButton = fixture.debugElement.nativeElement.querySelector('#join-button');
+        joinButton.click();
+        expect(spyEmit).toHaveBeenCalled();
     });
 
     it('convertTime should output the correct string using the timer in Lobby', () => {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const TIME = 90;
-        const EXPECTED_STRING = '1 minute et 30 secondes';
-        component.lobby.timer = TIME;
-        expect(component.convertTime()).toEqual(EXPECTED_STRING);
+        const EXPECTED_TIME = new Timer(1, 30);
+        component.lobby.maxRoundTime = TIME;
+        component.ngOnInit();
+        expect(component.roundTime).toEqual(EXPECTED_TIME);
     });
 
     it('the tooltip should be disabled if you can join the lobby', async () => {

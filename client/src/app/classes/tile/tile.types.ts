@@ -32,3 +32,8 @@ export interface TileData {
     amount: number;
     score: number;
 }
+
+export interface TileReserveData {
+    letter: LetterValue;
+    amount: number;
+}
