@@ -1,5 +1,6 @@
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
@@ -17,7 +18,7 @@ export class GameDispatcherService implements OnDestroy {
     currentName: string;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
-    lobbyFullEvent: EventEmitter<string> = new EventEmitter();
+    lobbyFullEvent: EventEmitter<void> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
@@ -28,9 +29,10 @@ export class GameDispatcherService implements OnDestroy {
     lobbyFullSubscription: Subscription;
     canceledGameSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
+    joinRequestValidSubscription: Subscription;
     joinerRejectedSubscription: Subscription;
 
-    constructor(private gameDispatcherController: GameDispatcherController) {
+    constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((gameId: string) => {
@@ -41,7 +43,10 @@ export class GameDispatcherService implements OnDestroy {
             .subscribe((opponentName: string) => this.handleJoinRequest(opponentName));
         this.lobbyFullSubscription = this.gameDispatcherController.lobbyFullEvent
             .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe((opponentName: string) => this.handleLobbyFull(opponentName));
+            .subscribe(() => this.handleLobbyFull());
+        this.joinRequestValidSubscription = this.gameDispatcherController.lobbyRequestValidEvent
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe(async () => this.router.navigateByUrl('join-waiting'));
         this.canceledGameSubscription = this.gameDispatcherController.canceledGameEvent
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((hostName: string) => this.handleCanceledGame(hostName));
@@ -119,8 +124,8 @@ export class GameDispatcherService implements OnDestroy {
         this.lobbiesUpdateEvent.emit(lobbies);
     }
 
-    handleLobbyFull(opponentName: string) {
-        this.lobbyFullEvent.emit(opponentName);
+    handleLobbyFull() {
+        this.lobbyFullEvent.emit();
         this.resetData();
     }
 

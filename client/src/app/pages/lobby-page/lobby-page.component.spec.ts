@@ -136,7 +136,7 @@ describe('LobbyPageComponent', () => {
 
     it('lobbyFullDialog should open the dialog component', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.lobbyFullDialog('leaver');
+        component.lobbyFullDialog();
         expect(spy).toHaveBeenCalled();
     });
 
@@ -162,12 +162,11 @@ describe('LobbyPageComponent', () => {
     });
 
     it('lobbyFullDialog should be called when lobbyFullEvent is emittted', () => {
-        const emitName = 'weirdName';
         const spyOpponentLeft = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.lobbyFullEvent.emit(emitName);
-        expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
+        gameDispatcherServiceMock.lobbyFullEvent.emit();
+        expect(spyOpponentLeft).toHaveBeenCalled();
     });
 
     it('ngOnDestroy should unsubscribe all subscriptions', () => {

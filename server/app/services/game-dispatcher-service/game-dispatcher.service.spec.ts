@@ -227,12 +227,13 @@ describe('GameDispatcherService', () => {
             expect(waitingRoom.joinedPlayer).to.be.undefined;
         });
 
-        it('should throw if joiningPlayer is undefined', () => {
-            waitingRoom.joinedPlayer = undefined;
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.throw(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        it('should throw if playerId is invalid', () => {
+            const invalidId = 'invalidId';
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
         });
 
-        it('should throw if playerId is invalid', () => {
+        it('should throw if player is undefined', () => {
+            waitingRoom.joinedPlayer = undefined;
             const invalidId = 'invalidId';
             expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
         });

@@ -1,13 +1,19 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+// import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DIALOG_TITLE, DIALOG_BUTTON_CONTENT, DIALOG_CONTENT_PART } from './lobby-page.component.const';
+import {
+    DIALOG_BUTTON_CONTENT,
+    DIALOG_CANCELED_CONTENT,
+    DIALOG_CANCELED_TITLE,
+    DIALOG_FULL_CONTENT,
+    DIALOG_FULL_TITLE,
+} from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',
@@ -19,14 +25,10 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
 
     lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
+    lobbyCanceledSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     lobbies: LobbyInfo[];
-    constructor(
-        private ref: ChangeDetectorRef,
-        public gameDispatcherService: GameDispatcherService,
-        public dialog: MatDialog,
-        private router: Router,
-    ) {}
+    constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
 
     ngOnInit() {
         this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
@@ -34,7 +36,10 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             .subscribe((lobbies) => this.updateLobbies(lobbies));
         this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent
             .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((opponentName) => this.lobbyFullDialog(opponentName));
+            .subscribe(() => this.lobbyFullDialog());
+        this.lobbyCanceledSubscription = this.gameDispatcherService.canceledGameEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe(() => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
     }
 
@@ -62,20 +67,32 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     joinLobby(lobbyId: string) {
-        this.router.navigateByUrl('join-waiting');
         this.gameDispatcherService.handleJoinLobby(
             this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
             this.nameField.formParameters.get('inputName')?.value,
         );
     }
 
-    lobbyFullDialog(opponentName: string) {
+    lobbyFullDialog() {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: DIALOG_TITLE,
-                // content: string. DIALOG_CONTENT_PART_1 + opponentName + DIALOG_CONTENT_PART_2,
-                content: DIALOG_CONTENT_PART.replace('%s', opponentName),
+                title: DIALOG_FULL_TITLE,
+                content: DIALOG_FULL_CONTENT,
+                buttons: [
+                    {
+                        content: DIALOG_BUTTON_CONTENT,
+                        closeDialog: true,
+                    },
+                ],
+            },
+        });
+    }
 
+    lobbyCanceledDialog() {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: DIALOG_CANCELED_TITLE,
+                content: DIALOG_CANCELED_CONTENT,
                 buttons: [
                     {
                         content: DIALOG_BUTTON_CONTENT,
