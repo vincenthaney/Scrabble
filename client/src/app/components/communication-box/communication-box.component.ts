@@ -38,7 +38,7 @@ export class CommunicationBoxComponent {
         content: new FormControl(''),
     });
 
-    objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
+    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
     lettersLeft: LetterMapItem[] = [
         { letter: 'A', amount: 4 },
@@ -65,7 +65,7 @@ export class CommunicationBoxComponent {
         const message = this.messageForm.get('content')?.value;
         if (message) {
             this.inputParser.parseInput(message);
-            this.messages = [...this.messages, { content: message, senderId: 'Mathilde', date: new Date() }];
+            // this.messages = [...this.messages, { content: message, senderId: 'Mathilde', date: new Date() }];
             this.messageForm.reset();
             this.scrollToBottom();
         }
