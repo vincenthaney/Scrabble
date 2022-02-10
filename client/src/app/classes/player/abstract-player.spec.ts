@@ -79,18 +79,6 @@ describe('AbstractPlayer', () => {
         expect(player['tiles'] === player.getTiles()).toBeFalsy();
     });
 
-    it('getTiles should return new instance of player tiles', () => {
-        const id = 'testId';
-        const name = 'testName';
-        const tiles: Tile[] = [
-            { letter: 'A', value: 10 },
-            { letter: 'B', value: 10 },
-        ];
-        const player = new Player(id, name, tiles);
-        // eslint-disable-next-line dot-notation
-        expect(player['tiles'] === player.getTiles()).toBeFalsy();
-    });
-
     playerDataTestCases.forEach((testCase: PlayerData) => {
         it('Update data should actualize player data', () => {
             const initId = 'testId1';
