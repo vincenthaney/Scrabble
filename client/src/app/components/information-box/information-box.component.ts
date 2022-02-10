@@ -36,7 +36,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         });
 
         if (!this.roundManager.endRoundEvent) return;
-        this.endRoundSubscription = this.roundManager.endRoundEvent.subscribe(() => this.endRound());
+        this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
     }
 
     ngAfterViewInit() {
