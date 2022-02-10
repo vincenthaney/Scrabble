@@ -74,7 +74,7 @@ describe('JoinWaitingPageComponent', () => {
         const spySubscribeCanceledGameEvent = spyOn(gameDispatcherServiceMock.canceledGameEvent, 'subscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeJoinerRejectedEvent = spyOn(gameDispatcherServiceMock.joinerRejectedEvent, 'subscribe').and.returnValue(of(true) as any);
-        // Create a new component to once spies have been applied
+        // Create a new component once spies have been applied
         fixture = TestBed.createComponent(JoinWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

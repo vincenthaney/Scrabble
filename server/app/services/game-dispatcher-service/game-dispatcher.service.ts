@@ -56,7 +56,6 @@ export class GameDispatcherService {
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
-        // TODO: Add emit
         if (waitingRoom.joinedPlayer !== undefined) {
             throw new HttpException(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
         }

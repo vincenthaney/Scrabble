@@ -76,7 +76,7 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    describe('joinMultiplayerGame', () => {
+    describe('requestJoinGame', () => {
         let id: string;
         let waitingRoom: WaitingRoom;
 
@@ -107,13 +107,17 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    describe('acceptMultiplayerGame', () => {
+    describe('acceptJoinRequest', () => {
         let id: string;
         let spy: unknown;
 
         beforeEach(() => {
             id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
             spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () => Promise.resolve());
+            spy = chai.spy.on(gameDispatcherService, 'createStartGameData', () => {
+                return;
+            });
+
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
@@ -193,6 +197,40 @@ describe('GameDispatcherService', () => {
         });
     });
 
+    describe('leaveLobbyRequest', () => {
+        let id: string;
+        let waitingRoom: WaitingRoom;
+
+        beforeEach(() => {
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
+            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+        });
+
+        it('should remove joinedPlayer from waitingRoom', () => {
+            expect(waitingRoom.joinedPlayer).to.not.be.undefined;
+            gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID);
+            expect(waitingRoom.joinedPlayer).to.be.undefined;
+        });
+
+        it('should throw if joiningPlayer is undefined', () => {
+            waitingRoom.joinedPlayer = undefined;
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.throw(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        });
+
+        it('should throw if playerId is invalid', () => {
+            const invalidId = 'invalidId';
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        });
+
+        it('should return the [hostPlayerId, leaverName]', () => {
+            expect(gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.deep.equal([
+                DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId,
+                DEFAULT_OPPONENT_NAME,
+            ]);
+        });
+    });
+
     describe('cancelGame', () => {
         let id: string;
 
@@ -253,4 +291,71 @@ describe('GameDispatcherService', () => {
             expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(Errors.NO_GAME_FOUND_WITH_ID);
         });
     });
+
+    // //////////////
+    describe('leaveLobbyRequest', () => {
+
+
+
+
+        let id: string;
+        let waitingRoom: WaitingRoom;
+
+        beforeEach(() => {
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
+            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+        });
+
+        it('should remove joinedPlayer from waitingRoom', () => {
+            expect(waitingRoom.joinedPlayer).to.not.be.undefined;
+            gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID);
+            expect(waitingRoom.joinedPlayer).to.be.undefined;
+        });
+
+        it('should throw if joiningPlayer is undefined', () => {
+            waitingRoom.joinedPlayer = undefined;
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.throw(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        });
+
+        it('should throw if playerId is invalid', () => {
+            const invalidId = 'invalidId';
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        });
+
+        it('should return the [hostPlayerId, leaverName]', () => {
+            expect(gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.deep.equal([
+                DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId,
+                DEFAULT_OPPONENT_NAME,
+            ]);
+        });
+    });
+
 });
+
+const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
+    playerId: 'id',
+    playerName: 'player',
+    gameType: GameType.Classic,
+    maxRoundTime: 1,
+    dictionary: 'francais',
+};
+
+// private createStartGameData(createdGame: Game): StartMultiplayerGameData {
+//     const tileReserve: TileReserveData[] = [];
+//     createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+//         tileReserve.push({ letter, amount });
+//     });
+//     const startMultiplayerGameData: StartMultiplayerGameData = {
+//         player1: createdGame.player1,
+//         player2: createdGame.player2,
+//         gameType: createdGame.gameType,
+//         maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
+//         dictionary: createdGame.dictionnaryName,
+//         gameId: createdGame.getId(),
+//         board: createdGame.board.grid,
+//         tileReserve,
+//         round: createdGame.roundManager.getCurrentRound(),
+//     };
+//     return startMultiplayerGameData;
+// }
