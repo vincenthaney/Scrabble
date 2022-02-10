@@ -64,7 +64,6 @@ export class GameDispatcherController {
 
     handleLeaveLobby(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
-        // patch?
         this.http.delete(endpoint).subscribe();
     }
 

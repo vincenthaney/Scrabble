@@ -137,7 +137,6 @@ describe('SquareView', () => {
                     return -1;
                 },
                 getMultiplierEffect: () => {
-                    // We can create an actual MultiplierEffect since it won't impact the getMultiplier
                     return { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER };
                 },
             },

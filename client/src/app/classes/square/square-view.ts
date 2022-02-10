@@ -46,7 +46,6 @@ export default class SquareView {
         const multiplierType: string = this.square.scoreMultiplier.multiplierEffect;
         const multiplier: number = this.square.scoreMultiplier.multiplier;
 
-        // return `${multiplierType} x ${String(multiplier)}`;
         return [multiplierType, `${multiplier}`];
     }
 }

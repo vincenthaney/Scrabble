@@ -6,7 +6,6 @@ import { GameType } from '@app/classes/game-type';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subscription } from 'rxjs';
 import { UNDEFINED_GAME_ID } from './game-dispatcher-errors';
-// import 'mock-fs';
 
 @Injectable({
     providedIn: 'root',

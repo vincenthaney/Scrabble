@@ -110,10 +110,6 @@ export class GameDispatcherController {
     }
 
     private handleCancelGame(gameId: string, playerId: string) {
-        // console.log(gameId);
-        // console.log(playerId);
-        // console.log(this.gameDispatcherService.getLobbiesRoom());
-        // console.log(this.gameDispatcherService.getAvailableWaitingRooms());
         const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
         if (waitingRoom.joinedPlayer) {
             this.socketService.emitToSocket(waitingRoom.joinedPlayer.getId(), 'canceledGame', { name: waitingRoom.getConfig().player1.name });
@@ -124,13 +120,7 @@ export class GameDispatcherController {
     }
 
     private handleLobbyLeave(gameId: string, playerId: string) {
-        // console.log('joinerLeaveGameSERVERSIDE');
-        // console.log(gameId);
-        // console.log(playerId);
         const result = this.gameDispatcherService.leaveLobbyRequest(playerId, gameId);
-        // console.log('RESULTAT');
-        // console.log(result[0]);
-        // console.log(result[1]);
 
         this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
         this.handleLobbiesUpdate();

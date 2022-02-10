@@ -105,7 +105,6 @@ describe('InformationBoxComponent', () => {
         spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(timerObs);
         spyOn(mockRoundManager.timer, 'pipe').and.returnValue(pipedObservable);
         component.ngOnInit();
-        // eslint-disable-next-line deprecation/deprecation
         expect(pipedSpy).toHaveBeenCalled();
     });
 
@@ -121,7 +120,6 @@ describe('InformationBoxComponent', () => {
     it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
         const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
         component.ngOnInit();
-        // eslint-disable-next-line deprecation/deprecation
         expect(subscribeSpy).toHaveBeenCalled();
 
         const endRoundSpy = spyOn(component, 'endRound');
