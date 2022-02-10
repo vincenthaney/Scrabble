@@ -12,7 +12,13 @@ export class WordExtraction {
         const navigator = this.board.navigate(startPosition);
 
         if (navigator.verify(SHOULD_HAVE_A_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
-        if (!navigator.detach().forward(orientation, tilesToPlace.length).isWithinBounds()) throw new Error(EXTRACTION_TILES_INVALID);
+        if (
+            !navigator
+                .detach()
+                .forward(orientation, tilesToPlace.length - 1)
+                .isWithinBounds()
+        )
+            throw new Error(POSITION_OUT_OF_BOARD);
 
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
