@@ -65,8 +65,7 @@ export class GamePlayController {
         if (localPlayerFeedback) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
                 content: localPlayerFeedback,
-                senderId: 'System',
-                date: new Date(),
+                senderId: Message,
             });
         }
         if (opponentFeedback) {
@@ -74,13 +73,11 @@ export class GamePlayController {
             this.socketService.emitToSocket(opponentId, 'newMessage', {
                 content: opponentId,
                 senderId: 'System',
-                date: new Date(),
             });
         }
     }
 
     private handleNewMessage(gameId: string, playerId: string, message: Message): void {
-        if (message.date === undefined) throw new HttpException('send date is required', StatusCodes.BAD_REQUEST);
         if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
         if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
 
