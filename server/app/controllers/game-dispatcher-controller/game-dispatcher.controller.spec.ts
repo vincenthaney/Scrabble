@@ -59,7 +59,7 @@ describe('GameDispatcherController', () => {
             expressApp = app.app;
         });
 
-        describe('/games/:playerId', () => {
+        describe('POST /games/:playerId', () => {
             it('should return CREATED', async () => {
                 chai.spy.on(controller, 'handleCreateGame', () => {});
 
@@ -72,6 +72,22 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp).post(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('GET /games/:playerId', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleLobbiesRequest', () => {});
+
+                return supertest(expressApp).get(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller, 'handleLobbiesRequest', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).get(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
 
