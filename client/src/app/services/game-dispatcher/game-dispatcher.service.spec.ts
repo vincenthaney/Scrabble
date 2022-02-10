@@ -10,7 +10,7 @@ import { SocketService } from '@app/services/socket/socket.service';
 import { GameDispatcherService } from './game-dispatcher.service';
 
 const BASE_GAME_ID = 'baseGameId';
-const TEST_GAME_ID = 'gameId';
+// const TEST_GAME_ID = 'gameId';
 const TEST_PLAYER_ID = 'playerId';
 const TEST_PLAYER_NAME = 'playerName';
 const TEST_LOBBIES = [{ lobbyId: '', playerName: '', gameType: GameType.Classic, maxRoundTime: 0, dictionary: '', canJoin: true }];
@@ -55,8 +55,8 @@ describe('GameDispatcherService', () => {
         const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleLobbyJoinRequest').and.callFake(() => {
             return;
         });
-        service.handleJoinLobby(TEST_GAME_ID, TEST_PLAYER_NAME);
-        expect(spyHandleLobbyJoinRequest).toHaveBeenCalledWith(TEST_GAME_ID, TEST_PLAYER_NAME);
+        service.handleJoinLobby(TEST_LOBBIES[0], TEST_PLAYER_NAME);
+        expect(spyHandleLobbyJoinRequest).toHaveBeenCalledWith(TEST_LOBBIES[0].lobbyId, TEST_PLAYER_NAME);
     });
 
     it('handleLobbyListRequest should call gameDispatcherController.handleLobbiesListRequest with the correct parameters', () => {

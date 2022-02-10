@@ -5,6 +5,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { LobbyInfo } from '@app/classes/communication/lobby-info';
+import { GameType } from '@app/classes/game-type';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { of } from 'rxjs';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
@@ -14,12 +16,23 @@ import { JoinWaitingPageComponent } from './join-waiting-page.component';
 })
 class TestComponent {}
 
+const EMPTY_LOBBY = {} as unknown as LobbyInfo;
+
+const DEFAULT_LOBBY = {
+    lobbyId: '1',
+    playerName: 'Name1',
+    gameType: GameType.Classic,
+    dictionary: 'default',
+    maxRoundTime: 60,
+    canJoin: false,
+};
+const DEFAULT_NAME = 'playerName';
+
 describe('JoinWaitingPageComponent', () => {
     let component: JoinWaitingPageComponent;
     let fixture: ComponentFixture<JoinWaitingPageComponent>;
     const opponentName = 'testName';
     let gameDispatcherServiceMock: GameDispatcherService;
-
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [JoinWaitingPageComponent],
@@ -38,10 +51,14 @@ describe('JoinWaitingPageComponent', () => {
     });
 
     beforeEach(() => {
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
+        gameDispatcherServiceMock.currentLobby = DEFAULT_LOBBY;
+        gameDispatcherServiceMock.currentName = DEFAULT_NAME;
         fixture = TestBed.createComponent(JoinWaitingPageComponent);
         component = fixture.componentInstance;
+        component.currentLobby = EMPTY_LOBBY;
+        component.currentName = '';
         fixture.detectChanges();
-        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
     });
 
     it('should create', () => {
@@ -69,7 +86,24 @@ describe('JoinWaitingPageComponent', () => {
         expect(gameDispatcherSpy).toHaveBeenCalled();
     });
 
-    it('ngOnInit should subscribe to gameDispatcherService canceledGameEvent and joinerRejectedEvent', () => {
+    it('ngOnInit should set the values to the gameDispatcherService lobby and name (currentLobby defined)', () => {
+        component.currentLobby = EMPTY_LOBBY;
+        component.currentName = '';
+        component.ngOnInit();
+        expect(component.currentLobby).toEqual(DEFAULT_LOBBY);
+        expect(component.currentName).toEqual(DEFAULT_NAME);
+    });
+
+    it('ngOnInit should set the values to the gameDispatcherService lobby and name (currentLobby undefined)', () => {
+        component.currentLobby = EMPTY_LOBBY;
+        gameDispatcherServiceMock.currentLobby = undefined;
+        component.currentName = '';
+        component.ngOnInit();
+        expect(component.currentLobby).toEqual(EMPTY_LOBBY);
+        expect(component.currentName).toEqual(DEFAULT_NAME);
+    });
+
+    it('ngOnInit should call the get the gameDispatcherService lobby and playerName ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeCanceledGameEvent = spyOn(gameDispatcherServiceMock.canceledGameEvent, 'subscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,6 +115,31 @@ describe('JoinWaitingPageComponent', () => {
 
         expect(spySubscribeCanceledGameEvent).toHaveBeenCalled();
         expect(spySubscribeJoinerRejectedEvent).toHaveBeenCalled();
+    });
+
+    it('routerChangeMethod should call handleLeaveLobby if the url is diffrent from /game ', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.returnValue(of(true) as any);
+        // Create a new component once spies have been applied
+        component.routerChangeMethod('notgame');
+        expect(spyHandleLeaveLobby).toHaveBeenCalled();
+    });
+
+    it('routerChangeMethod should not call handleLeaveLobby if the url is diffrent from /game ', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.returnValue(of(true) as any);
+        // Create a new component once spies have been applied
+        component.routerChangeMethod('/game');
+        expect(spyHandleLeaveLobby).not.toHaveBeenCalled();
+    });
+
+    it('onBeforeUnload should call handleLeaveLobby', () => {
+        const spyhandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
+            return;
+        });
+
+        component.onBeforeUnload();
+        expect(spyhandleLeaveLobby).toHaveBeenCalled();
     });
 
     it('hostHasCanceled should be called when canceledGameEvent is emittted', () => {

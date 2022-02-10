@@ -34,7 +34,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.currentLobby = this.gameDispatcherService.currentLobby;
+        if (this.gameDispatcherService.currentLobby) this.currentLobby = this.gameDispatcherService.currentLobby;
         this.currentName = this.gameDispatcherService.currentName;
 
         this.routingSubscription = this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
@@ -43,16 +43,12 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
             }
         });
 
-        if (!this.canceledGameSubscription) {
-            this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
-                .pipe(takeUntil(this.componentDestroyed$))
-                .subscribe((hostName: string) => this.hostHasCanceled(hostName));
-        }
-        if (!this.joinerRejectedSubscription) {
-            this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
-                .pipe(takeUntil(this.componentDestroyed$))
-                .subscribe((hostName: string) => this.playerRejected(hostName));
-        }
+        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((hostName: string) => this.hostHasCanceled(hostName));
+        this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((hostName: string) => this.playerRejected(hostName));
     }
     ngOnDestroy() {
         this.componentDestroyed$.next(true);
