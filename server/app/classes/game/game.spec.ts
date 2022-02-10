@@ -233,6 +233,8 @@ describe('Game', () => {
         it('should deduct points from player2 and add them to player1 if player 1 has no tiles', () => {
             roundManagerStub.getPassCounter.returns(0);
             player1Stub.hasTilesLeft.returns(false);
+            player2Stub.hasTilesLeft.returns(true);
+
             game.endOfGame();
 
             expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
@@ -241,14 +243,17 @@ describe('Game', () => {
 
         it('should deduct points from player1 and add them to player2 if player 2 has no tiles', () => {
             roundManagerStub.getPassCounter.returns(0);
+            player1Stub.hasTilesLeft.returns(true);
             player2Stub.hasTilesLeft.returns(false);
+
             game.endOfGame();
 
-            expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
-            expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE + PLAYER_1_TILE_SCORE);
         });
     });
-    /////////////////////////
+
+    // ///////////////////////
     // TODO: ADD TESTS ACCORDING TO MATHILDE INSSTRUCTIONS
     // describe('endGameMessage', () => {
     //     let game: Game;
@@ -295,20 +300,20 @@ describe('Game', () => {
         it('should congratulate player 1 if he has a higher score ', () => {
             player1Stub.score = HIGH_SCORE;
             player2Stub.score = LOW_SCORE;
-            const expectedMessage = { content: `Félicatations à ${PLAYER_1_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+            const expectedMessage = { content: `Félicitations à ${PLAYER_1_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 2 if he has a higher score ', () => {
             player1Stub.score = LOW_SCORE;
             player2Stub.score = HIGH_SCORE;
-            const expectedMessage = { content: `Félicatations à ${PLAYER_2_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+            const expectedMessage = { content: `Félicitations à ${PLAYER_2_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
-        it('should congratulate player 1 if he has a higher score ', () => {
+        it('should congratulate player 1 and player 2 if they are tied ', () => {
             player1Stub.score = HIGH_SCORE;
             player2Stub.score = HIGH_SCORE;
             const expectedMessage = {
-                content: `Félicatations à ${PLAYER_1_NAME} et ${PLAYER_2_NAME} pour votre victoire!`,
+                content: `Félicitations à ${PLAYER_1_NAME} et ${PLAYER_2_NAME} pour votre victoire!`,
                 senderId: SYSTEM_MESSAGE_ID,
             };
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);

@@ -110,7 +110,7 @@ export default class Game {
         } else {
             winner = this.player1.name + ' et ' + this.player2.name;
         }
-        return { content: `Félicatations à ${winner} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+        return { content: `Félicitations à ${winner} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
     }
 
     isPlayer1(arg: string | Player): boolean {
