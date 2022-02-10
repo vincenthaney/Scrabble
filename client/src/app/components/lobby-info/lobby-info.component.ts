@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LobbyInfo } from '@app/classes/communication/lobby-info';
 import { GameType } from '@app/classes/game-type';
 import { Timer } from '@app/classes/timer';
-import { convertTime } from '@app/classes/utils';
 
 @Component({
     selector: 'app-lobby-info',
@@ -23,6 +22,6 @@ export class LobbyInfoComponent {
     }
 
     convertTime(): Timer {
-        return convertTime(this.lobby.maxRoundTime);
+        return Timer.convertTime(this.lobby.maxRoundTime);
     }
 }

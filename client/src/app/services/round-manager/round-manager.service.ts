@@ -5,7 +5,6 @@ import { IResetableService } from '@app/classes/i-resetable-service';
 import { AbstractPlayer } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
-import { convertTime } from '@app/classes/utils';
 import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -67,7 +66,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     startTimer(): void {
-        this.timerSource.next(convertTime(this.maxRoundTime));
+        this.timerSource.next(Timer.convertTime(this.maxRoundTime));
     }
 
     roundTimeout(): void {

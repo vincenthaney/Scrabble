@@ -3,10 +3,18 @@ export class Timer {
     seconds: number;
 
     constructor(minutes: number, seconds: number) {
-        if (minutes < 0 || seconds < 0) throw new Error(ILLEGAL_TIMER_PARAMETERS);
+        if (minutes < 0 || seconds < 0 || seconds >= MAX_SECONDS) throw new Error(ILLEGAL_TIMER_PARAMETERS);
         this.minutes = minutes;
         this.seconds = seconds;
     }
+
+    static convertTime(time: number): Timer {
+        const SECONDS_IN_MINUTE = MAX_SECONDS;
+        const minutes = Math.floor(time / SECONDS_IN_MINUTE);
+        const seconds = Math.floor(time % SECONDS_IN_MINUTE);
+        return new Timer(minutes, seconds);
+    }
+
     decrement(): void {
         if (this.seconds > 0) {
             this.seconds--;
@@ -22,3 +30,4 @@ export class Timer {
 }
 
 export const ILLEGAL_TIMER_PARAMETERS = 'The arguments passed to create the timer are not valid (minute < 0 or seconds < 0)';
+const MAX_SECONDS = 60;
