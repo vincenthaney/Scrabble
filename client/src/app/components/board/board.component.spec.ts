@@ -117,6 +117,12 @@ describe('BoardComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('Component should call initializeBoard on init', () => {
+        const initSpy = spyOn<any>(component, 'initializeBoard');
+        component.ngOnInit();
+        expect(initSpy).toHaveBeenCalled();
+    });
+
     boardSizesToTest.forEach((testCase) => {
         const boardSize: Vec2 = testCase[0];
         const expectedBoardSize: Vec2 = testCase[1];
@@ -190,12 +196,6 @@ describe('BoardComponent', () => {
             return row.map((sv: SquareView) => sv.square);
         });
         expect(actualSquareGrid).toEqual(expectedGrid);
-    });
-
-    it('BoardService initialization event should initialize board', () => {
-        const initSpy = spyOn<any>(component, 'initializeBoard');
-        mockBoardService.boardInitializationEvent.emit(mockBoardService.grid);
-        expect(initSpy).toHaveBeenCalledWith(mockBoardService.grid);
     });
 
     it('BoardService update event should update board', () => {

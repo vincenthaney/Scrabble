@@ -38,7 +38,6 @@ export default class GameService {
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
-        await this.router.navigateByUrl('game');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -51,6 +50,7 @@ export default class GameService {
         this.roundManager.currentRound = startGameData.round;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
+        await this.router.navigateByUrl('game');
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {

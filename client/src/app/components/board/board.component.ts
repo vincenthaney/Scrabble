@@ -16,27 +16,21 @@ export class BoardComponent implements OnInit, OnDestroy {
     readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
-    boardInitializationSubscription: Subscription;
     boardUpdateSubscription: Subscription;
 
     constructor(private boardService: BoardService) {
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
-        this.boardInitializationSubscription = this.boardService.boardInitializationEvent.subscribe((board: Square[][]) => {
-            {
-                this.initializeBoard(board);
-            }
-        });
     }
 
     ngOnInit() {
+        this.initializeBoard(this.boardService.initialBoard);
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent.subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
     }
 
     ngOnDestroy() {
         this.boardUpdateSubscription.unsubscribe();
-        this.boardInitializationSubscription.unsubscribe();
     }
 
     private initializeBoard(board: Square[][]) {
