@@ -60,7 +60,7 @@ export class WordExtraction {
         const next = this.extractWordInDirection(orientation, Direction.Forward, position);
         const current = [[this.board.getSquare(position), tile]] as [Square, Tile][];
 
-        return [...previous, ...next, ...current];
+        return [...previous, ...current, ...next];
     }
 
     private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position) {
