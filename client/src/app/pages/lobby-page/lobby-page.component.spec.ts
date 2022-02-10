@@ -140,13 +140,22 @@ describe('LobbyPageComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
+    it('lobbyCanceledDialog should open the dialog component', () => {
+        const spy = spyOn(component.dialog, 'open');
+        component.lobbyCanceledDialog();
+        expect(spy).toHaveBeenCalled();
+    });
+
     it('ngOnInit should subscribe to gameDispatcherService lobbiesUpdateEvent and lobbyFullEvent', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeLobbyUpdateEvent = spyOn(gameDispatcherServiceMock.lobbiesUpdateEvent, 'subscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeLobbyFullEvent = spyOn(gameDispatcherServiceMock.lobbyFullEvent, 'subscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribeLobbyCanceledEvent = spyOn(gameDispatcherServiceMock.canceledGameEvent, 'subscribe').and.returnValue(of(true) as any);
         component.ngOnInit();
         expect(spySubscribeLobbyUpdateEvent).toHaveBeenCalled();
+        expect(spySubscribeLobbyCanceledEvent).toHaveBeenCalled();
         expect(spySubscribeLobbyFullEvent).toHaveBeenCalled();
     });
 
@@ -169,14 +178,25 @@ describe('LobbyPageComponent', () => {
         expect(spyOpponentLeft).toHaveBeenCalled();
     });
 
+    it('lobbyFullDialog should be called when lobbyCancelEvent is emittted', () => {
+        const spyOpponentLeft = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.canceledGameEvent.emit();
+        expect(spyOpponentLeft).toHaveBeenCalled();
+    });
+
     it('ngOnDestroy should unsubscribe all subscriptions', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyUnsubscribeUpdateEvent = spyOn(component.lobbiesUpdateSubscription, 'unsubscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyUnsubscribeLobbyFullEvent = spyOn(component.lobbyFullSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeLobbyCanceledEvent = spyOn(component.lobbyCanceledSubscription, 'unsubscribe').and.returnValue(of(true) as any);
 
         component.ngOnDestroy();
         expect(spyUnsubscribeUpdateEvent).toHaveBeenCalled();
         expect(spyUnsubscribeLobbyFullEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeLobbyCanceledEvent).toHaveBeenCalled();
     });
 });
