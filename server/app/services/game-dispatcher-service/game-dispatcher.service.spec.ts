@@ -4,7 +4,7 @@
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
-import { GameConfigData } from '@app/classes/game/game-config';
+import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import * as Errors from '@app/constants/errors';
@@ -14,10 +14,16 @@ import * as spies from 'chai-spies';
 import { GameDispatcherService } from './game-dispatcher.service';
 import * as GameDispatcherError from './game-dispatcher.service.error';
 import { Container } from 'typedi';
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import { Round } from '@app/classes/round/round';
+import RoundManager from '@app/classes/round/round-manager';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
+import { LetterValue, TileReserve } from '@app/classes/tile';
+import { TileReserveData } from '@app/classes/tile/tile.types';
+import { Board } from '@app/classes/board';
 
 const expect = chai.expect;
-
-// const DID_NOT_THROW = 'Did not throw error';
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
     playerId: 'id',
@@ -293,65 +299,69 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    // //////////////
-    describe('leaveLobbyRequest', () => {
-        let id: string;
-        let waitingRoom: WaitingRoom;
+    describe('createStartGameData', () => {
+        const PLAYER_1_ID = 'player1Id';
+        const PLAYER_2_ID = 'player2Id';
+        const PLAYER_1_NAME = 'player1Name';
+        const PLAYER_2_NAME = 'player2Name';
+        const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
+        const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
+        const DEFAULT_TIME = 60;
+        const DEFAULT_DICTIONARY = 'dict';
+        const DEFAULT_GAME_ID = 'gameId';
+        const DEFAULT_MAP = new Map<LetterValue, number>([
+            ['A', 1],
+            ['B', 2],
+        ]);
+        const TILE_RESERVE_DATA: TileReserveData[] = [
+            { letter: 'A', amount: 1 },
+            { letter: 'B', amount: 2 },
+        ];
+        let gameStub: SinonStubbedInstance<Game>;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let round: Round;
+        let tileReserveStub: SinonStubbedInstance<TileReserve>;
+        let boardStub: SinonStubbedInstance<Board>;
+        let game: Game;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
-            waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
-            gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+            gameStub = createStubInstance(Game);
+            roundManagerStub = createStubInstance(RoundManager);
+            boardStub = createStubInstance(Board);
+
+            roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
+            tileReserveStub = createStubInstance(TileReserve);
+            gameStub.player1 = PLAYER_1;
+            gameStub.player2 = PLAYER_2;
+            tileReserveStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+            gameStub.gameType = GameType.Classic;
+            gameStub.dictionnaryName = DEFAULT_DICTIONARY;
+            gameStub.getId.returns(DEFAULT_GAME_ID);
+            gameStub.board = boardStub;
+            gameStub.board.grid = [[]];
+            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+            gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+
+            round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
+            roundManagerStub.getCurrentRound.returns(round);
+
+            game = gameStub as unknown as Game;
         });
 
-        it('should remove joinedPlayer from waitingRoom', () => {
-            expect(waitingRoom.joinedPlayer).to.not.be.undefined;
-            gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID);
-            expect(waitingRoom.joinedPlayer).to.be.undefined;
-        });
-
-        it('should throw if joiningPlayer is undefined', () => {
-            waitingRoom.joinedPlayer = undefined;
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.throw(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
-        });
-
-        it('should throw if playerId is invalid', () => {
-            const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
-        });
-
-        it('should return the [hostPlayerId, leaverName]', () => {
-            expect(gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.deep.equal([
-                DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId,
-                DEFAULT_OPPONENT_NAME,
-            ]);
+        it('should return the expected StartMultiplayerGameData', () => {
+            const result = gameDispatcherService['createStartGameData'](game);
+            const expectedMultiplayerGameData: StartMultiplayerGameData = {
+                player1: gameStub.player1,
+                player2: gameStub.player2,
+                gameType: gameStub.gameType,
+                maxRoundTime: DEFAULT_TIME,
+                dictionary: DEFAULT_DICTIONARY,
+                gameId: DEFAULT_GAME_ID,
+                board: gameStub.board.grid,
+                tileReserve: TILE_RESERVE_DATA,
+                round,
+            };
+            expect(result).to.deep.equal(expectedMultiplayerGameData);
         });
     });
 });
-
-// const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
-//     playerId: 'id',
-//     playerName: 'player',
-//     gameType: GameType.Classic,
-//     maxRoundTime: 1,
-//     dictionary: 'francais',
-// };
-
-// private createStartGameData(createdGame: Game): StartMultiplayerGameData {
-//     const tileReserve: TileReserveData[] = [];
-//     createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
-//         tileReserve.push({ letter, amount });
-//     });
-//     const startMultiplayerGameData: StartMultiplayerGameData = {
-//         player1: createdGame.player1,
-//         player2: createdGame.player2,
-//         gameType: createdGame.gameType,
-//         maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
-//         dictionary: createdGame.dictionnaryName,
-//         gameId: createdGame.getId(),
-//         board: createdGame.board.grid,
-//         tileReserve,
-//         round: createdGame.roundManager.getCurrentRound(),
-//     };
-//     return startMultiplayerGameData;
-// }
