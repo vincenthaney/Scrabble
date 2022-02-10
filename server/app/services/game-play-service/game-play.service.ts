@@ -4,7 +4,6 @@ import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/clas
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { Tile } from '@app/classes/tile';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
@@ -13,15 +12,15 @@ import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player
 export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService) {}
 
-    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, string, string] {
+    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, string | undefined, string | undefined] {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
         if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
 
-        const localPlayerFeedback = this.getLocalPlayerFeedback(player, actionData);
-        const opponentFeedback = this.getOpponentFeedback(player, actionData);
         const action: Action = this.getAction(player, game, actionData);
+        const localPlayerFeedback = action.getMessage();
+        const opponentFeedback = action.getOpponentMessage();
         let updatedData: void | GameUpdateData = action.execute();
 
         if (action.willEndTurn()) {
@@ -50,44 +49,6 @@ export class GamePlayService {
             }
             case 'pass': {
                 return new ActionPass(player, game);
-            }
-            default: {
-                throw Error(INVALID_COMMAND);
-            }
-        }
-    }
-
-    getLocalPlayerFeedback(player: Player, actionData: ActionData): string {
-        switch (actionData.type) {
-            case 'place': {
-                const payload = this.getActionPlacePayload(actionData);
-                return `Vous avez placé ${payload.tiles.map((tile: Tile) => tile.letter).join(', ')}`;
-            }
-            case 'exchange': {
-                const payload = this.getActionExchangePayload(actionData);
-                return `Vous avez échangé ${payload.tiles.map((tile: Tile) => tile.letter).join(', ')}`;
-            }
-            case 'pass': {
-                return 'Vous avez passé votre tour';
-            }
-            default: {
-                throw Error(INVALID_COMMAND);
-            }
-        }
-    }
-
-    getOpponentFeedback(player: Player, actionData: ActionData): string {
-        switch (actionData.type) {
-            case 'place': {
-                const payload = this.getActionPlacePayload(actionData);
-                return `${player.name} a placé ${payload.tiles.map((tile: Tile) => tile.letter).join(', ')}`;
-            }
-            case 'exchange': {
-                const payload = this.getActionExchangePayload(actionData);
-                return `${player.name} a échangé ${payload.tiles.length} tuiles`;
-            }
-            case 'pass': {
-                return `${player.name} a passé son tour`;
             }
             default: {
                 throw Error(INVALID_COMMAND);

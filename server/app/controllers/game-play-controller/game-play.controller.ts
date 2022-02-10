@@ -54,7 +54,7 @@ export class GamePlayController {
         });
     }
 
-    private handlePlayAction(gameId: string, playerId: string, data: ActionData) {
+    private handlePlayAction(gameId: string, playerId: string, data: ActionData): void {
         if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
@@ -72,14 +72,14 @@ export class GamePlayController {
         if (opponentFeedback) {
             const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
             this.socketService.emitToSocket(opponentId, 'newMessage', {
-                content: localPlayerFeedback,
+                content: opponentId,
                 senderId: 'System',
                 date: new Date(),
             });
         }
     }
 
-    private handleNewMessage(gameId: string, playerId: string, message: Message) {
+    private handleNewMessage(gameId: string, playerId: string, message: Message): void {
         if (message.date === undefined) throw new HttpException('send date is required', StatusCodes.BAD_REQUEST);
         if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
         if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
