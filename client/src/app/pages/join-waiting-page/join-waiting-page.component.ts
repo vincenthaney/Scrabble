@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { OnlinePlayer } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subscription } from 'rxjs';
@@ -40,7 +40,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    playerHasBeenRejected(opponent: OnlinePlayer) {
+    playerHasBeenRejected(opponent: AbstractPlayer) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 // Data type is DefaultDialogParameters
