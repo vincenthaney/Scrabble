@@ -253,9 +253,10 @@ describe('GameDispatcherController', () => {
         let emitToSocketSpy: unknown;
         const playerStub = createStubInstance(Player);
         playerStub.getId.returns('1');
+        const hostName = 'hostName';
 
         beforeEach(() => {
-            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => playerStub);
+            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => [playerStub, hostName]);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
         });
 

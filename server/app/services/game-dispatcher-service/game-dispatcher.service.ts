@@ -79,7 +79,7 @@ export class GameDispatcherService {
         return this.createStartGameData(createdGame);
     }
 
-    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Player {
+    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
@@ -92,7 +92,7 @@ export class GameDispatcherService {
 
         const rejectedPlayer = waitingRoom.joinedPlayer;
         waitingRoom.joinedPlayer = undefined;
-        return rejectedPlayer;
+        return [rejectedPlayer, waitingRoom.getConfig().player1.name];
     }
 
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
