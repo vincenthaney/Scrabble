@@ -4,7 +4,11 @@ import SpyObj = jasmine.SpyObj;
 import { GameService } from '@app/services';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SocketService } from '@app/services/socket/socket.service';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
+import { Opponent } from '@app/classes/player';
 
+const DEFAULT_ID = 0;
+const DEFAULT_NAME = grogars;
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
@@ -40,9 +44,6 @@ describe('GameDispatcherController', () => {
     });
     // ////////////////////////////////////////////////////////////////
     it('On join request, configureSocket should emit opponent name', () => {
-        const consoleSpy = spyOn(console, 'log').and.callThrough();
-        socketHelper.peerSideEmit('connect');
-        expect(consoleSpy).toHaveBeenCalled();
     });
 
     it('On start game, configureSocket should emit socket id and game data', () => {
