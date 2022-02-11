@@ -9,6 +9,8 @@ import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import * as GAME_ERRORS from './game.service.error';
 
+export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -21,6 +23,7 @@ export default class GameService {
     gameType: GameType;
     dictionnaryName: string;
     updateTileRackEvent: EventEmitter<void>;
+    updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
 
     private gameId: string;
     private localPlayerId: string;
@@ -33,6 +36,7 @@ export default class GameService {
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
+        this.updateTileReserveEvent = new EventEmitter();
         this.gameplayController.gameUpdateData.subscribe((data: GameUpdateData) => this.handleGameUpdate(data));
     }
 
@@ -71,6 +75,9 @@ export default class GameService {
         }
         if (gameUpdateData.round) {
             this.roundManager.updateRound(gameUpdateData.round);
+        }
+        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
+            this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
         }
         if (gameUpdateData.isGameOver) {
             this.gameOver();
