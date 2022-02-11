@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 import { Injectable } from '@angular/core';
 import { ActionExchangePayload, ActionPlacePayload } from '@app/classes/actions/action-data';
-import { SocketService } from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket/socket.service';
 
 @Injectable({
     providedIn: 'root',
