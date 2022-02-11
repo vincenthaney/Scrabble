@@ -1,6 +1,6 @@
 import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
-import { SHOULD_HAVE_A_TILE } from '@app/classes/board/board';
+import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import { Tile } from '@app/classes/tile';
 import { EXTRACTION_SQUARE_ALREADY_FILLED } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
@@ -12,7 +12,7 @@ export class WordExtraction {
     extract(tilesToPlace: Tile[], startPosition: Position, orientation: Orientation): [Square, Tile][][] {
         const navigator = this.board.navigate(startPosition);
 
-        if (navigator.verify(SHOULD_HAVE_A_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
+        if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         if (
             !navigator
                 .detach()
@@ -27,7 +27,7 @@ export class WordExtraction {
         let i = 0;
         while (i < tilesToPlace.length) {
             if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
-            if (navigator.verify(SHOULD_HAVE_A_TILE)) {
+            if (navigator.verify(HAS_TILE)) {
                 // The square already has a letter, this means that the at index i must be placed in next square
                 // We know that square has a tile because it was checked in the if
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -40,7 +40,7 @@ export class WordExtraction {
 
             // Add the words created in the opposite Orientation of the move
             const oppositeOrientation = orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
-            if (navigator.verifyNeighbors(oppositeOrientation, SHOULD_HAVE_A_TILE)) {
+            if (navigator.verifyNeighbors(oppositeOrientation, HAS_TILE)) {
                 wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, tilesToPlace[i]));
             }
 
@@ -66,10 +66,10 @@ export class WordExtraction {
 
     private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position) {
         const navigator = this.board.navigate(position);
-        if (navigator.verify(SHOULD_HAVE_A_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
+        if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const word: [Square, Tile][] = [];
 
-        while (navigator.move(orientation, direction).verify(SHOULD_HAVE_A_TILE)) {
+        while (navigator.move(orientation, direction).verify(HAS_TILE)) {
             // We know that square has a tile because it was checked in the while
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             word.push([navigator.square, navigator.square.tile!]);
