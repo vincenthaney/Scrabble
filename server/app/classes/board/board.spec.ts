@@ -136,4 +136,10 @@ describe('Board', () => {
         const position: Position = new Position(7, 1);
         expect(board.verifySquare(position, SHOULD_HAVE_A_TILE)).to.be.false;
     });
+
+    describe('verifyNeighbors', () => {
+        it('should be false when forward is out of bounds', () => {
+            expect(board.verifyNeighbors(new Position(grid[0].length, grid.length), Orientation.Horizontal)).to.be.false;
+        });
+    });
 });
