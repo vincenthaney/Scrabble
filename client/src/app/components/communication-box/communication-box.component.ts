@@ -91,7 +91,6 @@ export class CommunicationBoxComponent implements OnInit {
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
-        console.log(this.messages);
     }
 
     private scrollToBottom(): void {

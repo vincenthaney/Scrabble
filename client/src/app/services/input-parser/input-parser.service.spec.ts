@@ -1,5 +1,5 @@
-// /* eslint-disable max-lines */
-// /* eslint-disable dot-notation */
+/* eslint-disable max-lines */
+/* eslint-disable dot-notation */
 // import { TestBed } from '@angular/core/testing';
 // import { ActionExchangePayload, ActionPlacePayload } from '@app/classes/actions/action-data';
 // import { Orientation } from '@app/classes/orientation';

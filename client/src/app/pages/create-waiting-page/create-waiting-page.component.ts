@@ -11,7 +11,7 @@ import {
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
-    OPPONENT_FOUND_MESSAGE
+    OPPONENT_FOUND_MESSAGE,
 } from './create-waiting-page.component.const';
 
 @Component({
