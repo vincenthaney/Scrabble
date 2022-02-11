@@ -4,12 +4,16 @@
             <app-tile *ngFor="let tile of tiles" [tile]="tile" fontSize="1.5em" class="rack-tile">{{ tile.letter }}</app-tile>
         </div>
         <div id="rack-button-container" class="rack-card">
-            <button mat-raised-button class="btn-rack" color="primary" [disabled]="!gameService.isLocalPlayerPlaying()">
-                <app-icon icon="exchange"></app-icon> Échanger
-            </button>
-            <button mat-raised-button class="btn-rack" color="primary" [disabled]="!gameService.isLocalPlayerPlaying()">
-                <app-icon icon="undo"></app-icon> Annuler
-            </button>
+            <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
+                <button mat-raised-button class="btn-rack" color="primary" [disabled]="true">
+                    <app-icon icon="exchange"></app-icon> Échanger
+                </button>
+            </div>
+            <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
+                <button mat-raised-button class="btn-rack" color="primary" [disabled]="true">
+                    <app-icon icon="undo"></app-icon> Annuler
+                </button>
+            </div>
         </div>
     </mat-card>
 </div>

@@ -6,6 +6,9 @@ import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Observable, Subject, Subscription, timer as timerCreationFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { IconName } from '@app/components/icon/icon.component.type';
+
+const LOCAL_PLAYER_ICON: IconName[] = ['user-astronaut', 'user-cowboy', 'user-ninja', 'user-robot', 'user-crown'];
 
 @Component({
     selector: 'app-information-box',
@@ -15,6 +18,8 @@ import { takeUntil } from 'rxjs/operators';
 export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit {
     isPlayer1Active: boolean;
     isPlayer2Active: boolean;
+    isPlayer1: boolean;
+    localPlayerIcon: IconName;
 
     readonly maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
 
@@ -37,6 +42,9 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
         if (!this.roundManager.endRoundEvent) return;
         this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
+
+        this.isPlayer1 = this.getIsPlayer1();
+        this.localPlayerIcon = this.getLocalPlayerIcon();
     }
 
     ngAfterViewInit() {
@@ -85,5 +93,13 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
     private createTimer(length: number): Observable<number> {
         return timerCreationFunction(0, length);
+    }
+
+    private getIsPlayer1() {
+        return this.gameService.getLocalPlayer() === this.gameService.player1;
+    }
+
+    private getLocalPlayerIcon() {
+        return LOCAL_PLAYER_ICON[Math.floor(Math.random() * LOCAL_PLAYER_ICON.length)];
     }
 }

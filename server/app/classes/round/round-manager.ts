@@ -53,7 +53,7 @@ export default class RoundManager {
         });
     }
 
-    getCurrentRound() {
+    getCurrentRound(): Round {
         return this.currentRound;
     }
 

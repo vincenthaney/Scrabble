@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-expressions */
@@ -5,11 +6,16 @@
 import { Application } from '@app/app';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
+import Room from '@app/classes/game/room';
+import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
+import Player from '@app/classes/player/player';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
+import { createStubInstance } from 'sinon';
+import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
@@ -56,7 +62,7 @@ describe('GameDispatcherController', () => {
             expressApp = app.app;
         });
 
-        describe('/games/:playerId', () => {
+        describe('POST /games/:playerId', () => {
             it('should return CREATED', async () => {
                 chai.spy.on(controller, 'handleCreateGame', () => {});
 
@@ -69,6 +75,22 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp).post(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('GET /games/:playerId', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleLobbiesRequest', () => {});
+
+                return supertest(expressApp).get(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller, 'handleLobbiesRequest', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).get(`/api/games/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
 
@@ -117,6 +139,44 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('/games/:gameId/player/:playerId/cancel', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleCancelGame', () => {});
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw', async () => {
+                chai.spy.on(controller, 'handleCancelGame', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
+        describe('/games/:gameId/player/:playerId/leave', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleLobbyLeave', () => {});
+
+                return supertest(expressApp).delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`).expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw', async () => {
+                chai.spy.on(controller, 'handleLobbyLeave', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`)
+                    .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
     });
@@ -180,6 +240,12 @@ describe('GameDispatcherController', () => {
         beforeEach(() => {
             emitSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
             requestSpy = chai.spy.on(controller['gameDispatcherService'], 'requestJoinGame', () => {});
+            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+            const stubSocket = createStubInstance(Socket);
+            stubSocket.leave.returns();
+            chai.spy.on(controller['socketService'], 'getSocket', () => {
+                return stubSocket;
+            });
         });
 
         it('should call socketService.emitToRoom', () => {
@@ -242,9 +308,12 @@ describe('GameDispatcherController', () => {
     describe('handleRejectRequest', () => {
         let rejectSpy: unknown;
         let emitToSocketSpy: unknown;
+        const playerStub = createStubInstance(Player);
+        playerStub.getId.returns('1');
+        const hostName = 'hostName';
 
         beforeEach(() => {
-            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => DEFAULT_PLAYER_ID);
+            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => [playerStub, hostName]);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
         });
 
@@ -262,6 +331,129 @@ describe('GameDispatcherController', () => {
 
         it('should throw if playerName is undefined', () => {
             expect(() => controller['handleRejectRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME, undefined as unknown as string)).to.throw();
+        });
+    });
+
+    describe('handleLobbiesRequest', () => {
+        let getAvailableRoomsSpy: unknown;
+        let addToRoomSpy: unknown;
+        let emitToSocketSpy: unknown;
+        const lobbyStub = createStubInstance(Room);
+        lobbyStub.getId.returns('1');
+
+        beforeEach(() => {
+            chai.spy.on(controller['gameDispatcherService'], 'getLobbiesRoom', () => lobbyStub);
+            getAvailableRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'getAvailableWaitingRooms', () => lobbyStub);
+            addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            controller['handleLobbiesRequest'](DEFAULT_PLAYER_ID);
+        });
+
+        it('should call gameDispatcherService.getAvailableWaitingRooms', () => {
+            expect(getAvailableRoomsSpy).to.have.been.called();
+        });
+
+        it('should call socketService.addToRoom', () => {
+            expect(addToRoomSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, lobbyStub.getId());
+        });
+
+        it('should call socketService.emitToSocket', () => {
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleCancelGame', () => {
+        let getGameFromIdSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let cancelGameSpy: unknown;
+        let handleLobbiesUpdateSpy: unknown;
+        const waitingRoomStub = createStubInstance(WaitingRoom);
+
+        beforeEach(() => {
+            getGameFromIdSpy = chai.spy.on(controller['gameDispatcherService'], 'getGameFromId', () => waitingRoomStub);
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            cancelGameSpy = chai.spy.on(controller['gameDispatcherService'], 'cancelGame', () => {});
+            handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+            waitingRoomStub.joinedPlayer = undefined;
+        });
+
+        it('should call gameDispatcherService.getGameFromId', () => {
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(getGameFromIdSpy).to.have.been.called.with(DEFAULT_GAME_ID);
+        });
+
+        it('should call socketService.emitToSocket', () => {
+            waitingRoomStub.joinedPlayer = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            chai.spy.on(waitingRoomStub, 'getConfig', () => {
+                return { player1: createStubInstance(Player) };
+            });
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+
+        it('should call gameDispatcherService.cancelGame', () => {
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(cancelGameSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+
+        it('should call handleLobbiesUpdate', () => {
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(handleLobbiesUpdateSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleLobbyLeave', () => {
+        let leaveLobbyRequestSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let handleLobbiesUpdateSpy: unknown;
+
+        beforeEach(() => {
+            leaveLobbyRequestSpy = chai.spy.on(controller['gameDispatcherService'], 'leaveLobbyRequest', () => {
+                return [DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME];
+            });
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+            controller['handleLobbyLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+
+        it('should call gameDispatcherService.leaveLobbyRequest', () => {
+            expect(leaveLobbyRequestSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+
+        it('should call socketService.emitToSocket', () => {
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+
+        it('should call handleLobbiesUpdate', () => {
+            expect(handleLobbiesUpdateSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleLobbiesUpdate', () => {
+        let getAvailableRoomsSpy: unknown;
+        let emitToRoomSpy: unknown;
+        let getLobbiesRoomSpy: unknown;
+        const lobbyRoomStub = createStubInstance(Room);
+
+        beforeEach(() => {
+            getAvailableRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'getAvailableWaitingRooms', () => {});
+            emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            getLobbiesRoomSpy = chai.spy.on(controller['gameDispatcherService'], 'getLobbiesRoom', () => {
+                return lobbyRoomStub;
+            });
+            controller['handleLobbiesUpdate']();
+        });
+
+        it('should call gameDispatcherService.getAvailableWaitingRooms', () => {
+            expect(getAvailableRoomsSpy).to.have.been.called();
+        });
+
+        it('should call socketService.emitToRoom', () => {
+            expect(emitToRoomSpy).to.have.been.called();
+        });
+
+        it('should call gameDispatcherService.getLobbiesRoom', () => {
+            expect(getLobbiesRoomSpy).to.have.been.called();
         });
     });
 });

@@ -17,7 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -83,7 +83,7 @@ describe('GameCreationPageComponent', () => {
             gameMode: component.gameModes.Solo,
             level: component.virtualPlayerLevels.Beginner,
             timer: '60',
-            dict: 'français',
+            dictionary: 'français',
         };
         gameParametersForm.setValue(formValues);
         component.child.formParameters.get('inputName')?.setValue('valid name');
@@ -102,6 +102,8 @@ describe('GameCreationPageComponent', () => {
                 selector: '#log2990-button',
             }),
         );
+
+        if (await log2990Button.isDisabled()) return;
         await log2990Button.toggle();
         expect(gameTypeField?.value).toEqual(component.gameTypes.LOG2990);
     });
@@ -128,6 +130,8 @@ describe('GameCreationPageComponent', () => {
                 selector: '#solo-button',
             }),
         );
+
+        if (await soloButton.isDisabled()) return;
         await soloButton.toggle();
         expect(gameModeField?.value).toEqual(component.gameModes.Solo);
     });
@@ -148,6 +152,7 @@ describe('GameCreationPageComponent', () => {
     it('virtual player level choices should appear if solo mode is selected', async () => {
         const gameModeField = component.gameParameters.get('gameMode');
         gameModeField?.setValue(component.gameModes.Solo);
+        fixture.detectChanges();
 
         const levelLabel = fixture.debugElement.nativeElement.querySelector('#level-label');
         const levelButtons = fixture.debugElement.nativeElement.querySelector('#level-buttons');
@@ -171,10 +176,10 @@ describe('GameCreationPageComponent', () => {
     it('form should have the right default values', async () => {
         const defaultFormValues = {
             gameType: component.gameTypes.Classic,
-            gameMode: component.gameModes.Solo,
+            gameMode: component.gameModes.Multiplayer,
             level: component.virtualPlayerLevels.Beginner,
             timer: EMPTY_VALUE,
-            dict: EMPTY_VALUE,
+            dictionary: EMPTY_VALUE,
         };
         const defaultNameValue = EMPTY_VALUE;
 
@@ -223,9 +228,9 @@ describe('GameCreationPageComponent', () => {
         expect(component.isFormValid()).toBeFalsy();
     });
 
-    it('form should not be valid if dict is empty', () => {
+    it('form should not be valid if dictionary is empty', () => {
         setValidFormValues();
-        gameParameters.get('dict')?.setValue(EMPTY_VALUE);
+        gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
 
         expect(component.isFormValid()).toBeFalsy();
     });

@@ -53,6 +53,10 @@ class MockGameService {
     get player2(): AbstractPlayer {
         return this.pPlayer2;
     }
+
+    getLocalPlayer(): AbstractPlayer {
+        return this.pPlayer1;
+    }
 }
 
 describe('InformationBoxComponent', () => {

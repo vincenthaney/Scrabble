@@ -1,5 +1,5 @@
-import { LobbyData } from './lobby-data';
+import { LobbyData } from './';
 
-export interface LobbyInfo extends LobbyData {
+export default interface LobbyInfo extends LobbyData {
     canJoin?: boolean;
 }
