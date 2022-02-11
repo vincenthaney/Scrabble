@@ -2,18 +2,18 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { expect } from 'chai';
-import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { Container } from 'typedi';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
-import RoundManager from '@app/classes/round/round-manager';
 import { Round } from '@app/classes/round/round';
-import { Orientation } from '@app/classes/board';
+import RoundManager from '@app/classes/round/round-manager';
+import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { expect } from 'chai';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { Container } from 'typedi';
+import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
@@ -91,7 +91,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns({});
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.isGameOver).to.be.true;
+            expect(result[0]!.isGameOver).to.be.true;
         });
 
         it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
@@ -99,7 +99,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns(undefined);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.isGameOver).to.be.true;
+            expect(result[0]!.isGameOver).to.be.true;
         });
 
         it('should call next round when action ends turn', () => {
@@ -113,7 +113,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns({});
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.round).to.exist;
+            expect(result[0]!.round).to.exist;
         });
 
         it("should set round action end turn (updatedData doesn't exists)", () => {
@@ -121,7 +121,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns(undefined);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.round).to.exist;
+            expect(result[0]!.round).to.exist;
         });
 
         it('should not call next round when action does not ends turn', () => {
