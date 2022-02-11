@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { VisualMessageClasses } from '@app/classes/communication/visual-message';
-import { SocketService } from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
