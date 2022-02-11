@@ -164,4 +164,27 @@ describe('RoundManagerService', () => {
         service.completedRounds = [];
         expect(() => service.getStartGameTime()).toThrowError(ROUND_ERROR.NO_START_GAME_TIME);
     });
+
+    describe('StartRound', () => {
+        let startTimerSpy: unknown;
+
+        beforeEach(() => {
+            startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
+                return;
+            });
+            service.startRound();
+        });
+
+        it('startRound should clear old timeout', () => {
+            // SpyOn clearTimeout
+        });
+
+        it('startRound should set new timeout', () => {
+            // SpyOn setTimeout
+        });
+
+        it('startRound should call startTimer', () => {
+            expect(startTimerSpy).toHaveBeenCalled();
+        });
+    });
 });
