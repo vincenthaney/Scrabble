@@ -1,8 +1,8 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { LetterValue } from '@app/classes/tile';
-import { InputParserService } from '@app/services';
+import { GameService, InputParserService } from '@app/services';
 
 type Message = { text: string; sender: string; date: Date; class: string };
 type LetterMapItem = { letter: LetterValue; amount: number };
@@ -13,7 +13,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent {
+export class CommunicationBoxComponent implements OnInit, OnDestroy {
     @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: Message[] = [
@@ -39,24 +39,20 @@ export class CommunicationBoxComponent {
 
     objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
-    lettersLeft: LetterMapItem[] = [
-        { letter: 'A', amount: 4 },
-        { letter: 'B', amount: 7 },
-        { letter: 'C', amount: 2 },
-        { letter: 'D', amount: 5 },
-        { letter: 'E', amount: 8 },
-        { letter: 'F', amount: 2 },
-        { letter: 'G', amount: 5 },
-        { letter: 'H', amount: 8 },
-        { letter: 'I', amount: 2 },
-        { letter: 'K', amount: 8 },
-        { letter: 'L', amount: 2 },
-        { letter: 'M', amount: 5 },
-        { letter: 'N', amount: 8 },
-        { letter: 'O', amount: 2 },
-    ];
+    lettersLeftTotal: number = 0;
+    lettersLeft: LetterMapItem[] = [];
 
-    constructor(private inputParser: InputParserService) {}
+    constructor(private inputParser: InputParserService, private gameService: GameService) {}
+
+    ngOnInit() {
+        this.gameService.updateTileReserveEvent.subscribe(({ tileReserve, tileReserveTotal }) => {
+            this.onTileReserveUpdate(tileReserve, tileReserveTotal);
+        });
+    }
+
+    ngOnDestroy() {
+        this.gameService.updateTileReserveEvent.unsubscribe();
+    }
 
     sendMessage() {
         const message = this.messageForm.get('content')?.value;
@@ -66,6 +62,11 @@ export class CommunicationBoxComponent {
             this.messageForm.reset();
             this.scrollToBottom();
         }
+    }
+
+    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number) {
+        this.lettersLeft = tileReserve;
+        this.lettersLeftTotal = tileReserveTotal;
     }
 
     private scrollToBottom() {
