@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -5,7 +7,25 @@ import { Round } from '@app/classes/round';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import * as ROUND_ERROR from './round-manager.service.errors';
 import SpyObj = jasmine.SpyObj;
+
+class RoundManagerServiceWrapper {
+    roundManagerService: RoundManagerService;
+    pCurrentRound: Round;
+    constructor(roundManagerService: RoundManagerService) {
+        this.roundManagerService = roundManagerService;
+        this.currentRound = roundManagerService.currentRound;
+    }
+
+    get currentRound(): Round {
+        return this.pCurrentRound;
+    }
+
+    set currentRound(round: Round) {
+        this.pCurrentRound = round;
+    }
+}
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
@@ -108,5 +128,18 @@ describe('RoundManagerService', () => {
         it('updateRound should call startRound', () => {
             expect(startRoundSpy).toHaveBeenCalled();
         });
+    });
+
+    it('getActivePlayer should return the player of the current round', () => {
+        service.currentRound = currentRound;
+        expect(service.getActivePlayer()).toEqual(currentRound.player);
+    });
+
+    it('getActivePlayer should throw error if there is no current round', () => {
+        const wrapper = new RoundManagerServiceWrapper(service);
+        spyOnProperty(wrapper, 'currentRound', 'get').and.returnValue(null);
+        service.currentRound = wrapper.currentRound;
+
+        expect(() => service.getActivePlayer()).toThrowError(ROUND_ERROR.NO_CURRENT_ROUND);
     });
 });
