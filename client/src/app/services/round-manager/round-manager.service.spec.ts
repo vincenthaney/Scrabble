@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Round } from '@app/classes/round';
+import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -186,5 +187,19 @@ describe('RoundManagerService', () => {
         it('startRound should call startTimer', () => {
             expect(startTimerSpy).toHaveBeenCalled();
         });
+    });
+
+    it('startTimer should send new timer with right values', () => {
+        const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
+            return;
+        });
+        service.maxRoundTime = 60;
+        const newTimer = new Timer(1, 0);
+
+        service.currentRound = currentRound;
+        const activePlayer = currentRound.player;
+
+        service.startTimer();
+        expect(timerSourceSpy).toHaveBeenCalledOnceWith([newTimer, activePlayer]);
     });
 });
