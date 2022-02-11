@@ -4,6 +4,7 @@ import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
+import { TileReserveData } from '@app/classes/tile/tile.types';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -22,6 +23,8 @@ export default class GameService {
     player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
+    tileReserve: TileReserveData[];
+    tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
 
@@ -51,6 +54,8 @@ export default class GameService {
         this.roundManager.localPlayerId = this.localPlayerId;
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
         this.roundManager.currentRound = startGameData.round;
+        this.tileReserve = startGameData.tileReserve;
+        this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
         await this.router.navigateByUrl('game');
@@ -77,6 +82,8 @@ export default class GameService {
             this.roundManager.updateRound(gameUpdateData.round);
         }
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
+            this.tileReserve = gameUpdateData.tileReserve;
+            this.tileReserveTotal = gameUpdateData.tileReserveTotal;
             this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
         }
         if (gameUpdateData.isGameOver) {
