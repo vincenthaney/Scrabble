@@ -1,10 +1,9 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
+import { LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
-import { LobbyInfo } from '@app/classes/communication/lobby-info';
-import { PlayerName } from '@app/classes/communication/player-name';
-import { GameService } from '@app/services';
-import { SocketService } from '@app/services/socket/socket.service';
+import GameService from '@app/services/game/game.service';
+import SocketService from '@app/services/socket/socket.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -83,13 +82,15 @@ export class GameDispatcherController {
             () => {
                 this.lobbyRequestValidEvent.emit();
             },
-            (error) => {
-                if (error.status === HttpStatusCode.Unauthorized) {
-                    this.lobbyFullEvent.emit();
-                } else if (error.status === HttpStatusCode.Gone) {
-                    this.canceledGameEvent.emit('Le créateur');
-                }
-            },
+            (error) => this.handleJoinError(error),
         );
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handleJoinError(error: any) {
+        if (error.status === HttpStatusCode.Unauthorized) {
+            this.lobbyFullEvent.emit();
+        } else if (error.status === HttpStatusCode.Gone) {
+            this.canceledGameEvent.emit('Le créateur');
+        }
     }
 }

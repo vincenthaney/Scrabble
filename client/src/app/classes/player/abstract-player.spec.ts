@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-import { PlayerData } from '@app/classes/communication/player-data';
+import { PlayerData } from '@app/classes/communication/';
 import { Tile } from '@app/classes/tile';
 import { Player } from '.';
 
