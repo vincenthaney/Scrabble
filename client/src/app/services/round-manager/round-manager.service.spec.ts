@@ -142,4 +142,16 @@ describe('RoundManagerService', () => {
 
         expect(() => service.getActivePlayer()).toThrowError(ROUND_ERROR.NO_CURRENT_ROUND);
     });
+
+    it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
+        service.localPlayerId = DEFAULT_PLAYER.id;
+        service.currentRound = currentRound;
+        expect(service.isActivePlayerLocalPlayer()).toBeTrue();
+    });
+
+    it('getActivePlayer should throw error if there is no current round', () => {
+        service.localPlayerId = 'unknown';
+        service.currentRound = currentRound;
+        expect(service.isActivePlayerLocalPlayer()).toBeFalse();
+    });
 });
