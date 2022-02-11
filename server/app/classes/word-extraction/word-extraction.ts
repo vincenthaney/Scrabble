@@ -15,7 +15,7 @@ export class WordExtraction {
         if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         if (
             !navigator
-                .detach()
+                .clone()
                 .forward(orientation, tilesToPlace.length - 1)
                 .isWithinBounds()
         )

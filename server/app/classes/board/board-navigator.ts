@@ -43,7 +43,7 @@ export default class BoardNavigator {
         return this.position.isWithinBounds(this.board.getSize());
     }
 
-    detach(): BoardNavigator {
+    clone(): BoardNavigator {
         return new BoardNavigator(this.board, this.position);
     }
 }
