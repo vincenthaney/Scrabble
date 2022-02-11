@@ -31,7 +31,8 @@ export default class ActionPlace extends ActionPlay {
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
 
-        const createdWords: [Square, Tile][][] = WordExtraction.extract(this.game.board, tilesToPlace, this.startPosition, this.orientation);
+        const wordExtraction = new WordExtraction(this.game.board);
+        const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
 
         // extract tiles from createdWords to have the words as string
         const wordsString = createdWords.map((word) => word.reduce((previous, [, tile]) => (previous += tile.letter), ''));
