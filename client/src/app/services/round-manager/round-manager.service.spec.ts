@@ -68,4 +68,45 @@ describe('RoundManagerService', () => {
             expect(timeSourceSpy).toHaveBeenCalled();
         });
     });
+
+    describe('UpdateRound', () => {
+        let startRoundSpy: unknown;
+
+        const updatedRound: Round = {
+            player: DEFAULT_PLAYER,
+            startTime: new Date(Date.now()),
+            limitTime: new Date(Date.now() + 1000),
+            completedTime: null,
+        };
+
+        beforeEach(() => {
+            startRoundSpy = spyOn(service, 'startRound').and.callFake(() => {
+                return;
+            });
+            currentRound.completedTime = null;
+            service.currentRound = currentRound;
+            service.updateRound(updatedRound);
+        });
+
+        it('updateRound should set the old current round completed time to new round start time', () => {
+            const numberOfRounds = service.completedRounds.length;
+            expect(service.completedRounds[numberOfRounds - 1].completedTime).toEqual(updatedRound.startTime);
+        });
+
+        it('updateRound should set old current round to the end of completed rounds', () => {
+            const numberOfRounds = service.completedRounds.length;
+            const lastRoundInArray = service.completedRounds[numberOfRounds - 1];
+            currentRound.completedTime = updatedRound.startTime;
+
+            expect(lastRoundInArray).toEqual(currentRound);
+        });
+
+        it('updateRound should set the new current round to the updatedRound', () => {
+            expect(service.currentRound).toEqual(updatedRound);
+        });
+
+        it('updateRound should call startRound', () => {
+            expect(startRoundSpy).toHaveBeenCalled();
+        });
+    });
 });
