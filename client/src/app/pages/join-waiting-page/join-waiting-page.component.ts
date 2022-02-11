@@ -11,7 +11,7 @@ import {
     DIALOG_CANCEL_CONTENT,
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
-    DIALOG_REJECT_TITLE,
+    DIALOG_REJECT_TITLE
 } from './join-waiting-page.component.const';
 
 @Component({

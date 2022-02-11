@@ -1,14 +1,13 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
-import { PlayerData } from '@app/classes/communication/player-data';
 import { VisualMessageClasses } from '@app/classes/communication/visual-message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { BoardService } from '@app/services/';
+import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { BehaviorSubject } from 'rxjs';
 import * as GAME_ERRORS from './game.service.error';

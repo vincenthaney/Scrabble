@@ -5,9 +5,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { LobbyInfo } from '@app/classes/communication/lobby-info';
+import { LobbyInfo } from '@app/classes/communication';
 import { GameType } from '@app/classes/game-type';
-import { GameDispatcherService } from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
 

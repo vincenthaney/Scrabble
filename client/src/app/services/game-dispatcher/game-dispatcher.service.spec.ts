@@ -7,8 +7,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
-import { SocketService } from '@app/services/socket/socket.service';
-import { GameDispatcherService } from './game-dispatcher.service';
+import { GameDispatcherService, SocketService } from '@app/services/';
 
 const BASE_GAME_ID = 'baseGameId';
 const TEST_PLAYER_ID = 'playerId';
