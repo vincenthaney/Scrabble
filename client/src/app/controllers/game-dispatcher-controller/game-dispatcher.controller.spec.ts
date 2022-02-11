@@ -119,7 +119,7 @@ describe('GameDispatcherController', () => {
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleConfirmationGameCreation should subscribe', async () => {
+    it('handleConfirmationGameCreation should subscribe on post', async () => {
         // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
@@ -133,14 +133,14 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleRejectionGameCreation', () => {
+    it('handleRejectionGameCreation should post', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
         controller.handleRejectionGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleRejectionGameCreation SUBSCRIBE', () => {
+    it('handleRejectionGameCreation should subscribe on post', () => {
         // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
@@ -154,14 +154,14 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleCancelGame', () => {
+    it('handleCancelGame should delete', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
         controller.handleCancelGame(DEFAULT_GAME_ID);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleCancelGame SUBSCRIBE', () => {
+    it('handleCancelGame should subscribe on delete', () => {
         // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
@@ -175,14 +175,14 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby', () => {
+    it('handleLeaveLobby should delete', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
         controller.handleLeaveLobby(DEFAULT_GAME_ID);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby SUBSCRIBE', () => {
+    it('handleLeaveLobby should subscribe on delete', () => {
         // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
@@ -196,14 +196,14 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleLobbiesListRequest', () => {
+    it('handleLobbiesListRequest should get ', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
         controller.handleLobbiesListRequest();
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleLobbiesListRequest SUBSCRIBE', () => {
+    it('handleLobbiesListRequest should subscribe on get', () => {
         // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
@@ -217,14 +217,14 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleLobbyJoinRequest', () => {
+    it('handleLobbyJoinRequest should post', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
         controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleLobbyJoinRequest SUBSCRIBE', () => {
+    it('handleLobbyJoinRequest should subscribe on post', () => {
         // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
