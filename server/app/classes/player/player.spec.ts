@@ -9,6 +9,12 @@ describe('Player', () => {
 
     beforeEach(() => {
         player = new Player(ID, DEFAULT_NAME);
+        player.tiles = [
+            { value: 1, letter: 'A' },
+            { value: 4, letter: 'B' },
+            { value: 2, letter: 'A' },
+            { value: 4, letter: 'D' },
+        ];
     });
 
     it('should create', () => {
@@ -17,23 +23,11 @@ describe('Player', () => {
     });
 
     it('getTileRackPoints should return the sum of tile values', () => {
-        player.tiles = [
-            { value: 1, letter: 'A' },
-            { value: 4, letter: 'A' },
-            { value: 2, letter: 'A' },
-            { value: 4, letter: 'A' },
-        ];
         const expected = 11;
         expect(player.getTileRackPoints()).to.equal(expected);
     });
 
     it('hasTilesLeft should true if there are tiles left', () => {
-        player.tiles = [
-            { value: 1, letter: 'A' },
-            { value: 4, letter: 'A' },
-            { value: 2, letter: 'A' },
-            { value: 4, letter: 'A' },
-        ];
         const expected = true;
         expect(player.hasTilesLeft()).to.equal(expected);
     });
@@ -42,5 +36,9 @@ describe('Player', () => {
         player.tiles = [];
         const expected = false;
         expect(player.hasTilesLeft()).to.equal(expected);
+    });
+
+    it('endGameMessage should return the message showing the tiles left', () => {
+        expect(player.endGameMessage()).to.equal(`${player.name} : abad`);
     });
 });

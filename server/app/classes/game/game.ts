@@ -86,7 +86,7 @@ export default class Game {
         } else if (!this.player1.hasTilesLeft()) {
             this.player1.score += this.player2.getTileRackPoints();
             this.player2.score -= this.player2.getTileRackPoints();
-        } else if (!this.player2.hasTilesLeft()) {
+        } else {
             this.player1.score -= this.player1.getTileRackPoints();
             this.player2.score += this.player1.getTileRackPoints();
         }

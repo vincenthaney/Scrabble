@@ -26,6 +26,6 @@ export default class Player {
     }
 
     endGameMessage(): string {
-        return `${this.name} : ${this.tiles.reduce((prev, next) => (prev += next.letter), '')}`;
+        return `${this.name} : ${this.tiles.reduce((prev, next) => (prev += next.letter.toLocaleLowerCase()), '')}`;
     }
 }
