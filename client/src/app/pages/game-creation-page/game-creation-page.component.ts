@@ -23,7 +23,7 @@ export class GameCreationPageComponent implements OnInit {
 
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
-        gameMode: new FormControl(GameMode.Solo, Validators.required),
+        gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         timer: new FormControl('', Validators.required),
         dictionary: new FormControl('', Validators.required),
