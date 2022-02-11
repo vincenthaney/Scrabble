@@ -59,6 +59,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     getStartGameTime(): Date {
+        if (!this.completedRounds[0]) throw new Error(ROUND_ERROR.NO_START_GAME_TIME);
         return this.completedRounds[0].startTime;
     }
 

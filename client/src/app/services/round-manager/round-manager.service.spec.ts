@@ -154,4 +154,14 @@ describe('RoundManagerService', () => {
         service.currentRound = currentRound;
         expect(service.isActivePlayerLocalPlayer()).toBeFalse();
     });
+
+    it('getStartGameTime should return the first round start time if there is one', () => {
+        service.completedRounds = [currentRound];
+        expect(service.getStartGameTime()).toEqual(currentRound.startTime);
+    });
+
+    it('getStartGameTime should throw error if there is no first round', () => {
+        service.completedRounds = [];
+        expect(() => service.getStartGameTime()).toThrowError(ROUND_ERROR.NO_START_GAME_TIME);
+    });
 });
