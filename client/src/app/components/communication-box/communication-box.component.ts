@@ -45,6 +45,9 @@ export class CommunicationBoxComponent implements OnInit, OnDestroy {
     constructor(private inputParser: InputParserService, private gameService: GameService) {}
 
     ngOnInit() {
+        this.lettersLeft = this.gameService.tileReserve;
+        this.lettersLeftTotal = this.gameService.tileReserveTotal;
+
         this.gameService.updateTileReserveEvent.subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
         });
