@@ -9,6 +9,7 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { BINGO_BONUS_POINTS, MAX_TILE_PER_PLAYER } from './action-place.const';
 
 // TODO: CHANGE THESE WITH THE REAL THINGS
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-unused-vars
@@ -28,6 +29,10 @@ export default class ActionPlace extends ActionPlay {
         this.orientation = orientation;
     }
 
+    isABingo(): boolean {
+        return this.tilesToPlace.length === MAX_TILE_PER_PLAYER;
+    }
+
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
 
@@ -40,7 +45,8 @@ export default class ActionPlace extends ActionPlay {
 
         if (!areValidWords) throw new Error(ERROR_INVALID_WORD);
 
-        const scoredPoints = ScoreComputer.compute(createdWords);
+        let scoredPoints = ScoreComputer.compute(createdWords);
+        if (this.isABingo()) scoredPoints += BINGO_BONUS_POINTS;
 
         const updatedBoard = this.updateBoard(createdWords, this.game);
 

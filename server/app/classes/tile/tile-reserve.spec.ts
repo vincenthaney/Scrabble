@@ -98,7 +98,7 @@ describe('TileReserve', () => {
         testGetTilesOnSuccess(amountToRemove, totalTiles);
     });
 
-    it('getTiles: should throw error when get more than amount in reserve.', () => {
+    it('getTiles: should return all tiles error when get more than amount in reserve.', () => {
         const totalTiles = tileReserve.getTilesLeft();
         const amountToRemove = totalTiles + 1;
 

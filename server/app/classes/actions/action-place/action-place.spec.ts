@@ -37,6 +37,15 @@ const VALID_TILES_TO_PLACE: Tile[] = [
     { letter: 'F', value: 0 },
     { letter: 'C', value: 1 },
 ];
+const MAX_LENGTH_TILES_TO_PLACE: Tile[] = [
+    { letter: 'A', value: 1 },
+    { letter: 'F', value: 0 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+];
 
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
 const DEFAULT_POSITION: Position = { row: 7, column: 7 };
@@ -114,6 +123,7 @@ describe('ActionPlace', () => {
             let scoreComputeSpy: unknown;
             let updateBoardSpy: unknown;
             let getTilesSpy: unknown;
+            let isABingoSpy: unknown;
 
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
@@ -123,6 +133,7 @@ describe('ActionPlace', () => {
                 scoreComputeSpy = chai.spy.on(ScoreComputer, 'compute', () => SCORE_RETURN);
                 updateBoardSpy = chai.spy.on(action, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 getTilesSpy = chai.spy.on(game.tileReserve, 'getTiles', () => []);
+                isABingoSpy = chai.spy.on(action, 'isABingo', () => false);
             });
 
             afterEach(() => {
@@ -157,6 +168,11 @@ describe('ActionPlace', () => {
             it('should call get tiles', () => {
                 action.execute();
                 expect(getTilesSpy).to.have.been.called();
+            });
+
+            it('should call isABingo', () => {
+                action.execute();
+                expect(isABingoSpy).to.have.been.called();
             });
 
             it('should return update', () => {
@@ -233,6 +249,20 @@ describe('ActionPlace', () => {
 
         it('should return message', () => {
             expect(action.getMessage()).to.exist;
+        });
+    });
+
+    describe('getMessage', () => {
+        let action: ActionPlace;
+
+        it('should return true with 7 tiles to place', () => {
+            action = new ActionPlace(game.player1, game, MAX_LENGTH_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            expect(action.isABingo()).to.be.true;
+        });
+
+        it('should return false with less than 7 tiles to place', () => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            expect(action.isABingo()).to.be.false;
         });
     });
 });
