@@ -28,7 +28,7 @@ export class WordExtraction {
         while (i < tilesToPlace.length) {
             if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
             if (navigator.verify(HAS_TILE)) {
-                // The square already has a letter, this means that the at index i must be placed in next square
+                // The square already has a letter, this means that the at the tile at index 'i' must be placed in next square
                 // We know that square has a tile because it was checked in the if
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 newWord.push([navigator.square, navigator.square.tile!]);
@@ -70,7 +70,7 @@ export class WordExtraction {
         const word: [Square, Tile][] = [];
 
         while (navigator.move(orientation, direction).verify(HAS_TILE)) {
-            // We know that square has a tile because it was checked in the while
+            // We know that square has a tile because it was checked in the while condition
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             word.push([navigator.square, navigator.square.tile!]);
         }
