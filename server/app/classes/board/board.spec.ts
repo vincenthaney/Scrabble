@@ -3,6 +3,7 @@ import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { BOARD_SIZE } from '@app/constants/game';
 import { expect } from 'chai';
+import { createStubInstance } from 'sinon';
 import { Board, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
 import { POSITION_OUT_OF_BOARD } from './board-errors';
@@ -137,9 +138,28 @@ describe('Board', () => {
         expect(board.verifySquare(position, SHOULD_HAVE_A_TILE)).to.be.false;
     });
 
+    describe('verifySquare', () => {
+        it('should call isWinthinBounds', () => {
+            const positionSub = createStubInstance(Position, {
+                isWithinBounds: true,
+            });
+            positionSub.row = 0;
+            positionSub.column = 0;
+            board.verifySquare(positionSub as Position, true);
+            expect(positionSub.isWithinBounds.called).to.be.true;
+        });
+    });
+
     describe('verifyNeighbors', () => {
         it('should be false when forward is out of bounds', () => {
             expect(board.verifyNeighbors(new Position(grid[0].length, grid.length), Orientation.Horizontal)).to.be.false;
+        });
+    });
+
+    describe('getSquare', () => {
+        it('should return square from grid', () => {
+            const position = new Position(2, 4);
+            expect(board.getSquare(position)).to.equal(board.grid[position.row][position.column]);
         });
     });
 });
