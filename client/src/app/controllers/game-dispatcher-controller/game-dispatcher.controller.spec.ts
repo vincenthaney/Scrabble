@@ -2,15 +2,16 @@ import { GameDispatcherController } from '@app/controllers/game-dispatcher-contr
 import { TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { SocketService } from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket/socket.service';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
-import { PlayerName } from '@app/classes/communication/player-name';
+import PlayerName from '@app/classes/communication/player-name';
 import { Socket } from 'socket.io-client';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
+const DEFAULT_SOCKET_ID = 'testSocketID';
 const DEFAULT_PLAYER_NAME = 'grogars';
 const DEFAULT_GAME_ID = 'grogarsID';
 const DEFAULT_OPPONENT_NAME: PlayerName[] = [{ name: DEFAULT_PLAYER_NAME }];
@@ -50,7 +51,7 @@ describe('GameDispatcherController', () => {
     it('should create', () => {
         expect(controller).toBeTruthy();
     });
-    // ////////////////////////////////////////////////////////////////
+
     it('On join request, configureSocket should emit opponent name', () => {
         const joinRequestSpy = spyOn(controller.joinRequestEvent, 'emit').and.callThrough();
         socketHelper.peerSideEmit('joinRequest', DEFAULT_OPPONENT_NAME);
@@ -94,7 +95,7 @@ describe('GameDispatcherController', () => {
         socketHelper.peerSideEmit('joinerLeaveGame', DEFAULT_OPPONENT_NAME);
         expect(joinerLeaveSpy).toHaveBeenCalled();
     });
-    // // ////////////////////////////////////////////////
+
     it('handleMultiplayerGameCreation should post', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
@@ -118,31 +119,122 @@ describe('GameDispatcherController', () => {
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
-    it('handleConfirmationGameCreation should subscribe', () => {
+    it('handleConfirmationGameCreation should subscribe', async () => {
         // eslint-disable-next-line dot-notation
-        const createGameSpy = spyOn(controller['http'].post, subscribe()).and.callThrough();
-        controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
-        expect(createGameSpy).toHaveBeenCalled();
-        expect(controller).toBeTruthy();
+        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+
+        const observable = new Observable();
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.returnValue(observable);
+        const spy = spyOn(observable, 'subscribe');
+
+        controller.handleMultiplayerGameCreation({} as unknown as GameConfigData);
+
+        expect(spy).toHaveBeenCalled();
     });
 
     it('handleRejectionGameCreation', () => {
-        expect(controller).toBeTruthy();
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        controller.handleRejectionGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
+
+    it('handleRejectionGameCreation SUBSCRIBE', () => {
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+
+        const observable = new Observable();
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.returnValue(observable);
+        const spy = spyOn(observable, 'subscribe');
+
+        controller.handleRejectionGameCreation({} as unknown as string, {} as unknown as string);
+
+        expect(spy).toHaveBeenCalled();
     });
 
     it('handleCancelGame', () => {
-        expect(controller).toBeTruthy();
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+        controller.handleCancelGame(DEFAULT_GAME_ID);
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
+
+    it('handleCancelGame SUBSCRIBE', () => {
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+
+        const observable = new Observable();
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'delete').and.returnValue(observable);
+        const spy = spyOn(observable, 'subscribe');
+
+        controller.handleCancelGame({} as unknown as string);
+
+        expect(spy).toHaveBeenCalled();
     });
 
     it('handleLeaveLobby', () => {
-        expect(controller).toBeTruthy();
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+        controller.handleLeaveLobby(DEFAULT_GAME_ID);
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
+
+    it('handleLeaveLobby SUBSCRIBE', () => {
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+
+        const observable = new Observable();
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'delete').and.returnValue(observable);
+        const spy = spyOn(observable, 'subscribe');
+
+        controller.handleLeaveLobby({} as unknown as string);
+
+        expect(spy).toHaveBeenCalled();
     });
 
     it('handleLobbiesListRequest', () => {
-        expect(controller).toBeTruthy();
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
+        controller.handleLobbiesListRequest();
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
+
+    it('handleLobbiesListRequest SUBSCRIBE', () => {
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+
+        const observable = new Observable();
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'get').and.returnValue(observable);
+        const spy = spyOn(observable, 'subscribe');
+
+        controller.handleLobbiesListRequest();
+
+        expect(spy).toHaveBeenCalled();
     });
 
     it('handleLobbyJoinRequest', () => {
-        expect(controller).toBeTruthy();
+        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
+        expect(httpPostSpy).toHaveBeenCalled();
+    });
+
+    it('handleLobbyJoinRequest SUBSCRIBE', () => {
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+
+        const observable = new Observable();
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.returnValue(observable);
+        const spy = spyOn(observable, 'subscribe');
+
+        controller.handleLobbyJoinRequest({} as unknown as string, {} as unknown as string);
+
+        expect(spy).toHaveBeenCalled();
     });
 });
