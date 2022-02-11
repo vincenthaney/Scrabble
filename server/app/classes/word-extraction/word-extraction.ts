@@ -24,27 +24,26 @@ export class WordExtraction {
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
 
-        let i = 0;
-        while (i < tilesToPlace.length) {
+        for (let i = 0; i < tilesToPlace.length; ) {
             if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
+
             if (navigator.verify(HAS_TILE)) {
                 // The square already has a letter, this means that the at the tile at index 'i' must be placed in next square
                 // We know that square has a tile because it was checked in the if
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 newWord.push([navigator.square, navigator.square.tile!]);
-                navigator.forward(orientation);
-                continue;
+            } else {
+                newWord.push([navigator.square, tilesToPlace[i]]);
+
+                // Add the words created in the opposite Orientation of the move
+                const oppositeOrientation = orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+                if (navigator.verifyNeighbors(oppositeOrientation, HAS_TILE)) {
+                    wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, tilesToPlace[i]));
+                }
+
+                i++;
             }
 
-            newWord.push([navigator.square, tilesToPlace[i]]);
-
-            // Add the words created in the opposite Orientation of the move
-            const oppositeOrientation = orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
-            if (navigator.verifyNeighbors(oppositeOrientation, HAS_TILE)) {
-                wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, tilesToPlace[i]));
-            }
-
-            i++;
             navigator.forward(orientation);
         }
         navigator.backward(orientation);
