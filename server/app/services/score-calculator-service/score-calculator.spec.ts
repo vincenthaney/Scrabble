@@ -23,6 +23,7 @@ import { DEFAULT_MULTIPLIER } from './score-calculator.service.const';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import { Position } from '@app/classes/board';
 
 chai.use(spies);
 chai.use(chaiAsPromised);
@@ -37,7 +38,7 @@ describe('ScoreCalculatorService', () => {
         testTile = { letter: 'X', value: DEFAULT_TILE_VALUE };
         testSquare = {
             tile: null,
-            position: { column: 0, row: 0 },
+            position: new Position(0, 0),
             scoreMultiplier: null,
             wasMultiplierUsed: false,
             isCenter: false,
