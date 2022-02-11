@@ -48,12 +48,13 @@ const MAX_LENGTH_TILES_TO_PLACE: Tile[] = [
 ];
 
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
-const DEFAULT_POSITION: Position = { row: 7, column: 7 };
+const CENTER = 7;
+const DEFAULT_POSITION: Position = new Position(CENTER, CENTER);
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 3 };
-const DEFAULT_SQUARE_1: Square = { tile: null, position: { row: 0, column: 0 }, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
-const DEFAULT_SQUARE_2: Square = { tile: null, position: { row: 0, column: 1 }, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 
 const EXTRACT_RETURN: [Square, Tile][][] = [
     [
@@ -74,12 +75,12 @@ const GET_TILES_RETURN: Tile[] = [
 ];
 const BOARD: Square[][] = [
     [
-        { ...DEFAULT_SQUARE_1, position: { row: 0, column: 0 } },
-        { ...DEFAULT_SQUARE_1, position: { row: 0, column: 1 } },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
     ],
     [
-        { ...DEFAULT_SQUARE_1, position: { row: 1, column: 1 } },
-        { ...DEFAULT_SQUARE_1, position: { row: 1, column: 1 } },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];
 
@@ -128,7 +129,7 @@ describe('ActionPlace', () => {
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
-                wordExtractSpy = chai.spy.on(WordExtraction, 'extract', () => [...EXTRACT_RETURN]);
+                wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordValidatorSpy = chai.spy.on(WordValidator, 'validate', () => true);
                 scoreComputeSpy = chai.spy.on(ScoreComputer, 'compute', () => SCORE_RETURN);
                 updateBoardSpy = chai.spy.on(action, 'updateBoard', () => UPDATE_BOARD_RETURN);
@@ -205,7 +206,7 @@ describe('ActionPlace', () => {
             it('should throw if a word is invalid', () => {
                 chai.spy.restore();
                 getTilesFromPlayerSpy = chai.spy.on(action, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
-                wordExtractSpy = chai.spy.on(WordExtraction, 'extract', () => [...EXTRACT_RETURN]);
+                wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordValidatorSpy = chai.spy.on(WordValidator, 'validate', () => false);
 
                 expect(() => action.execute()).to.throw(ERROR_INVALID_WORD);

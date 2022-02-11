@@ -2,6 +2,8 @@ import { Orientation, Position } from './';
 import { Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
 import { POSITION_OUT_OF_BOARD } from './board-errors';
+import BoardNavigator from './board-navigator';
+import { Vec2 } from '@app/classes/vec2';
 
 export const SHOULD_HAVE_A_TILE = true;
 export const SHOULD_HAVE_NO_TILE = false;
@@ -13,12 +15,39 @@ export default class Board {
     }
     // Verifies if the position is valid and if the square at the given position in the board has a tile or not
     verifySquare(position: Position, shouldBeFilled: boolean): boolean {
-        if (position.row >= 0 && position.column >= 0 && position.row <= this.grid.length - 1 && position.column <= this.grid[0].length - 1) {
+        if (position.isWithinBounds({ x: this.grid[0].length, y: this.grid.length })) {
             return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
         } else {
             throw new Error(POSITION_OUT_OF_BOARD);
         }
     }
+
+    getSquare(position: Position) {
+        return this.grid[position.row][position.column];
+    }
+
+    navigate(position: Position) {
+        return new BoardNavigator(this, position);
+    }
+
+    verifyNeighbors(position: Position, orientation: Orientation, shouldBeFilled: boolean = true) {
+        let backward: boolean;
+        let forward: boolean;
+
+        try {
+            backward = this.verifySquare(position.copy().backward(orientation), shouldBeFilled);
+        } catch (e) {
+            backward = !shouldBeFilled;
+        }
+        try {
+            forward = this.verifySquare(position.copy().forward(orientation), shouldBeFilled);
+        } catch (e) {
+            forward = !shouldBeFilled;
+        }
+
+        return backward || forward;
+    }
+
     placeTile(tile: Tile, position: Position): boolean {
         if (!this.verifySquare(position, SHOULD_HAVE_NO_TILE)) return false;
         this.grid[position.row][position.column].tile = tile;
@@ -53,5 +82,9 @@ export default class Board {
             square.tile = tile;
         }
         return true;
+    }
+
+    getSize(): Vec2 {
+        return { x: this.grid[0].length, y: this.grid.length };
     }
 }
