@@ -5,12 +5,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
+import { IconComponent } from '../icon/icon.component';
 import { InformationBoxComponent } from './information-box.component';
 
 class MockRoundManager {
@@ -72,8 +74,8 @@ describe('InformationBoxComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [HttpClientModule, MatCardModule],
-            declarations: [InformationBoxComponent],
+            imports: [HttpClientModule, MatCardModule, MatTooltipModule],
+            declarations: [InformationBoxComponent, IconComponent],
             providers: [
                 { provide: GameService, useValue: mockGameService },
                 { provide: RoundManagerService, useValue: mockRoundManager },

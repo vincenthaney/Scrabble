@@ -45,7 +45,6 @@ describe('JoinWaitingPageComponent', () => {
                     { path: 'lobby', component: TestComponent },
                     { path: 'join-waiting', component: JoinWaitingPageComponent },
                 ]),
-                s,
             ],
             providers: [GameDispatcherService],
         }).compileComponents();

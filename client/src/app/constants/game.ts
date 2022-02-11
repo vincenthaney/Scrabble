@@ -64,3 +64,5 @@ export const MAX_INPUT_LENGTH = 512;
 export const MAX_TILE_PER_PLAYER = 7;
 
 export const DEFAULT_PLAYER = new Player('id', 'name', []);
+
+export const SYSTEM_ID = 'system';

@@ -65,7 +65,7 @@ export class GamePlayController {
         if (localPlayerFeedback) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
                 content: localPlayerFeedback,
-                senderId: Message,
+                senderId: 'System',
             });
         }
         if (opponentFeedback) {

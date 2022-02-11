@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -7,8 +8,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Message } from '@app/classes/communication/message';
+import { VisualMessage, VisualMessageClasses } from '@app/classes/communication/visual-message';
+import { Player } from '@app/classes/player';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { CommunicationBoxComponent } from './communication-box.component';
 
@@ -20,7 +26,23 @@ describe('CommunicationBoxComponent', () => {
     let virtualScrollSpy: jasmine.SpyObj<CdkVirtualScrollViewport>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let scrollToBottomSpy: jasmine.Spy<any>;
-    let gameServiceSpy: GameService;
+    let gameServiceMock: GameService;
+    let formSpy: jasmine.Spy<any>;
+
+    const CURRENT_PLAYER_ID = 'idOfPlayer1';
+    const OPPONENT_PLAYER_ID = 'idOfPlayer2';
+    const testMessagePlayer1: Message = {
+        content: 'content of test message',
+        senderId: CURRENT_PLAYER_ID,
+    };
+    const testMessagePlayer2: Message = {
+        content: 'content of test message',
+        senderId: OPPONENT_PLAYER_ID,
+    };
+    const testMessageSystem: Message = {
+        content: 'content of test message',
+        senderId: SYSTEM_ID,
+    };
 
     beforeEach(async () => {
         inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput', 'emitNewMessage']);
@@ -64,6 +86,7 @@ describe('CommunicationBoxComponent', () => {
                 MatFormFieldModule,
                 ScrollingModule,
                 HttpClientTestingModule,
+                RouterTestingModule,
             ],
             providers: [
                 { provide: InputParserService, useValue: inputParserSpy },
@@ -72,7 +95,10 @@ describe('CommunicationBoxComponent', () => {
             ],
         }).compileComponents();
 
-        gameServiceSpy = TestBed.inject(GameService);
+        gameServiceMock = TestBed.inject(GameService);
+        gameServiceMock.player1 = new Player(CURRENT_PLAYER_ID, 'player1', []);
+        gameServiceMock.player2 = new Player(OPPONENT_PLAYER_ID, 'player2', []);
+        gameServiceMock['localPlayerId'] = CURRENT_PLAYER_ID;
     });
 
     beforeEach(() => {
@@ -82,10 +108,49 @@ describe('CommunicationBoxComponent', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom').and.callThrough();
+        formSpy = spyOn(component.messageForm, 'reset');
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
+        const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
+        gameServiceMock.handleNewMessage({
+            content: 'new message',
+            senderId: 'System',
+        });
+        expect(onReceiveSpy).toHaveBeenCalled();
+    });
+
+    it('onReceiveNewMessage should call appropriate functions and receive new message', () => {
+        const messagesLengthBefore: number = component.messages.length;
+        gameServiceMock.handleNewMessage({
+            content: 'new message',
+            senderId: 'System',
+        });
+        const messagesLengthAfter: number = component.messages.length;
+        expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
+        expect(scrollToBottomSpy).toHaveBeenCalled();
+    });
+
+    it('should create visualMessage from Message by player1', () => {
+        const returnValue: VisualMessage = component.createVisualMessage(testMessagePlayer1);
+        const expectedValue: VisualMessage = { ...testMessagePlayer1, class: VisualMessageClasses.Me };
+        expect(returnValue).toEqual(expectedValue);
+    });
+
+    it('should create visualMessage from Message by player2', () => {
+        const returnValue: VisualMessage = component.createVisualMessage(testMessagePlayer2);
+        const expectedValue: VisualMessage = { ...testMessagePlayer2, class: VisualMessageClasses.Opponent };
+        expect(returnValue).toEqual(expectedValue);
+    });
+
+    it('should create visualMessage from Message by system', () => {
+        const returnValue: VisualMessage = component.createVisualMessage(testMessageSystem);
+        const expectedValue: VisualMessage = { ...testMessageSystem, class: VisualMessageClasses.System };
+        expect(returnValue).toEqual(expectedValue);
     });
 
     it('scrollToBottom should call scrollTo on viewport', async () => {
@@ -99,35 +164,26 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    it('onSendMessage should clear input field', () => {
-        const inputField = component.messageForm.get('content');
-        inputField?.setValue('new input');
-        component.onSendMessage();
-        expect(inputField?.value).toEqual(null);
-    });
+    // it('onSendMessage should clear input field', () => {
+    //     const inputField = component.messageForm.get('content');
+    //     inputField?.setValue('new input');
+    //     console.log(component.messageForm.get('content')?.value);
+    //     component.onSendMessage();
+    //     console.log(component.messageForm.get('content')?.value);
+    //     expect(inputField?.value).toEqual('');
+    // });
 
     it('onSendMessage should call appropriate functions if message is not empty', () => {
-        component.messageForm.setValue({ content: 'new input' });
+        component.messageForm.get('content')?.setValue('new input');
         component.onSendMessage();
         expect(inputParserSpy.parseInput).toHaveBeenCalled();
-        expect(scrollToBottomSpy).toHaveBeenCalled();
+        expect(formSpy).toHaveBeenCalled();
     });
 
     it('onSendMessage should NOT call appropriate functions if message is empty', () => {
         component.messageForm.setValue({ content: '' });
         component.onSendMessage();
         expect(inputParserSpy.parseInput).not.toHaveBeenCalled();
-        expect(scrollToBottomSpy).not.toHaveBeenCalled();
-    });
-
-    it('should subscribe to inputParserService and receive its new messages', () => {
-        const messagesLengthBefore: number = component.messages.length;
-        gameServiceSpy.handleNewMessage({
-            content: 'new message',
-            senderId: 'System',
-            date: new Date(),
-        });
-        const messagesLengthAfter: number = component.messages.length;
-        expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
+        expect(formSpy).not.toHaveBeenCalled();
     });
 });

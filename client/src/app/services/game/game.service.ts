@@ -108,6 +108,11 @@ export default class GameService {
         return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
     }
 
+    getLocalPlayerId(): string | undefined {
+        if (!this.localPlayerId) return undefined;
+        return this.player1.id === this.localPlayerId ? this.player1.id : this.player2.id;
+    }
+
     gameOver(): boolean {
         throw new Error('Method not implemented.');
     }

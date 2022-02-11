@@ -69,7 +69,7 @@ export class CommunicationBoxComponent implements OnInit {
 
     createVisualMessage(newMessage: Message): VisualMessage {
         let messageClass: VisualMessageClasses;
-        if (newMessage.senderId === this.gameService.getLocalPlayer()?.id) {
+        if (newMessage.senderId === this.gameService.getLocalPlayerId()) {
             messageClass = VisualMessageClasses.Me;
         } else if (newMessage.senderId === VisualMessageClasses.System) {
             messageClass = VisualMessageClasses.System;
@@ -83,7 +83,7 @@ export class CommunicationBoxComponent implements OnInit {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0) {
             this.inputParser.parseInput(message);
-            this.messageForm.reset();
+            this.messageForm.reset({ content: '' });
         }
     }
 
