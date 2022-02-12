@@ -5,7 +5,7 @@
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import {
     EMPTY_WORDS,
     EMPTY_WORD,
@@ -17,6 +17,7 @@ import {
     NOT_USED_MULTIPLIER,
     GENERIC_WORDS_SCORE,
     GENERIC_LETTER_3,
+    MAX_LENGTH_TILES_TO_PLACE,
 } from './score-calculator.const.test';
 import { ScoreCalculatorService } from './score-calculator.service';
 import { DEFAULT_MULTIPLIER } from './score-calculator.service.const';
@@ -24,6 +25,8 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Position } from '@app/classes/board';
+import { stub } from 'sinon';
+import { BINGO_BONUS_POINTS } from '@app/classes/actions/action-place/action-place.const';
 
 chai.use(spies);
 chai.use(chaiAsPromised);
@@ -156,5 +159,25 @@ describe('ScoreCalculatorService', () => {
         const expectedPoints = GENERIC_WORDS_SCORE;
         const testWord = GENERIC_WORDS;
         expect(scoreCalculatorService.calculatePoints(testWord)).to.equal(expectedPoints);
+    });
+
+    it('isABingo should return true with 7 tiles to place', () => {
+        expect(scoreCalculatorService.isABingo(MAX_LENGTH_TILES_TO_PLACE)).to.be.true;
+    });
+
+    it('isABingo should return false with less than 7 tiles to place', () => {
+        expect(scoreCalculatorService.isABingo([MAX_LENGTH_TILES_TO_PLACE[0]])).to.be.false;
+    });
+
+    it('bonusPoints should return BINGO_BONUS_POINTS if isABingo returns true', () => {
+        const isABingoStub = stub(scoreCalculatorService, 'isABingo').returns(true);
+        expect(scoreCalculatorService.bonusPoints(MAX_LENGTH_TILES_TO_PLACE)).to.equal(BINGO_BONUS_POINTS);
+        assert(isABingoStub.calledOnce);
+    });
+
+    it('bonusPoints should return 0 if isABingo returns false', () => {
+        const isABingoStub = stub(scoreCalculatorService, 'isABingo').returns(false);
+        expect(scoreCalculatorService.bonusPoints(MAX_LENGTH_TILES_TO_PLACE)).to.equal(0);
+        assert(isABingoStub.calledOnce);
     });
 });

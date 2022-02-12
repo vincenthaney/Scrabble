@@ -1,3 +1,4 @@
+import { BINGO_BONUS_POINTS, MAX_TILE_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
@@ -6,12 +7,18 @@ import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from './score-calculator.service.co
 
 @Service()
 export class ScoreCalculatorService {
-    // calculatePoints(wordsToScore: [Tile, Square][][]) {
     calculatePoints(wordsToScore: [Square, Tile][][]) {
         return wordsToScore.reduce((total, word) => (total += this.calculatePointsPerWord(word)), DEFAULT_SCORE);
     }
 
-    // private calculatePointsPerWord(word: [Tile, Square][]) {
+    bonusPoints(tilesToPlace: Tile[]): number {
+        if (this.isABingo(tilesToPlace)) return BINGO_BONUS_POINTS;
+        else return 0;
+    }
+    isABingo(tilesToPlace: Tile[]): boolean {
+        return tilesToPlace.length === MAX_TILE_PER_PLAYER;
+    }
+
     private calculatePointsPerWord(word: [Square, Tile][]) {
         let wordScore = DEFAULT_SCORE;
         let wordMultiplier = DEFAULT_MULTIPLIER;
