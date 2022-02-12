@@ -26,7 +26,7 @@ export default class SocketService {
                 } else {
                     connectionTime += delay;
                     if (connectionTime >= timeout) {
-                        reject('TIMEOUT');
+                        reject();
                     }
                 }
             }, delay);
