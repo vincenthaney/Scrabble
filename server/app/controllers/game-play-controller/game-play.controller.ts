@@ -25,14 +25,10 @@ export class GamePlayController {
     }
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
-        console.log(data.player1);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
-        console.log(data.player2);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
-        console.log(data.round);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
-        console.log(data.board);
+        // eslint-disable-next-line no-console
+        console.log(data.player1?.score);
+        // eslint-disable-next-line no-console
+        console.log(data.player2?.score);
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
     }
 
@@ -42,6 +38,11 @@ export class GamePlayController {
         this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
+
+            // eslint-disable-next-line no-console
+            console.log('Action type: ' + data.type);
+            // eslint-disable-next-line no-console
+            console.log('Action Payload: ' + data.payload);
 
             try {
                 this.handlePlayAction(gameId, playerId, data);

@@ -1,8 +1,8 @@
 import { GameType } from '@app/classes/game-type';
-import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { PlayerData } from './';
+import { RoundData } from './round-data';
 
 export interface GameConfigData {
     playerName: string;
@@ -32,5 +32,5 @@ export interface StartMultiplayerGameData extends MultiplayerGameConfig {
     board: Square[][];
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
-    round: Round;
+    round: RoundData;
 }

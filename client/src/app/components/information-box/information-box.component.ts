@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
+import { IconName } from '@app/components/icon/icon.component.type';
 import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Observable, Subject, Subscription, timer as timerCreationFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { IconName } from '@app/components/icon/icon.component.type';
 
 const LOCAL_PLAYER_ICON: IconName[] = ['user-astronaut', 'user-cowboy', 'user-ninja', 'user-robot', 'user-crown'];
 

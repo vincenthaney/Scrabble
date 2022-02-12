@@ -1,8 +1,9 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { RoundData } from '@app/classes/communication/round-data';
 import { IResetableService } from '@app/classes/i-resetable-service';
-import { AbstractPlayer } from '@app/classes/player';
+import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
@@ -31,6 +32,18 @@ export default class RoundManagerService implements IResetableService {
         this.endRoundEvent = new EventEmitter();
     }
 
+    convertRoundDataToRound(roundData: RoundData): Round {
+        if (!roundData.playerData.id || !roundData.playerData.name || !roundData.playerData.tiles)
+            throw Error('INVALID PLAYER TO CONVERT ROUND DATA');
+        const player = new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles);
+        return {
+            player,
+            startTime: roundData.startTime,
+            limitTime: roundData.limitTime,
+            completedTime: roundData.completedTime,
+        };
+    }
+
     resetServiceData(): void {
         this.gameId = '';
         this.localPlayerId = '';
@@ -44,6 +57,7 @@ export default class RoundManagerService implements IResetableService {
         this.currentRound.completedTime = round.startTime;
         this.completedRounds.push(this.currentRound);
         this.currentRound = round;
+        this.endRoundEvent.emit();
         this.startRound();
     }
 

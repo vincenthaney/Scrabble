@@ -3,6 +3,7 @@ import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionRese
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -31,8 +32,9 @@ export class GamePlayService {
 
         if (action.willEndTurn()) {
             const nextRound = game.roundManager.nextRound(action);
-            if (updatedData) updatedData.round = nextRound;
-            else updatedData = { round: nextRound };
+            const nextRoundData: RoundData = game.roundManager.convertRoundToRoundData(nextRound);
+            if (updatedData) updatedData.round = nextRoundData;
+            else updatedData = { round: nextRoundData };
         }
 
         if (game.isGameOver()) {
