@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
@@ -37,14 +36,22 @@ class RoundManagerServiceWrapper {
 })
 class TestComponent {}
 
+const DEFAULT_MAX_ROUND_TIME = 60;
+const ONE_MINUTE_TIMER = new Timer(1, 0);
+
+const TIME_INTERVAL = 1000;
+const PAST_DATE = new Date(Date.now() - TIME_INTERVAL);
+const CURRENT_DATE = new Date(Date.now());
+const FUTUR_DATE = new Date(Date.now() + TIME_INTERVAL);
+
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
     let gameplayControllerSpy: SpyObj<GamePlayController>;
 
     const currentRound: Round = {
         player: DEFAULT_PLAYER,
-        startTime: new Date(Date.now() - 1000),
-        limitTime: new Date(Date.now()),
+        startTime: new Date(PAST_DATE),
+        limitTime: new Date(CURRENT_DATE),
         completedTime: null,
     };
 
@@ -106,8 +113,8 @@ describe('RoundManagerService', () => {
 
         const updatedRound: Round = {
             player: DEFAULT_PLAYER,
-            startTime: new Date(Date.now()),
-            limitTime: new Date(Date.now() + 1000),
+            startTime: new Date(CURRENT_DATE),
+            limitTime: new Date(FUTUR_DATE),
             completedTime: null,
         };
 
@@ -200,8 +207,8 @@ describe('RoundManagerService', () => {
         const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
             return;
         });
-        service.maxRoundTime = 60;
-        const newTimer = new Timer(1, 0);
+        service.maxRoundTime = DEFAULT_MAX_ROUND_TIME;
+        const newTimer = ONE_MINUTE_TIMER;
 
         service.currentRound = currentRound;
         const activePlayer = currentRound.player;
