@@ -30,9 +30,10 @@ export default class SocketService {
 
     disconnect() {
         if (!this.socket) {
-            return;
+            return false;
         }
         this.socket.disconnect();
+        return true;
     }
 
     getId(): string {
@@ -50,8 +51,9 @@ export default class SocketService {
 
     emit<T>(ev: string, ...args: T[]) {
         if (!this.socket) {
-            return;
+            return false;
         }
         this.socket.emit(ev, args);
+        return true;
     }
 }
