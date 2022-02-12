@@ -103,7 +103,7 @@ describe('RoundManagerService', () => {
             expect(service.maxRoundTime).toEqual(0);
         });
 
-        it('resetServiceData should reset the gameId', () => {
+        it('resetServiceData should complete timerSource', () => {
             expect(timeSourceSpy).toHaveBeenCalled();
         });
     });
@@ -132,7 +132,7 @@ describe('RoundManagerService', () => {
             expect(service.completedRounds[numberOfRounds - 1].completedTime).toEqual(updatedRound.startTime);
         });
 
-        it('updateRound should set old current round to the end of completed rounds', () => {
+        it('updateRound should append old current round to the completed rounds array', () => {
             const numberOfRounds = service.completedRounds.length;
             const lastRoundInArray = service.completedRounds[numberOfRounds - 1];
             currentRound.completedTime = updatedRound.startTime;
@@ -239,7 +239,7 @@ describe('RoundManagerService', () => {
             expect(endRoundEventSpy).not.toHaveBeenCalled();
         }));
 
-        it('RoundTimeout should not send pass event if the player is not the active player', () => {
+        it('RoundTimeout should not send pass event if the local player is not the active player', () => {
             spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
             service.roundTimeout();
             expect(gameplayControllerSpy.handleAction).not.toHaveBeenCalled();
@@ -256,7 +256,7 @@ describe('RoundManagerService', () => {
             expect(endRoundEventSpy).toHaveBeenCalled();
         }));
 
-        it('RoundTimeout should send pass action', fakeAsync(() => {
+        it('RoundTimeout should send pass action when local player is active player', fakeAsync(() => {
             const router: Router = TestBed.inject(Router);
             router.navigateByUrl('/game');
             tick();
