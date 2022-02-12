@@ -26,15 +26,14 @@ export class GamePlayService {
             const nextRound = game.roundManager.nextRound(action);
             if (updatedData) updatedData.round = nextRound;
             else updatedData = { round: nextRound };
+            if (game.isGameOver()) {
+                // Send messages to players
+                // TODO: Make sure it is sent AFTER action message
+                game.endOfGame();
+                if (updatedData) updatedData.isGameOver = true;
+                else updatedData = { isGameOver: true };
+            }
         }
-
-        if (game.isGameOver()) {
-            // Send messages to players
-            game.endOfGame();
-            if (updatedData) updatedData.isGameOver = true;
-            else updatedData = { isGameOver: true };
-        }
-
         return updatedData;
     }
 

@@ -217,9 +217,7 @@ describe('Game', () => {
 
             game.player1.score = PLAYER_1_SCORE;
             game.player2.score = PLAYER_2_SCORE;
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
         });
 
