@@ -2,7 +2,7 @@ import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
 import { Service } from 'typedi';
-import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from './score-calculator.service.const';
+import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from '../../constants/services-constants/score-calculator.service.const';
 
 @Service()
 export class ScoreCalculatorService {

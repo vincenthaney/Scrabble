@@ -9,7 +9,7 @@ import {
 import { Service } from 'typedi';
 import * as fs from 'fs';
 import { join } from 'path';
-import * as WordsVerificationConst from './words-verification.service.const';
+import * as WordsVerificationConst from '../../constants/services-constants/words-verification.service.const';
 import { DictionaryData } from './words-verification.service.types';
 
 @Service()

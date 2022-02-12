@@ -5,7 +5,7 @@
 import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { expect } from 'chai';
 import { WordsVerificationService } from './words-verification.service';
-import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from './words-verification.service.const';
+import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from '../../constants/services-constants/words-verification.service.const';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';

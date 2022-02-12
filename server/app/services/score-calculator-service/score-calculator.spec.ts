@@ -19,7 +19,7 @@ import {
     GENERIC_LETTER_3,
 } from './score-calculator.const.test';
 import { ScoreCalculatorService } from './score-calculator.service';
-import { DEFAULT_MULTIPLIER } from './score-calculator.service.const';
+import { DEFAULT_MULTIPLIER } from '../../constants/services-constants/score-calculator.service.const';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
