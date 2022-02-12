@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from './default-dialog.component';
-import defaultDialogErrors from './default-dialog.component.errors';
+import { defaultDialogErrors } from '@app/components/component-errors';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
 const MODEL: DefaultDialogParameters = {
