@@ -61,11 +61,11 @@ export default class Game {
         throw new Error('Solo mode not implemented');
     }
 
-    getTiles(amount: number): Tile[] {
+    getTilesFromReserve(amount: number): Tile[] {
         return this.tileReserve.getTiles(amount);
     }
 
-    swapTiles(tilesToSwap: Tile[]): Tile[] {
+    swapTilesFromReserve(tilesToSwap: Tile[]): Tile[] {
         return this.tileReserve.swapTiles(tilesToSwap);
     }
 

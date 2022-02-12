@@ -127,14 +127,14 @@ describe('Game', () => {
         it('getTiles should call tileReserve.getTiles and return it', () => {
             const expected = [DEFAULT_TILE];
             tileReserveStub.getTiles.returns([DEFAULT_TILE]);
-            expect(game.getTiles(1)).to.deep.equal(expected);
+            expect(game.getTilesFromReserve(1)).to.deep.equal(expected);
             assert(tileReserveStub.getTiles.calledOnce);
         });
 
         it('swapTiles should call tileReserve.swapTiles and return it', () => {
             const expected = [DEFAULT_TILE];
             tileReserveStub.swapTiles.returns([DEFAULT_TILE]);
-            expect(game.swapTiles([DEFAULT_TILE_2])).to.deep.equal(expected);
+            expect(game.swapTilesFromReserve([DEFAULT_TILE_2])).to.deep.equal(expected);
             assert(tileReserveStub.swapTiles.calledOnce);
         });
 
