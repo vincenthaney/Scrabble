@@ -1,7 +1,9 @@
+/* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { LobbyInfo } from '@app/classes/communication';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -137,27 +139,131 @@ describe('GameDispatcherService', () => {
         expect(spyEmit).toHaveBeenCalledWith(TEST_LOBBIES);
     });
 
-    // /////////////////////////////////////////////////////////////
-    // TODO:ADDDDD TESTS,  ngOnInit() and subscriber
-    // handleJoinRequest(opponentName: string) {
-    //     this.joinRequestEvent.emit(opponentName);
-    // }
+    describe('handleCancelGame', () => {
+        it('should call handleCancelGame if gameId is defined', () => {
+            service.gameId = BASE_GAME_ID;
+            const spy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
+            service.handleCancelGame();
+            expect(spy).toHaveBeenCalledWith(BASE_GAME_ID);
+        });
 
-    // handleLobbiesUpdate(lobbies: LobbyInfo[]) {
-    //     this.lobbiesUpdateEvent.emit(lobbies);
-    // }
+        it('should not call handleCancelGame if gameId is undefined', () => {
+            service.gameId = undefined;
+            const spy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
+            service.handleCancelGame();
+            expect(spy).not.toHaveBeenCalled();
+        });
 
-    // handleLobbyFull(opponentName: string) {
-    //     this.lobbyFullEvent.emit(opponentName);
-    //     this.gameId = undefined;
-    // }
+        it('should call resetData', () => {
+            spyOn(service['gameDispatcherController'], 'handleCancelGame');
+            const spy = spyOn(service, 'resetData');
+            service.handleCancelGame();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
 
-    // handleCanceledGame(hostName: string) {
-    //     this.canceledGameEvent.emit(hostName);
-    //     this.gameId = undefined;
-    // }
+    describe('handleConfirmation', () => {
+        it('should call handleCancelGame if gameId is defined', () => {
+            service.gameId = BASE_GAME_ID;
+            const spy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
+            service.handleConfirmation(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
+        });
 
-    // handleJoinerLeaveGame(leaverName: string) {
-    //     this.joinerLeaveGameEvent.emit(leaverName);
-    // }
+        it('should not call handleCancelGame if gameId is undefined', () => {
+            service.gameId = undefined;
+            const spy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
+            service.handleConfirmation(TEST_PLAYER_NAME);
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleRejection', () => {
+        it('should call handleCancelGame if gameId is defined', () => {
+            service.gameId = BASE_GAME_ID;
+            const spy = spyOn(service['gameDispatcherController'], 'handleRejectionGameCreation');
+            service.handleRejection(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
+        });
+
+        it('should not call handleCancelGame if gameId is undefined', () => {
+            service.gameId = undefined;
+            const spy = spyOn(service['gameDispatcherController'], 'handleRejectionGameCreation');
+            service.handleRejection(TEST_PLAYER_NAME);
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleJoinRequest', () => {
+        it('should emit to joinRequestEvent', () => {
+            const spy = spyOn(service.joinRequestEvent, 'emit');
+            service.handleJoinRequest(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+    });
+
+    describe('handleJoinerRejected', () => {
+        it('should emit to joinerRejectedEvent', () => {
+            const spy = spyOn(service.joinerRejectedEvent, 'emit');
+            spyOn(service, 'resetData');
+            service.handleJoinerRejected(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+
+        it('should call resetData', () => {
+            spyOn(service.joinerRejectedEvent, 'emit');
+            const spy = spyOn(service, 'resetData');
+            service.handleJoinerRejected(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('handleLobbiesUpdate', () => {
+        it('should emit to joinRequestEvent', () => {
+            const args: LobbyInfo[] = [];
+            const spy = spyOn(service.lobbiesUpdateEvent, 'emit');
+            service.handleLobbiesUpdate(args);
+            expect(spy).toHaveBeenCalledWith(args);
+        });
+    });
+
+    describe('handleLobbyFull', () => {
+        it('should emit to lobbyFullEvent', () => {
+            const spy = spyOn(service.lobbyFullEvent, 'emit');
+            spyOn(service, 'resetData');
+            service.handleLobbyFull();
+            expect(spy).toHaveBeenCalledWith();
+        });
+
+        it('should call resetData', () => {
+            spyOn(service.lobbyFullEvent, 'emit');
+            const spy = spyOn(service, 'resetData');
+            service.handleLobbyFull();
+            expect(spy).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('handleCanceledGame', () => {
+        it('should emit to canceledGameEvent', () => {
+            const spy = spyOn(service.canceledGameEvent, 'emit');
+            spyOn(service, 'resetData');
+            service.handleCanceledGame(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+
+        it('should call resetData', () => {
+            spyOn(service.canceledGameEvent, 'emit');
+            const spy = spyOn(service, 'resetData');
+            service.handleCanceledGame(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('handleJoinerLeaveGame', () => {
+        it('should emit to joinRequestEvent', () => {
+            const spy = spyOn(service.joinerLeaveGameEvent, 'emit');
+            service.handleJoinerLeaveGame(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+    });
 });
