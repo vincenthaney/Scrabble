@@ -15,6 +15,7 @@ section#text-box-container {
             flex-grow: 1;
             border: solid 2px rgb(207, 207, 207);
             border-radius: 4px;
+            padding-bottom: 6px;
             margin-bottom: 6px;
             text-align: left;
             overflow-x: hidden;
@@ -25,7 +26,7 @@ section#text-box-container {
             }
 
             .scroll-item {
-                padding: 0 12px;
+                //padding: 0 12px;
 
                 p {
                     margin: 0;
@@ -49,6 +50,7 @@ section#text-box-container {
                     margin-top: 12px;
 
                     p.message {
+                        padding: 4px 0;
                         border-top-left-radius: 1em;
                         border-top-right-radius: 1em;
                     }
