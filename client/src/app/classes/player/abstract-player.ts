@@ -1,4 +1,4 @@
-import { PlayerData } from '@app/classes/communication/player-data';
+import { PlayerData } from '@app/classes/communication/';
 import { Tile } from '@app/classes/tile';
 export default abstract class AbstractPlayer {
     id: string;

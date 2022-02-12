@@ -20,7 +20,16 @@ mat-button-toggle-group {
     margin-bottom: 25px;
 }
 
-mat-button-toggle-group, mat-button-toggle, mat-form-field, form, app-name-field input {
+mat-button-toggle-group {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+mat-button-toggle-group,
+mat-button-toggle,
+mat-form-field,
+form,
+app-name-field input {
     width: 100%;
 }
 
@@ -29,7 +38,6 @@ form ~ mat-label {
     width: 100%;
     text-align: left;
 }
-
 
 mat-button-toggle {
     display: inline-flex;

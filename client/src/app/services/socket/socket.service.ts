@@ -6,7 +6,7 @@ import * as SOCKET_ERROR from './socket.service.error';
 @Injectable({
     providedIn: 'root',
 })
-export class SocketService {
+export default class SocketService {
     private socket: Socket;
 
     async initializeService(): Promise<void> {
