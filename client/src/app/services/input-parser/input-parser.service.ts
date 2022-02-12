@@ -48,27 +48,28 @@ export default class InputParserService {
 
     parseInput(input: string): void {
         const playerId = this.getLocalPlayerId();
+        const gameId: string = this.gameService.getGameId();
+
         if (input[0] === '!') {
             // it is an action
             const inputWords: string[] = input.substring(1).split(' ');
             const actionName: string = inputWords[0];
 
             try {
-                this.parseCommand(actionName, inputWords);
+                const actionData: ActionData = this.parseCommand(actionName, inputWords);
                 this.controller.sendMessage(this.gameService.getGameId(), playerId, {
                     content: input,
                     senderId: this.getLocalPlayer().id,
                 });
+                this.controller.sendAction(gameId, playerId, actionData);
             } catch (e) {
                 if (e instanceof CommandError) {
                     if (e.message === CommandErrorMessages.NotYourTurn) {
-                        console.log(e.message);
                         this.controller.sendError(this.gameService.getGameId(), playerId, {
                             content: e.message,
                             senderId: SYSTEM_ID,
                         });
                     } else {
-                        console.log(e.message);
                         this.controller.sendError(this.gameService.getGameId(), playerId, {
                             content: `La commande ${input} est invalide`,
                             senderId: SYSTEM_ID,
@@ -84,9 +85,8 @@ export default class InputParserService {
         }
     }
 
-    private parseCommand(actionName: string, inputWords: string[]) {
+    private parseCommand(actionName: string, inputWords: string[]): ActionData {
         const playerId = this.getLocalPlayerId();
-        const gameId: string = this.gameService.getGameId();
         // eslint-disable-next-line dot-notation
         const currentPlayerId = this.gameService['roundManager'].currentRound.player.id;
 
@@ -110,17 +110,14 @@ export default class InputParserService {
                         payload: this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]),
                     };
                 }
-                this.controller.sendAction(gameId, playerId, actionData);
                 break;
             }
             case 'échanger':
                 if (inputWords.length !== EXPECTED_WORD_COUNT_EXCHANGE) throw new CommandError(CommandErrorMessages.BadSyntax);
-
                 actionData = {
                     type: ActionType.EXCHANGE,
                     payload: this.createExchangeActionPayload(inputWords[1]),
                 };
-                this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'passer':
                 if (inputWords.length !== EXPECTED_WORD_COUNT_PASS) throw new CommandError(CommandErrorMessages.BadSyntax);
@@ -128,11 +125,13 @@ export default class InputParserService {
                     type: ActionType.PASS,
                     payload: {},
                 };
-                this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'réserve':
                 if (inputWords.length !== EXPECTED_WORD_COUNT_RESERVE) throw new CommandError(CommandErrorMessages.BadSyntax);
-                // this.controller.sendReserveAction();
+                actionData = {
+                    type: ActionType.RESERVE,
+                    payload: {},
+                };
                 break;
             // case 'indice':
             //     if (inputWords.length !== EXPECTED_WORD_COUNT_HINT) throw new CommandError(CommandErrorMessages.BadSyntax);
@@ -140,11 +139,15 @@ export default class InputParserService {
             //     break;
             case 'aide':
                 if (inputWords.length !== EXPECTED_WORD_COUNT_HELP) throw new CommandError(CommandErrorMessages.BadSyntax);
-                // this.controller.sendHelpAction();
+                actionData = {
+                    type: ActionType.HELP,
+                    payload: {},
+                };
                 break;
             default:
                 throw new CommandError(CommandErrorMessages.InvalidEntry);
         }
+        return actionData;
     }
 
     private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string): ActionPlacePayload {
