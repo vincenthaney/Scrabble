@@ -23,13 +23,15 @@
             <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
                 <div [class]="'scroll-item ' + msg.class" *cdkVirtualFor="let msg of messages">
                     <div class="message-container">
-                        <p class="message">{{ msg.text }}</p>
+                        <p class="message">{{ msg.content }}</p>
                     </div>
                 </div>
             </cdk-virtual-scroll-viewport>
-            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
-                <input matInput type="text" formControlName="content" placeholder="Message..." #messageInput />
-                <button id="send-button" stype="submit" mat-flat-button color="primary"><app-icon icon="arrow-right"></app-icon></button>
+            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
+                <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici" #messageInput />
+                <div matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
+                    <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid"><app-icon icon="arrow-right"></app-icon></button>  
+                </div>
             </form>
         </mat-card>
     </section>

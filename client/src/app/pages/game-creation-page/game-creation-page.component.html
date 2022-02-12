@@ -51,7 +51,7 @@
                         <mat-option value="default-dictionary">Par défaut (Français)</mat-option>
                     </mat-select>
                 </mat-form-field>
-                <app-name-field></app-name-field>
+                <app-name-field (keydown.enter)="$event.preventDefault()"></app-name-field>
             </span>
             <span id="bottom-buttons">
                 <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>

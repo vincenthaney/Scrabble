@@ -38,6 +38,7 @@ export class GameDispatcherService {
     getLobbiesRoom() {
         return this.lobbiesRoom;
     }
+
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {

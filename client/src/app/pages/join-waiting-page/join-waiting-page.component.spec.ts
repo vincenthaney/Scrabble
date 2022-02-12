@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -40,7 +40,7 @@ describe('JoinWaitingPageComponent', () => {
                 MatDialogModule,
                 MatProgressBarModule,
                 BrowserAnimationsModule,
-                HttpClientModule,
+                HttpClientTestingModule,
                 RouterTestingModule.withRoutes([
                     { path: 'lobby', component: TestComponent },
                     { path: 'join-waiting', component: JoinWaitingPageComponent },

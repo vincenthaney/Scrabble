@@ -2,12 +2,15 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import { BehaviorSubject } from 'rxjs';
 import * as GAME_ERRORS from './game.service.error';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
@@ -23,6 +26,11 @@ export default class GameService {
     player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
+    gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
+    newMessageValue = new BehaviorSubject<Message>({
+        content: 'Début de la partie',
+        senderId: SYSTEM_ID,
+    });
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
@@ -35,12 +43,13 @@ export default class GameService {
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
-        private gameplayController: GamePlayController,
+        private gameController: GamePlayController,
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
+        this.gameController.newMessageValue.subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.gameController.gameUpdateValue.subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
-        this.gameplayController.gameUpdateData.subscribe((data: GameUpdateData) => this.handleGameUpdate(data));
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
@@ -91,6 +100,14 @@ export default class GameService {
         }
     }
 
+    updateGameUpdateData(newData: GameUpdateData) {
+        this.gameUpdateValue.next(newData);
+    }
+
+    handleNewMessage(newMessage: Message): void {
+        this.newMessageValue.next(newMessage);
+    }
+
     isLocalPlayerPlaying(): boolean {
         if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
         return this.localPlayerId === this.roundManager.getActivePlayer().id;
@@ -103,6 +120,11 @@ export default class GameService {
     getLocalPlayer(): AbstractPlayer | undefined {
         if (!this.localPlayerId) return undefined;
         return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
+    }
+
+    getLocalPlayerId(): string | undefined {
+        if (!this.localPlayerId) return undefined;
+        return this.player1.id === this.localPlayerId ? this.player1.id : this.player2.id;
     }
 
     gameOver(): boolean {

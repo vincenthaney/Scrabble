@@ -20,14 +20,13 @@ export default class SocketService {
         return new Promise((resolve, reject) => {
             let connectionTime = 0;
             const interval = setInterval(() => {
+                connectionTime += delay;
                 if (predicate()) {
                     clearInterval(interval);
                     resolve();
-                } else {
-                    connectionTime += delay;
-                    if (connectionTime >= timeout) {
-                        reject();
-                    }
+                } else if (connectionTime >= timeout) {
+                    clearInterval(interval);
+                    reject();
                 }
             }, delay);
         });
@@ -43,9 +42,10 @@ export default class SocketService {
 
     disconnect() {
         if (!this.socket) {
-            return;
+            return false;
         }
         this.socket.disconnect();
+        return true;
     }
 
     getId(): string {
@@ -63,8 +63,9 @@ export default class SocketService {
 
     emit<T>(ev: string, ...args: T[]) {
         if (!this.socket) {
-            return;
+            return false;
         }
         this.socket.emit(ev, args);
+        return true;
     }
 }
