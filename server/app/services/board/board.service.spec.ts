@@ -35,12 +35,12 @@ describe('BoardService', () => {
     */
     const isBoardDefined = boardConfigSize.x > 0 && boardConfigSize.y > 0;
     const isBoardDefinedTestCases: Map<Position, boolean> = new Map([
-        [{ row: -1, column: -1 }, false],
-        [{ row: 0, column: 0 }, isBoardDefined],
-        [{ row: boardConfigSize.x / 2, column: boardConfigSize.y / 2 }, isBoardDefined],
-        [{ row: boardConfigSize.x - 1, column: boardConfigSize.y - 1 }, isBoardDefined],
-        [{ row: boardConfigSize.x, column: boardConfigSize.y }, false],
-        [{ row: boardConfigSize.x + 1, column: boardConfigSize.y + 1 }, false],
+        [new Position(-1, -1), false],
+        [new Position(0, 0), isBoardDefined],
+        [new Position(boardConfigSize.y / 2, boardConfigSize.x / 2), isBoardDefined],
+        [new Position(boardConfigSize.y - 1, boardConfigSize.x - 1), isBoardDefined],
+        [new Position(boardConfigSize.y, boardConfigSize.x), false],
+        [new Position(boardConfigSize.y + 1, boardConfigSize.x + 1), false],
     ]);
 
     type MapTypes = ScoreMultiplier | null | undefined;
@@ -57,58 +57,58 @@ describe('BoardService', () => {
 
     const boardInitializationTestCases: Map<Position, Square | undefined> = new Map([
         [
-            { row: 0, column: 0 },
+            new Position(0, 0),
             {
                 tile: null,
-                position: { row: 0, column: 0 },
+                position: new Position(0, 0),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
         [
-            { row: 1, column: 1 },
+            new Position(1, 1),
             {
                 tile: null,
-                position: { row: 1, column: 1 },
+                position: new Position(1, 1),
                 scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
         [
-            { row: BOARD_SIZE.x - 1, column: 0 },
+            new Position(0, BOARD_SIZE.x - 1),
             {
                 tile: null,
-                position: { row: BOARD_SIZE.x - 1, column: 0 },
+                position: new Position(0, BOARD_SIZE.x - 1),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
-        [{ row: BOARD_SIZE.x, column: 0 }, undefined],
+        [new Position(0, BOARD_SIZE.x), undefined],
         [
-            { row: 0, column: BOARD_SIZE.y - 1 },
+            new Position(BOARD_SIZE.y - 1, 0),
             {
                 tile: null,
-                position: { row: 0, column: BOARD_SIZE.y - 1 },
+                position: new Position(BOARD_SIZE.y - 1, 0),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
-        [{ row: 0, column: BOARD_SIZE.y }, undefined],
+        [new Position(BOARD_SIZE.y, 0), undefined],
         [
-            { row: BOARD_SIZE.x - 1, column: BOARD_SIZE.y - 1 },
+            new Position(BOARD_SIZE.y - 1, BOARD_SIZE.x - 1),
             {
                 tile: null,
-                position: { row: BOARD_SIZE.x - 1, column: BOARD_SIZE.y - 1 },
+                position: new Position(BOARD_SIZE.y - 1, BOARD_SIZE.x - 1),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
-        [{ row: BOARD_SIZE.x, column: BOARD_SIZE.y }, undefined],
+        [new Position(BOARD_SIZE.y, BOARD_SIZE.x), undefined],
     ]);
 
     beforeEach(() => {
@@ -138,7 +138,7 @@ describe('BoardService', () => {
 
     it('Reading board config at undefined position should throw error', () => {
         chai.spy.on(service, 'isBoardConfigDefined', () => false);
-        const undefinedPosition: Position = { row: -1, column: -1 };
+        const undefinedPosition: Position = new Position(-1, -1);
         expect(() => service['readScoreMultiplierConfig'](undefinedPosition)).to.throw(BOARD_ERRORS.BOARD_CONFIG_UNDEFINED_AT(undefinedPosition));
     });
 
@@ -147,7 +147,7 @@ describe('BoardService', () => {
         chai.spy.on(service, 'parseSquareConfig', () => {
             return { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER };
         });
-        expect(service['readScoreMultiplierConfig']({ row: 5, column: 5 })).to.deep.equal({
+        expect(service['readScoreMultiplierConfig'](new Position(5, 5))).to.deep.equal({
             multiplier: 2,
             multiplierEffect: MultiplierEffect.LETTER,
         });
@@ -157,7 +157,7 @@ describe('BoardService', () => {
         chai.spy.on(service, 'readScoreMultiplierConfig', () => null);
         const board: Board = service.initializeBoard();
 
-        const expectedCenter: Position = { row: 7, column: 7 };
+        const expectedCenter: Position = new Position(7, 7);
         expect(board.grid[expectedCenter.row][expectedCenter.column].isCenter).to.be.true;
     });
 

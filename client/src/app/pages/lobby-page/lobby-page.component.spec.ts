@@ -150,7 +150,13 @@ describe('LobbyPageComponent', () => {
 
     it('lobbyFullDialog should open the dialog component', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.lobbyFullDialog('leaver');
+        component.lobbyFullDialog();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('lobbyCanceledDialog should open the dialog component', () => {
+        const spy = spyOn(component.dialog, 'open');
+        component.lobbyCanceledDialog();
         expect(spy).toHaveBeenCalled();
     });
 
@@ -159,8 +165,11 @@ describe('LobbyPageComponent', () => {
         const spySubscribeLobbyUpdateEvent = spyOn(gameDispatcherServiceMock.lobbiesUpdateEvent, 'subscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeLobbyFullEvent = spyOn(gameDispatcherServiceMock.lobbyFullEvent, 'subscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spySubscribeLobbyCanceledEvent = spyOn(gameDispatcherServiceMock.canceledGameEvent, 'subscribe').and.returnValue(of(true) as any);
         component.ngOnInit();
         expect(spySubscribeLobbyUpdateEvent).toHaveBeenCalled();
+        expect(spySubscribeLobbyCanceledEvent).toHaveBeenCalled();
         expect(spySubscribeLobbyFullEvent).toHaveBeenCalled();
     });
 
@@ -176,12 +185,19 @@ describe('LobbyPageComponent', () => {
     });
 
     it('lobbyFullDialog should be called when lobbyFullEvent is emittted', () => {
-        const emitName = 'weirdName';
         const spyOpponentLeft = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.lobbyFullEvent.emit(emitName);
-        expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
+        gameDispatcherServiceMock.lobbyFullEvent.emit();
+        expect(spyOpponentLeft).toHaveBeenCalled();
+    });
+
+    it('lobbyFullDialog should be called when lobbyCancelEvent is emittted', () => {
+        const spyOpponentLeft = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
+            return;
+        });
+        gameDispatcherServiceMock.canceledGameEvent.emit();
+        expect(spyOpponentLeft).toHaveBeenCalled();
     });
 
     it('ngOnDestroy should unsubscribe all subscriptions', () => {
@@ -189,9 +205,12 @@ describe('LobbyPageComponent', () => {
         const spyUnsubscribeUpdateEvent = spyOn(component.lobbiesUpdateSubscription, 'unsubscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spyUnsubscribeLobbyFullEvent = spyOn(component.lobbyFullSubscription, 'unsubscribe').and.returnValue(of(true) as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spyUnsubscribeLobbyCanceledEvent = spyOn(component.lobbyCanceledSubscription, 'unsubscribe').and.returnValue(of(true) as any);
 
         component.ngOnDestroy();
         expect(spyUnsubscribeUpdateEvent).toHaveBeenCalled();
         expect(spyUnsubscribeLobbyFullEvent).toHaveBeenCalled();
+        expect(spyUnsubscribeLobbyCanceledEvent).toHaveBeenCalled();
     });
 });

@@ -7,6 +7,7 @@ import Player from '@app/classes/player/player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
+import { Position } from '@app/classes/board';
 
 @Service()
 export class GamePlayService {
@@ -41,7 +42,8 @@ export class GamePlayService {
         switch (actionData.type) {
             case 'place': {
                 const payload = this.getActionPlacePayload(actionData);
-                return new ActionPlace(player, game, payload.tiles, payload.position, payload.orientation);
+                const position = new Position(payload.position.column, payload.position.row);
+                return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
             }
             case 'exchange': {
                 const payload = this.getActionExchangePayload(actionData);
