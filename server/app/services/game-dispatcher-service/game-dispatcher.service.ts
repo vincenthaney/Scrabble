@@ -41,7 +41,7 @@ export class GameDispatcherService {
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {
-            throw new HttpException(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
+            throw new HttpException(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
         }
         if (waitingRoom.getConfig().player1.name === playerName) {
             throw new HttpException(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
@@ -99,7 +99,7 @@ export class GameDispatcherService {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
-        } else if (waitingRoom.joinedPlayer?.getId() !== playerId) {
+        } else if (waitingRoom.joinedPlayer.getId() !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         }
         const leaverName = waitingRoom.joinedPlayer.name;
@@ -141,7 +141,7 @@ export class GameDispatcherService {
     getGameFromId(waitingRoomId: string): WaitingRoom {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
-        throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID);
+        throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
     }
 
     private createStartGameData(createdGame: Game): StartMultiplayerGameData {
@@ -149,6 +149,7 @@ export class GameDispatcherService {
         createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });
         });
+        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
         const startMultiplayerGameData: StartMultiplayerGameData = {
             player1: createdGame.player1,
             player2: createdGame.player2,
@@ -158,6 +159,7 @@ export class GameDispatcherService {
             gameId: createdGame.getId(),
             board: createdGame.board.grid,
             tileReserve,
+            tileReserveTotal,
             round: createdGame.roundManager.getCurrentRound(),
         };
         return startMultiplayerGameData;

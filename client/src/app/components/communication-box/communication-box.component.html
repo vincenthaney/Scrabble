@@ -6,8 +6,8 @@
                 <div *ngFor="let obj of objectives">{{obj}}</div>
             </mat-expansion-panel> -->
 
-            <mat-expansion-panel id="tile-map" [expanded]="true">
-                <mat-expansion-panel-header>Tuiles restantes : {{lettersLeft.length}}</mat-expansion-panel-header>
+            <mat-expansion-panel id="tile-map" [expanded]="false" [disabled]="lettersLeftTotal === 0">
+                <mat-expansion-panel-header>Tuiles restantes : {{lettersLeftTotal}}</mat-expansion-panel-header>
                 <div class="tile-map-content">
                     <p *ngFor="let letter of lettersLeft">
                         <app-tile [tile]="{ letter: letter.letter, value: 0 }" [hideValue]="true"></app-tile>
