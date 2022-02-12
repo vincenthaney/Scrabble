@@ -6,13 +6,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import {
-    DIALOG_BUTTON_CONTENT,
-    DIALOG_CANCEL_CONTENT,
-    DIALOG_CANCEL_TITLE,
-    DIALOG_REJECT_CONTENT,
-    DIALOG_REJECT_TITLE,
-} from './join-waiting-page.component.const';
+import { joinWaitingPageConstants } from '@app/constants/pages-constants';
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -64,11 +58,11 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     playerRejected(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: DIALOG_REJECT_TITLE,
-                content: hostName + DIALOG_REJECT_CONTENT,
+                title: joinWaitingPageConstants.DIALOG_REJECT_TITLE,
+                content: hostName + joinWaitingPageConstants.DIALOG_REJECT_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: joinWaitingPageConstants.DIALOG_BUTTON_CONTENT,
                         redirect: '/lobby',
                         closeDialog: true,
                     },
@@ -80,11 +74,11 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     hostHasCanceled(hostName: string) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: DIALOG_CANCEL_TITLE,
-                content: hostName + DIALOG_CANCEL_CONTENT,
+                title: joinWaitingPageConstants.DIALOG_CANCEL_TITLE,
+                content: hostName + joinWaitingPageConstants.DIALOG_CANCEL_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: joinWaitingPageConstants.DIALOG_BUTTON_CONTENT,
                         redirect: '/lobby',
                         closeDialog: true,
                     },

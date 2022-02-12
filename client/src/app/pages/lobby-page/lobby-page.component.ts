@@ -6,13 +6,7 @@ import { NameFieldComponent } from '@app/components/name-field/name-field.compon
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import {
-    DIALOG_BUTTON_CONTENT,
-    DIALOG_CANCELED_CONTENT,
-    DIALOG_CANCELED_TITLE,
-    DIALOG_FULL_CONTENT,
-    DIALOG_FULL_TITLE,
-} from './lobby-page.component.const';
+import { lobbyPageConstants } from '@app/constants/pages-constants';
 
 @Component({
     selector: 'app-lobby-page',
@@ -75,11 +69,11 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbyFullDialog() {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: DIALOG_FULL_TITLE,
-                content: DIALOG_FULL_CONTENT,
+                title: lobbyPageConstants.DIALOG_FULL_TITLE,
+                content: lobbyPageConstants.DIALOG_FULL_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: lobbyPageConstants.DIALOG_BUTTON_CONTENT,
                         closeDialog: true,
                     },
                 ],
@@ -90,11 +84,11 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbyCanceledDialog() {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: DIALOG_CANCELED_TITLE,
-                content: DIALOG_CANCELED_CONTENT,
+                title: lobbyPageConstants.DIALOG_CANCELED_TITLE,
+                content: lobbyPageConstants.DIALOG_CANCELED_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: lobbyPageConstants.DIALOG_BUTTON_CONTENT,
                         closeDialog: true,
                     },
                 ],
