@@ -74,7 +74,7 @@ export class GameDispatcherService {
         };
 
         const createdGame = await this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
-        await createdGame.tileReserve.init();
+        await createdGame.initTileReserve();
 
         return this.createStartGameData(createdGame);
     }
@@ -146,7 +146,7 @@ export class GameDispatcherService {
 
     private createStartGameData(createdGame: Game): StartMultiplayerGameData {
         const tileReserve: TileReserveData[] = [];
-        createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+        createdGame.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });
         });
         const startMultiplayerGameData: StartMultiplayerGameData = {
