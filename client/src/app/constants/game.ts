@@ -1,3 +1,4 @@
+import { Player } from '@app/classes/player';
 import { Square } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
@@ -42,7 +43,8 @@ export const UNDEFINED_GRID_SIZE: Vec2 = { x: -1, y: -1 };
 export const UNDEFINED_SQUARE_SIZE: Vec2 = { x: -1, y: -1 };
 export const UNDEFINED_SQUARE: Square = {
     tile: null,
-    multiplier: null,
+    position: { row: -1, column: -1 },
+    scoreMultiplier: null,
     wasMultiplierUsed: false,
     isCenter: false,
 };
@@ -52,3 +54,30 @@ export const VALID_MULTIPLIERS: number[] = [2, 3];
 export const TILE_MIN_FONT_SIZE = 1.2;
 export const TILE_MAX_FONT_SIZE = 1.9;
 export const TILE_DEFAULT_FONT_SIZE = 1.5;
+export const SECONDS_TO_MILLISECONDS = 1000;
+
+export const MIN_COL_NUMBER = 0;
+export const MAX_COL_NUMBER = 14;
+export const MIN_ROW_NUMBER = 0;
+export const MAX_ROW_NUMBER = 14;
+
+export const MAX_LOCATION_COMMAND_LENGTH = 3;
+export const MIN_LOCATION_COMMAND_LENGTH = 2;
+
+export const MAX_INPUT_LENGTH = 512;
+
+export const MAX_TILE_PER_PLAYER = 7;
+
+export const DEFAULT_PLAYER = new Player();
+Player('id', 'name', []);
+
+export const SYSTEM_ID = 'system';
+
+export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
+
+export const EXPECTED_WORD_COUNT_PLACE = 3;
+export const EXPECTED_WORD_COUNT_EXCHANGE = 2;
+export const EXPECTED_WORD_COUNT_PASS = 1;
+// export const EXPECTED_WORD_COUNT_HINT = 1;
+export const EXPECTED_WORD_COUNT_HELP = 1;
+export const EXPECTED_WORD_COUNT_RESERVE = 1;

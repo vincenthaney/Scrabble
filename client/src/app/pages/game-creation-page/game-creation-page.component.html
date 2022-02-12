@@ -1,25 +1,40 @@
 <span class="game-creation-container">
     <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
-    
+
     <section id="game-parameters">
         <h1>Créez une partie</h1>
         <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
             <mat-label>Choisissez un type de partie</mat-label>
             <mat-button-toggle-group formControlName="gameType" ngDefaultControl>
-                <mat-button-toggle id="classic-button" [value]="gameTypes.Classic">{{gameTypes.Classic}}</mat-button-toggle>
-                <mat-button-toggle id="log2990-button" [value]="gameTypes.LOG2990">{{gameTypes.LOG2990}}</mat-button-toggle>
-            </mat-button-toggle-group>
-            
-            <mat-label>Choisissez un mode de jeu</mat-label>
-            <mat-button-toggle-group formControlName="gameMode" ngDefaultControl>
-                <mat-button-toggle id="solo-button" [value]="gameModes.Solo">{{gameModes.Solo}}</mat-button-toggle>
-                <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{gameModes.Multiplayer}}</mat-button-toggle>
+                <mat-button-toggle id="classic-button" [value]="gameTypes.Classic">{{ gameTypes.Classic }}</mat-button-toggle>
+                <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                    <mat-button-toggle id="log2990-button" [value]="gameTypes.LOG2990" [disabled]="true">{{ gameTypes.LOG2990 }}</mat-button-toggle>
+                </div>
             </mat-button-toggle-group>
 
-            <mat-label id="level-label" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">Choisissez le niveau de votre adversaire virtuel</mat-label>
+            <mat-label>Choisissez un mode de jeu</mat-label>
+            <mat-button-toggle-group formControlName="gameMode" ngDefaultControl>
+                <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                    <mat-button-toggle id="solo-button" [value]="gameModes.Solo" [disabled]="true">{{ gameModes.Solo }}</mat-button-toggle>
+                </div>
+                <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{ gameModes.Multiplayer }}</mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <mat-label id="level-label" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo"
+                >Choisissez le niveau de votre adversaire virtuel</mat-label
+            >
             <mat-button-toggle-group id="level-buttons" formControlName="level" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
-                <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">{{virtualPlayerLevels.Beginner}}</mat-button-toggle>
-                <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert">{{virtualPlayerLevels.Expert}}</mat-button-toggle>
+                <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                    <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner" [disabled]="true">{{
+                        virtualPlayerLevels.Beginner
+                    }}</mat-button-toggle>
+                </div>
+
+                <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                    <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert" [disabled]="true">{{
+                        virtualPlayerLevels.Expert
+                    }}</mat-button-toggle>
+                </div>
             </mat-button-toggle-group>
 
             <span id="form-fields">
@@ -32,17 +47,16 @@
 
                 <mat-form-field appearance="outline">
                     <mat-label floatLabel="always">Choisissez le dictionnaire à utiliser</mat-label>
-                    <mat-select formControlName="dict">
-                        <mat-option value="default-dict">Par défaut (Français)</mat-option>
+                    <mat-select formControlName="dictionary">
+                        <mat-option value="default-dictionary">Par défaut (Français)</mat-option>
                     </mat-select>
                 </mat-form-field>
-                <app-name-field></app-name-field>
+                <app-name-field (keydown.enter)="$event.preventDefault()"></app-name-field>
             </span>
             <span id="bottom-buttons">
                 <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>
-                <button mat-flat-button type="submit" id="create-game-button">Créer la partie</button>
+                <button mat-flat-button type="submit" id="create-game-button" cdkFocusInitial>Créer la partie</button>
             </span>
         </form>
     </section>
-    
 </span>

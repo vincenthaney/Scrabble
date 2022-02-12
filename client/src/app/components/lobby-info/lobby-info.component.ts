@@ -1,27 +1,28 @@
-import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { LobbyInfo } from '@app/classes/communication/';
 import { GameType } from '@app/classes/game-type';
-import { LobbyInfo } from '@app/classes/lobby-info';
-import { convertTime } from '@app/classes/utils';
+import { Timer } from '@app/classes/timer';
 
 @Component({
     selector: 'app-lobby-info',
     templateUrl: './lobby-info.component.html',
     styleUrls: ['./lobby-info.component.scss'],
 })
-export class LobbyInfoComponent {
+export class LobbyInfoComponent implements OnInit {
     @Input() lobby: LobbyInfo;
-    // dictionnaries: Dictionnaries[]
+    @Output() joinLobbyId = new EventEmitter<string>();
+    roundTime: Timer;
 
-    constructor(private router: Router) {
-        this.lobby = { lobbyID: 0, playerName: '', gameType: GameType.Classic, timer: 0, canJoin: false };
+    constructor() {
+        this.lobby = { lobbyId: '0', dictionary: '', playerName: '', gameType: GameType.Classic, maxRoundTime: 0, canJoin: false };
+        this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 
-    async joinLobby() {
-        await this.router.navigateByUrl('waiting');
+    ngOnInit(): void {
+        this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 
-    convertTime(): string {
-        return convertTime(this.lobby.timer);
+    joinLobby() {
+        this.joinLobbyId.emit(this.lobby.lobbyId);
     }
 }

@@ -1,191 +1,32 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
 import { expect } from 'chai';
-import { ActionClue, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '.';
-import { Square, Orientation } from '@app/classes/board';
+import { ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
 
-const DEFAULT_SQUARE: Square = {
-    tile: undefined,
-    multiplier: 1,
-    multiplierType: 'letter',
-    played: false,
-};
+describe('Action', () => {
+    describe('ActionPlay', () => {
+        let action: ActionPlay;
 
-describe('Action Clue', () => {
-    let action: ActionClue;
-
-    beforeEach(() => {
-        action = new ActionClue();
-    });
-
-    it('should create', () => {
-        expect(action).to.exist;
-    });
-
-    describe('execute', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.execute()).to.throw('Method not implemented.');
+        beforeEach(() => {
+            action = new ActionPass(null as unknown as Player, null as unknown as Game);
         });
-    });
 
-    describe('getMessage', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.getMessage()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('willEndTurn', () => {
-        it('should not end turn', () => {
-            expect(action.willEndTurn()).to.be.false;
-        });
-    });
-});
-
-describe('Action Exchange', () => {
-    let action: ActionExchange;
-
-    beforeEach(() => {
-        action = new ActionExchange([]);
-    });
-
-    it('should create', () => {
-        expect(action).to.exist;
-    });
-
-    describe('execute', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.execute()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('getMessage', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.getMessage()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('willEndTurn', () => {
-        it('should end turn', () => {
+        it('should end round', () => {
             expect(action.willEndTurn()).to.be.true;
         });
     });
-});
 
-describe('Action Help', () => {
-    let action: ActionHelp;
+    describe('ActionInfo', () => {
+        let action: ActionInfo;
 
-    beforeEach(() => {
-        action = new ActionHelp();
-    });
-
-    it('should create', () => {
-        expect(action).to.exist;
-    });
-
-    describe('execute', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.execute()).to.throw('Method not implemented.');
+        beforeEach(() => {
+            action = new ActionHelp(null as unknown as Player, null as unknown as Game);
         });
-    });
 
-    describe('getMessage', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.getMessage()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('willEndTurn', () => {
-        it('should not end turn', () => {
-            expect(action.willEndTurn()).to.be.false;
-        });
-    });
-});
-
-describe('Action Pass', () => {
-    let action: ActionPass;
-
-    beforeEach(() => {
-        action = new ActionPass();
-    });
-
-    it('should create', () => {
-        expect(action).to.exist;
-    });
-
-    describe('execute', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.execute()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('getMessage', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.getMessage()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('willEndTurn', () => {
-        it('should end turn', () => {
-            expect(action.willEndTurn()).to.be.true;
-        });
-    });
-});
-
-describe('Action Place', () => {
-    let action: ActionPlace;
-
-    beforeEach(() => {
-        action = new ActionPlace([], DEFAULT_SQUARE, Orientation.Vertical);
-    });
-
-    it('should create', () => {
-        expect(action).to.exist;
-    });
-
-    describe('execute', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.execute()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('getMessage', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.getMessage()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('willEndTurn', () => {
-        it('should end turn', () => {
-            expect(action.willEndTurn()).to.be.true;
-        });
-    });
-});
-
-describe('Action Reserve', () => {
-    let action: ActionReserve;
-
-    beforeEach(() => {
-        action = new ActionReserve();
-    });
-
-    it('should create', () => {
-        expect(action).to.exist;
-    });
-
-    describe('execute', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.execute()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('getMessage', () => {
-        it('is not yet implemented', () => {
-            expect(() => action.getMessage()).to.throw('Method not implemented.');
-        });
-    });
-
-    describe('willEndTurn', () => {
-        it('should not end turn', () => {
+        it('should not end round', () => {
             expect(action.willEndTurn()).to.be.false;
         });
     });

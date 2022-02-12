@@ -1,15 +1,17 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ActiveGameService } from './active-game.service';
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
 import Game from '@app/classes/game/game';
-import Player from '@app/classes/player/player';
 import { MultiplayerGameConfig } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
+import Player from '@app/classes/player/player';
 import * as Errors from '@app/constants/errors';
+import BoardService from '@app/services/board/board.service';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { Container } from 'typedi';
+import { ActiveGameService } from './active-game.service';
 
 const expect = chai.expect;
 
@@ -38,7 +40,8 @@ describe('ActiveGameService', () => {
     let activeGameService: ActiveGameService;
 
     beforeEach(() => {
-        activeGameService = new ActiveGameService();
+        const boardService = Container.get(BoardService);
+        activeGameService = new ActiveGameService(boardService);
     });
 
     it('should create', () => {

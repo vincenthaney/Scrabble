@@ -1,22 +1,37 @@
 <div id="outer-container">
     <mat-card id="inner-container">
-        <div class="player-info" id="player-info-1">
-            <p class="player-name">{{player1.name}}<span class="score">{{ player1.score }} points</span></p>
-            <p class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implemented-->
+        <div [ngClass]="{ 'active-player': isPlayer1Active }" class="player-info" id="player-info-1">
+            <p class="player-name">
+                <span [matTooltip]="'Vous êtes ' + getPlayer1().name" [matTooltipDisabled]="!isPlayer1" class="name">
+                    <app-icon *ngIf="isPlayer1" [icon]="localPlayerIcon" styling="solid"></app-icon>
+                    {{ getPlayer1().name }}
+                </span>
+                <span class="score">{{ getPlayer1().score }} pts</span>
+            </p>
+            <p *ngIf="getPlayer1().getTiles().length < maxTilesPerPlayer" class="tiles-left">
+                Tuiles restantes : {{ getPlayer1().getTiles().length }}
+            </p>
         </div>
 
         <div id="time-left-container">
             <p>Temps restant au tour</p>
             <p id="time-left">
-                <span class="minutes">3</span>
+                <span class="minutes">{{ timer.minutes }}</span>
                 <span class="separator">:</span>
-                <span class="seconds">11</span>
+                <span class="seconds">{{ timer.getTimerSecondsPadded() }}</span>
             </p>
         </div>
 
-        <div class="player-info" id="player-info-2">
-            <p class="player-name"><span class="score">{{ player2.score }} points</span>{{player2.name}}</p>
-            <p class="tiles-left">Tuiles restantes : 7</p> <!--use *ngIf to verify if player has less than 8 tiles left when implemented-->
+        <div [ngClass]="{ 'active-player': isPlayer2Active }" class="player-info" id="player-info-2">
+            <p class="player-name">
+                <span class="score">{{ getPlayer2().score }} pts</span><span [matTooltip]="'Vous êtes ' + getPlayer2().name" [matTooltipDisabled]="isPlayer1" class="name">
+                    {{ getPlayer2().name }}
+                    <app-icon *ngIf="!isPlayer1" [icon]="localPlayerIcon" styling="solid"></app-icon>
+                </span>
+            </p>
+            <p *ngIf="getPlayer2().getTiles().length < maxTilesPerPlayer" class="tiles-left">
+                Tuiles restantes : {{ getPlayer2().getTiles().length }}
+            </p>
         </div>
-    </mat-card> 
+    </mat-card>
 </div>

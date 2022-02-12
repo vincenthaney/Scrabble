@@ -1,6 +1,7 @@
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { CommonModule, Location } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -16,7 +17,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
+import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -28,14 +31,19 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
-
+    let gameDispatcherSpy: SpyObj<GameDispatcherService>;
     const EMPTY_VALUE = '';
+
+    beforeEach(() => {
+        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleCreateGame']);
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent],
             imports: [
                 AppMaterialModule,
+                HttpClientModule,
                 BrowserAnimationsModule,
                 FormsModule,
                 ReactiveFormsModule,
@@ -46,12 +54,17 @@ describe('GameCreationPageComponent', () => {
                 MatSelectModule,
                 MatInputModule,
                 RouterTestingModule.withRoutes([
-                    { path: 'create-waiting', component: TestComponent },
+                    { path: 'waiting-room', component: TestComponent },
                     { path: 'home', component: TestComponent },
                     { path: 'game-creation', component: GameCreationPageComponent },
                 ]),
             ],
-            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness],
+            providers: [
+                MatButtonToggleHarness,
+                MatButtonHarness,
+                MatButtonToggleGroupHarness,
+                { provide: GameDispatcherService, useValue: gameDispatcherSpy },
+            ],
         }).compileComponents();
     });
 
@@ -70,7 +83,7 @@ describe('GameCreationPageComponent', () => {
             gameMode: component.gameModes.Solo,
             level: component.virtualPlayerLevels.Beginner,
             timer: '60',
-            dict: 'français',
+            dictionary: 'français',
         };
         gameParametersForm.setValue(formValues);
         component.child.formParameters.get('inputName')?.setValue('valid name');
@@ -80,18 +93,21 @@ describe('GameCreationPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('clicking on LOG2990 button should set gameType attribute to LOG2990', async () => {
-        const gameTypeField = component.gameParameters.get('gameType');
-        gameTypeField?.setValue(component.gameTypes.Classic);
+    // NOT YET IMPLEMENTED
+    // it('clicking on LOG2990 button should set gameType attribute to LOG2990', async () => {
+    //     const gameTypeField = component.gameParameters.get('gameType');
+    //     gameTypeField?.setValue(component.gameTypes.Classic);
 
-        const log2990Button = await loader.getHarness(
-            MatButtonToggleHarness.with({
-                selector: '#log2990-button',
-            }),
-        );
-        await log2990Button.toggle();
-        expect(gameTypeField?.value).toEqual(component.gameTypes.LOG2990);
-    });
+    //     const log2990Button = await loader.getHarness(
+    //         MatButtonToggleHarness.with({
+    //             selector: '#log2990-button',
+    //         }),
+    //     );
+
+    //     if (await log2990Button.isDisabled()) return;
+    //     await log2990Button.toggle();
+    //     expect(gameTypeField?.value).toEqual(component.gameTypes.LOG2990);
+    // });
 
     it('clicking on Classic button should set gameType attribute to Classic', async () => {
         const gameTypeField = component.gameParameters.get('gameType');
@@ -106,18 +122,21 @@ describe('GameCreationPageComponent', () => {
         expect(gameTypeField?.value).toEqual(component.gameTypes.Classic);
     });
 
-    it('clicking on Solo button should set gameMode attribute to Solo', async () => {
-        const gameModeField = component.gameParameters.get('gameMode');
-        gameModeField?.setValue(component.gameModes.Multiplayer);
+    // NOT YET IMPLEMENTED
+    // it('clicking on Solo button should set gameMode attribute to Solo', async () => {
+    //     const gameModeField = component.gameParameters.get('gameMode');
+    //     gameModeField?.setValue(component.gameModes.Multiplayer);
 
-        const soloButton = await loader.getHarness(
-            MatButtonToggleHarness.with({
-                selector: '#solo-button',
-            }),
-        );
-        await soloButton.toggle();
-        expect(gameModeField?.value).toEqual(component.gameModes.Solo);
-    });
+    //     const soloButton = await loader.getHarness(
+    //         MatButtonToggleHarness.with({
+    //             selector: '#solo-button',
+    //         }),
+    //     );
+
+    //     if (await soloButton.isDisabled()) return;
+    //     await soloButton.toggle();
+    //     expect(gameModeField?.value).toEqual(component.gameModes.Solo);
+    // });
 
     it('clicking on Multiplayer button should set gameMode attribute to Multiplayer', async () => {
         const gameModeField = component.gameParameters.get('gameMode');
@@ -135,6 +154,7 @@ describe('GameCreationPageComponent', () => {
     it('virtual player level choices should appear if solo mode is selected', async () => {
         const gameModeField = component.gameParameters.get('gameMode');
         gameModeField?.setValue(component.gameModes.Solo);
+        fixture.detectChanges();
 
         const levelLabel = fixture.debugElement.nativeElement.querySelector('#level-label');
         const levelButtons = fixture.debugElement.nativeElement.querySelector('#level-buttons');
@@ -158,10 +178,10 @@ describe('GameCreationPageComponent', () => {
     it('form should have the right default values', async () => {
         const defaultFormValues = {
             gameType: component.gameTypes.Classic,
-            gameMode: component.gameModes.Solo,
+            gameMode: component.gameModes.Multiplayer,
             level: component.virtualPlayerLevels.Beginner,
             timer: EMPTY_VALUE,
-            dict: EMPTY_VALUE,
+            dictionary: EMPTY_VALUE,
         };
         const defaultNameValue = EMPTY_VALUE;
 
@@ -210,9 +230,9 @@ describe('GameCreationPageComponent', () => {
         expect(component.isFormValid()).toBeFalsy();
     });
 
-    it('form should not be valid if dict is empty', () => {
+    it('form should not be valid if dictionary is empty', () => {
         setValidFormValues();
-        gameParameters.get('dict')?.setValue(EMPTY_VALUE);
+        gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
 
         expect(component.isFormValid()).toBeFalsy();
     });
@@ -262,8 +282,17 @@ describe('GameCreationPageComponent', () => {
         createButton.click();
 
         return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/create-waiting');
+            expect(location.path()).toBe('/waiting-room');
         });
+    });
+
+    it('createGame button should send game to GameDispatcher service if valid', async () => {
+        setValidFormValues();
+
+        const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+        createButton.click();
+
+        expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
     });
 
     it('back button should reroute to home page', async () => {

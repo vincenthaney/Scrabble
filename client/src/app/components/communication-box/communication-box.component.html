@@ -1,27 +1,38 @@
 <div id="outer-container">
     <section id="objectives-container">
         <mat-accordion multi>
-            <mat-expansion-panel>
+            <!-- <mat-expansion-panel>
                 <mat-expansion-panel-header>Objectifs</mat-expansion-panel-header>
                 <div *ngFor="let obj of objectives">{{obj}}</div>
-            </mat-expansion-panel>
+            </mat-expansion-panel> -->
 
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>Tuiles restantes : {{lettersLeft.length}}</mat-expansion-panel-header>
-                <span *ngFor="let letter of lettersLeft">{{letter}}</span>
+            <mat-expansion-panel id="tile-map" [expanded]="false" [disabled]="lettersLeftTotal === 0">
+                <mat-expansion-panel-header>Tuiles restantes : {{lettersLeftTotal}}</mat-expansion-panel-header>
+                <div class="tile-map-content">
+                    <p *ngFor="let letter of lettersLeft">
+                        <app-tile [tile]="{ letter: letter.letter, value: 0 }" [hideValue]="true"></app-tile>
+                        <span class="separator">:</span>
+                        <span class="amount">{{ letter.amount }}</span>
+                    </p>
+                </div>
             </mat-expansion-panel>
-
         </mat-accordion>
     </section>
-
-    <section>
-        <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
-            <div class="scroll-item" *cdkVirtualFor="let msg of messages">{{msg}}</div>
-        </cdk-virtual-scroll-viewport>
+    <section id="text-box-container">
+        <mat-card>
+            <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
+                <div [class]="'scroll-item ' + msg.class" *cdkVirtualFor="let msg of messages">
+                    <div class="message-container">
+                        <p class="message">{{ msg.content }}</p>
+                    </div>
+                </div>
+            </cdk-virtual-scroll-viewport>
+            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
+                <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici"/>
+                <div matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
+                    <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid"><app-icon icon="arrow-right"></app-icon></button>  
+                </div>
+            </form>
+        </mat-card>
     </section>
-
-    <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
-        <input matInput type="text" formControlName="content" [(ngModel)]="message" autocomplete="off"/>
-        <button id="send-button" stype="submit" mat-flat-button color="primary">Envoyer</button>
-    </form>
 </div>

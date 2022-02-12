@@ -16,6 +16,7 @@ import { SquareView } from '@app/classes/square';
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { IconComponent } from '../icon/icon.component';
 import { SquareComponent } from './square.component';
 
 describe('SquareComponent', () => {
@@ -39,7 +40,7 @@ describe('SquareComponent', () => {
                 FormsModule,
                 MatDialogModule,
             ],
-            declarations: [SquareComponent, CenterSquareWrapperComponent],
+            declarations: [SquareComponent, CenterSquareWrapperComponent, IconComponent],
             providers: [Renderer2],
         }).compileComponents();
     });
@@ -93,7 +94,7 @@ describe('SquareComponent', () => {
         const getTextSpy = spyOn(squareWrapper.squareView, 'getText').and.returnValue([undefined, undefined]);
 
         squareWrapper.squareComponent.setText();
-        
+
         expect(getTextSpy).toHaveBeenCalled();
     });
 
@@ -108,7 +109,6 @@ describe('SquareComponent', () => {
         const actualColor = squareWrapper.squareComponent.style['background-color'];
         expect(actualColor).toEqual(expectedColor);
     });
-
 });
 
 export class SquareTestWrapper {
@@ -137,7 +137,8 @@ class CenterSquareWrapperComponent {
     squareView = new SquareView(
         {
             tile: null,
-            multiplier: null,
+            position: { row: 0, column: 0 },
+            scoreMultiplier: null,
             wasMultiplierUsed: false,
             isCenter: true,
         },

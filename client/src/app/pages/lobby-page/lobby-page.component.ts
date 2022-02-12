@@ -1,47 +1,56 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { GameType } from '@app/classes/game-type';
-import { LobbyInfo } from '@app/classes/lobby-info';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { LobbyInfo } from '@app/classes/communication/';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { GameDispatcherService } from '@app/services/';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import {
+    DIALOG_BUTTON_CONTENT,
+    DIALOG_CANCELED_CONTENT,
+    DIALOG_CANCELED_TITLE,
+    DIALOG_FULL_CONTENT,
+    DIALOG_FULL_TITLE,
+} from './lobby-page.component.const';
 
 @Component({
     selector: 'app-lobby-page',
     templateUrl: './lobby-page.component.html',
     styleUrls: ['./lobby-page.component.scss'],
 })
-export class LobbyPageComponent {
+export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
 
-    // TODO: Receive LobbyInfo from server
-    lobbies: LobbyInfo[] = [
-        { lobbyID: 1, playerName: 'Nom1', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 2, playerName: 'Moyen Long', gameType: GameType.Classic, timer: 150, canJoin: false },
-        { lobbyID: 3, playerName: 'aa', gameType: GameType.LOG2990, timer: 90, canJoin: false },
-        { lobbyID: 4, playerName: 'Nom vraiment long', gameType: GameType.Classic, timer: 270, canJoin: false },
-        { lobbyID: 5, playerName: 'Nom5', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 6, playerName: 'Nom6', gameType: GameType.LOG2990, timer: 60, canJoin: false },
-        { lobbyID: 7, playerName: 'Nom7', gameType: GameType.LOG2990, timer: 60, canJoin: false },
-        { lobbyID: 8, playerName: 'Nom8', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 9, playerName: 'Nom9', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 10, playerName: 'Nom10', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 11, playerName: 'Nom11', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 12, playerName: 'Nom12', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 13, playerName: 'Nom13', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 14, playerName: 'Nom14', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 15, playerName: 'Nom15', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 16, playerName: 'Nom16', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 17, playerName: 'Nom17', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 18, playerName: 'Nom18', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 19, playerName: 'Nom19', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 20, playerName: 'Nom20', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 21, playerName: 'Nom21', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 22, playerName: 'Nom22', gameType: GameType.Classic, timer: 60, canJoin: false },
-        { lobbyID: 23, playerName: 'Nom23', gameType: GameType.Classic, timer: 60, canJoin: false },
-    ];
-    constructor(private ref: ChangeDetectorRef) {}
+    lobbiesUpdateSubscription: Subscription;
+    lobbyFullSubscription: Subscription;
+    lobbyCanceledSubscription: Subscription;
+    componentDestroyed$: Subject<boolean> = new Subject();
+    lobbies: LobbyInfo[];
+    constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
+
+    ngOnInit() {
+        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((lobbies) => this.updateLobbies(lobbies));
+        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe(() => this.lobbyFullDialog());
+        this.lobbyCanceledSubscription = this.gameDispatcherService.canceledGameEvent
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe(() => this.lobbyCanceledDialog());
+        this.gameDispatcherService.handleLobbyListRequest();
+    }
+
+    ngOnDestroy() {
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
+    }
+
     validateName(): void {
         for (const lobby of this.lobbies) {
             lobby.canJoin =
-                (this.nameField.formParameters.get('inputName')?.valid ? true : false) &&
+                (this.nameField.formParameters.get('inputName')?.valid as boolean) &&
                 this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
         }
     }
@@ -49,5 +58,47 @@ export class LobbyPageComponent {
     onNameChange() {
         this.validateName();
         this.ref.markForCheck();
+    }
+
+    updateLobbies(lobbies: LobbyInfo[]): void {
+        this.lobbies = lobbies;
+        this.validateName();
+    }
+
+    joinLobby(lobbyId: string) {
+        this.gameDispatcherService.handleJoinLobby(
+            this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
+            this.nameField.formParameters.get('inputName')?.value,
+        );
+    }
+
+    lobbyFullDialog() {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: DIALOG_FULL_TITLE,
+                content: DIALOG_FULL_CONTENT,
+                buttons: [
+                    {
+                        content: DIALOG_BUTTON_CONTENT,
+                        closeDialog: true,
+                    },
+                ],
+            },
+        });
+    }
+
+    lobbyCanceledDialog() {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: DIALOG_CANCELED_TITLE,
+                content: DIALOG_CANCELED_CONTENT,
+                buttons: [
+                    {
+                        content: DIALOG_BUTTON_CONTENT,
+                        closeDialog: true,
+                    },
+                ],
+            },
+        });
     }
 }

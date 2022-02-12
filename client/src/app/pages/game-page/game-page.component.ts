@@ -4,6 +4,7 @@ import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import { TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE } from '@app/constants/game';
+import { GameService } from '@app/services';
 
 @Component({
     selector: 'app-game-page',
@@ -14,7 +15,7 @@ export class GamePageComponent {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
-    constructor(public surrenderDialog: MatDialog) {}
+    constructor(public surrenderDialog: MatDialog, public gameService: GameService) {}
 
     openDialog() {
         this.surrenderDialog.open(DefaultDialogComponent, {

@@ -1,26 +1,26 @@
-import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
-import WaitingGame from '@app/classes/game/waiting-game';
-import { Service } from 'typedi';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import Player from '@app/classes/player/player';
-import * as GameDispatcherError from './game-dispatcher.service.error';
-import * as Errors from '@app/constants/errors';
+import { LobbyData } from '@app/classes/communication/lobby-data';
 import Game from '@app/classes/game/game';
+import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import Room from '@app/classes/game/room';
+import WaitingRoom from '@app/classes/game/waiting-room';
+import { HttpException } from '@app/classes/http.exception';
+import Player from '@app/classes/player/player';
+import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
+import * as Errors from '@app/constants/errors';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
+import * as GameDispatcherError from './game-dispatcher.service.error';
 
 @Service()
 export class GameDispatcherService {
-    private waitingGames: WaitingGame[];
+    private waitingRooms: WaitingRoom[];
+    private lobbiesRoom: Room;
 
     constructor(private activeGameService: ActiveGameService) {
-        this.waitingGames = [];
+        this.waitingRooms = [];
+        this.lobbiesRoom = new Room();
     }
-
-    /**
-     * Add the configuration into the waiting game list
-     *
-     * @param {GameConfigData} configData Necessary information to create the game
-     * @return {string} Waiting game id
-     */
 
     createMultiplayerGame(configData: GameConfigData): string {
         const config: GameConfig = {
@@ -29,120 +29,140 @@ export class GameDispatcherService {
             maxRoundTime: configData.maxRoundTime,
             dictionary: configData.dictionary,
         };
-        const waitingGame = new WaitingGame(config);
-        this.waitingGames.push(waitingGame);
-        return waitingGame.getId();
+        const waitingRoom = new WaitingRoom(config);
+        this.waitingRooms.push(waitingRoom);
+
+        return waitingRoom.getId();
     }
 
-    /**
-     * The second player ask the initiating player to join their game
-     *
-     * @param {string} waitingGameId Id of the game in the lobby
-     * @param playerId Id of the player asking to join
-     * @param playerName Name the player want to use
-     */
+    getLobbiesRoom() {
+        return this.lobbiesRoom;
+    }
 
-    requestJoinGame(waitingGameId: string, playerId: string, playerName: string) {
-        const waitingGame = this.getGameFromId(waitingGameId);
-
-        if (waitingGame.joinedPlayer !== undefined) {
-            throw new Error(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
+    requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
+        if (waitingRoom.joinedPlayer !== undefined) {
+            throw new HttpException(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
         }
-        if (waitingGame.getConfig().player1.name === playerName) {
-            throw new Error(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
+        if (waitingRoom.getConfig().player1.name === playerName) {
+            throw new HttpException(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
         }
 
         const joiningPlayer = new Player(playerId, playerName);
-        waitingGame.joinedPlayer = joiningPlayer;
-        // TODO: Inform initiating player that another is trying to join
+        waitingRoom.joinedPlayer = joiningPlayer;
+        return waitingRoom.getConfig();
     }
 
-    /**
-     * The initiating player accept their opponent and the game starts
-     *
-     * @param waitingGameId Id of the game in the lobby
-     * @param playerId Id of the initiating player
-     * @param opponentName Opponent name
-     * @returns {Game} game
-     */
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<StartMultiplayerGameData> {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
 
-    async acceptJoinRequest(waitingGameId: string, playerId: string, opponentName: string): Promise<Game> {
-        const waitingGame = this.getGameFromId(waitingGameId);
-
-        if (waitingGame.getConfig().player1.getId() !== playerId) {
-            throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
-        } else if (waitingGame.joinedPlayer === undefined) {
-            throw new Error(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
-        } else if (waitingGame.joinedPlayer.name !== opponentName) {
-            throw new Error(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
+        if (waitingRoom.getConfig().player1.getId() !== playerId) {
+            throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        } else if (waitingRoom.joinedPlayer === undefined) {
+            throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        } else if (waitingRoom.joinedPlayer.name !== opponentName) {
+            throw new HttpException(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
         // Remove game from wait
-        const index = this.waitingGames.indexOf(waitingGame);
-        this.waitingGames.splice(index, 1);
+        const index = this.waitingRooms.indexOf(waitingRoom);
+        this.waitingRooms.splice(index, 1);
 
         // Start game
         const config: MultiplayerGameConfig = {
-            ...waitingGame.getConfig(),
-            player2: waitingGame.joinedPlayer,
+            ...waitingRoom.getConfig(),
+            player2: waitingRoom.joinedPlayer,
         };
-        return this.activeGameService.beginMultiplayerGame(waitingGame.getId(), config);
+
+        const createdGame = await this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
+        await createdGame.tileReserve.init();
+
+        return this.createStartGameData(createdGame);
     }
 
-    /**
-     * Reject a player trying to join your game
-     *
-     * @param waitingGameId Id of the game in the lobby
-     * @param playerId Id of the initiating player
-     * @param opponentName Opponent name
-     */
+    rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
 
-    rejectJoinRequest(waitingGameId: string, playerId: string, opponentName: string) {
-        const waitingGame = this.getGameFromId(waitingGameId);
-
-        if (waitingGame.getConfig().player1.getId() !== playerId) {
-            throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
-        } else if (waitingGame.joinedPlayer === undefined) {
-            throw new Error(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
-        } else if (waitingGame.joinedPlayer.name !== opponentName) {
-            throw new Error(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
+        if (waitingRoom.getConfig().player1.getId() !== playerId) {
+            throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        } else if (waitingRoom.joinedPlayer === undefined) {
+            throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        } else if (waitingRoom.joinedPlayer.name !== opponentName) {
+            throw new HttpException(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
-        waitingGame.joinedPlayer = undefined;
+        const rejectedPlayer = waitingRoom.joinedPlayer;
+        waitingRoom.joinedPlayer = undefined;
+        return [rejectedPlayer, waitingRoom.getConfig().player1.name];
     }
 
-    /**
-     * Let initiating player cancel a game
-     *
-     * @param waitingGameId Id of the game in the lobby
-     * @param playerId Id of the initiating player
-     */
+    leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
+        if (waitingRoom.joinedPlayer === undefined) {
+            throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+        } else if (waitingRoom.joinedPlayer.getId() !== playerId) {
+            throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        }
+        const leaverName = waitingRoom.joinedPlayer.name;
+        const hostPlayerId = waitingRoom.getConfig().player1.getId();
 
-    cancelGame(waitingGameId: string, playerId: string) {
-        const waitingGame = this.getGameFromId(waitingGameId);
+        waitingRoom.joinedPlayer = undefined;
+        return [hostPlayerId, leaverName];
+    }
 
-        if (waitingGame.getConfig().player1.getId() !== playerId) {
-            throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
+    cancelGame(waitingRoomId: string, playerId: string) {
+        const waitingRoom = this.getGameFromId(waitingRoomId);
+
+        if (waitingRoom.getConfig().player1.getId() !== playerId) {
+            throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         }
 
         // Remove game from wait
-        const index = this.waitingGames.indexOf(waitingGame);
-        this.waitingGames.splice(index, 1);
+        const index = this.waitingRooms.indexOf(waitingRoom);
+        this.waitingRooms.splice(index, 1);
     }
 
-    /**
-     * Get all available lobby that the player can join
-     *
-     * @returns {WaitingGame[]} list of available lobby
-     */
+    getAvailableWaitingRooms() {
+        const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
+        const lobbyData: LobbyData[] = [];
+        for (const room of waitingRooms) {
+            const config = room.getConfig();
+            lobbyData.push({
+                dictionary: config.dictionary,
+                playerName: config.player1.name,
+                maxRoundTime: config.maxRoundTime,
+                lobbyId: room.getId(),
+                gameType: config.gameType,
+            });
+        }
 
-    getAvailableWaitingGames() {
-        return this.waitingGames.filter((g) => g.joinedPlayer === undefined);
+        return lobbyData;
     }
 
-    private getGameFromId(waitingGameId: string): WaitingGame {
-        const filteredWaitingGame = this.waitingGames.filter((g) => g.getId() === waitingGameId);
-        if (filteredWaitingGame.length > 0) return filteredWaitingGame[0];
-        throw new Error(Errors.NO_GAME_FOUND_WITH_ID);
+    getGameFromId(waitingRoomId: string): WaitingRoom {
+        const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
+        if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
+        throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
+    }
+
+    private createStartGameData(createdGame: Game): StartMultiplayerGameData {
+        const tileReserve: TileReserveData[] = [];
+        createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
+        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        const startMultiplayerGameData: StartMultiplayerGameData = {
+            player1: createdGame.player1,
+            player2: createdGame.player2,
+            gameType: createdGame.gameType,
+            maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
+            dictionary: createdGame.dictionnaryName,
+            gameId: createdGame.getId(),
+            board: createdGame.board.grid,
+            tileReserve,
+            tileReserveTotal,
+            round: createdGame.roundManager.getCurrentRound(),
+        };
+        return startMultiplayerGameData;
     }
 }

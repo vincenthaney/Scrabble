@@ -1,16 +1,20 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import Game from './game';
-import { GameType } from './game.type';
-import TileReserve from '@app/classes/tile/tile-reserve';
 import Player from '@app/classes/player/player';
-import { MultiplayerGameConfig } from './game-config';
 import { Tile } from '@app/classes/tile';
+import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
+import BoardService from '@app/services/board/board.service';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Container } from 'typedi';
+import RoundManager from '@app/classes/round/round-manager';
+import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
+import { MultiplayerGameConfig } from './game-config';
+import { GameType } from './game.type';
 
 const expect = chai.expect;
 
@@ -30,6 +34,9 @@ const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
 const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
 const DEFAULT_AMOUNT_OF_TILES = 25;
 
+const DEFAULT_PLAYER_1_ID = '1';
+const DEFAULT_PLAYER_2_ID = '2';
+
 describe('Game', () => {
     let defaultInit: () => Promise<void>;
 
@@ -43,6 +50,9 @@ describe('Game', () => {
             this['referenceTiles'] = [...this['tiles']];
             return Promise.resolve();
         };
+
+        const boardService = Container.get(BoardService);
+        Game.injectServices(boardService);
     });
 
     afterEach(() => {
@@ -131,6 +141,96 @@ describe('Game', () => {
             });
         });
     });
+
+    describe('isGameOver', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+
+            game.player1.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+            ];
+
+            roundManagerStub.getPassCounter.returns(0);
+        });
+
+        it('should not be gameOver passCount lower than threshold and both players have tiles', () => {
+            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
+            expect(game.isGameOver()).to.be.false;
+            expect(game.player1.tiles).to.not.be.empty;
+            expect(game.player2.tiles).to.not.be.empty;
+        });
+
+        it('should be gameOver passCount is equal to threshold', () => {
+            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+            expect(game.isGameOver()).to.be.true;
+            expect(game.player1.tiles).to.not.be.empty;
+            expect(game.player2.tiles).to.not.be.empty;
+        });
+
+        it('should be gameOver when player 1 has no tiles', () => {
+            game.player1.tiles = [];
+            expect(game.isGameOver()).to.be.true;
+            expect(game.roundManager.getPassCounter()).to.equal(0);
+            expect(game.player2.tiles).to.not.be.empty;
+        });
+
+        it('should gameOver when player 2 has no tiles', () => {
+            game.player2.tiles = [];
+            expect(game.isGameOver()).to.be.true;
+            expect(game.roundManager.getPassCounter()).to.equal(0);
+            expect(game.player1.tiles).to.not.be.empty;
+        });
+    });
+
+    describe('isPlayer1', () => {
+        let game: Game;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+
+        beforeEach(() => {
+            game = new Game();
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+
+            player1Stub.getId.returns(DEFAULT_PLAYER_1_ID);
+            player2Stub.getId.returns(DEFAULT_PLAYER_2_ID);
+
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+        });
+
+        it('should be true if player is player 1', () => {
+            expect(game.isPlayer1(player1Stub as unknown as Player)).to.be.true;
+        });
+
+        it('should be false if player is player 2', () => {
+            expect(game.isPlayer1(player2Stub as unknown as Player)).to.be.false;
+        });
+
+        it('should be true if player id is player 1 id', () => {
+            expect(game.isPlayer1(DEFAULT_PLAYER_1_ID)).to.be.true;
+        });
+
+        it('should be false if player id is player 2 id', () => {
+            expect(game.isPlayer1(DEFAULT_PLAYER_2_ID)).to.be.false;
+        });
+    });
 });
 
 describe('Game Type', () => {
@@ -140,5 +240,24 @@ describe('Game Type', () => {
 
     it('should contain LOG2990', () => {
         expect(GameType.LOG2990).to.equal('LOG2990');
+    });
+});
+
+describe('Game Service Injection', () => {
+    it('injectServices should set static Game BoardService', () => {
+        chai.spy.on(Game, 'getBoardService', () => null);
+        const boardService = Container.get(BoardService);
+
+        expect(Game['getBoardService']()).to.not.exist;
+        Game.injectServices(boardService);
+        chai.spy.restore();
+        expect(Game['getBoardService']()).to.equal(boardService);
+    });
+
+    it('injectServices should call getBoardService()', () => {
+        const boardService = Container.get(BoardService);
+        chai.spy.on(Game, 'getBoardService', () => boardService);
+        Game.injectServices(boardService);
+        expect(Game['getBoardService']).to.have.been.called;
     });
 });
