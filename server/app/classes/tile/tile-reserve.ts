@@ -3,7 +3,7 @@ import { promises } from 'fs';
 import { join } from 'path';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { tileErrors } from '@app/constants/classes-errors';
-import * as TileConst from './tile.const';
+import { tileConstants } from '@app/constants/classes-constants';
 import { LETTER_VALUES } from '@app/constants/game';
 import { LetterDistributionData, TileData } from './tile.types';
 
@@ -19,7 +19,7 @@ export default class TileReserve {
     }
 
     static async fetchLetterDistribution(): Promise<TileData[]> {
-        const filePath = join(__dirname, TileConst.LETTER_DISTRIBUTION_RELATIVE_PATH);
+        const filePath = join(__dirname, tileConstants.LETTER_DISTRIBUTION_RELATIVE_PATH);
         const dataBuffer = await promises.readFile(filePath, 'utf-8');
         const data: LetterDistributionData = JSON.parse(dataBuffer);
         return data.tiles;
@@ -53,7 +53,7 @@ export default class TileReserve {
     swapTiles(tilesToSwap: Tile[]): Tile[] {
         if (!this.initialized) throw new Error(tileErrors.TILE_RESERVE_MUST_BE_INITIATED);
         if (this.tiles.length < tilesToSwap.length) throw new Error(tileErrors.NOT_ENOUGH_TILES);
-        if (this.tiles.length < TileConst.TILE_RESERVE_THRESHOLD) throw new Error(tileErrors.MUST_HAVE_7_TILES_TO_SWAP);
+        if (this.tiles.length < tileConstants.TILE_RESERVE_THRESHOLD) throw new Error(tileErrors.MUST_HAVE_7_TILES_TO_SWAP);
         if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(tileErrors.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
 
         const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
