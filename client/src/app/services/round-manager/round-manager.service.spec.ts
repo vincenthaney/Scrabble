@@ -42,7 +42,7 @@ const ONE_MINUTE_TIMER = new Timer(1, 0);
 const TIME_INTERVAL = 1000;
 const PAST_DATE = new Date(Date.now() - TIME_INTERVAL);
 const CURRENT_DATE = new Date(Date.now());
-const FUTUR_DATE = new Date(Date.now() + TIME_INTERVAL);
+const FUTURE_DATE = new Date(Date.now() + TIME_INTERVAL);
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
@@ -114,7 +114,7 @@ describe('RoundManagerService', () => {
         const updatedRound: Round = {
             player: DEFAULT_PLAYER,
             startTime: new Date(CURRENT_DATE),
-            limitTime: new Date(FUTUR_DATE),
+            limitTime: new Date(FUTURE_DATE),
             completedTime: null,
         };
 
