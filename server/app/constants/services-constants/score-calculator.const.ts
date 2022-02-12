@@ -1,18 +1,15 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
 
-export const scoreCalculatorConstants = {
-    USED_MULTIPLIER: true,
-    NOT_USED_MULTIPLIER: false,
-    DEFAULT_TILE_VALUE: 10,
-    DEFAULT_WORD_MULTIPLIER: 2,
-    DEFAULT_LETTER_MULTIPLIER: 2,
-    DEFAULT_MULTIPLIER: 1,
-    DEFAULT_SCORE: 0,
-};
+export const USED_MULTIPLIER = true;
+export const NOT_USED_MULTIPLIER = false;
+export const DEFAULT_TILE_VALUE = 10;
+export const DEFAULT_WORD_MULTIPLIER = 2;
+export const DEFAULT_LETTER_MULTIPLIER = 2;
+export const DEFAULT_MULTIPLIER = 1;
+export const DEFAULT_SCORE = 0;
 
 export const EMPTY_WORDS: [Tile, Square][][] = [];
 export const EMPTY_WORD: [Tile, Square][] = [];

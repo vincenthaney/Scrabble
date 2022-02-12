@@ -26,11 +26,6 @@ export const HELP_ACTIONS: HelpAction[] = [
     },
 ];
 
-export const gameConstants = {
-    START_TILES_AMOUNT: 7,
-};
-
-export const tileConstants = {
-    TILE_RESERVE_THRESHOLD: 7,
-    LETTER_DISTRIBUTION_RELATIVE_PATH: '../../../assets/letter-distribution.json',
-};
+export const START_TILES_AMOUNT = 7;
+export const TILE_RESERVE_THRESHOLD = 7;
+export const LETTER_DISTRIBUTION_RELATIVE_PATH = '../../../assets/letter-distribution.json';
