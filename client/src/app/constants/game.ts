@@ -67,6 +67,8 @@ export const DEFAULT_PLAYER = new Player('id', 'name', []);
 
 export const SYSTEM_ID = 'system';
 
+export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
+
 export const EXPECTED_WORD_COUNT_PLACE = 3;
 export const EXPECTED_WORD_COUNT_EXCHANGE = 2;
 export const EXPECTED_WORD_COUNT_PASS = 1;
