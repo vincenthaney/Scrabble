@@ -8,10 +8,12 @@ import { Tile } from '@app/classes/tile';
 
 export default class ActionExchange extends ActionPlay {
     tilesToExchange: Tile[];
+    moreThanOne: boolean;
 
     constructor(player: Player, game: Game, tilesToExchange: Tile[]) {
         super(player, game);
         this.tilesToExchange = tilesToExchange;
+        this.moreThanOne = this.tilesToExchange.length > 1;
     }
 
     execute(): GameUpdateData {
@@ -31,10 +33,13 @@ export default class ActionExchange extends ActionPlay {
     }
 
     getMessage(): string {
-        return `${this.player.name} a échangé les tuiles ${this.tilesToExchange.reduce((prev, tile: Tile) => (prev += tile.letter), '')}.`;
+        return `Vous avez échangé ${this.moreThanOne ? 'les tuiles' : 'la tuile'} ${this.tilesToExchange.reduce(
+            (prev, tile: Tile) => (prev += tile.letter),
+            '',
+        )}`;
     }
+
     getOpponentMessage(): string {
-        const moreThanOne = this.tilesToExchange.length > 1;
-        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}.`;
+        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${this.moreThanOne ? 's' : ''}`;
     }
 }

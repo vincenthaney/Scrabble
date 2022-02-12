@@ -74,7 +74,7 @@ export class GamePlayController {
         if (opponentFeedback) {
             const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
             this.socketService.emitToSocket(opponentId, 'newMessage', {
-                content: opponentId,
+                content: opponentFeedback,
                 senderId: SYSTEM_ID,
             });
         }
