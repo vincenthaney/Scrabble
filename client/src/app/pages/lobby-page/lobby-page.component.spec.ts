@@ -185,19 +185,19 @@ describe('LobbyPageComponent', () => {
     });
 
     it('lobbyFullDialog should be called when lobbyFullEvent is emittted', () => {
-        const spyOpponentLeft = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
+        const spyLobbyFull = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock.lobbyFullEvent.emit();
-        expect(spyOpponentLeft).toHaveBeenCalled();
+        expect(spyLobbyFull).toHaveBeenCalled();
     });
 
-    it('lobbyFullDialog should be called when lobbyCancelEvent is emittted', () => {
-        const spyOpponentLeft = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
+    it('lobbyCanceled should be called when lobbyCancelEvent is emittted', () => {
+        const spyLobbyCanceled = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock.canceledGameEvent.emit();
-        expect(spyOpponentLeft).toHaveBeenCalled();
+        expect(spyLobbyCanceled).toHaveBeenCalled();
     });
 
     it('ngOnDestroy should unsubscribe all subscriptions', () => {
