@@ -146,7 +146,7 @@ describe('GamePlayService', () => {
             const type = 'place';
             const payload: ActionPlacePayload = {
                 tiles: [],
-                position: { column: 0, row: 0 },
+                startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
             const action = gamePlayService.getAction(player, game, { type, payload });
@@ -172,15 +172,15 @@ describe('GamePlayService', () => {
         it("should throw if place payload doesn't have tiles", () => {
             const type = 'place';
             const payload: Omit<ActionPlacePayload, 'tiles'> = {
-                position: { column: 0, row: 0 },
+                startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });
 
-        it("should throw if place payload doesn't have position", () => {
+        it("should throw if place payload doesn't have startPosition", () => {
             const type = 'place';
-            const payload: Omit<ActionPlacePayload, 'position'> = {
+            const payload: Omit<ActionPlacePayload, 'startPosition'> = {
                 tiles: [],
                 orientation: Orientation.Horizontal,
             };
@@ -191,7 +191,7 @@ describe('GamePlayService', () => {
             const type = 'place';
             const payload: Omit<ActionPlacePayload, 'orientation'> = {
                 tiles: [],
-                position: { column: 0, row: 0 },
+                startPosition: { column: 0, row: 0 },
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });

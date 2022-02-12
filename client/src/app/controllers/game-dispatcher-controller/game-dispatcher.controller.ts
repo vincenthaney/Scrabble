@@ -62,7 +62,6 @@ export class GameDispatcherController {
     }
 
     handleCancelGame(gameId: string): void {
-        console.log('cancel game');
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/cancel`;
         this.http.delete(endpoint).subscribe();
     }

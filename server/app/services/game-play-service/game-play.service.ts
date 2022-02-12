@@ -1,5 +1,5 @@
 /* eslint-disable no-dupe-class-members */
-import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '@app/classes/actions';
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -50,6 +50,12 @@ export class GamePlayService {
             }
             case 'pass': {
                 return new ActionPass(player, game);
+            }
+            case 'help': {
+                return new ActionHelp(player, game);
+            }
+            case 'reserve': {
+                return new ActionReserve(player, game);
             }
             default: {
                 throw Error(INVALID_COMMAND);

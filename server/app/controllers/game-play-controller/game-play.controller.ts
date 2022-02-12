@@ -33,8 +33,6 @@ export class GamePlayController {
         this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
-            console.log(req.body);
-            console.log(req.params);
 
             try {
                 this.handlePlayAction(gameId, playerId, data);

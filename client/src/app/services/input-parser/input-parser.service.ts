@@ -17,7 +17,7 @@ import {
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER,
-    SYSTEM_ID
+    SYSTEM_ID,
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject } from 'rxjs';
@@ -90,9 +90,9 @@ export default class InputParserService {
         // eslint-disable-next-line dot-notation
         const currentPlayerId = this.gameService['roundManager'].currentRound.player.id;
 
-        if (currentPlayerId !== playerId) throw new CommandError(CommandErrorMessages.NotYourTurn);
-
         let actionData: ActionData;
+        if (['placer, échanger, passer'].includes(actionName) && currentPlayerId !== playerId)
+            throw new CommandError(CommandErrorMessages.NotYourTurn);
 
         switch (actionName) {
             case 'placer': {

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { CommunicationBoxComponent } from '@app/components/communication-box/communication-box.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameService } from '@app/services';
 
@@ -9,7 +10,10 @@ import { GameService } from '@app/services';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
+    @ViewChild('communicationBox', { static: false }) communicationBox: CommunicationBoxComponent;
+
     constructor(public surrenderDialog: MatDialog, public gameService: GameService) {}
+
     openDialog() {
         this.surrenderDialog.open(DefaultDialogComponent, {
             data: {
