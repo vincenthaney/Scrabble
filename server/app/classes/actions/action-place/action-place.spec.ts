@@ -1,7 +1,7 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -11,12 +11,15 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile, TileReserve } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import * as chai from 'chai';
+import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
-import { ScoreComputer, WordValidator } from './action-place';
+import { BINGO_BONUS_POINTS } from './action-place.const';
 
 const expect = chai.expect;
 
@@ -55,6 +58,7 @@ const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 3 };
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_CENTER: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: true };
 
 const EXTRACT_RETURN: [Square, Tile][][] = [
     [
@@ -62,12 +66,16 @@ const EXTRACT_RETURN: [Square, Tile][][] = [
         [{ ...DEFAULT_SQUARE_2 }, { ...DEFAULT_TILE_B }],
     ],
 ];
-const SCORE_RETURN = 1;
-const UPDATE_BOARD_RETURN: (Square | undefined)[][] = [
+const EXTRACT_CENTER: [Square, Tile][][] = [
     [
-        { ...DEFAULT_SQUARE_1, tile: DEFAULT_TILE_A },
-        { ...DEFAULT_SQUARE_2, tile: DEFAULT_TILE_B },
+        [{ ...DEFAULT_SQUARE_CENTER }, { ...DEFAULT_TILE_A }],
+        [{ ...DEFAULT_SQUARE_2 }, { ...DEFAULT_TILE_B }],
     ],
+];
+const SCORE_RETURN = 1;
+const UPDATE_BOARD_RETURN: (Square | undefined)[] = [
+    { ...DEFAULT_SQUARE_1, tile: DEFAULT_TILE_A },
+    { ...DEFAULT_SQUARE_2, tile: DEFAULT_TILE_B },
 ];
 const GET_TILES_RETURN: Tile[] = [
     { letter: 'Y', value: 10 },
@@ -88,23 +96,27 @@ describe('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let tileReserveStub: SinonStubbedInstance<TileReserve>;
     let boardStub: SinonStubbedInstance<Board>;
+    let wordValidatorStub: SinonStubbedInstance<WordsVerificationService>;
+    let scoreCalculatorServiceStub: SinonStubbedInstance<ScoreCalculatorService>;
     let game: Game;
 
     beforeEach(async () => {
         gameStub = createStubInstance(Game);
         tileReserveStub = createStubInstance(TileReserve);
         boardStub = createStubInstance(Board);
+        wordValidatorStub = createStubInstance(WordsVerificationService);
+        scoreCalculatorServiceStub = createStubInstance(ScoreCalculatorService);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_1.getId(), DEFAULT_PLAYER_1.name);
         gameStub.player2 = new Player(DEFAULT_PLAYER_2.getId(), DEFAULT_PLAYER_2.name);
         gameStub.player1.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.player2.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.isPlayer1.returns(true);
-
-        tileReserveStub.getTiles.returns(GET_TILES_RETURN);
         boardStub.grid = BOARD.map((row) => row.map((s) => ({ ...s })));
 
-        gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+        // eslint-disable-next-line dot-notation
+        gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
+
         gameStub.board = boardStub as unknown as Board;
 
         game = gameStub as unknown as Game;
@@ -120,25 +132,37 @@ describe('ActionPlace', () => {
             let action: ActionPlace;
             let getTilesFromPlayerSpy: unknown;
             let wordExtractSpy: unknown;
-            let wordValidatorSpy: unknown;
-            let scoreComputeSpy: unknown;
             let updateBoardSpy: unknown;
             let getTilesSpy: unknown;
-            let isABingoSpy: unknown;
+            let isABingoSpy: SinonStub<[], boolean>;
+
+            let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
+            let wordToStringSpy: unknown;
 
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
+
+                // eslint-disable-next-line dot-notation
+                action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
+                // eslint-disable-next-line dot-notation
+                action['scoreCalculator'] = scoreCalculatorServiceStub as unknown as ScoreCalculatorService;
+                isABingoSpy = stub(action, 'isABingo').returns(false);
+
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                wordValidatorStub.verifyWords.callsFake(() => {});
+                scoreCalculatorServiceStub.calculatePoints.returns(SCORE_RETURN);
+                updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
+                isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                wordValidatorSpy = chai.spy.on(WordValidator, 'validate', () => true);
-                scoreComputeSpy = chai.spy.on(ScoreComputer, 'compute', () => SCORE_RETURN);
-                updateBoardSpy = chai.spy.on(action, 'updateBoard', () => UPDATE_BOARD_RETURN);
-                getTilesSpy = chai.spy.on(game.tileReserve, 'getTiles', () => []);
-                isABingoSpy = chai.spy.on(action, 'isABingo', () => false);
+                getTilesSpy = chai.spy.on(game, 'getTiles', () => GET_TILES_RETURN);
+                // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
+                wordToStringSpy = chai.spy.on(ActionPlace.prototype, 'wordToString', () => []);
             });
 
             afterEach(() => {
                 chai.spy.restore();
+                isLegalPlacementStub.restore();
             });
 
             it('should call getTilesFromPlayer', () => {
@@ -153,12 +177,12 @@ describe('ActionPlace', () => {
 
             it('should call word validator', () => {
                 action.execute();
-                expect(wordValidatorSpy).to.have.been.called();
+                assert(wordValidatorStub.verifyWords.calledOnce);
             });
 
             it('should call score computer', () => {
                 action.execute();
-                expect(scoreComputeSpy).to.have.been.called();
+                assert(scoreCalculatorServiceStub.calculatePoints.calledOnce);
             });
 
             it('should call board update', () => {
@@ -171,9 +195,33 @@ describe('ActionPlace', () => {
                 expect(getTilesSpy).to.have.been.called();
             });
 
+            it('should add points if isABingo is true', () => {
+                isABingoSpy.restore();
+                isABingoSpy = stub(action, 'isABingo').returns(true);
+                const result = action.execute();
+                expect(result!.player1!.score).to.equal(SCORE_RETURN + BINGO_BONUS_POINTS);
+            });
+
             it('should call isABingo', () => {
                 action.execute();
-                expect(isABingoSpy).to.have.been.called();
+                assert(isABingoSpy.calledOnce);
+            });
+
+            it('should call wordToString', () => {
+                action.execute();
+                expect(wordToStringSpy).to.have.been.called();
+            });
+
+            it('should call isLegalPlacement', () => {
+                action.execute();
+                assert(isLegalPlacementStub.calledOnce);
+            });
+
+            it('should throw if isLegalPlacement returns false', () => {
+                isLegalPlacementStub.restore();
+                isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(false);
+                const result = () => action.execute();
+                expect(result).to.throw('COMMANDE INVALIDE');
             });
 
             it('should return update', () => {
@@ -202,22 +250,13 @@ describe('ActionPlace', () => {
                 const update: GameUpdateData = action.execute()!;
                 expect(update.player2).to.exist;
             });
-
-            it('should throw if a word is invalid', () => {
-                chai.spy.restore();
-                getTilesFromPlayerSpy = chai.spy.on(action, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
-                wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                wordValidatorSpy = chai.spy.on(WordValidator, 'validate', () => false);
-
-                expect(() => action.execute()).to.throw(ERROR_INVALID_WORD);
-            });
         });
     });
 
     describe('updateBoard', () => {
         it('should return array with changed tiles', () => {
             const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
-            const result = action.updateBoard(EXTRACT_RETURN, game);
+            const result = action.updateBoard(EXTRACT_RETURN);
 
             for (const changes of EXTRACT_RETURN) {
                 for (const [square, tile] of changes) {
@@ -235,7 +274,7 @@ describe('ActionPlace', () => {
             const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
             const copiedExtractReturn: [Square, Tile][][] = EXTRACT_RETURN.map((row) => row.map(([square, tile]) => [{ ...square }, { ...tile }]));
             copiedExtractReturn.forEach((row) => row.forEach(([square, tile]) => (square.tile = tile)));
-            const result = action.updateBoard(EXTRACT_RETURN, game);
+            const result = action.updateBoard(EXTRACT_RETURN);
 
             expect(result).to.be.empty;
         });
@@ -253,8 +292,79 @@ describe('ActionPlace', () => {
         });
     });
 
-    describe('getMessage', () => {
+    describe('amountOfLettersInWords', () => {
         let action: ActionPlace;
+
+        beforeEach(() => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        });
+
+        it('should return the correct number of tiles', () => {
+            expect(action.amountOfLettersInWords(EXTRACT_RETURN)).to.equal(2);
+        });
+    });
+
+    describe('wordToString', () => {
+        let action: ActionPlace;
+
+        beforeEach(() => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        });
+
+        it('should return the word', () => {
+            expect(action.wordToString(EXTRACT_RETURN)).to.deep.equal(['AB']);
+        });
+    });
+
+    describe('isLegalPlacement', () => {
+        let action: ActionPlace;
+
+        beforeEach(() => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        });
+
+        it('should call amountOfLettersInWords', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            const amountOfLettersInWordsStub = stub(ActionPlace.prototype, 'amountOfLettersInWords').returns(1000);
+            action.isLegalPlacement(EXTRACT_RETURN);
+            assert(amountOfLettersInWordsStub.calledOnce);
+            amountOfLettersInWordsStub.restore();
+        });
+        it('should call containsCenterSquare if amountOfLettersInWords return the same amount than tileToPlace', () => {
+            chai.spy.restore(ActionPlace.prototype, 'amountOfLettersInWords');
+            const containsCenterSquareStub = stub(action, 'containsCenterSquare').returns(true);
+            const amountOfLettersInWordsStub = stub(action, 'amountOfLettersInWords').returns(VALID_TILES_TO_PLACE.length);
+            action.isLegalPlacement(EXTRACT_RETURN);
+            assert(containsCenterSquareStub.calledOnce);
+            containsCenterSquareStub.restore();
+            amountOfLettersInWordsStub.restore();
+        });
+    });
+
+    describe('containsCenterSquare', () => {
+        let action: ActionPlace;
+
+        beforeEach(() => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        });
+
+        it('should return true if it contains center square', () => {
+            const result = action.containsCenterSquare(EXTRACT_CENTER);
+            expect(result).to.be.true;
+        });
+
+        it('should return true if it contains center square', () => {
+            const result = action.containsCenterSquare(EXTRACT_RETURN);
+            expect(result).to.be.false;
+        });
+    });
+
+    describe('isABingo', () => {
+        let action: ActionPlace;
+
+        beforeEach(() => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        });
 
         it('should return true with 7 tiles to place', () => {
             action = new ActionPlace(game.player1, game, MAX_LENGTH_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
