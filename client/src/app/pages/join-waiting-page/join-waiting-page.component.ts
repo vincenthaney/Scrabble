@@ -1,9 +1,9 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NavigationStart, Router } from '@angular/router';
-import { LobbyInfo } from '@app/classes/communication/';
+import { LobbyInfo } from '@app/classes/communication';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { GameDispatcherService } from '@app/services/';
+import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -13,6 +13,7 @@ import {
     DIALOG_REJECT_CONTENT,
     DIALOG_REJECT_TITLE,
 } from './join-waiting-page.component.const';
+
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',

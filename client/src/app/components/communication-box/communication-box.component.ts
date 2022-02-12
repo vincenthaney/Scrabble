@@ -1,10 +1,12 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
+import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
+import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 
-type Message = { text: string; sender: string; date: Date; class: string };
 type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
@@ -14,65 +16,68 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunicationBoxComponent implements OnInit, OnDestroy {
-    @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
+    @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
-    messages: Message[] = [
-        { text: 'message 1', sender: 'Mathilde', date: new Date(), class: 'me' },
-        { text: 'message 2', sender: 'Mathilde', date: new Date(), class: 'me' },
-        { text: 'message 3', sender: 'Raph', date: new Date(), class: 'opponent' },
-        { text: 'message 4', sender: 'Mathilde', date: new Date(), class: 'me' },
-        { text: 'Raph a joué ARBRE', sender: '', date: new Date(), class: 'system' },
-        { text: 'message 5', sender: 'Raph', date: new Date(), class: 'opponent' },
-        { text: 'message 5', sender: 'Raph', date: new Date(), class: 'opponent' },
-        { text: 'message 6', sender: 'Mathilde', date: new Date(), class: 'me' },
-        {
-            // eslint-disable-next-line max-len
-            text: "je suis un message très long qui va sûrement prendre plus qu'une ligne à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
-            sender: 'Raph',
-            date: new Date(),
-            class: 'opponent',
-        },
-    ];
+    messages: VisualMessage[] = [];
     messageForm = new FormGroup({
-        content: new FormControl(''),
+        content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
+    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
 
-    constructor(private inputParser: InputParserService, private gameService: GameService) {}
+    constructor(private inputParser: InputParserService, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {}
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
 
         this.gameService.updateTileReserveEvent.subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
         });
+        this.gameService.newMessageValue.subscribe((newMessage) => {
+            this.onReceiveNewMessage(newMessage);
+        });
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.gameService.updateTileReserveEvent.unsubscribe();
     }
 
-    sendMessage() {
+    createVisualMessage(newMessage: Message): VisualMessage {
+        let messageClass: VisualMessageClass;
+        if (newMessage.senderId === this.gameService.getLocalPlayerId()) {
+            messageClass = 'me';
+        } else if (newMessage.senderId === 'system') {
+            messageClass = 'system';
+        } else {
+            messageClass = 'opponent';
+        }
+        return { ...newMessage, class: messageClass };
+    }
+
+    onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
-        if (message) {
+        if (message && message.length > 0) {
             this.inputParser.parseInput(message);
-            this.messages = [...this.messages, { text: message, sender: 'Mathilde', date: new Date(), class: 'me' }];
-            this.messageForm.reset();
-            this.scrollToBottom();
+            this.messageForm.reset({ content: '' });
         }
     }
 
-    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number) {
+    onReceiveNewMessage(newMessage: Message): void {
+        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
+        this.changeDetectorRef.detectChanges();
+        this.scrollToBottom();
+    }
+
+    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
         this.lettersLeft = tileReserve;
         this.lettersLeftTotal = tileReserveTotal;
     }
 
-    private scrollToBottom() {
+    private scrollToBottom(): void {
         setTimeout(() => {
             this.scrollViewport.scrollTo({
                 bottom: 0,
