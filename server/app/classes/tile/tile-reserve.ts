@@ -9,12 +9,10 @@ import { LetterDistributionData, TileData } from './tile.types';
 
 export default class TileReserve {
     private tiles: Tile[];
-    private referenceTiles: Tile[];
     private initialized: boolean;
 
     constructor() {
         this.tiles = [];
-        this.referenceTiles = [];
         this.initialized = false;
     }
 
@@ -32,7 +30,6 @@ export default class TileReserve {
                 this.tiles.push({ letter: tile.letter as LetterValue, value: tile.score });
             }
         });
-        this.referenceTiles = [...this.tiles];
         this.initialized = true;
     }
 
@@ -53,7 +50,6 @@ export default class TileReserve {
         if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         if (this.tiles.length < tilesToSwap.length) throw new Error(TileError.NOT_ENOUGH_TILES);
         if (this.tiles.length < TileConst.TILE_RESERVE_THRESHOLD) throw new Error(TileError.MUST_HAVE_7_TILES_TO_SWAP);
-        if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
 
         const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
         this.tiles = this.tiles.concat(tilesToSwap);
