@@ -236,16 +236,12 @@ describe('GameDispatcherController', () => {
         const fakeObservable = of<string>('fakeResponse');
         // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
-        // const errorSpy = spyOn(controller, 'handleJoinError').and.callFake(() => {
-        //    return;
-        // });
         const successSpy = spyOn(controller.lobbyRequestValidEvent, 'emit');
         controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
         expect(successSpy).toHaveBeenCalled();
     });
 
     it('handleLobbyJoinRequest should call handleJoinError when HTTP post request generates an error', () => {
-        // const fakeObservable = of<string>('fakeResponse');
         // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.callFake(() => {
             return throwError('fakeError');
