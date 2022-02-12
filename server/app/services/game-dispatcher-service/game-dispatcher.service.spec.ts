@@ -14,7 +14,14 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Container } from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
-import { CANNOT_HAVE_SAME_NAME, INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID, NO_OPPONENT_IN_WAITING_GAME, OPPONENT_NAME_DOES_NOT_MATCH, PLAYER_ALREADY_TRYING_TO_JOIN } from '@app/constants/services-errors';
+import {
+    CANNOT_HAVE_SAME_NAME,
+    INVALID_PLAYER_ID_FOR_GAME,
+    NO_GAME_FOUND_WITH_ID,
+    NO_OPPONENT_IN_WAITING_GAME,
+    OPPONENT_NAME_DOES_NOT_MATCH,
+    PLAYER_ALREADY_TRYING_TO_JOIN,
+} from '@app/constants/services-errors';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
