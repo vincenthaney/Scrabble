@@ -4,7 +4,6 @@
 import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
-import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -15,6 +14,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
+import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 
 const expect = chai.expect;
 
@@ -120,7 +120,7 @@ describe('Game', () => {
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getRequestingPlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getRequestingPlayer(invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
 
@@ -137,7 +137,7 @@ describe('Game', () => {
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getOpponentPlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getOpponentPlayer(invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
     });

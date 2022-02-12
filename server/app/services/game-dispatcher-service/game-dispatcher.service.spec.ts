@@ -9,13 +9,12 @@ import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
-import * as Errors from '@app/constants/errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Container } from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
-import { CANNOT_HAVE_SAME_NAME, OPPONENT_NAME_DOES_NOT_MATCH, PLAYER_ALREADY_TRYING_TO_JOIN } from '@app/constants/services-errors';
+import { CANNOT_HAVE_SAME_NAME, INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID, NO_OPPONENT_IN_WAITING_GAME, OPPONENT_NAME_DOES_NOT_MATCH, PLAYER_ALREADY_TRYING_TO_JOIN } from '@app/constants/services-errors';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
@@ -156,7 +155,7 @@ describe('GameDispatcherService', () => {
             const invalidId = 'invalidId';
 
             return expect(gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.rejectedWith(
-                Errors.INVALID_PLAYER_ID_FOR_GAME,
+                INVALID_PLAYER_ID_FOR_GAME,
             );
         });
 
@@ -165,7 +164,7 @@ describe('GameDispatcherService', () => {
 
             return expect(
                 gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
-            ).to.be.rejectedWith(Errors.NO_OPPONENT_IN_WAITING_GAME);
+            ).to.be.rejectedWith(NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it(' should throw error when playerId is invalid', () => {
@@ -193,14 +192,14 @@ describe('GameDispatcherService', () => {
 
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.rejectJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => gameDispatcherService.rejectJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it('should throw if no player is waiting', () => {
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
             expect(() => {
                 return gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
-            }).to.throw(Errors.NO_OPPONENT_IN_WAITING_GAME);
+            }).to.throw(NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it('should throw error if opponent name is incorrect', () => {
@@ -228,13 +227,13 @@ describe('GameDispatcherService', () => {
 
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it('should throw if player is undefined', () => {
             waitingRoom.joinedPlayer = undefined;
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.NO_OPPONENT_IN_WAITING_GAME);
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it('should return the [hostPlayerId, leaverName]', () => {
@@ -259,7 +258,7 @@ describe('GameDispatcherService', () => {
 
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.cancelGame(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => gameDispatcherService.cancelGame(id, invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
     });
 
@@ -302,7 +301,7 @@ describe('GameDispatcherService', () => {
 
         it('should throw when id is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(Errors.NO_GAME_FOUND_WITH_ID);
+            expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(NO_GAME_FOUND_WITH_ID);
         });
     });
 

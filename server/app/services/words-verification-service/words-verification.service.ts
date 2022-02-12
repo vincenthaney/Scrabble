@@ -1,3 +1,8 @@
+import { Service } from 'typedi';
+import * as fs from 'fs';
+import { join } from 'path';
+import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from '@app/constants/services-constants/words-verification.service.const';
+import { DictionaryData } from './words-verification.service.types';
 import {
     INVALID_WORD,
     MINIMUM_WORD_LENGTH,
@@ -5,12 +10,7 @@ import {
     WORD_CONTAINS_ASTERISK,
     WORD_CONTAINS_HYPHEN,
     WORD_TOO_SHORT,
-} from '@app/constants/errors';
-import { Service } from 'typedi';
-import * as fs from 'fs';
-import { join } from 'path';
-import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from '@app/constants/services-constants/words-verification.service.const';
-import { DictionaryData } from './words-verification.service.types';
+} from '@app/constants/services-errors';
 
 @Service()
 export class WordsVerificationService {
