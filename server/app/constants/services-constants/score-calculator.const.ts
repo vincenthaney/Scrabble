@@ -11,6 +11,7 @@ export const scoreCalculatorConstants = {
     DEFAULT_WORD_MULTIPLIER: 2,
     DEFAULT_LETTER_MULTIPLIER: 2,
     DEFAULT_MULTIPLIER: 1,
+    DEFAULT_SCORE: 0,
 };
 
 export const EMPTY_WORDS: [Tile, Square][][] = [];

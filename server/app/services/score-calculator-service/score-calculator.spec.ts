@@ -14,7 +14,7 @@ import {
     GENERIC_WORDS,
     GENERIC_LETTER_3,
     GENERIC_WORDS_SCORE,
-} from '@app/constants/services-constants/score-calculator.const.test';
+} from '@app/constants/services-constants/score-calculator.const';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
