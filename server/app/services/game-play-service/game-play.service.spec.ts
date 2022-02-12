@@ -10,7 +10,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
+import { gamePlayErrors } from '@app/constants/services-errors';
 import RoundManager from '@app/classes/round/round-manager';
 import { Round } from '@app/classes/round/round';
 import { Orientation } from '@app/classes/board';
@@ -131,7 +131,7 @@ describe('GamePlayService', () => {
         });
 
         it('should throw when playerId is invalid', () => {
-            expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
+            expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(gamePlayErrors.NOT_PLAYER_TURN);
         });
     });
 
@@ -139,7 +139,7 @@ describe('GamePlayService', () => {
         it('should fail when type is invalid', () => {
             expect(() => {
                 gamePlayService.getAction(player, game, { type: INVALID_ACTION_TYPE as unknown as ActionType, payload: {} });
-            }).to.throw(INVALID_COMMAND);
+            }).to.throw(gamePlayErrors.INVALID_COMMAND);
         });
 
         it('should return action of type ActionPlace when type is place', () => {
@@ -175,7 +175,7 @@ describe('GamePlayService', () => {
                 position: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(gamePlayErrors.INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have position", () => {
@@ -184,7 +184,7 @@ describe('GamePlayService', () => {
                 tiles: [],
                 orientation: Orientation.Horizontal,
             };
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(gamePlayErrors.INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have orientation", () => {
@@ -193,13 +193,13 @@ describe('GamePlayService', () => {
                 tiles: [],
                 position: { column: 0, row: 0 },
             };
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(gamePlayErrors.INVALID_PAYLOAD);
         });
 
         it("should throw if exchange payload doesn't have tiles", () => {
             const type = 'exchange';
             const payload: Omit<ActionExchangePayload, 'tiles'> = {};
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(gamePlayErrors.INVALID_PAYLOAD);
         });
     });
 });
