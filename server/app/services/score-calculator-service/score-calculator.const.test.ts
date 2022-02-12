@@ -48,4 +48,14 @@ export const GENERIC_WORDS = [
     [GENERIC_LETTER_1, GENERIC_LETTER_2],
 ];
 
+export const MAX_LENGTH_TILES_TO_PLACE: Tile[] = [
+    { letter: 'A', value: 1 },
+    { letter: 'F', value: 0 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+    { letter: 'C', value: 1 },
+];
+
 export const GENERIC_WORDS_SCORE = 50;
