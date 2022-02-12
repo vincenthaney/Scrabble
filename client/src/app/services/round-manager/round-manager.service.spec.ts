@@ -1,12 +1,16 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
-import { TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ActionType } from '@app/classes/actions/action-data';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import * as ROUND_ERROR from './round-manager.service.errors';
 import SpyObj = jasmine.SpyObj;
@@ -28,9 +32,14 @@ class RoundManagerServiceWrapper {
     }
 }
 
+@Component({
+    template: '',
+})
+class TestComponent {}
+
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
-    let gameDispatcherControllerSpy: SpyObj<GameDispatcherController>;
+    let gameplayControllerSpy: SpyObj<GamePlayController>;
 
     const currentRound: Round = {
         player: DEFAULT_PLAYER,
@@ -40,13 +49,19 @@ describe('RoundManagerService', () => {
     };
 
     beforeEach(() => {
-        gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
+        gameplayControllerSpy = jasmine.createSpyObj('GamePlayController', ['handleAction']);
     });
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, RouterTestingModule.withRoutes([])],
-            providers: [{ provide: GameDispatcherController, useValue: gameDispatcherControllerSpy }],
+            imports: [
+                HttpClientModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'game', component: TestComponent },
+                    { path: 'home', component: TestComponent },
+                ]),
+            ],
+            providers: [{ provide: GamePlayController, useValue: gameplayControllerSpy }],
         });
         service = TestBed.inject(RoundManagerService);
     });
@@ -79,10 +94,6 @@ describe('RoundManagerService', () => {
 
         it('resetServiceData should reset the max round time', () => {
             expect(service.maxRoundTime).toEqual(0);
-        });
-
-        it('resetServiceData should clear the timeout', () => {
-            // SPY ON clearTimeout
         });
 
         it('resetServiceData should reset the gameId', () => {
@@ -176,12 +187,8 @@ describe('RoundManagerService', () => {
             service.startRound();
         });
 
-        it('startRound should clear old timeout', () => {
-            // SpyOn clearTimeout
-        });
-
         it('startRound should set new timeout', () => {
-            // SpyOn setTimeout
+            expect(service.timeout).toBeTruthy();
         });
 
         it('startRound should call startTimer', () => {
@@ -201,5 +208,61 @@ describe('RoundManagerService', () => {
 
         service.startTimer();
         expect(timerSourceSpy).toHaveBeenCalledOnceWith([newTimer, activePlayer]);
+    });
+
+    describe('RoundTimeout', () => {
+        let endRoundEventSpy: unknown;
+
+        beforeEach(() => {
+            endRoundEventSpy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+                return;
+            });
+            spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
+            gameplayControllerSpy.handleAction.and.callFake(() => {
+                return;
+            });
+        });
+
+        it('RoundTimeout should not timeout if user is not on /game', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('/home');
+            tick();
+
+            service.roundTimeout();
+            expect(endRoundEventSpy).not.toHaveBeenCalled();
+        }));
+
+        it('RoundTimeout should not send pass event if the player is not the active player', () => {
+            spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
+            service.roundTimeout();
+            expect(gameplayControllerSpy.handleAction).not.toHaveBeenCalled();
+        });
+
+        it('RoundTimeout should emit endRoundEvent', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('/game');
+            tick();
+
+            spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
+
+            service.roundTimeout();
+            expect(endRoundEventSpy).toHaveBeenCalled();
+        }));
+
+        it('RoundTimeout should send pass action', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('/game');
+            tick();
+
+            spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
+
+            const actionPass = {
+                type: ActionType.PASS,
+                payload: {},
+            };
+
+            service.roundTimeout();
+            expect(gameplayControllerSpy.handleAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
+        }));
     });
 });
