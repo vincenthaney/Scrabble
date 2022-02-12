@@ -5,7 +5,7 @@
 import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
 import { expect } from 'chai';
 import { WordsVerificationService } from './words-verification.service';
-import { WordsVerificationConstants } from '@app/constants/services-constants/words-verification.service.const';
+import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from '@app/constants/services-constants/words-verification.service.const';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -25,8 +25,7 @@ const mockDictionary: DictionaryData = {
 // mockPaths must be of type any because keys must be dynamic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockPaths: any = [];
-mockPaths[join(__dirname, WordsVerificationConstants.DICTIONARY_RELATIVE_PATH, WordsVerificationConstants.DICTIONARY_NAME)] =
-    JSON.stringify(mockDictionary);
+mockPaths[join(__dirname, DICTIONARY_RELATIVE_PATH, DICTIONARY_NAME)] = JSON.stringify(mockDictionary);
 
 describe('WordsVerificationService', () => {
     let wordsVerificationService: WordsVerificationService;
@@ -47,7 +46,7 @@ describe('WordsVerificationService', () => {
     });
 
     it('should contain dictionary', () => {
-        expect(wordsVerificationService.activeDictionaries.has(WordsVerificationConstants.DICTIONARY_NAME)).to.be.true;
+        expect(wordsVerificationService.activeDictionaries.has(DICTIONARY_NAME)).to.be.true;
     });
 
     it('loadAllDictionaries should call fetchDictionary method', () => {
@@ -56,8 +55,8 @@ describe('WordsVerificationService', () => {
     });
 
     it('should return the content of dictionnary.words', () => {
-        const filePath = join(__dirname, WordsVerificationConstants.DICTIONARY_RELATIVE_PATH);
-        expect(wordsVerificationService.fetchDictionary(WordsVerificationConstants.DICTIONARY_NAME, filePath)).to.deep.equal(mockDictionary.words);
+        const filePath = join(__dirname, DICTIONARY_RELATIVE_PATH);
+        expect(wordsVerificationService.fetchDictionary(DICTIONARY_NAME, filePath)).to.deep.equal(mockDictionary.words);
     });
 
     it('should not have any character with accent', () => {
@@ -68,38 +67,38 @@ describe('WordsVerificationService', () => {
 
     it('should return error because word too short', () => {
         const testWord = 'a';
-        const result = () => wordsVerificationService.verifyWords([testWord], WordsVerificationConstants.DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
         expect(result).to.Throw(testWord + WORD_TOO_SHORT);
     });
 
     it('should return error because word contains asterisk', () => {
         const testWord = 'ka*ak';
-        const result = () => wordsVerificationService.verifyWords([testWord], WordsVerificationConstants.DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
         expect(result).to.Throw(testWord + WORD_CONTAINS_ASTERISK);
     });
 
     it('should return error because word contains hyphen', () => {
         const testWord = 'a-a';
-        const result = () => wordsVerificationService.verifyWords([testWord], WordsVerificationConstants.DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
         expect(result).to.Throw(testWord + WORD_CONTAINS_HYPHEN);
     });
 
     it('should return error because word contains apostrophe', () => {
         const testWord = "aaaa'aaaa";
-        const result = () => wordsVerificationService.verifyWords([testWord], WordsVerificationConstants.DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
         expect(result).to.Throw(testWord + WORD_CONTAINS_APOSTROPHE);
     });
 
     it('should return error if word is not in dictionary', () => {
         const testWord = 'ufdwihfewa';
-        const result = () => wordsVerificationService.verifyWords([testWord], WordsVerificationConstants.DICTIONARY_NAME);
+        const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
         expect(result).to.Throw(testWord + INVALID_WORD);
     });
 
     it('should be true when word is in the dictionary', () => {
         const wordsCount = 1;
         const words: string[] = [];
-        const dictionary = wordsVerificationService.activeDictionaries.get(WordsVerificationConstants.DICTIONARY_NAME);
+        const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
 
         if (dictionary) {
             const dictionaryIterator = dictionary[Symbol.iterator]();
@@ -109,13 +108,13 @@ describe('WordsVerificationService', () => {
                 i++;
             }
         }
-        expect(() => wordsVerificationService.verifyWords(words, WordsVerificationConstants.DICTIONARY_NAME)).to.not.throw();
+        expect(() => wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.not.throw();
     });
 
     it('should be true when words are in the dictionary', () => {
         const wordsCount = 4;
         const words: string[] = [];
-        const dictionary = wordsVerificationService.activeDictionaries.get(WordsVerificationConstants.DICTIONARY_NAME);
+        const dictionary = wordsVerificationService.activeDictionaries.get(DICTIONARY_NAME);
 
         if (dictionary) {
             const dictionaryIterator = dictionary[Symbol.iterator]();
@@ -125,6 +124,6 @@ describe('WordsVerificationService', () => {
                 i++;
             }
         }
-        expect(() => wordsVerificationService.verifyWords(words, WordsVerificationConstants.DICTIONARY_NAME)).to.not.throw();
+        expect(() => wordsVerificationService.verifyWords(words, DICTIONARY_NAME)).to.not.throw();
     });
 });

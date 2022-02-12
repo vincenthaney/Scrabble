@@ -6,7 +6,7 @@ import { Service } from 'typedi';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import Player from '@app/classes/player/player';
 import Game from '@app/classes/game/game';
-import { gamePlayErrors } from '@app/constants/services-errors';
+import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { Position } from '@app/classes/board';
 
 @Service()
@@ -17,7 +17,7 @@ export class GamePlayService {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
-        if (player.getId() !== playerId) throw Error(gamePlayErrors.NOT_PLAYER_TURN);
+        if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
 
         const action: Action = this.getAction(player, game, actionData);
         let updatedData: void | GameUpdateData = action.execute();
@@ -51,22 +51,22 @@ export class GamePlayService {
                 return new ActionPass(player, game);
             }
             default: {
-                throw Error(gamePlayErrors.INVALID_COMMAND);
+                throw Error(INVALID_COMMAND);
             }
         }
     }
 
     getActionPlacePayload(actionData: ActionData) {
         const payload = actionData.payload as ActionPlacePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(gamePlayErrors.INVALID_PAYLOAD);
-        if (payload.position === undefined) throw new Error(gamePlayErrors.INVALID_PAYLOAD);
-        if (payload.orientation === undefined) throw new Error(gamePlayErrors.INVALID_PAYLOAD);
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.position === undefined) throw new Error(INVALID_PAYLOAD);
+        if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
         return payload;
     }
 
     getActionExchangePayload(actionData: ActionData) {
         const payload = actionData.payload as ActionExchangePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(gamePlayErrors.INVALID_PAYLOAD);
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
         return payload;
     }
 }

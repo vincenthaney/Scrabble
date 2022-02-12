@@ -1,7 +1,7 @@
 import { Action, ActionPass } from '@app/classes/actions';
 import Player from '@app/classes/player/player';
 import { CompletedRound, Round } from './round';
-import { roundManagerErrors } from '@app/constants/classes-errors';
+import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 
 const SECONDS_TO_MILLISECONDS = 1000;
 
@@ -26,7 +26,7 @@ export default class RoundManager {
             if (this.currentRound) {
                 return this.currentRound.startTime;
             } else {
-                throw new Error(roundManagerErrors.ERROR_GAME_NOT_STARTED);
+                throw new Error(ERROR_GAME_NOT_STARTED);
             }
         } else {
             return this.completedRounds[0].startTime;

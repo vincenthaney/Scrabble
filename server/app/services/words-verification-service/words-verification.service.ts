@@ -9,7 +9,7 @@ import {
 import { Service } from 'typedi';
 import * as fs from 'fs';
 import { join } from 'path';
-import { WordsVerificationConstants } from '@app/constants/services-constants/words-verification.service.const';
+import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from '@app/constants/services-constants/words-verification.service.const';
 import { DictionaryData } from './words-verification.service.types';
 
 @Service()
@@ -32,9 +32,9 @@ export class WordsVerificationService {
     loadAllDictionaries() {
         // TODO: Change this to upload all dictionaries from mongoDB
         // Will be removed during sprint 3
-        const filePath = join(__dirname, WordsVerificationConstants.DICTIONARY_RELATIVE_PATH);
+        const filePath = join(__dirname, DICTIONARY_RELATIVE_PATH);
         fs.readdirSync(filePath).forEach((dictionary) => {
-            this.activeDictionaries.set(WordsVerificationConstants.DICTIONARY_NAME, new Set(this.fetchDictionary(dictionary, filePath)));
+            this.activeDictionaries.set(DICTIONARY_NAME, new Set(this.fetchDictionary(dictionary, filePath)));
         });
     }
 

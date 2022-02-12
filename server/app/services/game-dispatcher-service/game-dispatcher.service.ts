@@ -10,7 +10,7 @@ import * as Errors from '@app/constants/errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import { gameDispatcherErrors } from '@app/constants/services-errors';
+import { CANNOT_HAVE_SAME_NAME, OPPONENT_NAME_DOES_NOT_MATCH, PLAYER_ALREADY_TRYING_TO_JOIN } from '@app/constants/services-errors';
 
 @Service()
 export class GameDispatcherService {
@@ -41,10 +41,10 @@ export class GameDispatcherService {
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {
-            throw new HttpException(gameDispatcherErrors.PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
+            throw new HttpException(PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
         }
         if (waitingRoom.getConfig().player1.name === playerName) {
-            throw new HttpException(gameDispatcherErrors.CANNOT_HAVE_SAME_NAME);
+            throw new HttpException(CANNOT_HAVE_SAME_NAME);
         }
 
         const joiningPlayer = new Player(playerId, playerName);
@@ -58,9 +58,9 @@ export class GameDispatcherService {
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(gameDispatcherErrors.NO_OPPONENT_IN_WAITING_GAME);
+            throw new HttpException(Errors.NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer.name !== opponentName) {
-            throw new HttpException(gameDispatcherErrors.OPPONENT_NAME_DOES_NOT_MATCH);
+            throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
         // Remove game from wait
@@ -85,9 +85,9 @@ export class GameDispatcherService {
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(gameDispatcherErrors.NO_OPPONENT_IN_WAITING_GAME);
+            throw new HttpException(Errors.NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer.name !== opponentName) {
-            throw new HttpException(gameDispatcherErrors.OPPONENT_NAME_DOES_NOT_MATCH);
+            throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
         const rejectedPlayer = waitingRoom.joinedPlayer;
@@ -98,7 +98,7 @@ export class GameDispatcherService {
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(gameDispatcherErrors.NO_OPPONENT_IN_WAITING_GAME);
+            throw new HttpException(Errors.NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer.getId() !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         }

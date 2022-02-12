@@ -12,7 +12,7 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import BoardService from './board.service';
-import { boardErrors } from '@app/constants/services-errors';
+import { BOARD_CONFIG_UNDEFINED_AT, NO_MULTIPLIER_MAPPED_TO_INPUT } from '@app/constants/services-errors';
 
 const expect = chai.expect;
 chai.use(spies);
@@ -129,7 +129,7 @@ describe('BoardService', () => {
     boardConfigTestCases.forEach((value: MapTypes, key: string) => {
         it('Parsing Square config for data ' + key + ' should return ' + value, () => {
             if (value === undefined) {
-                expect(() => service['parseSquareConfig'](key)).to.throw(boardErrors.NO_MULTIPLIER_MAPPED_TO_INPUT(key));
+                expect(() => service['parseSquareConfig'](key)).to.throw(NO_MULTIPLIER_MAPPED_TO_INPUT(key));
             } else {
                 expect(service['parseSquareConfig'](key)).to.deep.equal(value);
             }
@@ -139,7 +139,7 @@ describe('BoardService', () => {
     it('Reading board config at undefined position should throw error', () => {
         chai.spy.on(service, 'isBoardConfigDefined', () => false);
         const undefinedPosition: Position = new Position(-1, -1);
-        expect(() => service['readScoreMultiplierConfig'](undefinedPosition)).to.throw(boardErrors.BOARD_CONFIG_UNDEFINED_AT(undefinedPosition));
+        expect(() => service['readScoreMultiplierConfig'](undefinedPosition)).to.throw(BOARD_CONFIG_UNDEFINED_AT(undefinedPosition));
     });
 
     it('Reading board config at valid position should return appropriate multiplier', () => {

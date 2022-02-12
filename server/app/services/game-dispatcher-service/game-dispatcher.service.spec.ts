@@ -15,7 +15,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Container } from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
-import { gameDispatcherErrors } from '@app/constants/services-errors';
+import { CANNOT_HAVE_SAME_NAME, OPPONENT_NAME_DOES_NOT_MATCH, PLAYER_ALREADY_TRYING_TO_JOIN } from '@app/constants/services-errors';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
@@ -103,13 +103,13 @@ describe('GameDispatcherService', () => {
 
             expect(() => {
                 gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID_2, DEFAULT_OPPONENT_NAME_2);
-            }).to.throw(gameDispatcherErrors.PLAYER_ALREADY_TRYING_TO_JOIN);
+            }).to.throw(PLAYER_ALREADY_TRYING_TO_JOIN);
         });
 
         it('should not join if initiating players have the same name', () => {
             expect(() => {
                 gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
-            }).to.throw(gameDispatcherErrors.CANNOT_HAVE_SAME_NAME);
+            }).to.throw(CANNOT_HAVE_SAME_NAME);
         });
     });
 
@@ -165,13 +165,13 @@ describe('GameDispatcherService', () => {
 
             return expect(
                 gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
-            ).to.be.rejectedWith(gameDispatcherErrors.NO_OPPONENT_IN_WAITING_GAME);
+            ).to.be.rejectedWith(Errors.NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it(' should throw error when playerId is invalid', () => {
             return expect(
                 gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2),
-            ).to.be.rejectedWith(gameDispatcherErrors.OPPONENT_NAME_DOES_NOT_MATCH);
+            ).to.be.rejectedWith(OPPONENT_NAME_DOES_NOT_MATCH);
         });
     });
 
@@ -200,13 +200,13 @@ describe('GameDispatcherService', () => {
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
             expect(() => {
                 return gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
-            }).to.throw(gameDispatcherErrors.NO_OPPONENT_IN_WAITING_GAME);
+            }).to.throw(Errors.NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it('should throw error if opponent name is incorrect', () => {
             expect(() => {
                 return gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2);
-            }).to.throw(gameDispatcherErrors.OPPONENT_NAME_DOES_NOT_MATCH);
+            }).to.throw(OPPONENT_NAME_DOES_NOT_MATCH);
         });
     });
 
