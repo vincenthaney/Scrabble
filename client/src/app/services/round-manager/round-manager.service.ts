@@ -9,6 +9,7 @@ import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { NO_CURRENT_ROUND } from '@app/constants/services-errors';
+import { NO_START_GAME_TIME } from './round-manager.service.errors';
 
 @Injectable({
     providedIn: 'root',
@@ -59,7 +60,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     getStartGameTime(): Date {
-        if (!this.completedRounds[0]) throw new Error(ROUND_ERROR.NO_START_GAME_TIME);
+        if (!this.completedRounds[0]) throw new Error(NO_START_GAME_TIME);
         return this.completedRounds[0].startTime;
     }
 
