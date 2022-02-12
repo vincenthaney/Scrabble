@@ -12,7 +12,6 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { DICTIONARY_NAME } from '@app/services/words-verification-service/words-verification.service.const';
-import { BINGO_BONUS_POINTS, MAX_TILE_PER_PLAYER } from './action-place.const';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -27,10 +26,6 @@ export default class ActionPlace extends ActionPlay {
         this.orientation = orientation;
     }
 
-    isABingo(): boolean {
-        return this.tilesToPlace.length === MAX_TILE_PER_PLAYER;
-    }
-
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
         const wordExtraction = new WordExtraction(this.game.board);
@@ -39,21 +34,18 @@ export default class ActionPlace extends ActionPlay {
         // TODO: Use mathilde's errors and correctly catch it
         if (!this.isLegalPlacement(createdWords)) throw new Error('COMMANDE INVALIDE');
 
-        const wordsString = this.wordToString(createdWords);
+        this.wordValidator.verifyWords(this.wordToString(createdWords), DICTIONARY_NAME);
 
-        this.wordValidator.verifyWords(wordsString, DICTIONARY_NAME);
+        const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        let scoredPoints = this.scoreCalculator.calculatePoints(createdWords);
-        if (this.isABingo()) scoredPoints += BINGO_BONUS_POINTS;
+        const updatedSquares = this.updateBoard(createdWords);
 
-        const updatedBoard = this.updateBoard(createdWords);
-
-        this.player.tiles = unplayedTiles.concat(this.game.getTiles(tilesToPlace.length));
+        this.player.tiles = unplayedTiles.concat(this.game.getTilesFromReserve(tilesToPlace.length));
         this.player.score += scoredPoints;
 
         const playerData: PlayerData = { tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedBoard };
+        const response: GameUpdateData = { board: updatedSquares };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
@@ -78,31 +70,24 @@ export default class ActionPlace extends ActionPlay {
     }
 
     containsCenterSquare(words: [Square, Tile][][]): boolean {
-        for (const word of words) {
-            for (const [square] of word) {
-                if (square.isCenter) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return words.some((word) => word.some(([square]) => square.isCenter));
     }
 
     updateBoard(words: [Square, Tile][][]): Square[] {
-        const board: Square[] = [];
+        const updatedSquares: Square[] = [];
         for (const word of words) {
             for (const [square, tile] of word) {
                 if (!square.tile) {
                     square.tile = tile;
                     square.wasMultiplierUsed = true;
                     const position = square.position;
-                    board.push(square);
+                    updatedSquares.push(square);
                     this.game.board.placeTile(tile, position);
                 }
             }
         }
 
-        return board;
+        return updatedSquares;
     }
 
     getMessage(): string {

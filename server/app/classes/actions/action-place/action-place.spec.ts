@@ -19,7 +19,6 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
-import { BINGO_BONUS_POINTS } from './action-place.const';
 
 const expect = chai.expect;
 
@@ -38,15 +37,6 @@ const TILES_PLAYER_1: Tile[] = [
 const VALID_TILES_TO_PLACE: Tile[] = [
     { letter: 'A', value: 1 },
     { letter: 'F', value: 0 },
-    { letter: 'C', value: 1 },
-];
-const MAX_LENGTH_TILES_TO_PLACE: Tile[] = [
-    { letter: 'A', value: 1 },
-    { letter: 'F', value: 0 },
-    { letter: 'C', value: 1 },
-    { letter: 'C', value: 1 },
-    { letter: 'C', value: 1 },
-    { letter: 'C', value: 1 },
     { letter: 'C', value: 1 },
 ];
 
@@ -134,7 +124,6 @@ describe('ActionPlace', () => {
             let wordExtractSpy: unknown;
             let updateBoardSpy: unknown;
             let getTilesSpy: unknown;
-            let isABingoSpy: SinonStub<[], boolean>;
 
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
             let wordToStringSpy: unknown;
@@ -147,11 +136,11 @@ describe('ActionPlace', () => {
                 action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
                 // eslint-disable-next-line dot-notation
                 action['scoreCalculator'] = scoreCalculatorServiceStub as unknown as ScoreCalculatorService;
-                isABingoSpy = stub(action, 'isABingo').returns(false);
 
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 wordValidatorStub.verifyWords.callsFake(() => {});
                 scoreCalculatorServiceStub.calculatePoints.returns(SCORE_RETURN);
+                scoreCalculatorServiceStub.bonusPoints.returns(0);
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
@@ -195,16 +184,9 @@ describe('ActionPlace', () => {
                 expect(getTilesSpy).to.have.been.called();
             });
 
-            it('should add points if isABingo is true', () => {
-                isABingoSpy.restore();
-                isABingoSpy = stub(action, 'isABingo').returns(true);
-                const result = action.execute();
-                expect(result!.player1!.score).to.equal(SCORE_RETURN + BINGO_BONUS_POINTS);
-            });
-
-            it('should call isABingo', () => {
+            it('should call bonusPoints', () => {
                 action.execute();
-                assert(isABingoSpy.calledOnce);
+                assert(scoreCalculatorServiceStub.bonusPoints.calledOnce);
             });
 
             it('should call wordToString', () => {
@@ -357,24 +339,6 @@ describe('ActionPlace', () => {
         it('should return true if it contains center square', () => {
             const result = action.containsCenterSquare(EXTRACT_RETURN);
             expect(result).to.be.false;
-        });
-    });
-
-    describe('isABingo', () => {
-        let action: ActionPlace;
-
-        beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
-        });
-
-        it('should return true with 7 tiles to place', () => {
-            action = new ActionPlace(game.player1, game, MAX_LENGTH_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
-            expect(action.isABingo()).to.be.true;
-        });
-
-        it('should return false with less than 7 tiles to place', () => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
-            expect(action.isABingo()).to.be.false;
         });
     });
 });
