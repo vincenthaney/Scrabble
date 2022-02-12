@@ -1,7 +1,7 @@
 import { Orientation, Position } from './';
 import { Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
-import { POSITION_OUT_OF_BOARD } from './board-errors';
+import { boardErrors } from '@app/constants/classes-errors';
 import BoardNavigator from './board-navigator';
 import { Vec2 } from '@app/classes/vec2';
 
@@ -18,7 +18,7 @@ export default class Board {
         if (position.isWithinBounds({ x: this.grid[0].length, y: this.grid.length })) {
             return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
         } else {
-            throw new Error(POSITION_OUT_OF_BOARD);
+            throw new Error(boardErrors.POSITION_OUT_OF_BOARD);
         }
     }
 

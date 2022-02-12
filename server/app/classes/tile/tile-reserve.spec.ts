@@ -4,7 +4,7 @@ import { join } from 'path';
 import { LETTER_VALUES } from '@app/constants/game';
 import TileReserve from './tile-reserve';
 import { LetterDistributionData, LetterValue } from './tile.types';
-import * as TileError from './tiles.errors';
+import { tileErrors } from '@app/constants/classes-errors';
 import * as TileConst from './tile.const';
 import Tile from './tile';
 
@@ -65,7 +65,7 @@ describe('TileReserve', () => {
 
     it('getTiles: should throw error when get 0 tiles', () => {
         const amountToRemove = 0;
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(tileErrors.AMOUNT_MUST_BE_GREATER_THAN_1);
     });
 
     it('getTiles: should remove tiles when getTiles (1)', () => {
@@ -102,12 +102,12 @@ describe('TileReserve', () => {
         const totalTiles = tileReserve.getTilesLeft();
         const amountToRemove = totalTiles + 1;
 
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(TileError.NOT_ENOUGH_TILES);
+        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(tileErrors.NOT_ENOUGH_TILES);
     });
 
     it('swapTiles: should throw error when swapping no tiles', () => {
         const tiles: Tile[] = [];
-        expect(() => tileReserve.swapTiles(tiles)).to.throw(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        expect(() => tileReserve.swapTiles(tiles)).to.throw(tileErrors.AMOUNT_MUST_BE_GREATER_THAN_1);
     });
 
     it('swapTiles: should contain the same amount of tiles, but not the same instances (1)', () => {
@@ -146,19 +146,19 @@ describe('TileReserve', () => {
         const amount = tileReserve.getTilesLeft() - 3;
         const tiles: Tile[] = tileReserve.getTiles(amount - 3);
 
-        expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(TileError.MUST_HAVE_7_TILES_TO_SWAP);
+        expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(tileErrors.MUST_HAVE_7_TILES_TO_SWAP);
     });
 
     it('swapTiles: should throw error when tile is not from reserve', () => {
         const tiles: Tile[] = [{ letter: '*', value: 0 }];
-        expect(() => tileReserve.swapTiles(tiles)).to.throw(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
+        expect(() => tileReserve.swapTiles(tiles)).to.throw(tileErrors.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
     });
 
     it('removeTile: should throw error when tile is not in reserve', () => {
         const tile = tileReserve.getTiles(1);
 
         // eslint-disable-next-line dot-notation
-        expect(() => tileReserve['removeTile'](tile[0])).to.throw(TileError.TILE_NOT_IN_RESERVE);
+        expect(() => tileReserve['removeTile'](tile[0])).to.throw(tileErrors.TILE_NOT_IN_RESERVE);
     });
 
     const testGetTilesOnSuccess = (amount: number, total: number) => {
@@ -196,18 +196,18 @@ describe('TileReserve: uninitialized', () => {
     });
 
     it('should throw error when getTile while uninitialized', () => {
-        expect(() => tileReserve.getTiles(0)).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTiles(0)).to.throw(tileErrors.TILE_RESERVE_MUST_BE_INITIATED);
     });
 
     it('should throw error when swapTile while uninitialized', () => {
-        expect(() => tileReserve.swapTiles([])).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.swapTiles([])).to.throw(tileErrors.TILE_RESERVE_MUST_BE_INITIATED);
     });
 
     it('should throw error when getTilesLeft while uninitialized', () => {
-        expect(() => tileReserve.getTilesLeft()).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTilesLeft()).to.throw(tileErrors.TILE_RESERVE_MUST_BE_INITIATED);
     });
 
     it('should throw error when getTilesLeftPerLetter while uninitialized', () => {
-        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(tileErrors.TILE_RESERVE_MUST_BE_INITIATED);
     });
 });

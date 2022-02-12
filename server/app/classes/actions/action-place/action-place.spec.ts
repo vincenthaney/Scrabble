@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
+import { actionErrors } from '@app/constants/classes-errors';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -193,7 +193,7 @@ describe('ActionPlace', () => {
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordValidatorSpy = chai.spy.on(WordValidator, 'validate', () => false);
 
-                expect(() => action.execute()).to.throw(ERROR_INVALID_WORD);
+                expect(() => action.execute()).to.throw(actionErrors.ERROR_INVALID_WORD);
             });
         });
     });

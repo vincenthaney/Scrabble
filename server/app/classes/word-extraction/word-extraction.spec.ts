@@ -7,9 +7,8 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { expect } from 'chai';
-import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
+import { boardErrors, wordExtractionErrors } from '@app/constants/classes-errors';
 import { WordExtraction } from './word-extraction';
-import { EXTRACTION_SQUARE_ALREADY_FILLED } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
 
 type LetterOrEmpty = LetterValue | ' ';
@@ -103,14 +102,16 @@ describe('WordExtract', () => {
         });
 
         it('should throw if square already has a tile', () => {
-            expect(() => extraction.extract([], HAS_TILE_POSITION, DEFAULT_ORIENTATION)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+            expect(() => extraction.extract([], HAS_TILE_POSITION, DEFAULT_ORIENTATION)).to.throw(
+                wordExtractionErrors.EXTRACTION_SQUARE_ALREADY_FILLED,
+            );
         });
 
         it('should throw if tiles go outside board', () => {
             const tiles = tilesFromLetters(['X', 'Y', 'Z']);
             const position = new Position(4, 0);
             const orientation = Orientation.Horizontal;
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
+            expect(() => extraction.extract(tiles, position, orientation)).to.throw(boardErrors.POSITION_OUT_OF_BOARD);
         });
 
         it("should throw if letters doesn't go over edge, but tiles are already there", () => {
@@ -118,7 +119,7 @@ describe('WordExtract', () => {
             const position = new Position(1, 1);
             const orientation = Orientation.Horizontal;
 
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
+            expect(() => extraction.extract(tiles, position, orientation)).to.throw(boardErrors.POSITION_OUT_OF_BOARD);
         });
     });
 
@@ -127,7 +128,9 @@ describe('WordExtract', () => {
             const orientation = Orientation.Horizontal;
             const direction = Direction.Forward;
             const position = new Position(2, 1);
-            expect(() => extraction['extractWordInDirection'](orientation, direction, position)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+            expect(() => extraction['extractWordInDirection'](orientation, direction, position)).to.throw(
+                wordExtractionErrors.EXTRACTION_SQUARE_ALREADY_FILLED,
+            );
         });
     });
 });
