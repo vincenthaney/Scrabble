@@ -11,7 +11,7 @@ import {
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
-    MIN_ROW_NUMBER,
+    MIN_ROW_NUMBER
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject } from 'rxjs';
@@ -71,7 +71,7 @@ export default class InputParserService {
 
         switch (actionName) {
             case 'placer':
-                if (inputWords.length !== 3) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                if (inputWords.length !== 3) throw new CommandError(CommandErrorMessages.badSyntax);
 
                 if (inputWords[2].length === 1) {
                     actionData = {
@@ -87,7 +87,7 @@ export default class InputParserService {
                 this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'échanger':
-                if (inputWords.length !== 2) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                if (inputWords.length !== 2) throw new CommandError(CommandErrorMessages.badSyntax);
 
                 actionData = {
                     type: ActionType.EXCHANGE,
@@ -96,7 +96,7 @@ export default class InputParserService {
                 this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'passer':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.badSyntax);
                 actionData = {
                     type: ActionType.PASS,
                     payload: {},
@@ -104,19 +104,19 @@ export default class InputParserService {
                 this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'réserve':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.badSyntax);
                 // this.controller.sendReserveAction();
                 break;
             case 'indice':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.badSyntax);
                 // this.controller.sendHintAction();
                 break;
             case 'aide':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.badSyntax);
                 // this.controller.sendHelpAction();
                 break;
             default:
-                throw new CommandError(CommandErrorMessages.INVALID_ENTRY);
+                throw new CommandError(CommandErrorMessages.invalidEntry);
         }
     }
 
@@ -177,14 +177,14 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToPlace.length !== lettersToPlace.length) throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
+        if (tilesToPlace.length !== lettersToPlace.length) throw new CommandError(CommandErrorMessages.impossibleCommand);
 
         return tilesToPlace;
     }
 
     private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
         // user must type exchange letters in lower case
-        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.badSyntax);
 
         const player: AbstractPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
@@ -203,24 +203,24 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToExchange.length !== lettersToExchange.length) throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
+        if (tilesToExchange.length !== lettersToExchange.length) throw new CommandError(CommandErrorMessages.impossibleCommand);
 
         return tilesToExchange;
     }
 
     private getStartPosition(location: string): Position {
         if (location.length > MAX_LOCATION_COMMAND_LENGTH || location.length < MIN_LOCATION_COMMAND_LENGTH) {
-            throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+            throw new CommandError(CommandErrorMessages.badSyntax);
         }
 
         const inputRow: number = location[0].charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
         if (inputRow < MIN_ROW_NUMBER || inputRow > MAX_ROW_NUMBER) {
-            throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
+            throw new CommandError(CommandErrorMessages.impossibleCommand);
         }
 
         const inputCol: number = +location.substring(1) - 1;
         if (inputCol < MIN_COL_NUMBER || inputCol > MAX_COL_NUMBER) {
-            throw new CommandError(CommandErrorMessages.IMPOSSIBLE_COMMAND);
+            throw new CommandError(CommandErrorMessages.impossibleCommand);
         }
 
         const inputStartPosition: Position = {
@@ -231,11 +231,11 @@ export default class InputParserService {
     }
 
     private getOrientation(orientationString: string): Orientation {
-        if (orientationString.length !== 1) throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+        if (orientationString.length !== 1) throw new CommandError(CommandErrorMessages.badSyntax);
 
         if (orientationString === 'h') return Orientation.Horizontal;
         else if (orientationString === 'v') return Orientation.Vertical;
-        else throw new CommandError(CommandErrorMessages.BAD_SYNTAX);
+        else throw new CommandError(CommandErrorMessages.badSyntax);
     }
 
     private getLocalPlayerId(): string {
