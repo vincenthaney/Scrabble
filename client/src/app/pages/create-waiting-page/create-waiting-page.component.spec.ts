@@ -153,7 +153,9 @@ describe('CreateWaitingPageComponent', () => {
     it('clicking on the rejectButton should call handleRejection() if an opponent is found', () => {
         component.isOpponentFound = true;
         fixture.detectChanges();
-        const spyDisconnect = spyOn(component, 'disconnectOpponent');
+        const spyDisconnect = spyOn(component, 'disconnectOpponent').and.callFake(() => {
+            return;
+        });
 
         const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection')
             .withArgs(component.opponent as string)
@@ -185,7 +187,7 @@ describe('CreateWaitingPageComponent', () => {
         component.isOpponentFound = true;
         fixture.detectChanges();
 
-        const gameDispatcherSpy = spyOn(TestBed.inject(GameDispatcherService), 'handleConfirmation').and.callFake(() => {
+        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConfirmation').and.callFake(() => {
             return;
         });
 
