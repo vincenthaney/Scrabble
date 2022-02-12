@@ -22,7 +22,6 @@ import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import { LetterValue, TileReserve } from '@app/classes/tile';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { Board } from '@app/classes/board';
-
 const expect = chai.expect;
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
@@ -227,14 +226,15 @@ describe('GameDispatcherService', () => {
             expect(waitingRoom.joinedPlayer).to.be.undefined;
         });
 
-        it('should throw if joiningPlayer is undefined', () => {
-            waitingRoom.joinedPlayer = undefined;
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, DEFAULT_OPPONENT_ID)).to.throw(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
-        });
-
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
             expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        });
+
+        it('should throw if player is undefined', () => {
+            waitingRoom.joinedPlayer = undefined;
+            const invalidId = 'invalidId';
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it('should return the [hostPlayerId, leaverName]', () => {
