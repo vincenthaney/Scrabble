@@ -264,6 +264,7 @@ describe('ActionPlace', () => {
                     const resultSquare: Square = result.filter((s: Square) => s.position.row === row && s.position.column === column)[0];
                     expect(resultSquare).to.exist;
                     expect(resultSquare!.tile).to.exist;
+                    expect(resultSquare.wasMultiplierUsed).to.be.true;
                     expect(resultSquare!.tile!.letter).to.equal(tile.letter);
                     expect(resultSquare!.tile!.value).to.equal(tile.value);
                 }
