@@ -7,7 +7,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { Tile, TileReserve } from '@app/classes/tile';
+import { Tile } from '@app/classes/tile';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import ActionExchange from './action-exchange';
 
@@ -28,19 +28,17 @@ const TILES_NOT_TO_EXCHANGE = [PLAYER_TILES[0], PLAYER_TILES[2]];
 
 describe('ActionExchange', () => {
     let gameStub: SinonStubbedInstance<Game>;
-    let tileReserveStub: SinonStubbedInstance<TileReserve>;
     let game: Game;
     let getTilesFromPlayerStub: SinonStub;
 
     beforeEach(() => {
         gameStub = createStubInstance(Game);
-        tileReserveStub = createStubInstance(TileReserve);
+        gameStub.getTiles.returns(PLAYER_TILES);
         getTilesFromPlayerStub = stub(ActionUtils, 'getTilesFromPlayer');
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
         gameStub.player1.tiles = PLAYER_TILES.map((t) => ({ ...t }));
 
-        gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
         game = gameStub as unknown as Game;
     });
 
@@ -51,7 +49,6 @@ describe('ActionExchange', () => {
     describe('execute', () => {
         it('should call getTilesFromPlayer', () => {
             getTilesFromPlayerStub.returns([game.player1.tiles, []]);
-            tileReserveStub.swapTiles.returns([]);
 
             const action = new ActionExchange(game.player1, game, []);
             action.execute();
@@ -61,19 +58,19 @@ describe('ActionExchange', () => {
 
         it('should call swapTiles', () => {
             getTilesFromPlayerStub.returns([game.player1.tiles, []]);
-            tileReserveStub.swapTiles.returns([]);
 
             const action = new ActionExchange(game.player1, game, []);
             action.execute();
 
-            expect(tileReserveStub.swapTiles.called).to.be.true;
+            expect(gameStub.swapTiles.called).to.be.true;
         });
 
         it('should return a player with tiles', () => {
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
-            tileReserveStub.swapTiles.returns(tilesToReceive);
+            gameStub.getTiles.returns(tilesToReceive);
+
             gameStub.isPlayer1.returns(true);
 
             const action = new ActionExchange(game.player1, game, []);
@@ -87,7 +84,8 @@ describe('ActionExchange', () => {
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
-            tileReserveStub.swapTiles.returns(tilesToReceive);
+            gameStub.swapTiles.returns(tilesToReceive);
+
             gameStub.isPlayer1.returns(false);
 
             const action = new ActionExchange(game.player1, game, []);
@@ -102,7 +100,8 @@ describe('ActionExchange', () => {
             const initialTilesAmount = game.player1.tiles.length;
 
             getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
-            tileReserveStub.swapTiles.returns(tilesToReceive);
+            gameStub.swapTiles.returns(tilesToReceive);
+
             gameStub.isPlayer1.returns(true);
 
             const action = new ActionExchange(game.player1, game, []);
@@ -115,7 +114,8 @@ describe('ActionExchange', () => {
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
-            tileReserveStub.swapTiles.returns(tilesToReceive);
+            gameStub.swapTiles.returns(tilesToReceive);
+
             gameStub.isPlayer1.returns(true);
 
             const action = new ActionExchange(game.player1, game, []);
@@ -134,7 +134,8 @@ describe('ActionExchange', () => {
             const tilesToReceive: Tile[] = [{ letter: 'Z', value: 0 }];
 
             getTilesFromPlayerStub.returns([TILES_TO_EXCHANGE, TILES_NOT_TO_EXCHANGE]);
-            tileReserveStub.swapTiles.returns(tilesToReceive);
+            gameStub.swapTiles.returns(tilesToReceive);
+
             gameStub.isPlayer1.returns(true);
 
             const action = new ActionExchange(game.player1, game, []);
@@ -148,11 +149,11 @@ describe('ActionExchange', () => {
         let action: ActionExchange;
 
         beforeEach(() => {
-            action = new ActionExchange(game.player1, game, []);
+            action = new ActionExchange(game.player1, game, PLAYER_TILES);
         });
 
         it('should return message', () => {
-            expect(action.getMessage()).to.exist;
+            expect(action.getMessage()).to.equal(`${game.player1.name} a échangé les tuiles abc.`);
         });
     });
 
