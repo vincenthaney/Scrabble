@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { createStubInstance } from 'sinon';
 import { Board, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
-import { boardErrors } from '@app/constants/classes-errors';
+import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
@@ -50,7 +50,7 @@ describe('Board', () => {
     it('place Tile should not place a Tile and return false if it is outside of the board', () => {
         const targetPosition = new Position(3, board.grid.length + 1);
         const result = () => board.placeTile(DEFAULT_TILE_A, targetPosition);
-        expect(result).to.throw(boardErrors.POSITION_OUT_OF_BOARD);
+        expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     it('place Tile should not place a Tile and return false if it is already occupied', () => {
@@ -111,9 +111,9 @@ describe('Board', () => {
     it('verifySquare should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the position is outside the array no matter if a tile is expected', () => {
         const position: Position = new Position(board.grid[0].length + 1, 1);
         const result1 = () => board.verifySquare(position, SHOULD_HAVE_A_TILE);
-        expect(result1).to.throw(boardErrors.POSITION_OUT_OF_BOARD);
+        expect(result1).to.throw(POSITION_OUT_OF_BOARD);
         const result2 = () => board.verifySquare(position, SHOULD_HAVE_NO_TILE);
-        expect(result2).to.throw(boardErrors.POSITION_OUT_OF_BOARD);
+        expect(result2).to.throw(POSITION_OUT_OF_BOARD);
     });
 
     it('verifySquare should return true when the position is valid and there is no tile as expected', () => {

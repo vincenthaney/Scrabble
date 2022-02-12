@@ -1,4 +1,4 @@
-import { actionErrors } from '@app/constants/classes-errors';
+import { ERROR_INVALID_WORD } from '@app/constants/classes-errors';
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Orientation, Position } from '@app/classes/board';
@@ -39,7 +39,7 @@ export default class ActionPlace extends ActionPlay {
 
         const areValidWords = WordValidator.validate(wordsString);
 
-        if (!areValidWords) throw new Error(actionErrors.ERROR_INVALID_WORD);
+        if (!areValidWords) throw new Error(ERROR_INVALID_WORD);
 
         const scoredPoints = ScoreComputer.compute(createdWords);
 

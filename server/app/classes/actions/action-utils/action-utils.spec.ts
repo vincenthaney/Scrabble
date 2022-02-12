@@ -5,7 +5,7 @@ import Player from '@app/classes/player/player';
 import { ActionUtils } from './action-utils';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { actionErrors } from '@app/constants/classes-errors';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 const DEFAULT_PLAYER_NAME = 'player1';
 const DEFAULT_PLAYER_ID = '1';
@@ -46,7 +46,7 @@ describe('ActionUtils', () => {
             const INVALID_INDEX = -1;
             const s = stub(ActionUtils, 'getIndexOfTile').onFirstCall().returns(INVALID_INDEX);
 
-            expect(() => ActionUtils.getTilesFromPlayer(tilesToPlay, player)).to.throw(actionErrors.ERROR_PLAYER_DOESNT_HAVE_TILE);
+            expect(() => ActionUtils.getTilesFromPlayer(tilesToPlay, player)).to.throw(ERROR_PLAYER_DOESNT_HAVE_TILE);
 
             s.restore();
         });

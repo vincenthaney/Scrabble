@@ -1,6 +1,6 @@
 import { Tile } from '@app/classes/tile';
 import Player from '@app/classes/player/player';
-import { actionErrors } from '@app/constants/classes-errors';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 export class ActionUtils {
     static getTilesFromPlayer(tilesToPlay: Tile[], player: Player, allowWildcard: boolean = true): [played: Tile[], unplayed: Tile[]] {
@@ -12,7 +12,7 @@ export class ActionUtils {
             if (index >= 0) {
                 playedTiles.push(unplayedTiles.splice(index, 1)[0]);
             } else {
-                throw new Error(actionErrors.ERROR_PLAYER_DOESNT_HAVE_TILE);
+                throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
             }
         }
 

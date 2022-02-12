@@ -3,7 +3,7 @@ import { Square } from '@app/classes/square';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import { Tile } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { boardErrors, wordExtractionErrors } from '@app/constants/classes-errors';
+import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 export class WordExtraction {
     constructor(private board: Board) {}
@@ -11,20 +11,20 @@ export class WordExtraction {
     extract(tilesToPlace: Tile[], startPosition: Position, orientation: Orientation): [Square, Tile][][] {
         const navigator = this.board.navigate(startPosition);
 
-        if (navigator.verify(HAS_TILE)) throw new Error(wordExtractionErrors.EXTRACTION_SQUARE_ALREADY_FILLED);
+        if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         if (
             !navigator
                 .clone()
                 .forward(orientation, tilesToPlace.length - 1)
                 .isWithinBounds()
         )
-            throw new Error(boardErrors.POSITION_OUT_OF_BOARD);
+            throw new Error(POSITION_OUT_OF_BOARD);
 
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
 
         for (let i = 0; i < tilesToPlace.length; ) {
-            if (!navigator.isWithinBounds()) throw new Error(boardErrors.POSITION_OUT_OF_BOARD);
+            if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
 
             if (navigator.verify(HAS_TILE)) {
                 // The square already has a letter, this means that the at the tile at index 'i' must be placed in next square
@@ -64,7 +64,7 @@ export class WordExtraction {
 
     private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position) {
         const navigator = this.board.navigate(position);
-        if (navigator.verify(HAS_TILE)) throw new Error(wordExtractionErrors.EXTRACTION_SQUARE_ALREADY_FILLED);
+        if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const word: [Square, Tile][] = [];
 
         while (navigator.move(orientation, direction).verify(HAS_TILE)) {

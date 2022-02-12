@@ -5,7 +5,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig } from './game-config';
-import { gameConstants } from '@app/constants/classes-constants';
+import { START_TILES_AMOUNT } from '@app/constants/classes-constants';
 import { GameType } from './game.type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -47,8 +47,8 @@ export default class Game {
 
         await game.tileReserve.init();
 
-        game.player1.tiles = game.tileReserve.getTiles(gameConstants.START_TILES_AMOUNT);
-        game.player2.tiles = game.tileReserve.getTiles(gameConstants.START_TILES_AMOUNT);
+        game.player1.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
+        game.player2.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
 
         game.roundManager.beginRound();
 
