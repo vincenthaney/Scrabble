@@ -33,7 +33,15 @@ describe('SocketService', () => {
 
     it('should call connect on initializeService', () => {
         const spy = spyOn(service, 'connect');
+        spyOn(service, 'waitForConnection').and.resolveTo();
         service.initializeService();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call isSocketAlive on initializeService', async () => {
+        spyOn(service, 'connect');
+        const spy = spyOn(service, 'isSocketAlive').and.returnValue(true);
+        await service.initializeService();
         expect(spy).toHaveBeenCalled();
     });
 
@@ -103,5 +111,32 @@ describe('SocketService', () => {
     it('should throw when socket is undefined on getId', () => {
         (service['socket'] as unknown) = undefined;
         expect(() => service.getId()).toThrowError(SOCKET_ERROR.SOCKET_ID_UNDEFINED);
+    });
+
+    describe('waitForConnection', () => {
+        const DELAY = 2;
+        const TIMEOUT = 20;
+
+        it('should resolve when predicate is true', async () => {
+            const predicate = () => true;
+            await expectAsync(service.waitForConnection(predicate, DELAY, TIMEOUT)).toBeResolved();
+        });
+
+        it('should resolve when predicate will be true', async () => {
+            let predicateValue = false;
+            const predicate = () => predicateValue;
+            const wait = service.waitForConnection(predicate, DELAY, TIMEOUT);
+
+            setTimeout(() => {
+                predicateValue = true;
+            }, TIMEOUT / 3);
+
+            await expectAsync(wait).toBeResolved();
+        });
+
+        it('should reject when timeout is reached', async () => {
+            const predicate = () => false;
+            await expectAsync(service.waitForConnection(predicate, DELAY, TIMEOUT)).toBeRejected();
+        });
     });
 });
