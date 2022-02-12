@@ -6,7 +6,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { joinWaitingPageConstants } from '@app/constants/pages-constants';
+import {  } from '@app/constants/pages-constants';
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
