@@ -119,7 +119,7 @@ describe('CommunicationBoxComponent', () => {
         const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
         gameServiceMock.handleNewMessage({
             content: 'new message',
-            senderId: 'System',
+            senderId: SYSTEM_ID,
         });
         expect(onReceiveSpy).toHaveBeenCalled();
     });
@@ -128,7 +128,7 @@ describe('CommunicationBoxComponent', () => {
         const messagesLengthBefore: number = component.messages.length;
         gameServiceMock.handleNewMessage({
             content: 'new message',
-            senderId: 'System',
+            senderId: SYSTEM_ID,
         });
         const messagesLengthAfter: number = component.messages.length;
         expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
