@@ -8,10 +8,9 @@ export const NOT_USED_MULTIPLIER = false;
 export const DEFAULT_TILE_VALUE = 10;
 export const DEFAULT_WORD_MULTIPLIER = 2;
 export const DEFAULT_LETTER_MULTIPLIER = 2;
-export const EMPTY_WORDS: [Tile, Square][][] = [];
-export const EMPTY_WORD: [Tile, Square][] = [];
-export const GENERIC_LETTER_1: [Tile, Square] = [
-    { letter: 'X', value: 10 },
+export const EMPTY_WORDS: [Square, Tile][][] = [];
+export const EMPTY_WORD: [Square, Tile][] = [];
+export const GENERIC_LETTER_1: [Square, Tile] = [
     {
         tile: null,
         position: new Position(0, 0),
@@ -19,10 +18,10 @@ export const GENERIC_LETTER_1: [Tile, Square] = [
         wasMultiplierUsed: false,
         isCenter: false,
     },
+    { letter: 'X', value: 10 },
 ];
 
-export const GENERIC_LETTER_2: [Tile, Square] = [
-    { letter: 'N', value: 1 },
+export const GENERIC_LETTER_2: [Square, Tile] = [
     {
         tile: null,
         position: new Position(0, 0),
@@ -30,10 +29,10 @@ export const GENERIC_LETTER_2: [Tile, Square] = [
         wasMultiplierUsed: false,
         isCenter: false,
     },
+    { letter: 'N', value: 1 },
 ];
 
-export const GENERIC_LETTER_3: [Tile, Square] = [
-    { letter: 'C', value: 3 },
+export const GENERIC_LETTER_3: [Square, Tile] = [
     {
         tile: null,
         position: new Position(0, 0),
@@ -41,6 +40,7 @@ export const GENERIC_LETTER_3: [Tile, Square] = [
         wasMultiplierUsed: false,
         isCenter: false,
     },
+    { letter: 'C', value: 3 },
 ];
 
 export const GENERIC_WORDS = [

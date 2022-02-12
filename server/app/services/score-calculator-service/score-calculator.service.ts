@@ -6,22 +6,24 @@ import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from './score-calculator.service.co
 
 @Service()
 export class ScoreCalculatorService {
-    calculatePoints(wordsToScore: [Tile, Square][][]) {
+    // calculatePoints(wordsToScore: [Tile, Square][][]) {
+    calculatePoints(wordsToScore: [Square, Tile][][]) {
         return wordsToScore.reduce((total, word) => (total += this.calculatePointsPerWord(word)), DEFAULT_SCORE);
     }
 
-    private calculatePointsPerWord(word: [Tile, Square][]) {
+    // private calculatePointsPerWord(word: [Tile, Square][]) {
+    private calculatePointsPerWord(word: [Square, Tile][]) {
         let wordScore = DEFAULT_SCORE;
         let wordMultiplier = DEFAULT_MULTIPLIER;
 
-        word.forEach(([tile, square]) => {
-            wordScore += this.letterValue(tile, square);
+        word.forEach(([square, tile]) => {
+            wordScore += this.letterValue(square, tile);
             wordMultiplier *= this.wordMultiplier(square);
         });
         return (wordScore *= wordMultiplier);
     }
 
-    private letterValue(tile: Tile, square: Square): number {
+    private letterValue(square: Square, tile: Tile): number {
         if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.LETTER && !square.wasMultiplierUsed) {
             return tile.value * square.scoreMultiplier.multiplier;
         } else {
