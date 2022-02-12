@@ -19,9 +19,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy, AfterViewInit {
-    @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
     @ViewChild('messageInput') messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
@@ -66,7 +64,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         };
         this.focusEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(handleKeyEvent);
     }
-    
+
     ngOnDestroy(): void {
         this.gameService.updateTileReserveEvent.unsubscribe();
         this.serviceDestroyed$.next(true);
