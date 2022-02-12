@@ -40,7 +40,8 @@ export default class TileReserve {
         if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         if (amount < 1) throw new Error(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
         const tilesToReturn: Tile[] = [];
-        for (let i = 0; i < Math.min(this.tiles.length, amount); ++i) {
+        const tileToGive = Math.min(this.tiles.length, amount);
+        for (let i = 0; i < tileToGive; ++i) {
             const tile = this.tiles[Math.floor(Math.random() * this.tiles.length)];
             tilesToReturn.push(tile);
             this.removeTile(tile);
