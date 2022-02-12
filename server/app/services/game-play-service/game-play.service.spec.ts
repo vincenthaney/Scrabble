@@ -59,6 +59,7 @@ describe('GamePlayService', () => {
 
         beforeEach(() => {
             actionStub = createStubInstance(ActionPass);
+            actionStub.willEndTurn.returns(true);
             getActionStub = stub(gamePlayService, 'getAction').returns(actionStub as unknown as Action);
         });
 
@@ -97,6 +98,8 @@ describe('GamePlayService', () => {
         it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
             gameStub.isGameOver.returns(true);
             actionStub.execute.returns(undefined);
+            actionStub.execute.returns(undefined);
+
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result!.isGameOver).to.be.true;

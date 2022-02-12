@@ -30,8 +30,7 @@ export class GamePlayService {
                 // Send messages to players
                 // TODO: Make sure it is sent AFTER action message
                 game.endOfGame();
-                if (updatedData) updatedData.isGameOver = true;
-                else updatedData = { isGameOver: true };
+                updatedData.isGameOver = true;
             }
         }
         return updatedData;
