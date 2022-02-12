@@ -3,6 +3,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
+import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -32,6 +33,8 @@ export class GamePlayController {
         this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
+            console.log(req.body);
+            console.log(req.params);
 
             try {
                 this.handlePlayAction(gameId, playerId, data);
@@ -65,14 +68,14 @@ export class GamePlayController {
         if (localPlayerFeedback) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
                 content: localPlayerFeedback,
-                senderId: 'System',
+                senderId: SYSTEM_ID,
             });
         }
         if (opponentFeedback) {
             const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
             this.socketService.emitToSocket(opponentId, 'newMessage', {
                 content: opponentId,
-                senderId: 'System',
+                senderId: SYSTEM_ID,
             });
         }
     }

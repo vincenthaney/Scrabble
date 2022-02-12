@@ -1,5 +1,6 @@
 /* eslint-disable no-dupe-class-members */
 import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
@@ -7,7 +8,6 @@ import Player from '@app/classes/player/player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
-import { Position } from '@app/classes/board';
 
 @Service()
 export class GamePlayService {
@@ -34,7 +34,6 @@ export class GamePlayService {
             if (updatedData) updatedData.isGameOver = true;
             else updatedData = { isGameOver: true };
         }
-        console.log([updatedData, localPlayerFeedback, opponentFeedback]);
         return [updatedData, localPlayerFeedback, opponentFeedback];
     }
 
@@ -42,7 +41,7 @@ export class GamePlayService {
         switch (actionData.type) {
             case 'place': {
                 const payload = this.getActionPlacePayload(actionData);
-                const position = new Position(payload.position.column, payload.position.row);
+                const position = new Position(payload.startPosition.column, payload.startPosition.row);
                 return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
             }
             case 'exchange': {
@@ -61,7 +60,7 @@ export class GamePlayService {
     getActionPlacePayload(actionData: ActionData) {
         const payload = actionData.payload as ActionPlacePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
-        if (payload.position === undefined) throw new Error(INVALID_PAYLOAD);
+        if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
         if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
         return payload;
     }

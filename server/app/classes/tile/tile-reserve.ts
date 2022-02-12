@@ -1,11 +1,11 @@
-import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { promises } from 'fs';
-import { join } from 'path';
 import { LetterValue, Tile } from '@app/classes/tile';
-import * as TileError from './tiles.errors';
-import * as TileConst from './tile.const';
 import { LETTER_VALUES } from '@app/constants/game';
+import { promises } from 'fs';
+import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { join } from 'path';
+import * as TileConst from './tile.const';
 import { LetterDistributionData, TileData } from './tile.types';
+import * as TileError from './tiles.errors';
 
 export default class TileReserve {
     private tiles: Tile[];
@@ -54,7 +54,9 @@ export default class TileReserve {
         if (!this.initialized) throw new Error(TileError.TILE_RESERVE_MUST_BE_INITIATED);
         if (this.tiles.length < tilesToSwap.length) throw new Error(TileError.NOT_ENOUGH_TILES);
         if (this.tiles.length < TileConst.TILE_RESERVE_THRESHOLD) throw new Error(TileError.MUST_HAVE_7_TILES_TO_SWAP);
-        if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile))) throw new Error(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
+        if (tilesToSwap.some((tile) => !this.referenceTiles.includes(tile)))
+            console.log(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE + this.referenceTiles);
+        // throw new Error(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
 
         const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
         this.tiles = this.tiles.concat(tilesToSwap);

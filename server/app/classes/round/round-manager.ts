@@ -46,6 +46,7 @@ export default class RoundManager {
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
 
+        console.log('current player : ' + player.name);
         return (this.currentRound = {
             player,
             startTime: now,

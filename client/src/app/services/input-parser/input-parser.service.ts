@@ -6,12 +6,18 @@ import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import {
+    EXPECTED_WORD_COUNT_EXCHANGE,
+    EXPECTED_WORD_COUNT_HELP,
+    EXPECTED_WORD_COUNT_PASS,
+    EXPECTED_WORD_COUNT_PLACE,
+    EXPECTED_WORD_COUNT_RESERVE,
     MAX_COL_NUMBER,
     MAX_LOCATION_COMMAND_LENGTH,
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
-    MIN_ROW_NUMBER
+    MIN_ROW_NUMBER,
+    SYSTEM_ID
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject } from 'rxjs';
@@ -27,7 +33,7 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
 export default class InputParserService {
     private newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
-        senderId: 'System',
+        senderId: SYSTEM_ID,
     });
 
     constructor(private controller: GamePlayController, private gameService: GameService) {
@@ -53,7 +59,7 @@ export default class InputParserService {
                 if (e instanceof CommandError) {
                     this.newMessageValue.next({
                         content: `La commande ${input} est invalide`,
-                        senderId: 'System',
+                        senderId: SYSTEM_ID,
                     });
                 }
             }
@@ -70,10 +76,11 @@ export default class InputParserService {
         let actionData: ActionData;
 
         switch (actionName) {
-            case 'placer':
-                if (inputWords.length !== 3) throw new CommandError(CommandErrorMessages.BadSyntax);
+            case 'placer': {
+                if (inputWords.length !== EXPECTED_WORD_COUNT_PLACE) throw new CommandError(CommandErrorMessages.BadSyntax);
 
-                if (inputWords[2].length === 1) {
+                const nLettersToPlace = inputWords[2].length;
+                if (nLettersToPlace === 1) {
                     actionData = {
                         type: ActionType.PLACE,
                         payload: this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]),
@@ -86,8 +93,9 @@ export default class InputParserService {
                 }
                 this.controller.sendAction(gameId, playerId, actionData);
                 break;
+            }
             case 'échanger':
-                if (inputWords.length !== 2) throw new CommandError(CommandErrorMessages.BadSyntax);
+                if (inputWords.length !== EXPECTED_WORD_COUNT_EXCHANGE) throw new CommandError(CommandErrorMessages.BadSyntax);
 
                 actionData = {
                     type: ActionType.EXCHANGE,
@@ -96,7 +104,7 @@ export default class InputParserService {
                 this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'passer':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BadSyntax);
+                if (inputWords.length !== EXPECTED_WORD_COUNT_PASS) throw new CommandError(CommandErrorMessages.BadSyntax);
                 actionData = {
                     type: ActionType.PASS,
                     payload: {},
@@ -104,15 +112,15 @@ export default class InputParserService {
                 this.controller.sendAction(gameId, playerId, actionData);
                 break;
             case 'réserve':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BadSyntax);
+                if (inputWords.length !== EXPECTED_WORD_COUNT_RESERVE) throw new CommandError(CommandErrorMessages.BadSyntax);
                 // this.controller.sendReserveAction();
                 break;
-            case 'indice':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BadSyntax);
-                // this.controller.sendHintAction();
-                break;
+            // case 'indice':
+            //     if (inputWords.length !== EXPECTED_WORD_COUNT_HINT) throw new CommandError(CommandErrorMessages.BadSyntax);
+            //     // this.controller.sendHintAction();
+            //     break;
             case 'aide':
-                if (inputWords.length !== 1) throw new CommandError(CommandErrorMessages.BadSyntax);
+                if (inputWords.length !== EXPECTED_WORD_COUNT_HELP) throw new CommandError(CommandErrorMessages.BadSyntax);
                 // this.controller.sendHelpAction();
                 break;
             default:

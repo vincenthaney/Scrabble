@@ -4,6 +4,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Application } from '@app/app';
+import { Position } from '@app/classes/board';
 import Board from '@app/classes/board/board';
 import { ActionData } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -35,15 +36,15 @@ const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_FEEDBACK = 'this is a feedback';
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
-const DEFAULT_SQUARE_1: Square = { tile: null, position: { row: 0, column: 0 }, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_BOARD: Square[][] = [
     [
-        { ...DEFAULT_SQUARE_1, position: { row: 0, column: 0 } },
-        { ...DEFAULT_SQUARE_1, position: { row: 0, column: 1 } },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
     ],
     [
-        { ...DEFAULT_SQUARE_1, position: { row: 1, column: 1 } },
-        { ...DEFAULT_SQUARE_1, position: { row: 1, column: 1 } },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];
 

@@ -66,3 +66,10 @@ export const MAX_TILE_PER_PLAYER = 7;
 export const DEFAULT_PLAYER = new Player('id', 'name', []);
 
 export const SYSTEM_ID = 'system';
+
+export const EXPECTED_WORD_COUNT_PLACE = 3;
+export const EXPECTED_WORD_COUNT_EXCHANGE = 2;
+export const EXPECTED_WORD_COUNT_PASS = 1;
+// export const EXPECTED_WORD_COUNT_HINT = 1;
+export const EXPECTED_WORD_COUNT_HELP = 1;
+export const EXPECTED_WORD_COUNT_RESERVE = 1;

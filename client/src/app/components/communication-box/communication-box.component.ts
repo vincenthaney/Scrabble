@@ -18,24 +18,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
 export class CommunicationBoxComponent implements OnInit {
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
-    messages: VisualMessage[] = [
-        { content: 'message 1', senderId: 'Mathilde', class: VisualMessageClasses.Me },
-        { content: 'message 2', senderId: 'Mathilde', class: VisualMessageClasses.Me },
-        { content: 'message 3', senderId: 'Raph', class: VisualMessageClasses.Opponent },
-        { content: 'message 4', senderId: 'Mathilde', class: VisualMessageClasses.Me },
-        { content: 'Raph a joué ARBRE', senderId: '', class: VisualMessageClasses.System },
-        { content: 'message 5', senderId: 'Raph', class: VisualMessageClasses.Opponent },
-        { content: 'message 5', senderId: 'Raph', class: VisualMessageClasses.Opponent },
-        { content: 'message 6', senderId: 'Mathilde', class: VisualMessageClasses.Me },
-        {
-            // eslint-disable-next-line max-len
-            content:
-                "je suis un message très long qui va sûrement prendre plus qu'une ligne \
-                à afficher parce qu'il faut tester le wrap sur plusieurs lignes",
-            senderId: 'Raph',
-            class: VisualMessageClasses.Opponent,
-        },
-    ];
+    messages: VisualMessage[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
