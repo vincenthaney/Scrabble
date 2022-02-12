@@ -10,6 +10,7 @@ import { SocketService } from '@app/services/socket-service/socket.service';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
+import { CONTENT_REQUIRED, SENDER_REQUIRED } from './game-play-controller-errors';
 
 @Service()
 export class GamePlayController {
@@ -91,15 +92,15 @@ export class GamePlayController {
     }
 
     private handleNewMessage(gameId: string, message: Message): void {
-        if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
-        if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
+        if (message.senderId === undefined) throw new HttpException(SENDER_REQUIRED, StatusCodes.BAD_REQUEST);
+        if (message.content === undefined) throw new HttpException(CONTENT_REQUIRED, StatusCodes.BAD_REQUEST);
 
         this.socketService.emitToRoom(gameId, 'newMessage', message);
     }
 
     private handleNewError(playerId: string, message: Message): void {
-        if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
-        if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
+        if (message.senderId === undefined) throw new HttpException(SENDER_REQUIRED, StatusCodes.BAD_REQUEST);
+        if (message.content === undefined) throw new HttpException(CONTENT_REQUIRED, StatusCodes.BAD_REQUEST);
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: message.content,

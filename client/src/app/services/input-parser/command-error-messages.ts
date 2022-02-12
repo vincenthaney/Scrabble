@@ -4,3 +4,5 @@ export enum CommandErrorMessages {
     ImpossibleCommand = 'Cette commande est impossible à réaliser',
     NotYourTurn = "Ce n'est pas votre de jouer",
 }
+
+export const PLAYER_NOT_FOUND = 'Current player could not be found';

@@ -23,7 +23,7 @@ import {
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject } from 'rxjs';
 import { GameService } from '..';
-import { CommandErrorMessages } from './command-error-messages';
+import { CommandErrorMessages, PLAYER_NOT_FOUND } from './command-error-messages';
 import CommandError from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
@@ -269,15 +269,7 @@ export default class InputParserService {
     }
 
     private getLocalPlayerId(): string {
-        let playerId: string;
-        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof AbstractPlayer) {
-            playerId = localPlayer.id;
-        } else {
-            throw new Error('Current player could not be found');
-        }
-
-        return playerId;
+        return this.getLocalPlayer().id;
     }
 
     private getLocalPlayer(): AbstractPlayer {
@@ -286,7 +278,7 @@ export default class InputParserService {
         if (localPlayer instanceof AbstractPlayer) {
             player = localPlayer;
         } else {
-            throw new Error('Current player could not be found');
+            throw new Error(PLAYER_NOT_FOUND);
         }
 
         return player;
