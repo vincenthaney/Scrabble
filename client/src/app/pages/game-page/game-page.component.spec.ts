@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
@@ -87,6 +88,16 @@ describe('GamePageComponent', () => {
         const surrenderButton = fixture.debugElement.nativeElement.querySelector('#surrender-dialog-button');
         surrenderButton.click();
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call emitKeyboard on keyboardEvent', () => {
+        const event: KeyboardEvent = new KeyboardEvent('keypress', {
+            key: '.',
+            cancelable: true,
+        });
+        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
+        component.handleKeyboardEvent(event);
+        expect(spy).toHaveBeenCalledWith(event);
     });
 });
 
