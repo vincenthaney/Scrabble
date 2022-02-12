@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -26,7 +26,7 @@ describe('GameService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, RouterTestingModule.withRoutes([{ path: 'game', component: TestComponent }])],
+            imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([{ path: 'game', component: TestComponent }])],
             providers: [
                 { provide: BoardService, useValue: boardServiceSpy },
                 { provide: RoundManagerService, useValue: roundManagerSpy },

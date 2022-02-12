@@ -7,6 +7,10 @@ export default class ActionPass extends ActionPlay {
     execute(): GameUpdateData | void {}
 
     getMessage(): string {
-        return `${this.player.name} a passé son tour.`;
+        return 'Vous avez passé votre tour';
+    }
+
+    getOpponentMessage(): string | undefined {
+        return `${this.player.name} a passé son tour`;
     }
 }

@@ -1,12 +1,13 @@
 /* eslint-disable max-classes-per-file */
-import { HttpClientModule } from '@angular/common/http';
+/* eslint-disable no-console */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -21,7 +22,20 @@ import { LobbyPageComponent } from './lobby-page.component';
 @Component({
     template: '',
 })
-class TestComponent {}
+export class TestComponent {}
+
+export class GameDispatcherServiceSpy extends GameDispatcherService {
+    handleLobbyListRequest() {
+        // eslint-disable-next-line no-console
+        console.log('handleLobbyListRequest');
+        return;
+    }
+    handleJoinLobby() {
+        return;
+    }
+    // lobbiesUpdateEvent: {subscribe: createSpy('lobbiesUpdateEvent subscribe')};
+    // lobbiesUpdateEvent
+}
 
 export class MatDialogMock {
     open() {
@@ -42,7 +56,7 @@ describe('LobbyPageComponent', () => {
                 MatInputModule,
                 MatFormFieldModule,
                 MatDividerModule,
-                HttpClientModule,
+                HttpClientTestingModule,
                 MatDialogModule,
                 MatTooltipModule,
                 BrowserAnimationsModule,
@@ -171,19 +185,19 @@ describe('LobbyPageComponent', () => {
     });
 
     it('lobbyFullDialog should be called when lobbyFullEvent is emittted', () => {
-        const spyOpponentLeft = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
+        const spyLobbyFull = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock.lobbyFullEvent.emit();
-        expect(spyOpponentLeft).toHaveBeenCalled();
+        expect(spyLobbyFull).toHaveBeenCalled();
     });
 
-    it('lobbyFullDialog should be called when lobbyCancelEvent is emittted', () => {
-        const spyOpponentLeft = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
+    it('lobbyCanceled should be called when lobbyCancelEvent is emittted', () => {
+        const spyLobbyCanceled = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock.canceledGameEvent.emit();
-        expect(spyOpponentLeft).toHaveBeenCalled();
+        expect(spyLobbyCanceled).toHaveBeenCalled();
     });
 
     it('ngOnDestroy should unsubscribe all subscriptions', () => {

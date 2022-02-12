@@ -1,5 +1,6 @@
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
+import { LetterValue } from '@app/classes/tile';
 import { PlayerData } from './';
 
 export default interface GameUpdateData {
@@ -8,4 +9,6 @@ export default interface GameUpdateData {
     isGameOver?: boolean;
     board?: Square[] | undefined;
     round?: Round;
+    tileReserve?: { letter: LetterValue; amount: number }[];
+    tileReserveTotal?: number;
 }
