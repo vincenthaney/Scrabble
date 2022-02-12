@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from './default-dialog.component';
-import { defaultDialogErrors } from '@app/constants/component-errors';
+import { BUTTON_MUST_HAVE_CONTENT, DIALOG_BUTTONS_MUST_BE_AN_ARRAY, DIALOG_MUST_HAVE_TITLE } from '@app/constants/component-errors';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
 const MODEL: DefaultDialogParameters = {
@@ -137,7 +137,7 @@ describe('DefaultDialogComponent', () => {
             const model = {
                 notATitle: 'This is not a title',
             };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(defaultDialogErrors.DIALOG_MUST_HAVE_TITLE);
+            expect(() => createDialogWithUnknownModel(model)).toThrowError(DIALOG_MUST_HAVE_TITLE);
         });
 
         it('should throw error when buttons is not an array', () => {
@@ -147,7 +147,7 @@ describe('DefaultDialogComponent', () => {
                     content: 'Button but not in an array',
                 },
             };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(defaultDialogErrors.DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
+            expect(() => createDialogWithUnknownModel(model)).toThrowError(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
         });
 
         it('should throw error when any button has no content', () => {
@@ -159,7 +159,7 @@ describe('DefaultDialogComponent', () => {
                     },
                 ],
             };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(defaultDialogErrors.BUTTON_MUST_HAVE_CONTENT);
+            expect(() => createDialogWithUnknownModel(model)).toThrowError(BUTTON_MUST_HAVE_CONTENT);
         });
     });
 });

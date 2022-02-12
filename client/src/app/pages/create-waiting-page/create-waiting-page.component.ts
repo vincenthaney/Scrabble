@@ -6,7 +6,13 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { createWaitingPageConstants } from '@app/constants/pages-constants';
+import {
+    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
+    DIALOG_CONTENT,
+    DIALOG_TITLE,
+    HOST_WAITING_MESSAGE,
+    OPPONENT_FOUND_MESSAGE,
+} from '@app/constants/pages-constants';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -20,7 +26,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     joinerLeaveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     host: AbstractPlayer;
-    waitingRoomMessage: string = createWaitingPageConstants.HOST_WAITING_MESSAGE;
+    waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
     constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
 
@@ -42,30 +48,30 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     setOpponent(opponent: string) {
         this.opponent = opponent;
-        this.waitingRoomMessage = this.opponent + createWaitingPageConstants.OPPONENT_FOUND_MESSAGE;
+        this.waitingRoomMessage = this.opponent + OPPONENT_FOUND_MESSAGE;
         this.isOpponentFound = true;
     }
 
     disconnectOpponent() {
         if (this.opponent) {
             this.opponent = undefined;
-            this.waitingRoomMessage = createWaitingPageConstants.HOST_WAITING_MESSAGE;
+            this.waitingRoomMessage = HOST_WAITING_MESSAGE;
             this.isOpponentFound = false;
         }
     }
 
     opponentLeft(leaverName: string) {
         this.opponent = undefined;
-        this.waitingRoomMessage = createWaitingPageConstants.HOST_WAITING_MESSAGE;
+        this.waitingRoomMessage = HOST_WAITING_MESSAGE;
         this.isOpponentFound = false;
 
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: createWaitingPageConstants.DIALOG_TITLE,
-                content: leaverName + createWaitingPageConstants.DIALOG_CONTENT,
+                title: DIALOG_TITLE,
+                content: leaverName + DIALOG_CONTENT,
                 buttons: [
                     {
-                        content: createWaitingPageConstants.DIALOG_BUTTON_CONTENT,
+                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
                         closeDialog: true,
                     },
                 ],

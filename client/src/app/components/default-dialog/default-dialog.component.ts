@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { defaultDialogErrors } from '@app/constants/component-errors';
+import { BUTTON_MUST_HAVE_CONTENT, DIALOG_BUTTONS_MUST_BE_AN_ARRAY, DIALOG_MUST_HAVE_TITLE } from '@app/constants/component-errors';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
 @Component({
@@ -16,17 +16,17 @@ export class DefaultDialogComponent {
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: DefaultDialogParameters, private router: Router) {
         // Data must be handled because it is not typed correctly when used in dialog.open(...)
-        if (!this.data.title || typeof this.data.title !== 'string') throw new Error(defaultDialogErrors.DIALOG_MUST_HAVE_TITLE);
+        if (!this.data.title || typeof this.data.title !== 'string') throw new Error(DIALOG_MUST_HAVE_TITLE);
 
         this.title = this.data.title;
         this.content = this.data.content;
         this.buttons = [];
 
         if (this.data.buttons) {
-            if (!Array.isArray(this.data.buttons)) throw new Error(defaultDialogErrors.DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
+            if (!Array.isArray(this.data.buttons)) throw new Error(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
 
             this.data.buttons.forEach((btn) => {
-                if (!btn.content) throw new Error(defaultDialogErrors.BUTTON_MUST_HAVE_CONTENT);
+                if (!btn.content) throw new Error(BUTTON_MUST_HAVE_CONTENT);
                 this.buttons.push({
                     content: btn.content,
                     closeDialog: btn.redirect ? true : btn.closeDialog ?? false,

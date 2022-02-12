@@ -7,7 +7,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { gameErrors } from '@app/constants/services-errors';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 
 @Injectable({
     providedIn: 'root',
@@ -53,7 +53,7 @@ export default class GameService {
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
-        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(gameErrors.MISSING_PLAYER_DATA_TO_INITIALIZE);
+        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
         return new Player(playerData.id, playerData.name, playerData.tiles);
     }
 

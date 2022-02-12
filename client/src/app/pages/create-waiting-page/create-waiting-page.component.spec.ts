@@ -11,7 +11,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
-import { createWaitingPageConstants } from '@app/constants/pages-constants';
+import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from '@app/constants/pages-constants';
 @Component({
     template: '',
 })
@@ -73,7 +73,7 @@ describe('CreateWaitingPageComponent', () => {
 
     it('waitingRoomMessage should change the attributes according to the opponent name', async () => {
         component.setOpponent(testOpponentName);
-        expect(component.waitingRoomMessage).toEqual(testOpponentName + createWaitingPageConstants.OPPONENT_FOUND_MESSAGE);
+        expect(component.waitingRoomMessage).toEqual(testOpponentName + OPPONENT_FOUND_MESSAGE);
         expect(component.isOpponentFound).toEqual(true);
         expect(component.opponent).toEqual(testOpponentName);
     });
@@ -81,7 +81,7 @@ describe('CreateWaitingPageComponent', () => {
     it('waitingRoomMessage should change to HostWaitingMessage when an opponent leaves the lobby', async () => {
         component.isOpponentFound = true;
         component.disconnectOpponent();
-        expect(component.waitingRoomMessage).toEqual(createWaitingPageConstants.HOST_WAITING_MESSAGE);
+        expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
         expect(component.isOpponentFound).toEqual(false);
         expect(component.opponent).toEqual(undefined);
     });
@@ -145,7 +145,7 @@ describe('CreateWaitingPageComponent', () => {
         const spy = spyOn(component.dialog, 'open');
         component.opponentLeft('leaver');
         expect(spy).toHaveBeenCalled();
-        expect(component.waitingRoomMessage).toEqual(createWaitingPageConstants.HOST_WAITING_MESSAGE);
+        expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
         expect(component.isOpponentFound).toEqual(false);
         expect(component.opponent).toEqual(undefined);
     });
