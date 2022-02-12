@@ -80,7 +80,6 @@ describe('SocketService', () => {
         const action = () => {};
         const spy = spyOn(service['socket'], 'on');
         service.on(event, action);
-        expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledWith(event, action);
     });
 
