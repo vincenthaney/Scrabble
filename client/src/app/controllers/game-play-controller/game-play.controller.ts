@@ -38,4 +38,9 @@ export class GamePlayController {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/message`;
         this.http.post(endpoint, message).subscribe();
     }
+
+    sendError(gameId: string, playerId: string, message: Message) {
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/error`;
+        this.http.post(endpoint, message).subscribe();
+    }
 }

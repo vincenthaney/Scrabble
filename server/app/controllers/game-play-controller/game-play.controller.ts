@@ -45,11 +45,23 @@ export class GamePlayController {
         });
 
         this.router.post('/games/:gameId/player/:playerId/message', (req: GameRequest, res: Response) => {
-            const { gameId, playerId } = req.params;
+            const gameId = req.params.gameId;
             const message: Message = req.body;
 
             try {
-                this.handleNewMessage(gameId, playerId, message);
+                this.handleNewMessage(gameId, message);
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+
+        this.router.post('/games/:gameId/player/:playerId/error', (req: GameRequest, res: Response) => {
+            const playerId = req.params.playerId;
+            const message: Message = req.body;
+
+            try {
+                this.handleNewError(playerId, message);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
                 HttpException.sendError(e, res);
@@ -80,10 +92,20 @@ export class GamePlayController {
         }
     }
 
-    private handleNewMessage(gameId: string, playerId: string, message: Message): void {
+    private handleNewMessage(gameId: string, message: Message): void {
         if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
         if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
 
         this.socketService.emitToRoom(gameId, 'newMessage', message);
+    }
+
+    private handleNewError(playerId: string, message: Message): void {
+        if (message.senderId === undefined) throw new HttpException('messager sender is required', StatusCodes.BAD_REQUEST);
+        if (message.content === undefined) throw new HttpException('message content is required', StatusCodes.BAD_REQUEST);
+
+        this.socketService.emitToSocket(playerId, 'newMessage', {
+            content: message.content,
+            senderId: SYSTEM_ID,
+        });
     }
 }

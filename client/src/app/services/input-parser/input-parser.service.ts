@@ -55,24 +55,43 @@ export default class InputParserService {
 
             try {
                 this.parseCommand(actionName, inputWords);
+                this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                    content: input,
+                    senderId: this.getLocalPlayer().id,
+                });
             } catch (e) {
                 if (e instanceof CommandError) {
-                    this.newMessageValue.next({
-                        content: `La commande ${input} est invalide`,
-                        senderId: SYSTEM_ID,
-                    });
+                    if (e.message === CommandErrorMessages.NotYourTurn) {
+                        console.log(e.message);
+                        this.controller.sendError(this.gameService.getGameId(), playerId, {
+                            content: e.message,
+                            senderId: SYSTEM_ID,
+                        });
+                    } else {
+                        console.log(e.message);
+                        this.controller.sendError(this.gameService.getGameId(), playerId, {
+                            content: `La commande ${input} est invalide`,
+                            senderId: SYSTEM_ID,
+                        });
+                    }
                 }
             }
+        } else {
+            this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                content: input,
+                senderId: this.getLocalPlayer().id,
+            });
         }
-        this.controller.sendMessage(this.gameService.getGameId(), playerId, {
-            content: input,
-            senderId: this.getLocalPlayer().id,
-        });
     }
 
     private parseCommand(actionName: string, inputWords: string[]) {
         const playerId = this.getLocalPlayerId();
         const gameId: string = this.gameService.getGameId();
+        // eslint-disable-next-line dot-notation
+        const currentPlayerId = this.gameService['roundManager'].currentRound.player.id;
+
+        if (currentPlayerId !== playerId) throw new CommandError(CommandErrorMessages.NotYourTurn);
+
         let actionData: ActionData;
 
         switch (actionName) {
