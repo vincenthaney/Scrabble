@@ -94,6 +94,7 @@ export default class ActionPlace extends ActionPlay {
             for (const [square, tile] of word) {
                 if (!square.tile) {
                     square.tile = tile;
+                    square.wasMultiplierUsed = true;
                     const position = square.position;
                     board.push(square);
                     this.game.board.placeTile(tile, position);
