@@ -3,23 +3,18 @@
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 import { Square } from '@app/classes/square';
-import { MultiplierEffect } from '@app/classes/square/score-multiplier';
+import { MultiplierEffect, MultiplierValue } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
 import { expect } from 'chai';
-import {
-    EMPTY_WORDS,
-    EMPTY_WORD,
-    DEFAULT_TILE_VALUE,
-    DEFAULT_WORD_MULTIPLIER,
-    DEFAULT_LETTER_MULTIPLIER,
-    USED_MULTIPLIER,
-    GENERIC_WORDS,
-    NOT_USED_MULTIPLIER,
-    GENERIC_WORDS_SCORE,
-    GENERIC_LETTER_3,
-} from './score-calculator.const.test';
 import { ScoreCalculatorService } from './score-calculator.service';
-import { DEFAULT_MULTIPLIER } from '../../constants/services-constants/score-calculator.service.const';
+import {
+    scoreCalculatorConstants,
+    EMPTY_WORD,
+    EMPTY_WORDS,
+    GENERIC_WORDS,
+    GENERIC_LETTER_3,
+    GENERIC_WORDS_SCORE,
+} from '@app/constants/services-constants/score-calculator.const.test';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -35,7 +30,7 @@ describe('ScoreCalculatorService', () => {
     let testTuple: [Tile, Square];
     beforeEach(() => {
         scoreCalculatorService = new ScoreCalculatorService();
-        testTile = { letter: 'X', value: DEFAULT_TILE_VALUE };
+        testTile = { letter: 'X', value: scoreCalculatorConstants.DEFAULT_TILE_VALUE };
         testSquare = {
             tile: null,
             position: new Position(0, 0),
@@ -77,36 +72,48 @@ describe('ScoreCalculatorService', () => {
     });
 
     it('should return default multiplier "1"', () => {
-        expect(scoreCalculatorService['wordMultiplier'](testSquare)).to.equal(DEFAULT_MULTIPLIER);
+        expect(scoreCalculatorService['wordMultiplier'](testSquare)).to.equal(scoreCalculatorConstants.DEFAULT_MULTIPLIER);
     });
 
     it('should return wordMultiplier', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_WORD_MULTIPLIER, multiplierEffect: MultiplierEffect.WORD };
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_WORD_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.WORD,
+        };
         expect(scoreCalculatorService['wordMultiplier'](testSquare)).to.equal(testSquare.scoreMultiplier?.multiplier);
     });
 
     it('should return modified letter value ', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
-        const expectedValue = DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.LETTER,
+        };
+        const expectedValue = scoreCalculatorConstants.DEFAULT_TILE_VALUE * scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER;
         expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
     });
 
     it('should return original tile value because square has no multiplier', () => {
-        const expectedValue = DEFAULT_TILE_VALUE;
+        const expectedValue = scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
     });
 
     it('should return modified tile value because square letter multiplier has not been used', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
-        testSquare.wasMultiplierUsed = NOT_USED_MULTIPLIER;
-        const expectedValue = DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.LETTER,
+        };
+        testSquare.wasMultiplierUsed = scoreCalculatorConstants.NOT_USED_MULTIPLIER;
+        const expectedValue = scoreCalculatorConstants.DEFAULT_TILE_VALUE * scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER;
         expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
     });
 
     it('should return original tile value because square letter multiplier has already been used', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
-        testSquare.wasMultiplierUsed = USED_MULTIPLIER;
-        const expectedValue = DEFAULT_TILE_VALUE;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.LETTER,
+        };
+        testSquare.wasMultiplierUsed = scoreCalculatorConstants.USED_MULTIPLIER;
+        const expectedValue = scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
     });
 
@@ -117,38 +124,52 @@ describe('ScoreCalculatorService', () => {
     });
 
     it('should return score with multipliers not applied because letter multiplier was used', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
-        testSquare.wasMultiplierUsed = USED_MULTIPLIER;
-        testTile.value = DEFAULT_TILE_VALUE;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.LETTER,
+        };
+        testSquare.wasMultiplierUsed = scoreCalculatorConstants.USED_MULTIPLIER;
+        testTile.value = scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         const testMultiplierUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE;
+        const expectedScore = GENERIC_LETTER_3[0].value + scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierUsedWord)).to.equal(expectedScore);
     });
 
     it('should return score with multipliers applied because letter multiplier was not used ', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
-        testSquare.wasMultiplierUsed = NOT_USED_MULTIPLIER;
-        testTile.value = DEFAULT_TILE_VALUE;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.LETTER,
+        };
+        testSquare.wasMultiplierUsed = scoreCalculatorConstants.NOT_USED_MULTIPLIER;
+        testTile.value = scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         const testMultiplierNotUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
+        const expectedScore =
+            GENERIC_LETTER_3[0].value + scoreCalculatorConstants.DEFAULT_TILE_VALUE * scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierNotUsedWord)).to.equal(expectedScore);
     });
 
     it('should return score with multipliers not applied because word multipliers were used ', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.WORD };
-        testSquare.wasMultiplierUsed = USED_MULTIPLIER;
-        testTile.value = DEFAULT_TILE_VALUE;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.WORD,
+        };
+        testSquare.wasMultiplierUsed = scoreCalculatorConstants.USED_MULTIPLIER;
+        testTile.value = scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         const testMultiplierNotUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE;
+        const expectedScore = GENERIC_LETTER_3[0].value + scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierNotUsedWord)).to.equal(expectedScore);
     });
 
     it('should return score with multipliers applied because word multipliers were not used ', () => {
-        testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.WORD };
-        testSquare.wasMultiplierUsed = NOT_USED_MULTIPLIER;
-        testTile.value = DEFAULT_TILE_VALUE;
+        testSquare.scoreMultiplier = {
+            multiplier: scoreCalculatorConstants.DEFAULT_LETTER_MULTIPLIER as MultiplierValue,
+            multiplierEffect: MultiplierEffect.WORD,
+        };
+        testSquare.wasMultiplierUsed = scoreCalculatorConstants.NOT_USED_MULTIPLIER;
+        testTile.value = scoreCalculatorConstants.DEFAULT_TILE_VALUE;
         const testMultiplierNotUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = (GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE) * DEFAULT_WORD_MULTIPLIER;
+        const expectedScore =
+            (GENERIC_LETTER_3[0].value + scoreCalculatorConstants.DEFAULT_TILE_VALUE) * scoreCalculatorConstants.DEFAULT_WORD_MULTIPLIER;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierNotUsedWord)).to.equal(expectedScore);
     });
 

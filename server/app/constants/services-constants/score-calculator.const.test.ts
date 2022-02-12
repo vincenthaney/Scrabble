@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
 
-export const USED_MULTIPLIER = true;
-export const NOT_USED_MULTIPLIER = false;
-export const DEFAULT_TILE_VALUE = 10;
-export const DEFAULT_WORD_MULTIPLIER = 2;
-export const DEFAULT_LETTER_MULTIPLIER = 2;
+export const scoreCalculatorConstants = {
+    USED_MULTIPLIER: true,
+    NOT_USED_MULTIPLIER: false,
+    DEFAULT_TILE_VALUE: 10,
+    DEFAULT_WORD_MULTIPLIER: 2,
+    DEFAULT_LETTER_MULTIPLIER: 2,
+    DEFAULT_MULTIPLIER: 1,
+};
+
 export const EMPTY_WORDS: [Tile, Square][][] = [];
 export const EMPTY_WORD: [Tile, Square][] = [];
 export const GENERIC_LETTER_1: [Tile, Square] = [
@@ -15,7 +20,7 @@ export const GENERIC_LETTER_1: [Tile, Square] = [
     {
         tile: null,
         position: new Position(0, 0),
-        scoreMultiplier: { multiplier: DEFAULT_WORD_MULTIPLIER, multiplierEffect: MultiplierEffect.WORD },
+        scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD },
         wasMultiplierUsed: false,
         isCenter: false,
     },
@@ -26,7 +31,7 @@ export const GENERIC_LETTER_2: [Tile, Square] = [
     {
         tile: null,
         position: new Position(0, 0),
-        scoreMultiplier: { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER },
+        scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER },
         wasMultiplierUsed: false,
         isCenter: false,
     },
