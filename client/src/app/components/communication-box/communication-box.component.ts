@@ -1,8 +1,12 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { LetterValue } from '@app/classes/tile';
 import { GameService, InputParserService } from '@app/services';
+import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
+import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 type Message = { text: string; sender: string; date: Date; class: string };
 type LetterMapItem = { letter: LetterValue; amount: number };
@@ -13,8 +17,11 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent implements OnInit, OnDestroy {
+export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild(CdkVirtualScrollViewport, { static: false }) scrollViewport: CdkVirtualScrollViewport;
+    @ViewChild('messageInput') messageInputElement: ElementRef;
+    @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     messages: Message[] = [
         { text: 'message 1', sender: 'Mathilde', date: new Date(), class: 'me' },
@@ -42,7 +49,14 @@ export class CommunicationBoxComponent implements OnInit, OnDestroy {
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
 
-    constructor(private inputParser: InputParserService, private gameService: GameService) {}
+    constructor(
+        private inputParser: InputParserService,
+        private gameService: GameService,
+        private focusableComponentsService: FocusableComponentsService,
+    ) {
+        super();
+        this.focusableComponentsService.setActiveKeyboardComponent(this);
+    }
 
     ngOnInit() {
         this.lettersLeft = this.gameService.tileReserve;
@@ -53,8 +67,18 @@ export class CommunicationBoxComponent implements OnInit, OnDestroy {
         });
     }
 
+    ngAfterViewInit(): void {
+        this.messageInputElement.nativeElement.focus();
+        const handleKeyEvent = () => {
+            this.messageInputElement.nativeElement.focus();
+        };
+        this.focusEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(handleKeyEvent);
+    }
+
     ngOnDestroy() {
         this.gameService.updateTileReserveEvent.unsubscribe();
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     sendMessage() {
