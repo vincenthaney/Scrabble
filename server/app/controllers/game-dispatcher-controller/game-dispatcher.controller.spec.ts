@@ -18,7 +18,7 @@ import { createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import { gameDispatcherErrors } from '@app/constants/controllers-errors';
 import { GameDispatcherController } from './game-dispatcher.controller';
 
 const expect = chai.expect;
@@ -208,28 +208,28 @@ describe('GameDispatcherController', () => {
 
         it('should throw if config.playerName is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(gameDispatcherErrors.PLAYER_NAME_REQUIRED);
         });
 
         it('should throw if config.gameType is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, gameType: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(GAME_TYPE_REQUIRED);
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(gameDispatcherErrors.GAME_TYPE_REQUIRED);
         });
 
         it('should throw if config.maxRoundTime is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, maxRoundTime: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(MAX_ROUND_TIME_REQUIRED);
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(gameDispatcherErrors.MAX_ROUND_TIME_REQUIRED);
         });
 
         it('should throw if config.dictionary is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, dictionary: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(DICTIONARY_REQUIRED);
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(gameDispatcherErrors.DICTIONARY_REQUIRED);
         });
 
         it('should throw if config.playerName is invalid', () => {
             const playerName = '     ';
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(gameDispatcherErrors.NAME_IS_INVALID);
         });
     });
 
@@ -261,14 +261,14 @@ describe('GameDispatcherController', () => {
         it('should throw if playerName is undefined', () => {
             expect(() => {
                 controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, undefined as unknown as string);
-            }).to.throw(PLAYER_NAME_REQUIRED);
+            }).to.throw(gameDispatcherErrors.PLAYER_NAME_REQUIRED);
         });
 
         it('should throw if playerName is invalid', () => {
             const playerName = '     ';
             expect(() => {
                 controller['handleJoinGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, playerName);
-            }).to.throw(NAME_IS_INVALID);
+            }).to.throw(gameDispatcherErrors.NAME_IS_INVALID);
         });
     });
 
