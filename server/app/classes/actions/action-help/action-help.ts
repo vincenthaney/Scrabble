@@ -5,6 +5,7 @@ export default class ActionHelp extends ActionInfo {
     getMessage(): string {
         return HELP_ACTIONS.map((action) => `!${action.command}${action.usage ? ' ' + action.usage : ''}: ${action.description}`).join('\n');
     }
+
     getOpponentMessage(): string | undefined {
         return undefined;
     }

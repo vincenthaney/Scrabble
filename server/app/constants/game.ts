@@ -34,3 +34,5 @@ export const LETTER_VALUES: LetterValue[] = [
 export const BOARD_SIZE: Vec2 = { x: 15, y: 15 };
 export const UNDEFINED_BOARD_SIZE: Vec2 = { x: -1, y: -1 };
 export const VALID_MULTIPLIERS: number[] = [2, 3];
+
+export const SYSTEM_ID = 'system';

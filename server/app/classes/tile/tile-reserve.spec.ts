@@ -1,19 +1,18 @@
-import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { expect } from 'chai';
-import { join } from 'path';
 import { LETTER_VALUES } from '@app/constants/game';
+import { expect } from 'chai';
+import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { join } from 'path';
+import Tile from './tile';
 import TileReserve from './tile-reserve';
 import { LetterDistributionData, LetterValue } from './tile.types';
 import {
     AMOUNT_MUST_BE_GREATER_THAN_1,
     MUST_HAVE_7_TILES_TO_SWAP,
-    MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE,
     NOT_ENOUGH_TILES,
     TILE_NOT_IN_RESERVE,
     TILE_RESERVE_MUST_BE_INITIATED,
 } from '@app/constants/classes-errors';
 import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
-import Tile from './tile';
 
 const mockLetterDistribution: LetterDistributionData = {
     tiles: [
@@ -154,11 +153,6 @@ describe('TileReserve', () => {
         const tiles: Tile[] = tileReserve.getTiles(amount - 3);
 
         expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
-    });
-
-    it('swapTiles: should throw error when tile is not from reserve', () => {
-        const tiles: Tile[] = [{ letter: '*', value: 0 }];
-        expect(() => tileReserve.swapTiles(tiles)).to.throw(MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
     });
 
     it('removeTile: should throw error when tile is not in reserve', () => {

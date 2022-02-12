@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Tile, TileReserve } from '@app/classes/tile';
-import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import ActionExchange from './action-exchange';
 
 const expect = chai.expect;
@@ -173,12 +173,12 @@ describe('ActionExchange', () => {
 
         it("should have 'tuile' plural if more than one tiles to exchange", () => {
             action.tilesToExchange = PLAYER_TILES;
-            expect(action.getOpponentMessage()).to.include('tuiles.');
+            expect(action.getOpponentMessage()).to.include('tuiles');
         });
 
         it("should have 'tuile' singular if one tile to exchange", () => {
             action.tilesToExchange = [PLAYER_TILES[0]];
-            expect(action.getOpponentMessage()).to.include('tuile.');
+            expect(action.getOpponentMessage()).to.include('tuile');
         });
     });
 });

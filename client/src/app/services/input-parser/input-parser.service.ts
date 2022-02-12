@@ -1,22 +1,30 @@
 import { Injectable } from '@angular/core';
-import { ActionExchangePayload } from '@app/classes/actions/action-exchange';
-import { ActionPlacePayload } from '@app/classes/actions/action-place';
+import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import {
+    EXPECTED_WORD_COUNT_EXCHANGE,
+    EXPECTED_WORD_COUNT_HELP,
+    EXPECTED_WORD_COUNT_PASS,
+    EXPECTED_WORD_COUNT_PLACE,
+    EXPECTED_WORD_COUNT_RESERVE,
     MAX_COL_NUMBER,
     MAX_LOCATION_COMMAND_LENGTH,
     MAX_ROW_NUMBER,
     MIN_COL_NUMBER,
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER,
+    ON_YOUR_TURN_ACTIONS,
+    SYSTEM_ID,
 } from '@app/constants/game';
-import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
-import * as GAME_SERVICE_ERROR from '@app/services/game/game.service.error';
+import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { BehaviorSubject } from 'rxjs';
 import { GameService } from '..';
-import { INVALID_COMMAND } from './command-errors';
+import { CommandErrorMessages, PLAYER_NOT_FOUND } from './command-error-messages';
+import CommandError from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -24,53 +32,125 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
     providedIn: 'root',
 })
 export default class InputParserService {
-    constructor(private controller: InputControllerService, private gameService: GameService) {}
+    private newMessageValue = new BehaviorSubject<Message>({
+        content: 'Début de la partie',
+        senderId: SYSTEM_ID,
+    });
+
+    constructor(private controller: GamePlayController, private gameService: GameService) {
+        this.gameService.newMessageValue.subscribe((newMessage) => {
+            this.emitNewMessage(newMessage);
+        });
+    }
+
+    emitNewMessage(newMessage: Message): void {
+        this.newMessageValue.next(newMessage);
+    }
 
     parseInput(input: string): void {
+        const playerId = this.getLocalPlayerId();
+        const gameId: string = this.gameService.getGameId();
+
         if (input[0] === '!') {
             // it is an action
             const inputWords: string[] = input.substring(1).split(' ');
             const actionName: string = inputWords[0];
 
-            switch (actionName) {
-                case 'placer':
-                    if (inputWords.length !== 3) throw new Error(INVALID_COMMAND);
-
-                    if (inputWords[2].length === 1) {
-                        this.controller.sendPlaceAction(this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]));
+            try {
+                const actionData: ActionData = this.parseCommand(actionName, inputWords);
+                this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                    content: input,
+                    senderId: this.getLocalPlayer().id,
+                });
+                this.controller.sendAction(gameId, playerId, actionData);
+            } catch (e) {
+                if (e instanceof CommandError) {
+                    if (e.message === CommandErrorMessages.NotYourTurn) {
+                        this.controller.sendError(this.gameService.getGameId(), playerId, {
+                            content: e.message,
+                            senderId: SYSTEM_ID,
+                        });
                     } else {
-                        this.controller.sendPlaceAction(this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]));
+                        this.controller.sendError(this.gameService.getGameId(), playerId, {
+                            content: `La commande ${input} est invalide`,
+                            senderId: SYSTEM_ID,
+                        });
                     }
-                    break;
-                case 'échanger':
-                    if (inputWords.length !== 2) throw new Error(INVALID_COMMAND);
-                    this.controller.sendExchangeAction(this.createExchangeActionPayload(inputWords[1]));
-                    break;
-                case 'passer':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendPassAction();
-                    break;
-                case 'réserve':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendReserveAction();
-                    break;
-                case 'indice':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendHintAction();
-                    break;
-                case 'aide':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
-                    this.controller.sendHelpAction();
-                    break;
-                default:
+                }
             }
         } else {
-            this.controller.sendMessage(input);
+            this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                content: input,
+                senderId: this.getLocalPlayer().id,
+            });
         }
     }
 
-    private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string) {
-        // try catch invalid command
+    private parseCommand(actionName: string, inputWords: string[]): ActionData {
+        const playerId = this.getLocalPlayerId();
+        // eslint-disable-next-line dot-notation
+        const currentPlayerId = this.gameService['roundManager'].currentRound.player.id;
+
+        let actionData: ActionData;
+        if (ON_YOUR_TURN_ACTIONS.includes(actionName) && currentPlayerId !== playerId) throw new CommandError(CommandErrorMessages.NotYourTurn);
+
+        switch (actionName) {
+            case 'placer': {
+                if (inputWords.length !== EXPECTED_WORD_COUNT_PLACE) throw new CommandError(CommandErrorMessages.BadSyntax);
+
+                const nLettersToPlace = inputWords[2].length;
+                if (nLettersToPlace === 1) {
+                    actionData = {
+                        type: ActionType.PLACE,
+                        payload: this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]),
+                    };
+                } else {
+                    actionData = {
+                        type: ActionType.PLACE,
+                        payload: this.createPlaceActionPayloadMultipleLetters(inputWords[1], inputWords[2]),
+                    };
+                }
+                break;
+            }
+            case 'échanger':
+                if (inputWords.length !== EXPECTED_WORD_COUNT_EXCHANGE) throw new CommandError(CommandErrorMessages.BadSyntax);
+                actionData = {
+                    type: ActionType.EXCHANGE,
+                    payload: this.createExchangeActionPayload(inputWords[1]),
+                };
+                break;
+            case 'passer':
+                if (inputWords.length !== EXPECTED_WORD_COUNT_PASS) throw new CommandError(CommandErrorMessages.BadSyntax);
+                actionData = {
+                    type: ActionType.PASS,
+                    payload: {},
+                };
+                break;
+            case 'réserve':
+                if (inputWords.length !== EXPECTED_WORD_COUNT_RESERVE) throw new CommandError(CommandErrorMessages.BadSyntax);
+                actionData = {
+                    type: ActionType.RESERVE,
+                    payload: {},
+                };
+                break;
+            // case 'indice':
+            //     if (inputWords.length !== EXPECTED_WORD_COUNT_HINT) throw new CommandError(CommandErrorMessages.BadSyntax);
+            //     // this.controller.sendHintAction();
+            //     break;
+            case 'aide':
+                if (inputWords.length !== EXPECTED_WORD_COUNT_HELP) throw new CommandError(CommandErrorMessages.BadSyntax);
+                actionData = {
+                    type: ActionType.HELP,
+                    payload: {},
+                };
+                break;
+            default:
+                throw new CommandError(CommandErrorMessages.InvalidEntry);
+        }
+        return actionData;
+    }
+
+    private createPlaceActionPayloadSingleLetter(location: string, lettersToPlace: string): ActionPlacePayload {
         const lastLocationChar = location.charAt(location.length - 1);
         let positionString = '';
         if (lastLocationChar.toLowerCase() === lastLocationChar.toUpperCase()) {
@@ -88,8 +168,7 @@ export default class InputParserService {
         return placeActionPayload;
     }
 
-    private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string) {
-        // try catch invalid command
+    private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string): ActionPlacePayload {
         const placeActionPayload: ActionPlacePayload = {
             tiles: this.parsePlaceLettersToTiles(lettersToPlace),
             startPosition: this.getStartPosition(location.substring(0, location.length - 1)),
@@ -99,7 +178,7 @@ export default class InputParserService {
         return placeActionPayload;
     }
 
-    private createExchangeActionPayload(lettersToExchange: string) {
+    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
         const exchangeActionPayload: ActionExchangePayload = {
             tiles: this.parseExchangeLettersToTiles(lettersToExchange),
         };
@@ -108,11 +187,9 @@ export default class InputParserService {
     }
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
-        const player: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (!player) throw new Error(GAME_SERVICE_ERROR.NO_LOCAL_PLAYER);
-
+        const player: AbstractPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
-        player.getTiles().forEach((tile: Tile) => {
+        player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
         const tilesToPlace: Tile[] = [];
@@ -130,22 +207,20 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToPlace.length !== lettersToPlace.length) throw new Error(INVALID_COMMAND);
+        if (tilesToPlace.length !== lettersToPlace.length) throw new CommandError(CommandErrorMessages.ImpossibleCommand);
 
         return tilesToPlace;
     }
 
     private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
         // user must type exchange letters in lower case
-        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new Error(INVALID_COMMAND);
-        const player: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (!player) throw new Error(GAME_SERVICE_ERROR.NO_LOCAL_PLAYER);
+        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.BadSyntax);
 
+        const player: AbstractPlayer = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
-        player.getTiles().forEach((tile: Tile) => {
+        player.getTiles().forEach((tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
-
         const tilesToExchange: Tile[] = [];
 
         for (const letter of lettersToExchange) {
@@ -158,24 +233,24 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToExchange.length !== lettersToExchange.length) throw new Error(INVALID_COMMAND);
+        if (tilesToExchange.length !== lettersToExchange.length) throw new CommandError(CommandErrorMessages.ImpossibleCommand);
 
         return tilesToExchange;
     }
 
     private getStartPosition(location: string): Position {
         if (location.length > MAX_LOCATION_COMMAND_LENGTH || location.length < MIN_LOCATION_COMMAND_LENGTH) {
-            throw new Error(INVALID_COMMAND);
+            throw new CommandError(CommandErrorMessages.BadSyntax);
         }
 
         const inputRow: number = location[0].charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
         if (inputRow < MIN_ROW_NUMBER || inputRow > MAX_ROW_NUMBER) {
-            throw new Error(INVALID_COMMAND);
+            throw new CommandError(CommandErrorMessages.ImpossibleCommand);
         }
 
         const inputCol: number = +location.substring(1) - 1;
         if (inputCol < MIN_COL_NUMBER || inputCol > MAX_COL_NUMBER) {
-            throw new Error(INVALID_COMMAND);
+            throw new CommandError(CommandErrorMessages.ImpossibleCommand);
         }
 
         const inputStartPosition: Position = {
@@ -186,10 +261,26 @@ export default class InputParserService {
     }
 
     private getOrientation(orientationString: string): Orientation {
-        if (orientationString.length !== 1) throw new Error(INVALID_COMMAND);
+        if (orientationString.length !== 1) throw new CommandError(CommandErrorMessages.BadSyntax);
 
         if (orientationString === 'h') return Orientation.Horizontal;
         else if (orientationString === 'v') return Orientation.Vertical;
-        else throw new Error(INVALID_COMMAND);
+        else throw new CommandError(CommandErrorMessages.BadSyntax);
+    }
+
+    private getLocalPlayerId(): string {
+        return this.getLocalPlayer().id;
+    }
+
+    private getLocalPlayer(): AbstractPlayer {
+        let player: AbstractPlayer;
+        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+        if (localPlayer instanceof AbstractPlayer) {
+            player = localPlayer;
+        } else {
+            throw new Error(PLAYER_NOT_FOUND);
+        }
+
+        return player;
     }
 }

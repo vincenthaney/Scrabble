@@ -10,6 +10,7 @@ import { GameService } from '@app/services';
 })
 export class GamePageComponent {
     constructor(public surrenderDialog: MatDialog, public gameService: GameService) {}
+
     openDialog() {
         this.surrenderDialog.open(DefaultDialogComponent, {
             data: {

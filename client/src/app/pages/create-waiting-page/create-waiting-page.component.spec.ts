@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { GameDispatcherService } from '@app/services/';
+import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
 import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from '@app/constants/pages-constants';
@@ -29,12 +29,13 @@ describe('CreateWaitingPageComponent', () => {
     let component: CreateWaitingPageComponent;
     let fixture: ComponentFixture<CreateWaitingPageComponent>;
     const testOpponentName = 'testname';
+
     let gameDispatcherServiceMock: GameDispatcherService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
             imports: [
-                HttpClientModule,
+                HttpClientTestingModule,
                 MatProgressSpinnerModule,
                 MatDialogModule,
                 CommonModule,
@@ -64,7 +65,7 @@ describe('CreateWaitingPageComponent', () => {
 
     beforeEach(() => {
         component.waitingRoomMessage = 'initialWaitingRoomMessage';
-        component.opponent = 'initialOpponent';
+        component.opponentName = 'initialOpponent';
     });
 
     it('should create', () => {
@@ -75,7 +76,7 @@ describe('CreateWaitingPageComponent', () => {
         component.setOpponent(testOpponentName);
         expect(component.waitingRoomMessage).toEqual(testOpponentName + OPPONENT_FOUND_MESSAGE);
         expect(component.isOpponentFound).toEqual(true);
-        expect(component.opponent).toEqual(testOpponentName);
+        expect(component.opponentName).toEqual(testOpponentName);
     });
 
     it('waitingRoomMessage should change to HostWaitingMessage when an opponent leaves the lobby', async () => {
@@ -83,11 +84,11 @@ describe('CreateWaitingPageComponent', () => {
         component.disconnectOpponent();
         expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
         expect(component.isOpponentFound).toEqual(false);
-        expect(component.opponent).toEqual(undefined);
+        expect(component.opponentName).toEqual(undefined);
     });
 
     it('disconnectOpponent should not change anything if there is no opponent', async () => {
-        component.opponent = undefined;
+        component.opponentName = undefined;
         const beforeMessage = component.waitingRoomMessage;
         component.disconnectOpponent();
         expect(component.waitingRoomMessage).toEqual(beforeMessage);
@@ -131,9 +132,14 @@ describe('CreateWaitingPageComponent', () => {
         expect(rejectButton.disabled).toBeTruthy();
     });
 
-    it('convertSolo should be enabled when the game is created and no opponent has joined it.', () => {
+    // it('convertSolo should be enabled when the game is created and no opponent has joined it.', () => {
+    //     const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
+    //     expect(convertSoloButton.disabled).toBeFalsy();
+    // });
+
+    it('convertSolo should be disabled as it is not yet implemented', () => {
         const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
-        expect(convertSoloButton.disabled).toBeFalsy();
+        expect(convertSoloButton.disabled).toBeTruthy();
     });
 
     it('cancelButton should be enabled when the game is created and no opponent has joined it.', () => {
@@ -147,7 +153,7 @@ describe('CreateWaitingPageComponent', () => {
         expect(spy).toHaveBeenCalled();
         expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
         expect(component.isOpponentFound).toEqual(false);
-        expect(component.opponent).toEqual(undefined);
+        expect(component.opponentName).toEqual(undefined);
     });
 
     it('clicking on the rejectButton should call handleRejection() if an opponent is found', () => {
@@ -158,7 +164,7 @@ describe('CreateWaitingPageComponent', () => {
         });
 
         const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection')
-            .withArgs(component.opponent as string)
+            .withArgs(component.opponentName as string)
             .and.callFake(() => {
                 return;
             });
@@ -170,7 +176,7 @@ describe('CreateWaitingPageComponent', () => {
 
     it('clicking on the rejectButton with no opponent should not call handleRejection() and disconnectOpponent', () => {
         component.isOpponentFound = false;
-        component.opponent = undefined;
+        component.opponentName = undefined;
         fixture.detectChanges();
         const spyDisconnect = spyOn(component, 'disconnectOpponent');
 
@@ -194,12 +200,12 @@ describe('CreateWaitingPageComponent', () => {
         const startGameButton = fixture.debugElement.nativeElement.querySelector('#start-game-button');
         startGameButton.click();
 
-        expect(gameDispatcherSpy).toHaveBeenCalledWith(component.opponent as string);
+        expect(gameDispatcherSpy).toHaveBeenCalledWith(component.opponentName as string);
     });
 
     it('clicking on the startGame Button should not call confirmOpponentToServer() if there is no opponent', () => {
         component.isOpponentFound = false;
-        component.opponent = undefined;
+        component.opponentName = undefined;
         fixture.detectChanges();
 
         const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConfirmation').and.callFake(() => {
