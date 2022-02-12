@@ -29,11 +29,11 @@ export class BoardComponent implements OnInit, OnDestroy {
     changeFontSize(operation: string) {
         if (operation === 'smaller') {
             this.squareComponents.forEach((squareComponent) => {
-                if (squareComponent.fontSize > TILE_MIN_FONT_SIZE) squareComponent.fontSize -= 0.1;
+                if (squareComponent.tileFontSize > TILE_MIN_FONT_SIZE) squareComponent.tileFontSize -= 0.1;
             });
         } else if (operation === 'larger') {
             this.squareComponents.forEach((squareComponent) => {
-                if (squareComponent.fontSize < TILE_MAX_FONT_SIZE) squareComponent.fontSize += 0.1;
+                if (squareComponent.tileFontSize < TILE_MAX_FONT_SIZE) squareComponent.tileFontSize += 0.1;
             });
         }
     }

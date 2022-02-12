@@ -18,7 +18,7 @@ export class SquareComponent implements OnInit {
     style: { [key: string]: string } = {};
     multiplierType: string | undefined;
     multiplierValue: string | undefined;
-    fontSize: number = TILE_DEFAULT_FONT_SIZE;
+    tileFontSize: number = TILE_DEFAULT_FONT_SIZE;
 
     ngOnInit() {
         this.setText();
@@ -39,7 +39,6 @@ export class SquareComponent implements OnInit {
     private initializeStyle() {
         this.style = {
             'background-color': this.squareView.getColor(),
-            'font-size': `${this.fontSize}em`,
         };
     }
 }
