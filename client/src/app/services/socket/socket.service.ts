@@ -20,14 +20,13 @@ export default class SocketService {
         return new Promise((resolve, reject) => {
             let connectionTime = 0;
             const interval = setInterval(() => {
+                connectionTime += delay;
                 if (predicate()) {
                     clearInterval(interval);
                     resolve();
-                } else {
-                    connectionTime += delay;
-                    if (connectionTime >= timeout) {
-                        reject();
-                    }
+                } else if (connectionTime >= timeout) {
+                    clearInterval(interval);
+                    reject();
                 }
             }, delay);
         });
