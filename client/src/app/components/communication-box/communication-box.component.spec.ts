@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Message } from '@app/classes/communication/message';
@@ -87,6 +88,7 @@ describe('CommunicationBoxComponent', () => {
                 ScrollingModule,
                 HttpClientTestingModule,
                 RouterTestingModule,
+                MatTooltipModule,
             ],
             providers: [
                 { provide: InputParserService, useValue: inputParserSpy },
