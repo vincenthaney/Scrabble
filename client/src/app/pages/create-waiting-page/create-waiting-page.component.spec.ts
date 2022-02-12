@@ -131,9 +131,14 @@ describe('CreateWaitingPageComponent', () => {
         expect(rejectButton.disabled).toBeTruthy();
     });
 
-    it('convertSolo should be enabled when the game is created and no opponent has joined it.', () => {
+    // it('convertSolo should be enabled when the game is created and no opponent has joined it.', () => {
+    //     const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
+    //     expect(convertSoloButton.disabled).toBeFalsy();
+    // });
+
+    it('convertSolo should be disabled as it is not yet implemented', () => {
         const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
-        expect(convertSoloButton.disabled).toBeFalsy();
+        expect(convertSoloButton.disabled).toBeTruthy();
     });
 
     it('cancelButton should be enabled when the game is created and no opponent has joined it.', () => {
