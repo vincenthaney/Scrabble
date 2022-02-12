@@ -25,6 +25,14 @@ export class GamePlayController {
     }
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
+        console.log(data.player1);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
+        console.log(data.player2);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
+        console.log(data.round);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, no-console
+        console.log(data.board);
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
     }
 

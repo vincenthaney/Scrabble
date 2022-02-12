@@ -16,7 +16,7 @@ import {
     RejectEmitArgs,
     SocketEmitEvents,
     // eslint-disable-next-line prettier/prettier
-    StartGameEmitArgs
+    StartGameEmitArgs,
 } from './socket-types';
 import * as SocketError from './socket.service.error';
 
