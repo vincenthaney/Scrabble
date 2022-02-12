@@ -17,7 +17,7 @@ export default class ActionExchange extends ActionPlay {
     execute(): GameUpdateData {
         const [tilesToExchange, unusedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToExchange, this.player);
 
-        const newTiles = this.game.swapTiles(tilesToExchange);
+        const newTiles = this.game.swapTilesFromReserve(tilesToExchange);
         this.player.tiles = unusedTiles.concat(newTiles);
 
         const playerUpdate: PlayerData = { tiles: this.player.tiles };
@@ -31,8 +31,13 @@ export default class ActionExchange extends ActionPlay {
     }
 
     getMessage(): string {
-        return `${this.player.name} a échangé les tuiles ${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter.toLowerCase()), '')}.`;
+        return `${this.player.name} a échangé ${this.tilesToExchange.length === 1 ? 'la tuile' : 'les tuiles'} ${this.lettersToSwap()}`;
     }
+
+    lettersToSwap(): string {
+        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter.toLowerCase()), '')}.`;
+    }
+
     getOpponentMessage(): string {
         const moreThanOne = this.tilesToExchange.length > 1;
         return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}.`;
