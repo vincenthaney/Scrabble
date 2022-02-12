@@ -9,6 +9,7 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
+import { LetterValue, TileReserve } from '@app/classes/tile';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { expect } from 'chai';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -21,12 +22,19 @@ const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
 const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {} };
 const INVALID_ACTION_TYPE = 'invalid action type';
+const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
+    ['A', 1],
+    ['B', 2],
+    ['C', 3],
+    ['D', 0],
+];
 
 describe('GamePlayService', () => {
     let gamePlayService: GamePlayService;
     let getGameStub: SinonStub;
     let gameStub: SinonStubbedInstance<Game>;
     let roundManagerStub: SinonStubbedInstance<RoundManager>;
+    let tileReserveStub: SinonStubbedInstance<TileReserve>;
     let round: Round;
     let player: Player;
     let game: Game;
@@ -35,13 +43,17 @@ describe('GamePlayService', () => {
         gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
+        tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
         gameStub.getRequestingPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+        gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
 
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
+
+        tileReserveStub.getTilesLeftPerLetter.returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
         player = gameStub.player1;
         game = gameStub as unknown as Game;
@@ -132,6 +144,25 @@ describe('GamePlayService', () => {
 
         it('should throw when playerId is invalid', () => {
             expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
+        });
+
+        it('should return tileReserve is updateData exists', () => {
+            actionStub.execute.returns({});
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(result).to.exist;
+            expect(result[0]!.tileReserve).to.exist;
+
+            for (const [expectedLetter, expectedAmount] of DEFAULT_GET_TILES_PER_LETTER_ARRAY) {
+                expect(result[0]!.tileReserve!.some(({ letter, amount }) => expectedLetter === letter && expectedAmount === amount)).to.be.true;
+            }
+        });
+
+        it('should return tileReserveTotal is updateData exists', () => {
+            actionStub.execute.returns({});
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(result).to.exist;
+            expect(result[0]!.tileReserveTotal).to.exist;
+            expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));
         });
     });
 

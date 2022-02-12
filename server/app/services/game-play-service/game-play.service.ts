@@ -24,6 +24,11 @@ export class GamePlayService {
         const opponentFeedback = action.getOpponentMessage();
         let updatedData: void | GameUpdateData = action.execute();
 
+        if (updatedData) {
+            updatedData.tileReserve = Array.from(game.tileReserve.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
+            updatedData.tileReserveTotal = updatedData.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
+        }
+
         if (action.willEndTurn()) {
             const nextRound = game.roundManager.nextRound(action);
             if (updatedData) updatedData.round = nextRound;

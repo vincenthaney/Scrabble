@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { VisualMessage, VisualMessageClasses } from '@app/classes/communication/visual-message';
@@ -15,7 +15,7 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent implements OnInit {
+export class CommunicationBoxComponent implements OnInit, OnDestroy {
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
     messages: VisualMessage[] = [];
@@ -25,14 +25,25 @@ export class CommunicationBoxComponent implements OnInit {
 
     // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
+    lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
 
     constructor(private inputParser: InputParserService, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {}
 
-    ngOnInit() {
+    ngOnInit(): void {
+        this.lettersLeft = this.gameService.tileReserve;
+        this.lettersLeftTotal = this.gameService.tileReserveTotal;
+
+        this.gameService.updateTileReserveEvent.subscribe(({ tileReserve, tileReserveTotal }) => {
+            this.onTileReserveUpdate(tileReserve, tileReserveTotal);
+        });
         this.gameService.newMessageValue.subscribe((newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
+    }
+
+    ngOnDestroy(): void {
+        this.gameService.updateTileReserveEvent.unsubscribe();
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
@@ -47,7 +58,7 @@ export class CommunicationBoxComponent implements OnInit {
         return { ...newMessage, class: messageClass };
     }
 
-    onSendMessage() {
+    onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0) {
             this.inputParser.parseInput(message);
@@ -55,10 +66,15 @@ export class CommunicationBoxComponent implements OnInit {
         }
     }
 
-    onReceiveNewMessage(newMessage: Message) {
+    onReceiveNewMessage(newMessage: Message): void {
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
+    }
+
+    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
+        this.lettersLeft = tileReserve;
+        this.lettersLeftTotal = tileReserveTotal;
     }
 
     private scrollToBottom(): void {

@@ -78,12 +78,6 @@ describe('GameDispatcherController', () => {
         expect(rejectedSpy).toHaveBeenCalled();
     });
 
-    it('On full lobby, configureSocket should emit opponent name', () => {
-        const lobbyFullSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callThrough();
-        socketHelper.peerSideEmit('lobbyFull', DEFAULT_OPPONENT_NAME);
-        expect(lobbyFullSpy).toHaveBeenCalled();
-    });
-
     it('On cancel game, configureSocket should emit opponent name', () => {
         const cancelGameSpy = spyOn(controller.canceledGameEvent, 'emit').and.callThrough();
         socketHelper.peerSideEmit('canceledGame', DEFAULT_OPPONENT_NAME);

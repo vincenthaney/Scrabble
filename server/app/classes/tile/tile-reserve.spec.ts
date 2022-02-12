@@ -149,11 +149,6 @@ describe('TileReserve', () => {
         expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(TileError.MUST_HAVE_7_TILES_TO_SWAP);
     });
 
-    // it('swapTiles: should throw error when tile is not from reserve', () => {
-    //     const tiles: Tile[] = [{ letter: '*', value: 0 }];
-    //     expect(() => tileReserve.swapTiles(tiles)).to.throw(TileError.MUST_SWAP_WITH_TILES_ORIGINALLY_FROM_RESERVE);
-    // });
-
     it('removeTile: should throw error when tile is not in reserve', () => {
         const tile = tileReserve.getTiles(1);
 

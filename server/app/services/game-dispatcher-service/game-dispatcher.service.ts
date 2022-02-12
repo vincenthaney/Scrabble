@@ -150,6 +150,7 @@ export class GameDispatcherService {
         createdGame.tileReserve.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });
         });
+        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
         const startMultiplayerGameData: StartMultiplayerGameData = {
             player1: createdGame.player1,
             player2: createdGame.player2,
@@ -159,6 +160,7 @@ export class GameDispatcherService {
             gameId: createdGame.getId(),
             board: createdGame.board.grid,
             tileReserve,
+            tileReserveTotal,
             round: createdGame.roundManager.getCurrentRound(),
         };
         return startMultiplayerGameData;
