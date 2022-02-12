@@ -5,7 +5,7 @@ import { LETTER_VALUES } from '@app/constants/game';
 import TileReserve from './tile-reserve';
 import { LetterDistributionData, LetterValue } from './tile.types';
 import { tileErrors } from '@app/constants/classes-errors';
-import * as TileConst from './tile.const';
+import { tileConstants } from '@app/constants/classes-constants';
 import Tile from './tile';
 
 const mockLetterDistribution: LetterDistributionData = {
@@ -19,7 +19,7 @@ const mockLetterDistribution: LetterDistributionData = {
 // mockPaths must be of type any because keys must be dynamic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockPaths: any = [];
-mockPaths[join(__dirname, TileConst.LETTER_DISTRIBUTION_RELATIVE_PATH)] = JSON.stringify(mockLetterDistribution);
+mockPaths[join(__dirname, tileConstants.LETTER_DISTRIBUTION_RELATIVE_PATH)] = JSON.stringify(mockLetterDistribution);
 
 describe('TileReserve', () => {
     let tileReserve: TileReserve;

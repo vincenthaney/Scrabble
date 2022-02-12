@@ -14,9 +14,8 @@ import {
     MIN_ROW_NUMBER,
 } from '@app/constants/game';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
-import * as GAME_SERVICE_ERROR from '@app/services/game/game.service.error';
+import { gameErrors, inputParserErrors } from '@app/constants/services-errors';
 import { GameService } from '..';
-import { INVALID_COMMAND } from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -34,7 +33,7 @@ export default class InputParserService {
 
             switch (actionName) {
                 case 'placer':
-                    if (inputWords.length !== 3) throw new Error(INVALID_COMMAND);
+                    if (inputWords.length !== 3) throw new Error(inputParserErrors.INVALID_COMMAND);
 
                     if (inputWords[2].length === 1) {
                         this.controller.sendPlaceAction(this.createPlaceActionPayloadSingleLetter(inputWords[1], inputWords[2]));
@@ -43,23 +42,23 @@ export default class InputParserService {
                     }
                     break;
                 case 'échanger':
-                    if (inputWords.length !== 2) throw new Error(INVALID_COMMAND);
+                    if (inputWords.length !== 2) throw new Error(inputParserErrors.INVALID_COMMAND);
                     this.controller.sendExchangeAction(this.createExchangeActionPayload(inputWords[1]));
                     break;
                 case 'passer':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
+                    if (inputWords.length !== 1) throw new Error(inputParserErrors.INVALID_COMMAND);
                     this.controller.sendPassAction();
                     break;
                 case 'réserve':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
+                    if (inputWords.length !== 1) throw new Error(inputParserErrors.INVALID_COMMAND);
                     this.controller.sendReserveAction();
                     break;
                 case 'indice':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
+                    if (inputWords.length !== 1) throw new Error(inputParserErrors.INVALID_COMMAND);
                     this.controller.sendHintAction();
                     break;
                 case 'aide':
-                    if (inputWords.length !== 1) throw new Error(INVALID_COMMAND);
+                    if (inputWords.length !== 1) throw new Error(inputParserErrors.INVALID_COMMAND);
                     this.controller.sendHelpAction();
                     break;
                 default:
@@ -109,7 +108,7 @@ export default class InputParserService {
 
     private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
         const player: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (!player) throw new Error(GAME_SERVICE_ERROR.NO_LOCAL_PLAYER);
+        if (!player) throw new Error(gameErrors.NO_LOCAL_PLAYER);
 
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile: Tile) => {
@@ -130,16 +129,16 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToPlace.length !== lettersToPlace.length) throw new Error(INVALID_COMMAND);
+        if (tilesToPlace.length !== lettersToPlace.length) throw new Error(inputParserErrors.INVALID_COMMAND);
 
         return tilesToPlace;
     }
 
     private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
         // user must type exchange letters in lower case
-        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new Error(INVALID_COMMAND);
+        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new Error(inputParserErrors.INVALID_COMMAND);
         const player: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (!player) throw new Error(GAME_SERVICE_ERROR.NO_LOCAL_PLAYER);
+        if (!player) throw new Error(gameErrors.NO_LOCAL_PLAYER);
 
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile: Tile) => {
@@ -158,24 +157,24 @@ export default class InputParserService {
             }
         }
 
-        if (tilesToExchange.length !== lettersToExchange.length) throw new Error(INVALID_COMMAND);
+        if (tilesToExchange.length !== lettersToExchange.length) throw new Error(inputParserErrors.INVALID_COMMAND);
 
         return tilesToExchange;
     }
 
     private getStartPosition(location: string): Position {
         if (location.length > MAX_LOCATION_COMMAND_LENGTH || location.length < MIN_LOCATION_COMMAND_LENGTH) {
-            throw new Error(INVALID_COMMAND);
+            throw new Error(inputParserErrors.INVALID_COMMAND);
         }
 
         const inputRow: number = location[0].charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
         if (inputRow < MIN_ROW_NUMBER || inputRow > MAX_ROW_NUMBER) {
-            throw new Error(INVALID_COMMAND);
+            throw new Error(inputParserErrors.INVALID_COMMAND);
         }
 
         const inputCol: number = +location.substring(1) - 1;
         if (inputCol < MIN_COL_NUMBER || inputCol > MAX_COL_NUMBER) {
-            throw new Error(INVALID_COMMAND);
+            throw new Error(inputParserErrors.INVALID_COMMAND);
         }
 
         const inputStartPosition: Position = {
@@ -186,10 +185,10 @@ export default class InputParserService {
     }
 
     private getOrientation(orientationString: string): Orientation {
-        if (orientationString.length !== 1) throw new Error(INVALID_COMMAND);
+        if (orientationString.length !== 1) throw new Error(inputParserErrors.INVALID_COMMAND);
 
         if (orientationString === 'h') return Orientation.Horizontal;
         else if (orientationString === 'v') return Orientation.Vertical;
-        else throw new Error(INVALID_COMMAND);
+        else throw new Error(inputParserErrors.INVALID_COMMAND);
     }
 }

@@ -16,7 +16,7 @@ import {
     SocketEmitEvents,
     StartGameEmitArgs,
 } from './socket-types';
-import * as SocketError from './socket.service.error';
+import { socketErrors } from '@app/constants/services-errors';
 
 @Service()
 export class SocketService {
@@ -32,7 +32,7 @@ export class SocketService {
     }
 
     handleSockets(): void {
-        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new Error(socketErrors.SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.on('connection', (socket) => {
             this.sockets.set(socket.id, socket);
@@ -45,13 +45,13 @@ export class SocketService {
     }
 
     addToRoom(socketId: string, room: string) {
-        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new Error(socketErrors.SOCKET_SERVICE_NOT_INITIALIZED);
         const socket = this.getSocket(socketId);
         socket.join(room);
     }
 
     deleteRoom(room: string) {
-        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new Error(socketErrors.SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.sockets.in(room).socketsLeave(room);
     }
@@ -64,7 +64,7 @@ export class SocketService {
     emitToRoom(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]) {
-        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new Error(socketErrors.SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.to(room).emit(ev, args);
     }
@@ -75,7 +75,7 @@ export class SocketService {
 
     getSocket(id: string): io.Socket {
         const socket = this.sockets.get(id);
-        if (!socket) throw new HttpException(SocketError.INVALID_ID_FOR_SOCKET, StatusCodes.BAD_REQUEST);
+        if (!socket) throw new HttpException(socketErrors.INVALID_ID_FOR_SOCKET, StatusCodes.BAD_REQUEST);
         return socket;
     }
 
@@ -88,7 +88,7 @@ export class SocketService {
     emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
-        if (this.sio === undefined) throw new Error(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new Error(socketErrors.SOCKET_SERVICE_NOT_INITIALIZED);
         this.getSocket(id).emit(ev, args);
     }
 }

@@ -9,7 +9,7 @@ import { Socket } from 'socket.io-client';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 const DEFAULT_SOCKET_ID = 'testSocketID';
 const DEFAULT_PLAYER_NAME = 'grogars';
@@ -76,12 +76,6 @@ describe('GameDispatcherController', () => {
         const rejectedSpy = spyOn(controller.joinerRejectedEvent, 'emit').and.callThrough();
         socketHelper.peerSideEmit('rejected', DEFAULT_OPPONENT_NAME);
         expect(rejectedSpy).toHaveBeenCalled();
-    });
-
-    it('On full lobby, configureSocket should emit opponent name', () => {
-        const lobbyFullSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callThrough();
-        socketHelper.peerSideEmit('lobbyFull', DEFAULT_OPPONENT_NAME);
-        expect(lobbyFullSpy).toHaveBeenCalled();
     });
 
     it('On cancel game, configureSocket should emit opponent name', () => {
@@ -236,5 +230,30 @@ describe('GameDispatcherController', () => {
         controller.handleLobbyJoinRequest({} as unknown as string, {} as unknown as string);
 
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('handleLobbyJoinRequest should emit when HTTP post request on success', () => {
+        const fakeObservable = of<string>('fakeResponse');
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
+        // const errorSpy = spyOn(controller, 'handleJoinError').and.callFake(() => {
+        //    return;
+        // });
+        const successSpy = spyOn(controller.lobbyRequestValidEvent, 'emit');
+        controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
+        expect(successSpy).toHaveBeenCalled();
+    });
+
+    it('handleLobbyJoinRequest should call handleJoinError when HTTP post request generates an error', () => {
+        // const fakeObservable = of<string>('fakeResponse');
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.callFake(() => {
+            return throwError('fakeError');
+        });
+        const errorSpy = spyOn(controller, 'handleJoinError').and.callFake(() => {
+            return;
+        });
+        controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
+        expect(errorSpy).toHaveBeenCalled();
     });
 });

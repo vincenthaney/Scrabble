@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import defaultDialogErrors from './default-dialog.component.errors';
+import { defaultDialogErrors } from '@app/constants/component-errors';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
 @Component({
