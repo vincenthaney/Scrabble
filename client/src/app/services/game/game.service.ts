@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
-import { VisualMessageClasses } from '@app/classes/communication/visual-message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -29,7 +29,7 @@ export default class GameService {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
     newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
-        senderId: VisualMessageClasses.System,
+        senderId: SYSTEM_ID,
     });
     tileReserve: TileReserveData[];
     tileReserveTotal: number;

@@ -2,8 +2,8 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
-import { VisualMessage, VisualMessageClasses } from '@app/classes/communication/visual-message';
 import { LetterValue } from '@app/classes/tile';
+import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
 import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 
@@ -47,13 +47,13 @@ export class CommunicationBoxComponent implements OnInit, OnDestroy {
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
-        let messageClass: VisualMessageClasses;
+        let messageClass: VisualMessageClass;
         if (newMessage.senderId === this.gameService.getLocalPlayerId()) {
-            messageClass = VisualMessageClasses.Me;
-        } else if (newMessage.senderId === VisualMessageClasses.System) {
-            messageClass = VisualMessageClasses.System;
+            messageClass = 'me';
+        } else if (newMessage.senderId === 'system') {
+            messageClass = 'system';
         } else {
-            messageClass = VisualMessageClasses.Opponent;
+            messageClass = 'opponent';
         }
         return { ...newMessage, class: messageClass };
     }

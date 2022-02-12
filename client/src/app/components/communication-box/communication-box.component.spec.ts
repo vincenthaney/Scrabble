@@ -11,8 +11,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Message } from '@app/classes/communication/message';
-import { VisualMessage, VisualMessageClasses } from '@app/classes/communication/visual-message';
 import { Player } from '@app/classes/player';
+import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { SYSTEM_ID } from '@app/constants/game';
@@ -114,19 +114,19 @@ describe('CommunicationBoxComponent', () => {
 
     it('should create visualMessage from Message by player1', () => {
         const returnValue: VisualMessage = component.createVisualMessage(testMessagePlayer1);
-        const expectedValue: VisualMessage = { ...testMessagePlayer1, class: VisualMessageClasses.Me };
+        const expectedValue: VisualMessage = { ...testMessagePlayer1, class: 'me' };
         expect(returnValue).toEqual(expectedValue);
     });
 
     it('should create visualMessage from Message by player2', () => {
         const returnValue: VisualMessage = component.createVisualMessage(testMessagePlayer2);
-        const expectedValue: VisualMessage = { ...testMessagePlayer2, class: VisualMessageClasses.Opponent };
+        const expectedValue: VisualMessage = { ...testMessagePlayer2, class: 'opponent' };
         expect(returnValue).toEqual(expectedValue);
     });
 
     it('should create visualMessage from Message by system', () => {
         const returnValue: VisualMessage = component.createVisualMessage(testMessageSystem);
-        const expectedValue: VisualMessage = { ...testMessageSystem, class: VisualMessageClasses.System };
+        const expectedValue: VisualMessage = { ...testMessageSystem, class: 'system' };
         expect(returnValue).toEqual(expectedValue);
     });
 
