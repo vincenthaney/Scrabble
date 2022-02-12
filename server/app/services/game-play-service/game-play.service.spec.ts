@@ -2,18 +2,19 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { expect } from 'chai';
-import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { Container } from 'typedi';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
-import RoundManager from '@app/classes/round/round-manager';
 import { Round } from '@app/classes/round/round';
-import { Orientation } from '@app/classes/board';
+import RoundManager from '@app/classes/round/round-manager';
+import { LetterValue, TileReserve } from '@app/classes/tile';
+import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { expect } from 'chai';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { Container } from 'typedi';
+import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
@@ -21,12 +22,19 @@ const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
 const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {} };
 const INVALID_ACTION_TYPE = 'invalid action type';
+const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
+    ['A', 1],
+    ['B', 2],
+    ['C', 3],
+    ['D', 0],
+];
 
 describe('GamePlayService', () => {
     let gamePlayService: GamePlayService;
     let getGameStub: SinonStub;
     let gameStub: SinonStubbedInstance<Game>;
     let roundManagerStub: SinonStubbedInstance<RoundManager>;
+    let tileReserveStub: SinonStubbedInstance<TileReserve>;
     let round: Round;
     let player: Player;
     let game: Game;
@@ -35,13 +43,17 @@ describe('GamePlayService', () => {
         gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
+        tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
         gameStub.getRequestingPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+        gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
 
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
+
+        tileReserveStub.getTilesLeftPerLetter.returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
         player = gameStub.player1;
         game = gameStub as unknown as Game;
@@ -91,7 +103,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns({});
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.isGameOver).to.be.true;
+            expect(result[0]!.isGameOver).to.be.true;
         });
 
         it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
@@ -99,7 +111,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns(undefined);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.isGameOver).to.be.true;
+            expect(result[0]!.isGameOver).to.be.true;
         });
 
         it('should call next round when action ends turn', () => {
@@ -113,7 +125,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns({});
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.round).to.exist;
+            expect(result[0]!.round).to.exist;
         });
 
         it("should set round action end turn (updatedData doesn't exists)", () => {
@@ -121,7 +133,7 @@ describe('GamePlayService', () => {
             actionStub.execute.returns(undefined);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result!.round).to.exist;
+            expect(result[0]!.round).to.exist;
         });
 
         it('should not call next round when action does not ends turn', () => {
@@ -132,6 +144,25 @@ describe('GamePlayService', () => {
 
         it('should throw when playerId is invalid', () => {
             expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
+        });
+
+        it('should return tileReserve is updateData exists', () => {
+            actionStub.execute.returns({});
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(result).to.exist;
+            expect(result[0]!.tileReserve).to.exist;
+
+            for (const [expectedLetter, expectedAmount] of DEFAULT_GET_TILES_PER_LETTER_ARRAY) {
+                expect(result[0]!.tileReserve!.some(({ letter, amount }) => expectedLetter === letter && expectedAmount === amount)).to.be.true;
+            }
+        });
+
+        it('should return tileReserveTotal is updateData exists', () => {
+            actionStub.execute.returns({});
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(result).to.exist;
+            expect(result[0]!.tileReserveTotal).to.exist;
+            expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));
         });
     });
 
@@ -146,7 +177,7 @@ describe('GamePlayService', () => {
             const type = 'place';
             const payload: ActionPlacePayload = {
                 tiles: [],
-                position: { column: 0, row: 0 },
+                startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
             const action = gamePlayService.getAction(player, game, { type, payload });
@@ -172,15 +203,15 @@ describe('GamePlayService', () => {
         it("should throw if place payload doesn't have tiles", () => {
             const type = 'place';
             const payload: Omit<ActionPlacePayload, 'tiles'> = {
-                position: { column: 0, row: 0 },
+                startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });
 
-        it("should throw if place payload doesn't have position", () => {
+        it("should throw if place payload doesn't have startPosition", () => {
             const type = 'place';
-            const payload: Omit<ActionPlacePayload, 'position'> = {
+            const payload: Omit<ActionPlacePayload, 'startPosition'> = {
                 tiles: [],
                 orientation: Orientation.Horizontal,
             };
@@ -191,7 +222,7 @@ describe('GamePlayService', () => {
             const type = 'place';
             const payload: Omit<ActionPlacePayload, 'orientation'> = {
                 tiles: [],
-                position: { column: 0, row: 0 },
+                startPosition: { column: 0, row: 0 },
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
         });

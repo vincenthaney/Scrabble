@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import SocketService from '@app/services/socket/socket.service';
-import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import PlayerName from '@app/classes/communication/player-name';
 import { Socket } from 'socket.io-client';
 import { GameConfigData } from '@app/classes/communication/game-config';
@@ -76,12 +76,6 @@ describe('GameDispatcherController', () => {
         const rejectedSpy = spyOn(controller.joinerRejectedEvent, 'emit').and.callThrough();
         socketHelper.peerSideEmit('rejected', DEFAULT_OPPONENT_NAME);
         expect(rejectedSpy).toHaveBeenCalled();
-    });
-
-    it('On full lobby, configureSocket should emit opponent name', () => {
-        const lobbyFullSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callThrough();
-        socketHelper.peerSideEmit('lobbyFull', DEFAULT_OPPONENT_NAME);
-        expect(lobbyFullSpy).toHaveBeenCalled();
     });
 
     it('On cancel game, configureSocket should emit opponent name', () => {

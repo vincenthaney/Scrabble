@@ -6,8 +6,8 @@
                 <div *ngFor="let obj of objectives">{{obj}}</div>
             </mat-expansion-panel> -->
 
-            <mat-expansion-panel id="tile-map" [expanded]="true">
-                <mat-expansion-panel-header>Tuiles restantes : {{lettersLeft.length}}</mat-expansion-panel-header>
+            <mat-expansion-panel id="tile-map" [expanded]="false" [disabled]="lettersLeftTotal === 0">
+                <mat-expansion-panel-header>Tuiles restantes : {{lettersLeftTotal}}</mat-expansion-panel-header>
                 <div class="tile-map-content">
                     <p *ngFor="let letter of lettersLeft">
                         <app-tile [tile]="{ letter: letter.letter, value: 0 }" [hideValue]="true"></app-tile>
@@ -18,18 +18,20 @@
             </mat-expansion-panel>
         </mat-accordion>
     </section>
-    <section id="text-box-container">
+    <section id="text-box-container" #textBoxContainer>
         <mat-card>
             <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
                 <div [class]="'scroll-item ' + msg.class" *cdkVirtualFor="let msg of messages">
                     <div class="message-container">
-                        <p class="message">{{ msg.text }}</p>
+                        <p class="message">{{ msg.content }}</p>
                     </div>
                 </div>
             </cdk-virtual-scroll-viewport>
-            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="sendMessage()">
-                <input matInput type="text" formControlName="content" placeholder="Message..."/>
-                <button id="send-button" stype="submit" mat-flat-button color="primary"><app-icon icon="arrow-right"></app-icon></button>
+            <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
+                <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici" #messageInput />
+                <div matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
+                    <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid"><app-icon icon="arrow-right"></app-icon></button>  
+                </div>
             </form>
         </mat-card>
     </section>

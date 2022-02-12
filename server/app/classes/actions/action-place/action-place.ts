@@ -91,6 +91,10 @@ export default class ActionPlace extends ActionPlay {
     }
 
     getMessage(): string {
-        return `${this.player.name} a placé ${this.tilesToPlace.join('')}.`;
+        return `Vous avez placé ${this.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+    }
+
+    getOpponentMessage(): string {
+        return `${this.player.name} a placé ${this.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
     }
 }

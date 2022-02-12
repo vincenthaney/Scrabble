@@ -1,29 +1,46 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
-import { GameUpdateData } from '@app/classes/communication/';
+import GameUpdateData from '@app/classes/communication/game-update-data';
+import { Message } from '@app/classes/communication/message';
+import { SYSTEM_ID } from '@app/constants/game';
 import SocketService from '@app/services/socket/socket.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GamePlayController {
-    gameUpdateData: Observable<GameUpdateData>;
-    private gameUpdateSource: BehaviorSubject<GameUpdateData>;
+    gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
+    newMessageValue = new BehaviorSubject<Message>({
+        content: 'Début de la partie',
+        senderId: SYSTEM_ID,
+    });
+
     constructor(private http: HttpClient, public socketService: SocketService) {
-        this.gameUpdateSource = new BehaviorSubject<GameUpdateData>({});
-        this.gameUpdateData = this.gameUpdateSource.asObservable();
         this.configureSocket();
     }
 
     configureSocket(): void {
-        this.socketService.on('gameUpdate', (data: GameUpdateData) => this.gameUpdateSource.next(data));
+        this.socketService.on('gameUpdate', (newData: GameUpdateData) => this.gameUpdateValue.next(newData));
+        this.socketService.on('newMessage', (newMessage: Message[]) => {
+            this.newMessageValue.next(newMessage[0]);
+        });
     }
 
-    handleAction(gameId: string, playerId: string, action: ActionData) {
+    sendAction(gameId: string, playerId: string, action: ActionData) {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/action`;
-        this.http.post(endpoint, action).subscribe();
+        this.http.post(endpoint, { type: action.type, payload: action.payload }).subscribe();
+    }
+
+    sendMessage(gameId: string, playerId: string, message: Message) {
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/message`;
+        this.http.post(endpoint, message).subscribe();
+    }
+
+    sendError(gameId: string, playerId: string, message: Message) {
+        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/error`;
+        this.http.post(endpoint, message).subscribe();
     }
 }

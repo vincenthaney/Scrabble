@@ -1,11 +1,11 @@
-import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { promises } from 'fs';
-import { join } from 'path';
 import { LetterValue, Tile } from '@app/classes/tile';
-import * as TileError from './tiles.errors';
-import * as TileConst from './tile.const';
 import { LETTER_VALUES } from '@app/constants/game';
+import { promises } from 'fs';
+import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { join } from 'path';
+import * as TileConst from './tile.const';
 import { LetterDistributionData, TileData } from './tile.types';
+import * as TileError from './tiles.errors';
 
 export default class TileReserve {
     private tiles: Tile[];

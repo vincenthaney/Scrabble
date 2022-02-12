@@ -10,6 +10,7 @@ export default class ActionReserve extends ActionInfo {
         message += `\nTotal: ${total}`;
         return message;
     }
+
     getOpponentMessage(): undefined {
         return undefined;
     }

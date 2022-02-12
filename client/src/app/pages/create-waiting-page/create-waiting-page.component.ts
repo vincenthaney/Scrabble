@@ -20,7 +20,7 @@ import {
     styleUrls: ['./create-waiting-page.component.scss'],
 })
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
-    @Input() opponent: string | undefined;
+    @Input() opponentName: string | undefined;
     isStartingGame: boolean = false;
     joinRequestSubscription: Subscription;
     joinerLeaveGameSubscription: Subscription;
@@ -40,28 +40,28 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
             .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((opponentName) => this.setOpponent(opponentName));
+            .subscribe((opponentName: string) => this.setOpponent(opponentName));
         this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((leaverName) => this.opponentLeft(leaverName));
+            .subscribe((leaverName: string) => this.opponentLeft(leaverName));
     }
 
-    setOpponent(opponent: string) {
-        this.opponent = opponent;
-        this.waitingRoomMessage = this.opponent + OPPONENT_FOUND_MESSAGE;
+    setOpponent(opponentName: string) {
+        this.opponentName = opponentName;
+        this.waitingRoomMessage = this.opponentName + OPPONENT_FOUND_MESSAGE;
         this.isOpponentFound = true;
     }
 
     disconnectOpponent() {
-        if (this.opponent) {
-            this.opponent = undefined;
+        if (this.opponentName) {
+            this.opponentName = undefined;
             this.waitingRoomMessage = HOST_WAITING_MESSAGE;
             this.isOpponentFound = false;
         }
     }
 
     opponentLeft(leaverName: string) {
-        this.opponent = undefined;
+        this.opponentName = undefined;
         this.waitingRoomMessage = HOST_WAITING_MESSAGE;
         this.isOpponentFound = false;
 
@@ -81,14 +81,14 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     confirmOpponentToServer() {
         this.isStartingGame = true;
-        if (this.opponent) {
-            this.gameDispatcherService.handleConfirmation(this.opponent);
+        if (this.opponentName) {
+            this.gameDispatcherService.handleConfirmation(this.opponentName);
         }
     }
 
     confirmRejectionToServer() {
-        if (this.opponent) {
-            this.gameDispatcherService.handleRejection(this.opponent);
+        if (this.opponentName) {
+            this.gameDispatcherService.handleRejection(this.opponentName);
             this.disconnectOpponent();
         }
     }

@@ -329,6 +329,7 @@ describe('GameDispatcherService', () => {
             { letter: 'C', amount: 2 },
             { letter: 'F', amount: 8 },
         ];
+        const TILE_RESERVE_TOTAL = 3;
         let gameStub: SinonStubbedInstance<Game>;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
         let round: Round;
@@ -368,6 +369,7 @@ describe('GameDispatcherService', () => {
                 gameId: DEFAULT_GAME_ID,
                 board: gameStub.board.grid,
                 tileReserve: TILE_RESERVE_DATA,
+                tileReserveTotal: TILE_RESERVE_TOTAL,
                 round,
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);

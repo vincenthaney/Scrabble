@@ -4,7 +4,7 @@ export default abstract class AbstractPlayer {
     id: string;
     name: string;
     score: number;
-    private tiles: Tile[];
+    tiles: Tile[];
 
     constructor(id: string, name: string, tiles: Tile[]) {
         this.id = id;

@@ -1,10 +1,10 @@
 import ActionPlay from '@app/classes/actions/action-play';
-import { Tile } from '@app/classes/tile';
-import Game from '@app/classes/game/game';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import Player from '@app/classes/player/player';
-import { PlayerData } from '@app/classes/communication/player-data';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { PlayerData } from '@app/classes/communication/player-data';
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import { Tile } from '@app/classes/tile';
 
 export default class ActionExchange extends ActionPlay {
     tilesToExchange: Tile[];
@@ -40,6 +40,6 @@ export default class ActionExchange extends ActionPlay {
 
     getOpponentMessage(): string {
         const moreThanOne = this.tilesToExchange.length > 1;
-        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}.`;
+        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}`;
     }
 }

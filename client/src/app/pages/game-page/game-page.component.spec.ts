@@ -1,6 +1,7 @@
+/* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -55,8 +56,8 @@ describe('GamePageComponent', () => {
                 ReactiveFormsModule,
                 FormsModule,
                 ScrollingModule,
+                HttpClientTestingModule,
                 RouterTestingModule.withRoutes([]),
-                HttpClientModule,
             ],
             providers: [
                 {
@@ -87,6 +88,16 @@ describe('GamePageComponent', () => {
         const surrenderButton = fixture.debugElement.nativeElement.querySelector('#surrender-dialog-button');
         surrenderButton.click();
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call emitKeyboard on keyboardEvent', () => {
+        const event: KeyboardEvent = new KeyboardEvent('keypress', {
+            key: '.',
+            cancelable: true,
+        });
+        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
+        component.handleKeyboardEvent(event);
+        expect(spy).toHaveBeenCalledWith(event);
     });
 });
 

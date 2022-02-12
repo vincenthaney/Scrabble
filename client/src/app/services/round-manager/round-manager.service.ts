@@ -25,6 +25,7 @@ export default class RoundManagerService implements IResetableService {
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
 
     constructor(private gameplayController: GamePlayController, private router: Router) {
+        this.completedRounds = [];
         this.timerSource = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([new Timer(0, 0), DEFAULT_PLAYER]);
         this.timer = this.timerSource.asObservable();
         this.endRoundEvent = new EventEmitter();
@@ -32,9 +33,11 @@ export default class RoundManagerService implements IResetableService {
 
     resetServiceData(): void {
         this.gameId = '';
+        this.localPlayerId = '';
         this.completedRounds = [];
         this.maxRoundTime = 0;
         clearTimeout(this.timeout);
+        this.timerSource.complete();
     }
 
     updateRound(round: Round): void {
@@ -56,6 +59,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     getStartGameTime(): Date {
+        if (!this.completedRounds[0]) throw new Error(ROUND_ERROR.NO_START_GAME_TIME);
         return this.completedRounds[0].startTime;
     }
 
@@ -77,6 +81,6 @@ export default class RoundManagerService implements IResetableService {
             payload: {},
         };
         this.endRoundEvent.emit();
-        this.gameplayController.handleAction(this.gameId, this.getActivePlayer().id, actionPass);
+        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
     }
 }
