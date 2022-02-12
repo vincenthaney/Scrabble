@@ -7,17 +7,14 @@ import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { Action, ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import RoundManager from '@app/classes/round/round-manager';
 import { Round } from '@app/classes/round/round';
-import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, TileReserve } from '@app/classes/tile';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { expect } from 'chai';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
