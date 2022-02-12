@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
@@ -23,13 +24,14 @@ const TEST_GAME_PARAMETERS = {
     dictionary: 'français',
 };
 
-const TEST_FORM: FormGroup = new FormGroup({
+const TEST_FORM_CONTENT = {
     gameType: new FormControl(GameType.Classic, Validators.required),
     gameMode: new FormControl(GameMode.Solo, Validators.required),
     level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
     timer: new FormControl('', Validators.required),
     dictionary: new FormControl('', Validators.required),
-});
+};
+const TEST_FORM: FormGroup = new FormGroup(TEST_FORM_CONTENT);
 TEST_FORM.setValue(TEST_GAME_PARAMETERS);
 
 describe('GameDispatcherService', () => {
@@ -137,6 +139,73 @@ describe('GameDispatcherService', () => {
         });
         service.handleLobbiesUpdate(TEST_LOBBIES);
         expect(spyEmit).toHaveBeenCalledWith(TEST_LOBBIES);
+    });
+
+    describe('ngOnDestroy', () => {
+        it('should call next', () => {
+            const spy = spyOn(service.serviceDestroyed$, 'next');
+            spyOn(service.serviceDestroyed$, 'complete');
+            service.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call complete', () => {
+            spyOn(service.serviceDestroyed$, 'next');
+            const spy = spyOn(service.serviceDestroyed$, 'complete');
+            service.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('Subscriptions', () => {
+        it('should set gameId on createGameEvent', () => {
+            service.gameId = undefined;
+            service['gameDispatcherController'].createGameEvent.emit(BASE_GAME_ID);
+            expect(service.gameId as string | undefined).toEqual(BASE_GAME_ID);
+        });
+
+        it('should call handleJoinRequest on joinRequestEvent', () => {
+            const spy = spyOn(service, 'handleJoinRequest');
+            service['gameDispatcherController'].joinRequestEvent.emit(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+
+        it('should call handleJoinRequest on lobbyFullEvent', () => {
+            const spy = spyOn(service, 'handleLobbyFull');
+            service['gameDispatcherController'].lobbyFullEvent.emit();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call handleJoinRequest on lobbyRequestValidEvent', () => {
+            const spy = spyOn(service.router, 'navigateByUrl');
+            service['gameDispatcherController'].lobbyRequestValidEvent.emit();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call handleJoinRequest on canceledGameEvent', () => {
+            const spy = spyOn(service, 'handleCanceledGame');
+            service['gameDispatcherController'].canceledGameEvent.emit(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+
+        it('should call handleJoinerLeaveGame on joinerLeaveGameEvent', () => {
+            const spy = spyOn(service, 'handleJoinerLeaveGame');
+            service['gameDispatcherController'].joinerLeaveGameEvent.emit(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+
+        it('should call handleJoinerRejected on joinerRejectedEvent', () => {
+            const spy = spyOn(service, 'handleJoinerRejected');
+            service['gameDispatcherController'].joinerRejectedEvent.emit(TEST_PLAYER_NAME);
+            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+
+        it('should call handleJoinerRejected on lobbiesUpdateEvent', () => {
+            const lobbies: LobbyInfo[] = [];
+            const spy = spyOn(service, 'handleLobbiesUpdate');
+            service['gameDispatcherController'].lobbiesUpdateEvent.emit(lobbies);
+            expect(spy).toHaveBeenCalledWith(lobbies);
+        });
     });
 
     describe('handleCancelGame', () => {
@@ -264,6 +333,31 @@ describe('GameDispatcherService', () => {
             const spy = spyOn(service.joinerLeaveGameEvent, 'emit');
             service.handleJoinerLeaveGame(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+        });
+    });
+
+    describe('handleLeaveLobby', () => {
+        it('should call handleLeaveLobby if gameId is defined', () => {
+            service.gameId = BASE_GAME_ID;
+            spyOn(service, 'resetData');
+            const spy = spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
+            service.handleLeaveLobby();
+            expect(spy).toHaveBeenCalledWith(BASE_GAME_ID);
+        });
+
+        it('should not call handleLeaveLobby if gameId is undefined', () => {
+            service.gameId = undefined;
+            spyOn(service, 'resetData');
+            const spy = spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
+            service.handleLeaveLobby();
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should call resetData', () => {
+            const spy = spyOn(service, 'resetData');
+            spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
+            service.handleLeaveLobby();
+            expect(spy).toHaveBeenCalled();
         });
     });
 });
