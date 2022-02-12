@@ -9,7 +9,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import { InputControllerService } from '@app/controllers/input-controller/input-controller.service';
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
-import { INVALID_COMMAND } from './command-errors';
+import { inputParserErrors } from '@app/constants/services-errors';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE = 'this is a regular message';
@@ -84,7 +84,7 @@ describe('InputParserService', () => {
         for (const invalidOrientationString of invalidOrientationStrings) {
             expect(() => {
                 service['getOrientation'](invalidOrientationString);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrowError(inputParserErrors.INVALID_COMMAND);
         }
     });
 
@@ -101,7 +101,7 @@ describe('InputParserService', () => {
         for (const invalidLocationString of invalidLocationStrings) {
             expect(() => {
                 service['getStartPosition'](invalidLocationString);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrowError(inputParserErrors.INVALID_COMMAND);
         }
     });
 
@@ -143,7 +143,7 @@ describe('InputParserService', () => {
         for (const invalidInput of invalidLetters) {
             expect(() => {
                 service['parseExchangeLettersToTiles'](invalidInput);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrowError(inputParserErrors.INVALID_COMMAND);
         }
     });
 
@@ -167,7 +167,7 @@ describe('InputParserService', () => {
         for (const invalidInput of invalidLetters) {
             expect(() => {
                 service['parsePlaceLettersToTiles'](invalidInput);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrowError(inputParserErrors.INVALID_COMMAND);
         }
     });
 
@@ -295,7 +295,7 @@ describe('InputParserService', () => {
         for (const invalidCommand of invalidCommands) {
             expect(() => {
                 service.parseInput(invalidCommand);
-            }).toThrowError(INVALID_COMMAND);
+            }).toThrowError(inputParserErrors.INVALID_COMMAND);
         }
     });
 });
