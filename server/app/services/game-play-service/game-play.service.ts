@@ -33,7 +33,7 @@ export class GamePlayService {
             if (updatedData) updatedData.isGameOver = true;
             else updatedData = { isGameOver: true };
         }
-
+        console.log([updatedData, localPlayerFeedback, opponentFeedback]);
         return [updatedData, localPlayerFeedback, opponentFeedback];
     }
 
