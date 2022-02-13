@@ -11,7 +11,7 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-type LetterMapItem = { letter: LetterValue; amount: number };
+export type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
     selector: 'app-communication-box',
