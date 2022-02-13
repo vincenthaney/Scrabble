@@ -105,32 +105,4 @@ describe('SocketService', () => {
         (service['socket'] as unknown) = undefined;
         expect(() => service.getId()).toThrowError(SOCKET_ID_UNDEFINED);
     });
-
-    // describe('waitForConnection', () => {
-    //     const DELAY = 10;
-    //     const TIMEOUT = 1000;
-    //     const BEFORE_RESOLVE = 40;
-
-    //     it('should resolve when predicate is true', async () => {
-    //         const predicate = () => true;
-    //         await expectAsync(service.waitForConnection(predicate, DELAY, TIMEOUT)).toBeResolved();
-    //     });
-
-    //     it('should resolve when predicate will be true', async () => {
-    //         let predicateValue = false;
-    //         const predicate = () => predicateValue;
-    //         const wait = service.waitForConnection(predicate, DELAY, TIMEOUT);
-
-    //         setTimeout(() => {
-    //             predicateValue = true;
-    //         }, BEFORE_RESOLVE);
-
-    //         await expectAsync(wait).toBeResolved();
-    //     });
-
-    //     it('should reject when timeout is reached', async () => {
-    //         const predicate = () => false;
-    //         await expectAsync(service.waitForConnection(predicate, DELAY, TIMEOUT)).toBeRejectedWith(SOCKET_ERROR.TIMEOUT_REACHED);
-    //     });
-    // });
 });
