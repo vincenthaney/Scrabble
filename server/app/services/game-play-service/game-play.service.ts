@@ -1,4 +1,3 @@
-/* eslint-disable no-dupe-class-members */
 import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '@app/classes/actions';
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
@@ -8,11 +7,13 @@ import Player from '@app/classes/player/player';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
+import { FeedbackMessages } from './feedback-messages';
+
 @Service()
 export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService) {}
 
-    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, string | undefined, string | undefined] {
+    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, FeedbackMessages | void] {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
@@ -21,6 +22,8 @@ export class GamePlayService {
         const action: Action = this.getAction(player, game, actionData);
         const localPlayerFeedback = action.getMessage();
         const opponentFeedback = action.getOpponentMessage();
+        let endGameFeedback: string[] | undefined;
+
         let updatedData: void | GameUpdateData = action.execute();
 
         if (updatedData) {
@@ -32,13 +35,19 @@ export class GamePlayService {
             const nextRound = game.roundManager.nextRound(action);
             if (updatedData) updatedData.round = nextRound;
             else updatedData = { round: nextRound };
-        }
+            if (game.isGameOver()) {
+                const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame();
 
-        if (game.isGameOver()) {
-            if (updatedData) updatedData.isGameOver = true;
-            else updatedData = { isGameOver: true };
+                if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
+                else updatedData.player1 = { score: updatedScorePlayer1 };
+                if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
+                else updatedData.player2 = { score: updatedScorePlayer2 };
+
+                endGameFeedback = game.endGameMessage();
+                updatedData.isGameOver = true;
+            }
         }
-        return [updatedData, localPlayerFeedback, opponentFeedback];
+        return [updatedData, { localPlayerFeedback, opponentFeedback, endGameFeedback }];
     }
 
     getAction(player: Player, game: Game, actionData: ActionData): Action {

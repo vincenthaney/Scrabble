@@ -72,22 +72,31 @@ export class GamePlayController {
         if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
-        const [updateData, localPlayerFeedback, opponentFeedback] = this.gamePlayService.playAction(gameId, playerId, data);
+        const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
         if (updateData) {
             this.gameUpdate(gameId, updateData);
         }
-        if (localPlayerFeedback) {
+        if (!feedback) return;
+        if (feedback.localPlayerFeedback) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
-                content: localPlayerFeedback,
+                content: feedback.localPlayerFeedback,
                 senderId: SYSTEM_ID,
             });
         }
-        if (opponentFeedback) {
+        if (feedback.opponentFeedback) {
             const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
             this.socketService.emitToSocket(opponentId, 'newMessage', {
-                content: opponentFeedback,
+                content: feedback.opponentFeedback,
                 senderId: SYSTEM_ID,
             });
+        }
+        if (feedback.endGameFeedback) {
+            for (const message of feedback.endGameFeedback) {
+                this.socketService.emitToRoom(gameId, 'newMessage', {
+                    content: message,
+                    senderId: SYSTEM_ID,
+                });
+            }
         }
     }
 

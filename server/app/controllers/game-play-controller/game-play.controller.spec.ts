@@ -133,31 +133,35 @@ describe('GamePlayController', () => {
         });
 
         it('should call playAction', () => {
-            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
+            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
         });
 
         it('should call gameUpdate if updateData exists', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(gameUpdateSpy).to.have.been.called();
         });
 
         it("should not call gameUpdate if updateData doesn't exist", () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(gameUpdateSpy).to.not.have.been.called();
         });
 
-        it("should not call emitToScket if localPlayerFeedback or opponentFeedback doesn't exist", () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined, undefined]);
+        it("should not call emitToSocket if feedback doesn't exist", () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.not.have.been.called();
         });
 
         it('should call emitToScket if localPlayerFeedback exists', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, DEFAULT_FEEDBACK, DEFAULT_FEEDBACK]);
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [
+                {},
+                { localPlayerFeedback: DEFAULT_FEEDBACK, opponentFeedback: DEFAULT_FEEDBACK, endGameFeedback: undefined },
+            ]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.twice;
         });
