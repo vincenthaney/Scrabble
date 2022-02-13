@@ -18,7 +18,7 @@ import {
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER,
     ON_YOUR_TURN_ACTIONS,
-    SYSTEM_ID,
+    SYSTEM_ID
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject } from 'rxjs';
@@ -58,11 +58,11 @@ export default class InputParserService {
 
             try {
                 const actionData: ActionData = this.parseCommand(actionName, inputWords);
-                this.controller.sendMessage(this.gameService.getGameId(), playerId, {
-                    content: input,
-                    senderId: this.getLocalPlayer().id,
-                });
-                this.controller.sendAction(gameId, playerId, actionData);
+                // this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                //     content: input,
+                //     senderId: this.getLocalPlayer().id,
+                // });
+                this.controller.sendAction(gameId, playerId, actionData, input);
             } catch (e) {
                 if (e instanceof CommandError) {
                     if (e.message === CommandErrorMessages.NotYourTurn) {

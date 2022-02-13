@@ -81,6 +81,6 @@ export default class RoundManagerService implements IResetableService {
             payload: {},
         };
         this.endRoundEvent.emit();
-        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass, '');
     }
 }
