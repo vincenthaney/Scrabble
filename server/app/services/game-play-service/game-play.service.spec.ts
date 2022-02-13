@@ -22,6 +22,7 @@ const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
 const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
+const DEFAULT_PLAYER_SCORE = 5;
 const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {} };
 const INVALID_ACTION_TYPE = 'invalid action type';
 const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
@@ -57,6 +58,7 @@ describe('GamePlayService', () => {
         roundManagerStub.nextRound.returns(round);
 
         gameStub.getTilesLeftPerLetter.returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
+        gameStub.endOfGame.returns([DEFAULT_PLAYER_SCORE, DEFAULT_PLAYER_SCORE]);
 
         player = gameStub.player1;
         game = gameStub as unknown as Game;
@@ -74,6 +76,7 @@ describe('GamePlayService', () => {
 
         beforeEach(() => {
             actionStub = createStubInstance(ActionPass);
+            actionStub.willEndTurn.returns(true);
             getActionStub = stub(gamePlayService, 'getAction').returns(actionStub as unknown as Action);
             actionStub.getMessage.returns('');
             actionStub.getOpponentMessage.returns('');
@@ -113,17 +116,32 @@ describe('GamePlayService', () => {
             expect(gameStub.isGameOver.called).to.be.true;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists)', () => {
+        it('should set isGameOver to true if gameOver (updatedData exists #1)', () => {
             gameStub.isGameOver.returns(true);
+            actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            // expect(result[0]!.isGameOver).to.be.true;
+            expect(result[0]!.isGameOver).to.be.true;
+        });
+
+        it('should set isGameOver to true if gameOver (updatedData exists #2)', () => {
+            gameStub.isGameOver.returns(true);
+            actionStub.willEndTurn.returns(true);
+            actionStub.execute.returns({ player1: { score: DEFAULT_PLAYER_SCORE }, player2: { score: DEFAULT_PLAYER_SCORE } } as GameUpdateData);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(result).to.exist;
+            expect(result[0]!.isGameOver).to.be.true;
         });
 
         it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
             gameStub.isGameOver.returns(true);
-            actionStub.execute.returns(undefined);
+            actionStub.willEndTurn.returns(true);
+
+            actionStub.execute.callsFake(() => {
+                return;
+            });
+
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.isGameOver).to.be.true;
