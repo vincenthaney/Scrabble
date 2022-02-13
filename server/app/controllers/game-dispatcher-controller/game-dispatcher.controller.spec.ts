@@ -308,12 +308,11 @@ describe('GameDispatcherController', () => {
     describe('handleRejectRequest', () => {
         let rejectSpy: unknown;
         let emitToSocketSpy: unknown;
-        const playerStub = createStubInstance(Player);
-        playerStub.getId.returns('1');
+        const player = new Player('id', 'name');
         const hostName = 'hostName';
 
         beforeEach(() => {
-            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => [playerStub, hostName]);
+            rejectSpy = chai.spy.on(controller['gameDispatcherService'], 'rejectJoinRequest', () => [player, hostName]);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
         });
 
@@ -385,7 +384,7 @@ describe('GameDispatcherController', () => {
         it('should call socketService.emitToSocket', () => {
             waitingRoomStub.joinedPlayer = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
             chai.spy.on(waitingRoomStub, 'getConfig', () => {
-                return { player1: createStubInstance(Player) };
+                return { player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME) };
             });
             controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(emitToSocketSpy).to.have.been.called();
