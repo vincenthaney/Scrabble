@@ -29,3 +29,4 @@ export const HELP_ACTIONS: HelpAction[] = [
 export const START_TILES_AMOUNT = 7;
 export const TILE_RESERVE_THRESHOLD = 7;
 export const LETTER_DISTRIBUTION_RELATIVE_PATH = '../../../assets/letter-distribution.json';
+export const END_GAME_HEADER_MESSAGE = 'Fin de partie - lettres restantes';
