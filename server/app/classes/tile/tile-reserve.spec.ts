@@ -98,11 +98,12 @@ describe('TileReserve', () => {
         testGetTilesOnSuccess(amountToRemove, totalTiles);
     });
 
-    it('getTiles: should throw error when get more than amount in reserve.', () => {
+    it('getTiles: should return every tile left when trying to get more than amount in reserve.', () => {
         const totalTiles = tileReserve.getTilesLeft();
         const amountToRemove = totalTiles + 1;
-
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(TileError.NOT_ENOUGH_TILES);
+        const result = tileReserve.getTiles(amountToRemove);
+        expect(result.length).to.equal(totalTiles);
+        expect(tileReserve.getTilesLeft()).to.equal(0);
     });
 
     it('swapTiles: should throw error when swapping no tiles', () => {

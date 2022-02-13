@@ -116,7 +116,7 @@ describe('GamePlayController', () => {
             gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_1.name);
             gameStub.player2 = new Player(DEFAULT_PLAYER_ID + '2', DEFAULT_PLAYER_2.name);
             boardStub.grid = DEFAULT_BOARD.map((row) => row.map((s) => ({ ...s })));
-            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+            gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
             gameStub.board = boardStub as unknown as Board;
             gameStub['id'] = DEFAULT_GAME_ID;
             gameStub.getOpponentPlayer.returns(gameStub.player2);
