@@ -218,7 +218,6 @@ describe('CommunicationBoxComponent', () => {
 
             expect(component.lettersLeft).toEqual(expectedLettersLeft);
             expect(component.lettersLeftTotal).toEqual(expectedLettersLeftTotal);
-            
         });
     });
 });
