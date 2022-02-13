@@ -46,7 +46,7 @@ export default class GameDispatcherService implements OnDestroy {
             .subscribe(() => this.handleLobbyFull());
         this.joinRequestValidSubscription = this.gameDispatcherController.lobbyRequestValidEvent
             .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe(async () => this.router.navigateByUrl('join-waiting'));
+            .subscribe(async () => this.router.navigateByUrl('join-waiting-room'));
         this.canceledGameSubscription = this.gameDispatcherController.canceledGameEvent
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((hostName: string) => this.handleCanceledGame(hostName));

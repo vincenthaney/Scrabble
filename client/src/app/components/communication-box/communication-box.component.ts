@@ -49,10 +49,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
 
-        this.gameService.updateTileReserveEvent.subscribe(({ tileReserve, tileReserveTotal }) => {
+        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
         });
-        this.gameService.newMessageValue.subscribe((newMessage) => {
+        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
     }
@@ -66,7 +66,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnDestroy(): void {
-        this.gameService.updateTileReserveEvent.unsubscribe();
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }

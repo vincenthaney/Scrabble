@@ -7,12 +7,12 @@ import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
-    DIALOG_BUTTON_CONTENT,
+    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCELED_CONTENT,
     DIALOG_CANCELED_TITLE,
     DIALOG_FULL_CONTENT,
     DIALOG_FULL_TITLE,
-} from './lobby-page.component.const';
+} from '@app/constants/pages-constants';
 
 @Component({
     selector: 'app-lobby-page',
@@ -79,7 +79,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
                 content: DIALOG_FULL_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
                         closeDialog: true,
                     },
                 ],
@@ -94,7 +94,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
                 content: DIALOG_CANCELED_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
                         closeDialog: true,
                     },
                 ],

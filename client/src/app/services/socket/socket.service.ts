@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import * as SOCKET_ERROR from './socket.service.error';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -32,7 +34,7 @@ export default class SocketService {
     }
 
     getId(): string {
-        if (!this.socket) throw new Error(SOCKET_ERROR.SOCKET_ID_UNDEFINED);
+        if (!this.socket) throw new Error(SOCKET_ID_UNDEFINED);
 
         return this.socket.id;
     }

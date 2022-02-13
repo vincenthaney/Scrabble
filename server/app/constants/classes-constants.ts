@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 interface HelpAction {
     command: string;
     usage?: string;
@@ -24,3 +25,8 @@ export const HELP_ACTIONS: HelpAction[] = [
         description: 'affiche les lettres dans la réserve',
     },
 ];
+
+export const START_TILES_AMOUNT = 7;
+export const TILE_RESERVE_THRESHOLD = 7;
+export const LETTER_DISTRIBUTION_RELATIVE_PATH = '../../../assets/letter-distribution.json';
+export const END_GAME_HEADER_MESSAGE = 'Fin de partie - lettres restantes';
