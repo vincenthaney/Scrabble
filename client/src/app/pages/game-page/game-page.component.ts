@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameService } from '@app/services';
+import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 
 @Component({
     selector: 'app-game-page',
@@ -9,7 +10,12 @@ import { GameService } from '@app/services';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(public surrenderDialog: MatDialog, public gameService: GameService) {}
+    constructor(public surrenderDialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService) {}
+
+    @HostListener('document:keypress', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        this.focusableComponentService.emitKeyboard(event);
+    }
 
     openDialog() {
         this.surrenderDialog.open(DefaultDialogComponent, {

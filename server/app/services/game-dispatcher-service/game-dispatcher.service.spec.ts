@@ -124,7 +124,7 @@ describe('GameDispatcherService', () => {
             tileReserveStub = createStubInstance(TileReserve);
             tileReserveStub.init.returns(Promise.resolve());
             gameStub = createStubInstance(Game);
-            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+            gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
             spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () =>
                 Promise.resolve(gameStub as unknown as Game),
             );
@@ -319,16 +319,20 @@ describe('GameDispatcherService', () => {
         const DEFAULT_MAP = new Map<LetterValue, number>([
             ['A', 1],
             ['B', 2],
+            ['C', 2],
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            ['F', 8],
         ]);
         const TILE_RESERVE_DATA: TileReserveData[] = [
             { letter: 'A', amount: 1 },
             { letter: 'B', amount: 2 },
+            { letter: 'C', amount: 2 },
+            { letter: 'F', amount: 8 },
         ];
         const TILE_RESERVE_TOTAL = 13;
         let gameStub: SinonStubbedInstance<Game>;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
         let round: Round;
-        let tileReserveStub: SinonStubbedInstance<TileReserve>;
         let boardStub: SinonStubbedInstance<Board>;
         let game: Game;
 
@@ -338,16 +342,14 @@ describe('GameDispatcherService', () => {
             boardStub = createStubInstance(Board);
 
             roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-            tileReserveStub = createStubInstance(TileReserve);
             gameStub.player1 = PLAYER_1;
             gameStub.player2 = PLAYER_2;
-            tileReserveStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+            gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
             gameStub.gameType = GameType.Classic;
             gameStub.dictionnaryName = DEFAULT_DICTIONARY;
             gameStub.getId.returns(DEFAULT_GAME_ID);
             gameStub.board = boardStub;
             gameStub.board.grid = [[]];
-            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
             gameStub.roundManager = roundManagerStub as unknown as RoundManager;
 
             round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };

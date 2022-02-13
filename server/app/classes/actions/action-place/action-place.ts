@@ -1,4 +1,4 @@
-import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
+// import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Orientation, Position } from '@app/classes/board';
@@ -9,18 +9,17 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-
-// TODO: CHANGE THESE WITH THE REAL THINGS
-// eslint-disable-next-line @typescript-eslint/naming-convention, no-unused-vars
-export const WordValidator = { validate: (s: string[]) => true };
-// eslint-disable-next-line @typescript-eslint/naming-convention, no-unused-vars
-export const ScoreComputer = { compute: (c: [Square, Tile][][]) => 0 };
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { DICTIONARY_NAME } from '@app/services/words-verification-service/words-verification.service.const';
+import { ActionErrorsMessages } from './action-errors';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
     startPosition: Position;
     orientation: Orientation;
-
+    private scoreCalculator: ScoreCalculatorService;
+    private wordValidator: WordsVerificationService;
     constructor(player: Player, game: Game, tilesToPlace: Tile[], startPosition: Position, orientation: Orientation) {
         super(player, game);
         this.tilesToPlace = tilesToPlace;
@@ -30,27 +29,22 @@ export default class ActionPlace extends ActionPlay {
 
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
-
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
+        if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        // extract tiles from createdWords to have the words as string
-        const wordsString = createdWords.map((word) => word.reduce((previous, [, tile]) => (previous += tile.letter), ''));
+        this.wordValidator.verifyWords(this.wordToString(createdWords), DICTIONARY_NAME);
 
-        const areValidWords = WordValidator.validate(wordsString);
+        const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        if (!areValidWords) throw new Error(ERROR_INVALID_WORD);
+        const updatedSquares = this.updateBoard(createdWords);
 
-        const scoredPoints = ScoreComputer.compute(createdWords);
-
-        const updatedBoard = this.updateBoard(createdWords, this.game);
-
-        this.player.tiles = unplayedTiles.concat(this.game.tileReserve.getTiles(tilesToPlace.length));
+        this.player.tiles = unplayedTiles.concat(this.game.getTilesFromReserve(tilesToPlace.length));
         this.player.score += scoredPoints;
 
         const playerData: PlayerData = { tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedBoard };
+        const response: GameUpdateData = { board: updatedSquares };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
@@ -58,21 +52,42 @@ export default class ActionPlace extends ActionPlay {
         return response;
     }
 
-    updateBoard(words: [Square, Tile][][], game: Game): Square[] {
-        const board: Square[] = [];
+    wordToString(words: [Square, Tile][][]): string[] {
+        return words.map((word) => word.reduce((previous, [, tile]) => (previous += tile.letter), ''));
+    }
 
+    isLegalPlacement(words: [Square, Tile][][]): boolean {
+        const isAdjacentToPlacedTile = this.amountOfLettersInWords(words) !== this.tilesToPlace.length;
+        if (isAdjacentToPlacedTile) {
+            return true;
+        } else {
+            return this.containsCenterSquare(words);
+        }
+    }
+
+    amountOfLettersInWords(words: [Square, Tile][][]): number {
+        return words.reduce((lettersInWords, word) => (lettersInWords += word.length), 0);
+    }
+
+    containsCenterSquare(words: [Square, Tile][][]): boolean {
+        return words.some((word) => word.some(([square]) => square.isCenter));
+    }
+
+    updateBoard(words: [Square, Tile][][]): Square[] {
+        const updatedSquares: Square[] = [];
         for (const word of words) {
             for (const [square, tile] of word) {
                 if (!square.tile) {
                     square.tile = tile;
+                    square.wasMultiplierUsed = true;
                     const position = square.position;
-                    board.push(square);
-                    game.board.placeTile(tile, position);
+                    updatedSquares.push(square);
+                    this.game.board.placeTile(tile, position);
                 }
             }
         }
 
-        return board;
+        return updatedSquares;
     }
 
     getMessage(): string {

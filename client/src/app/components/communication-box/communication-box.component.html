@@ -18,7 +18,7 @@
             </mat-expansion-panel>
         </mat-accordion>
     </section>
-    <section id="text-box-container">
+    <section id="text-box-container" #textBoxContainer>
         <mat-card>
             <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
                 <div [class]="'scroll-item ' + msg.class" *cdkVirtualFor="let msg of messages">
@@ -28,7 +28,7 @@
                 </div>
             </cdk-virtual-scroll-viewport>
             <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
-                <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici"/>
+                <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici" #messageInput />
                 <div matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
                     <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid"><app-icon icon="arrow-right"></app-icon></button>  
                 </div>

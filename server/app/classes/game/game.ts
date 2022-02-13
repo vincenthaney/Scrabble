@@ -4,6 +4,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { MultiplayerGameConfig } from './game-config';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from './game.const';
 import { GameType } from './game.type';
@@ -12,14 +13,15 @@ export const GAME_OVER_PASS_THRESHOLD = 6;
 
 export default class Game {
     private static boardService: BoardService;
-    player1: Player;
-    player2: Player;
     roundManager: RoundManager;
+    // Not used yet, for future features
     wordsPlayed: string[];
     gameType: GameType;
-    tileReserve: TileReserve;
     board: Board;
     dictionnaryName: string;
+    player1: Player;
+    player2: Player;
+    private tileReserve: TileReserve;
     private id: string;
 
     static getBoardService(): BoardService {
@@ -63,8 +65,24 @@ export default class Game {
         return `Félicitations à ${winner} pour votre victoire!`;
     }
 
+    getTilesFromReserve(amount: number): Tile[] {
+        return this.tileReserve.getTiles(amount);
+    }
+
+    swapTilesFromReserve(tilesToSwap: Tile[]): Tile[] {
+        return this.tileReserve.swapTiles(tilesToSwap);
+    }
+
+    getTilesLeftPerLetter(): Map<LetterValue, number> {
+        return this.tileReserve.getTilesLeftPerLetter();
+    }
+
     getId() {
         return this.id;
+    }
+
+    async initTileReserve() {
+        return this.tileReserve.init();
     }
 
     getRequestingPlayer(playerId: string): Player {
