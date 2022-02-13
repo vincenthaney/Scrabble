@@ -56,7 +56,7 @@ describe('RoundManagerService', () => {
     };
 
     beforeEach(() => {
-        gameplayControllerSpy = jasmine.createSpyObj('GamePlayController', ['handleAction']);
+        gameplayControllerSpy = jasmine.createSpyObj('GamePlayController', ['sendAction']);
     });
 
     beforeEach(() => {
@@ -225,7 +225,7 @@ describe('RoundManagerService', () => {
                 return;
             });
             spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
-            gameplayControllerSpy.handleAction.and.callFake(() => {
+            gameplayControllerSpy.sendAction.and.callFake(() => {
                 return;
             });
         });
@@ -242,7 +242,7 @@ describe('RoundManagerService', () => {
         it('RoundTimeout should not send pass event if the local player is not the active player', () => {
             spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
             service.roundTimeout();
-            expect(gameplayControllerSpy.handleAction).not.toHaveBeenCalled();
+            expect(gameplayControllerSpy.sendAction).not.toHaveBeenCalled();
         });
 
         it('RoundTimeout should emit endRoundEvent', fakeAsync(() => {
@@ -269,7 +269,7 @@ describe('RoundManagerService', () => {
             };
 
             service.roundTimeout();
-            expect(gameplayControllerSpy.handleAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
+            expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
         }));
     });
 });
