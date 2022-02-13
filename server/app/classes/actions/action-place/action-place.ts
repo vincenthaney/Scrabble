@@ -12,6 +12,7 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { DICTIONARY_NAME } from '@app/services/words-verification-service/words-verification.service.const';
+import { ActionErrorsMessages } from './action-errors';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -30,7 +31,7 @@ export default class ActionPlace extends ActionPlay {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
-        if (!this.isLegalPlacement(createdWords)) throw new Error('COMMANDE INVALIDE');
+        if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
         this.wordValidator.verifyWords(this.wordToString(createdWords), DICTIONARY_NAME);
 
@@ -56,7 +57,8 @@ export default class ActionPlace extends ActionPlay {
     }
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {
-        if (this.amountOfLettersInWords(words) !== this.tilesToPlace.length) {
+        const isAdjacentToPlacedTile = this.amountOfLettersInWords(words) !== this.tilesToPlace.length;
+        if (isAdjacentToPlacedTile) {
             return true;
         } else {
             return this.containsCenterSquare(words);

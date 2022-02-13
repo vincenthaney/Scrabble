@@ -19,6 +19,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
+import { ActionErrorsMessages } from './action-errors';
 
 const expect = chai.expect;
 
@@ -205,7 +206,7 @@ describe('ActionPlace', () => {
                 isLegalPlacementStub.restore();
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(false);
                 const result = () => action.execute();
-                expect(result).to.throw('COMMANDE INVALIDE');
+                expect(result).to.throw(ActionErrorsMessages.ImpossibleAction);
             });
 
             it('should return update', () => {
