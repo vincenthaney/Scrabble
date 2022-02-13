@@ -56,6 +56,8 @@ const EXTRACT_RETURN: [Square, Tile][][] = [
         [{ ...DEFAULT_SQUARE_2 }, { ...DEFAULT_TILE_B }],
     ],
 ];
+const EXTRACT_RETURN_LETTERS = 2;
+
 const EXTRACT_CENTER: [Square, Tile][][] = [
     [
         [{ ...DEFAULT_SQUARE_CENTER }, { ...DEFAULT_TILE_A }],
@@ -144,7 +146,7 @@ describe('ActionPlace', () => {
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                getTilesSpy = chai.spy.on(game, 'getTiles', () => GET_TILES_RETURN);
+                getTilesSpy = chai.spy.on(game, 'getTilesFromReserve', () => GET_TILES_RETURN);
                 // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
                 wordToStringSpy = chai.spy.on(ActionPlace.prototype, 'wordToString', () => []);
             });
@@ -275,6 +277,18 @@ describe('ActionPlace', () => {
         });
     });
 
+    describe('getOpponentMessage', () => {
+        let action: ActionPlace;
+
+        beforeEach(() => {
+            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        });
+
+        it('should return OpponentMessage', () => {
+            expect(action.getOpponentMessage()).to.exist;
+        });
+    });
+
     describe('amountOfLettersInWords', () => {
         let action: ActionPlace;
 
@@ -283,7 +297,7 @@ describe('ActionPlace', () => {
         });
 
         it('should return the correct number of tiles', () => {
-            expect(action.amountOfLettersInWords(EXTRACT_RETURN)).to.equal(2);
+            expect(action.amountOfLettersInWords(EXTRACT_RETURN)).to.equal(EXTRACT_RETURN_LETTERS);
         });
     });
 

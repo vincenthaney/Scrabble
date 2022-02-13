@@ -29,9 +29,7 @@ export default class ActionPlace extends ActionPlay {
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
         const wordExtraction = new WordExtraction(this.game.board);
-        // TODO: Catch errors from extraction and make it a message
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
-        // TODO: Use mathilde's errors and correctly catch it
         if (!this.isLegalPlacement(createdWords)) throw new Error('COMMANDE INVALIDE');
 
         this.wordValidator.verifyWords(this.wordToString(createdWords), DICTIONARY_NAME);
