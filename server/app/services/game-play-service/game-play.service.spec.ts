@@ -171,7 +171,7 @@ describe('GamePlayService', () => {
 
         it('should call getMessage from action', () => {
             gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
-            expect(actionStub.getMessage()).to.have.been.called();
+            expect(actionStub.getMessage.calledOnce).to.be.true;
         });
 
         it('should return localPlayerFeedback equal to getMessage from action', () => {
@@ -181,7 +181,7 @@ describe('GamePlayService', () => {
 
         it('should call getOpponentMessage from action', () => {
             gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
-            expect(actionStub.getOpponentMessage()).to.have.been.called();
+            expect(actionStub.getOpponentMessage.calledOnce).to.be.true;
         });
 
         it('should return opponentFeedback equal to getOppnentMessage from action', () => {
