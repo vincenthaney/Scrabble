@@ -49,11 +49,6 @@ describe('SocketService', () => {
             service.connect();
             expect(service['socket']).toBeTruthy();
         });
-
-        it('should be connected on connect', async () => {
-            await service.connect();
-            expect(service['socket'].connected).toBeTrue();
-        });
     });
 
     it('isSocketAlive should return true if the socket is still connected', () => {
