@@ -66,6 +66,7 @@ export const MAX_TILE_PER_PLAYER = 7;
 export const DEFAULT_PLAYER = new Player('id', 'name', []);
 
 export const SYSTEM_ID = 'system';
+export const SYSTEM_ERROR_ID = 'system-error';
 
 export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
 
