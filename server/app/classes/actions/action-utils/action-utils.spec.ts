@@ -50,6 +50,21 @@ describe('ActionUtils', () => {
 
             s.restore();
         });
+
+        it('should return tile with isBlank and playedLetter if *', () => {
+            const playerTiles: Tile[] = [
+                { letter: 'A', value: 0 },
+                { letter: '*', value: 0 },
+            ];
+            const tilesToPlay: Tile[] = [{ letter: 'B', value: 0 }];
+
+            player.tiles = playerTiles;
+
+            const [[tile]] = ActionUtils.getTilesFromPlayer(tilesToPlay, player);
+
+            expect(tile.isBlank).to.be.true;
+            expect(tile.playedLetter).to.be(tilesToPlay[0].letter);
+        });
     });
 
     describe('getIndexOfTile', () => {

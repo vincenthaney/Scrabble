@@ -11,7 +11,10 @@ export class ActionUtils {
             const index = this.getIndexOfTile(unplayedTiles, tile, allowWildcard);
             if (index >= 0) {
                 const playerTile = unplayedTiles.splice(index, 1)[0];
-                if (this.isBlankTile(playerTile)) playerTile.playedLetter = tile.letter;
+                if (this.isBlankTile(playerTile)) {
+                    playerTile.playedLetter = tile.letter;
+                    playerTile.isBlank = true;
+                }
                 playedTiles.push(playerTile);
             } else {
                 throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);

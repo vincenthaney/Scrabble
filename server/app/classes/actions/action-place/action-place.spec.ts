@@ -341,6 +341,16 @@ describe('ActionPlace', () => {
         it('should return the word', () => {
             expect(action.wordToString(EXTRACT_RETURN)).to.deep.equal(['AB']);
         });
+
+        it('should return word when tile has playedLetter', () => {
+            const tiles: [Square, Tile][][] = [
+                [
+                    [{} as unknown as Square, { letter: 'A', value: 0 }],
+                    [{} as unknown as Square, { letter: '*', value: 0, playedLetter: 'B' }],
+                ],
+            ];
+            expect(action.wordToString(tiles)).to.deep.equal(['AB']);
+        });
     });
 
     describe('isLegalPlacement', () => {
