@@ -117,7 +117,7 @@ describe('Game', () => {
             expect(game.getId()).to.exist;
         });
 
-        it('initTileReserve should return an id', async () => {
+        it('initTileReserve should call init ', async () => {
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const initStub = tileReserveStub.init.callsFake(async () => {});
             await game.initTileReserve();
