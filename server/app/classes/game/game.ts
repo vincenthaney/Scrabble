@@ -6,6 +6,7 @@ import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { MultiplayerGameConfig } from './game-config';
+import { GameInfoData } from './game-info';
 import { START_TILES_AMOUNT } from './game.const';
 import { GameType } from './game.type';
 
@@ -82,14 +83,14 @@ export default class Game {
     }
 
     getRequestingPlayer(playerId: string): Player {
-        if (this.player1.getId() === playerId) return this.player1;
-        if (this.player2.getId() === playerId) return this.player2;
+        if (this.player1.id === playerId) return this.player1;
+        if (this.player2.id === playerId) return this.player2;
         throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
     }
 
     getOpponentPlayer(playerId: string): Player {
-        if (this.player1.getId() === playerId) return this.player2;
-        if (this.player2.getId() === playerId) return this.player1;
+        if (this.player1.id === playerId) return this.player2;
+        if (this.player2.id === playerId) return this.player1;
         throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
     }
 
@@ -99,9 +100,18 @@ export default class Game {
 
     isPlayer1(arg: string | Player): boolean {
         if (arg instanceof Player) {
-            return this.player1.getId() === arg.getId();
+            return this.player1.id === arg.id;
         } else {
-            return this.player1.getId() === arg;
+            return this.player1.id === arg;
         }
+    }
+    getInfoData(): GameInfoData {
+        return {
+            player1: this.player1,
+            player2: this.player2,
+            round: this.roundManager.getCurrentRound(),
+            board: this.board.grid,
+            isGameOver: this.isGameOver(),
+        };
     }
 }
