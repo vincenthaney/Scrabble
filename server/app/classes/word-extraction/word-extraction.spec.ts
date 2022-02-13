@@ -7,9 +7,8 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { expect } from 'chai';
-import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
+import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { WordExtraction } from './word-extraction';
-import { EXTRACTION_SQUARE_ALREADY_FILLED } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
 
 type LetterOrEmpty = LetterValue | ' ';

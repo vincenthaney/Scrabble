@@ -3,6 +3,7 @@
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/errors';
+import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from '@app/constants/services-constants/words-verification.service.const';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -11,8 +12,8 @@ import * as fs from 'fs';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { join } from 'path';
 import { WordsVerificationService } from './words-verification.service';
-import { DICTIONARY_NAME, DICTIONARY_RELATIVE_PATH } from './words-verification.service.const';
 import { DictionaryData } from './words-verification.service.types';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 import path = require('path');
 
 chai.use(spies);

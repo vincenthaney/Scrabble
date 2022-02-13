@@ -1,6 +1,6 @@
 import { Tile } from '@app/classes/tile';
 import Player from '@app/classes/player/player';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/classes/actions/action-error';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 export class ActionUtils {
     static getTilesFromPlayer(tilesToPlay: Tile[], player: Player, allowWildcard: boolean = true): [played: Tile[], unplayed: Tile[]] {

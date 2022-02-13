@@ -7,12 +7,12 @@ import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
-    DIALOG_BUTTON_CONTENT,
+    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
     OPPONENT_FOUND_MESSAGE,
-} from './create-waiting-page.component.const';
+} from '@app/constants/pages-constants';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -71,7 +71,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
                 content: leaverName + DIALOG_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT,
+                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
                         closeDialog: true,
                     },
                 ],

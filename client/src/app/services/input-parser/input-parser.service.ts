@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
@@ -21,7 +21,8 @@ import {
     SYSTEM_ID
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { GameService } from '..';
 import { CommandErrorMessages, PLAYER_NOT_FOUND } from './command-error-messages';
 import CommandError from './command-errors';
@@ -31,16 +32,23 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
 @Injectable({
     providedIn: 'root',
 })
-export default class InputParserService {
+export default class InputParserService implements OnDestroy {
+    serviceDestroyed$: Subject<boolean> = new Subject();
+
     private newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
         senderId: SYSTEM_ID,
     });
 
     constructor(private controller: GamePlayController, private gameService: GameService) {
-        this.gameService.newMessageValue.subscribe((newMessage) => {
+        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
             this.emitNewMessage(newMessage);
         });
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     emitNewMessage(newMessage: Message): void {

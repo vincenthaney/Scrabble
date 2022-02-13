@@ -4,9 +4,14 @@ import * as mock from 'mock-fs'; // required when running test. Otherwise compil
 import { join } from 'path';
 import Tile from './tile';
 import TileReserve from './tile-reserve';
-import * as TileConst from './tile.const';
 import { LetterDistributionData, LetterValue } from './tile.types';
-import * as TileError from './tiles.errors';
+import {
+    AMOUNT_MUST_BE_GREATER_THAN_1,
+    MUST_HAVE_7_TILES_TO_SWAP,
+    TILE_NOT_IN_RESERVE,
+    TILE_RESERVE_MUST_BE_INITIATED,
+} from '@app/constants/classes-errors';
+import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
 
 const mockLetterDistribution: LetterDistributionData = {
     tiles: [
@@ -19,7 +24,7 @@ const mockLetterDistribution: LetterDistributionData = {
 // mockPaths must be of type any because keys must be dynamic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockPaths: any = [];
-mockPaths[join(__dirname, TileConst.LETTER_DISTRIBUTION_RELATIVE_PATH)] = JSON.stringify(mockLetterDistribution);
+mockPaths[join(__dirname, LETTER_DISTRIBUTION_RELATIVE_PATH)] = JSON.stringify(mockLetterDistribution);
 
 describe('TileReserve', () => {
     let tileReserve: TileReserve;
@@ -65,7 +70,7 @@ describe('TileReserve', () => {
 
     it('getTiles: should throw error when get 0 tiles', () => {
         const amountToRemove = 0;
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(AMOUNT_MUST_BE_GREATER_THAN_1);
     });
 
     it('getTiles: should remove tiles when getTiles (1)', () => {
@@ -98,16 +103,17 @@ describe('TileReserve', () => {
         testGetTilesOnSuccess(amountToRemove, totalTiles);
     });
 
-    it('getTiles: should throw error when get more than amount in reserve.', () => {
+    it('getTiles: should return every tile left when trying to get more than amount in reserve.', () => {
         const totalTiles = tileReserve.getTilesLeft();
         const amountToRemove = totalTiles + 1;
-
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(TileError.NOT_ENOUGH_TILES);
+        const result = tileReserve.getTiles(amountToRemove);
+        expect(result.length).to.equal(totalTiles);
+        expect(tileReserve.getTilesLeft()).to.equal(0);
     });
 
     it('swapTiles: should throw error when swapping no tiles', () => {
         const tiles: Tile[] = [];
-        expect(() => tileReserve.swapTiles(tiles)).to.throw(TileError.AMOUNT_MUST_BE_GREATER_THAN_1);
+        expect(() => tileReserve.swapTiles(tiles)).to.throw(AMOUNT_MUST_BE_GREATER_THAN_1);
     });
 
     it('swapTiles: should contain the same amount of tiles, but not the same instances (1)', () => {
@@ -146,14 +152,14 @@ describe('TileReserve', () => {
         const amount = tileReserve.getTilesLeft() - 3;
         const tiles: Tile[] = tileReserve.getTiles(amount - 3);
 
-        expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(TileError.MUST_HAVE_7_TILES_TO_SWAP);
+        expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
     });
 
     it('removeTile: should throw error when tile is not in reserve', () => {
         const tile = tileReserve.getTiles(1);
 
         // eslint-disable-next-line dot-notation
-        expect(() => tileReserve['removeTile'](tile[0])).to.throw(TileError.TILE_NOT_IN_RESERVE);
+        expect(() => tileReserve['removeTile'](tile[0])).to.throw(TILE_NOT_IN_RESERVE);
     });
 
     const testGetTilesOnSuccess = (amount: number, total: number) => {
@@ -191,18 +197,18 @@ describe('TileReserve: uninitialized', () => {
     });
 
     it('should throw error when getTile while uninitialized', () => {
-        expect(() => tileReserve.getTiles(0)).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTiles(0)).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
     });
 
     it('should throw error when swapTile while uninitialized', () => {
-        expect(() => tileReserve.swapTiles([])).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.swapTiles([])).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
     });
 
     it('should throw error when getTilesLeft while uninitialized', () => {
-        expect(() => tileReserve.getTilesLeft()).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTilesLeft()).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
     });
 
     it('should throw error when getTilesLeftPerLetter while uninitialized', () => {
-        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(TileError.TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
     });
 });

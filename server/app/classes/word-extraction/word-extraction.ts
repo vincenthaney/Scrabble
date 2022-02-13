@@ -2,9 +2,8 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import { Tile } from '@app/classes/tile';
-import { EXTRACTION_SQUARE_ALREADY_FILLED } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
-import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
+import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 export class WordExtraction {
     constructor(private board: Board) {}

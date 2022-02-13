@@ -2,24 +2,26 @@ import Board from '@app/classes/board/board';
 import Player from '@app/classes/player/player';
 import RoundManager from '@app/classes/round/round-manager';
 import TileReserve from '@app/classes/tile/tile-reserve';
-import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { MultiplayerGameConfig } from './game-config';
-import { START_TILES_AMOUNT } from './game.const';
+import { START_TILES_AMOUNT } from '@app/constants/classes-constants';
 import { GameType } from './game.type';
+import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
 
 export default class Game {
     private static boardService: BoardService;
-    player1: Player;
-    player2: Player;
     roundManager: RoundManager;
+    // Not used yet, for future features
     wordsPlayed: string[];
     gameType: GameType;
-    tileReserve: TileReserve;
     board: Board;
     dictionnaryName: string;
+    player1: Player;
+    player2: Player;
+    private tileReserve: TileReserve;
     private id: string;
 
     static getBoardService(): BoardService {
@@ -59,20 +61,36 @@ export default class Game {
         throw new Error('Solo mode not implemented');
     }
 
+    getTilesFromReserve(amount: number): Tile[] {
+        return this.tileReserve.getTiles(amount);
+    }
+
+    swapTilesFromReserve(tilesToSwap: Tile[]): Tile[] {
+        return this.tileReserve.swapTiles(tilesToSwap);
+    }
+
+    getTilesLeftPerLetter(): Map<LetterValue, number> {
+        return this.tileReserve.getTilesLeftPerLetter();
+    }
+
     getId() {
         return this.id;
+    }
+
+    async initTileReserve() {
+        return this.tileReserve.init();
     }
 
     getRequestingPlayer(playerId: string): Player {
         if (this.player1.getId() === playerId) return this.player1;
         if (this.player2.getId() === playerId) return this.player2;
-        throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
     getOpponentPlayer(playerId: string): Player {
         if (this.player1.getId() === playerId) return this.player2;
         if (this.player2.getId() === playerId) return this.player1;
-        throw new Error(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
     isGameOver(): boolean {

@@ -5,10 +5,9 @@ import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/clas
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
+import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
-
 @Service()
 export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService) {}
@@ -25,7 +24,7 @@ export class GamePlayService {
         let updatedData: void | GameUpdateData = action.execute();
 
         if (updatedData) {
-            updatedData.tileReserve = Array.from(game.tileReserve.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
+            updatedData.tileReserve = Array.from(game.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
             updatedData.tileReserveTotal = updatedData.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
         }
 

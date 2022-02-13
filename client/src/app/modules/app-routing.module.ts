@@ -14,7 +14,7 @@ const routes: Routes = [
     { path: 'game-creation', component: GameCreationPageComponent },
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'waiting-room', component: CreateWaitingPageComponent },
-    { path: 'join-waiting', component: JoinWaitingPageComponent },
+    { path: 'join-waiting-room', component: JoinWaitingPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
