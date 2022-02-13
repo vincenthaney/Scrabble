@@ -209,57 +209,82 @@ describe('GameDispatcherService', () => {
     });
 
     describe('handleCancelGame', () => {
+        let cancelGameSpy: jasmine.Spy;
+        let resetDataSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            cancelGameSpy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
+            resetDataSpy = spyOn(service, 'resetData');
+        });
+
+        afterEach(() => {
+            cancelGameSpy.calls.reset();
+            resetDataSpy.calls.reset();
+        });
+
         it('should call handleCancelGame if gameId is defined', () => {
             service.gameId = BASE_GAME_ID;
-            const spy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
             service.handleCancelGame();
-            expect(spy).toHaveBeenCalledWith(BASE_GAME_ID);
+            expect(cancelGameSpy).toHaveBeenCalledWith(BASE_GAME_ID);
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
             service.gameId = undefined;
-            const spy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
             service.handleCancelGame();
-            expect(spy).not.toHaveBeenCalled();
+            expect(cancelGameSpy).not.toHaveBeenCalled();
         });
 
         it('should call resetData', () => {
-            spyOn(service['gameDispatcherController'], 'handleCancelGame');
-            const spy = spyOn(service, 'resetData');
             service.handleCancelGame();
-            expect(spy).toHaveBeenCalled();
+            expect(resetDataSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleConfirmation', () => {
+        let confirmationSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
+        });
+
+        afterEach(() => {
+            confirmationSpy.calls.reset();
+        });
+
         it('should call handleCancelGame if gameId is defined', () => {
             service.gameId = BASE_GAME_ID;
-            const spy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
             service.handleConfirmation(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
+            expect(confirmationSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
             service.gameId = undefined;
-            const spy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
             service.handleConfirmation(TEST_PLAYER_NAME);
-            expect(spy).not.toHaveBeenCalled();
+            expect(confirmationSpy).not.toHaveBeenCalled();
         });
     });
 
     describe('handleRejection', () => {
+        let rejectionSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            rejectionSpy = spyOn(service['gameDispatcherController'], 'handleRejectionGameCreation');
+        });
+
+        afterEach(() => {
+            rejectionSpy.calls.reset();
+        });
+
         it('should call handleCancelGame if gameId is defined', () => {
             service.gameId = BASE_GAME_ID;
-            const spy = spyOn(service['gameDispatcherController'], 'handleRejectionGameCreation');
             service.handleRejection(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
+            expect(rejectionSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
             service.gameId = undefined;
-            const spy = spyOn(service['gameDispatcherController'], 'handleRejectionGameCreation');
             service.handleRejection(TEST_PLAYER_NAME);
-            expect(spy).not.toHaveBeenCalled();
+            expect(rejectionSpy).not.toHaveBeenCalled();
         });
     });
 
@@ -272,18 +297,27 @@ describe('GameDispatcherService', () => {
     });
 
     describe('handleJoinerRejected', () => {
+        let emitSpy: jasmine.Spy;
+        let resetSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            emitSpy = spyOn(service.joinerRejectedEvent, 'emit');
+            resetSpy = spyOn(service, 'resetData');
+        });
+
+        afterEach(() => {
+            emitSpy.calls.reset();
+            resetSpy.calls.reset();
+        });
+
         it('should emit to joinerRejectedEvent', () => {
-            const spy = spyOn(service.joinerRejectedEvent, 'emit');
-            spyOn(service, 'resetData');
             service.handleJoinerRejected(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+            expect(emitSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call resetData', () => {
-            spyOn(service.joinerRejectedEvent, 'emit');
-            const spy = spyOn(service, 'resetData');
             service.handleJoinerRejected(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith();
+            expect(resetSpy).toHaveBeenCalledWith();
         });
     });
 
@@ -297,34 +331,52 @@ describe('GameDispatcherService', () => {
     });
 
     describe('handleLobbyFull', () => {
+        let emitSpy: jasmine.Spy;
+        let resetSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            emitSpy = spyOn(service.lobbyFullEvent, 'emit');
+            resetSpy = spyOn(service, 'resetData');
+        });
+
+        afterEach(() => {
+            emitSpy.calls.reset();
+            resetSpy.calls.reset();
+        });
+
         it('should emit to lobbyFullEvent', () => {
-            const spy = spyOn(service.lobbyFullEvent, 'emit');
-            spyOn(service, 'resetData');
             service.handleLobbyFull();
-            expect(spy).toHaveBeenCalledWith();
+            expect(emitSpy).toHaveBeenCalledWith();
         });
 
         it('should call resetData', () => {
-            spyOn(service.lobbyFullEvent, 'emit');
-            const spy = spyOn(service, 'resetData');
             service.handleLobbyFull();
-            expect(spy).toHaveBeenCalledWith();
+            expect(resetSpy).toHaveBeenCalledWith();
         });
     });
 
     describe('handleCanceledGame', () => {
+        let emitSpy: jasmine.Spy;
+        let resetSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            emitSpy = spyOn(service.canceledGameEvent, 'emit');
+            resetSpy = spyOn(service, 'resetData');
+        });
+
+        afterEach(() => {
+            emitSpy.calls.reset();
+            resetSpy.calls.reset();
+        });
+
         it('should emit to canceledGameEvent', () => {
-            const spy = spyOn(service.canceledGameEvent, 'emit');
-            spyOn(service, 'resetData');
             service.handleCanceledGame(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
+            expect(emitSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call resetData', () => {
-            spyOn(service.canceledGameEvent, 'emit');
-            const spy = spyOn(service, 'resetData');
             service.handleCanceledGame(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith();
+            expect(resetSpy).toHaveBeenCalledWith();
         });
     });
 
@@ -337,27 +389,34 @@ describe('GameDispatcherService', () => {
     });
 
     describe('handleLeaveLobby', () => {
+        let resetSpy: jasmine.Spy;
+        let leaveSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            resetSpy = spyOn(service, 'resetData');
+            leaveSpy = spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
+        });
+
+        afterEach(() => {
+            resetSpy.calls.reset();
+            leaveSpy.calls.reset();
+        });
+
         it('should call handleLeaveLobby if gameId is defined', () => {
             service.gameId = BASE_GAME_ID;
-            spyOn(service, 'resetData');
-            const spy = spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
             service.handleLeaveLobby();
-            expect(spy).toHaveBeenCalledWith(BASE_GAME_ID);
+            expect(leaveSpy).toHaveBeenCalledWith(BASE_GAME_ID);
         });
 
         it('should not call handleLeaveLobby if gameId is undefined', () => {
             service.gameId = undefined;
-            spyOn(service, 'resetData');
-            const spy = spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
             service.handleLeaveLobby();
-            expect(spy).not.toHaveBeenCalled();
+            expect(leaveSpy).not.toHaveBeenCalled();
         });
 
         it('should call resetData', () => {
-            const spy = spyOn(service, 'resetData');
-            spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
             service.handleLeaveLobby();
-            expect(spy).toHaveBeenCalled();
+            expect(leaveSpy).toHaveBeenCalled();
         });
     });
 });
