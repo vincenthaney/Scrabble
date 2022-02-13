@@ -1,19 +1,31 @@
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { validateName } from '@app/utils/validate-name';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import {
+    DICTIONARY_REQUIRED,
+    GAME_IS_OVER,
+    GAME_TYPE_REQUIRED,
+    MAX_ROUND_TIME_REQUIRED,
+    NAME_IS_INVALID,
+    PLAYER_NAME_REQUIRED,
+} from './game-dispatcher-error';
 
 @Service()
 export class GameDispatcherController {
     router: Router;
 
-    constructor(private readonly gameDispatcherService: GameDispatcherService, private readonly socketService: SocketService) {
+    constructor(
+        private readonly gameDispatcherService: GameDispatcherService,
+        private readonly socketService: SocketService,
+        private readonly activeGameService: ActiveGameService,
+    ) {
         this.configureRouter();
     }
 
@@ -106,12 +118,37 @@ export class GameDispatcherController {
                 HttpException.sendError(e, res);
             }
         });
+
+        this.router.post('/games/:gameId/player/:playerId/reconnect', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+            const { newPlayerId }: { newPlayerId: string } = req.body;
+
+            try {
+                this.handleReconnection(gameId, playerId, newPlayerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
+
+        this.router.delete('/games/:gameId/player/:playerId/disconnect', (req: GameRequest, res: Response) => {
+            const { gameId, playerId } = req.params;
+
+            try {
+                this.handleDisconnection(gameId, playerId);
+
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (e) {
+                HttpException.sendError(e, res);
+            }
+        });
     }
 
     private handleCancelGame(gameId: string, playerId: string) {
         const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
         if (waitingRoom.joinedPlayer) {
-            this.socketService.emitToSocket(waitingRoom.joinedPlayer.getId(), 'canceledGame', { name: waitingRoom.getConfig().player1.name });
+            this.socketService.emitToSocket(waitingRoom.joinedPlayer.id, 'canceledGame', { name: waitingRoom.getConfig().player1.name });
         }
         this.gameDispatcherService.cancelGame(gameId, playerId);
 
@@ -155,14 +192,14 @@ export class GameDispatcherController {
 
         const startGameData = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
 
-        this.socketService.addToRoom(startGameData.player2.getId(), gameId);
+        this.socketService.addToRoom(startGameData.player2.id, gameId);
         this.socketService.emitToRoom(gameId, 'startGame', startGameData);
     }
 
     private handleRejectRequest(gameId: string, playerId: string, playerName: string) {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         const [rejectedPlayer, hostName] = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
-        this.socketService.emitToSocket(rejectedPlayer.getId(), 'rejected', { name: hostName });
+        this.socketService.emitToSocket(rejectedPlayer.id, 'rejected', { name: hostName });
         this.handleLobbiesUpdate();
     }
 
@@ -176,4 +213,39 @@ export class GameDispatcherController {
         const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
         this.socketService.emitToRoom(this.gameDispatcherService.getLobbiesRoom().getId(), 'lobbiesUpdate', waitingRooms);
     }
+
+    private handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
+        const game = this.activeGameService.getGame(gameId, playerId);
+
+        console.log(`handleReconnection gameId : ${gameId}`);
+        console.log(`handleReconnection playerId : ${playerId}`);
+        console.log(`handleReconnection newPlayerId : ${newPlayerId}`);
+
+        // TODO: Add condition once we have singleplayer games
+        // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
+        if (game.isGameOver()) {
+            throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
+        }
+        game.getRequestingPlayer(playerId).id = newPlayerId;
+        this.socketService.addToRoom(newPlayerId, gameId);
+        const data = game.getInfoData();
+        this.socketService.emitToSocket(newPlayerId, 'gameInfo', data);
+    }
+
+    private handleDisconnection(gameId: string, playerId: string) {
+        const game = this.activeGameService.getGame(gameId, playerId);
+        // TODO: Add condition once we have singleplayer games
+        // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
+        const disconnectedPlayer = game.getRequestingPlayer(playerId);
+        disconnectedPlayer.isConnected = false;
+        // setTimeout(() => {
+        //     if (!disconnectedPlayer.isConnected) {
+        //         // END GAME
+        //         // eslint-disable-next-line no-console
+        //         console.log('too late');
+        //     }
+        // }, TIME_TO_RECONNECT);
+    }
 }
+
+// const TIME_TO_RECONNECT = 5000;

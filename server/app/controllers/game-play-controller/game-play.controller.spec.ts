@@ -103,7 +103,6 @@ describe('GamePlayController', () => {
         let emitToSocketSpy: any;
         let gameUpdateSpy: any;
         let getGameStub: any;
-        let getIdStub: any;
         let gameStub: SinonStubbedInstance<Game>;
         let tileReserveStub: SinonStubbedInstance<TileReserve>;
         let boardStub: SinonStubbedInstance<Board>;
@@ -124,12 +123,10 @@ describe('GamePlayController', () => {
             emitToSocketSpy = chai.spy.on(gamePlayController['socketService'], 'emitToSocket', () => {});
             gameUpdateSpy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
             getGameStub = stub(ActiveGameService.prototype, 'getGame').returns(gameStub as unknown as Game);
-            getIdStub = stub(Player.prototype, 'getId').returns(gameStub.player2['id']);
         });
 
         afterEach(() => {
             getGameStub.restore();
-            getIdStub.restore();
         });
 
         it('should call playAction', () => {
