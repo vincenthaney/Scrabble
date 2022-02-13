@@ -5,7 +5,7 @@
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import {
     EMPTY_WORDS,
     EMPTY_WORD,
@@ -17,6 +17,7 @@ import {
     NOT_USED_MULTIPLIER,
     GENERIC_WORDS_SCORE,
     GENERIC_LETTER_3,
+    MAX_LENGTH_TILES_TO_PLACE,
 } from './score-calculator.const.test';
 import { ScoreCalculatorService } from './score-calculator.service';
 import { DEFAULT_MULTIPLIER } from './score-calculator.service.const';
@@ -24,6 +25,8 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Position } from '@app/classes/board';
+import { stub } from 'sinon';
+import { BINGO_BONUS_POINTS } from '@app/classes/actions/action-place/action-place.const';
 
 chai.use(spies);
 chai.use(chaiAsPromised);
@@ -32,7 +35,7 @@ describe('ScoreCalculatorService', () => {
     let scoreCalculatorService: ScoreCalculatorService;
     let testTile: Tile;
     let testSquare: Square;
-    let testTuple: [Tile, Square];
+    let testTuple: [Square, Tile];
     beforeEach(() => {
         scoreCalculatorService = new ScoreCalculatorService();
         testTile = { letter: 'X', value: DEFAULT_TILE_VALUE };
@@ -43,7 +46,7 @@ describe('ScoreCalculatorService', () => {
             wasMultiplierUsed: false,
             isCenter: false,
         };
-        testTuple = [testTile, testSquare];
+        testTuple = [testSquare, testTile];
     });
 
     afterEach(() => {
@@ -88,26 +91,26 @@ describe('ScoreCalculatorService', () => {
     it('should return modified letter value ', () => {
         testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
         const expectedValue = DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
-        expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
+        expect(scoreCalculatorService['letterValue'](testSquare, testTile)).to.equal(expectedValue);
     });
 
     it('should return original tile value because square has no multiplier', () => {
         const expectedValue = DEFAULT_TILE_VALUE;
-        expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
+        expect(scoreCalculatorService['letterValue'](testSquare, testTile)).to.equal(expectedValue);
     });
 
     it('should return modified tile value because square letter multiplier has not been used', () => {
         testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
         testSquare.wasMultiplierUsed = NOT_USED_MULTIPLIER;
         const expectedValue = DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
-        expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
+        expect(scoreCalculatorService['letterValue'](testSquare, testTile)).to.equal(expectedValue);
     });
 
     it('should return original tile value because square letter multiplier has already been used', () => {
         testSquare.scoreMultiplier = { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER };
         testSquare.wasMultiplierUsed = USED_MULTIPLIER;
         const expectedValue = DEFAULT_TILE_VALUE;
-        expect(scoreCalculatorService['letterValue'](testTile, testSquare)).to.equal(expectedValue);
+        expect(scoreCalculatorService['letterValue'](testSquare, testTile)).to.equal(expectedValue);
     });
 
     it('should return 0 points', () => {
@@ -121,7 +124,7 @@ describe('ScoreCalculatorService', () => {
         testSquare.wasMultiplierUsed = USED_MULTIPLIER;
         testTile.value = DEFAULT_TILE_VALUE;
         const testMultiplierUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE;
+        const expectedScore = GENERIC_LETTER_3[1].value + DEFAULT_TILE_VALUE;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierUsedWord)).to.equal(expectedScore);
     });
 
@@ -130,7 +133,7 @@ describe('ScoreCalculatorService', () => {
         testSquare.wasMultiplierUsed = NOT_USED_MULTIPLIER;
         testTile.value = DEFAULT_TILE_VALUE;
         const testMultiplierNotUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
+        const expectedScore = GENERIC_LETTER_3[1].value + DEFAULT_TILE_VALUE * DEFAULT_LETTER_MULTIPLIER;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierNotUsedWord)).to.equal(expectedScore);
     });
 
@@ -139,7 +142,7 @@ describe('ScoreCalculatorService', () => {
         testSquare.wasMultiplierUsed = USED_MULTIPLIER;
         testTile.value = DEFAULT_TILE_VALUE;
         const testMultiplierNotUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE;
+        const expectedScore = GENERIC_LETTER_3[1].value + DEFAULT_TILE_VALUE;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierNotUsedWord)).to.equal(expectedScore);
     });
 
@@ -148,7 +151,7 @@ describe('ScoreCalculatorService', () => {
         testSquare.wasMultiplierUsed = NOT_USED_MULTIPLIER;
         testTile.value = DEFAULT_TILE_VALUE;
         const testMultiplierNotUsedWord = [GENERIC_LETTER_3, testTuple];
-        const expectedScore = (GENERIC_LETTER_3[0].value + DEFAULT_TILE_VALUE) * DEFAULT_WORD_MULTIPLIER;
+        const expectedScore = (GENERIC_LETTER_3[1].value + DEFAULT_TILE_VALUE) * DEFAULT_WORD_MULTIPLIER;
         expect(scoreCalculatorService['calculatePointsPerWord'](testMultiplierNotUsedWord)).to.equal(expectedScore);
     });
 
@@ -156,5 +159,25 @@ describe('ScoreCalculatorService', () => {
         const expectedPoints = GENERIC_WORDS_SCORE;
         const testWord = GENERIC_WORDS;
         expect(scoreCalculatorService.calculatePoints(testWord)).to.equal(expectedPoints);
+    });
+
+    it('isABingo should return true with 7 tiles to place', () => {
+        expect(scoreCalculatorService.isABingo(MAX_LENGTH_TILES_TO_PLACE)).to.be.true;
+    });
+
+    it('isABingo should return false with less than 7 tiles to place', () => {
+        expect(scoreCalculatorService.isABingo([MAX_LENGTH_TILES_TO_PLACE[0]])).to.be.false;
+    });
+
+    it('bonusPoints should return BINGO_BONUS_POINTS if isABingo returns true', () => {
+        const isABingoStub = stub(scoreCalculatorService, 'isABingo').returns(true);
+        expect(scoreCalculatorService.bonusPoints(MAX_LENGTH_TILES_TO_PLACE)).to.equal(BINGO_BONUS_POINTS);
+        assert(isABingoStub.calledOnce);
+    });
+
+    it('bonusPoints should return 0 if isABingo returns false', () => {
+        const isABingoStub = stub(scoreCalculatorService, 'isABingo').returns(false);
+        expect(scoreCalculatorService.bonusPoints(MAX_LENGTH_TILES_TO_PLACE)).to.equal(0);
+        assert(isABingoStub.calledOnce);
     });
 });

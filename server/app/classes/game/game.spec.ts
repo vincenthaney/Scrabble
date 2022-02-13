@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Player from '@app/classes/player/player';
-import { Tile } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
@@ -15,6 +15,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
+import { assert } from 'chai';
 
 const expect = chai.expect;
 
@@ -32,10 +33,16 @@ const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
     dictionary: 'francais',
 };
 const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
+const DEFAULT_TILE_2: Tile = { letter: 'B', value: 5 };
+
 const DEFAULT_AMOUNT_OF_TILES = 25;
 
 const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
+const DEFAULT_MAP = new Map<LetterValue, number>([
+    ['A', 0],
+    ['B', 0],
+]);
 
 describe('Game', () => {
     let defaultInit: () => Promise<void>;
@@ -76,12 +83,12 @@ describe('Game', () => {
             expect(game.roundManager).to.exist;
             expect(game.wordsPlayed).to.exist;
             expect(game.gameType).to.exist;
-            expect(game.tileReserve).to.exist;
+            expect(game['tileReserve']).to.exist;
             expect(game.board).to.exist;
         });
 
         it('should init TileReserve', () => {
-            expect(game.tileReserve.isInitialized()).to.be.true;
+            expect(game['tileReserve'].isInitialized()).to.be.true;
         });
 
         it('should give players their tiles', () => {
@@ -98,13 +105,44 @@ describe('Game', () => {
 
     describe('General', () => {
         let game: Game;
+        let tileReserveStub: SinonStubbedInstance<TileReserve>;
 
         beforeEach(async () => {
             game = await Game.createMultiplayerGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            tileReserveStub = createStubInstance(TileReserve);
+            game['tileReserve'] = tileReserveStub as unknown as TileReserve;
         });
 
-        it('should return an id', () => {
+        it('getId should return an id', () => {
             expect(game.getId()).to.exist;
+        });
+
+        it('initTileReserve should call init ', async () => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const initStub = tileReserveStub.init.callsFake(async () => {});
+            await game.initTileReserve();
+            assert(initStub.calledOnce);
+        });
+
+        it('getTiles should call tileReserve.getTiles and return it', () => {
+            const expected = [DEFAULT_TILE];
+            tileReserveStub.getTiles.returns([DEFAULT_TILE]);
+            expect(game.getTilesFromReserve(1)).to.deep.equal(expected);
+            assert(tileReserveStub.getTiles.calledOnce);
+        });
+
+        it('swapTiles should call tileReserve.swapTiles and return it', () => {
+            const expected = [DEFAULT_TILE];
+            tileReserveStub.swapTiles.returns([DEFAULT_TILE]);
+            expect(game.swapTilesFromReserve([DEFAULT_TILE_2])).to.deep.equal(expected);
+            assert(tileReserveStub.swapTiles.calledOnce);
+        });
+
+        it('swapTiles should call tileReserve.getTilesLeftPerLetter and return it', () => {
+            const expected = DEFAULT_MAP;
+            tileReserveStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+            expect(game.getTilesLeftPerLetter()).to.deep.equal(expected);
+            assert(tileReserveStub.getTilesLeftPerLetter.calledOnce);
         });
 
         describe('getActivePlayer', () => {
