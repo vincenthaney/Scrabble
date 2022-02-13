@@ -329,7 +329,7 @@ describe('GameDispatcherService', () => {
             { letter: 'C', amount: 2 },
             { letter: 'F', amount: 8 },
         ];
-        const TILE_RESERVE_TOTAL = 3;
+        const TILE_RESERVE_TOTAL = 13;
         let gameStub: SinonStubbedInstance<Game>;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
         let round: Round;
