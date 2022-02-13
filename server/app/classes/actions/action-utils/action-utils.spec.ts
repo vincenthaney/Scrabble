@@ -63,7 +63,7 @@ describe('ActionUtils', () => {
             const [[tile]] = ActionUtils.getTilesFromPlayer(tilesToPlay, player);
 
             expect(tile.isBlank).to.be.true;
-            expect(tile.playedLetter).to.be(tilesToPlay[0].letter);
+            expect(tile.playedLetter).to.equal(tilesToPlay[0].letter);
         });
     });
 
