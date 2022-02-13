@@ -72,20 +72,33 @@ export class GamePlayController {
         if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
-        const [updateData, localPlayerFeedback, opponentFeedback] = this.gamePlayService.playAction(gameId, playerId, data);
-        if (updateData) {
-            this.gameUpdate(gameId, updateData);
-        }
-        if (localPlayerFeedback) {
+        try {
+            const [updateData, localPlayerFeedback, opponentFeedback] = this.gamePlayService.playAction(gameId, playerId, data);
+            if (data.input.length > 0) {
+                this.socketService.emitToRoom(gameId, 'newMessage', {
+                    content: data.input,
+                    senderId: playerId,
+                });
+            }
+            if (updateData) {
+                this.gameUpdate(gameId, updateData);
+            }
+            if (localPlayerFeedback) {
+                this.socketService.emitToSocket(playerId, 'newMessage', {
+                    content: localPlayerFeedback,
+                    senderId: SYSTEM_ID,
+                });
+            }
+            if (opponentFeedback) {
+                const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+                this.socketService.emitToSocket(opponentId, 'newMessage', {
+                    content: opponentFeedback,
+                    senderId: SYSTEM_ID,
+                });
+            }
+        } catch (e) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
-                content: localPlayerFeedback,
-                senderId: SYSTEM_ID,
-            });
-        }
-        if (opponentFeedback) {
-            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
-            this.socketService.emitToSocket(opponentId, 'newMessage', {
-                content: opponentFeedback,
+                content: e.message,
                 senderId: SYSTEM_ID,
             });
         }
