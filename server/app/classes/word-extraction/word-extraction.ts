@@ -50,8 +50,9 @@ export class WordExtraction {
 
         const beforeWord = this.extractWordInDirection(orientation, Direction.Backward, startPosition);
         const afterWord = this.extractWordInDirection(orientation, Direction.Forward, navigator.position);
+        const word = [...beforeWord, ...newWord, ...afterWord];
 
-        wordsCreated.push([...beforeWord, ...newWord, ...afterWord]);
+        if (word.length > 1) wordsCreated.push(word);
         return wordsCreated;
     }
 
