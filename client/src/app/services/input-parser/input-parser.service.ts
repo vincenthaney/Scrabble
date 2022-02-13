@@ -66,11 +66,11 @@ export default class InputParserService implements OnDestroy {
 
             try {
                 const actionData: ActionData = this.parseCommand(actionName, inputWords);
-                this.controller.sendMessage(this.gameService.getGameId(), playerId, {
-                    content: input,
-                    senderId: this.getLocalPlayer().id,
-                });
-                this.controller.sendAction(gameId, playerId, actionData);
+                // this.controller.sendMessage(this.gameService.getGameId(), playerId, {
+                //     content: input,
+                //     senderId: this.getLocalPlayer().id,
+                // });
+                this.controller.sendAction(gameId, playerId, actionData, input);
             } catch (e) {
                 if (e instanceof CommandError) {
                     if (e.message === CommandErrorMessages.NotYourTurn) {

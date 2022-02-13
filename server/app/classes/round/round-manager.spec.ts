@@ -189,6 +189,27 @@ describe('RoundManager', () => {
         });
     });
 
+    describe('convertRoundToRoundData', () => {
+        it('should convert player to playerData', () => {
+            const player = new Player(DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.getId());
+            player.score = 10;
+            player.tiles = [];
+            const round: Round = {
+                player,
+                startTime: new Date(),
+                limitTime: new Date(),
+            };
+            const roundData = roundManager.convertRoundToRoundData(round);
+
+            expect(roundData.playerData.name).to.equal(player.name);
+            expect(roundData.playerData.id).to.equal(player.getId());
+            expect(roundData.playerData.score).to.equal(player.score);
+            expect(roundData.playerData.tiles).to.equal(player.tiles);
+            expect(roundData.startTime).to.equal(round.startTime);
+            expect(roundData.limitTime).to.equal(round.limitTime);
+        });
+    });
+
     it('getCurrentRound should return the current currentRound', () => {
         const CURRENT_ROUND = {
             player: DEFAULT_PLAYER_1,

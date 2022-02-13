@@ -35,6 +35,11 @@ export class GamePlayController {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
 
+            // eslint-disable-next-line no-console
+            console.log('Action type: ' + data.type);
+            // eslint-disable-next-line no-console
+            console.log('Action Payload: ' + data.payload);
+
             try {
                 this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
@@ -72,31 +77,45 @@ export class GamePlayController {
         if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
-        const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
-        if (updateData) {
-            this.gameUpdate(gameId, updateData);
-        }
-        if (!feedback) return;
-        if (feedback.localPlayerFeedback) {
-            this.socketService.emitToSocket(playerId, 'newMessage', {
-                content: feedback.localPlayerFeedback,
-                senderId: SYSTEM_ID,
-            });
-        }
-        if (feedback.opponentFeedback) {
-            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
-            this.socketService.emitToSocket(opponentId, 'newMessage', {
-                content: feedback.opponentFeedback,
-                senderId: SYSTEM_ID,
-            });
-        }
-        if (feedback.endGameFeedback) {
-            for (const message of feedback.endGameFeedback) {
+        try {
+            const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
+            if (data.input.length > 0) {
                 this.socketService.emitToRoom(gameId, 'newMessage', {
-                    content: message,
-                    senderId: SYSTEM_ID,
+                    content: data.input,
+                    senderId: playerId,
                 });
             }
+            if (updateData) {
+                this.gameUpdate(gameId, updateData);
+            }
+            if (feedback) {
+                if (feedback.localPlayerFeedback) {
+                    this.socketService.emitToSocket(playerId, 'newMessage', {
+                        content: feedback.localPlayerFeedback,
+                        senderId: SYSTEM_ID,
+                    });
+                }
+                if (feedback.opponentFeedback) {
+                    const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+                    this.socketService.emitToSocket(opponentId, 'newMessage', {
+                        content: feedback.opponentFeedback,
+                        senderId: SYSTEM_ID,
+                    });
+                }
+                if (feedback.endGameFeedback) {
+                    for (const message of feedback.endGameFeedback) {
+                        this.socketService.emitToRoom(gameId, 'newMessage', {
+                            content: message,
+                            senderId: SYSTEM_ID,
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            this.socketService.emitToSocket(playerId, 'newMessage', {
+                content: e.message,
+                senderId: SYSTEM_ID,
+            });
         }
     }
 

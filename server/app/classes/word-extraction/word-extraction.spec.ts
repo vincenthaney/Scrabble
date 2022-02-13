@@ -101,6 +101,10 @@ describe('WordExtract', () => {
             testWords(['X', 'Y', 'Z'], 3, 3, Orientation.Horizontal, ['CXYZ', 'DY', 'EZ']);
         });
 
+        it('should contains all words (9)', () => {
+            testWords(['X'], 4, 1, Orientation.Horizontal, ['XD']);
+        });
+
         it('should throw if square already has a tile', () => {
             expect(() => extraction.extract([], HAS_TILE_POSITION, DEFAULT_ORIENTATION)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
         });
