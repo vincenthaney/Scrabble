@@ -5,7 +5,7 @@ import Game from '@app/classes/game/game';
 import { MultiplayerGameConfig } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import Player from '@app/classes/player/player';
-import * as Errors from '@app/constants/errors';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -96,12 +96,12 @@ describe('ActiveGameService', () => {
 
         it('should throw is ID is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => activeGameService.getGame(invalidId, DEFAULT_PLAYER_1.getId())).to.throw(Errors.NO_GAME_FOUND_WITH_ID);
+            expect(() => activeGameService.getGame(invalidId, DEFAULT_PLAYER_1.getId())).to.throw(NO_GAME_FOUND_WITH_ID);
         });
 
         it('should throw is player ID is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => activeGameService.getGame(DEFAULT_ID, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => activeGameService.getGame(DEFAULT_ID, invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
     });
 

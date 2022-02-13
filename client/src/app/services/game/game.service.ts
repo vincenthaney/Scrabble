@@ -10,9 +10,9 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import * as GAME_ERRORS from './game.service.error';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -78,7 +78,7 @@ export default class GameService implements OnDestroy {
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
-        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(GAME_ERRORS.MISSING_PLAYER_DATA_TO_INITIALIZE);
+        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
         return new Player(playerData.id, playerData.name, playerData.tiles);
     }
 

@@ -1,0 +1,14 @@
+export const HOST_WAITING_MESSAGE = "En attente d'un adversaire.";
+export const OPPONENT_FOUND_MESSAGE = ' a rejoint votre partie.';
+export const DIALOG_TITLE = 'Attention!';
+export const DIALOG_CONTENT = " a quitté le salon. Veuillez patientez le temps qu'un autre joueur veuille vous affronter.";
+export const DIALOG_BUTTON_CONTENT_REJECTED = 'Retourner en attente.';
+export const DIALOG_BUTTON_CONTENT_RETURN_LOBBY = 'Retourner à la sélection de parties.';
+export const DIALOG_REJECT_TITLE = 'Rejeté';
+export const DIALOG_REJECT_CONTENT = ' vous a rejeté de la partie.';
+export const DIALOG_CANCEL_TITLE = 'Partie annulée';
+export const DIALOG_CANCEL_CONTENT = ' a annulé la partie.';
+export const DIALOG_FULL_TITLE = 'Partie Remplie';
+export const DIALOG_FULL_CONTENT = 'La partie est déjà remplie';
+export const DIALOG_CANCELED_TITLE = 'Partie annulée';
+export const DIALOG_CANCELED_CONTENT = 'La partie a été annulée';

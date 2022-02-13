@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { createStubInstance } from 'sinon';
 import { Board, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
-import { POSITION_OUT_OF_BOARD } from './board-errors';
+import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };

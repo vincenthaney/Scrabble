@@ -7,7 +7,7 @@ import { Server } from 'app/server';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
 import { delay } from '@app/utils/delay';
-import * as SocketError from './socket.service.error';
+import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 
 const RESPONSE_DELAY = 200;
 const SERVER_URL = 'http://localhost:';
@@ -92,7 +92,7 @@ describe('SocketService', () => {
             it('should throw when id is invalid', () => {
                 const invalidId = 'invalidId';
                 expect(invalidId).to.not.equal(id);
-                expect(() => service.getSocket(invalidId)).to.throw(SocketError.INVALID_ID_FOR_SOCKET);
+                expect(() => service.getSocket(invalidId)).to.throw(INVALID_ID_FOR_SOCKET);
             });
         });
 
@@ -162,7 +162,7 @@ describe('SocketService', () => {
             it('should throw if sio is undefined', () => {
                 const sio = service['sio'];
                 service['sio'] = undefined;
-                expect(() => service.emitToRoom(DEFAULT_ROOM, '_test_event', DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                expect(() => service.emitToRoom(DEFAULT_ROOM, '_test_event', DEFAULT_ARGS)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
                 service['sio'] = sio;
             });
         });
@@ -192,7 +192,7 @@ describe('SocketService', () => {
             it('should throw if sio is undefined', () => {
                 const sio = service['sio'];
                 service['sio'] = undefined;
-                expect(() => service.emitToSocket(id, '_test_event', DEFAULT_ARGS)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                expect(() => service.emitToSocket(id, '_test_event', DEFAULT_ARGS)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
                 service['sio'] = sio;
             });
         });
@@ -207,19 +207,19 @@ describe('SocketService', () => {
 
         describe('handleSockets', () => {
             it('should throw', () => {
-                expect(() => service.handleSockets()).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                expect(() => service.handleSockets()).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
             });
         });
 
         describe('addToRoom', () => {
             it('should throw if ID is invalid', () => {
-                expect(() => service.addToRoom(INVALID_ID, DEFAULT_ROOM)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                expect(() => service.addToRoom(INVALID_ID, DEFAULT_ROOM)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
             });
         });
 
         describe('deleteRoom', () => {
             it('should throw if ID is invalid', () => {
-                expect(() => service.deleteRoom(INVALID_ID)).to.throw(SocketError.SOCKET_SERVICE_NOT_INITIALIZED);
+                expect(() => service.deleteRoom(INVALID_ID)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
             });
         });
     });
