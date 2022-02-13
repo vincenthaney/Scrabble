@@ -10,13 +10,13 @@ import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import RoundManager from '@app/classes/round/round-manager';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
-import { SYSTEM_MESSAGE_ID } from './game.const';
+import { assert } from 'chai';
 
 const expect = chai.expect;
 
@@ -251,30 +251,34 @@ describe('Game', () => {
         });
     });
 
-    // ///////////////////////
-    // TODO: ADD TESTS ACCORDING TO MATHILDE INSSTRUCTIONS
-    // describe('endGameMessage', () => {
-    //     let game: Game;
-    //     let player1Stub: SinonStubbedInstance<Player>;
-    //     let player2Stub: SinonStubbedInstance<Player>;
-    //     const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
-    //     const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
+    describe('endGameMessage', () => {
+        let game: Game;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
 
-    //     beforeEach(() => {
-    //         game = new Game();
-    //         roundManagerStub = createStubInstance(RoundManager);
-    //         player1Stub = createStubInstance(Player);
-    //         player2Stub = createStubInstance(Player);
-    //         game.player1 = player1Stub as unknown as Player;
-    //         game.player2 = player2Stub as unknown as Player;
-    //         player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
-    //         player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
-    //     });
+        let congratulateStub: SinonStub<[], string>;
 
-    //     it('should return the message ', () => {
-    //         game.endGameMessage();
-    //     });
-    // });
+        const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
+        const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
+
+        beforeEach(() => {
+            game = new Game();
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+            player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
+            player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
+            congratulateStub = stub(game, 'congratulateWinner').returns('congratulate winner');
+        });
+
+        it('should call the messages ', () => {
+            game.endGameMessage();
+            assert(player1Stub.endGameMessage.calledOnce);
+            assert(player2Stub.endGameMessage.calledOnce);
+            assert(congratulateStub.calledOnce);
+        });
+    });
 
     describe('congratulateWinner', () => {
         let game: Game;
@@ -282,8 +286,8 @@ describe('Game', () => {
         let player2Stub: SinonStubbedInstance<Player>;
         const PLAYER_1_NAME = 'VINCENT';
         const PLAYER_2_NAME = 'MATHILDE';
-        const HIGH_SCORE = 100;
-        const LOW_SCORE = 1;
+        const HIGHER_SCORE = 100;
+        const LOWER_SCORE = 1;
 
         beforeEach(() => {
             game = new Game();
@@ -296,24 +300,21 @@ describe('Game', () => {
         });
 
         it('should congratulate player 1 if he has a higher score ', () => {
-            player1Stub.score = HIGH_SCORE;
-            player2Stub.score = LOW_SCORE;
-            const expectedMessage = { content: `Félicitations à ${PLAYER_1_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+            player1Stub.score = HIGHER_SCORE;
+            player2Stub.score = LOWER_SCORE;
+            const expectedMessage = Game.winnerMessage(PLAYER_1_NAME);
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 2 if he has a higher score ', () => {
-            player1Stub.score = LOW_SCORE;
-            player2Stub.score = HIGH_SCORE;
-            const expectedMessage = { content: `Félicitations à ${PLAYER_2_NAME} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+            player1Stub.score = LOWER_SCORE;
+            player2Stub.score = HIGHER_SCORE;
+            const expectedMessage = Game.winnerMessage(PLAYER_2_NAME);
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 1 and player 2 if they are tied ', () => {
-            player1Stub.score = HIGH_SCORE;
-            player2Stub.score = HIGH_SCORE;
-            const expectedMessage = {
-                content: `Félicitations à ${PLAYER_1_NAME} et ${PLAYER_2_NAME} pour votre victoire!`,
-                senderId: SYSTEM_MESSAGE_ID,
-            };
+            player1Stub.score = HIGHER_SCORE;
+            player2Stub.score = HIGHER_SCORE;
+            const expectedMessage = Game.winnerMessage(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
     });

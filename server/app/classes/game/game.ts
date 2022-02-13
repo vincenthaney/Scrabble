@@ -5,7 +5,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig } from './game-config';
-import { START_TILES_AMOUNT, SYSTEM_MESSAGE_ID } from './game.const';
+import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from './game.const';
 import { GameType } from './game.type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -59,6 +59,10 @@ export default class Game {
         throw new Error('Solo mode not implemented');
     }
 
+    static winnerMessage(winner: string): string {
+        return `Félicitations à ${winner} pour votre victoire!`;
+    }
+
     getId() {
         return this.id;
     }
@@ -79,7 +83,7 @@ export default class Game {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
 
-    endOfGame() {
+    endOfGame(): [number, number] {
         if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
             this.player1.score -= this.player1.getTileRackPoints();
             this.player2.score -= this.player2.getTileRackPoints();
@@ -90,18 +94,15 @@ export default class Game {
             this.player1.score -= this.player1.getTileRackPoints();
             this.player2.score += this.player1.getTileRackPoints();
         }
+
+        return [this.player1.score, this.player2.score];
     }
 
-    // TODO: RETURN LES MESSAGES ET EMIT A ???
-    endGameMessage() {
-        // const message1 = { content: 'Fin de partie - lettres restantes', senderId: SYSTEM_MESSAGE_ID };
-        // const message2 = { content: this.player1.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
-        // const message3 = { content: this.player2.endGameMessage(), senderId: SYSTEM_MESSAGE_ID };
-        // const message4 = this.congratulateWinner();
+    endGameMessage(): string[] {
+        return [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage(), this.congratulateWinner()];
     }
 
-    // TODO: USE MATHILDE MESSAGE
-    congratulateWinner(): { content: string; senderId: string } {
+    congratulateWinner(): string {
         let winner: string;
         if (this.player1.score > this.player2.score) {
             winner = this.player1.name;
@@ -110,7 +111,7 @@ export default class Game {
         } else {
             winner = this.player1.name + ' et ' + this.player2.name;
         }
-        return { content: `Félicitations à ${winner} pour votre victoire!`, senderId: SYSTEM_MESSAGE_ID };
+        return Game.winnerMessage(winner);
     }
 
     isPlayer1(arg: string | Player): boolean {
