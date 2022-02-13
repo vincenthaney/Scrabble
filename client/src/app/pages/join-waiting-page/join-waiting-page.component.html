@@ -1,17 +1,17 @@
-<div class="container">
+<div class="container centered">
     <p>En attente que l'hôte vous accepte.</p>
     <mat-progress-bar class="progress" mode="indeterminate"></mat-progress-bar>
     <div class="grid">
-        <div class="align-left">Votre nom:</div>
-        <div class="align-right">{{ currentName }}</div>
-        <div class="align-left">Votre adversaire:</div>
-        <div class="align-right">{{ currentLobby.playerName }}</div>
-        <div class="align-left">Type de partie:</div>
-        <div class="align-right">{{ currentLobby.gameType }}</div>
-        <div class="align-left">Temps par tour:</div>
-        <div class="align-right">{{ currentLobby.maxRoundTime }}</div>
-        <div class="align-left">Dictionnaire:</div>
-        <div class="align-right">{{ currentLobby.dictionary }}</div>
+        <div id="cell" class="align-left">Votre nom:</div>
+        <div id="cell" class="align-right">{{ currentName }}</div>
+        <div id="cell" class="align-left">Votre adversaire:</div>
+        <div id="cell" class="align-right">{{ currentLobby.playerName }}</div>
+        <div id="cell" class="align-left">Type de partie:</div>
+        <div id="cell" class="align-right">{{ currentLobby.gameType }}</div>
+        <div id="cell" class="align-left">Temps par tour:</div>
+        <div id="cell" class="align-right">{{ currentLobby.maxRoundTime }}</div>
+        <div id="cell" class="align-left">Dictionnaire:</div>
+        <div id="cell" class="align-right">{{ currentLobby.dictionary }}</div>
     </div>
     <button id="cancel-button" mat-flat-button color="primary" [routerLink]="'/lobby'">Annuler</button>
 
