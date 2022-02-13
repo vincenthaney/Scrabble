@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { Tile } from '@app/classes/tile';
+import { Component, Input, OnInit } from '@angular/core';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { UNDEFINED_TILE } from '@app/constants/game';
 
 const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
@@ -9,8 +9,8 @@ const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
     templateUrl: './tile.component.html',
     styleUrls: ['./tile.component.scss'],
 })
-export class TileComponent {
-    @Input() tile: Tile | { letter: '?'; value: number } = UNDEFINED_TILE;
+export class TileComponent implements OnInit {
+    @Input() tile: Tile | { letter: '?'; value: number; isBlank?: boolean; playedLetter?: LetterValue } = UNDEFINED_TILE;
     @Input() fontSize: string = '1em';
     @Input() hideValue: boolean = false;
     isPlayed: boolean = false;
@@ -18,6 +18,12 @@ export class TileComponent {
 
     constructor() {
         this.bgPath = this.getBgPath();
+    }
+
+    ngOnInit(): void {
+        if (this.tile.letter === '*' && this.tile.value === 0) {
+            this.hideValue = true;
+        }
     }
 
     getBgPath(): string {
