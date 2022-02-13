@@ -17,7 +17,7 @@ export class GamePlayService {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
-        if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
+        if (player.id !== playerId) throw Error(NOT_PLAYER_TURN);
 
         const action: Action = this.getAction(player, game, actionData);
         const localPlayerFeedback = action.getMessage();

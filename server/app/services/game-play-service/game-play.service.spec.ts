@@ -83,39 +83,39 @@ describe('GamePlayService', () => {
         });
 
         it('should call getGame', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(getGameStub.called).to.be.true;
         });
 
         it('should call getMessage', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.called).to.be.true;
         });
 
         it('should call getOpponentMessage', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getOpponentMessage.called).to.be.true;
         });
 
         it('should call getAction', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(getActionStub.called).to.be.true;
         });
 
         it('should call execute', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.execute.called).to.be.true;
         });
 
         it('should call isGameOver', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(gameStub.isGameOver.called).to.be.true;
         });
 
         it('should set isGameOver to true if gameOver (updatedData exists)', () => {
             gameStub.isGameOver.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             // expect(result[0]!.isGameOver).to.be.true;
         });
@@ -123,21 +123,21 @@ describe('GamePlayService', () => {
         it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
             gameStub.isGameOver.returns(true);
             actionStub.execute.returns(undefined);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.isGameOver).to.be.true;
         });
 
         it('should call next round when action ends turn', () => {
             actionStub.willEndTurn.returns(true);
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(roundManagerStub.nextRound.called).to.be.true;
         });
 
         it('should set round action end turn (updatedData exists)', () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
         });
@@ -145,14 +145,14 @@ describe('GamePlayService', () => {
         it("should set round action end turn (updatedData doesn't exists)", () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns(undefined);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
         });
 
         it('should not call next round when action does not ends turn', () => {
             actionStub.willEndTurn.returns(false);
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(roundManagerStub.nextRound.called).to.not.be.true;
         });
 
@@ -162,7 +162,7 @@ describe('GamePlayService', () => {
 
         it('should return tileReserve is updateData exists', () => {
             actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.tileReserve).to.exist;
 
@@ -173,7 +173,7 @@ describe('GamePlayService', () => {
 
         it('should return tileReserveTotal is updateData exists', () => {
             actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.tileReserveTotal).to.exist;
             expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));

@@ -56,7 +56,7 @@ export class GameDispatcherService {
     async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<StartMultiplayerGameData> {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
-        if (waitingRoom.getConfig().player1.getId() !== playerId) {
+        if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
@@ -83,7 +83,7 @@ export class GameDispatcherService {
     rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
-        if (waitingRoom.getConfig().player1.getId() !== playerId) {
+        if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
@@ -100,11 +100,11 @@ export class GameDispatcherService {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
-        } else if (waitingRoom.joinedPlayer.getId() !== playerId) {
+        } else if (waitingRoom.joinedPlayer.id !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
         }
         const leaverName = waitingRoom.joinedPlayer.name;
-        const hostPlayerId = waitingRoom.getConfig().player1.getId();
+        const hostPlayerId = waitingRoom.getConfig().player1.id;
 
         waitingRoom.joinedPlayer = undefined;
         return [hostPlayerId, leaverName];
@@ -113,7 +113,7 @@ export class GameDispatcherService {
     cancelGame(waitingRoomId: string, playerId: string) {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
-        if (waitingRoom.getConfig().player1.getId() !== playerId) {
+        if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         }
 
