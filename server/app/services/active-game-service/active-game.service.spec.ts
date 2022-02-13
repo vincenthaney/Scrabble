@@ -87,16 +87,16 @@ describe('ActiveGameService', () => {
         });
 
         it('should return game with player1 ID', () => {
-            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_1.getId())).to.exist;
+            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.exist;
         });
 
         it('should return game with player2 ID', () => {
-            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_2.getId())).to.exist;
+            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_2.id)).to.exist;
         });
 
         it('should throw is ID is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => activeGameService.getGame(invalidId, DEFAULT_PLAYER_1.getId())).to.throw(Errors.NO_GAME_FOUND_WITH_ID);
+            expect(() => activeGameService.getGame(invalidId, DEFAULT_PLAYER_1.id)).to.throw(Errors.NO_GAME_FOUND_WITH_ID);
         });
 
         it('should throw is player ID is invalid', () => {
@@ -117,13 +117,13 @@ describe('ActiveGameService', () => {
 
         it('should remove from list with player1 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_1.getId());
+            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_1.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
 
         it('should remove from list with player2 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_2.getId());
+            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
     });
