@@ -97,7 +97,7 @@ describe('DefaultDialogComponent', () => {
 
         it('******should set button as closeDialog=true if redirect exists', () => {
             const index = 2;
-            expect(MODEL.buttons[index].closeDialog).toBeFalse();
+            expect(MODEL.buttons[index].closeDialog).toBeFalsy();
             expect(MODEL.buttons[index].redirect).toBeFalsy();
             expect(component.buttons[index].closeDialog).toBeFalse();
         });
