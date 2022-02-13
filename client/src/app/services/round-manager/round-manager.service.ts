@@ -7,10 +7,9 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { NO_CURRENT_ROUND } from '@app/constants/services-errors';
-import { NO_START_GAME_TIME } from './round-manager.service.errors';
 
 @Injectable({
     providedIn: 'root',
@@ -96,6 +95,6 @@ export default class RoundManagerService implements IResetableService {
             payload: {},
         };
         this.endRoundEvent.emit();
-        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass, '');
     }
 }

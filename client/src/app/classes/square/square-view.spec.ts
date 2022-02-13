@@ -1,9 +1,10 @@
 /* eslint-disable dot-notation */
+import { NO_COLOR_FOR_MULTIPLIER, NO_SQUARE_FOR_SQUARE_VIEW } from '@app/constants/classes-errors';
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { ScoreMultiplier, Square, SquareView } from '.';
-import { MultiplierEffect } from './score-multiplier';
-import { NO_COLOR_FOR_MULTIPLIER, NO_SQUARE_FOR_SQUARE_VIEW } from '@app/constants/classes-errors';
+import { MultiplierEffect, MultiplierValue } from './score-multiplier';
+import { MULTIPLIER_COLOR_MAP } from './square-multiplier-to-color-map';
 
 interface ColorTestCase {
     multiplierName: string;
@@ -32,6 +33,7 @@ class SquareViewWrapper {
         this.pSquare = square;
     }
 }
+
 describe('SquareView', () => {
     const validColorTestCases: ColorTestCase[] = [
         {
@@ -153,6 +155,31 @@ describe('SquareView', () => {
         expect(() => squareView.getColor()).toThrowError(NO_COLOR_FOR_MULTIPLIER);
     });
 
+    it('SquareView with invalid score multiplier should throw error', () => {
+        const negativeMultiplierSpy = jasmine.createSpyObj(
+            'AbstractScoreMultiplier',
+            {
+                getMultiplier: () => {
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    return -1;
+                },
+                getMultiplierEffect: () => {
+                    return { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER };
+                },
+            },
+            { multiplier: -1, multiplierEffect: { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER } },
+        );
+        const square = {
+            tile: null,
+            position: { row: 0, column: 0 },
+            scoreMultiplier: negativeMultiplierSpy,
+            wasMultiplierUsed: false,
+            isCenter: false,
+        };
+        const squareView = new SquareView(square, SQUARE_SIZE);
+        expect(() => squareView.getColor()).toThrowError(NO_COLOR_FOR_MULTIPLIER);
+    });
+
     it('SquareView with no Square associated should throw error when getting text', () => {
         const squareViewWrapper = new SquareViewWrapper();
         spyOnProperty(squareViewWrapper, 'square', 'get').and.returnValue(null);
@@ -189,5 +216,23 @@ describe('SquareView', () => {
             const squareView = new SquareView(square, SQUARE_SIZE);
             expect(squareView.getText()).toEqual(expectedText);
         });
+    });
+
+    it('getColor should throw NO_COLOR_FOR_MULTIPLIER if color is undefined', () => {
+        const multiplier: MultiplierValue = 3;
+        const TEST_SQUARE: Square = {
+            tile: null,
+            position: { row: -1, column: -1 },
+            scoreMultiplier: { multiplierEffect: MultiplierEffect.WORD, multiplier },
+            wasMultiplierUsed: false,
+            isCenter: false,
+        };
+        const TEST_MAP: Map<number, COLORS> = new Map([
+            [2, undefined as unknown as COLORS],
+            [3, undefined as unknown as COLORS],
+        ]);
+        spyOn(MULTIPLIER_COLOR_MAP, 'get').and.returnValue(TEST_MAP);
+        const squareView = new SquareView(TEST_SQUARE, SQUARE_SIZE);
+        expect(() => squareView.getColor()).toThrowError(NO_COLOR_FOR_MULTIPLIER);
     });
 });

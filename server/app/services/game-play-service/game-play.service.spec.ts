@@ -8,13 +8,13 @@ import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } fro
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
-import RoundManager from '@app/classes/round/round-manager';
 import { Round } from '@app/classes/round/round';
+import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, TileReserve } from '@app/classes/tile';
+import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { expect } from 'chai';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub, restore } from 'sinon';
+import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import { RoundData } from '@app/classes/communication/round-data';
 
@@ -23,7 +23,8 @@ const DEFAULT_PLAYER_ID = '1';
 const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
 const DEFAULT_PLAYER_SCORE = 5;
-const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {} };
+const DEFAULT_INPUT = 'input';
+const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {}, input: DEFAULT_INPUT };
 const INVALID_ACTION_TYPE = 'invalid action type';
 const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['A', 1],
@@ -32,6 +33,7 @@ const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['D', 0],
     ['E', 2],
 ];
+const DEFAULT_ACTION_MESSAGE = 'default action message';
 
 describe('GamePlayService', () => {
     let gamePlayService: GamePlayService;
@@ -57,8 +59,8 @@ describe('GamePlayService', () => {
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
 
-        gameStub.getTilesLeftPerLetter.returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
         gameStub.endOfGame.returns([DEFAULT_PLAYER_SCORE, DEFAULT_PLAYER_SCORE]);
+        gameStub['getTilesLeftPerLetter'].returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
         player = gameStub.player1;
         game = gameStub as unknown as Game;
@@ -78,8 +80,8 @@ describe('GamePlayService', () => {
             actionStub = createStubInstance(ActionPass);
             actionStub.willEndTurn.returns(true);
             getActionStub = stub(gamePlayService, 'getAction').returns(actionStub as unknown as Action);
-            actionStub.getMessage.returns('');
-            actionStub.getOpponentMessage.returns('');
+            actionStub.getMessage.returns(DEFAULT_ACTION_MESSAGE);
+            actionStub.getOpponentMessage.returns(DEFAULT_ACTION_MESSAGE);
         });
 
         afterEach(() => {
@@ -181,7 +183,7 @@ describe('GamePlayService', () => {
             expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
         });
 
-        it('should return tileReserve is updateData exists', () => {
+        it('should return tileReserve if updatedData exists', () => {
             actionStub.execute.returns({});
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
@@ -192,19 +194,34 @@ describe('GamePlayService', () => {
             }
         });
 
-        it('should return tileReserveTotal is updateData exists', () => {
+        it('should return tileReserveTotal if updatedData exists', () => {
             actionStub.execute.returns({});
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.tileReserveTotal).to.exist;
             expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));
         });
+
+        it('should call getMessage from action', () => {
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(actionStub.getMessage.calledOnce).to.be.true;
+        });
+
+        it('should call getOpponentMessage from action', () => {
+            gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(actionStub.getOpponentMessage.calledOnce).to.be.true;
+        });
+
+        it('should return opponentFeedback equal to getOppnentMessage from action', () => {
+            const [, feedback] = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(feedback!.opponentFeedback).to.equal(DEFAULT_ACTION_MESSAGE);
+        });
     });
 
     describe('getAction', () => {
         it('should fail when type is invalid', () => {
             expect(() => {
-                gamePlayService.getAction(player, game, { type: INVALID_ACTION_TYPE as unknown as ActionType, payload: {} });
+                gamePlayService.getAction(player, game, { type: INVALID_ACTION_TYPE as unknown as ActionType, payload: {}, input: DEFAULT_INPUT });
             }).to.throw(INVALID_COMMAND);
         });
 
@@ -215,7 +232,7 @@ describe('GamePlayService', () => {
                 startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
-            const action = gamePlayService.getAction(player, game, { type, payload });
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionPlace);
         });
 
@@ -224,28 +241,28 @@ describe('GamePlayService', () => {
             const payload: ActionExchangePayload = {
                 tiles: [],
             };
-            const action = gamePlayService.getAction(player, game, { type, payload });
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
         });
 
         it('should return action of type ActionPass when type is pass', () => {
             const type = 'pass';
             const payload = {};
-            const action = gamePlayService.getAction(player, game, { type, payload });
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionPass);
         });
 
         it('should return action of type ActionHelp when type is help', () => {
             const type = 'help';
             const payload = {};
-            const action = gamePlayService.getAction(player, game, { type, payload });
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionHelp);
         });
 
         it('should return action of type ActionReserve when type is reserve', () => {
             const type = 'reserve';
             const payload = {};
-            const action = gamePlayService.getAction(player, game, { type, payload });
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionReserve);
         });
 
@@ -255,7 +272,7 @@ describe('GamePlayService', () => {
                 startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have startPosition", () => {
@@ -264,7 +281,7 @@ describe('GamePlayService', () => {
                 tiles: [],
                 orientation: Orientation.Horizontal,
             };
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have orientation", () => {
@@ -273,13 +290,13 @@ describe('GamePlayService', () => {
                 tiles: [],
                 startPosition: { column: 0, row: 0 },
             };
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if exchange payload doesn't have tiles", () => {
             const type = 'exchange';
             const payload: Omit<ActionExchangePayload, 'tiles'> = {};
-            expect(() => gamePlayService.getAction(player, game, { type, payload })).to.throw(INVALID_PAYLOAD);
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
     });
 });

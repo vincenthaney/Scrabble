@@ -9,9 +9,9 @@ import { ActionType } from '@app/classes/actions/action-data';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
+import { NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import * as ROUND_ERROR from './round-manager.service.errors';
 import SpyObj = jasmine.SpyObj;
 
 class RoundManagerServiceWrapper {
@@ -159,7 +159,7 @@ describe('RoundManagerService', () => {
         spyOnProperty(wrapper, 'currentRound', 'get').and.returnValue(null);
         service.currentRound = wrapper.currentRound;
 
-        expect(() => service.getActivePlayer()).toThrowError(ROUND_ERROR.NO_CURRENT_ROUND);
+        expect(() => service.getActivePlayer()).toThrowError(NO_CURRENT_ROUND);
     });
 
     it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
@@ -181,7 +181,7 @@ describe('RoundManagerService', () => {
 
     it('getStartGameTime should throw error if there is no first round', () => {
         service.completedRounds = [];
-        expect(() => service.getStartGameTime()).toThrowError(ROUND_ERROR.NO_START_GAME_TIME);
+        expect(() => service.getStartGameTime()).toThrowError(NO_START_GAME_TIME);
     });
 
     describe('StartRound', () => {
@@ -269,7 +269,7 @@ describe('RoundManagerService', () => {
             };
 
             service.roundTimeout();
-            expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
+            expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass, '');
         }));
     });
 });

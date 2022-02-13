@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { IconComponent } from './icon.component';
-import { IconAnimation, IconName, IconRotation, IconSize, IconStyle } from './icon.component.type';
+import { IconAnimation, IconName, IconPrefix, IconRotation, IconSize, IconStyle } from './icon.component.type';
 
 describe('IconComponent', () => {
     let component: IconComponent;
@@ -37,6 +36,15 @@ describe('IconComponent', () => {
         component.styling = styling;
         fixture.detectChanges();
         expect(i.classList).toContain(prefix);
+    });
+
+    it('getPrefix should return correct prefix for style', () => {
+        const styles: IconStyle[] = ['regular', 'light', 'solid', 'duotone', undefined as unknown as IconStyle];
+        const expected: IconPrefix[] = ['far', 'fal', 'fas', 'fad', 'far'];
+
+        for (let j = 0; j < styles.length; j++) {
+            expect(component.getPrefix(styles[j])).toEqual(expected[j]);
+        }
     });
 
     it('should add animation when have one', () => {
