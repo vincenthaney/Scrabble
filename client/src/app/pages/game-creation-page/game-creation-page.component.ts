@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
@@ -6,13 +6,15 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { GameDispatcherService } from '@app/services';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements OnInit {
+export class GameCreationPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) child: NameFieldComponent;
     gameTypes = GameType;
     gameModes = GameMode;
@@ -20,6 +22,7 @@ export class GameCreationPageComponent implements OnInit {
     // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
     dictionaryOptions: string[];
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
@@ -33,14 +36,22 @@ export class GameCreationPageComponent implements OnInit {
 
     // TODO: Check if this causes memory leak
     ngOnInit() {
-        this.gameParameters.get('gameMode')?.valueChanges.subscribe((value) => {
-            if (value === this.gameModes.Solo) {
-                this.gameParameters?.get('level')?.setValidators([Validators.required]);
-            } else {
-                this.gameParameters?.get('level')?.clearValidators();
-            }
-            this.gameParameters?.get('level')?.updateValueAndValidity();
-        });
+        this.gameParameters
+            .get('gameMode')
+            ?.valueChanges.pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe((value) => {
+                if (value === this.gameModes.Solo) {
+                    this.gameParameters?.get('level')?.setValidators([Validators.required]);
+                } else {
+                    this.gameParameters?.get('level')?.clearValidators();
+                }
+                this.gameParameters?.get('level')?.updateValueAndValidity();
+            });
+    }
+
+    ngOnDestroy() {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     isFormValid(): boolean {
