@@ -25,10 +25,6 @@ export class GamePlayController {
     }
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
-        // eslint-disable-next-line no-console
-        console.log(data.player1?.score);
-        // eslint-disable-next-line no-console
-        console.log(data.player2?.score);
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
     }
 

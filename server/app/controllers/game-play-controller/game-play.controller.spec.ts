@@ -19,6 +19,7 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { INVALID_COMMAND } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -248,6 +249,22 @@ describe('GamePlayController', () => {
             ]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.twice;
+        });
+
+        it('should call emitToRoom for each messages in endGameFeedback', () => {
+            const feedback: FeedbackMessages = {
+                localPlayerFeedback: undefined,
+                opponentFeedback: undefined,
+                endGameFeedback: ['message 1', 'message 2'],
+            };
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
+            gamePlayController['handlePlayAction']('', '', {
+                type: 'help',
+                payload: {},
+                input: '',
+            });
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            expect(emitToRoomSpy).to.have.been.called.exactly(feedback.endGameFeedback!.length);
         });
 
         it('should throw if data.type is undefined', () => {
