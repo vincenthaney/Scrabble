@@ -226,26 +226,35 @@ export class GameDispatcherController {
         if (game.isGameOver()) {
             throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
         }
-        game.getRequestingPlayer(playerId).id = newPlayerId;
+        const player = game.getRequestingPlayer(playerId);
+        player.id = newPlayerId;
+        player.isConnected = true;
         this.socketService.addToRoom(newPlayerId, gameId);
         const data = game.getInfoData();
         this.socketService.emitToSocket(newPlayerId, 'gameInfo', data);
     }
 
     private handleDisconnection(gameId: string, playerId: string) {
+        console.log(`handleDisconnection gameId : ${gameId}`);
+        console.log(`handleDisconnection playerId : ${playerId}`);
+
         const game = this.activeGameService.getGame(gameId, playerId);
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
-        const disconnectedPlayer = game.getRequestingPlayer(playerId);
-        disconnectedPlayer.isConnected = false;
-        // setTimeout(() => {
-        //     if (!disconnectedPlayer.isConnected) {
-        //         // END GAME
-        //         // eslint-disable-next-line no-console
-        //         console.log('too late');
-        //     }
-        // }, TIME_TO_RECONNECT);
+        if (!game.isGameOver()) {
+            const disconnectedPlayer = game.getRequestingPlayer(playerId);
+            disconnectedPlayer.isConnected = false;
+            setTimeout(() => {
+                console.log('setTimeout EXPIRE ');
+
+                if (!disconnectedPlayer.isConnected) {
+                    // END GAME
+                    // eslint-disable-next-line no-console
+                    console.log('setTimeout GIVEUP ');
+                }
+            }, TIME_TO_RECONNECT);
+        }
     }
 }
 
-// const TIME_TO_RECONNECT = 5000;
+const TIME_TO_RECONNECT = 5000;

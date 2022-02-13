@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
@@ -19,7 +19,7 @@ export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileRese
 @Injectable({
     providedIn: 'root',
 })
-export default class GameService {
+export default class GameService implements OnDestroy {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
@@ -52,6 +52,10 @@ export default class GameService {
         this.gameController.newMessageValue.subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
+    }
+
+    ngOnDestroy(): void {
+        console.log("ngOnDestroy GameService");
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
@@ -138,6 +142,8 @@ export default class GameService {
     }
 
     reconnectGame() {
+        console.log(`gameService gameId : ${this.gameId}`);
+
         const gameIdCookie = this.getCookie('gameId');
         const socketIdCookie = this.getCookie('socketId');
         console.log(`reconnectGame gameId : ${gameIdCookie}`);
@@ -150,13 +156,22 @@ export default class GameService {
     }
 
     disconnectGame() {
-        console.log(`disconnect gameId : ${this.gameId}`);
+        
+        const gameId = this.gameId;
+        console.log(`disconnect gameId : ${gameId}`);
         console.log(`disconnect socketId : ${this.getLocalPlayerId()}`);
-        this.setCookie('gameId', this.gameId, 30);
+        this.setCookie('gameId', gameId, 1000);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.setCookie('socketId', this.getLocalPlayerId()!, 30);
+        this.setCookie('socketId', this.getLocalPlayerId()!, 1000);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.gameController.handleDisconnection(this.gameId, this.getLocalPlayerId()!);
+        const localPlayerId = this.getLocalPlayerId()!;
+
+        this.gameId = '';
+        this.player1.id = '';
+        this.player2.id = '';
+        this.localPlayerId = '';
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.gameController.handleDisconnection(gameId, localPlayerId);
     }
 
     setCookie(username: string, value: string, expiry: number) {
