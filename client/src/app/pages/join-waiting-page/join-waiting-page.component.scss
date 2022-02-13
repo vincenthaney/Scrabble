@@ -1,6 +1,7 @@
 
 .grid{
     width: 17%;
+    min-width: 250 px;
     display: grid;
     grid-template-columns: 50% 50%;
 }
@@ -14,6 +15,7 @@
 }
 
 .container {
+    min-width: 250 px;
     display: flex;
     flex-direction: column;
     justify-content: center;

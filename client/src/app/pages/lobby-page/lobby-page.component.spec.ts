@@ -63,7 +63,7 @@ describe('LobbyPageComponent', () => {
                 FormsModule,
                 ReactiveFormsModule,
                 RouterTestingModule.withRoutes([
-                    { path: 'join-waiting', component: TestComponent },
+                    { path: 'join-waiting-room', component: TestComponent },
                     { path: 'lobby', component: LobbyPageComponent },
                 ]),
             ],
