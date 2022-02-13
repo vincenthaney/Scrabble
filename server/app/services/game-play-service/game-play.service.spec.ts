@@ -16,6 +16,7 @@ import { GamePlayService } from '@app/services/game-play-service/game-play.servi
 import { expect } from 'chai';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, restore } from 'sinon';
 import { Container } from 'typedi';
+import { RoundData } from '@app/classes/communication/round-data';
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
@@ -137,6 +138,7 @@ describe('GamePlayService', () => {
         it('should set round action end turn (updatedData exists)', () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({});
+            roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
@@ -145,6 +147,7 @@ describe('GamePlayService', () => {
         it("should set round action end turn (updatedData doesn't exists)", () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns(undefined);
+            roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
