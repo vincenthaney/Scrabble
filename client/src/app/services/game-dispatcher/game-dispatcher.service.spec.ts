@@ -170,19 +170,19 @@ describe('GameDispatcherService', () => {
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
-        it('should call handleJoinRequest on lobbyFullEvent', () => {
+        it('should call handleLobbyFull on lobbyFullEvent', () => {
             const spy = spyOn(service, 'handleLobbyFull');
             service['gameDispatcherController'].lobbyFullEvent.emit();
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should call handleJoinRequest on lobbyRequestValidEvent', () => {
+        it('should call navigateByUrl on lobbyRequestValidEvent', () => {
             const spy = spyOn(service.router, 'navigateByUrl');
             service['gameDispatcherController'].lobbyRequestValidEvent.emit();
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should call handleJoinRequest on canceledGameEvent', () => {
+        it('should call handleCanceledGame on canceledGameEvent', () => {
             const spy = spyOn(service, 'handleCanceledGame');
             service['gameDispatcherController'].canceledGameEvent.emit(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
