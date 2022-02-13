@@ -8,7 +8,6 @@ import { LetterDistributionData, LetterValue } from './tile.types';
 import {
     AMOUNT_MUST_BE_GREATER_THAN_1,
     MUST_HAVE_7_TILES_TO_SWAP,
-    NOT_ENOUGH_TILES,
     TILE_NOT_IN_RESERVE,
     TILE_RESERVE_MUST_BE_INITIATED,
 } from '@app/constants/classes-errors';
@@ -104,11 +103,12 @@ describe('TileReserve', () => {
         testGetTilesOnSuccess(amountToRemove, totalTiles);
     });
 
-    it('getTiles: should throw error when get more than amount in reserve.', () => {
+    it('getTiles: should return every tile left when trying to get more than amount in reserve.', () => {
         const totalTiles = tileReserve.getTilesLeft();
         const amountToRemove = totalTiles + 1;
-
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(NOT_ENOUGH_TILES);
+        const result = tileReserve.getTiles(amountToRemove);
+        expect(result.length).to.equal(totalTiles);
+        expect(tileReserve.getTilesLeft()).to.equal(0);
     });
 
     it('swapTiles: should throw error when swapping no tiles', () => {

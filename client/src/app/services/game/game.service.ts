@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
@@ -11,14 +11,15 @@ import { GamePlayController } from '@app/controllers/game-play-controller/game-p
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
 @Injectable({
     providedIn: 'root',
 })
-export default class GameService {
+export default class GameService implements OnDestroy {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
@@ -35,6 +36,7 @@ export default class GameService {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     private gameId: string;
     private localPlayerId: string;
@@ -47,9 +49,14 @@ export default class GameService {
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
-        this.gameController.newMessageValue.subscribe((newMessage) => this.handleNewMessage(newMessage));
-        this.gameController.gameUpdateValue.subscribe((newData) => this.handleGameUpdate(newData));
+        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {

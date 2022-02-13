@@ -23,17 +23,18 @@ describe('ActionReserve', () => {
         gameStub = createStubInstance(Game);
         tileReserveStub = createStubInstance(TileReserve);
 
-        tileReserveStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+        gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
 
-        gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+        // eslint-disable-next-line dot-notation
+        gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
 
         action = new ActionReserve(gameStub.player1, gameStub as unknown as Game);
     });
 
     describe('getMessage', () => {
-        it('should exists', () => {
+        it('should exist', () => {
             expect(action.getMessage()).to.exist;
         });
 
