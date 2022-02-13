@@ -26,6 +26,10 @@ export default class Player {
     }
 
     endGameMessage(): string {
-        return `${this.name} : ${this.tiles.reduce((prev, next) => (prev += next.letter.toLocaleLowerCase()), '')}`;
+        return `${this.name} : ${this.tilesToString()}`;
+    }
+
+    tilesToString(): string {
+        return this.tiles.reduce((prev, next) => (prev += next.letter.toLocaleLowerCase()), '');
     }
 }

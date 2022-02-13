@@ -1,4 +1,6 @@
 import { expect } from 'chai';
+import { assert } from 'console';
+import { stub } from 'sinon';
 import Player from './player';
 
 const ID = 'id';
@@ -38,7 +40,13 @@ describe('Player', () => {
         expect(player.hasTilesLeft()).to.equal(expected);
     });
 
-    it('endGameMessage should return the message showing the tiles left', () => {
-        expect(player.endGameMessage()).to.equal(`${player.name} : abad`);
+    it('endGameMessage should call tilesToString and return the correct message', () => {
+        const tilesToStringStub = stub(player, 'tilesToString').returns('aaaa');
+        expect(player.endGameMessage()).to.equal(`${player.name} : aaaa`);
+        assert(tilesToStringStub.calledOnce);
+    });
+
+    it('tilesToString should return the string of the tiles', () => {
+        expect(player.tilesToString()).to.equal('abad');
     });
 });
