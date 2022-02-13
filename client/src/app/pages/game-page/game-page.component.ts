@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameService } from '@app/services';
@@ -9,12 +9,27 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent {
+export class GamePageComponent implements OnInit {
     constructor(public surrenderDialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
         this.focusableComponentService.emitKeyboard(event);
+    }
+
+    // TODO: Fix if player goes to /game or change attribute when game starts
+    @HostListener('window:beforeunload')
+    onBeforeUnload() {
+        if (this.gameService.getGameId()) {
+            console.log('beforeunload');
+            this.gameService.disconnectGame();
+        }
+    }
+
+    ngOnInit(): void {
+        if (!this.gameService.getGameId()) {
+            this.gameService.reconnectGame();
+        }
     }
 
     openDialog() {
