@@ -5,7 +5,7 @@ import Player from '@app/classes/player/player';
 import { ActionUtils } from './action-utils';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/classes/actions/action-error';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 const DEFAULT_PLAYER_NAME = 'player1';
 const DEFAULT_PLAYER_ID = '1';

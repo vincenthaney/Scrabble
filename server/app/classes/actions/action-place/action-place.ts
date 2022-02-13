@@ -1,4 +1,3 @@
-// import { ERROR_INVALID_WORD } from '@app/classes/actions/action-error';
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Orientation, Position } from '@app/classes/board';
@@ -11,8 +10,8 @@ import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
-import { DICTIONARY_NAME } from '@app/services/words-verification-service/words-verification.service.const';
 import { Container } from 'typedi';
+import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
 
 export default class ActionPlace extends ActionPlay {

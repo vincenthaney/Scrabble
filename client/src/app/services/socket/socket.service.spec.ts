@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { SocketService } from '@app/services/';
 import { Socket } from 'socket.io-client';
-import * as SOCKET_ERROR from './socket.service.error';
+import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 
 describe('SocketService', () => {
     let service: SocketService;
@@ -109,7 +109,7 @@ describe('SocketService', () => {
 
     it('should throw when socket is undefined on getId', () => {
         (service['socket'] as unknown) = undefined;
-        expect(() => service.getId()).toThrowError(SOCKET_ERROR.SOCKET_ID_UNDEFINED);
+        expect(() => service.getId()).toThrowError(SOCKET_ID_UNDEFINED);
     });
 
     describe('waitForConnection', () => {

@@ -43,7 +43,7 @@ describe('JoinWaitingPageComponent', () => {
                 HttpClientTestingModule,
                 RouterTestingModule.withRoutes([
                     { path: 'lobby', component: TestComponent },
-                    { path: 'join-waiting', component: JoinWaitingPageComponent },
+                    { path: 'join-waiting-room', component: JoinWaitingPageComponent },
                 ]),
             ],
             providers: [GameDispatcherService],
