@@ -7,13 +7,14 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
+import { FeedbackMessages } from './feedback-messages';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from './game-player-error';
 
 @Service()
 export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService) {}
 
-    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, string | undefined, string | undefined] {
+    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, FeedbackMessages | void] {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
@@ -22,6 +23,8 @@ export class GamePlayService {
         const action: Action = this.getAction(player, game, actionData);
         const localPlayerFeedback = action.getMessage();
         const opponentFeedback = action.getOpponentMessage();
+        let endGameFeedback: string[] | undefined;
+
         let updatedData: void | GameUpdateData = action.execute();
 
         if (updatedData) {
@@ -34,13 +37,18 @@ export class GamePlayService {
             if (updatedData) updatedData.round = nextRound;
             else updatedData = { round: nextRound };
             if (game.isGameOver()) {
-                // Send messages to players
-                // TODO: Make sure it is sent AFTER action message
-                game.endOfGame();
+                const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame();
+
+                if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
+                else updatedData.player1 = { score: updatedScorePlayer1 };
+                if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
+                else updatedData.player2 = { score: updatedScorePlayer2 };
+
+                endGameFeedback = game.endGameMessage();
                 updatedData.isGameOver = true;
             }
         }
-        return [updatedData, localPlayerFeedback, opponentFeedback];
+        return [updatedData, { localPlayerFeedback, opponentFeedback, endGameFeedback }];
     }
 
     getAction(player: Player, game: Game, actionData: ActionData): Action {
