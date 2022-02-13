@@ -21,7 +21,7 @@ export class TileComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.tile.letter === '*' && this.tile.value === 0) {
+        if (this.tile.isBlank || (this.tile.letter === '*' && this.tile.value === 0)) {
             this.hideValue = true;
         }
     }
