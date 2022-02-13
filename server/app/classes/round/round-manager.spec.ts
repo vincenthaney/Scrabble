@@ -6,7 +6,7 @@ import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
 import Player from '@app/classes/player/player';
 import RoundManager from './round-manager';
-import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
+import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
 import { Round } from './round';

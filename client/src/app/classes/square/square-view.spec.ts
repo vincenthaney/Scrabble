@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { ScoreMultiplier, Square, SquareView } from '.';
 import { MultiplierEffect } from './score-multiplier';
-import * as SQUARE_ERRORS from './square-errors';
+import { NO_COLOR_FOR_MULTIPLIER, NO_SQUARE_FOR_SQUARE_VIEW } from '@app/constants/classes-errors';
 
 interface ColorTestCase {
     multiplierName: string;
@@ -77,7 +76,7 @@ describe('SquareView', () => {
         spyOnProperty(squareViewWrapper, 'square', 'get').and.returnValue(null);
         squareViewWrapper.createSquareView();
 
-        expect(() => squareViewWrapper.squareView.getColor()).toThrowError(SQUARE_ERRORS.NO_SQUARE_FOR_SQUARE_VIEW);
+        expect(() => squareViewWrapper.squareView.getColor()).toThrowError(NO_SQUARE_FOR_SQUARE_VIEW);
     });
 
     it('SquareView with no Square Multiplier should give default square color', () => {
@@ -125,7 +124,7 @@ describe('SquareView', () => {
             isCenter: false,
         };
         const squareView = new SquareView(square, SQUARE_SIZE);
-        expect(() => squareView.getColor()).toThrowError(SQUARE_ERRORS.NO_COLOR_FOR_MULTIPLIER);
+        expect(() => squareView.getColor()).toThrowError(NO_COLOR_FOR_MULTIPLIER);
     });
 
     it('SquareView with invalid score multiplier should throw error', () => {
@@ -134,6 +133,7 @@ describe('SquareView', () => {
             'AbstractScoreMultiplier',
             {
                 getMultiplier: () => {
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                     return -1;
                 },
                 getMultiplierEffect: () => {
@@ -150,7 +150,7 @@ describe('SquareView', () => {
             isCenter: false,
         };
         const squareView = new SquareView(square, SQUARE_SIZE);
-        expect(() => squareView.getColor()).toThrowError(SQUARE_ERRORS.NO_COLOR_FOR_MULTIPLIER);
+        expect(() => squareView.getColor()).toThrowError(NO_COLOR_FOR_MULTIPLIER);
     });
 
     it('SquareView with no Square associated should throw error when getting text', () => {
@@ -158,7 +158,7 @@ describe('SquareView', () => {
         spyOnProperty(squareViewWrapper, 'square', 'get').and.returnValue(null);
         squareViewWrapper.createSquareView();
 
-        expect(() => squareViewWrapper.squareView.getText()).toThrowError(SQUARE_ERRORS.NO_SQUARE_FOR_SQUARE_VIEW);
+        expect(() => squareViewWrapper.squareView.getText()).toThrowError(NO_SQUARE_FOR_SQUARE_VIEW);
     });
 
     it('SquareView with no square multiplier should return no text', () => {

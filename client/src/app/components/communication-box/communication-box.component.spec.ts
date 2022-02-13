@@ -17,7 +17,7 @@ import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
-import { CommunicationBoxComponent } from './communication-box.component';
+import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
 describe('CommunicationBoxComponent', () => {
     let component: CommunicationBoxComponent;
@@ -162,5 +162,62 @@ describe('CommunicationBoxComponent', () => {
         component.onSendMessage();
         expect(inputParserSpy.parseInput).not.toHaveBeenCalled();
         expect(formSpy).not.toHaveBeenCalled();
+    });
+
+    describe('ngOnInit', () => {
+        let spyTile: jasmine.Spy;
+        let spyMessage: jasmine.Spy;
+
+        beforeEach(() => {
+            spyTile = spyOn(component['gameService'].updateTileReserveEvent, 'subscribe');
+            spyMessage = spyOn(component['gameService'].newMessageValue, 'subscribe');
+        });
+
+        afterEach(() => {
+            spyTile.and.callThrough();
+            spyMessage.and.callThrough();
+        });
+
+        it('should subscribe to updateTileReserveEvent', () => {
+            component.ngOnInit();
+            expect(spyTile).toHaveBeenCalled();
+        });
+
+        it('should call onTileReserveUpdate on updateTileReserveEvent', () => {
+            const spy = spyOn(component, 'onTileReserveUpdate');
+            component.ngOnInit();
+            component['gameService'].updateTileReserveEvent.emit({ tileReserve: [], tileReserveTotal: 0 });
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should subscribe to updateTileReserveEvent', () => {
+            component.ngOnInit();
+            expect(spyMessage).toHaveBeenCalled();
+        });
+    });
+
+    describe('ngAfterViewInit', () => {
+        it('should call focus on handleKeyEvent', () => {
+            const spy = spyOn(component.messageInputElement.nativeElement, 'focus');
+            component.focusEvent.emit(new KeyboardEvent('keypress'));
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onTileReserveUpdate', () => {
+        it('should set lettersLeft and tileReserveTotal', () => {
+            component.lettersLeft = [];
+            component.lettersLeftTotal = 0;
+            const expectedLettersLeft: LetterMapItem[] = [{ letter: 'A', amount: 0 }];
+            const expectedLettersLeftTotal = 1;
+
+            expect(component.lettersLeft).not.toEqual(expectedLettersLeft);
+            expect(component.lettersLeftTotal).not.toEqual(expectedLettersLeftTotal);
+
+            component.onTileReserveUpdate(expectedLettersLeft, expectedLettersLeftTotal);
+
+            expect(component.lettersLeft).toEqual(expectedLettersLeft);
+            expect(component.lettersLeftTotal).toEqual(expectedLettersLeftTotal);
+        });
     });
 });

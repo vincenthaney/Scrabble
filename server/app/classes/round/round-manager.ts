@@ -1,7 +1,7 @@
 import { Action, ActionPass } from '@app/classes/actions';
 import Player from '@app/classes/player/player';
 import { CompletedRound, Round } from './round';
-import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
+import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 
 const SECONDS_TO_MILLISECONDS = 1000;
 

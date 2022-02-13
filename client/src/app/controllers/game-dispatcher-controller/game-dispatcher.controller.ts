@@ -82,7 +82,9 @@ export class GameDispatcherController {
             () => {
                 this.lobbyRequestValidEvent.emit();
             },
-            (error) => this.handleJoinError(error),
+            (error) => {
+                this.handleJoinError(error);
+            },
         );
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
