@@ -1,3 +1,5 @@
+import { ActionData } from '@app/classes/communication/action-data';
+import { HttpRequest } from '@app/classes/communication/http-interface';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
@@ -135,10 +137,12 @@ export class GameDispatcherController {
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
             this.handleLobbiesUpdate();
         } else {
-            // eslint-disable-next-line no-console
-            console.log('player left during game');
             this.socketService.removeFromRoom(playerId, gameId);
-            this.socketService.emitToRoom(gameId, 'playerLeft', { name: 'test' });
+            if (this.activeGameService.isGameOver(gameId, playerId)) return;
+
+            const requestData: ActionData = this.activeGameService.forcePlayerLose(gameId, playerId);
+            const endpoint = `/games/${gameId}/player/${playerId}/action`;
+            HttpRequest.post(endpoint, requestData);
         }
     }
 

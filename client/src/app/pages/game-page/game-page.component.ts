@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 
 @Component({
     selector: 'app-game-page',
@@ -10,7 +11,12 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(public surrenderDialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService) {}
+    constructor(
+        public surrenderDialog: MatDialog,
+        public gameService: GameService,
+        private focusableComponentService: FocusableComponentsService,
+        private readonly playerLeavesService: PlayerLeavesService,
+    ) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -45,7 +51,7 @@ export class GamePageComponent {
                         content: buttonsContent[0],
                         redirect: '/home',
                         style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
-                        action: () => this.gameService.handleLocalPlayerLeavesGame(),
+                        action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
                     },
                     {
                         content: buttonsContent[1],

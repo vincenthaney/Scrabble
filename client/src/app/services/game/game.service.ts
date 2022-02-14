@@ -65,8 +65,6 @@ export default class GameService implements OnDestroy, IResetableService {
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
-        // eslint-disable-next-line no-console
-        console.log('init game');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -151,10 +149,6 @@ export default class GameService implements OnDestroy, IResetableService {
 
     resetServiceData(): void {
         throw new Error('Method not implemented.');
-    }
-
-    handleLocalPlayerLeavesGame(): void {
-        this.leaveGameSubject.next(this.gameId);
     }
 
     sendScores(): void {

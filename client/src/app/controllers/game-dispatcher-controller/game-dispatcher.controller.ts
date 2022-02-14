@@ -5,7 +5,6 @@ import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/class
 import { GameService } from '@app/services';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -27,10 +26,6 @@ export class GameDispatcherController implements OnDestroy {
 
     constructor(private http: HttpClient, public socketService: SocketService, private readonly gameService: GameService) {
         this.configureSocket();
-
-        this.gameService.leaveGameSubject.pipe(takeUntil(this.serviceDestroyed$)).subscribe((gameId: string) => {
-            this.handleLeaveGame(gameId);
-        });
     }
 
     ngOnDestroy(): void {
@@ -52,9 +47,6 @@ export class GameDispatcherController implements OnDestroy {
             this.joinerRejectedEvent.emit(hostName[0].name);
         });
         this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
-        this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
-            this.joinerLeaveGameEvent.emit(opponent[0].name);
-        });
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
@@ -76,11 +68,6 @@ export class GameDispatcherController implements OnDestroy {
 
     handleCancelGame(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/cancel`;
-        this.http.delete(endpoint).subscribe();
-    }
-
-    handleLeaveGame(gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
         this.http.delete(endpoint).subscribe();
     }
 
