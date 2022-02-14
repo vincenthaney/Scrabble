@@ -15,7 +15,7 @@ import { Player } from '@app/classes/player';
 import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
@@ -32,17 +32,21 @@ describe('CommunicationBoxComponent', () => {
 
     const CURRENT_PLAYER_ID = 'idOfPlayer1';
     const OPPONENT_PLAYER_ID = 'idOfPlayer2';
-    const testMessagePlayer1: Message = {
+    const DEFAULT_PLAYER1_MESSAGE: Message = {
         content: 'content of test message',
         senderId: CURRENT_PLAYER_ID,
     };
-    const testMessagePlayer2: Message = {
+    const DEFAULT_PLAYER2_MESSAGE: Message = {
         content: 'content of test message',
         senderId: OPPONENT_PLAYER_ID,
     };
-    const testMessageSystem: Message = {
+    const DEFAULT_SYSTEM_MESSAGE: Message = {
         content: 'content of test message',
         senderId: SYSTEM_ID,
+    };
+    const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
+        content: 'content of test message',
+        senderId: SYSTEM_ERROR_ID,
     };
 
     beforeEach(async () => {
@@ -99,34 +103,16 @@ describe('CommunicationBoxComponent', () => {
 
     it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
         const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
-        gameServiceMock.handleNewMessage(testMessageSystem);
+        gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
         expect(onReceiveSpy).toHaveBeenCalled();
     });
 
     it('onReceiveNewMessage should call appropriate functions and receive new message', () => {
         const messagesLengthBefore: number = component.messages.length;
-        gameServiceMock.handleNewMessage(testMessageSystem);
+        gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
         const messagesLengthAfter: number = component.messages.length;
         expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
         expect(scrollToBottomSpy).toHaveBeenCalled();
-    });
-
-    it('should create visualMessage from Message by player1', () => {
-        const returnValue: VisualMessage = component.createVisualMessage(testMessagePlayer1);
-        const expectedValue: VisualMessage = { ...testMessagePlayer1, class: 'me' };
-        expect(returnValue).toEqual(expectedValue);
-    });
-
-    it('should create visualMessage from Message by player2', () => {
-        const returnValue: VisualMessage = component.createVisualMessage(testMessagePlayer2);
-        const expectedValue: VisualMessage = { ...testMessagePlayer2, class: 'opponent' };
-        expect(returnValue).toEqual(expectedValue);
-    });
-
-    it('should create visualMessage from Message by system', () => {
-        const returnValue: VisualMessage = component.createVisualMessage(testMessageSystem);
-        const expectedValue: VisualMessage = { ...testMessageSystem, class: 'system' };
-        expect(returnValue).toEqual(expectedValue);
     });
 
     it('scrollToBottom should call scrollTo on viewport', async () => {
@@ -140,27 +126,46 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    // it('onSendMessage should clear input field', () => {
-    //     const inputField = component.messageForm.get('content');
-    //     inputField?.setValue('new input');
-    //     console.log(component.messageForm.get('content')?.value);
-    //     component.onSendMessage();
-    //     console.log(component.messageForm.get('content')?.value);
-    //     expect(inputField?.value).toEqual('');
-    // });
+    describe('createVisualMessage', () => {
+        it('should create visualMessage from Message by player1', () => {
+            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_PLAYER1_MESSAGE);
+            const expectedValue: VisualMessage = { ...DEFAULT_PLAYER1_MESSAGE, class: 'me' };
+            expect(returnValue).toEqual(expectedValue);
+        });
 
-    it('onSendMessage should call appropriate functions if message is not empty', () => {
-        component.messageForm.get('content')?.setValue('new input');
-        component.onSendMessage();
-        expect(inputParserSpy.parseInput).toHaveBeenCalled();
-        expect(formSpy).toHaveBeenCalled();
+        it('should create visualMessage from Message by player2', () => {
+            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_PLAYER2_MESSAGE);
+            const expectedValue: VisualMessage = { ...DEFAULT_PLAYER2_MESSAGE, class: 'opponent' };
+            expect(returnValue).toEqual(expectedValue);
+        });
+
+        it('should create visualMessage from Message by system', () => {
+            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_SYSTEM_MESSAGE);
+            const expectedValue: VisualMessage = { ...DEFAULT_SYSTEM_MESSAGE, class: 'system' };
+            expect(returnValue).toEqual(expectedValue);
+        });
+
+        it('should create visualMessage from Message by system-error', () => {
+            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            const expectedValue: VisualMessage = { ...DEFAULT_SYSTEM_ERROR_MESSAGE, class: 'system-error' };
+            expect(returnValue).toEqual(expectedValue);
+        });
     });
 
-    it('onSendMessage should NOT call appropriate functions if message is empty', () => {
-        component.messageForm.setValue({ content: '' });
-        component.onSendMessage();
-        expect(inputParserSpy.parseInput).not.toHaveBeenCalled();
-        expect(formSpy).not.toHaveBeenCalled();
+    describe('onSendMessage', () => {
+        it('onSendMessage should call appropriate functions if message is not empty', () => {
+            component.messageForm.get('content')?.setValue('new input');
+            component.onSendMessage();
+            expect(inputParserSpy.parseInput).toHaveBeenCalled();
+            expect(formSpy).toHaveBeenCalled();
+        });
+
+        it('onSendMessage should NOT call appropriate functions if message is empty', () => {
+            component.messageForm.setValue({ content: '' });
+            component.onSendMessage();
+            expect(inputParserSpy.parseInput).not.toHaveBeenCalled();
+            expect(formSpy).not.toHaveBeenCalled();
+        });
     });
 
     describe('ngOnInit', () => {
