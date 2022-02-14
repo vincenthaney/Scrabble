@@ -102,7 +102,7 @@ describe('InputParserService', () => {
     });
 
     describe('parseInput', () => {
-        it('should always call getLocalPLayer, gamservice.getGameId and parseCommand', () => {
+        it('should always call getLocalPLayer, gameservice.getGameId', () => {
             const getLocalPlayerSpy = spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER_ID);
             service.parseInput(VALID_MESSAGE_INPUT);
             expect(getLocalPlayerSpy).toHaveBeenCalled();
@@ -205,10 +205,6 @@ describe('InputParserService', () => {
             const spy = spyOn<any>(service, 'createExchangeActionPayload').and.returnValue(EXPECTED_EXCHANGE_PAYLOAD);
             service['parseCommand'](VALID_EXCHANGE_INPUT.substring(1).split(' '));
             expect(spy).toHaveBeenCalled();
-        });
-
-        it('should return right ActionData if input is a valid pass command', () => {
-            expect(service['parseCommand'](VALID_PASS_INPUT.substring(1).split(' '))).toEqual({ type: ActionType.PASS, payload: {} });
         });
 
         it('should return right Actiondata if input is a valid pass command', () => {
@@ -324,9 +320,8 @@ describe('InputParserService', () => {
 
     describe('parsePlaceLettersToTiles', () => {
         it('should return valid tiles with valid input', () => {
-            const validLetters = ['abce', 'abce', 'ceX', 'bKcc', 'ccee'];
+            const validLetters = ['abce', 'ceX', 'bKcc', 'ccee'];
             const expectedTiles: Tile[][] = [
-                [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
                 [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
                 [new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1), new Tile('X' as LetterValue, 0, true)],
                 [
@@ -364,9 +359,8 @@ describe('InputParserService', () => {
 
     describe('parseExchangeLettersToTiles', () => {
         it('should return valid tiles with valid input', () => {
-            const validLetters = ['abce', 'abce', 'ab*', 'ccee'];
+            const validLetters = ['abce', 'ab*', 'ccee'];
             const expectedTiles: Tile[][] = [
-                [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
                 [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
                 [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('*' as LetterValue, 0)],
                 [new Tile('C' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
