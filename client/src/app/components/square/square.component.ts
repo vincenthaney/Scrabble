@@ -15,10 +15,10 @@ export interface CssStyleProperty {
 })
 export class SquareComponent implements OnInit {
     @Input() squareView: SquareView;
+    @Input() tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
     style: { [key: string]: string } = {};
     multiplierType: string | undefined;
     multiplierValue: string | undefined;
-    tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
     ngOnInit() {
         this.setText();

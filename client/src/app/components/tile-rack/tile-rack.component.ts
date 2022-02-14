@@ -13,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class TileRackComponent implements OnInit, OnDestroy {
     tiles: Tile[];
-    fontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
+    tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
     updateTileRackSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -21,7 +21,6 @@ export class TileRackComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.updateTileRack();
-        if (!this.gameService.updateTileRackEvent) return;
         this.updateTileRackSubscription = this.gameService.updateTileRackEvent
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe(() => this.updateTileRack());

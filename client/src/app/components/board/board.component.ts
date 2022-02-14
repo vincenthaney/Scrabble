@@ -1,17 +1,8 @@
-import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { SquareComponent } from '@app/components/square/square.component';
-import {
-    LETTER_VALUES,
-    MARGIN_COLUMN_SIZE,
-    SQUARE_FONT_SIZE_INCREMENT,
-    SQUARE_SIZE,
-    SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE,
-    UNDEFINED_SQUARE
-} from '@app/constants/game';
+import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, SQUARE_TILE_DEFAULT_FONT_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { BoardService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -22,30 +13,18 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent implements OnInit, OnDestroy {
-    @ViewChildren('square') squareComponents: QueryList<SquareComponent>;
     boardDestroyed$: Subject<boolean> = new Subject();
     marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
     squareGrid: SquareView[][];
     boardUpdateSubscription: Subscription;
+    tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
     constructor(private boardService: BoardService) {
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
-    }
-
-    changeFontSize(operation: string) {
-        if (operation === 'smaller') {
-            this.squareComponents.forEach((squareComponent) => {
-                if (squareComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) squareComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
-            });
-        } else if (operation === 'larger') {
-            this.squareComponents.forEach((squareComponent) => {
-                if (squareComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) squareComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
-            });
-        }
     }
 
     ngOnInit() {
