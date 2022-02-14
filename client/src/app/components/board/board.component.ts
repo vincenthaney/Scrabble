@@ -3,7 +3,15 @@ import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { SquareComponent } from '@app/components/square/square.component';
-import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
+import {
+    LETTER_VALUES,
+    MARGIN_COLUMN_SIZE,
+    SQUARE_FONT_SIZE_INCREMENT,
+    SQUARE_SIZE,
+    SQUARE_TILE_MAX_FONT_SIZE,
+    SQUARE_TILE_MIN_FONT_SIZE,
+    UNDEFINED_SQUARE
+} from '@app/constants/game';
 import { BoardService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -31,11 +39,11 @@ export class BoardComponent implements OnInit, OnDestroy {
     changeFontSize(operation: string) {
         if (operation === 'smaller') {
             this.squareComponents.forEach((squareComponent) => {
-                if (squareComponent.tileFontSize > TILE_MIN_FONT_SIZE) squareComponent.tileFontSize -= 0.1;
+                if (squareComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) squareComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
             });
         } else if (operation === 'larger') {
             this.squareComponents.forEach((squareComponent) => {
-                if (squareComponent.tileFontSize < TILE_MAX_FONT_SIZE) squareComponent.tileFontSize += 0.1;
+                if (squareComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) squareComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
             });
         }
     }

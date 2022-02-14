@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
-import { TILE_DEFAULT_FONT_SIZE } from '@app/constants/game';
+import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/game';
 import { GameService } from '@app/services';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class TileRackComponent implements OnInit, OnDestroy {
     tiles: Tile[];
-    fontSize: number = TILE_DEFAULT_FONT_SIZE;
+    fontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
     updateTileRackSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
 

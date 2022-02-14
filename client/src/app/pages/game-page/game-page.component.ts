@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
-import { TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE } from '@app/constants/game';
+import { RACK_FONT_SIZE_INCREMENT, RACK_TILE_MAX_FONT_SIZE, RACK_TILE_MIN_FONT_SIZE } from '@app/constants/game';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 
@@ -45,14 +45,13 @@ export class GamePageComponent {
     }
 
     changeFontSize(operation: string) {
-        console.log(operation);
         this.boardComponent.changeFontSize(operation);
         if (operation === 'smaller') {
             // this.boardComponent.gridSize.x = 10;
             // this.tileRackComponent.tiles.forEach((tile) => (tile.letter = 'A'));
-            if (this.tileRackComponent.fontSize > TILE_MIN_FONT_SIZE) this.tileRackComponent.fontSize -= 0.1;
+            if (this.tileRackComponent.fontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.fontSize -= RACK_FONT_SIZE_INCREMENT;
         } else if (operation === 'larger') {
-            if (this.tileRackComponent.fontSize < TILE_MAX_FONT_SIZE) this.tileRackComponent.fontSize += 0.1;
+            if (this.tileRackComponent.fontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.fontSize += RACK_FONT_SIZE_INCREMENT;
         }
     }
 }
