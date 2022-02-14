@@ -56,7 +56,9 @@ export default class ActionPlace extends ActionPlay {
     }
 
     wordToString(words: [Square, Tile][][]): string[] {
-        return words.map((word) => word.reduce((previous, [, tile]) => (previous += tile.letter), ''));
+        return words.map((word) =>
+            word.reduce((previous, [, tile]) => (tile.playedLetter ? (previous += tile.playedLetter) : (previous += tile.letter)), ''),
+        );
     }
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {

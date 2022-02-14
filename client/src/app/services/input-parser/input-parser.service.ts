@@ -209,7 +209,7 @@ export default class InputParserService implements OnDestroy {
                     break;
                 } else if (playerTiles[i].letter === '*' && (letter as LetterValue) && letter === letter.toUpperCase()) {
                     const tile = playerTiles.splice(i, 1)[0];
-                    tilesToPlace.push(new Tile(letter as LetterValue, tile.value));
+                    tilesToPlace.push(new Tile(letter as LetterValue, tile.value, true));
                     break;
                 }
             }
