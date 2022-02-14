@@ -5,7 +5,8 @@ import { Vec2 } from '@app/classes/vec2';
 import { SquareComponent } from '@app/components/square/square.component';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, TILE_MAX_FONT_SIZE, TILE_MIN_FONT_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { BoardService } from '@app/services/';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-board',
@@ -14,6 +15,7 @@ import { Subscription } from 'rxjs';
 })
 export class BoardComponent implements OnInit, OnDestroy {
     @ViewChildren('square') squareComponents: QueryList<SquareComponent>;
+    boardDestroyed$: Subject<boolean> = new Subject();
     marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
@@ -40,10 +42,14 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.initializeBoard(this.boardService.initialBoard);
-        this.boardUpdateSubscription = this.boardService.boardUpdateEvent.subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
+        this.boardUpdateSubscription = this.boardService.boardUpdateEvent
+            .pipe(takeUntil(this.boardDestroyed$))
+            .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
     }
 
     ngOnDestroy() {
+        this.boardDestroyed$.next(true);
+        this.boardDestroyed$.complete();
         this.boardUpdateSubscription.unsubscribe();
     }
 

@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
+import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import * as SOCKET_ERROR from './socket.service.error';
 
-const CONNECTION_DELAY = 5;
-const CONNECTION_TIMEOUT = 5000;
 @Injectable({
     providedIn: 'root',
 })
@@ -12,32 +10,18 @@ export default class SocketService {
     private socket: Socket;
 
     async initializeService(): Promise<void> {
-        this.connect();
-        return this.waitForConnection(() => this.isSocketAlive(), CONNECTION_DELAY, CONNECTION_TIMEOUT);
-    }
-
-    async waitForConnection(predicate: () => boolean, delay: number, timeout: number): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let connectionTime = 0;
-            const interval = setInterval(() => {
-                connectionTime += delay;
-                if (predicate()) {
-                    clearInterval(interval);
-                    resolve();
-                } else if (connectionTime >= timeout) {
-                    clearInterval(interval);
-                    reject();
-                }
-            }, delay);
-        });
+        return this.connect();
     }
 
     isSocketAlive(): boolean {
         return this.socket && this.socket.connected;
     }
 
-    connect() {
-        this.socket = io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
+    async connect() {
+        return new Promise<void>((resolve) => {
+            this.socket = io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
+            this.socket.on('connect', () => resolve());
+        });
     }
 
     disconnect() {
@@ -49,7 +33,7 @@ export default class SocketService {
     }
 
     getId(): string {
-        if (!this.socket) throw new Error(SOCKET_ERROR.SOCKET_ID_UNDEFINED);
+        if (!this.socket) throw new Error(SOCKET_ID_UNDEFINED);
 
         return this.socket.id;
     }

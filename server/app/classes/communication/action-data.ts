@@ -16,4 +16,5 @@ export interface ActionExchangePayload {
 export interface ActionData<T extends unknown = unknown> {
     type: ActionType;
     payload: T;
+    input: string;
 }

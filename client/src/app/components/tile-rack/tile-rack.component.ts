@@ -3,7 +3,8 @@ import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { TILE_DEFAULT_FONT_SIZE } from '@app/constants/game';
 import { GameService } from '@app/services';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-tile-rack',
@@ -14,18 +15,21 @@ export class TileRackComponent implements OnInit, OnDestroy {
     tiles: Tile[];
     fontSize: number = TILE_DEFAULT_FONT_SIZE;
     updateTileRackSubscription: Subscription;
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(public gameService: GameService) {}
 
     ngOnInit() {
         this.updateTileRack();
         if (!this.gameService.updateTileRackEvent) return;
-        this.updateTileRackSubscription = this.gameService.updateTileRackEvent.subscribe(() => this.updateTileRack());
+        this.updateTileRackSubscription = this.gameService.updateTileRackEvent
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe(() => this.updateTileRack());
     }
 
     ngOnDestroy() {
-        if (!this.updateTileRackSubscription) return;
-        this.updateTileRackSubscription.unsubscribe();
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     private updateTileRack() {

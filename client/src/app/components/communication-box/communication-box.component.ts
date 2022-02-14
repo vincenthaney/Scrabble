@@ -1,13 +1,17 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
 import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
 import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
+import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
+import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-type LetterMapItem = { letter: LetterValue; amount: number };
+export type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
     selector: 'app-communication-box',
@@ -15,8 +19,11 @@ type LetterMapItem = { letter: LetterValue; amount: number };
     styleUrls: ['./communication-box.component.scss', './communication-box-text.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CommunicationBoxComponent implements OnInit, OnDestroy {
+export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy, AfterViewInit {
+    @ViewChild('messageInput') messageInputElement: ElementRef;
+    @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     messages: VisualMessage[] = [];
     messageForm = new FormGroup({
@@ -28,33 +35,58 @@ export class CommunicationBoxComponent implements OnInit, OnDestroy {
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
 
-    constructor(private inputParser: InputParserService, private gameService: GameService, private changeDetectorRef: ChangeDetectorRef) {}
+    constructor(
+        private inputParser: InputParserService,
+        private gameService: GameService,
+        private focusableComponentsService: FocusableComponentsService,
+        private changeDetectorRef: ChangeDetectorRef,
+    ) {
+        super();
+        this.focusableComponentsService.setActiveKeyboardComponent(this);
+    }
 
     ngOnInit(): void {
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
 
-        this.gameService.updateTileReserveEvent.subscribe(({ tileReserve, tileReserveTotal }) => {
+        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
         });
-        this.gameService.newMessageValue.subscribe((newMessage) => {
+        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
     }
 
+    ngAfterViewInit(): void {
+        this.messageInputElement.nativeElement.focus();
+        const handleKeyEvent = () => {
+            this.messageInputElement.nativeElement.focus();
+        };
+        this.focusEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(handleKeyEvent);
+    }
+
     ngOnDestroy(): void {
-        this.gameService.updateTileReserveEvent.unsubscribe();
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
         let messageClass: VisualMessageClass;
-        if (newMessage.senderId === this.gameService.getLocalPlayerId()) {
-            messageClass = 'me';
-        } else if (newMessage.senderId === 'system') {
-            messageClass = 'system';
-        } else {
-            messageClass = 'opponent';
+        switch (newMessage.senderId) {
+            case this.gameService.getLocalPlayerId():
+                messageClass = 'me';
+                break;
+            case 'system':
+                messageClass = 'system';
+                break;
+            case 'system-error':
+                messageClass = 'system-error';
+                break;
+            default:
+                messageClass = 'opponent';
+                break;
         }
+
         return { ...newMessage, class: messageClass };
     }
 

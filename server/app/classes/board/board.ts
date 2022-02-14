@@ -1,7 +1,7 @@
 import { Orientation, Position } from './';
 import { Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
-import { POSITION_OUT_OF_BOARD } from './board-errors';
+import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import BoardNavigator from './board-navigator';
 import { Vec2 } from '@app/classes/vec2';
 

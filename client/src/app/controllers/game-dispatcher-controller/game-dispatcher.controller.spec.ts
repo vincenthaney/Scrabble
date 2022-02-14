@@ -3,13 +3,13 @@ import { TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import SocketService from '@app/services/socket/socket.service';
-import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import PlayerName from '@app/classes/communication/player-name';
 import { Socket } from 'socket.io-client';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 const DEFAULT_SOCKET_ID = 'testSocketID';
 const DEFAULT_PLAYER_NAME = 'grogars';
@@ -230,5 +230,26 @@ describe('GameDispatcherController', () => {
         controller.handleLobbyJoinRequest({} as unknown as string, {} as unknown as string);
 
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('handleLobbyJoinRequest should emit when HTTP post request on success', () => {
+        const fakeObservable = of<string>('fakeResponse');
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
+        const successSpy = spyOn(controller.lobbyRequestValidEvent, 'emit');
+        controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
+        expect(successSpy).toHaveBeenCalled();
+    });
+
+    it('handleLobbyJoinRequest should call handleJoinError when HTTP post request generates an error', () => {
+        // eslint-disable-next-line dot-notation
+        spyOn(controller['http'], 'post').and.callFake(() => {
+            return throwError('fakeError');
+        });
+        const errorSpy = spyOn(controller, 'handleJoinError').and.callFake(() => {
+            return;
+        });
+        controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
+        expect(errorSpy).toHaveBeenCalled();
     });
 });

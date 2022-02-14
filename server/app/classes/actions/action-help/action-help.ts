@@ -1,5 +1,5 @@
 import ActionInfo from '@app/classes/actions/action-info';
-import { HELP_ACTIONS } from './action-help-const';
+import { HELP_ACTIONS } from '@app/constants/classes-constants';
 
 export default class ActionHelp extends ActionInfo {
     getMessage(): string {

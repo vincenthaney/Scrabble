@@ -7,9 +7,8 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { expect } from 'chai';
-import { POSITION_OUT_OF_BOARD } from '@app/classes/board/board-errors';
+import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { WordExtraction } from './word-extraction';
-import { EXTRACTION_SQUARE_ALREADY_FILLED } from './word-extraction-errors';
 import Direction from '@app/classes/board/direction';
 
 type LetterOrEmpty = LetterValue | ' ';
@@ -100,6 +99,10 @@ describe('WordExtract', () => {
 
         it('should contains all words (8)', () => {
             testWords(['X', 'Y', 'Z'], 3, 3, Orientation.Horizontal, ['CXYZ', 'DY', 'EZ']);
+        });
+
+        it('should contains all words (9)', () => {
+            testWords(['X'], 4, 1, Orientation.Horizontal, ['XD']);
         });
 
         it('should throw if square already has a tile', () => {

@@ -6,7 +6,7 @@ import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
 import Player from '@app/classes/player/player';
 import RoundManager from './round-manager';
-import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
+import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
 import { Round } from './round';
@@ -186,6 +186,27 @@ describe('RoundManager', () => {
             roundManager['saveCompletedRound'](round, actionExchange);
 
             expect(roundManager.getPassCounter()).to.equal(0);
+        });
+    });
+
+    describe('convertRoundToRoundData', () => {
+        it('should convert player to playerData', () => {
+            const player = new Player(DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.getId());
+            player.score = 10;
+            player.tiles = [];
+            const round: Round = {
+                player,
+                startTime: new Date(),
+                limitTime: new Date(),
+            };
+            const roundData = roundManager.convertRoundToRoundData(round);
+
+            expect(roundData.playerData.name).to.equal(player.name);
+            expect(roundData.playerData.id).to.equal(player.getId());
+            expect(roundData.playerData.score).to.equal(player.score);
+            expect(roundData.playerData.tiles).to.equal(player.tiles);
+            expect(roundData.startTime).to.equal(round.startTime);
+            expect(roundData.limitTime).to.equal(round.limitTime);
         });
     });
 

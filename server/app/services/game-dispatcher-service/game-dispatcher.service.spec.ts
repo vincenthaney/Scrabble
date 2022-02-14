@@ -9,13 +9,19 @@ import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
-import * as Errors from '@app/constants/errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Container } from 'typedi';
 import { GameDispatcherService } from './game-dispatcher.service';
-import * as GameDispatcherError from './game-dispatcher.service.error';
+import {
+    CANNOT_HAVE_SAME_NAME,
+    INVALID_PLAYER_ID_FOR_GAME,
+    NO_GAME_FOUND_WITH_ID,
+    NO_OPPONENT_IN_WAITING_GAME,
+    OPPONENT_NAME_DOES_NOT_MATCH,
+    PLAYER_ALREADY_TRYING_TO_JOIN,
+} from '@app/constants/services-errors';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { SinonStubbedInstance, createStubInstance } from 'sinon';
@@ -103,13 +109,13 @@ describe('GameDispatcherService', () => {
 
             expect(() => {
                 gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID_2, DEFAULT_OPPONENT_NAME_2);
-            }).to.throw(GameDispatcherError.PLAYER_ALREADY_TRYING_TO_JOIN);
+            }).to.throw(PLAYER_ALREADY_TRYING_TO_JOIN);
         });
 
         it('should not join if initiating players have the same name', () => {
             expect(() => {
                 gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
-            }).to.throw(GameDispatcherError.CANNOT_HAVE_SAME_NAME);
+            }).to.throw(CANNOT_HAVE_SAME_NAME);
         });
     });
 
@@ -124,7 +130,7 @@ describe('GameDispatcherService', () => {
             tileReserveStub = createStubInstance(TileReserve);
             tileReserveStub.init.returns(Promise.resolve());
             gameStub = createStubInstance(Game);
-            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
+            gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
             spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () =>
                 Promise.resolve(gameStub as unknown as Game),
             );
@@ -156,7 +162,7 @@ describe('GameDispatcherService', () => {
             const invalidId = 'invalidId';
 
             return expect(gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.rejectedWith(
-                Errors.INVALID_PLAYER_ID_FOR_GAME,
+                INVALID_PLAYER_ID_FOR_GAME,
             );
         });
 
@@ -165,13 +171,13 @@ describe('GameDispatcherService', () => {
 
             return expect(
                 gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
-            ).to.be.rejectedWith(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+            ).to.be.rejectedWith(NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it(' should throw error when playerId is invalid', () => {
             return expect(
                 gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2),
-            ).to.be.rejectedWith(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
+            ).to.be.rejectedWith(OPPONENT_NAME_DOES_NOT_MATCH);
         });
     });
 
@@ -193,20 +199,20 @@ describe('GameDispatcherService', () => {
 
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.rejectJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => gameDispatcherService.rejectJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it('should throw if no player is waiting', () => {
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
             expect(() => {
                 return gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
-            }).to.throw(GameDispatcherError.NO_OPPONENT_IN_WAITING_GAME);
+            }).to.throw(NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it('should throw error if opponent name is incorrect', () => {
             expect(() => {
                 return gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2);
-            }).to.throw(GameDispatcherError.OPPONENT_NAME_DOES_NOT_MATCH);
+            }).to.throw(OPPONENT_NAME_DOES_NOT_MATCH);
         });
     });
 
@@ -228,13 +234,13 @@ describe('GameDispatcherService', () => {
 
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it('should throw if player is undefined', () => {
             waitingRoom.joinedPlayer = undefined;
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(Errors.NO_OPPONENT_IN_WAITING_GAME);
+            expect(() => gameDispatcherService.leaveLobbyRequest(id, invalidId)).to.throw(NO_OPPONENT_IN_WAITING_GAME);
         });
 
         it('should return the [hostPlayerId, leaverName]', () => {
@@ -259,7 +265,7 @@ describe('GameDispatcherService', () => {
 
         it('should throw if playerId is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService.cancelGame(id, invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+            expect(() => gameDispatcherService.cancelGame(id, invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
     });
 
@@ -302,7 +308,7 @@ describe('GameDispatcherService', () => {
 
         it('should throw when id is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(Errors.NO_GAME_FOUND_WITH_ID);
+            expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(NO_GAME_FOUND_WITH_ID);
         });
     });
 
@@ -319,16 +325,20 @@ describe('GameDispatcherService', () => {
         const DEFAULT_MAP = new Map<LetterValue, number>([
             ['A', 1],
             ['B', 2],
+            ['C', 2],
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            ['F', 8],
         ]);
         const TILE_RESERVE_DATA: TileReserveData[] = [
             { letter: 'A', amount: 1 },
             { letter: 'B', amount: 2 },
+            { letter: 'C', amount: 2 },
+            { letter: 'F', amount: 8 },
         ];
-        const TILE_RESERVE_TOTAL = 3;
+        const TILE_RESERVE_TOTAL = 13;
         let gameStub: SinonStubbedInstance<Game>;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
         let round: Round;
-        let tileReserveStub: SinonStubbedInstance<TileReserve>;
         let boardStub: SinonStubbedInstance<Board>;
         let game: Game;
 
@@ -338,16 +348,14 @@ describe('GameDispatcherService', () => {
             boardStub = createStubInstance(Board);
 
             roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-            tileReserveStub = createStubInstance(TileReserve);
             gameStub.player1 = PLAYER_1;
             gameStub.player2 = PLAYER_2;
-            tileReserveStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+            gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
             gameStub.gameType = GameType.Classic;
             gameStub.dictionnaryName = DEFAULT_DICTIONARY;
             gameStub.getId.returns(DEFAULT_GAME_ID);
             gameStub.board = boardStub;
             gameStub.board.grid = [[]];
-            gameStub.tileReserve = tileReserveStub as unknown as TileReserve;
             gameStub.roundManager = roundManagerStub as unknown as RoundManager;
 
             round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
@@ -368,7 +376,7 @@ describe('GameDispatcherService', () => {
                 board: gameStub.board.grid,
                 tileReserve: TILE_RESERVE_DATA,
                 tileReserveTotal: TILE_RESERVE_TOTAL,
-                round,
+                round: roundManagerStub.convertRoundToRoundData(round),
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);
         });
