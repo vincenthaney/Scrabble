@@ -1,9 +1,9 @@
 import { Square } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
+import { NO_COLOR_FOR_MULTIPLIER, NO_SQUARE_FOR_SQUARE_VIEW } from '@app/constants/classes-errors';
 import { COLORS } from '@app/constants/colors';
 import { MultiplierEffect, MultiplierValue } from './score-multiplier';
 import { MULTIPLIER_COLOR_MAP } from './square-multiplier-to-color-map';
-import { NO_COLOR_FOR_MULTIPLIER, NO_SQUARE_FOR_SQUARE_VIEW } from '@app/constants/classes-errors';
 
 export default class SquareView {
     square: Square;

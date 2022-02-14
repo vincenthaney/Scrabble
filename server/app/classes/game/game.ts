@@ -1,5 +1,7 @@
 import Board from '@app/classes/board/board';
+import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
+import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
@@ -147,6 +149,8 @@ export default class Game {
             tileReserve.push({ letter, amount });
         });
         const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        const round: Round = this.roundManager.getCurrentRound();
+        const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
         const startMultiplayerGameData: StartMultiplayerGameData = {
             player1: this.player1,
             player2: this.player2,
@@ -157,7 +161,7 @@ export default class Game {
             board: this.board.grid,
             tileReserve,
             tileReserveTotal,
-            round: this.roundManager.getCurrentRound(),
+            round: roundData,
         };
         return startMultiplayerGameData;
     }

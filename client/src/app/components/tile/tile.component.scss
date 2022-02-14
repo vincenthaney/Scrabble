@@ -45,4 +45,7 @@ $text-color: rgb(80, 55, 10);
             visibility: hidden;
         }
     }
+    &.blank p {
+        color: tomato !important;
+    }
 }

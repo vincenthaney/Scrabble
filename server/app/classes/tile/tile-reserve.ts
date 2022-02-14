@@ -33,7 +33,7 @@ export default class TileReserve {
         const letterDistribution = await TileReserve.fetchLetterDistribution();
         letterDistribution.forEach((tile) => {
             for (let i = 0; i < tile.amount; ++i) {
-                this.tiles.push({ letter: tile.letter as LetterValue, value: tile.score });
+                this.tiles.push({ letter: tile.letter as LetterValue, value: tile.score, isBlank: tile.letter === '*' });
             }
         });
         this.initialized = true;

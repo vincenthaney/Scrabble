@@ -376,7 +376,7 @@ describe('GameDispatcherService', () => {
                 board: gameStub.board.grid,
                 tileReserve: TILE_RESERVE_DATA,
                 tileReserveTotal: TILE_RESERVE_TOTAL,
-                round,
+                round: roundManagerStub.convertRoundToRoundData(round),
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);
         });

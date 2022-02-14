@@ -16,7 +16,7 @@ import {
     RejectEmitArgs,
     SocketEmitEvents,
     // eslint-disable-next-line prettier/prettier
-    StartGameEmitArgs
+    StartGameEmitArgs,
 } from './socket-types';
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 

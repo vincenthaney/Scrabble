@@ -144,7 +144,6 @@ export class GameDispatcherService {
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
     }
-
     isGameInWaitingRooms(gameId: string): boolean {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === gameId);
         return filteredWaitingRoom.length > 0;

@@ -6,6 +6,7 @@ import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IResetableService } from '@app/classes/i-resetable-service';
 import { AbstractPlayer, Player } from '@app/classes/player';
+import { Round } from '@app/classes/round';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ID } from '@app/constants/game';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
@@ -76,7 +77,7 @@ export default class GameService implements OnDestroy, IResetableService {
         this.roundManager.gameId = startGameData.gameId;
         this.roundManager.localPlayerId = this.localPlayerId;
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
-        this.roundManager.currentRound = startGameData.round;
+        this.roundManager.currentRound = this.roundManager.convertRoundDataToRound(startGameData.round);
         this.tileReserve = startGameData.tileReserve;
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
@@ -103,7 +104,8 @@ export default class GameService implements OnDestroy, IResetableService {
             this.boardService.updateBoard(gameUpdateData.board);
         }
         if (gameUpdateData.round) {
-            this.roundManager.updateRound(gameUpdateData.round);
+            const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
+            this.roundManager.updateRound(round);
         }
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
             this.tileReserve = gameUpdateData.tileReserve;
