@@ -426,7 +426,7 @@ describe('GameDispatcherController', () => {
         let handleLobbiesUpdateSpy: unknown;
 
         beforeEach(() => {
-            isGameInWaitingRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'isGameInWaitingRoomsSpy', () => {
+            isGameInWaitingRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'isGameInWaitingRooms', () => {
                 return true;
             });
             leaveLobbyRequestSpy = chai.spy.on(controller['gameDispatcherService'], 'leaveLobbyRequest', () => {
