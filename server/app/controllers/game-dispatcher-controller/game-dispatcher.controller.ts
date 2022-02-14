@@ -166,7 +166,6 @@ export class GameDispatcherController {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
 
         const gameConfig = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
-
         const startGameData = await this.activeGameService.beginMultiplayerGame(gameId, gameConfig);
 
         this.socketService.addToRoom(startGameData.player2.getId(), gameId);

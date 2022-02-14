@@ -9,7 +9,6 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ID } from '@app/constants/game';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -38,6 +37,7 @@ export default class GameService implements OnDestroy, IResetableService {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    leaveGameSubject: Subject<string>;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     isGameOver: boolean;
@@ -49,16 +49,14 @@ export default class GameService implements OnDestroy, IResetableService {
         private boardService: BoardService,
         private roundManager: RoundManagerService,
         private gameController: GamePlayController,
-        private gameDispatcherController: GameDispatcherController,
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
-        this.gameDispatcherController.initializeGameSubject
-            .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe(async ([localPlayerId, startGameData]) => this.initializeMultiplayerGame(localPlayerId, startGameData));
+
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
+        this.leaveGameSubject = new Subject<string>();
     }
 
     ngOnDestroy(): void {
@@ -68,7 +66,7 @@ export default class GameService implements OnDestroy, IResetableService {
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
         // eslint-disable-next-line no-console
-        console.log('start game');
+        console.log('init game');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -155,7 +153,7 @@ export default class GameService implements OnDestroy, IResetableService {
     }
 
     handleLocalPlayerLeavesGame(): void {
-        this.gameDispatcherController.handleLeaveLobby(this.gameId);
+        this.leaveGameSubject.next(this.gameId);
     }
 
     sendScores(): void {

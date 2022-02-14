@@ -2,8 +2,8 @@ import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameService } from '@app/services';
 import SocketService from '@app/services/socket/socket.service';
-import { ReplaySubject, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -21,8 +21,7 @@ export class GameDispatcherController {
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
-    initializeGameSubject: Subject<[string, StartMultiplayerGameData]> = new ReplaySubject();
-    constructor(private http: HttpClient, public socketService: SocketService) {
+    constructor(private http: HttpClient, public socketService: SocketService, private readonly gameService: GameService) {
         this.configureSocket();
     }
 
@@ -30,9 +29,9 @@ export class GameDispatcherController {
         this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
             this.joinRequestEvent.emit(opponent[0].name);
         });
-        this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
-            this.initializeGameSubject.next([this.socketService.getId(), startGameData[0]]),
-        );
+        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) => {
+            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]);
+        });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
         });
