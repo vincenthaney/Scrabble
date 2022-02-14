@@ -1,19 +1,19 @@
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
+import {
+    DICTIONARY_REQUIRED,
+    GAME_TYPE_REQUIRED,
+    MAX_ROUND_TIME_REQUIRED,
+    NAME_IS_INVALID,
+    PLAYER_NAME_REQUIRED
+} from '@app/constants/controllers-errors';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { validateName } from '@app/utils/validate-name';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import {
-    DICTIONARY_REQUIRED,
-    GAME_TYPE_REQUIRED,
-    MAX_ROUND_TIME_REQUIRED,
-    NAME_IS_INVALID,
-    PLAYER_NAME_REQUIRED,
-} from '@app/constants/controllers-errors';
 
 @Service()
 export class GameDispatcherController {
@@ -50,7 +50,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/join', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/join', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { playerName }: { playerName: string } = req.body;
 
@@ -63,7 +63,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/accept', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/accept', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
@@ -76,7 +76,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/reject', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/reject', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
@@ -89,7 +89,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.delete('/games/:gameId/player/:playerId/cancel', (req: GameRequest, res: Response) => {
+        this.router.delete('/games/:gameId/players/:playerId/cancel', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
 
             try {
@@ -101,7 +101,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.delete('/games/:gameId/player/:playerId/leave', (req: GameRequest, res: Response) => {
+        this.router.delete('/games/:gameId/players/:playerId/leave', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
 
             try {
