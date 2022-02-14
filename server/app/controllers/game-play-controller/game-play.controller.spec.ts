@@ -16,7 +16,7 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
-import { INVALID_COMMAND } from '@app/constants/services-errors';
+import { INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';

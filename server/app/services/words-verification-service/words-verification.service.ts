@@ -30,7 +30,7 @@ export class WordsVerificationService {
                 if (word.includes('*')) throw new Error(word + WORD_CONTAINS_ASTERISK);
                 if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
                 if (word.includes("'")) throw new Error(word + WORD_CONTAINS_APOSTROPHE);
-                if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(word + INVALID_WORD);
+                if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(INVALID_WORD.replace('{0}', word.toUpperCase()));
             }
         }
     }
