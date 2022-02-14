@@ -46,11 +46,10 @@ describe('CommunicationBoxComponent', () => {
     };
 
     beforeEach(async () => {
-        inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput', 'emitNewMessage']);
+        inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput']);
         inputParserSpy.parseInput.and.callFake(() => {
             return;
         });
-        inputParserSpy.emitNewMessage.and.callThrough();
 
         virtualScrollSpy = jasmine.createSpyObj('CdkVirtualScrollViewport', ['scrollTo']);
         virtualScrollSpy.scrollTo.and.callFake(() => {
