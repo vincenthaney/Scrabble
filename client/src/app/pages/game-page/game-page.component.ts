@@ -10,7 +10,7 @@ import {
     RACK_TILE_MIN_FONT_SIZE,
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE
+    SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
@@ -56,7 +56,7 @@ export class GamePageComponent {
         if (operation === 'smaller') {
             if (this.tileRackComponent.tileFontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.tileFontSize -= RACK_FONT_SIZE_INCREMENT;
             if (this.boardComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) this.boardComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
-        } else if (operation === 'larger') {
+        } else {
             if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
             if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
         }

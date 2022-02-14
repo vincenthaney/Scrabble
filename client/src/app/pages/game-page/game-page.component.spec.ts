@@ -22,7 +22,7 @@ import {
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_DEFAULT_FONT_SIZE,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE
+    SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { of } from 'rxjs';
@@ -188,14 +188,6 @@ describe('GamePageComponent', () => {
             component.changeTileFontSize('smaller');
             expect(component.tileRackComponent.tileFontSize).toEqual(RACK_TILE_MIN_FONT_SIZE);
             expect(component.boardComponent.tileFontSize).toEqual(SQUARE_TILE_MIN_FONT_SIZE);
-        });
-
-        it('should do nothing if changeFontSize operation is not smaller or larger', () => {
-            component.tileRackComponent.tileFontSize = RACK_TILE_DEFAULT_FONT_SIZE;
-            component.boardComponent.tileFontSize = SQUARE_TILE_DEFAULT_FONT_SIZE;
-            component.changeTileFontSize('coucou');
-            expect(component.tileRackComponent.tileFontSize).toEqual(RACK_TILE_DEFAULT_FONT_SIZE);
-            expect(component.boardComponent.tileFontSize).toEqual(SQUARE_TILE_DEFAULT_FONT_SIZE);
         });
     });
 });
