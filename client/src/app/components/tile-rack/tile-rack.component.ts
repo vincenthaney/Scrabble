@@ -1,9 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { Message } from '@app/classes/communication/message';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { GameService } from '@app/services';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
+export type RackTile = Tile & { played?: boolean };
 
 @Component({
     selector: 'app-tile-rack',
@@ -11,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./tile-rack.component.scss'],
 })
 export class TileRackComponent implements OnInit, OnDestroy {
-    tiles: Tile[];
+    tiles: RackTile[];
     updateTileRackSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -19,10 +23,13 @@ export class TileRackComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.updateTileRack();
-        if (!this.gameService.updateTileRackEvent) return;
         this.updateTileRackSubscription = this.gameService.updateTileRackEvent
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe(() => this.updateTileRack());
+        this.gameService.playingTiles
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
+        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
     }
 
     ngOnDestroy() {
@@ -39,5 +46,20 @@ export class TileRackComponent implements OnInit, OnDestroy {
         localPlayer.getTiles().forEach((tile: Tile) => {
             this.tiles.push({ letter: tile.letter, value: tile.value });
         });
+    }
+
+    private handlePlaceTiles(payload: ActionPlacePayload): void {
+        for (const tile of payload.tiles) {
+            const filtered = this.tiles.filter((t) => t.value === tile.value && t.letter === tile.letter && !t.played);
+            if (filtered.length > 0) filtered[0].played = true;
+        }
+    }
+
+    private handleNewMessage(message: Message): void {
+        if (message.senderId === 'system-error') {
+            for (const tile of this.tiles) {
+                tile.played = false;
+            }
+        }
     }
 }
