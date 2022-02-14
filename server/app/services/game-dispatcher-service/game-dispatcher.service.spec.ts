@@ -126,12 +126,6 @@ describe('GameDispatcherService', () => {
             tileReserveStub.init.returns(Promise.resolve());
             gameStub = createStubInstance(Game);
             gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
-            spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () =>
-                Promise.resolve(gameStub as unknown as Game),
-            );
-            spy = chai.spy.on(gameDispatcherService, 'createStartGameData', () => {
-                return;
-            });
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 

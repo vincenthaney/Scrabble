@@ -34,6 +34,7 @@ const DEFAULT_GAME = {
     id: DEFAULT_ID,
 
     getId: () => DEFAULT_ID,
+    createStartGameData: () => undefined,
 };
 
 describe('ActiveGameService', () => {
