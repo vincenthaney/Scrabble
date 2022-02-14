@@ -18,6 +18,7 @@ import {
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER,
     ON_YOUR_TURN_ACTIONS,
+    SYSTEM_ERROR_ID,
     SYSTEM_ID,
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
@@ -76,12 +77,12 @@ export default class InputParserService implements OnDestroy {
                     if (e.message === CommandErrorMessages.NotYourTurn) {
                         this.controller.sendError(this.gameService.getGameId(), playerId, {
                             content: e.message,
-                            senderId: SYSTEM_ID,
+                            senderId: SYSTEM_ERROR_ID,
                         });
                     } else {
                         this.controller.sendError(this.gameService.getGameId(), playerId, {
                             content: `La commande ${input} est invalide`,
-                            senderId: SYSTEM_ID,
+                            senderId: SYSTEM_ERROR_ID,
                         });
                     }
                 }

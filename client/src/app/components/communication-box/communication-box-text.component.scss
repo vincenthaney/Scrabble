@@ -54,8 +54,12 @@ section#text-box-container {
                     }
                 }
 
-                &.system {
+                &.system, &.system-error {
                     text-align: center;
+
+                    &.system-error {
+                        color: tomato;
+                    }
 
                     p.message {
                         width: 100%;

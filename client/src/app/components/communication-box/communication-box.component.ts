@@ -72,13 +72,21 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     createVisualMessage(newMessage: Message): VisualMessage {
         let messageClass: VisualMessageClass;
-        if (newMessage.senderId === this.gameService.getLocalPlayerId()) {
-            messageClass = 'me';
-        } else if (newMessage.senderId === 'system') {
-            messageClass = 'system';
-        } else {
-            messageClass = 'opponent';
+        switch (newMessage.senderId) {
+            case this.gameService.getLocalPlayerId():
+                messageClass = 'me';
+                break;
+            case 'system':
+                messageClass = 'system';
+                break;
+            case 'system-error':
+                messageClass = 'system-error';
+                break;
+            default:
+                messageClass = 'opponent';
+                break;
         }
+
         return { ...newMessage, class: messageClass };
     }
 

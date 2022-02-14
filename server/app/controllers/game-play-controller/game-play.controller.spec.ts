@@ -15,7 +15,7 @@ import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { INVALID_COMMAND } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -286,7 +286,7 @@ describe('GamePlayController', () => {
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'newMessage', {
                 content: DEFAULT_ERROR_MESSAGE,
-                senderId: SYSTEM_ID,
+                senderId: SYSTEM_ERROR_ID,
             });
         });
     });
