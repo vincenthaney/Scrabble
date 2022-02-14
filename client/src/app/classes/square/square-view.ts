@@ -8,10 +8,12 @@ import { MULTIPLIER_COLOR_MAP } from './square-multiplier-to-color-map';
 export default class SquareView {
     square: Square;
     squareSize: Vec2;
+    applied: boolean;
 
     constructor(square: Square, squareSize: Vec2) {
         this.square = square;
         this.squareSize = squareSize;
+        this.applied = true;
     }
 
     getColor(): COLORS {
