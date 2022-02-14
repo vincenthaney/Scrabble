@@ -26,18 +26,21 @@ export class GamePlayController {
     }
 
     configureSocket(): void {
-        this.socketService.on('gameInfo', (newData: GameInfoData) => this.gameInfoData.next(newData));
+        // this.socketService.on('gameInfo', (newData: GameInfoData) => this.gameInfoData.next(newData));
+        // this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
+        // this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
+    // );
 
         this.socketService.on('gameUpdate', (newData: GameUpdateData[]) => {
             // eslint-disable-next-line no-console
-            console.log('game update player1: ' + newData[0].player1?.score);
+            // console.log('game update player1: ' + newData[0].player1?.score);
             // eslint-disable-next-line no-console
-            console.log('game update player2: ' + newData[0].player2?.score);
+            // console.log('game update player2: ' + newData[0].player2?.score);
             this.gameUpdateValue.next(newData[0]);
         });
         this.socketService.on('newMessage', (newMessage: Message[]) => {
             // eslint-disable-next-line no-console
-            console.log('game update message: ' + newMessage[0].content);
+            // console.log('game update message: ' + newMessage[0].content);
             this.newMessageValue.next(newMessage[0]);
         });
     }
@@ -58,6 +61,8 @@ export class GamePlayController {
     }
 
     handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
+        console.log(`handleReconnection a: ${environment.serverUrl}/games/${gameId}/player/${playerId}/reconnect`);
+        console.log(newPlayerId);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/reconnect`;
         this.http.post(endpoint, { newPlayerId }).subscribe();
     }

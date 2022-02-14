@@ -24,6 +24,7 @@ import { NameFieldComponent } from './components/name-field/name-field.component
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { SocketService } from './services';
+// import { ReconnectionService } from './services/reconnection/reconnection.service';
 
 /**
  * Main module that is used in main.ts.
@@ -69,6 +70,13 @@ import { SocketService } from './services';
             deps: [SocketService],
             multi: true,
         },
+        // ReconnectionService,
+        // {
+        //     provide: APP_INITIALIZER,
+        //     useFactory: (reconnectionService: ReconnectionService) => async () => reconnectionService.setupReconnection(),
+        //     deps: [ReconnectionService, SocketService],
+        //     multi: true,
+        // },
     ],
     bootstrap: [AppComponent],
 })

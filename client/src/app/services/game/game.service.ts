@@ -11,7 +11,7 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import SocketService from '@app/services/socket/socket.service';
+// import SocketService from '@app/services/socket/socket.service';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -37,6 +37,7 @@ export default class GameService implements OnDestroy {
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
+    noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -48,7 +49,7 @@ export default class GameService implements OnDestroy {
         private boardService: BoardService,
         private roundManager: RoundManagerService,
         private gameController: GamePlayController,
-        private socketService: SocketService,
+        // private socketService: SocketService,
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
@@ -58,7 +59,7 @@ export default class GameService implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        console.log("ngOnDestroy GameService");
+        console.log('ngOnDestroy GameService');
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }
@@ -79,7 +80,15 @@ export default class GameService implements OnDestroy {
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
+        
+        // await this.router.navigateByUrl('/', { skipLocationChange: true }).then(async () => this.router.navigateByUrl('game'));
         await this.router.navigateByUrl('game');
+        this.updateTileRackEvent.emit();
+        for (line of board)
+        this.boardService.updateBoard(startGameData.board);
+        this.roundManager.updateRound(this.roundManager.currentRound());
+        this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
+
         // if (this.router.url !== '/game') {
         // }
     }
@@ -161,6 +170,9 @@ export default class GameService implements OnDestroy {
 
         if (gameIdCookie !== '' && socketIdCookie !== '') {
             this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
+        } else {
+            console.log(`noActiveGameEvent emit`);
+            this.noActiveGameEvent.emit();
         }
     }
 
@@ -168,9 +180,9 @@ export default class GameService implements OnDestroy {
         const gameId = this.gameId;
         console.log(`disconnect gameId : ${gameId}`);
         console.log(`disconnect socketId : ${this.getLocalPlayerId()}`);
-        this.setCookie('gameId', gameId, 1000);
+        this.setCookie('gameId', gameId, 5);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.setCookie('socketId', this.getLocalPlayerId()!, 1000);
+        this.setCookie('socketId', this.getLocalPlayerId()!, 5);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const localPlayerId = this.getLocalPlayerId()!;
 
