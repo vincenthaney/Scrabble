@@ -117,9 +117,12 @@ export default class GameService implements OnDestroy {
         this.newMessageValue.next(newMessage);
     }
 
+    getPlayingPlayerId(): string {
+        return this.roundManager.getActivePlayer().id;
+    }
+
     isLocalPlayerPlaying(): boolean {
-        if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
-        return this.localPlayerId === this.roundManager.getActivePlayer().id;
+        return this.getPlayingPlayerId() === this.localPlayerId;
     }
 
     getGameId(): string {
