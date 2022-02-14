@@ -5,13 +5,16 @@ import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
+import { EventEmitter } from 'events';
 import { Service } from 'typedi';
 
 @Service()
 export class ActiveGameService {
+    playerLeftEvent: EventEmitter;
     private activeGames: Game[];
 
     constructor(private boardService: BoardService) {
+        this.playerLeftEvent = new EventEmitter();
         this.activeGames = [];
         Game.injectServices(this.boardService);
     }

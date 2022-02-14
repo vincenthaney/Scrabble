@@ -12,7 +12,11 @@ import { FeedbackMessages } from './feedback-messages';
 
 @Service()
 export class GamePlayService {
-    constructor(private readonly activeGameService: ActiveGameService) {}
+    constructor(private readonly activeGameService: ActiveGameService) {
+        this.activeGameService.playerLeftEvent.on('playerLeft', (gameId, playerWhoLeftId) => {
+            this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
+        });
+    }
 
     playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, FeedbackMessages | void] {
         const game = this.activeGameService.getGame(gameId, playerId);
@@ -38,14 +42,7 @@ export class GamePlayService {
             if (updatedData) updatedData.round = nextRoundData;
             else updatedData = { round: nextRoundData };
             if (game.isGameOver()) {
-                const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame();
-                if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
-                else updatedData.player1 = { score: updatedScorePlayer1 };
-                if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
-                else updatedData.player2 = { score: updatedScorePlayer2 };
-
-                endGameFeedback = game.endGameMessage();
-                updatedData.isGameOver = true;
+                this.handleGameOver(undefined, game, updatedData);
             }
         }
         return [updatedData, { localPlayerFeedback, opponentFeedback, endGameFeedback }];
@@ -89,5 +86,24 @@ export class GamePlayService {
         const payload = actionData.payload as ActionExchangePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
         return payload;
+    }
+
+    handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData) {
+        const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame();
+        if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
+        else updatedData.player1 = { score: updatedScorePlayer1 };
+        if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
+        else updatedData.player2 = { score: updatedScorePlayer2 };
+
+        updatedData.isGameOver = true;
+        return game.endGameMessage(winnerName);
+    }
+
+    handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string) {
+        const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
+        const playerStillInGame = game.player1.getId() === playerWhoLeftId ? game.player2 : game.player1;
+        const updatedData: GameUpdateData = {};
+        const endOfGameMessages = this.handleGameOver(playerStillInGame.name, game, updatedData);
+        this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
     }
 }

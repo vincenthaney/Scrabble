@@ -119,8 +119,11 @@ export default class Game {
         return [this.player1.score, this.player2.score];
     }
 
-    endGameMessage(): string[] {
-        return [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage(), this.congratulateWinner()];
+    endGameMessage(winnerName: string | undefined): string[] {
+        const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
+        const winnerMessage = winnerName ? Game.winnerMessage(winnerName) : this.congratulateWinner();
+        messages.push(winnerMessage);
+        return messages;
     }
 
     congratulateWinner(): string {

@@ -1,5 +1,4 @@
-import { ActionData } from '@app/classes/communication/action-data';
-import { HttpRequest } from '@app/classes/communication/http-interface';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
@@ -10,6 +9,7 @@ import {
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
+import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -28,6 +28,12 @@ export class GameDispatcherController {
         private readonly socketService: SocketService,
     ) {
         this.configureRouter();
+        this.activeGameService.playerLeftEvent.on(
+            'playerLeftFeedback',
+            (gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData) => {
+                this.handlePlayerLeftFeedback(gameId, endOfGameMessages, updatedData);
+            },
+        );
     }
 
     private configureRouter(): void {
@@ -138,11 +144,22 @@ export class GameDispatcherController {
             this.handleLobbiesUpdate();
         } else {
             this.socketService.removeFromRoom(playerId, gameId);
+
+            // Check if there is no player left --> cleanup server and client
+
             if (this.activeGameService.isGameOver(gameId, playerId)) return;
 
-            const requestData: ActionData = this.activeGameService.forcePlayerLose(gameId, playerId);
-            const endpoint = `/games/${gameId}/player/${playerId}/action`;
-            HttpRequest.post(endpoint, requestData);
+            this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
+        }
+    }
+
+    private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData) {
+        this.socketService.emitToRoom(gameId, 'gameUpdate', updatedData);
+        for (const message of endOfGameMessages) {
+            this.socketService.emitToRoom(gameId, 'newMessage', {
+                content: message,
+                senderId: SYSTEM_ID,
+            });
         }
     }
 
