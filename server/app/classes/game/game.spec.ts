@@ -446,7 +446,6 @@ describe('createStartGameData', () => {
         { letter: 'F', amount: 8 },
     ];
     const TILE_RESERVE_TOTAL = 13;
-    let gameStub: SinonStubbedInstance<Game>;
     let roundManagerStub: SinonStubbedInstance<RoundManager>;
     let round: Round;
     let boardStub: SinonStubbedInstance<Board>;
@@ -458,30 +457,30 @@ describe('createStartGameData', () => {
         boardStub = createStubInstance(Board);
 
         roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-        gameStub.player1 = PLAYER_1;
-        gameStub.player2 = PLAYER_2;
-        gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
-        gameStub.gameType = GameType.Classic;
-        gameStub.dictionnaryName = DEFAULT_DICTIONARY;
-        gameStub.getId.returns(DEFAULT_GAME_ID);
-        gameStub.board = boardStub;
-        gameStub.board.grid = [[]];
-        gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+        game.player1 = PLAYER_1;
+        game.player2 = PLAYER_2;
+        chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
+        game.gameType = GameType.Classic;
+        game.dictionnaryName = DEFAULT_DICTIONARY;
+        chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
+        game.board = boardStub;
+        game.board.grid = [[]];
+        game.roundManager = roundManagerStub as unknown as RoundManager;
 
-        round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
+        round = { player: game.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.getCurrentRound.returns(round);
     });
 
     it('should return the expected StartMultiplayerGameData', () => {
         const result = game['createStartGameData']();
         const expectedMultiplayerGameData: StartMultiplayerGameData = {
-            player1: gameStub.player1,
-            player2: gameStub.player2,
-            gameType: gameStub.gameType,
+            player1: game.player1,
+            player2: game.player2,
+            gameType: game.gameType,
             maxRoundTime: DEFAULT_TIME,
             dictionary: DEFAULT_DICTIONARY,
             gameId: DEFAULT_GAME_ID,
-            board: gameStub.board.grid,
+            board: game.board.grid,
             tileReserve: TILE_RESERVE_DATA,
             tileReserveTotal: TILE_RESERVE_TOTAL,
             round: roundManagerStub.convertRoundToRoundData(round),
