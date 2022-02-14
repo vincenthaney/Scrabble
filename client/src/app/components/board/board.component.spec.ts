@@ -315,7 +315,7 @@ describe('BoardComponent', () => {
             const position = { row: 0, column: 0 };
             expect(component['isInBounds'](position)).toBeTrue();
         });
-        it('return true if is in bound', () => {
+        it('return false if is not in bound', () => {
             const position = { row: 9999, column: 9999 };
             expect(component['isInBounds'](position)).toBeFalse();
         });
@@ -362,7 +362,7 @@ describe('BoardComponent', () => {
             }
         });
 
-        it('should place tiles on grid', () => {
+        it('should not place tiles when position is out of bounds', () => {
             payload.startPosition.column = 999;
 
             component['handlePlaceTiles'](payload);
@@ -370,7 +370,7 @@ describe('BoardComponent', () => {
             expect(component.squareGrid[0].some((sv) => sv.square.tile !== null)).toBeFalse();
         });
 
-        it('should add squareView to notAppliedSquares', () => {
+        it('should not change tile if applied is true', () => {
             component.squareGrid[0][1].square.tile = new Tile('Z', 0);
             component.squareGrid[0][1].applied = true;
 

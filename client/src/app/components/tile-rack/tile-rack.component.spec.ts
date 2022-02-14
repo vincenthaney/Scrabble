@@ -127,7 +127,7 @@ describe('TileRackComponent', () => {
         expect(handlePlaceTileSpy).toHaveBeenCalled();
     });
 
-    it('should mark tiles as played', () => {
+    it('should mark tiles as played but only those in playedTiles', () => {
         const tiles: RackTile[] = [
             { letter: 'A', value: 0 },
             { letter: 'B', value: 0 },

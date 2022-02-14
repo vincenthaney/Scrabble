@@ -60,25 +60,4 @@ describe('TileComponent', () => {
         component['tile'] = expectedTile;
         expect(component.tile).toEqual(expectedTile);
     });
-
-    it('should mark blank tiles as hideValue', () => {
-        const tile: Tile = { letter: '*', value: 0, isBlank: true };
-        component.tile = tile;
-        component.ngOnInit();
-        expect(component.hideValue).toBeTrue();
-    });
-
-    it('should mark blank tiles as hideValue', () => {
-        const tile: Tile = { letter: '*', value: 0 };
-        component.tile = tile;
-        component.ngOnInit();
-        expect(component.hideValue).toBeTrue();
-    });
-
-    it('should mark blank tiles as hideValue', () => {
-        const tile: Tile = { letter: 'A', value: 0 };
-        component.tile = tile;
-        component.ngOnInit();
-        expect(component.hideValue).toBeFalse();
-    });
 });

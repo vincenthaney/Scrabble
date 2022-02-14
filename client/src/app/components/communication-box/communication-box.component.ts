@@ -105,7 +105,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
-        this.loading = false;
+        if (!this.isOpponent(newMessage.senderId)) this.loading = false;
+    }
+
+    isOpponent(id: string) {
+        return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
     onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
