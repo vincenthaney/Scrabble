@@ -104,18 +104,40 @@ export default class Game {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
 
-    endOfGame(): [number, number] {
-        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
-            this.player1.score -= this.player1.getTileRackPoints();
-            this.player2.score -= this.player2.getTileRackPoints();
-        } else if (!this.player1.hasTilesLeft()) {
-            this.player1.score += this.player2.getTileRackPoints();
-            this.player2.score -= this.player2.getTileRackPoints();
+    endOfGame(winnerName: string | undefined): [number, number] {
+        if (winnerName) {
+            if (winnerName === this.player1.name) return this.computeEndOfGameScoresPlayer1Wins();
+            else return this.computeEndOfGameScoresPlayer2Wins();
         } else {
-            this.player1.score -= this.player1.getTileRackPoints();
-            this.player2.score += this.player1.getTileRackPoints();
+            return this.computeEndOfGameScores();
         }
+    }
 
+    computeEndOfGameScores(): [number, number] {
+        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
+            return this.computeEndOfGameScoresBothLose();
+        } else if (!this.player1.hasTilesLeft()) {
+            return this.computeEndOfGameScoresPlayer1Wins();
+        } else {
+            return this.computeEndOfGameScoresPlayer2Wins();
+        }
+    }
+
+    computeEndOfGameScoresBothLose(): [number, number] {
+        this.player1.score -= this.player1.getTileRackPoints();
+        this.player2.score -= this.player2.getTileRackPoints();
+        return [this.player1.score, this.player2.score];
+    }
+
+    computeEndOfGameScoresPlayer1Wins(): [number, number] {
+        this.player1.score += this.player2.getTileRackPoints();
+        this.player2.score -= this.player2.getTileRackPoints();
+        return [this.player1.score, this.player2.score];
+    }
+
+    computeEndOfGameScoresPlayer2Wins(): [number, number] {
+        this.player1.score -= this.player1.getTileRackPoints();
+        this.player2.score += this.player1.getTileRackPoints();
         return [this.player1.score, this.player2.score];
     }
 

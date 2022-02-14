@@ -89,7 +89,7 @@ export class GamePlayService {
     }
 
     handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData) {
-        const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame();
+        const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
         else updatedData.player1 = { score: updatedScorePlayer1 };
         if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
