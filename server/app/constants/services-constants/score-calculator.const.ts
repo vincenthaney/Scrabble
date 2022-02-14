@@ -8,13 +8,15 @@ export const NOT_USED_MULTIPLIER = false;
 export const DEFAULT_TILE_VALUE = 10;
 export const DEFAULT_WORD_MULTIPLIER = 2;
 export const DEFAULT_LETTER_MULTIPLIER = 2;
+export const DEFAULT_MULTIPLIER = 1;
+export const DEFAULT_SCORE = 0;
 export const EMPTY_WORDS: [Square, Tile][][] = [];
 export const EMPTY_WORD: [Square, Tile][] = [];
 export const GENERIC_LETTER_1: [Square, Tile] = [
     {
         tile: null,
         position: new Position(0, 0),
-        scoreMultiplier: { multiplier: DEFAULT_WORD_MULTIPLIER, multiplierEffect: MultiplierEffect.WORD },
+        scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD },
         wasMultiplierUsed: false,
         isCenter: false,
     },
@@ -25,7 +27,7 @@ export const GENERIC_LETTER_2: [Square, Tile] = [
     {
         tile: null,
         position: new Position(0, 0),
-        scoreMultiplier: { multiplier: DEFAULT_LETTER_MULTIPLIER, multiplierEffect: MultiplierEffect.LETTER },
+        scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER },
         wasMultiplierUsed: false,
         isCenter: false,
     },

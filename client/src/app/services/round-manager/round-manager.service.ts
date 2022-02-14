@@ -1,14 +1,15 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { RoundData } from '@app/classes/communication/round-data';
 import { IResetableService } from '@app/classes/i-resetable-service';
-import { AbstractPlayer } from '@app/classes/player';
+import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
-import * as ROUND_ERROR from './round-manager.service.errors';
 
 @Injectable({
     providedIn: 'root',
@@ -31,6 +32,18 @@ export default class RoundManagerService implements IResetableService {
         this.endRoundEvent = new EventEmitter();
     }
 
+    convertRoundDataToRound(roundData: RoundData): Round {
+        if (!roundData.playerData.id || !roundData.playerData.name || !roundData.playerData.tiles)
+            throw Error('INVALID PLAYER TO CONVERT ROUND DATA');
+        const player = new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles);
+        return {
+            player,
+            startTime: roundData.startTime,
+            limitTime: roundData.limitTime,
+            completedTime: roundData.completedTime,
+        };
+    }
+
     resetServiceData(): void {
         this.gameId = '';
         this.localPlayerId = '';
@@ -44,12 +57,13 @@ export default class RoundManagerService implements IResetableService {
         this.currentRound.completedTime = round.startTime;
         this.completedRounds.push(this.currentRound);
         this.currentRound = round;
+        this.endRoundEvent.emit();
         this.startRound();
     }
 
     getActivePlayer(): AbstractPlayer {
         if (!this.currentRound) {
-            throw new Error(ROUND_ERROR.NO_CURRENT_ROUND);
+            throw new Error(NO_CURRENT_ROUND);
         }
         return this.currentRound.player;
     }
@@ -59,7 +73,7 @@ export default class RoundManagerService implements IResetableService {
     }
 
     getStartGameTime(): Date {
-        if (!this.completedRounds[0]) throw new Error(ROUND_ERROR.NO_START_GAME_TIME);
+        if (!this.completedRounds[0]) throw new Error(NO_START_GAME_TIME);
         return this.completedRounds[0].startTime;
     }
 
@@ -81,6 +95,6 @@ export default class RoundManagerService implements IResetableService {
             payload: {},
         };
         this.endRoundEvent.emit();
-        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass, '');
     }
 }

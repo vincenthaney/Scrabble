@@ -1,20 +1,21 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Player from '@app/classes/player/player';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
-import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import RoundManager from '@app/classes/round/round-manager';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
+import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import { assert } from 'chai';
 
 const expect = chai.expect;
@@ -158,7 +159,7 @@ describe('Game', () => {
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getRequestingPlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getRequestingPlayer(invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
 
@@ -175,7 +176,7 @@ describe('Game', () => {
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getOpponentPlayer(invalidId)).to.throw(Errors.INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getOpponentPlayer(invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
     });
@@ -199,6 +200,10 @@ describe('Game', () => {
                 { letter: 'A', value: 0 },
                 { letter: 'B', value: 0 },
             ];
+            // game.player1 = player1Stub as unknown as Player;
+            // game.player2 = player2Stub as unknown as Player;
+            // player1Stub.hasTilesLeft.returns(true);
+            // player2Stub.hasTilesLeft.returns(true);
 
             roundManagerStub.getPassCounter.returns(0);
         });
@@ -206,29 +211,155 @@ describe('Game', () => {
         it('should not be gameOver passCount lower than threshold and both players have tiles', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
             expect(game.isGameOver()).to.be.false;
-            expect(game.player1.tiles).to.not.be.empty;
-            expect(game.player2.tiles).to.not.be.empty;
         });
 
         it('should be gameOver passCount is equal to threshold', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+
             expect(game.isGameOver()).to.be.true;
-            expect(game.player1.tiles).to.not.be.empty;
-            expect(game.player2.tiles).to.not.be.empty;
         });
 
         it('should be gameOver when player 1 has no tiles', () => {
-            game.player1.tiles = [];
+            // player1Stub.hasTilesLeft.returns(false);
             expect(game.isGameOver()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
-            expect(game.player2.tiles).to.not.be.empty;
         });
 
         it('should gameOver when player 2 has no tiles', () => {
-            game.player2.tiles = [];
+            // player2Stub.hasTilesLeft.returns(false);
             expect(game.isGameOver()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
-            expect(game.player1.tiles).to.not.be.empty;
+        });
+    });
+
+    describe('endOfGame', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        const PLAYER_1_SCORE = 20;
+        const PLAYER_2_SCORE = 40;
+        const PLAYER_1_TILE_SCORE = 6;
+        const PLAYER_2_TILE_SCORE = 14;
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+
+            game.player1.tiles = [
+                { letter: 'A', value: 2 },
+                { letter: 'B', value: 4 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 6 },
+                { letter: 'B', value: 8 },
+            ];
+
+            game.player1.score = PLAYER_1_SCORE;
+            game.player2.score = PLAYER_2_SCORE;
+            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
+            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+        });
+
+        it('should deduct points from both player if the getPassCounter is exceeded', () => {
+            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+            game.endOfGame();
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+        });
+
+        it('should deduct points from player2 and add them to player1 if player 1 has no tiles', () => {
+            roundManagerStub.getPassCounter.returns(0);
+            player1Stub.hasTilesLeft.returns(false);
+            player2Stub.hasTilesLeft.returns(true);
+
+            game.endOfGame();
+
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
+        });
+
+        it('should deduct points from player1 and add them to player2 if player 2 has no tiles', () => {
+            roundManagerStub.getPassCounter.returns(0);
+            player1Stub.hasTilesLeft.returns(true);
+            player2Stub.hasTilesLeft.returns(false);
+
+            game.endOfGame();
+
+            expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
+            expect(game.player2.score).to.equal(PLAYER_2_SCORE + PLAYER_1_TILE_SCORE);
+        });
+    });
+
+    describe('endGameMessage', () => {
+        let game: Game;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+
+        let congratulateStub: SinonStub<[], string>;
+
+        const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
+        const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
+
+        beforeEach(() => {
+            game = new Game();
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+            player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
+            player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
+            congratulateStub = stub(game, 'congratulateWinner').returns('congratulate winner');
+        });
+
+        it('should call the messages ', () => {
+            game.endGameMessage();
+            assert(player1Stub.endGameMessage.calledOnce);
+            assert(player2Stub.endGameMessage.calledOnce);
+            assert(congratulateStub.calledOnce);
+        });
+    });
+
+    describe('congratulateWinner', () => {
+        let game: Game;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        const PLAYER_1_NAME = 'VINCENT';
+        const PLAYER_2_NAME = 'MATHILDE';
+        const HIGHER_SCORE = 100;
+        const LOWER_SCORE = 1;
+
+        beforeEach(() => {
+            game = new Game();
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+            player1Stub.name = PLAYER_1_NAME;
+            player2Stub.name = PLAYER_2_NAME;
+        });
+
+        it('should congratulate player 1 if he has a higher score ', () => {
+            player1Stub.score = HIGHER_SCORE;
+            player2Stub.score = LOWER_SCORE;
+            const expectedMessage = Game.winnerMessage(PLAYER_1_NAME);
+            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+        });
+        it('should congratulate player 2 if he has a higher score ', () => {
+            player1Stub.score = LOWER_SCORE;
+            player2Stub.score = HIGHER_SCORE;
+            const expectedMessage = Game.winnerMessage(PLAYER_2_NAME);
+            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+        });
+        it('should congratulate player 1 and player 2 if they are tied ', () => {
+            player1Stub.score = HIGHER_SCORE;
+            player2Stub.score = HIGHER_SCORE;
+            const expectedMessage = Game.winnerMessage(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
+            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
     });
 

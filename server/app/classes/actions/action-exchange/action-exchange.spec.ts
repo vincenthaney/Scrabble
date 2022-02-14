@@ -165,6 +165,16 @@ describe('ActionExchange', () => {
             const stubLettersToSwap = stub(action, 'lettersToSwap').returns('a');
             assert(stubLettersToSwap.calledOnce);
         });
+
+        it("should have 'les tuiles' if more than one tiles to exchange", () => {
+            action.tilesToExchange = PLAYER_TILES;
+            expect(action.getMessage()).to.include('les tuiles');
+        });
+
+        it("should have 'la tuile' if one tile to exchange", () => {
+            action.tilesToExchange = [PLAYER_TILES[0]];
+            expect(action.getMessage()).to.include('la tuile');
+        });
     });
 
     describe('getOpponentMessage', () => {
@@ -184,12 +194,12 @@ describe('ActionExchange', () => {
 
         it("should have 'tuile' plural if more than one tiles to exchange", () => {
             action.tilesToExchange = PLAYER_TILES;
-            expect(action.getOpponentMessage()).to.include('tuiles');
+            expect(action.getOpponentMessage()).to.include(`${PLAYER_TILES.length} tuiles`);
         });
 
         it("should have 'tuile' singular if one tile to exchange", () => {
             action.tilesToExchange = [PLAYER_TILES[0]];
-            expect(action.getOpponentMessage()).to.include('tuile');
+            expect(action.getOpponentMessage()).to.include('1 tuile');
         });
     });
 });

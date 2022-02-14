@@ -1,7 +1,9 @@
 import { Action, ActionPass } from '@app/classes/actions';
+import { PlayerData } from '@app/classes/communication/player-data';
+import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
 import { CompletedRound, Round } from './round';
-import { ERROR_GAME_NOT_STARTED } from './round-manager-error';
+import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 
 const SECONDS_TO_MILLISECONDS = 1000;
 
@@ -19,6 +21,20 @@ export default class RoundManager {
         this.player2 = player2;
         this.completedRounds = [];
         this.passCounter = 0;
+    }
+
+    convertRoundToRoundData(round: Round): RoundData {
+        const playerData: PlayerData = {
+            name: round.player.name,
+            id: round.player.getId(),
+            score: round.player.score,
+            tiles: round.player.tiles,
+        };
+        return {
+            playerData,
+            startTime: round.startTime,
+            limitTime: round.limitTime,
+        };
     }
 
     getStartGameTime(): Date {

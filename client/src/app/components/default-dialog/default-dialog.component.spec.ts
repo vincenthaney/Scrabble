@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
+import { BUTTON_MUST_HAVE_CONTENT, DIALOG_BUTTONS_MUST_BE_AN_ARRAY, DIALOG_MUST_HAVE_TITLE } from '@app/constants/component-errors';
 import { DefaultDialogComponent } from './default-dialog.component';
-import defaultDialogErrors from './default-dialog.component.errors';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
 const MODEL: DefaultDialogParameters = {
@@ -18,6 +18,10 @@ const MODEL: DefaultDialogParameters = {
         {
             content: 'Button 2',
             redirect: '/test',
+        },
+        {
+            content: 'Button 3',
+            closeDialog: undefined,
         },
     ],
 };
@@ -91,6 +95,13 @@ describe('DefaultDialogComponent', () => {
             expect(component.buttons[index].closeDialog).toBeTrue();
         });
 
+        it('******should set button as closeDialog=true if redirect exists', () => {
+            const index = 2;
+            expect(MODEL.buttons[index].closeDialog).toBeFalsy();
+            expect(MODEL.buttons[index].redirect).toBeFalsy();
+            expect(component.buttons[index].closeDialog).toBeFalse();
+        });
+
         describe('handleButtonClick', () => {
             it('should call button action if it exists', () => {
                 type DefaultDialogButtonWithActionParameters = DefaultDialogButtonParameters & { action: () => void };
@@ -137,7 +148,7 @@ describe('DefaultDialogComponent', () => {
             const model = {
                 notATitle: 'This is not a title',
             };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(defaultDialogErrors.DIALOG_MUST_HAVE_TITLE);
+            expect(() => createDialogWithUnknownModel(model)).toThrowError(DIALOG_MUST_HAVE_TITLE);
         });
 
         it('should throw error when buttons is not an array', () => {
@@ -147,7 +158,7 @@ describe('DefaultDialogComponent', () => {
                     content: 'Button but not in an array',
                 },
             };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(defaultDialogErrors.DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
+            expect(() => createDialogWithUnknownModel(model)).toThrowError(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
         });
 
         it('should throw error when any button has no content', () => {
@@ -159,7 +170,7 @@ describe('DefaultDialogComponent', () => {
                     },
                 ],
             };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(defaultDialogErrors.BUTTON_MUST_HAVE_CONTENT);
+            expect(() => createDialogWithUnknownModel(model)).toThrowError(BUTTON_MUST_HAVE_CONTENT);
         });
     });
 });

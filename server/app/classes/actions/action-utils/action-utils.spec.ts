@@ -5,7 +5,7 @@ import Player from '@app/classes/player/player';
 import { ActionUtils } from './action-utils';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/classes/actions/action-error';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 const DEFAULT_PLAYER_NAME = 'player1';
 const DEFAULT_PLAYER_ID = '1';
@@ -49,6 +49,21 @@ describe('ActionUtils', () => {
             expect(() => ActionUtils.getTilesFromPlayer(tilesToPlay, player)).to.throw(ERROR_PLAYER_DOESNT_HAVE_TILE);
 
             s.restore();
+        });
+
+        it('should return tile with isBlank and playedLetter if *', () => {
+            const playerTiles: Tile[] = [
+                { letter: 'A', value: 0 },
+                { letter: '*', value: 0 },
+            ];
+            const tilesToPlay: Tile[] = [{ letter: 'B', value: 0 }];
+
+            player.tiles = playerTiles;
+
+            const [[tile]] = ActionUtils.getTilesFromPlayer(tilesToPlay, player);
+
+            expect(tile.isBlank).to.be.true;
+            expect(tile.playedLetter).to.equal(tilesToPlay[0].letter);
         });
     });
 

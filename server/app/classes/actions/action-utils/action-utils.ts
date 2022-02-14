@@ -1,6 +1,6 @@
 import { Tile } from '@app/classes/tile';
 import Player from '@app/classes/player/player';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/classes/actions/action-error';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 export class ActionUtils {
     static getTilesFromPlayer(tilesToPlay: Tile[], player: Player, allowWildcard: boolean = true): [played: Tile[], unplayed: Tile[]] {
@@ -10,7 +10,12 @@ export class ActionUtils {
         for (const tile of tilesToPlay) {
             const index = this.getIndexOfTile(unplayedTiles, tile, allowWildcard);
             if (index >= 0) {
-                playedTiles.push(unplayedTiles.splice(index, 1)[0]);
+                const playerTile = unplayedTiles.splice(index, 1)[0];
+                if (this.isBlankTile(playerTile)) {
+                    playerTile.playedLetter = tile.letter;
+                    playerTile.isBlank = true;
+                }
+                playedTiles.push(playerTile);
             } else {
                 throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
             }
@@ -28,4 +33,8 @@ export class ActionUtils {
 
         return index;
     };
+
+    static isBlankTile(tile: Tile) {
+        return tile.isBlank || tile.letter === '*';
+    }
 }

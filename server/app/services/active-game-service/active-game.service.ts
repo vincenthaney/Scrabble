@@ -1,10 +1,10 @@
 import Game from '@app/classes/game/game';
 import { MultiplayerGameConfig } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
-import * as Errors from '@app/constants/errors';
 import BoardService from '@app/services/board/board.service';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 
 @Service()
 export class ActiveGameService {
@@ -24,10 +24,10 @@ export class ActiveGameService {
     getGame(id: string, playerId: string): Game {
         const filteredGames = this.activeGames.filter((g) => g.getId() === id);
 
-        if (filteredGames.length === 0) throw new HttpException(Errors.NO_GAME_FOUND_WITH_ID, StatusCodes.NOT_FOUND);
+        if (filteredGames.length === 0) throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.NOT_FOUND);
 
         const game = filteredGames[0];
-        if (game.player1.id !== playerId && game.player2.id !== playerId) throw new HttpException(Errors.INVALID_PLAYER_ID_FOR_GAME);
+        if (game.player1.id !== playerId && game.player2.id !== playerId) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
 
         return game;
     }

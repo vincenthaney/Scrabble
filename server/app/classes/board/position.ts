@@ -1,8 +1,3 @@
-// export default interface Position {
-//     column: number;
-//     row: number;
-// }
-
 import { Orientation } from '.';
 import { Vec2 } from '@app/classes/vec2';
 import Direction from './direction';

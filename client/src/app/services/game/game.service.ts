@@ -5,14 +5,16 @@ import { StartMultiplayerGameData } from '@app/classes/communication/game-config
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
+import { Round } from '@app/classes/round';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { BehaviorSubject } from 'rxjs';
 import { SocketService } from '..';
-import * as GAME_ERRORS from './game.service.error';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -36,6 +38,7 @@ export default class GameService implements OnDestroy {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     private gameId: string;
     private localPlayerId: string;
@@ -49,13 +52,15 @@ export default class GameService implements OnDestroy {
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
-        this.gameController.newMessageValue.subscribe((newMessage) => this.handleNewMessage(newMessage));
-        this.gameController.gameUpdateValue.subscribe((newData) => this.handleGameUpdate(newData));
+        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
     }
 
     ngOnDestroy(): void {
         console.log("ngOnDestroy GameService");
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
@@ -68,7 +73,7 @@ export default class GameService implements OnDestroy {
         this.roundManager.gameId = startGameData.gameId;
         this.roundManager.localPlayerId = this.localPlayerId;
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
-        this.roundManager.currentRound = startGameData.round;
+        this.roundManager.currentRound = this.roundManager.convertRoundDataToRound(startGameData.round);
         this.tileReserve = startGameData.tileReserve;
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
@@ -77,7 +82,7 @@ export default class GameService implements OnDestroy {
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
-        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(GAME_ERRORS.MISSING_PLAYER_DATA_TO_INITIALIZE);
+        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
         return new Player(playerData.id, playerData.name, playerData.tiles);
     }
 
@@ -94,7 +99,8 @@ export default class GameService implements OnDestroy {
             this.boardService.updateBoard(gameUpdateData.board);
         }
         if (gameUpdateData.round) {
-            this.roundManager.updateRound(gameUpdateData.round);
+            const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
+            this.roundManager.updateRound(round);
         }
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
             this.tileReserve = gameUpdateData.tileReserve;

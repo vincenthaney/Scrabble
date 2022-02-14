@@ -14,4 +14,20 @@ export default class Player {
         this.tiles = [];
         this.isConnected = true;
     }
+
+    getTileRackPoints(): number {
+        return this.tiles.reduce((prev, next) => (prev += next.value), 0);
+    }
+
+    hasTilesLeft(): boolean {
+        return this.tiles.length > 0;
+    }
+
+    endGameMessage(): string {
+        return `${this.name} : ${this.tilesToString()}`;
+    }
+
+    tilesToString(): string {
+        return this.tiles.reduce((prev, next) => (prev += next.letter.toLocaleLowerCase()), '');
+    }
 }

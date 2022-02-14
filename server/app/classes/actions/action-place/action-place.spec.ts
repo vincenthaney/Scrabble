@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
@@ -126,7 +127,6 @@ describe('ActionPlace', () => {
             let getTilesFromPlayerSpy: unknown;
             let wordExtractSpy: unknown;
             let updateBoardSpy: unknown;
-            let getTilesSpy: unknown;
 
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
             let wordToStringSpy: unknown;
@@ -135,19 +135,17 @@ describe('ActionPlace', () => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
 
-                // eslint-disable-next-line dot-notation
                 action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
-                // eslint-disable-next-line dot-notation
                 action['scoreCalculator'] = scoreCalculatorServiceStub as unknown as ScoreCalculatorService;
 
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 wordValidatorStub.verifyWords.callsFake(() => {});
                 scoreCalculatorServiceStub.calculatePoints.returns(SCORE_RETURN);
                 scoreCalculatorServiceStub.bonusPoints.returns(0);
+                gameStub.getTilesFromReserve.returns(GET_TILES_RETURN);
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                getTilesSpy = chai.spy.on(game, 'getTilesFromReserve', () => GET_TILES_RETURN);
                 // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
                 wordToStringSpy = chai.spy.on(ActionPlace.prototype, 'wordToString', () => []);
             });
@@ -184,7 +182,7 @@ describe('ActionPlace', () => {
 
             it('should call get tiles', () => {
                 action.execute();
-                expect(getTilesSpy).to.have.been.called();
+                assert(gameStub.getTilesFromReserve.calledOnce);
             });
 
             it('should call bonusPoints', () => {
@@ -234,6 +232,37 @@ describe('ActionPlace', () => {
                 gameStub.isPlayer1.returns(false);
                 const update: GameUpdateData = action.execute()!;
                 expect(update.player2).to.exist;
+            });
+
+            it('should execute with a blank tile', () => {
+                const userTiles: Tile[] = [
+                    { letter: 'A', value: 1 },
+                    { letter: 'B', value: 1 },
+                    { letter: '*', value: 0 },
+                ];
+                const playTiles: Tile[] = [
+                    { letter: 'A', value: 1 },
+                    { letter: 'B', value: 1 },
+                    { letter: 'C', value: 0, isBlank: true },
+                ];
+                const returnTiles: Tile[] = [
+                    { letter: 'D', value: 1 },
+                    { letter: 'E', value: 1 },
+                    { letter: 'F', value: 1 },
+                ];
+                scoreCalculatorServiceStub.calculatePoints.callThrough();
+                game.player1.tiles = userTiles;
+                gameStub.getTilesFromReserve.returns(returnTiles);
+
+                action = new ActionPlace(game.player1, game, playTiles, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+                action.execute();
+
+                for (const tile of userTiles) {
+                    expect(game.player1.tiles).to.not.include(tile);
+                }
+                for (const tile of returnTiles) {
+                    expect(game.player1.tiles).to.include(tile);
+                }
             });
         });
     });
@@ -311,6 +340,16 @@ describe('ActionPlace', () => {
 
         it('should return the word', () => {
             expect(action.wordToString(EXTRACT_RETURN)).to.deep.equal(['AB']);
+        });
+
+        it('should return word when tile has playedLetter', () => {
+            const tiles: [Square, Tile][][] = [
+                [
+                    [{} as unknown as Square, { letter: 'A', value: 0 }],
+                    [{} as unknown as Square, { letter: '*', value: 0, playedLetter: 'B' }],
+                ],
+            ];
+            expect(action.wordToString(tiles)).to.deep.equal(['AB']);
         });
     });
 

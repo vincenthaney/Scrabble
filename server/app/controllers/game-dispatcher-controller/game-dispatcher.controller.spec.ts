@@ -18,7 +18,13 @@ import { createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import { DICTIONARY_REQUIRED, GAME_TYPE_REQUIRED, MAX_ROUND_TIME_REQUIRED, NAME_IS_INVALID, PLAYER_NAME_REQUIRED } from './game-dispatcher-error';
+import {
+    DICTIONARY_REQUIRED,
+    GAME_TYPE_REQUIRED,
+    MAX_ROUND_TIME_REQUIRED,
+    NAME_IS_INVALID,
+    PLAYER_NAME_REQUIRED,
+} from '@app/constants/controllers-errors';
 import { GameDispatcherController } from './game-dispatcher.controller';
 
 const expect = chai.expect;

@@ -15,7 +15,7 @@ import {
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
-} from './game-dispatcher-error';
+} from '@app/constants/controllers-errors';
 
 @Service()
 export class GameDispatcherController {
