@@ -44,6 +44,8 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
 };
 const DEFAULT_EXCEPTION = 'exception';
 
+const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
 
@@ -286,7 +288,7 @@ describe('GameDispatcherController', () => {
 
         beforeEach(() => {
             beginGameSpy = chai.spy.on(controller['activeGameService'], 'beginMultiplayerGame', async () => {
-                return Promise.resolve(true);
+                return Promise.resolve({ player2: DEFAULT_PLAYER });
             });
             acceptSpy = chai.spy.on(controller['gameDispatcherService'], 'acceptJoinRequest', async () => {
                 return Promise.resolve({ player2: { getId: () => DEFAULT_PLAYER_ID } });

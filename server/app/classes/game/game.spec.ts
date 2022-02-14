@@ -421,73 +421,71 @@ describe('Game Service Injection', () => {
         Game.injectServices(boardService);
         expect(Game['getBoardService']).to.have.been.called;
     });
+});
 
-    describe('createStartGameData', () => {
-        const PLAYER_1_ID = 'player1Id';
-        const PLAYER_2_ID = 'player2Id';
-        const PLAYER_1_NAME = 'player1Name';
-        const PLAYER_2_NAME = 'player2Name';
-        const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
-        const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
-        const DEFAULT_TIME = 60;
-        const DEFAULT_DICTIONARY = 'dict';
-        DEFAULT_MAP = new Map<LetterValue, number>([
-            ['A', 1],
-            ['B', 2],
-            ['C', 2],
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            ['F', 8],
-        ]);
-        const TILE_RESERVE_DATA: TileReserveData[] = [
-            { letter: 'A', amount: 1 },
-            { letter: 'B', amount: 2 },
-            { letter: 'C', amount: 2 },
-            { letter: 'F', amount: 8 },
-        ];
-        const TILE_RESERVE_TOTAL = 13;
-        let gameStub: SinonStubbedInstance<Game>;
-        let roundManagerStub: SinonStubbedInstance<RoundManager>;
-        let round: Round;
-        let boardStub: SinonStubbedInstance<Board>;
-        let game: Game;
+describe('createStartGameData', () => {
+    const PLAYER_1_ID = 'player1Id';
+    const PLAYER_2_ID = 'player2Id';
+    const PLAYER_1_NAME = 'player1Name';
+    const PLAYER_2_NAME = 'player2Name';
+    const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
+    const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
+    const DEFAULT_TIME = 60;
+    const DEFAULT_DICTIONARY = 'dict';
+    DEFAULT_MAP = new Map<LetterValue, number>([
+        ['A', 1],
+        ['B', 2],
+        ['C', 2],
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        ['F', 8],
+    ]);
+    const TILE_RESERVE_DATA: TileReserveData[] = [
+        { letter: 'A', amount: 1 },
+        { letter: 'B', amount: 2 },
+        { letter: 'C', amount: 2 },
+        { letter: 'F', amount: 8 },
+    ];
+    const TILE_RESERVE_TOTAL = 13;
+    let gameStub: SinonStubbedInstance<Game>;
+    let roundManagerStub: SinonStubbedInstance<RoundManager>;
+    let round: Round;
+    let boardStub: SinonStubbedInstance<Board>;
+    let game: Game;
 
-        beforeEach(() => {
-            gameStub = createStubInstance(Game);
-            roundManagerStub = createStubInstance(RoundManager);
-            boardStub = createStubInstance(Board);
+    beforeEach(() => {
+        game = new Game();
+        roundManagerStub = createStubInstance(RoundManager);
+        boardStub = createStubInstance(Board);
 
-            roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-            gameStub.player1 = PLAYER_1;
-            gameStub.player2 = PLAYER_2;
-            gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
-            gameStub.gameType = GameType.Classic;
-            gameStub.dictionnaryName = DEFAULT_DICTIONARY;
-            gameStub.getId.returns(DEFAULT_GAME_ID);
-            gameStub.board = boardStub;
-            gameStub.board.grid = [[]];
-            gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+        roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
+        gameStub.player1 = PLAYER_1;
+        gameStub.player2 = PLAYER_2;
+        gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+        gameStub.gameType = GameType.Classic;
+        gameStub.dictionnaryName = DEFAULT_DICTIONARY;
+        gameStub.getId.returns(DEFAULT_GAME_ID);
+        gameStub.board = boardStub;
+        gameStub.board.grid = [[]];
+        gameStub.roundManager = roundManagerStub as unknown as RoundManager;
 
-            round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
-            roundManagerStub.getCurrentRound.returns(round);
+        round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
+        roundManagerStub.getCurrentRound.returns(round);
+    });
 
-            game = gameStub as unknown as Game;
-        });
-
-        it('should return the expected StartMultiplayerGameData', () => {
-            const result = game['createStartGameData']();
-            const expectedMultiplayerGameData: StartMultiplayerGameData = {
-                player1: gameStub.player1,
-                player2: gameStub.player2,
-                gameType: gameStub.gameType,
-                maxRoundTime: DEFAULT_TIME,
-                dictionary: DEFAULT_DICTIONARY,
-                gameId: DEFAULT_GAME_ID,
-                board: gameStub.board.grid,
-                tileReserve: TILE_RESERVE_DATA,
-                tileReserveTotal: TILE_RESERVE_TOTAL,
-                round: roundManagerStub.convertRoundToRoundData(round),
-            };
-            expect(result).to.deep.equal(expectedMultiplayerGameData);
-        });
+    it('should return the expected StartMultiplayerGameData', () => {
+        const result = game['createStartGameData']();
+        const expectedMultiplayerGameData: StartMultiplayerGameData = {
+            player1: gameStub.player1,
+            player2: gameStub.player2,
+            gameType: gameStub.gameType,
+            maxRoundTime: DEFAULT_TIME,
+            dictionary: DEFAULT_DICTIONARY,
+            gameId: DEFAULT_GAME_ID,
+            board: gameStub.board.grid,
+            tileReserve: TILE_RESERVE_DATA,
+            tileReserveTotal: TILE_RESERVE_TOTAL,
+            round: roundManagerStub.convertRoundToRoundData(round),
+        };
+        expect(result).to.deep.equal(expectedMultiplayerGameData);
     });
 });
