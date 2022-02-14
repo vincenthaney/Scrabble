@@ -174,6 +174,8 @@ export default class InputParserService implements OnDestroy {
             orientation: Orientation.Horizontal,
         };
 
+        this.gameService.playingTiles.emit(placeActionPayload);
+
         return placeActionPayload;
     }
 
@@ -183,6 +185,8 @@ export default class InputParserService implements OnDestroy {
             startPosition: this.getStartPosition(location.substring(0, location.length - 1)),
             orientation: this.getOrientation(location.charAt(location.length - 1)),
         };
+
+        this.gameService.playingTiles.emit(placeActionPayload);
 
         return placeActionPayload;
     }
