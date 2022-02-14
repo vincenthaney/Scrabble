@@ -12,6 +12,7 @@ export type SocketEmitEvents =
     | 'lobbiesUpdate'
     | 'canceledGame'
     | 'joinerLeaveGame'
+    | 'playerLeft'
     | 'newMessage'
     | '_test_event';
 
@@ -21,5 +22,6 @@ export type StartGameEmitArgs = StartMultiplayerGameData;
 export type RejectEmitArgs = PlayerName;
 export type CanceledGameEmitArgs = PlayerName;
 export type JoinerLeaveGameEmitArgs = PlayerName;
+export type PlayerLeftGameEmitArgs = PlayerName;
 export type LobbiesUpdateEmitArgs = LobbyData[];
 export type NewMessageEmitArgs = Message;

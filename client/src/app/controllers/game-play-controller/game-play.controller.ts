@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
+import { PlayerName } from '@app/classes/communication';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { SYSTEM_ID } from '@app/constants/game';
@@ -34,6 +35,11 @@ export class GamePlayController {
             // eslint-disable-next-line no-console
             console.log('game update message: ' + newMessage[0].content);
             this.newMessageValue.next(newMessage[0]);
+        });
+
+        this.socketService.on('playerLeft', (playerName: PlayerName[]) => {
+            // eslint-disable-next-line no-console
+            console.log('player left: ' + playerName[0]);
         });
     }
 

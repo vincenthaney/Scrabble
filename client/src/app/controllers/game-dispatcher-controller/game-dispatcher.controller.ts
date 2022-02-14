@@ -1,15 +1,17 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { GameService } from '@app/services';
 import SocketService from '@app/services/socket/socket.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GameDispatcherController {
+export class GameDispatcherController implements OnDestroy {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
@@ -21,8 +23,19 @@ export class GameDispatcherController {
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
+    serviceDestroyed$: Subject<boolean> = new Subject();
+
     constructor(private http: HttpClient, public socketService: SocketService, private readonly gameService: GameService) {
         this.configureSocket();
+
+        this.gameService.leaveGameSubject.pipe(takeUntil(this.serviceDestroyed$)).subscribe((gameId: string) => {
+            this.handleLeaveGame(gameId);
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     configureSocket(): void {
@@ -66,7 +79,7 @@ export class GameDispatcherController {
         this.http.delete(endpoint).subscribe();
     }
 
-    handleLeaveLobby(gameId: string): void {
+    handleLeaveGame(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
         this.http.delete(endpoint).subscribe();
     }

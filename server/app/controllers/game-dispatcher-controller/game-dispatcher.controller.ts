@@ -134,6 +134,11 @@ export class GameDispatcherController {
             const result = this.gameDispatcherService.leaveLobbyRequest(gameId, playerId);
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
             this.handleLobbiesUpdate();
+        } else {
+            // eslint-disable-next-line no-console
+            console.log('player left during game');
+            this.socketService.removeFromRoom(playerId, gameId);
+            this.socketService.emitToRoom(gameId, 'playerLeft', { name: 'test' });
         }
     }
 

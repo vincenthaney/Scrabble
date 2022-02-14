@@ -2,6 +2,7 @@
 /* eslint-disable no-dupe-class-members */
 
 import { HttpException } from '@app/classes/http.exception';
+import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
 import * as io from 'socket.io';
@@ -13,12 +14,12 @@ import {
     JoinRequestEmitArgs,
     LobbiesUpdateEmitArgs,
     NewMessageEmitArgs,
+    PlayerLeftGameEmitArgs,
     RejectEmitArgs,
     SocketEmitEvents,
     // eslint-disable-next-line prettier/prettier
     StartGameEmitArgs,
 } from './socket-types';
-import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 
 @Service()
 export class SocketService {
@@ -52,6 +53,12 @@ export class SocketService {
         socket.join(room);
     }
 
+    removeFromRoom(socketId: string, room: string) {
+        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        const socket = this.getSocket(socketId);
+        socket.leave(room);
+    }
+
     deleteRoom(room: string) {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
 
@@ -65,6 +72,7 @@ export class SocketService {
     emitToRoom(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
     emitToRoom(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
+    emitToRoom(id: string, ev: 'playerLeft', ...args: PlayerLeftGameEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]) {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);

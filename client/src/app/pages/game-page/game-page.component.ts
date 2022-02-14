@@ -33,7 +33,6 @@ export class GamePageComponent {
             buttonsContent[1] = 'Continuer la partie';
         }
         this.openDialog(title, content, buttonsContent);
-        this.gameService.handleLocalPlayerLeavesGame();
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]) {
@@ -46,6 +45,7 @@ export class GamePageComponent {
                         content: buttonsContent[0],
                         redirect: '/home',
                         style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
+                        action: () => this.gameService.handleLocalPlayerLeavesGame(),
                     },
                     {
                         content: buttonsContent[1],

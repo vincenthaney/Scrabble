@@ -84,7 +84,7 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     handleLeaveLobby() {
-        if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
+        if (this.gameId) this.gameDispatcherController.handleLeaveGame(this.gameId);
         this.resetData();
     }
     handleCreateGame(playerName: string, gameParameters: FormGroup) {
