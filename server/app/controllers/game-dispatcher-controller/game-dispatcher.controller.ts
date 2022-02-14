@@ -149,6 +149,7 @@ export class GameDispatcherController {
             if (!this.socketService.doesRoomExist(gameId)) {
                 // eslint-disable-next-line no-console
                 console.log('hola');
+                this.activeGameService.removeGame(gameId, playerId);
             }
             if (this.activeGameService.isGameOver(gameId, playerId)) return;
 

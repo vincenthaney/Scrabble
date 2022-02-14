@@ -36,7 +36,7 @@ export class ActiveGameService {
         return game;
     }
 
-    remove(id: string, playerId: string): Game {
+    removeGame(id: string, playerId: string): Game {
         const game = this.getGame(id, playerId);
         const index = this.activeGames.indexOf(game);
         this.activeGames.splice(index, 1);

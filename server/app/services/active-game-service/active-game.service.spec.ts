@@ -117,13 +117,13 @@ describe('ActiveGameService', () => {
 
         it('should remove from list with player1 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_1.getId());
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_1.getId());
             expect(activeGameService['activeGames']).to.be.empty;
         });
 
         it('should remove from list with player2 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_2.getId());
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.getId());
             expect(activeGameService['activeGames']).to.be.empty;
         });
     });
