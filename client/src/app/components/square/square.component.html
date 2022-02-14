@@ -1,7 +1,7 @@
 <div [class]="'square' + (squareView.square.tile ? ' has-tile' : ' no-tile')" [ngStyle]="style">
     <div class="content">
         <ng-container *ngIf="squareView.square.tile; else noTile">
-            <app-tile [tile]="squareView.square.tile"></app-tile>
+            <app-tile [tile]="squareView.square.tile" [applied]="squareView.applied"></app-tile>
         </ng-container>
         <ng-template #noTile>
             <ng-container *ngIf="squareView.square.isCenter; else notCenter">
