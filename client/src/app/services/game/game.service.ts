@@ -50,7 +50,6 @@ export default class GameService implements OnDestroy, IResetableService {
         private roundManager: RoundManagerService,
         private gameController: GamePlayController,
     ) {
-        this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
 
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
@@ -142,13 +141,22 @@ export default class GameService implements OnDestroy, IResetableService {
     }
 
     gameOver(): void {
-        // this.resetServiceData();
         this.isGameOver = true;
         this.roundManager.resetServiceData();
     }
 
     resetServiceData(): void {
-        throw new Error('Method not implemented.');
+        // eslint-disable-next-line no-console
+        console.log('GameService reset');
+        this.player1 = undefined as unknown as AbstractPlayer;
+        this.player2 = undefined as unknown as AbstractPlayer;
+        this.gameType = undefined as unknown as GameType;
+        this.dictionnaryName = '';
+        this.tileReserve = [];
+        this.tileReserveTotal = 0;
+        this.isGameOver = false;
+        this.gameId = '';
+        this.localPlayerId = '';
     }
 
     sendScores(): void {

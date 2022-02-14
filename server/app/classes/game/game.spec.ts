@@ -3,20 +3,20 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Player from '@app/classes/player/player';
+import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
+import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
+import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import RoundManager from '@app/classes/round/round-manager';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
 import { MultiplayerGameConfig } from './game-config';
 import { GameType } from './game.type';
-import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
-import { assert } from 'chai';
 
 const expect = chai.expect;
 
@@ -260,7 +260,7 @@ describe('Game', () => {
 
         it('should deduct points from both player if the getPassCounter is exceeded', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
-            game.endOfGame();
+            game.endOfGame(undefined);
             expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
             expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
         });
@@ -270,7 +270,7 @@ describe('Game', () => {
             player1Stub.hasTilesLeft.returns(false);
             player2Stub.hasTilesLeft.returns(true);
 
-            game.endOfGame();
+            game.endOfGame(undefined);
 
             expect(game.player1.score).to.equal(PLAYER_1_SCORE + PLAYER_2_TILE_SCORE);
             expect(game.player2.score).to.equal(PLAYER_2_SCORE - PLAYER_2_TILE_SCORE);
@@ -281,7 +281,7 @@ describe('Game', () => {
             player1Stub.hasTilesLeft.returns(true);
             player2Stub.hasTilesLeft.returns(false);
 
-            game.endOfGame();
+            game.endOfGame(undefined);
 
             expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
             expect(game.player2.score).to.equal(PLAYER_2_SCORE + PLAYER_1_TILE_SCORE);
@@ -310,7 +310,7 @@ describe('Game', () => {
         });
 
         it('should call the messages ', () => {
-            game.endGameMessage();
+            game.endGameMessage(undefined);
             assert(player1Stub.endGameMessage.calledOnce);
             assert(player2Stub.endGameMessage.calledOnce);
             assert(congratulateStub.calledOnce);
@@ -417,5 +417,75 @@ describe('Game Service Injection', () => {
         chai.spy.on(Game, 'getBoardService', () => boardService);
         Game.injectServices(boardService);
         expect(Game['getBoardService']).to.have.been.called;
+    });
+
+    describe('createStartGameData', () => {
+        const PLAYER_1_ID = 'player1Id';
+        const PLAYER_2_ID = 'player2Id';
+        const PLAYER_1_NAME = 'player1Name';
+        const PLAYER_2_NAME = 'player2Name';
+        const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
+        const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
+        const DEFAULT_TIME = 60;
+        const DEFAULT_DICTIONARY = 'dict';
+        const DEFAULT_GAME_ID = 'gameId';
+        const DEFAULT_MAP = new Map<LetterValue, number>([
+            ['A', 1],
+            ['B', 2],
+            ['C', 2],
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            ['F', 8],
+        ]);
+        const TILE_RESERVE_DATA: TileReserveData[] = [
+            { letter: 'A', amount: 1 },
+            { letter: 'B', amount: 2 },
+            { letter: 'C', amount: 2 },
+            { letter: 'F', amount: 8 },
+        ];
+        const TILE_RESERVE_TOTAL = 13;
+        let gameStub: SinonStubbedInstance<Game>;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let round: Round;
+        let boardStub: SinonStubbedInstance<Board>;
+        let game: Game;
+
+        beforeEach(() => {
+            gameStub = createStubInstance(Game);
+            roundManagerStub = createStubInstance(RoundManager);
+            boardStub = createStubInstance(Board);
+
+            roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
+            gameStub.player1 = PLAYER_1;
+            gameStub.player2 = PLAYER_2;
+            gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
+            gameStub.gameType = GameType.Classic;
+            gameStub.dictionnaryName = DEFAULT_DICTIONARY;
+            gameStub.getId.returns(DEFAULT_GAME_ID);
+            gameStub.board = boardStub;
+            gameStub.board.grid = [[]];
+            gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+
+            round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
+            roundManagerStub.getCurrentRound.returns(round);
+
+            game = gameStub as unknown as Game;
+        });
+
+        it('should return the expected StartMultiplayerGameData', () => {
+            const result = gameDispatcherService['createStartGameData'](game);
+            const expectedMultiplayerGameData: StartMultiplayerGameData = {
+                player1: gameStub.player1,
+                player2: gameStub.player2,
+                gameType: gameStub.gameType,
+                maxRoundTime: DEFAULT_TIME,
+                dictionary: DEFAULT_DICTIONARY,
+                gameId: DEFAULT_GAME_ID,
+                board: gameStub.board.grid,
+                tileReserve: TILE_RESERVE_DATA,
+                tileReserveTotal: TILE_RESERVE_TOTAL,
+                round: roundManagerStub.convertRoundToRoundData(round),
+            };
+            expect(result).to.deep.equal(expectedMultiplayerGameData);
+        });
     });
 });

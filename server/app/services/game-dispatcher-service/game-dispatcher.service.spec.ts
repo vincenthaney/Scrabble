@@ -4,16 +4,11 @@
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
-import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import Game from '@app/classes/game/game';
+import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingRoom from '@app/classes/game/waiting-room';
-import Player from '@app/classes/player/player';
-import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
-import * as spies from 'chai-spies';
-import { Container } from 'typedi';
-import { GameDispatcherService } from './game-dispatcher.service';
+import { TileReserve } from '@app/classes/tile';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -22,12 +17,12 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
-import { Round } from '@app/classes/round/round';
-import RoundManager from '@app/classes/round/round-manager';
-import { SinonStubbedInstance, createStubInstance } from 'sinon';
-import { LetterValue, TileReserve } from '@app/classes/tile';
-import { TileReserveData } from '@app/classes/tile/tile.types';
-import { Board } from '@app/classes/board';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Container } from 'typedi';
+import { GameDispatcherService } from './game-dispatcher.service';
 const expect = chai.expect;
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
@@ -309,76 +304,6 @@ describe('GameDispatcherService', () => {
         it('should throw when id is invalid', () => {
             const invalidId = 'invalidId';
             expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(NO_GAME_FOUND_WITH_ID);
-        });
-    });
-
-    describe('createStartGameData', () => {
-        const PLAYER_1_ID = 'player1Id';
-        const PLAYER_2_ID = 'player2Id';
-        const PLAYER_1_NAME = 'player1Name';
-        const PLAYER_2_NAME = 'player2Name';
-        const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
-        const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
-        const DEFAULT_TIME = 60;
-        const DEFAULT_DICTIONARY = 'dict';
-        const DEFAULT_GAME_ID = 'gameId';
-        const DEFAULT_MAP = new Map<LetterValue, number>([
-            ['A', 1],
-            ['B', 2],
-            ['C', 2],
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            ['F', 8],
-        ]);
-        const TILE_RESERVE_DATA: TileReserveData[] = [
-            { letter: 'A', amount: 1 },
-            { letter: 'B', amount: 2 },
-            { letter: 'C', amount: 2 },
-            { letter: 'F', amount: 8 },
-        ];
-        const TILE_RESERVE_TOTAL = 13;
-        let gameStub: SinonStubbedInstance<Game>;
-        let roundManagerStub: SinonStubbedInstance<RoundManager>;
-        let round: Round;
-        let boardStub: SinonStubbedInstance<Board>;
-        let game: Game;
-
-        beforeEach(() => {
-            gameStub = createStubInstance(Game);
-            roundManagerStub = createStubInstance(RoundManager);
-            boardStub = createStubInstance(Board);
-
-            roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-            gameStub.player1 = PLAYER_1;
-            gameStub.player2 = PLAYER_2;
-            gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
-            gameStub.gameType = GameType.Classic;
-            gameStub.dictionnaryName = DEFAULT_DICTIONARY;
-            gameStub.getId.returns(DEFAULT_GAME_ID);
-            gameStub.board = boardStub;
-            gameStub.board.grid = [[]];
-            gameStub.roundManager = roundManagerStub as unknown as RoundManager;
-
-            round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
-            roundManagerStub.getCurrentRound.returns(round);
-
-            game = gameStub as unknown as Game;
-        });
-
-        it('should return the expected StartMultiplayerGameData', () => {
-            const result = gameDispatcherService['createStartGameData'](game);
-            const expectedMultiplayerGameData: StartMultiplayerGameData = {
-                player1: gameStub.player1,
-                player2: gameStub.player2,
-                gameType: gameStub.gameType,
-                maxRoundTime: DEFAULT_TIME,
-                dictionary: DEFAULT_DICTIONARY,
-                gameId: DEFAULT_GAME_ID,
-                board: gameStub.board.grid,
-                tileReserve: TILE_RESERVE_DATA,
-                tileReserveTotal: TILE_RESERVE_TOTAL,
-                round: roundManagerStub.convertRoundToRoundData(round),
-            };
-            expect(result).to.deep.equal(expectedMultiplayerGameData);
         });
     });
 });

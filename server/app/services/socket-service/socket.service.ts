@@ -59,6 +59,11 @@ export class SocketService {
         socket.leave(room);
     }
 
+    deleteRoom(roomName: string) {
+        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        this.sio.sockets.in(roomName).socketsLeave(roomName);
+    }
+
     doesRoomExist(roomName: string): boolean {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
         return this.sio.sockets.adapter.rooms.get(roomName) !== undefined;

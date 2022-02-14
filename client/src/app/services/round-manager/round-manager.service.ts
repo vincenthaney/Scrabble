@@ -45,6 +45,8 @@ export default class RoundManagerService implements IResetableService {
     }
 
     resetServiceData(): void {
+        // eslint-disable-next-line no-console
+        console.log('RoundManager reset');
         this.gameId = '';
         this.localPlayerId = '';
         this.resetRoundData();

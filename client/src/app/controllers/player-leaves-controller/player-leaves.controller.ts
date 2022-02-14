@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 })
 export class PlayerLeavesController implements OnDestroy {
     joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
+    resetGameEvent: EventEmitter<string> = new EventEmitter();
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private http: HttpClient, public socketService: SocketService, private readonly gamePlayController: GamePlayController) {
@@ -30,6 +31,7 @@ export class PlayerLeavesController implements OnDestroy {
 
         this.socketService.on('cleanup', () => {
             this.gamePlayController.newMessageValue.next(INITIAL_MESSAGE);
+            this.resetGameEvent.emit();
         });
     }
 

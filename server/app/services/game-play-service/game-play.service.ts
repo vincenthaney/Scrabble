@@ -42,7 +42,7 @@ export class GamePlayService {
             if (updatedData) updatedData.round = nextRoundData;
             else updatedData = { round: nextRoundData };
             if (game.isGameOver()) {
-                this.handleGameOver(undefined, game, updatedData);
+                endGameFeedback = this.handleGameOver(undefined, game, updatedData);
             }
         }
         return [updatedData, { localPlayerFeedback, opponentFeedback, endGameFeedback }];
