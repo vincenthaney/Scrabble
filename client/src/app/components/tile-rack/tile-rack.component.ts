@@ -19,7 +19,6 @@ export class TileRackComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.updateTileRack();
-        if (!this.gameService.updateTileRackEvent) return;
         this.updateTileRackSubscription = this.gameService.updateTileRackEvent
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe(() => this.updateTileRack());
