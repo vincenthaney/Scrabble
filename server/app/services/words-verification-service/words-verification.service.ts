@@ -5,7 +5,7 @@ import {
     WORD_CONTAINS_APOSTROPHE,
     WORD_CONTAINS_ASTERISK,
     WORD_CONTAINS_HYPHEN,
-    WORD_TOO_SHORT
+    WORD_TOO_SHORT,
 } from '@app/constants/services-errors';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -22,9 +22,10 @@ export class WordsVerificationService {
     }
 
     verifyWords(words: string[], dictionary: string) {
-        for (const word of words) {
+        for (let word of words) {
             if (word.length > 0) {
-                this.removeAccents(word);
+                word = this.removeAccents(word);
+                word = word.toLowerCase();
                 if (word.length < MINIMUM_WORD_LENGTH) throw new Error(word + WORD_TOO_SHORT);
                 if (word.includes('*')) throw new Error(word + WORD_CONTAINS_ASTERISK);
                 if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
@@ -38,6 +39,7 @@ export class WordsVerificationService {
     // Will be removed during sprint 3
     private fetchDictionary(dictionaryName: string, filePath: string): string[] {
         const dataBuffer = fs.readFileSync(join(filePath, dictionaryName));
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const data: DictionaryData = JSON.parse(dataBuffer.toString());
         return data.words;
     }

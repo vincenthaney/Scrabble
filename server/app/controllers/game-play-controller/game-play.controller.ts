@@ -3,7 +3,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -34,6 +34,11 @@ export class GamePlayController {
         this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
+
+            // eslint-disable-next-line no-console
+            console.log('Action type: ' + data.type);
+            // eslint-disable-next-line no-console
+            console.log('Action Payload: ' + data.payload);
 
             try {
                 this.handlePlayAction(gameId, playerId, data);
@@ -73,7 +78,7 @@ export class GamePlayController {
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         try {
-            const [updateData, localPlayerFeedback, opponentFeedback] = this.gamePlayService.playAction(gameId, playerId, data);
+            const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
                 this.socketService.emitToRoom(gameId, 'newMessage', {
                     content: data.input,
@@ -83,23 +88,33 @@ export class GamePlayController {
             if (updateData) {
                 this.gameUpdate(gameId, updateData);
             }
-            if (localPlayerFeedback) {
-                this.socketService.emitToSocket(playerId, 'newMessage', {
-                    content: localPlayerFeedback,
-                    senderId: SYSTEM_ID,
-                });
-            }
-            if (opponentFeedback) {
-                const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
-                this.socketService.emitToSocket(opponentId, 'newMessage', {
-                    content: opponentFeedback,
-                    senderId: SYSTEM_ID,
-                });
+            if (feedback) {
+                if (feedback.localPlayerFeedback) {
+                    this.socketService.emitToSocket(playerId, 'newMessage', {
+                        content: feedback.localPlayerFeedback,
+                        senderId: SYSTEM_ID,
+                    });
+                }
+                if (feedback.opponentFeedback) {
+                    const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+                    this.socketService.emitToSocket(opponentId, 'newMessage', {
+                        content: feedback.opponentFeedback,
+                        senderId: SYSTEM_ID,
+                    });
+                }
+                if (feedback.endGameFeedback) {
+                    for (const message of feedback.endGameFeedback) {
+                        this.socketService.emitToRoom(gameId, 'newMessage', {
+                            content: message,
+                            senderId: SYSTEM_ID,
+                        });
+                    }
+                }
             }
         } catch (e) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
                 content: e.message,
-                senderId: SYSTEM_ID,
+                senderId: SYSTEM_ERROR_ID,
             });
         }
     }
@@ -117,7 +132,7 @@ export class GamePlayController {
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: message.content,
-            senderId: SYSTEM_ID,
+            senderId: SYSTEM_ERROR_ID,
         });
     }
 }

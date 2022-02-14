@@ -23,8 +23,16 @@ export class GamePlayController {
     }
 
     configureSocket(): void {
-        this.socketService.on('gameUpdate', (newData: GameUpdateData) => this.gameUpdateValue.next(newData));
+        this.socketService.on('gameUpdate', (newData: GameUpdateData[]) => {
+            // eslint-disable-next-line no-console
+            console.log('game update player1: ' + newData[0].player1?.score);
+            // eslint-disable-next-line no-console
+            console.log('game update player2: ' + newData[0].player2?.score);
+            this.gameUpdateValue.next(newData[0]);
+        });
         this.socketService.on('newMessage', (newMessage: Message[]) => {
+            // eslint-disable-next-line no-console
+            console.log('game update message: ' + newMessage[0].content);
             this.newMessageValue.next(newMessage[0]);
         });
     }

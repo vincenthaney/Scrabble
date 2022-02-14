@@ -10,6 +10,7 @@ import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
 
@@ -24,6 +25,9 @@ export default class ActionPlace extends ActionPlay {
         this.tilesToPlace = tilesToPlace;
         this.startPosition = startPosition;
         this.orientation = orientation;
+
+        this.scoreCalculator = Container.get(ScoreCalculatorService);
+        this.wordValidator = Container.get(WordsVerificationService);
     }
 
     execute(): void | GameUpdateData {
@@ -52,7 +56,9 @@ export default class ActionPlace extends ActionPlay {
     }
 
     wordToString(words: [Square, Tile][][]): string[] {
-        return words.map((word) => word.reduce((previous, [, tile]) => (previous += tile.letter), ''));
+        return words.map((word) =>
+            word.reduce((previous, [, tile]) => (tile.playedLetter ? (previous += tile.playedLetter) : (previous += tile.letter)), ''),
+        );
     }
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {

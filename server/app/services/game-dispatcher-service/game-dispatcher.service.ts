@@ -1,10 +1,12 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
+import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import { Round } from '@app/classes/round/round';
 import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { StatusCodes } from 'http-status-codes';
@@ -157,6 +159,8 @@ export class GameDispatcherService {
             tileReserve.push({ letter, amount });
         });
         const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        const round: Round = createdGame.roundManager.getCurrentRound();
+        const roundData: RoundData = createdGame.roundManager.convertRoundToRoundData(round);
         const startMultiplayerGameData: StartMultiplayerGameData = {
             player1: createdGame.player1,
             player2: createdGame.player2,
@@ -167,7 +171,7 @@ export class GameDispatcherService {
             board: createdGame.board.grid,
             tileReserve,
             tileReserveTotal,
-            round: createdGame.roundManager.getCurrentRound(),
+            round: roundData,
         };
         return startMultiplayerGameData;
     }

@@ -139,10 +139,12 @@ describe('WordsVerificationService', () => {
 
     it('verifyWords should call removeAccents if a word has length > 0', () => {
         const words: string[] = ['dummy', 'dictionary'];
-        const removeAccentsSpy = spy.on(wordsVerificationService, 'removeAccents', () => {
-            return;
-        });
-        wordsVerificationService.verifyWords(words, DICTIONARY_NAME);
+        const removeAccentsSpy = spy.on(wordsVerificationService, 'removeAccents');
+        spy.on(wordsVerificationService['activeDictionaries'], 'get', () => undefined);
+        try {
+            wordsVerificationService.verifyWords(words, DICTIONARY_NAME);
+            // eslint-disable-next-line no-empty
+        } catch (e) {}
         expect(removeAccentsSpy).to.have.been.called();
     });
 

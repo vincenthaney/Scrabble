@@ -17,7 +17,7 @@ import {
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER,
     ON_YOUR_TURN_ACTIONS,
-    SYSTEM_ID
+    SYSTEM_ERROR_ID
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { Subject } from 'rxjs';
@@ -57,7 +57,7 @@ export default class InputParserService implements OnDestroy {
                     const errorMessageContent = e.message === CommandErrorMessages.NotYourTurn ? e.message : `La commande ${input} est invalide`;
                     this.controller.sendError(this.gameService.getGameId(), playerId, {
                         content: errorMessageContent,
-                        senderId: SYSTEM_ID,
+                        senderId: SYSTEM_ERROR_ID,
                     });
                 }
             }
@@ -184,7 +184,7 @@ export default class InputParserService implements OnDestroy {
                     break;
                 } else if (playerTiles[i].letter === '*' && (letter as LetterValue) && letter === letter.toUpperCase()) {
                     const tile = playerTiles.splice(i, 1)[0];
-                    tilesToPlace.push(new Tile(letter as LetterValue, tile.value));
+                    tilesToPlace.push(new Tile(letter as LetterValue, tile.value, true));
                     break;
                 }
             }

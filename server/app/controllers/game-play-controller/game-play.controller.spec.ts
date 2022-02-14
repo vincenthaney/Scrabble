@@ -15,10 +15,11 @@ import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { INVALID_COMMAND } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -197,7 +198,7 @@ describe('GamePlayController', () => {
         });
 
         it('should call playAction', () => {
-            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
+            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(spy).to.have.been.called();
         });
@@ -223,27 +224,47 @@ describe('GamePlayController', () => {
         });
 
         it('should call gameUpdate if updateData exists', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(gameUpdateSpy).to.have.been.called();
         });
 
         it("should not call gameUpdate if updateData doesn't exist", () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(gameUpdateSpy).to.not.have.been.called();
         });
 
-        it("should not call emitToScket if localPlayerFeedback or opponentFeedback doesn't exist", () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined, undefined]);
+        it("should not call emitToSocket if feedback doesn't exist", () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.not.have.been.called();
         });
 
         it('should call emitToScket if localPlayerFeedback exists', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, DEFAULT_FEEDBACK, DEFAULT_FEEDBACK]);
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [
+                {},
+                { localPlayerFeedback: DEFAULT_FEEDBACK, opponentFeedback: DEFAULT_FEEDBACK, endGameFeedback: undefined },
+            ]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.twice;
+        });
+
+        it('should call emitToRoom for each messages in endGameFeedback', () => {
+            const feedback: FeedbackMessages = {
+                localPlayerFeedback: undefined,
+                opponentFeedback: undefined,
+                endGameFeedback: ['message 1', 'message 2'],
+            };
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
+            gamePlayController['handlePlayAction']('', '', {
+                type: 'help',
+                payload: {},
+                input: '',
+            });
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            expect(emitToRoomSpy).to.have.been.called.exactly(feedback.endGameFeedback!.length);
         });
 
         it('should throw if data.type is undefined', () => {
@@ -265,7 +286,7 @@ describe('GamePlayController', () => {
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'newMessage', {
                 content: DEFAULT_ERROR_MESSAGE,
-                senderId: SYSTEM_ID,
+                senderId: SYSTEM_ERROR_ID,
             });
         });
     });

@@ -16,11 +16,13 @@ import { GamePlayService } from '@app/services/game-play-service/game-play.servi
 import { expect } from 'chai';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { RoundData } from '@app/classes/communication/round-data';
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
 const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
+const DEFAULT_PLAYER_SCORE = 5;
 const DEFAULT_INPUT = 'input';
 const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {}, input: DEFAULT_INPUT };
 const INVALID_ACTION_TYPE = 'invalid action type';
@@ -57,6 +59,7 @@ describe('GamePlayService', () => {
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
 
+        gameStub.endOfGame.returns([DEFAULT_PLAYER_SCORE, DEFAULT_PLAYER_SCORE]);
         gameStub['getTilesLeftPerLetter'].returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
         player = gameStub.player1;
@@ -75,6 +78,7 @@ describe('GamePlayService', () => {
 
         beforeEach(() => {
             actionStub = createStubInstance(ActionPass);
+            actionStub.willEndTurn.returns(true);
             getActionStub = stub(gamePlayService, 'getAction').returns(actionStub as unknown as Action);
             actionStub.getMessage.returns(DEFAULT_ACTION_MESSAGE);
             actionStub.getOpponentMessage.returns(DEFAULT_ACTION_MESSAGE);
@@ -114,17 +118,32 @@ describe('GamePlayService', () => {
             expect(gameStub.isGameOver.called).to.be.true;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists)', () => {
+        it('should set isGameOver to true if gameOver (updatedData exists #1)', () => {
             gameStub.isGameOver.returns(true);
+            actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
-            // expect(result[0]!.isGameOver).to.be.true;
+            expect(result[0]!.isGameOver).to.be.true;
+        });
+
+        it('should set isGameOver to true if gameOver (updatedData exists #2)', () => {
+            gameStub.isGameOver.returns(true);
+            actionStub.willEndTurn.returns(true);
+            actionStub.execute.returns({ player1: { score: DEFAULT_PLAYER_SCORE }, player2: { score: DEFAULT_PLAYER_SCORE } } as GameUpdateData);
+            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(result).to.exist;
+            expect(result[0]!.isGameOver).to.be.true;
         });
 
         it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
             gameStub.isGameOver.returns(true);
-            actionStub.execute.returns(undefined);
+            actionStub.willEndTurn.returns(true);
+
+            actionStub.execute.callsFake(() => {
+                return;
+            });
+
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.isGameOver).to.be.true;
@@ -139,6 +158,7 @@ describe('GamePlayService', () => {
         it('should set round action end turn (updatedData exists)', () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({});
+            roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
@@ -147,6 +167,7 @@ describe('GamePlayService', () => {
         it("should set round action end turn (updatedData doesn't exists)", () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns(undefined);
+            roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
             const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
@@ -186,19 +207,14 @@ describe('GamePlayService', () => {
             expect(actionStub.getMessage.calledOnce).to.be.true;
         });
 
-        it('should return localPlayerFeedback equal to getMessage from action', () => {
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
-            expect(result[1]).to.equal(DEFAULT_ACTION_MESSAGE);
-        });
-
         it('should call getOpponentMessage from action', () => {
             gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
             expect(actionStub.getOpponentMessage.calledOnce).to.be.true;
         });
 
         it('should return opponentFeedback equal to getOppnentMessage from action', () => {
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
-            expect(result[2]).to.equal(DEFAULT_ACTION_MESSAGE);
+            const [, feedback] = gamePlayService.playAction(DEFAULT_GAME_ID, player.getId(), DEFAULT_ACTION);
+            expect(feedback!.opponentFeedback).to.equal(DEFAULT_ACTION_MESSAGE);
         });
     });
 
