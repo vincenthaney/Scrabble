@@ -153,7 +153,8 @@ export class GameDispatcherService {
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
     }
 
-    private createStartGameData(createdGame: Game): StartMultiplayerGameData {
+    createStartGameData(createdGame: Game): StartMultiplayerGameData {
+        // private createStartGameData(createdGame: Game): StartMultiplayerGameData {
         const tileReserve: TileReserveData[] = [];
         createdGame.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });

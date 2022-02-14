@@ -11,7 +11,7 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { SocketService } from '..';
+import SocketService from '@app/services/socket/socket.service';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -64,6 +64,7 @@ export default class GameService implements OnDestroy {
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
+        console.log('initializeMultiplayerGame');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -79,6 +80,8 @@ export default class GameService implements OnDestroy {
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
         await this.router.navigateByUrl('game');
+        // if (this.router.url !== '/game') {
+        // }
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
@@ -162,7 +165,6 @@ export default class GameService implements OnDestroy {
     }
 
     disconnectGame() {
-        
         const gameId = this.gameId;
         console.log(`disconnect gameId : ${gameId}`);
         console.log(`disconnect socketId : ${this.getLocalPlayerId()}`);

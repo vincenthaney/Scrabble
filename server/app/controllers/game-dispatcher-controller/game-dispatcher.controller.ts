@@ -230,8 +230,9 @@ export class GameDispatcherController {
         player.id = newPlayerId;
         player.isConnected = true;
         this.socketService.addToRoom(newPlayerId, gameId);
-        const data = game.getInfoData();
-        this.socketService.emitToSocket(newPlayerId, 'gameInfo', data);
+
+        const data = this.gameDispatcherService.createStartGameData(game);
+        this.socketService.emitToSocket(newPlayerId, 'startGame', data);
     }
 
     private handleDisconnection(gameId: string, playerId: string) {

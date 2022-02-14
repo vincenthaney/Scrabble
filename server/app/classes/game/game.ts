@@ -148,5 +148,28 @@ export default class Game {
             board: this.board.grid,
             isGameOver: this.isGameOver(),
         };
+
+        // private createStartGameData(createdGame: Game): StartMultiplayerGameData {
+        //     const tileReserve: TileReserveData[] = [];
+        //     createdGame.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+        //         tileReserve.push({ letter, amount });
+        //     });
+        //     const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        //     const round: Round = createdGame.roundManager.getCurrentRound();
+        //     const roundData: RoundData = createdGame.roundManager.convertRoundToRoundData(round);
+        //     const startMultiplayerGameData: StartMultiplayerGameData = {
+        //         player1: createdGame.player1,
+        //         player2: createdGame.player2,
+        //         gameType: createdGame.gameType,
+        //         maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
+        //         dictionary: createdGame.dictionnaryName,
+        //         gameId: createdGame.getId(),
+        //         board: createdGame.board.grid,
+        //         tileReserve,
+        //         tileReserveTotal,
+        //         round: roundData,
+        //     };
+        //     return startMultiplayerGameData;
+        // }
     }
 }

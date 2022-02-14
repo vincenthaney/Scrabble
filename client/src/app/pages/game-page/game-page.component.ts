@@ -37,6 +37,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.gameService.getGameId();
         console.log('ngOnInit');
         if (!this.gameService.getGameId()) {
             console.log('ngOnInit SANS GAMEID');
