@@ -7,10 +7,10 @@ import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ID } from '@app/constants/game';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
