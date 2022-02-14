@@ -1,9 +1,9 @@
 import Game from '@app/classes/game/game';
-import { MultiplayerGameConfig } from '@app/classes/game/game-config';
+import { MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { Service } from 'typedi';
-import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 
 @Service()
 export class ActiveGameService {
@@ -14,10 +14,10 @@ export class ActiveGameService {
         Game.injectServices(this.boardService);
     }
 
-    async beginMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<Game> {
+    async beginMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<StartMultiplayerGameData> {
         const game = await Game.createMultiplayerGame(id, config);
         this.activeGames.push(game);
-        return game;
+        return game.createStartGameData();
     }
 
     getGame(id: string, playerId: string): Game {
@@ -37,4 +37,10 @@ export class ActiveGameService {
         this.activeGames.splice(index, 1);
         return game;
     }
+
+    // removePlayerFromGame(gameId: string, playerId: string): void {
+    //     const game = this.getGame(gameId, playerId);
+    //     // if (game.player1.getId() === playerId) {
+    //     // }
+    // }
 }

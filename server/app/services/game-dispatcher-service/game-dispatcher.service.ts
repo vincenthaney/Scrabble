@@ -1,14 +1,9 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
-import Game from '@app/classes/game/game';
-import { GameConfig, GameConfigData, MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
-import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { StatusCodes } from 'http-status-codes';
-import { Service } from 'typedi';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -17,13 +12,15 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
 
-    constructor(private activeGameService: ActiveGameService) {
+    constructor() {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
@@ -59,7 +56,7 @@ export class GameDispatcherService {
         return waitingRoom.getConfig();
     }
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<StartMultiplayerGameData> {
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<MultiplayerGameConfig> {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.getId() !== playerId) {
@@ -80,10 +77,7 @@ export class GameDispatcherService {
             player2: waitingRoom.joinedPlayer,
         };
 
-        const createdGame = await this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
-        await createdGame.initTileReserve();
-
-        return this.createStartGameData(createdGame);
+        return config;
     }
 
     rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
@@ -151,24 +145,8 @@ export class GameDispatcherService {
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
     }
 
-    private createStartGameData(createdGame: Game): StartMultiplayerGameData {
-        const tileReserve: TileReserveData[] = [];
-        createdGame.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
-            tileReserve.push({ letter, amount });
-        });
-        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
-        const startMultiplayerGameData: StartMultiplayerGameData = {
-            player1: createdGame.player1,
-            player2: createdGame.player2,
-            gameType: createdGame.gameType,
-            maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
-            dictionary: createdGame.dictionnaryName,
-            gameId: createdGame.getId(),
-            board: createdGame.board.grid,
-            tileReserve,
-            tileReserveTotal,
-            round: createdGame.roundManager.getCurrentRound(),
-        };
-        return startMultiplayerGameData;
+    isGameInWaitingRooms(gameId: string): boolean {
+        const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === gameId);
+        return filteredWaitingRoom.length > 0;
     }
 }

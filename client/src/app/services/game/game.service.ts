@@ -4,13 +4,15 @@ import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
+import { IResetableService } from '@app/classes/i-resetable-service';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ID } from '@app/constants/game';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -19,7 +21,7 @@ export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileRese
 @Injectable({
     providedIn: 'root',
 })
-export default class GameService implements OnDestroy {
+export default class GameService implements OnDestroy, IResetableService {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
@@ -38,6 +40,7 @@ export default class GameService implements OnDestroy {
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
+    isGameOver: boolean;
     private gameId: string;
     private localPlayerId: string;
 
@@ -46,9 +49,13 @@ export default class GameService implements OnDestroy {
         private boardService: BoardService,
         private roundManager: RoundManagerService,
         private gameController: GamePlayController,
+        private gameDispatcherController: GameDispatcherController,
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
+        this.gameDispatcherController.initializeGameSubject
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe(async ([localPlayerId, startGameData]) => this.initializeMultiplayerGame(localPlayerId, startGameData));
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
@@ -60,6 +67,8 @@ export default class GameService implements OnDestroy {
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
+        // eslint-disable-next-line no-console
+        console.log('start game');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -74,6 +83,7 @@ export default class GameService implements OnDestroy {
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
         this.roundManager.startRound();
+        this.isGameOver = false;
         await this.router.navigateByUrl('game');
     }
 
@@ -134,8 +144,18 @@ export default class GameService implements OnDestroy {
         return this.player1.id === this.localPlayerId ? this.player1.id : this.player2.id;
     }
 
-    gameOver(): boolean {
+    gameOver(): void {
+        // this.resetServiceData();
+        this.isGameOver = true;
+        this.roundManager.resetServiceData();
+    }
+
+    resetServiceData(): void {
         throw new Error('Method not implemented.');
+    }
+
+    handleLocalPlayerLeavesGame(): void {
+        this.gameDispatcherController.handleLeaveLobby(this.gameId);
     }
 
     sendScores(): void {

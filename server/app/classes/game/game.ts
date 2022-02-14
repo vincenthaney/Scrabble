@@ -1,13 +1,14 @@
 import Board from '@app/classes/board/board';
 import Player from '@app/classes/player/player';
 import RoundManager from '@app/classes/round/round-manager';
-import TileReserve from '@app/classes/tile/tile-reserve';
-import BoardService from '@app/services/board/board.service';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { MultiplayerGameConfig } from './game-config';
-import { START_TILES_AMOUNT, END_GAME_HEADER_MESSAGE } from '@app/constants/classes-constants';
-import { GameType } from './game.type';
+import TileReserve from '@app/classes/tile/tile-reserve';
+import { TileReserveData } from '@app/classes/tile/tile.types';
+import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
+import BoardService from '@app/services/board/board.service';
+import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
+import { GameType } from './game.type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
 
@@ -138,5 +139,26 @@ export default class Game {
         } else {
             return this.player1.getId() === arg;
         }
+    }
+
+    createStartGameData(): StartMultiplayerGameData {
+        const tileReserve: TileReserveData[] = [];
+        this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
+        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        const startMultiplayerGameData: StartMultiplayerGameData = {
+            player1: this.player1,
+            player2: this.player2,
+            gameType: this.gameType,
+            maxRoundTime: this.roundManager.getMaxRoundTime(),
+            dictionary: this.dictionnaryName,
+            gameId: this.getId(),
+            board: this.board.grid,
+            tileReserve,
+            tileReserveTotal,
+            round: this.roundManager.getCurrentRound(),
+        };
+        return startMultiplayerGameData;
     }
 }
