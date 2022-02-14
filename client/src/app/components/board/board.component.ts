@@ -3,6 +3,7 @@ import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
+import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -19,6 +20,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     gridSize: Vec2;
     squareGrid: SquareView[][];
     boardUpdateSubscription: Subscription;
+    tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
     constructor(private boardService: BoardService) {
         this.gridSize = { x: 0, y: 0 };

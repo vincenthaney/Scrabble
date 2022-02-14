@@ -60,4 +60,22 @@ describe('TileComponent', () => {
         component['tile'] = expectedTile;
         expect(component.tile).toEqual(expectedTile);
     });
+
+    it('Should have hideValue true if blank tile', () => {
+        component.tile = {
+            letter: '*',
+            value: 0,
+        };
+        component.ngOnInit();
+        expect(component.hideValue).toBeTrue();
+    });
+
+    it('Should NOT have hideValue true if normal tile', () => {
+        component.tile = {
+            letter: 'A',
+            value: 1,
+        };
+        component.ngOnInit();
+        expect(component.hideValue).toBeFalse();
+    });
 });
