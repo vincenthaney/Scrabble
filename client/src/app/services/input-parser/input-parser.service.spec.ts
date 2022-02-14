@@ -45,14 +45,6 @@ describe('InputParserService', () => {
         new Tile('*' as LetterValue, 0, true),
     ];
     const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME, DEFAULT_TILES);
-    // const DEFAULT_ACTION_DATA: ActionData = {
-    //     type: ActionType.PASS,
-    //     payload: {},
-    // };
-    // const DEFAULT_MESSAGE: Message = {
-    //     content: VALID_MESSAGE_INPUT,
-    //     senderId: DEFAULT_PLAYER_ID,
-    // };
     const DEFAULT_COMMAND_ERROR_MESSAGE = CommandErrorMessages.InvalidEntry;
 
     const EXPECTED_PLACE_PAYLOAD_MULTI: ActionPlacePayload = {
@@ -347,9 +339,6 @@ describe('InputParserService', () => {
             ];
 
             for (let i = 0; i < validLetters.length; i++) {
-                console.log(i);
-                console.log(service['parsePlaceLettersToTiles'](validLetters[i]));
-                console.log(expectedTiles[i]);
                 expect(service['parsePlaceLettersToTiles'](validLetters[i])).toEqual(expectedTiles[i]);
             }
         });
