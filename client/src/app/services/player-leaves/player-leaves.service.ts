@@ -10,8 +10,6 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PlayerLeavesService implements OnDestroy, IResetableService {
     joinerLeaveGameEvent: Subject<string> = new Subject();
-    opponentLeftGameSubject: Subject<string> = new Subject();
-
     joinerLeaveGameSubscription: Subscription;
 
     serviceDestroyed$: Subject<boolean> = new Subject();
@@ -25,10 +23,6 @@ export class PlayerLeavesService implements OnDestroy, IResetableService {
 
         this.gameDispatcherService.gameIdUpdate.pipe(takeUntil(this.serviceDestroyed$)).subscribe((gameId: string | undefined) => {
             this.gameId = gameId;
-        });
-
-        this.playerLeavesController.playerLeftGameSubject.pipe(takeUntil(this.serviceDestroyed$)).subscribe((playerName: string) => {
-            this.handleOpponentLeft(playerName);
         });
     }
 
@@ -44,10 +38,6 @@ export class PlayerLeavesService implements OnDestroy, IResetableService {
         if (this.gameId) this.playerLeavesController.handleLeaveGame(this.gameId);
         this.resetServiceData();
         this.gameDispatcherService.resetServiceData();
-    }
-
-    handleOpponentLeft(playerName: string) {
-        this.opponentLeftGameSubject.next(playerName);
     }
 
     resetServiceData(): void {

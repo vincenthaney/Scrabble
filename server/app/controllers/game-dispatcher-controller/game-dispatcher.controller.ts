@@ -144,9 +144,12 @@ export class GameDispatcherController {
             this.handleLobbiesUpdate();
         } else {
             this.socketService.removeFromRoom(playerId, gameId);
-
+            this.socketService.emitToSocket(playerId, 'cleanup');
             // Check if there is no player left --> cleanup server and client
-
+            if (!this.socketService.doesRoomExist(gameId)) {
+                // eslint-disable-next-line no-console
+                console.log('hola');
+            }
             if (this.activeGameService.isGameOver(gameId, playerId)) return;
 
             this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);

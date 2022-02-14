@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
-import { SYSTEM_ID } from '@app/constants/game';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -13,10 +13,7 @@ import { environment } from 'src/environments/environment';
 })
 export class GamePlayController {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>({
-        content: 'Début de la partie',
-        senderId: SYSTEM_ID,
-    });
+    newMessageValue = new BehaviorSubject<Message>(INITIAL_MESSAGE);
 
     constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();

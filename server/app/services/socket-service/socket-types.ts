@@ -14,6 +14,7 @@ export type SocketEmitEvents =
     | 'joinerLeaveGame'
     | 'playerLeft'
     | 'newMessage'
+    | 'cleanup'
     | '_test_event';
 
 export type GameUpdateEmitArgs = GameUpdateData;
@@ -25,3 +26,4 @@ export type JoinerLeaveGameEmitArgs = PlayerName;
 export type PlayerLeftGameEmitArgs = PlayerName;
 export type LobbiesUpdateEmitArgs = LobbyData[];
 export type NewMessageEmitArgs = Message;
+export type CleanupEmitArgs = never;

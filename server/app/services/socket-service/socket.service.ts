@@ -9,12 +9,12 @@ import * as io from 'socket.io';
 import { Service } from 'typedi';
 import {
     CanceledGameEmitArgs,
+    CleanupEmitArgs,
     GameUpdateEmitArgs,
     JoinerLeaveGameEmitArgs,
     JoinRequestEmitArgs,
     LobbiesUpdateEmitArgs,
     NewMessageEmitArgs,
-    PlayerLeftGameEmitArgs,
     RejectEmitArgs,
     SocketEmitEvents,
     // eslint-disable-next-line prettier/prettier
@@ -59,10 +59,9 @@ export class SocketService {
         socket.leave(room);
     }
 
-    deleteRoom(room: string) {
+    doesRoomExist(roomName: string): boolean {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
-
-        this.sio.sockets.in(room).socketsLeave(room);
+        return this.sio.sockets.adapter.rooms.get(roomName) !== undefined;
     }
 
     emitToRoom(id: string, ev: 'gameUpdate', ...args: GameUpdateEmitArgs[]): void;
@@ -72,7 +71,6 @@ export class SocketService {
     emitToRoom(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
     emitToRoom(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
-    emitToRoom(id: string, ev: 'playerLeft', ...args: PlayerLeftGameEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]) {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
@@ -98,6 +96,7 @@ export class SocketService {
     emitToSocket(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
     emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToSocket(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
+    emitToSocket(id: string, ev: 'cleanup', ...args: CleanupEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
