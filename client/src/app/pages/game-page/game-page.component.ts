@@ -9,7 +9,7 @@ import {
     RACK_TILE_MIN_FONT_SIZE,
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE
+    SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/game';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
