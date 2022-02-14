@@ -1,4 +1,5 @@
-import { Injectable, OnDestroy } from '@angular/core';
+/* eslint-disable dot-notation */
+import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer } from '@app/classes/player';
@@ -20,7 +21,6 @@ import {
     SYSTEM_ERROR_ID
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { Subject } from 'rxjs';
 import { GameService } from '..';
 import { CommandErrorMessages, PLAYER_NOT_FOUND } from './command-error-messages';
 import CommandError from './command-errors';
@@ -30,27 +30,19 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
 @Injectable({
     providedIn: 'root',
 })
-export default class InputParserService implements OnDestroy {
-    serviceDestroyed$: Subject<boolean> = new Subject();
-
+export default class InputParserService {
     constructor(private controller: GamePlayController, private gameService: GameService) {}
 
-    ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
-    }
-
     parseInput(input: string): void {
-        const playerId = this.getLocalPlayerId();
+        const playerId = this.getLocalPlayer().id;
         const gameId: string = this.gameService.getGameId();
 
         if (input[0] === '!') {
             // it is an action
             const inputWords: string[] = input.substring(1).split(' ');
-            const actionName: string = inputWords[0];
 
             try {
-                const actionData: ActionData = this.parseCommand(actionName, inputWords);
+                const actionData: ActionData = this.parseCommand(inputWords);
                 this.controller.sendAction(gameId, playerId, actionData, input);
             } catch (e) {
                 if (e instanceof CommandError) {
@@ -69,13 +61,12 @@ export default class InputParserService implements OnDestroy {
         }
     }
 
-    private parseCommand(actionName: string, inputWords: string[]): ActionData {
-        const playerId = this.getLocalPlayerId();
-        // eslint-disable-next-line dot-notation
-        const currentPlayerId = this.gameService['roundManager'].currentRound.player.id;
+    private parseCommand(inputWords: string[]): ActionData {
+        const actionName: string = inputWords[0];
 
         let actionData: ActionData;
-        if (ON_YOUR_TURN_ACTIONS.includes(actionName) && currentPlayerId !== playerId) throw new CommandError(CommandErrorMessages.NotYourTurn);
+        if (ON_YOUR_TURN_ACTIONS.includes(actionName) && !this.gameService.isLocalPlayerPlaying())
+            throw new CommandError(CommandErrorMessages.NotYourTurn);
 
         switch (actionName) {
             case 'placer': {
@@ -251,19 +242,11 @@ export default class InputParserService implements OnDestroy {
         else throw new CommandError(CommandErrorMessages.BadSyntax);
     }
 
-    private getLocalPlayerId(): string {
-        return this.getLocalPlayer().id;
-    }
-
     private getLocalPlayer(): AbstractPlayer {
-        let player: AbstractPlayer;
         const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (localPlayer instanceof AbstractPlayer) {
-            player = localPlayer;
-        } else {
-            throw new Error(PLAYER_NOT_FOUND);
+        if (localPlayer) {
+            return localPlayer;
         }
-
-        return player;
+        throw new Error(PLAYER_NOT_FOUND);
     }
 }
