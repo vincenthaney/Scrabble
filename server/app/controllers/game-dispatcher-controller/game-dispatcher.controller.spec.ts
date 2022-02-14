@@ -432,7 +432,7 @@ describe('GameDispatcherController', () => {
             });
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
-            controller['handleLobbyLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
         });
 
         it('should call gameDispatcherService.isGameInWaitingRoomsSpy', () => {
