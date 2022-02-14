@@ -3,7 +3,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -114,7 +114,7 @@ export class GamePlayController {
         } catch (e) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
                 content: e.message,
-                senderId: SYSTEM_ID,
+                senderId: SYSTEM_ERROR_ID,
             });
         }
     }
@@ -132,7 +132,7 @@ export class GamePlayController {
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: message.content,
-            senderId: SYSTEM_ID,
+            senderId: SYSTEM_ERROR_ID,
         });
     }
 }
