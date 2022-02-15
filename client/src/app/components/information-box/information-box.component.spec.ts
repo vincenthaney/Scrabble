@@ -158,10 +158,6 @@ describe('InformationBoxComponent', () => {
             spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(undefined);
             component.ngOnInit();
             expect(subscribeSpy).not.toHaveBeenCalled();
-
-            const endRoundSpy = spyOn(component, 'endRound');
-            mockRoundManager.endRoundEvent.emit();
-            expect(endRoundSpy).toHaveBeenCalled();
         });
 
         it('ngOnInit endRoundEvent subscription should call endRound', () => {
@@ -177,17 +173,20 @@ describe('InformationBoxComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('ngOnDestroy should unsubscribe from subscriptions', () => {
-        const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
-        const ngUnsubscribeCompleteSpy = spyOn(component['ngUnsubscribe'], 'complete');
-        const timerSubscriptionSpy = spyOn(component.timerSubscription, 'unsubscribe');
-        const endRoundSubscriptionSpy = spyOn(component.endRoundSubscription, 'unsubscribe');
+    describe('ngOndestroy', () => {
+        beforeEach(() => {
+            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
+            spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
+        });
 
-        component.ngOnDestroy();
-        expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
-        expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
-        expect(timerSubscriptionSpy).toHaveBeenCalled();
-        expect(endRoundSubscriptionSpy).toHaveBeenCalled();
+        it('should always call next and complete on ngUnsubscribe', () => {
+            const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn(component['ngUnsubscribe'], 'complete');
+
+            component.ngOnDestroy();
+            expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
+            expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
+        });
     });
 
     describe('startTimer', () => {
