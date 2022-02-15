@@ -153,7 +153,7 @@ describe('GameService', () => {
             expect(service['roundManager'].gameId).toEqual(defaultGameData.gameId);
         });
 
-        it('should set roundManager.gameId', async () => {
+        it('should set roundManager.localPlayerId', async () => {
             expect(service['roundManager'].localPlayerId).not.toBeDefined();
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service['roundManager'].localPlayerId).toEqual(DEFAULT_PLAYER_ID);
