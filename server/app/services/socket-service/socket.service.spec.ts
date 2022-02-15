@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
-import { delay } from '@app/utils/delay';
+import { Delay } from '@app/utils/delay';
 import { Server } from 'app/server';
 import { expect } from 'chai';
 import { io as ioClient, Socket } from 'socket.io-client';
@@ -23,7 +23,7 @@ const getSocketId = async (socket: Socket) => {
 
     let i = 0;
     while (socket.id === undefined) {
-        await delay(DELAY);
+        await Delay.for(DELAY);
         if (i * DELAY > MAX_DELAY) throw new Error('TIMEOUT');
         i++;
     }
@@ -60,7 +60,7 @@ describe('SocketService', () => {
         it('should add to the socket map on connect', async () => {
             service.handleSockets();
             await clientSocket.connect();
-            await delay(RESPONSE_DELAY); // Wait until the server socket received connection.
+            await Delay.for(RESPONSE_DELAY); // Wait until the server socket received connection.
             expect(service['sockets'].get(clientSocket.id)).to.exist;
         });
 

@@ -16,15 +16,17 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
-import { INVALID_COMMAND } from '@app/constants/services-errors';
+import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { CONTENT_REQUIRED, SENDER_REQUIRED } from './game-play-controller-errors';
@@ -289,7 +291,7 @@ describe('GamePlayController', () => {
             });
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'newMessage', {
-                content: DEFAULT_ERROR_MESSAGE,
+                content: COMMAND_IS_INVALID(DEFAULT_DATA.input) + DEFAULT_ERROR_MESSAGE,
                 senderId: SYSTEM_ERROR_ID,
             });
         });
@@ -376,6 +378,31 @@ describe('GamePlayController', () => {
             };
             gamePlayController['handleNewError'](DEFAULT_GAME_ID, validMessage);
             expect(emitToRoomSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleError', () => {
+        let socketServiceStub: SinonStubbedInstance<SocketService>;
+        let delayStub: SinonStub;
+
+        beforeEach(() => {
+            socketServiceStub = createStubInstance(SocketService);
+            (gamePlayController['socketService'] as unknown) = socketServiceStub;
+            delayStub = stub(Delay, 'for');
+        });
+
+        afterEach(() => {
+            delayStub.restore();
+        });
+
+        it('should call emitToSocket', async () => {
+            await gamePlayController['handleError'](new Error(), '', '');
+            expect(socketServiceStub.emitToSocket.called).to.be.true;
+        });
+
+        it('should call emitToSocket', async () => {
+            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '');
+            expect(delayStub.called).to.be.true;
         });
     });
 });
