@@ -1,5 +1,6 @@
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
@@ -15,7 +16,6 @@ import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
 @Injectable({
@@ -148,12 +148,10 @@ export default class GameService implements OnDestroy, IResetableService {
 
     gameOver(): void {
         this.isGameOver = true;
-        this.roundManager.resetServiceData();
+        this.roundManager.resetTimerData();
     }
 
     resetServiceData(): void {
-        // eslint-disable-next-line no-console
-        console.log('GameService reset');
         this.player1 = undefined as unknown as AbstractPlayer;
         this.player2 = undefined as unknown as AbstractPlayer;
         this.gameType = undefined as unknown as GameType;

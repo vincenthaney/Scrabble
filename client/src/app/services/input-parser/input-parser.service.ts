@@ -70,6 +70,8 @@ export default class InputParserService {
         if (ON_YOUR_TURN_ACTIONS.includes(actionName) && !this.gameService.isLocalPlayerPlaying())
             throw new CommandError(CommandErrorMessages.NotYourTurn);
 
+        if (this.gameService.isGameOver) throw new CommandError(CommandErrorMessages.ImpossibleCommand);
+
         switch (actionName) {
             case 'placer': {
                 if (inputWords.length !== EXPECTED_WORD_COUNT_PLACE) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
