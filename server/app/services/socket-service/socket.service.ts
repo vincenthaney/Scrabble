@@ -8,7 +8,6 @@ import * as io from 'socket.io';
 import { Service } from 'typedi';
 import {
     CanceledGameEmitArgs,
-    GameInfoEmitArgs,
     GameUpdateEmitArgs,
     JoinerLeaveGameEmitArgs,
     JoinRequestEmitArgs,
@@ -66,7 +65,6 @@ export class SocketService {
     emitToRoom(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
     emitToRoom(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
-    emitToRoom(id: string, ev: 'gameInfo', ...args: GameInfoEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]) {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
@@ -91,7 +89,6 @@ export class SocketService {
     emitToSocket(id: string, ev: 'joinerLeaveGame', ...args: JoinerLeaveGameEmitArgs[]): void;
     emitToSocket(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
     emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
-    emitToSocket(id: string, ev: 'gameInfo', ...args: GameInfoEmitArgs[]): void;
     emitToSocket(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
