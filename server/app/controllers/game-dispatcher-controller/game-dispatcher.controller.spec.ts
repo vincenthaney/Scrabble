@@ -4,6 +4,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Application } from '@app/app';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import Room from '@app/classes/game/room';
@@ -17,6 +18,7 @@ import {
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
+import { SYSTEM_ID } from '@app/constants/game';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -479,6 +481,34 @@ describe('GameDispatcherController', () => {
 
         it('should call gameDispatcherService.getLobbiesRoom', () => {
             expect(getLobbiesRoomSpy).to.have.been.called();
+        });
+    });
+
+    describe('PlayerLeftFeedback', () => {
+        it('On receive player feedback, should call handlePlayerFeedback method', () => {
+            const handlePlayerFeedbackSpy = chai.spy.on(controller, 'handlePlayerLeftFeedback', () => {});
+            const messages: string[] = ['test'];
+            const updatedData: GameUpdateData = {};
+            controller['activeGameService'].playerLeftEvent.emit('playerLeftFeedback', DEFAULT_GAME_ID, messages, updatedData);
+            expect(handlePlayerFeedbackSpy).to.have.been.called.with(DEFAULT_GAME_ID, messages, updatedData);
+        });
+
+        it('PlayerLeftFeedback shoud emit game update to room', () => {
+            const emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            const messages: string[] = ['test'];
+            const updatedData: GameUpdateData = {};
+            controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
+            expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'gameUpdate', updatedData);
+        });
+
+        it('PlayerLeftFeedback shoud emit end game messages to room', () => {
+            const emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            const messages: string[] = ['test'];
+            const updatedData: GameUpdateData = {};
+            controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
+            messages.forEach((message) => {
+                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', { content: message, senderId: SYSTEM_ID });
+            });
         });
     });
 });
