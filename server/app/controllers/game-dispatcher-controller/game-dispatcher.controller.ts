@@ -16,6 +16,7 @@ import {
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
+import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 
 @Service()
 export class GameDispatcherController {
@@ -140,7 +141,6 @@ export class GameDispatcherController {
 
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
-                console.log(e);
                 HttpException.sendError(e, res);
             }
         });
@@ -218,10 +218,6 @@ export class GameDispatcherController {
     private handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
         const game = this.activeGameService.getGame(gameId, playerId);
 
-        console.log(`handleReconnection gameId : ${gameId}`);
-        console.log(`handleReconnection playerId : ${playerId}`);
-        console.log(`handleReconnection newPlayerId : ${newPlayerId}`);
-
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
         if (game.isGameOver()) {
@@ -237,9 +233,6 @@ export class GameDispatcherController {
     }
 
     private handleDisconnection(gameId: string, playerId: string) {
-        console.log(`handleDisconnection gameId : ${gameId}`);
-        console.log(`handleDisconnection playerId : ${playerId}`);
-
         const game = this.activeGameService.getGame(gameId, playerId);
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
@@ -247,6 +240,7 @@ export class GameDispatcherController {
             const disconnectedPlayer = game.getRequestingPlayer(playerId);
             disconnectedPlayer.isConnected = false;
             setTimeout(() => {
+                // eslint-disable-next-line no-console
                 console.log('setTimeout EXPIRE ');
 
                 if (!disconnectedPlayer.isConnected) {
@@ -254,9 +248,7 @@ export class GameDispatcherController {
                     // eslint-disable-next-line no-console
                     console.log('setTimeout GIVEUP ');
                 }
-            }, TIME_TO_RECONNECT);
+            }, TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
         }
     }
 }
-
-const TIME_TO_RECONNECT = 5000;

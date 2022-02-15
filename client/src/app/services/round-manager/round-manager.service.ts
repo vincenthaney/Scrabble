@@ -6,7 +6,7 @@ import { IResetableService } from '@app/classes/i-resetable-service';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
-import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -64,12 +64,11 @@ export default class RoundManagerService implements IResetableService {
     continueRound(round: Round): void {
         this.currentRound = round;
         this.endRoundEvent.emit();
-        const currentTime: Date = new Date(Date.now());
-        const limitTime: Date = new Date(round.limitTime);
-        const timeLeft: number = limitTime.getTime() - currentTime.getTime();
-        console.log(timeLeft);
+        this.startRound(this.timeLeft(round.limitTime));
+    }
 
-        this.startRound(timeLeft / 1000);
+    timeLeft(limitTime: Date): number {
+        return Math.max((new Date(limitTime).getTime() - new Date(Date.now()).getTime()) / SECONDS_TO_MILLISECONDS, MINIMUM_TIMER_TIME);
     }
 
     getActivePlayer(): AbstractPlayer {

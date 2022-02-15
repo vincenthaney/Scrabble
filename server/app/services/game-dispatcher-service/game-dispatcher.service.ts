@@ -154,7 +154,6 @@ export class GameDispatcherService {
     }
 
     createStartGameData(createdGame: Game): StartMultiplayerGameData {
-        // private createStartGameData(createdGame: Game): StartMultiplayerGameData {
         const tileReserve: TileReserveData[] = [];
         createdGame.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });
