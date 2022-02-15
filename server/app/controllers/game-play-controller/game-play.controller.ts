@@ -31,7 +31,7 @@ export class GamePlayController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
 
@@ -48,7 +48,7 @@ export class GamePlayController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/message', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/message', (req: GameRequest, res: Response) => {
             const gameId = req.params.gameId;
             const message: Message = req.body;
 
@@ -60,7 +60,7 @@ export class GamePlayController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/error', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/error', (req: GameRequest, res: Response) => {
             const playerId = req.params.playerId;
             const message: Message = req.body;
 

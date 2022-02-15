@@ -10,6 +10,13 @@ import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import {
+    DICTIONARY_REQUIRED,
+    GAME_TYPE_REQUIRED,
+    MAX_ROUND_TIME_REQUIRED,
+    NAME_IS_INVALID,
+    PLAYER_NAME_REQUIRED,
+} from '@app/constants/controllers-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -18,13 +25,6 @@ import { createStubInstance } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import {
-    DICTIONARY_REQUIRED,
-    GAME_TYPE_REQUIRED,
-    MAX_ROUND_TIME_REQUIRED,
-    NAME_IS_INVALID,
-    PLAYER_NAME_REQUIRED,
-} from '@app/constants/controllers-errors';
 import { GameDispatcherController } from './game-dispatcher.controller';
 
 const expect = chai.expect;
@@ -100,11 +100,11 @@ describe('GameDispatcherController', () => {
             });
         });
 
-        describe('/games/:gameId/player/:playerId/join', () => {
+        describe('/games/:gameId/players/:playerId/join', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleJoinGame', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -112,15 +112,15 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/accept', () => {
+        describe('/games/:gameId/players/:playerId/accept', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleAcceptRequest', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -128,15 +128,17 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/accept`)
+                    .expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/reject', () => {
+        describe('/games/:gameId/players/:playerId/reject', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleRejectRequest', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -144,16 +146,18 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/reject`)
+                    .expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/cancel', () => {
+        describe('/games/:gameId/players/:playerId/cancel', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleCancelGame', () => {});
 
                 return supertest(expressApp)
-                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/cancel`)
                     .expect(StatusCodes.NO_CONTENT);
             });
 
@@ -163,16 +167,18 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp)
-                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/cancel`)
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/leave', () => {
+        describe('/games/:gameId/players/:playerId/leave', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleLobbyLeave', () => {});
 
-                return supertest(expressApp).delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/leave`)
+                    .expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw', async () => {
@@ -181,7 +187,7 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp)
-                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/leave`)
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
