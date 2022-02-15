@@ -69,9 +69,14 @@ describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     let gameServiceSpy: SpyObj<GameService>;
+    // const observable = new Observable<void>();
+
+    // const pipedObservable = observable.pipe();
 
     beforeEach(() => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['isLocalPlayerPlaying']);
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['isLocalPlayerPlaying', 'noActiveGameEvent']);
+        // spyOn(gameServiceSpy.noActiveGameEvent, 'pipe').and.returnValue(pipedObservable);
+
     });
 
     beforeEach(async () => {
@@ -122,7 +127,7 @@ describe('GamePageComponent', () => {
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
         // eslint-disable-next-line -- surrenderDialog is private and we need access for the test
-        const spy = spyOn(component['surrenderDialog'], 'open');
+        const spy = spyOn(component['dialog'], 'open');
         const surrenderButton = fixture.debugElement.nativeElement.querySelector('#surrender-dialog-button');
         surrenderButton.click();
         expect(spy).toHaveBeenCalled();

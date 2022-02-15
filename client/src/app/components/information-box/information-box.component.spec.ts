@@ -47,7 +47,8 @@ class MockRoundManager {
 class MockGameService {
     pPlayer1: AbstractPlayer = new Player('id1', 'name1', []);
     pPlayer2: AbstractPlayer = new Player('id2', 'name2', []);
-
+    rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
+    gameIsSetUp: boolean = true;
     get player1(): AbstractPlayer {
         return this.pPlayer1;
     }

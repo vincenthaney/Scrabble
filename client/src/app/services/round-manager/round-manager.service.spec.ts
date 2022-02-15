@@ -191,7 +191,7 @@ describe('RoundManagerService', () => {
             startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
                 return;
             });
-            service.startRound();
+            service.startRound(DEFAULT_MAX_ROUND_TIME);
         });
 
         it('startRound should set new timeout', () => {
@@ -213,7 +213,7 @@ describe('RoundManagerService', () => {
         service.currentRound = currentRound;
         const activePlayer = currentRound.player;
 
-        service.startTimer();
+        service.startTimer(DEFAULT_MAX_ROUND_TIME);
         expect(timerSourceSpy).toHaveBeenCalledOnceWith([newTimer, activePlayer]);
     });
 
