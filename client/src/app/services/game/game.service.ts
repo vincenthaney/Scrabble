@@ -106,7 +106,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
             const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
             this.roundManager.updateRound(round);
         }
-        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
+        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
             this.tileReserve = gameUpdateData.tileReserve;
             this.tileReserveTotal = gameUpdateData.tileReserveTotal;
             this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
@@ -161,14 +161,5 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.isGameOver = false;
         this.gameId = '';
         this.localPlayerId = '';
-    }
-
-    sendScores(): void {
-        throw new Error('Method not implemented.');
-    }
-
-    // TODO: Maybe rename to sendGame or sendFinishedGame
-    sendGameHistory(): void {
-        throw new Error('Method not implemented.');
     }
 }
