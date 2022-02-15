@@ -102,7 +102,7 @@ export default class GameService implements OnDestroy {
             const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
             this.roundManager.updateRound(round);
         }
-        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
+        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
             this.tileReserve = gameUpdateData.tileReserve;
             this.tileReserveTotal = gameUpdateData.tileReserveTotal;
             this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
