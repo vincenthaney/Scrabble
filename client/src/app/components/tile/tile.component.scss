@@ -48,4 +48,8 @@ $text-color: rgb(80, 55, 10);
     &.blank p {
         color: tomato !important;
     }
+
+    &:not(.applied) {
+        filter: hue-rotate(50deg);
+    }
 }

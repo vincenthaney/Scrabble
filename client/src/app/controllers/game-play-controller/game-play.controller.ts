@@ -29,17 +29,17 @@ export class GamePlayController {
     }
 
     sendAction(gameId: string, playerId: string, action: ActionData, typedInput: string) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/action`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/action`;
         this.http.post(endpoint, { type: action.type, payload: action.payload, input: typedInput }).subscribe();
     }
 
     sendMessage(gameId: string, playerId: string, message: Message) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/message`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/message`;
         this.http.post(endpoint, message).subscribe();
     }
 
     sendError(gameId: string, playerId: string, message: Message) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/error`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/error`;
         this.http.post(endpoint, message).subscribe();
     }
 }

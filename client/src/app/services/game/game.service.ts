@@ -15,6 +15,7 @@ import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
 @Injectable({
@@ -37,6 +38,7 @@ export default class GameService implements OnDestroy, IResetableService {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    playingTiles: EventEmitter<ActionPlacePayload>;
     leaveGameSubject: Subject<string>;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -56,6 +58,7 @@ export default class GameService implements OnDestroy, IResetableService {
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
         this.leaveGameSubject = new Subject<string>();
+        this.playingTiles = new EventEmitter();
     }
 
     ngOnDestroy(): void {
@@ -121,9 +124,12 @@ export default class GameService implements OnDestroy, IResetableService {
         this.newMessageValue.next(newMessage);
     }
 
+    getPlayingPlayerId(): string {
+        return this.roundManager.getActivePlayer().id;
+    }
+
     isLocalPlayerPlaying(): boolean {
-        if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
-        return this.localPlayerId === this.roundManager.getActivePlayer().id;
+        return this.getPlayingPlayerId() === this.localPlayerId;
     }
 
     getGameId(): string {

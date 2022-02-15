@@ -1,6 +1,17 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
+import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
+import {
+    RACK_FONT_SIZE_INCREMENT,
+    RACK_TILE_MAX_FONT_SIZE,
+    RACK_TILE_MIN_FONT_SIZE,
+    SQUARE_FONT_SIZE_INCREMENT,
+    SQUARE_TILE_MAX_FONT_SIZE,
+    SQUARE_TILE_MIN_FONT_SIZE,
+} from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
@@ -11,12 +22,10 @@ import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.s
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent {
-    constructor(
-        public surrenderDialog: MatDialog,
-        public gameService: GameService,
-        private focusableComponentService: FocusableComponentsService,
-        private readonly playerLeavesService: PlayerLeavesService,
-    ) {}
+    @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
+    @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
+
+    constructor(public surrenderDialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService, private readonly playerLeavesService: PlayerLeavesService) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -61,5 +70,15 @@ export class GamePageComponent {
                 ],
             },
         });
+    }
+
+    changeTileFontSize(operation: FontSizeChangeOperations) {
+        if (operation === 'smaller') {
+            if (this.tileRackComponent.tileFontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.tileFontSize -= RACK_FONT_SIZE_INCREMENT;
+            if (this.boardComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) this.boardComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
+        } else {
+            if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
+            if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
+        }
     }
 }
