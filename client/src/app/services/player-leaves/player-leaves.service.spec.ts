@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
@@ -42,9 +44,7 @@ describe('PlayerLeavesService', () => {
         expect(createGameSpy).toHaveBeenCalled();
     });
     it('should call handleJoinerLeaveGame when playerLeavesController.joinerLeaveGameEvent emits', () => {
-        const createGameSpy = spyOn(service['gameDispatcherService'], 'resetServiceData').and.callFake(() => {
-            return;
-        });
+        const createGameSpy = spyOn<any>(service['gameDispatcherService'], 'resetServiceData').and.callFake(() => {});
         // eslint-disable-next-line dot-notation
         playerLeavesController.resetGameEvent.emit();
         expect(createGameSpy).toHaveBeenCalled();
@@ -65,7 +65,6 @@ describe('PlayerLeavesService', () => {
         playerLeavesController.resetGameEvent.emit();
         expect(createGameSpy).toHaveBeenCalled();
     });
-
 
     it('handleJoinerLeaveGame should call joinerLeaveGameEvent.next', () => {
         const joinerLeaveGameEventSpy = spyOn(service.joinerLeaveGameEvent, 'next').and.callFake(() => {
@@ -102,9 +101,7 @@ describe('PlayerLeavesService', () => {
     });
 
     it('handleLeaveLobby should call gameDispatcherService.resetServiceData', () => {
-        const handleLeaveGameSpy = spyOn(service['gameDispatcherService'], 'resetServiceData').and.callFake(() => {
-            return;
-        });
+        const handleLeaveGameSpy = spyOn<any>(service['gameDispatcherService'], 'resetServiceData').and.callFake(() => {});
         service.handleLeaveLobby();
         expect(handleLeaveGameSpy).toHaveBeenCalled();
     });

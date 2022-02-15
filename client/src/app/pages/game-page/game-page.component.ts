@@ -25,7 +25,12 @@ export class GamePageComponent {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
-    constructor(public surrenderDialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService, private readonly playerLeavesService: PlayerLeavesService) {}
+    constructor(
+        public surrenderDialog: MatDialog,
+        public gameService: GameService,
+        private focusableComponentService: FocusableComponentsService,
+        private readonly playerLeavesService: PlayerLeavesService,
+    ) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
