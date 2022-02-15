@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
@@ -62,9 +63,9 @@ describe('GameDispatcherService', () => {
 
     describe('Subscriptions', () => {
         it('should set gameId on createGameEvent', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service['gameDispatcherController'].createGameEvent.emit(BASE_GAME_ID);
-            expect(service.gameId as string | undefined).toEqual(BASE_GAME_ID);
+            expect(service.gameId).toEqual(BASE_GAME_ID);
         });
 
         it('should call handleJoinRequest on joinRequestEvent', () => {
@@ -88,12 +89,6 @@ describe('GameDispatcherService', () => {
         it('should call handleCanceledGame on canceledGameEvent', () => {
             const spy = spyOn(service, 'handleCanceledGame');
             service['gameDispatcherController'].canceledGameEvent.emit(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
-        });
-
-        it('should call handleJoinerLeaveGame on joinerLeaveGameEvent', () => {
-            const spy = spyOn(service, 'handleJoinerLeaveGame');
-            service['gameDispatcherController'].joinerLeaveGameEvent.emit(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
@@ -175,7 +170,7 @@ describe('GameDispatcherService', () => {
         let spyHandleLobbyJoinRequest: jasmine.Spy;
 
         beforeEach(() => {
-            spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleLeaveLobby').and.callFake(() => {
+            spyHandleLobbyJoinRequest = spyOn<any>(gameDispatcherControllerMock, 'handleLeaveLobby').and.callFake(() => {
                 return;
             });
         });
@@ -226,8 +221,8 @@ describe('GameDispatcherService', () => {
         let resetDataSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetDataSpy = spyOn<any>(service, 'resetServiceData');
             cancelGameSpy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
-            resetDataSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -242,7 +237,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service.handleCancelGame();
             expect(cancelGameSpy).not.toHaveBeenCalled();
         });
@@ -271,7 +266,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).not.toHaveBeenCalled();
         });
@@ -295,7 +290,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service.handleRejection(TEST_PLAYER_NAME);
             expect(rejectionSpy).not.toHaveBeenCalled();
         });
@@ -314,8 +309,8 @@ describe('GameDispatcherService', () => {
         let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetSpy = spyOn<any>(service, 'resetServiceData');
             emitSpy = spyOn(service.joinerRejectedEvent, 'emit');
-            resetSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -348,8 +343,8 @@ describe('GameDispatcherService', () => {
         let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetSpy = spyOn<any>(service, 'resetServiceData');
             emitSpy = spyOn(service.lobbyFullEvent, 'emit');
-            resetSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -373,8 +368,8 @@ describe('GameDispatcherService', () => {
         let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetSpy = spyOn<any>(service, 'resetServiceData');
             emitSpy = spyOn(service.canceledGameEvent, 'emit');
-            resetSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {

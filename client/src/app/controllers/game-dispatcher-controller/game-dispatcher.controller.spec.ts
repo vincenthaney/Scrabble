@@ -35,7 +35,6 @@ describe('GameDispatcherController', () => {
     beforeEach(async () => {
         socketHelper = new SocketTestHelper();
         socketServiceMock = new SocketService();
-        // eslint-disable-next-line dot-notation
         socketServiceMock['socket'] = socketHelper as unknown as Socket;
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
@@ -86,22 +85,14 @@ describe('GameDispatcherController', () => {
         expect(cancelGameSpy).toHaveBeenCalled();
     });
 
-    it('On joiner leave game, configureSocket should emit opponent name', () => {
-        const joinerLeaveSpy = spyOn(controller.joinerLeaveGameEvent, 'emit').and.callThrough();
-        socketHelper.peerSideEmit('joinerLeaveGame', DEFAULT_OPPONENT_NAME);
-        expect(joinerLeaveSpy).toHaveBeenCalled();
-    });
-
     it('handleMultiplayerGameCreation should  make an HTTP post request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as unknown);
         controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
     it('handleMultiplayerGameCreation should emit to createGameEvent', () => {
         const fakeObservable = of<string>('fakeResponse');
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
         const createGameSpy = spyOn(controller.createGameEvent, 'emit').and.callThrough();
         controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
@@ -109,18 +100,15 @@ describe('GameDispatcherController', () => {
     });
 
     it('handleConfirmationGameCreation should make an HTTP post request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as unknown);
         controller.handleConfirmationGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
     it('handleConfirmationGameCreation should subscribe after making an HTTP post request', async () => {
-        // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
         const observable = new Observable();
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.returnValue(observable);
         const spy = spyOn(observable, 'subscribe');
 
@@ -130,18 +118,15 @@ describe('GameDispatcherController', () => {
     });
 
     it('handleRejectionGameCreation should make an HTTP post request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as unknown);
         controller.handleRejectionGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
     it('handleRejectionGameCreation should subscribe after making an HTTP post request', () => {
-        // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
         const observable = new Observable();
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.returnValue(observable);
         const spy = spyOn(observable, 'subscribe');
 
@@ -151,18 +136,15 @@ describe('GameDispatcherController', () => {
     });
 
     it('handleCancelGame should make an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as unknown);
         controller.handleCancelGame(DEFAULT_GAME_ID);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
     it('handleCancelGame should subscribe after making an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
         const observable = new Observable();
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'delete').and.returnValue(observable);
         const spy = spyOn(observable, 'subscribe');
 
@@ -171,40 +153,16 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should make an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
-        controller.handleLeaveLobby(DEFAULT_GAME_ID);
-        expect(httpPostSpy).toHaveBeenCalled();
-    });
-
-    it('handleLeaveLobby should subscribe after making an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation
-        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
-
-        const observable = new Observable();
-        // eslint-disable-next-line dot-notation
-        spyOn(controller['http'], 'delete').and.returnValue(observable);
-        const spy = spyOn(observable, 'subscribe');
-
-        controller.handleLeaveLobby({} as unknown as string);
-
-        expect(spy).toHaveBeenCalled();
-    });
-
     it('handleLobbiesListRequest should make an HTTP get request ', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
+        const httpPostSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as unknown);
         controller.handleLobbiesListRequest();
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
     it('handleLobbiesListRequest should subscribe after making an HTTP get request', () => {
-        // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
         const observable = new Observable();
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'get').and.returnValue(observable);
         const spy = spyOn(observable, 'subscribe');
 
@@ -214,18 +172,15 @@ describe('GameDispatcherController', () => {
     });
 
     it('handleLobbyJoinRequest should make an HTTP post request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+        const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as unknown);
         controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
         expect(httpPostSpy).toHaveBeenCalled();
     });
 
     it('handleLobbyJoinRequest should subscribe after making an HTTP post request', () => {
-        // eslint-disable-next-line dot-notation
         spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
 
         const observable = new Observable();
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.returnValue(observable);
         const spy = spyOn(observable, 'subscribe');
 
@@ -236,7 +191,6 @@ describe('GameDispatcherController', () => {
 
     it('handleLobbyJoinRequest should emit when HTTP post request on success', () => {
         const fakeObservable = of<string>('fakeResponse');
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
         const successSpy = spyOn(controller.lobbyRequestValidEvent, 'emit');
         controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
@@ -244,7 +198,6 @@ describe('GameDispatcherController', () => {
     });
 
     it('handleLobbyJoinRequest should call handleJoinError when HTTP post request generates an error', () => {
-        // eslint-disable-next-line dot-notation
         spyOn(controller['http'], 'post').and.callFake(() => {
             return throwError('fakeError');
         });

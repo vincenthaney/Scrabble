@@ -13,6 +13,7 @@ export class TileComponent implements OnInit {
     @Input() tile: Tile | { letter: '?'; value: number; isBlank?: boolean; playedLetter?: LetterValue } = UNDEFINED_TILE;
     @Input() fontSize: string = '1em';
     @Input() hideValue: boolean = false;
+    @Input() applied: boolean = true;
     isPlayed: boolean = false;
     bgPath: string;
 

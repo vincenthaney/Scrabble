@@ -16,15 +16,17 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
-import { INVALID_COMMAND } from '@app/constants/services-errors';
+import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { CONTENT_REQUIRED, SENDER_REQUIRED } from './game-play-controller-errors';
@@ -81,11 +83,11 @@ describe('GamePlayController', () => {
             expressApp = app.app;
         });
 
-        describe('POST /games/:gameId/player/:playerId/action', () => {
+        describe('POST /games/:gameId/players/:playerId/action', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -93,25 +95,29 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`)
+                    .expect(StatusCodes.BAD_REQUEST);
             });
 
             it('should call handlePlayAction', async () => {
                 const spy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
                 return supertest(expressApp)
-                    .post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/action`)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`)
                     .then(() => {
                         expect(spy).to.have.been.called();
                     });
             });
         });
 
-        describe('POST /games/:gameId/player/:playerId/message', () => {
+        describe('POST /games/:gameId/players/:playerId/message', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handleNewMessage', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/message`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
+                    .expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -120,7 +126,7 @@ describe('GamePlayController', () => {
                 });
 
                 return supertest(expressApp)
-                    .post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/message`)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
                     .expect(StatusCodes.BAD_REQUEST);
             });
 
@@ -128,18 +134,18 @@ describe('GamePlayController', () => {
                 const spy = chai.spy.on(gamePlayController, 'handleNewMessage', () => {});
 
                 return supertest(expressApp)
-                    .post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/message`)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
                     .then(() => {
                         expect(spy).to.have.been.called();
                     });
             });
         });
 
-        describe('POST /games/:gameId/player/:playerId/error', () => {
+        describe('POST /games/:gameId/players/:playerId/error', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handleNewError', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/error`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -147,14 +153,14 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/error`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`).expect(StatusCodes.BAD_REQUEST);
             });
 
             it('should call handleNewError', async () => {
                 const spy = chai.spy.on(gamePlayController, 'handleNewError', () => {});
 
                 return supertest(expressApp)
-                    .post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/error`)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`)
                     .then(() => {
                         expect(spy).to.have.been.called();
                     });
@@ -285,7 +291,7 @@ describe('GamePlayController', () => {
             });
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'newMessage', {
-                content: DEFAULT_ERROR_MESSAGE,
+                content: COMMAND_IS_INVALID(DEFAULT_DATA.input) + DEFAULT_ERROR_MESSAGE,
                 senderId: SYSTEM_ERROR_ID,
             });
         });
@@ -372,6 +378,31 @@ describe('GamePlayController', () => {
             };
             gamePlayController['handleNewError'](DEFAULT_GAME_ID, validMessage);
             expect(emitToRoomSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleError', () => {
+        let socketServiceStub: SinonStubbedInstance<SocketService>;
+        let delayStub: SinonStub;
+
+        beforeEach(() => {
+            socketServiceStub = createStubInstance(SocketService);
+            (gamePlayController['socketService'] as unknown) = socketServiceStub;
+            delayStub = stub(Delay, 'for');
+        });
+
+        afterEach(() => {
+            delayStub.restore();
+        });
+
+        it('should call emitToSocket', async () => {
+            await gamePlayController['handleError'](new Error(), '', '');
+            expect(socketServiceStub.emitToSocket.called).to.be.true;
+        });
+
+        it('should call emitToSocket', async () => {
+            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '');
+            expect(delayStub.called).to.be.true;
         });
     });
 });
