@@ -14,6 +14,8 @@ import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game.type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
+export const WIN = 1;
+export const LOOSE = -1;
 
 export default class Game {
     private static boardService: BoardService;
@@ -103,38 +105,32 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         if (winnerName) {
-            if (winnerName === this.player1.name) return this.computeEndOfGameScoresPlayer1Wins();
-            else return this.computeEndOfGameScoresPlayer2Wins();
+            if (winnerName === this.player1.name)
+                return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+            else return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         } else {
-            return this.computeEndOfGameScores();
+            return this.getEndOfGameScores();
         }
     }
 
-    computeEndOfGameScores(): [number, number] {
+    getEndOfGameScores(): [number, number] {
         if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
-            return this.computeEndOfGameScoresBothLose();
+            return this.computeEndOfGameScore(LOOSE, LOOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
         } else if (!this.player1.hasTilesLeft()) {
-            return this.computeEndOfGameScoresPlayer1Wins();
+            return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
         } else {
-            return this.computeEndOfGameScoresPlayer2Wins();
+            return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         }
     }
 
-    computeEndOfGameScoresBothLose(): [number, number] {
-        this.player1.score -= this.player1.getTileRackPoints();
-        this.player2.score -= this.player2.getTileRackPoints();
-        return [this.player1.score, this.player2.score];
-    }
-
-    computeEndOfGameScoresPlayer1Wins(): [number, number] {
-        this.player1.score += this.player2.getTileRackPoints();
-        this.player2.score -= this.player2.getTileRackPoints();
-        return [this.player1.score, this.player2.score];
-    }
-
-    computeEndOfGameScoresPlayer2Wins(): [number, number] {
-        this.player1.score -= this.player1.getTileRackPoints();
-        this.player2.score += this.player1.getTileRackPoints();
+    computeEndOfGameScore(
+        player1Win: number,
+        player2Win: number,
+        player1PointsToDeduct: number,
+        player2PointsToDeduct: number,
+    ): [player1Score: number, player2Score: number] {
+        this.player1.score += player1Win * player1PointsToDeduct;
+        this.player2.score += player2Win * player2PointsToDeduct;
         return [this.player1.score, this.player2.score];
     }
 

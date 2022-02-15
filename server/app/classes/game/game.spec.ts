@@ -18,7 +18,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
+import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game.type';
 
@@ -293,34 +293,24 @@ describe('Game', () => {
             expect(game.player2.score).to.equal(PLAYER_2_SCORE + PLAYER_1_TILE_SCORE);
         });
 
-        it('should call computeEndOfGameScoresPlayer1Wins if winnerName is player1.name', () => {
+        it('should call computeEndOfGameScore with player1Win if winnerName is player1.name', () => {
             roundManagerStub.getPassCounter.returns(0);
-            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer1Wins', () => {
+            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScore', () => {
                 return;
             });
-            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer2Wins', () => {
-                return;
-            });
-
             game.endOfGame(game.player1.name);
 
-            expect(player1WinSpy).to.have.been.called();
-            expect(player2WinSpy).to.not.have.been.called();
+            expect(player1WinSpy).to.have.been.called.with(WIN, LOOSE);
         });
 
-        it('should call computeEndOfGameScoresPlayer2Wins if winnerName is player2.name', () => {
+        it('should call computeEndOfGameScore with player2Win if winnerName is player2.name', () => {
             roundManagerStub.getPassCounter.returns(0);
-            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer1Wins', () => {
+            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScore', () => {
                 return;
             });
-            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer2Wins', () => {
-                return;
-            });
-
             game.endOfGame(game.player2.name);
 
-            expect(player1WinSpy).to.not.have.been.called();
-            expect(player2WinSpy).to.have.been.called();
+            expect(player2WinSpy).to.have.been.called.with(LOOSE, WIN);
         });
     });
 
