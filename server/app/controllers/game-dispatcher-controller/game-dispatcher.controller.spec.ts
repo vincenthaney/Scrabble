@@ -15,7 +15,7 @@ import {
     GAME_TYPE_REQUIRED,
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
-    PLAYER_NAME_REQUIRED
+    PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
