@@ -12,6 +12,7 @@ import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher
 import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import { HOST_WAITING_MESSAGE, OPPONENT_FOUND_MESSAGE } from '@app/constants/pages-constants';
+import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 @Component({
     template: '',
 })
@@ -31,6 +32,7 @@ describe('CreateWaitingPageComponent', () => {
     const testOpponentName = 'testname';
 
     let gameDispatcherServiceMock: GameDispatcherService;
+    let playerLeavesServiceMock: PlayerLeavesService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
@@ -61,6 +63,7 @@ describe('CreateWaitingPageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
+        playerLeavesServiceMock = TestBed.inject(PlayerLeavesService);
     });
 
     beforeEach(() => {
@@ -222,7 +225,7 @@ describe('CreateWaitingPageComponent', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeJoinRequestEvent = spyOn(gameDispatcherServiceMock.joinRequestEvent, 'subscribe').and.returnValue(of(true) as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spySubscribeJoinerLeaveGameEvent = spyOn(gameDispatcherServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
+        const spySubscribeJoinerLeaveGameEvent = spyOn(playerLeavesServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
         component.ngOnInit();
         expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
         expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
@@ -273,7 +276,7 @@ describe('CreateWaitingPageComponent', () => {
         const spyOpponentLeft = spyOn(component, 'opponentLeft').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.joinerLeaveGameEvent.emit(emitName);
+        playerLeavesServiceMock.joinerLeaveGameEvent.next(emitName);
         expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
     });
 });

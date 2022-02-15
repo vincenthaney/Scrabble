@@ -4,6 +4,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Application } from '@app/app';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import Room from '@app/classes/game/room';
@@ -17,6 +18,7 @@ import {
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
+import { SYSTEM_ID } from '@app/constants/game';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -43,6 +45,8 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     dictionary: 'french',
 };
 const DEFAULT_EXCEPTION = 'exception';
+
+const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
@@ -174,7 +178,7 @@ describe('GameDispatcherController', () => {
 
         describe('/games/:gameId/players/:playerId/leave', () => {
             it('should return NO_CONTENT', async () => {
-                chai.spy.on(controller, 'handleLobbyLeave', () => {});
+                chai.spy.on(controller, 'handleLeave', () => {});
 
                 return supertest(expressApp)
                     .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/leave`)
@@ -182,7 +186,7 @@ describe('GameDispatcherController', () => {
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw', async () => {
-                chai.spy.on(controller, 'handleLobbyLeave', () => {
+                chai.spy.on(controller, 'handleLeave', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -285,11 +289,15 @@ describe('GameDispatcherController', () => {
     });
 
     describe('handleAcceptRequest', () => {
+        let beginGameSpy: unknown;
         let acceptSpy: unknown;
         let addToRoomSpy: unknown;
         let emitToRoomSpy: unknown;
 
         beforeEach(() => {
+            beginGameSpy = chai.spy.on(controller['activeGameService'], 'beginMultiplayerGame', async () => {
+                return Promise.resolve({ player2: DEFAULT_PLAYER });
+            });
             acceptSpy = chai.spy.on(controller['gameDispatcherService'], 'acceptJoinRequest', async () => {
                 return Promise.resolve({ player2: { getId: () => DEFAULT_PLAYER_ID } });
             });
@@ -300,6 +308,11 @@ describe('GameDispatcherController', () => {
         it('should call gameDispatcherService.acceptJoinRequest', async () => {
             await controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
             expect(acceptSpy).to.have.been.called();
+        });
+
+        it('should call activeGameService.beginMultiplayerGame', async () => {
+            await controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            expect(beginGameSpy).to.have.been.called();
         });
 
         it('should call socketService.addToRoom', async () => {
@@ -414,30 +427,100 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleLobbyLeave', () => {
-        let leaveLobbyRequestSpy: unknown;
+    describe('handleLeave', () => {
+        let isGameInWaitingRoomsSpy: unknown;
         let emitToSocketSpy: unknown;
-        let handleLobbiesUpdateSpy: unknown;
 
         beforeEach(() => {
-            leaveLobbyRequestSpy = chai.spy.on(controller['gameDispatcherService'], 'leaveLobbyRequest', () => {
-                return [DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME];
-            });
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
-            handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
-            controller['handleLobbyLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        });
+        describe('Player leave before game', () => {
+            let leaveLobbyRequestSpy: unknown;
+            let handleLobbiesUpdateSpy: unknown;
+
+            beforeEach(() => {
+                isGameInWaitingRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'isGameInWaitingRooms', () => {
+                    return true;
+                });
+                leaveLobbyRequestSpy = chai.spy.on(controller['gameDispatcherService'], 'leaveLobbyRequest', () => {
+                    return [DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME];
+                });
+                handleLobbiesUpdateSpy = chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            });
+
+            it('should call gameDispatcherService.isGameInWaitingRoomsSpy', () => {
+                expect(isGameInWaitingRoomsSpy).to.have.been.called();
+            });
+
+            it('should call gameDispatcherService.leaveLobbyRequest', () => {
+                expect(leaveLobbyRequestSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            });
+
+            it('should call socketService.emitToSocket', () => {
+                expect(emitToSocketSpy).to.have.been.called();
+            });
+
+            it('should call handleLobbiesUpdate', () => {
+                expect(handleLobbiesUpdateSpy).to.have.been.called();
+            });
         });
 
-        it('should call gameDispatcherService.leaveLobbyRequest', () => {
-            expect(leaveLobbyRequestSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-        });
+        describe('Player leave during game', () => {
+            let removeFromRoomSpy: unknown;
+            let doesRoomExistSpy: unknown;
+            let isGameOverSpy: unknown;
+            let removeGameSpy: unknown;
+            let playerLeftEventSpy: unknown;
 
-        it('should call socketService.emitToSocket', () => {
-            expect(emitToSocketSpy).to.have.been.called();
-        });
+            beforeEach(() => {
+                isGameInWaitingRoomsSpy = chai.spy.on(controller['gameDispatcherService'], 'isGameInWaitingRooms', () => {
+                    return false;
+                });
 
-        it('should call handleLobbiesUpdate', () => {
-            expect(handleLobbiesUpdateSpy).to.have.been.called();
+                removeFromRoomSpy = chai.spy.on(controller['socketService'], 'removeFromRoom', () => {});
+                removeGameSpy = chai.spy.on(controller['activeGameService'], 'removeGame', () => {});
+            });
+
+            it('should remove player who leaves from socket room', () => {
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+                expect(removeFromRoomSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, DEFAULT_GAME_ID);
+            });
+
+            it('should emit cleanup event to socket', () => {
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+                expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'cleanup');
+            });
+
+            it('should remove game from active game service if there is no more player in room', () => {
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+                expect(doesRoomExistSpy).to.have.been.called();
+                expect(removeGameSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            });
+
+            it('should not emit player left event if the game is over', () => {
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
+                isGameOverSpy = chai.spy.on(controller['activeGameService'], 'isGameOver', () => true);
+                playerLeftEventSpy = chai.spy.on(controller['activeGameService'].playerLeftEvent, 'emit', () => {});
+
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+                expect(isGameOverSpy).to.have.been.called();
+                expect(playerLeftEventSpy).to.not.have.been.called();
+            });
+
+            it('should emit player left event if the game is still ongoing', () => {
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
+                isGameOverSpy = chai.spy.on(controller['activeGameService'], 'isGameOver', () => false);
+                playerLeftEventSpy = chai.spy.on(controller['activeGameService'].playerLeftEvent, 'emit', () => {});
+
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+                expect(playerLeftEventSpy).to.have.been.called.with('playerLeft', DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            });
         });
     });
 
@@ -466,6 +549,34 @@ describe('GameDispatcherController', () => {
 
         it('should call gameDispatcherService.getLobbiesRoom', () => {
             expect(getLobbiesRoomSpy).to.have.been.called();
+        });
+    });
+
+    describe('PlayerLeftFeedback', () => {
+        it('On receive player feedback, should call handlePlayerFeedback method', () => {
+            const handlePlayerFeedbackSpy = chai.spy.on(controller, 'handlePlayerLeftFeedback', () => {});
+            const messages: string[] = ['test'];
+            const updatedData: GameUpdateData = {};
+            controller['activeGameService'].playerLeftEvent.emit('playerLeftFeedback', DEFAULT_GAME_ID, messages, updatedData);
+            expect(handlePlayerFeedbackSpy).to.have.been.called.with(DEFAULT_GAME_ID, messages, updatedData);
+        });
+
+        it('PlayerLeftFeedback shoud emit game update to room', () => {
+            const emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            const messages: string[] = ['test'];
+            const updatedData: GameUpdateData = {};
+            controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
+            expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'gameUpdate', updatedData);
+        });
+
+        it('PlayerLeftFeedback shoud emit end game messages to room', () => {
+            const emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+            const messages: string[] = ['test'];
+            const updatedData: GameUpdateData = {};
+            controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
+            messages.forEach((message) => {
+                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', { content: message, senderId: SYSTEM_ID });
+            });
         });
     });
 });

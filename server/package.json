@@ -78,6 +78,7 @@
         "@types/mocha": "^9.0.0",
         "@types/morgan": "~1.9.3",
         "@types/node": "^16.6.1",
+        "@types/node-fetch": "^3.0.3",
         "@types/node-uuid": "0.0.29",
         "@types/sinon": "^10.0.2",
         "@types/supertest": "^2.0.11",

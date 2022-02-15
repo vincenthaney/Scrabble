@@ -1,15 +1,21 @@
 import Board from '@app/classes/board/board';
+import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
+import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
-import TileReserve from '@app/classes/tile/tile-reserve';
-import BoardService from '@app/services/board/board.service';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { MultiplayerGameConfig } from './game-config';
-import { START_TILES_AMOUNT, END_GAME_HEADER_MESSAGE } from '@app/constants/classes-constants';
-import { GameType } from './game.type';
+import TileReserve from '@app/classes/tile/tile-reserve';
+import { TileReserveData } from '@app/classes/tile/tile.types';
+import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
+import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
+import BoardService from '@app/services/board/board.service';
+import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
+import { GameType } from './game.type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
+export const WIN = 1;
+export const LOOSE = -1;
 
 export default class Game {
     private static boardService: BoardService;
@@ -61,10 +67,6 @@ export default class Game {
         throw new Error('Solo mode not implemented');
     }
 
-    static winnerMessage(winner: string): string {
-        return `Félicitations à ${winner} pour votre victoire!`;
-    }
-
     getTilesFromReserve(amount: number): Tile[] {
         return this.tileReserve.getTiles(amount);
     }
@@ -101,23 +103,42 @@ export default class Game {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
 
-    endOfGame(): [number, number] {
-        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
-            this.player1.score -= this.player1.getTileRackPoints();
-            this.player2.score -= this.player2.getTileRackPoints();
-        } else if (!this.player1.hasTilesLeft()) {
-            this.player1.score += this.player2.getTileRackPoints();
-            this.player2.score -= this.player2.getTileRackPoints();
+    endOfGame(winnerName: string | undefined): [number, number] {
+        if (winnerName) {
+            if (winnerName === this.player1.name)
+                return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+            else return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         } else {
-            this.player1.score -= this.player1.getTileRackPoints();
-            this.player2.score += this.player1.getTileRackPoints();
+            return this.getEndOfGameScores();
         }
+    }
 
+    getEndOfGameScores(): [number, number] {
+        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
+            return this.computeEndOfGameScore(LOOSE, LOOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
+        } else if (!this.player1.hasTilesLeft()) {
+            return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+        } else {
+            return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+        }
+    }
+
+    computeEndOfGameScore(
+        player1Win: number,
+        player2Win: number,
+        player1PointsToDeduct: number,
+        player2PointsToDeduct: number,
+    ): [player1Score: number, player2Score: number] {
+        this.player1.score += player1Win * player1PointsToDeduct;
+        this.player2.score += player2Win * player2PointsToDeduct;
         return [this.player1.score, this.player2.score];
     }
 
-    endGameMessage(): string[] {
-        return [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage(), this.congratulateWinner()];
+    endGameMessage(winnerName: string | undefined): string[] {
+        const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
+        const winnerMessage = winnerName ? WINNER_MESSAGE(winnerName) : this.congratulateWinner();
+        messages.push(winnerMessage);
+        return messages;
     }
 
     congratulateWinner(): string {
@@ -129,7 +150,7 @@ export default class Game {
         } else {
             winner = this.player1.name + ' et ' + this.player2.name;
         }
-        return Game.winnerMessage(winner);
+        return WINNER_MESSAGE(winner);
     }
 
     isPlayer1(arg: string | Player): boolean {
@@ -138,5 +159,28 @@ export default class Game {
         } else {
             return this.player1.getId() === arg;
         }
+    }
+
+    createStartGameData(): StartMultiplayerGameData {
+        const tileReserve: TileReserveData[] = [];
+        this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
+        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        const round: Round = this.roundManager.getCurrentRound();
+        const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
+        const startMultiplayerGameData: StartMultiplayerGameData = {
+            player1: this.player1,
+            player2: this.player2,
+            gameType: this.gameType,
+            maxRoundTime: this.roundManager.getMaxRoundTime(),
+            dictionary: this.dictionnaryName,
+            gameId: this.getId(),
+            board: this.board.grid,
+            tileReserve,
+            tileReserveTotal,
+            round: roundData,
+        };
+        return startMultiplayerGameData;
     }
 }
