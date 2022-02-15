@@ -19,12 +19,11 @@ import {
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
-import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
@@ -617,11 +616,14 @@ describe('GameDispatcherController', () => {
         });
 
         it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
+            const clock = useFakeTimers();
             gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(handleLeaveSpy).to.not.have.been.called();
 
-            Delay.for(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
-            expect(handleLeaveSpy).have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            expect(handleLeaveSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            clock.restore();
         });
     });
 });
