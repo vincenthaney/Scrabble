@@ -70,15 +70,6 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should call gameDispatcherController.handleLobbiesListRequest and put gameId to undefined', () => {
-        const spyHandleLobbyJoinRequest = spyOn(gameDispatcherControllerMock, 'handleLeaveLobby').and.callFake(() => {
-            return;
-        });
-        service.handleLeaveLobby();
-        expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
-        expect(service.gameId).toEqual(undefined);
-    });
-
     // eslint-disable-next-line max-len
     it('handleCreateGame should call gameDispatcherController.handleMultiplayerGameCreation with the correct parameters and put gameId to undefined', () => {
         const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleMultiplayerGameCreation').and.callFake(() => {
@@ -188,12 +179,6 @@ describe('GameDispatcherService', () => {
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
-        it('should call handleJoinerLeaveGame on joinerLeaveGameEvent', () => {
-            const spy = spyOn(service, 'handleJoinerLeaveGame');
-            service['gameDispatcherController'].joinerLeaveGameEvent.emit(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
-        });
-
         it('should call handleJoinerRejected on joinerRejectedEvent', () => {
             const spy = spyOn(service, 'handleJoinerRejected');
             service['gameDispatcherController'].joinerRejectedEvent.emit(TEST_PLAYER_NAME);
@@ -213,8 +198,8 @@ describe('GameDispatcherService', () => {
         let resetDataSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetDataSpy = spyOn(service, 'resetServiceData');
             cancelGameSpy = spyOn(service['gameDispatcherController'], 'handleCancelGame');
-            resetDataSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -301,8 +286,8 @@ describe('GameDispatcherService', () => {
         let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetSpy = spyOn(service, 'resetServiceData');
             emitSpy = spyOn(service.joinerRejectedEvent, 'emit');
-            resetSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -335,8 +320,8 @@ describe('GameDispatcherService', () => {
         let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetSpy = spyOn(service, 'resetServiceData');
             emitSpy = spyOn(service.lobbyFullEvent, 'emit');
-            resetSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -360,8 +345,8 @@ describe('GameDispatcherService', () => {
         let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
+            resetSpy = spyOn(service, 'resetServiceData');
             emitSpy = spyOn(service.canceledGameEvent, 'emit');
-            resetSpy = spyOn(service, 'resetData');
         });
 
         afterEach(() => {
@@ -377,46 +362,6 @@ describe('GameDispatcherService', () => {
         it('should call resetData', () => {
             service.handleCanceledGame(TEST_PLAYER_NAME);
             expect(resetSpy).toHaveBeenCalledWith();
-        });
-    });
-
-    describe('handleJoinerLeaveGame', () => {
-        it('should emit to joinRequestEvent', () => {
-            const spy = spyOn(service.joinerLeaveGameEvent, 'emit');
-            service.handleJoinerLeaveGame(TEST_PLAYER_NAME);
-            expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
-        });
-    });
-
-    describe('handleLeaveLobby', () => {
-        let resetSpy: jasmine.Spy;
-        let leaveSpy: jasmine.Spy;
-
-        beforeEach(() => {
-            resetSpy = spyOn(service, 'resetData');
-            leaveSpy = spyOn(service['gameDispatcherController'], 'handleLeaveLobby');
-        });
-
-        afterEach(() => {
-            resetSpy.calls.reset();
-            leaveSpy.calls.reset();
-        });
-
-        it('should call handleLeaveLobby if gameId is defined', () => {
-            service.gameId = BASE_GAME_ID;
-            service.handleLeaveLobby();
-            expect(leaveSpy).toHaveBeenCalledWith(BASE_GAME_ID);
-        });
-
-        it('should not call handleLeaveLobby if gameId is undefined', () => {
-            service.gameId = undefined;
-            service.handleLeaveLobby();
-            expect(leaveSpy).not.toHaveBeenCalled();
-        });
-
-        it('should call resetData', () => {
-            service.handleLeaveLobby();
-            expect(leaveSpy).toHaveBeenCalled();
         });
     });
 });
