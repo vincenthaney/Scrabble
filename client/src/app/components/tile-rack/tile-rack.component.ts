@@ -16,7 +16,7 @@ export type RackTile = Tile & { played?: boolean };
     styleUrls: ['./tile-rack.component.scss'],
 })
 export class TileRackComponent implements OnInit, OnDestroy {
-    tiles: Tile[];
+    tiles: RackTile[];
     tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
     updateTileRackSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
