@@ -1,9 +1,11 @@
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
+import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { TileReserveData } from '@app/classes/tile/tile.types';
@@ -17,14 +19,13 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Square } from '@app/classes/square';
 import { CookieService } from '@app/services/cookie/cookie.service';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
 @Injectable({
     providedIn: 'root',
 })
-export default class GameService implements OnDestroy {
+export default class GameService implements OnDestroy, IResetServiceData {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
@@ -44,8 +45,10 @@ export default class GameService implements OnDestroy {
     rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
     playingTiles: EventEmitter<ActionPlacePayload>;
+    leaveGameSubject: Subject<string>;
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
+    isGameOver: boolean;
     private gameId: string;
     private localPlayerId: string;
 
@@ -57,11 +60,11 @@ export default class GameService implements OnDestroy {
         private socketService: SocketService,
         private cookieService: CookieService,
     ) {
-        this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
         this.updateTileReserveEvent = new EventEmitter();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
+        this.leaveGameSubject = new Subject<string>();
         this.playingTiles = new EventEmitter();
     }
 
@@ -123,7 +126,7 @@ export default class GameService implements OnDestroy {
             const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
             this.roundManager.updateRound(round);
         }
-        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal) {
+        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
             this.tileReserve = gameUpdateData.tileReserve;
             this.tileReserveTotal = gameUpdateData.tileReserveTotal;
             this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
@@ -163,12 +166,9 @@ export default class GameService implements OnDestroy {
         return this.player1.id === this.localPlayerId ? this.player1.id : this.player2.id;
     }
 
-    gameOver(): boolean {
-        throw new Error('Method not implemented.');
-    }
-
-    sendScores(): void {
-        throw new Error('Method not implemented.');
+    gameOver(): void {
+        this.isGameOver = true;
+        this.roundManager.resetTimerData();
     }
 
     reconnectGame() {
@@ -198,8 +198,15 @@ export default class GameService implements OnDestroy {
         this.gameController.handleDisconnection(gameId, localPlayerId);
     }
 
-    // TODO: Maybe rename to sendGame or sendFinishedGame
-    sendGameHistory(): void {
-        throw new Error('Method not implemented.');
+    resetServiceData(): void {
+        this.player1 = undefined as unknown as AbstractPlayer;
+        this.player2 = undefined as unknown as AbstractPlayer;
+        this.gameType = undefined as unknown as GameType;
+        this.dictionnaryName = '';
+        this.tileReserve = [];
+        this.tileReserveTotal = 0;
+        this.isGameOver = false;
+        this.gameId = '';
+        this.localPlayerId = '';
     }
 }

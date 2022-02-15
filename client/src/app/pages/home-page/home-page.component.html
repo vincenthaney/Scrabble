@@ -14,7 +14,9 @@
         <section id="button-group" class="justified">
             <button mat-flat-button color="primary" routerLink="/lobby">Rejoindre une partie</button>
             <button mat-flat-button color="primary" routerLink="/game-creation">Créer une partie</button>
-            <button mat-flat-button color="primary" routerLink="/high-score">Meilleurs scores</button>
+            <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                <button mat-flat-button color="primary" routerLink="/high-score" [disabled]="true">Meilleurs scores</button>
+            </div>
         </section>
         <div class="footer-item">
             <h4 class="team-name">Équipe 212</h4>

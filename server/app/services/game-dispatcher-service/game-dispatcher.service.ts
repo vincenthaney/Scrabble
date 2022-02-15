@@ -7,10 +7,8 @@ import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
-import { LetterValue, TileReserveData } from '@app/classes/tile/tile.types';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { StatusCodes } from 'http-status-codes';
-import { Service } from 'typedi';
+import { LetterValue } from '@app/classes/tile';
+import { TileReserveData } from '@app/classes/tile/tile.types';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -19,13 +17,15 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
 
-    constructor(private activeGameService: ActiveGameService) {
+    constructor() {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
@@ -61,7 +61,7 @@ export class GameDispatcherService {
         return waitingRoom.getConfig();
     }
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<StartMultiplayerGameData> {
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<MultiplayerGameConfig> {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
@@ -82,10 +82,7 @@ export class GameDispatcherService {
             player2: waitingRoom.joinedPlayer,
         };
 
-        const createdGame = await this.activeGameService.beginMultiplayerGame(waitingRoom.getId(), config);
-        await createdGame.initTileReserve();
-
-        return this.createStartGameData(createdGame);
+        return config;
     }
 
     rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
@@ -174,5 +171,10 @@ export class GameDispatcherService {
             round: roundData,
         };
         return startMultiplayerGameData;
+    }
+
+    isGameInWaitingRooms(gameId: string): boolean {
+        const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === gameId);
+        return filteredWaitingRoom.length > 0;
     }
 }
