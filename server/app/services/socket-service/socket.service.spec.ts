@@ -6,7 +6,7 @@ import { SocketService } from './socket.service';
 import { Server } from 'app/server';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
-import { delay } from '@app/utils/delay';
+import { Delay } from '@app/utils/delay';
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 
 const RESPONSE_DELAY = 200;
@@ -22,7 +22,7 @@ const getSocketId = async (socket: Socket) => {
 
     let i = 0;
     while (socket.id === undefined) {
-        await delay(DELAY);
+        await Delay.for(DELAY);
         if (i * DELAY > MAX_DELAY) throw new Error('TIMEOUT');
         i++;
     }
@@ -59,7 +59,7 @@ describe('SocketService', () => {
         it('should add to the socket map on connect', async () => {
             service.handleSockets();
             await clientSocket.connect();
-            await delay(RESPONSE_DELAY); // Wait until the server socket received connection.
+            await Delay.for(RESPONSE_DELAY); // Wait until the server socket received connection.
             expect(service['sockets'].get(clientSocket.id)).to.exist;
         });
 

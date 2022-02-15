@@ -135,7 +135,7 @@ describe('InputParserService', () => {
             });
             service.parseInput(VALID_PASS_INPUT);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
-                content: `La commande ${VALID_PASS_INPUT} est invalide`,
+                content: `La commande **${VALID_PASS_INPUT}** est invalide :<br />${DEFAULT_COMMAND_ERROR_MESSAGE}`,
                 senderId: SYSTEM_ERROR_ID,
             });
         });
@@ -229,17 +229,17 @@ describe('InputParserService', () => {
         });
 
         it('should throw error if commands have incorrect lengths', () => {
-            const invalidCommands = [
-                '!placer abc',
-                '!échanger one two three',
-                '!passer thing',
-                '!réserve second word',
+            const invalidCommands: [command: string, error: CommandErrorMessages][] = [
+                ['!placer abc', CommandErrorMessages.PlaceBadSyntax],
+                ['!échanger one two three', CommandErrorMessages.ExchangeBadSyntax],
+                ['!passer thing', CommandErrorMessages.PassBadSyntax],
+                ['!réserve second word', CommandErrorMessages.BadSyntax],
                 // '!indice not length of two',
-                '!aide help',
+                ['!aide help', CommandErrorMessages.BadSyntax],
             ];
-            for (const invalidCommand of invalidCommands) {
-                const inputWords = invalidCommand.substring(1).split(' ');
-                expect(() => service['parseCommand'](inputWords)).toThrow(new CommandError(CommandErrorMessages.BadSyntax));
+            for (const [command, error] of invalidCommands) {
+                const inputWords = command.substring(1).split(' ');
+                expect(() => service['parseCommand'](inputWords)).toThrow(new CommandError(error));
             }
         });
 
@@ -343,12 +343,12 @@ describe('InputParserService', () => {
         it('should throw error with invalid input', () => {
             const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
             const errorMessages: CommandErrorMessages[] = [
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
             ];
 
             for (let i = 0; i < invalidLetters.length; i++) {
@@ -376,11 +376,11 @@ describe('InputParserService', () => {
         it('should throw error with invalid input', () => {
             const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
             const errorMessages: CommandErrorMessages[] = [
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.BadSyntax,
-                CommandErrorMessages.ImpossibleCommand,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.DontHaveTiles,
+                CommandErrorMessages.ExhangeRequireLowercaseLettes,
+                CommandErrorMessages.DontHaveTiles,
             ];
 
             for (let i = 0; i < invalidLetters.length; i++) {
@@ -398,13 +398,13 @@ describe('InputParserService', () => {
                 CommandErrorMessages.BadSyntax,
                 CommandErrorMessages.BadSyntax,
                 CommandErrorMessages.BadSyntax,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
-                CommandErrorMessages.ImpossibleCommand,
+                CommandErrorMessages.PositionFormat,
+                CommandErrorMessages.PositionFormat,
+                CommandErrorMessages.PositionFormat,
+                CommandErrorMessages.PositionFormat,
+                CommandErrorMessages.PositionFormat,
+                CommandErrorMessages.PositionFormat,
+                CommandErrorMessages.PositionFormat,
             ];
 
             for (let i = 0; i < invalidLocations.length; i++) {
