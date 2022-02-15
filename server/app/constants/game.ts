@@ -37,3 +37,5 @@ export const VALID_MULTIPLIERS: number[] = [2, 3];
 
 export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
+
+export const WINNER_MESSAGE = (winnerName: string) => `Félicitations à ${winnerName} pour votre victoire!`;

@@ -9,6 +9,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
@@ -243,6 +244,8 @@ describe('Game', () => {
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
+            player1Stub.name = 'Luck Luke';
+            player2Stub.name = 'Dalton';
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
 
@@ -289,6 +292,36 @@ describe('Game', () => {
             expect(game.player1.score).to.equal(PLAYER_1_SCORE - PLAYER_1_TILE_SCORE);
             expect(game.player2.score).to.equal(PLAYER_2_SCORE + PLAYER_1_TILE_SCORE);
         });
+
+        it('should call computeEndOfGameScoresPlayer1Wins if winnerName is player1.name', () => {
+            roundManagerStub.getPassCounter.returns(0);
+            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer1Wins', () => {
+                return;
+            });
+            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer2Wins', () => {
+                return;
+            });
+
+            game.endOfGame(game.player1.name);
+
+            expect(player1WinSpy).to.have.been.called();
+            expect(player2WinSpy).to.not.have.been.called();
+        });
+
+        it('should call computeEndOfGameScoresPlayer2Wins if winnerName is player2.name', () => {
+            roundManagerStub.getPassCounter.returns(0);
+            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer1Wins', () => {
+                return;
+            });
+            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScoresPlayer2Wins', () => {
+                return;
+            });
+
+            game.endOfGame(game.player2.name);
+
+            expect(player1WinSpy).to.not.have.been.called();
+            expect(player2WinSpy).to.have.been.called();
+        });
     });
 
     describe('endGameMessage', () => {
@@ -305,6 +338,8 @@ describe('Game', () => {
             game = new Game();
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
+            player1Stub.name = 'Darth Vader';
+            player2Stub.name = 'Obi Wan Kenobi';
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
             player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
@@ -312,11 +347,20 @@ describe('Game', () => {
             congratulateStub = stub(game, 'congratulateWinner').returns('congratulate winner');
         });
 
-        it('should call the messages ', () => {
+        it('should call the messages', () => {
             game.endGameMessage(undefined);
             assert(player1Stub.endGameMessage.calledOnce);
             assert(player2Stub.endGameMessage.calledOnce);
+        });
+
+        it('should call congratulateWinner if winnerName is undefined', () => {
+            game.endGameMessage(undefined);
             assert(congratulateStub.calledOnce);
+        });
+
+        it('should call winnerMessage with winner directly if winner name is provided ', () => {
+            game.endGameMessage(game.player1.name);
+            expect(congratulateStub.calledOnce).to.be.false;
         });
     });
 
@@ -333,28 +377,28 @@ describe('Game', () => {
             game = new Game();
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
-            game.player1 = player1Stub as unknown as Player;
-            game.player2 = player2Stub as unknown as Player;
             player1Stub.name = PLAYER_1_NAME;
             player2Stub.name = PLAYER_2_NAME;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
         });
 
         it('should congratulate player 1 if he has a higher score ', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = LOWER_SCORE;
-            const expectedMessage = Game.winnerMessage(PLAYER_1_NAME);
+            const expectedMessage = WINNER_MESSAGE(PLAYER_1_NAME);
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 2 if he has a higher score ', () => {
             player1Stub.score = LOWER_SCORE;
             player2Stub.score = HIGHER_SCORE;
-            const expectedMessage = Game.winnerMessage(PLAYER_2_NAME);
+            const expectedMessage = WINNER_MESSAGE(PLAYER_2_NAME);
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 1 and player 2 if they are tied ', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = HIGHER_SCORE;
-            const expectedMessage = Game.winnerMessage(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
+            const expectedMessage = WINNER_MESSAGE(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
             expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
         });
     });
