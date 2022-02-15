@@ -1,18 +1,15 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Application } from '@app/app';
 import Game from '@app/classes/game/game';
-// import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/controllers-constants';
+import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
     GAME_IS_OVER,
@@ -20,23 +17,18 @@ import {
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
-    // GAME_IS_OVER,
 } from '@app/constants/controllers-errors';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
-// import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
-// import Game from '@app/classes/game/game';
-// import { assert } from 'console';
-// import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
-// import { SocketService } from '@app/services/socket-service/socket.service';
 
 const expect = chai.expect;
 
@@ -66,10 +58,12 @@ describe('GameDispatcherController', () => {
     });
 
     it('should create', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
         expect(controller).to.exist;
     });
 
     it('router should be created', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
         expect(controller.router).to.exist;
     });
 
@@ -205,6 +199,26 @@ describe('GameDispatcherController', () => {
             });
         });
 
+        describe('/games/:gameId/player/:playerId/disconnect', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleDisconnection', () => {});
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/disconnect`)
+                    .expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw', async () => {
+                chai.spy.on(controller, 'handleDisconnection', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/disconnect`)
+                    .expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
         describe('/games/:gameId/player/:playerId/leave', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleLobbyLeave', () => {});
@@ -227,32 +241,38 @@ describe('GameDispatcherController', () => {
     });
 
     describe('handleReconnection', () => {
-
         let gameStub: SinonStubbedInstance<Game>;
         let getGameSpy: SinonStub;
-        // let addtoRoomStub: SinonStub;
         let playerStub: SinonStubbedInstance<Player>;
         let gameDispatcherStub: SinonStubbedInstance<GameDispatcherService>;
-        // let socketServiceStub: SinonStubbedInstance<SocketService>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let emitToSocketSpy: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let addToRoomSpy: any;
 
         beforeEach(() => {
             gameStub = createStubInstance(Game);
             gameDispatcherStub = createStubInstance(GameDispatcherService);
-            // socketServiceStub = createStubInstance(SocketService);
-            gameDispatcherStub.createStartGameData.returns(null as unknown as StartMultiplayerGameData);
+            playerStub = createStubInstance(Player);
+            playerStub.id = DEFAULT_PLAYER_ID;
+            playerStub.isConnected = true;
+            gameDispatcherStub.createStartGameData.callsFake(() => undefined as unknown as StartMultiplayerGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
+            controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
             gameStub.getRequestingPlayer.returns(playerStub);
-            // addtoRoomStub = stub(controller['socketService'], 'addToRoom');
+            emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
+            gameStub.isGameOver.returns(false);
         });
 
         it('should call activeGameService.getGame', () => {
-            gameStub.isGameOver.returns(true);
+            gameStub.isGameOver.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(getGameSpy.calledOnce);
         });
 
         it('should call isGameOver', () => {
-            gameStub.isGameOver.returns(true);
+            gameStub.isGameOver.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(gameStub.isGameOver.calledOnce);
         });
@@ -264,24 +284,18 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call getRequestingPlayer', () => {
-            gameStub.isGameOver.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(gameStub.getRequestingPlayer.calledOnce);
         });
 
         it('should call addToRoom', () => {
             gameStub.isGameOver.returns(false);
-            const spy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-            chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
-
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            expect(spy).to.have.been.called();
+            expect(addToRoomSpy).to.have.been.called();
         });
 
-        it('should call addToRoom', () => {
+        it('should createStartGameData', () => {
             gameStub.isGameOver.returns(false);
-            chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-            chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(gameDispatcherStub.createStartGameData.calledOnce);
@@ -289,8 +303,6 @@ describe('GameDispatcherController', () => {
 
         it('should call emit to socket', () => {
             gameStub.isGameOver.returns(false);
-            chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-            const emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(emitToSocketSpy).to.have.been.called();
@@ -417,6 +429,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('should throw if playerName is undefined', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
             expect(controller['handleAcceptRequest'](DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME, undefined as unknown as string)).to.eventually.be.rejected;
         });
     });
@@ -577,17 +590,20 @@ describe('GameDispatcherController', () => {
         let getGameSpy: SinonStub;
         let gameIsOverSpy: unknown;
         let playerStub: SinonStubbedInstance<Player>;
+        let handleLeaveSpy: unknown;
 
         beforeEach(() => {
             gameStub = createStubInstance(Game);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             playerStub = createStubInstance(Player);
             gameStub.getRequestingPlayer.returns(playerStub);
+            handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
         });
 
         it('Disconnection should verify if game is over', () => {
             gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => true);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
             expect(getGameSpy.calledOnce).to.be.true;
             expect(gameIsOverSpy).to.have.been.called();
         });
@@ -596,6 +612,7 @@ describe('GameDispatcherController', () => {
             gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
             expect(playerStub.isConnected).to.be.false;
         });
 
@@ -603,8 +620,8 @@ describe('GameDispatcherController', () => {
             gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
 
-            setTimeout(() =>, TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS)
-            expect(playerStub.isConnected).to.be.false;
+            Delay.for(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            expect(handleLeaveSpy).have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
         });
     });
 });

@@ -23,9 +23,9 @@ export class GameDispatcherController {
     router: Router;
 
     constructor(
-        private readonly gameDispatcherService: GameDispatcherService,
-        private readonly socketService: SocketService,
-        private readonly activeGameService: ActiveGameService,
+        private gameDispatcherService: GameDispatcherService,
+        private socketService: SocketService,
+        private activeGameService: ActiveGameService,
     ) {
         this.configureRouter();
     }
@@ -242,7 +242,8 @@ export class GameDispatcherController {
             setTimeout(() => {
                 if (!disconnectedPlayer.isConnected) {
                     // END GAME
-                    // this.handleLeave(gameId, playerId);
+                    console.log('timeout');
+                    this.handleLobbyLeave(gameId, playerId);
                 }
             }, TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
         }
