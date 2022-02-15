@@ -7,3 +7,4 @@ export const INITIAL_MESSAGE: Message = {
 };
 
 export const DEFAULT_OPPONENT_NAME = 'steve';
+export const DEFAULT_GAME_ID = '42069';
