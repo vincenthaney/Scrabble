@@ -2,8 +2,9 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
-import { DEFAULT_OPPONENT_NAME } from '@app/constants/controller-constants';
+import { DEFAULT_GAME_ID, DEFAULT_OPPONENT_NAME } from '@app/constants/controller-constants';
 import { GameService, SocketService } from '@app/services';
+import { of } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { PlayerLeavesController } from './player-leaves.controller';
 
@@ -11,7 +12,7 @@ describe('PlayerLeavesController', () => {
     let controller: PlayerLeavesController;
     let httpMock: HttpTestingController;
     let socketServiceMock: SocketService;
-    let gameServiceMock: GameService;
+    // let gameServiceMock: GameService;
     let socketHelper: SocketTestHelper;
 
     beforeEach(async () => {
@@ -25,7 +26,7 @@ describe('PlayerLeavesController', () => {
         });
         controller = TestBed.inject(PlayerLeavesController);
         httpMock = TestBed.inject(HttpTestingController);
-        gameServiceMock = TestBed.inject(GameService);
+        // gameServiceMock = TestBed.inject(GameService);
     });
 
     afterEach(() => {
@@ -61,24 +62,27 @@ describe('PlayerLeavesController', () => {
         expect(cleanupSpy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should make an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+    it('handleLeaveGame should send delete request', () => {
+        const fakeObservable = of<string>('fakeResponse');
+        // eslint-disable-next-line dot-notation
+        const deleteSpy = spyOn(controller['http'], 'delete').and.returnValue(fakeObservable);
         controller.handleLeaveGame(DEFAULT_GAME_ID);
-        expect(httpPostSpy).toHaveBeenCalled();
+        expect(deleteSpy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should subscribe after making an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation
-        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+    it('ngDestroy should call serviceDestroyed$.next', () => {
+        const nextSpy = spyOn(controller.serviceDestroyed$, 'next').and.callFake(() => {
+            return;
+        });
+        controller.ngOnDestroy();
+        expect(nextSpy).toHaveBeenCalled();
+    });
 
-        const observable = new Observable();
-        // eslint-disable-next-line dot-notation
-        spyOn(controller['http'], 'delete').and.returnValue(observable);
-        const spy = spyOn(observable, 'subscribe');
-
-        controller.handleLeaveGame({} as unknown as string);
-
-        expect(spy).toHaveBeenCalled();
+    it('handleLeaveGame should call serviceDestroyed$.complete', () => {
+        const completeSpy = spyOn(controller.serviceDestroyed$, 'complete').and.callFake(() => {
+            return;
+        });
+        controller.ngOnDestroy();
+        expect(completeSpy).toHaveBeenCalled();
     });
 });
