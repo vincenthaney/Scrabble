@@ -13,16 +13,22 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Message } from '@app/classes/communication/message';
+import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
-import { TileRackComponent } from './tile-rack.component';
+import { BehaviorSubject } from 'rxjs';
+import { RackTile, TileRackComponent } from './tile-rack.component';
 
 class MockGameService {
     updateTileRackEvent: EventEmitter<void> = new EventEmitter();
+    newMessageValue = new BehaviorSubject<unknown>({});
+    playingTiles: EventEmitter<unknown> = new EventEmitter();
+
     getLocalPlayer(): AbstractPlayer | undefined {
         return new Player('id', 'name', []);
     }
@@ -37,6 +43,8 @@ describe('TileRackComponent', () => {
     const mockGameService = new MockGameService();
     let component: TileRackComponent;
     let fixture: ComponentFixture<TileRackComponent>;
+    let handlePlaceTileSpy: jasmine.Spy;
+    let handleNewMessageSpy: jasmine.Spy;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -64,6 +72,9 @@ describe('TileRackComponent', () => {
         fixture = TestBed.createComponent(TileRackComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+
+        handleNewMessageSpy = spyOn<any>(component, 'handleNewMessage');
+        handlePlaceTileSpy = spyOn<any>(component, 'handlePlaceTiles');
     });
 
     it('should create', () => {
@@ -109,5 +120,39 @@ describe('TileRackComponent', () => {
         component['updateTileRack']();
 
         expect(component.tiles[0]).toBeTruthy();
+    });
+
+    it('should call handlePlaceTiles on playTiles event', () => {
+        component['gameService'].playingTiles.emit();
+        expect(handlePlaceTileSpy).toHaveBeenCalled();
+    });
+
+    it('should mark tiles as played but only those in playedTiles', () => {
+        const tiles: RackTile[] = [
+            { letter: 'A', value: 0 },
+            { letter: 'B', value: 0 },
+        ];
+        const playedTiles: Tile[] = [{ ...tiles[0] }, { letter: 'Z', value: 0 }];
+        component.tiles = tiles;
+        const payload = { tiles: playedTiles, orientation: Orientation.Horizontal, startPosition: { row: 0, column: 9 } };
+
+        handlePlaceTileSpy.and.callThrough();
+        component['handlePlaceTiles'](payload);
+
+        expect(tiles[0].played).toBeTrue();
+        expect(tiles[1].played).toBeFalsy();
+    });
+
+    it('should set all tiles to not played when call handleNewMessage', () => {
+        const tiles: RackTile[] = [
+            { letter: 'A', value: 0, played: true },
+            { letter: 'B', value: 0 },
+        ];
+        component.tiles = tiles;
+
+        handleNewMessageSpy.and.callThrough();
+        component['handleNewMessage']({ senderId: 'system-error' } as Message);
+
+        for (const tile of tiles) expect(tile.played).toBeFalse();
     });
 });

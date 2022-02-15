@@ -1,7 +1,7 @@
 <div id="rack-grid">
     <mat-card>
         <div id="rack-card-container">
-            <app-tile *ngFor="let tile of tiles" [tile]="tile" fontSize="1.5em" class="rack-tile">{{ tile.letter }}</app-tile>
+            <app-tile *ngFor="let tile of tiles" [tile]="tile" [ngStyle]="{'fontSize': tileFontSize+'em'}" class="rack-tile" [ngClass]="{hidden: tile.played}">{{ tile.letter }}</app-tile>
         </div>
         <div id="rack-button-container" class="rack-card">
             <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">

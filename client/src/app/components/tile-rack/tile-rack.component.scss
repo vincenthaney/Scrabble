@@ -29,6 +29,11 @@ $tile-size: 50px;
                 transform: translateY(-15%) scale(1.05);
                 transition: ease-in transform 0.15s;
             }
+
+            &.hidden {
+                display: none !important;
+                visibility: hidden !important;
+            }
         }
     }
 

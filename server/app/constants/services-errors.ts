@@ -19,7 +19,7 @@ export const NOT_PLAYER_TURN = 'It is not the turn of requesting player';
 export const SOCKET_SERVICE_NOT_INITIALIZED = 'SocketService not initialized';
 export const INVALID_ID_FOR_SOCKET = 'Invalid ID for socket';
 export const MINIMUM_WORD_LENGTH = 2;
-export const INVALID_WORD = ' Word not in dictionary';
+export const INVALID_WORD = (word: string) => `Mot invalide : le mot "${word}" n'est pas dans le dictionnaire choisi.`;
 export const WORD_TOO_SHORT = ' Word too short';
 export const WORD_CONTAINS_HYPHEN = ' Word cannot contain hyphen';
 export const WORD_CONTAINS_APOSTROPHE = ' Word cannot contain apostrophe';

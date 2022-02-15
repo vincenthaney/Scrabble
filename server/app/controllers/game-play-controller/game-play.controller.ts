@@ -3,10 +3,11 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
-import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { INVALID_WORD_TIMEOUT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { delay } from '@app/utils/delay';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -31,7 +32,7 @@ export class GamePlayController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.post('/games/:gameId/player/:playerId/action', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
 
@@ -48,7 +49,7 @@ export class GamePlayController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/message', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/message', (req: GameRequest, res: Response) => {
             const gameId = req.params.gameId;
             const message: Message = req.body;
 
@@ -60,7 +61,7 @@ export class GamePlayController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/error', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/error', (req: GameRequest, res: Response) => {
             const playerId = req.params.playerId;
             const message: Message = req.body;
 
@@ -112,10 +113,7 @@ export class GamePlayController {
                 }
             }
         } catch (e) {
-            this.socketService.emitToSocket(playerId, 'newMessage', {
-                content: e.message,
-                senderId: SYSTEM_ERROR_ID,
-            });
+            this.handleError(e, playerId);
         }
     }
 
@@ -132,6 +130,17 @@ export class GamePlayController {
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: message.content,
+            senderId: SYSTEM_ERROR_ID,
+        });
+    }
+
+    private async handleError(e: Error, playerId: string) {
+        if (e.message.includes('Mot invalide : ')) {
+            await delay(INVALID_WORD_TIMEOUT);
+        }
+
+        this.socketService.emitToSocket(playerId, 'newMessage', {
+            content: e.message,
             senderId: SYSTEM_ERROR_ID,
         });
     }

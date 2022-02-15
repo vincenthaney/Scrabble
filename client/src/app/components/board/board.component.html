@@ -10,7 +10,7 @@
                     <p class="letter-number-grid">{{ marginLetters[i] }}</p>
                 </mat-grid-tile>
                 <mat-grid-tile *ngFor="let square of squareRow" [colspan]="square.squareSize.x" [rowspan]="square.squareSize.y" class="square-background">
-                    <app-square class="full-size" [squareView]="square"></app-square>
+                    <app-square [tileFontSize]="tileFontSize" class="full-size" [squareView]="square"></app-square>
                 </mat-grid-tile>
             </div>
         </mat-grid-list>
