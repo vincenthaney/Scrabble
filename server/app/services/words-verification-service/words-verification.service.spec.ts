@@ -96,13 +96,13 @@ describe('WordsVerificationService', () => {
     it('verifyWords should return error if word is not in dictionary', () => {
         const testWord = 'ufdwihfewa';
         const result = () => wordsVerificationService.verifyWords([testWord], DICTIONARY_NAME);
-        expect(result).to.Throw(INVALID_WORD.replace('{0}', testWord.toUpperCase()));
+        expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
     });
 
     it('verifyWords should throw error if dictionary does not exist', () => {
         const testWord = 'ufdwihfewa';
         const result = () => wordsVerificationService.verifyWords([testWord], 'truc');
-        expect(result).to.Throw(INVALID_WORD.replace('{0}', testWord.toUpperCase()));
+        expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
     });
 
     it('verifyWords should NOT throw error when word is in the dictionary(one word)', () => {
