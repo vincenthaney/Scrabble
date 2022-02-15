@@ -92,6 +92,8 @@ export class BoardComponent implements OnInit, OnDestroy {
                 .map((sameSquare: Square) => {
                     squareView.square = sameSquare;
                     squareView.applied = true;
+                    // eslint-disable-next-line no-console
+                    console.log(sameSquare.tile);
                 });
         });
         this.notAppliedSquares = [];

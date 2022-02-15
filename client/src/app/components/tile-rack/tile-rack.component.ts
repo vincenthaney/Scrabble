@@ -46,7 +46,7 @@ export class TileRackComponent implements OnInit, OnDestroy {
             return;
         }
         localPlayer.getTiles().forEach((tile: Tile) => {
-            this.tiles.push({ letter: tile.letter, value: tile.value });
+            this.tiles.push({ ...tile });
         });
     }
 
