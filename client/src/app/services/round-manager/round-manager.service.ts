@@ -58,7 +58,20 @@ export default class RoundManagerService implements IResetableService {
         this.completedRounds.push(this.currentRound);
         this.currentRound = round;
         this.endRoundEvent.emit();
-        this.startRound();
+        this.startRound(this.maxRoundTime);
+    }
+
+    continueRound(round: Round): void {
+        // this.currentRound.completedTime = round.startTime;
+        // this.completedRounds.push(this.currentRound);
+        this.currentRound = round;
+        // this.endRoundEvent.emit();
+        const currentTime: Date = new Date(Date.now());
+        const limitTime: Date = new Date(round.limitTime);
+        const timeLeft: number = limitTime.getTime() - currentTime.getTime();
+        console.log(timeLeft);
+
+        this.startRound(timeLeft);
     }
 
     getActivePlayer(): AbstractPlayer {
@@ -77,13 +90,16 @@ export default class RoundManagerService implements IResetableService {
         return this.completedRounds[0].startTime;
     }
 
-    startRound(): void {
+    startRound(roundTime: number): void {
+        console.log('startRound');
+
         clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.roundTimeout(), this.maxRoundTime * SECONDS_TO_MILLISECONDS);
+        this.timeout = setTimeout(() => this.roundTimeout(), roundTime * SECONDS_TO_MILLISECONDS);
         this.startTimer();
     }
 
     startTimer(): void {
+        console.log('startTyimer');
         this.timerSource.next([Timer.convertTime(this.maxRoundTime), this.getActivePlayer()]);
     }
 

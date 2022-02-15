@@ -19,9 +19,11 @@ export class BoardComponent implements OnInit, OnDestroy {
     gridSize: Vec2;
     squareGrid: SquareView[][];
     boardUpdateSubscription: Subscription;
+    boardInitializationSubscription: Subscription;
 
     constructor(private boardService: BoardService) {
-        this.gridSize = { x: 0, y: 0 };
+        // this.gridSize = { x: 0, y: 0 };
+        this.gridSize = { x: 15, y: 15 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
@@ -31,6 +33,9 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
+        this.boardInitializationSubscription = this.boardService.boardInitializationEvent
+            .pipe(takeUntil(this.boardDestroyed$))
+            .subscribe((board: Square[][]) => this.initializeBoard(board));
     }
 
     ngOnDestroy() {
@@ -63,6 +68,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
+        console.log(squaresToUpdate.length);
+        console.log(this.gridSize.x * this.gridSize.y);
+        console.log(squaresToUpdate.length > this.gridSize.x * this.gridSize.y);
         if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
 
         /* 

@@ -11,10 +11,11 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-// import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket/socket.service';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Square } from '@app/classes/square';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -49,7 +50,7 @@ export default class GameService implements OnDestroy {
         private boardService: BoardService,
         private roundManager: RoundManagerService,
         private gameController: GamePlayController,
-        // private socketService: SocketService,
+        private socketService: SocketService,
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
@@ -79,18 +80,25 @@ export default class GameService implements OnDestroy {
         this.tileReserve = startGameData.tileReserve;
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
-        this.roundManager.startRound();
-        
+        this.roundManager.startRound(startGameData.maxRoundTime);
         // await this.router.navigateByUrl('/', { skipLocationChange: true }).then(async () => this.router.navigateByUrl('game'));
-        await this.router.navigateByUrl('game');
-        this.updateTileRackEvent.emit();
-        for (line of board)
-        this.boardService.updateBoard(startGameData.board);
-        this.roundManager.updateRound(this.roundManager.currentRound());
-        this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
+        if (this.router.url !== '/game') {
+            await this.router.navigateByUrl('game');
+        } else {
+            console.log('reco');
+            console.log(startGameData);
+            this.updateTileRackEvent.emit();
+            const board1D: Square[] = [];
+            const board1D1: Square[] = board1D.concat(...startGameData.board);
 
-        // if (this.router.url !== '/game') {
-        // }
+            console.log(board1D1);
+            console.log(this.boardService.updateBoard(board1D1));
+            this.player1.updatePlayerData(startGameData.player1);
+            this.player2.updatePlayerData(startGameData.player2);
+            
+            this.roundManager.continueRound(this.roundManager.convertRoundDataToRound(startGameData.round));
+            this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
+        }
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
