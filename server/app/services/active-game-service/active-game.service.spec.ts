@@ -34,6 +34,8 @@ const DEFAULT_GAME = {
     id: DEFAULT_ID,
 
     getId: () => DEFAULT_ID,
+    createStartGameData: () => undefined,
+    isGameOver: () => true,
 };
 
 describe('ActiveGameService', () => {
@@ -117,14 +119,19 @@ describe('ActiveGameService', () => {
 
         it('should remove from list with player1 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_1.id);
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_1.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
 
         it('should remove from list with player2 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.remove(DEFAULT_ID, DEFAULT_PLAYER_2.id);
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
+    });
+
+    it('isGameOver should return if the game with the game id provided is over', () => {
+        chai.spy.on(activeGameService, 'getGame', () => DEFAULT_GAME);
+        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.be.equal(DEFAULT_GAME.isGameOver());
     });
 });

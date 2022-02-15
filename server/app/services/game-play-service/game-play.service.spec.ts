@@ -6,17 +6,20 @@ import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionRese
 import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, TileReserve } from '@app/classes/tile';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
-import { expect } from 'chai';
+import * as chai from 'chai';
+import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { RoundData } from '@app/classes/communication/round-data';
+const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
@@ -301,6 +304,44 @@ describe('GamePlayService', () => {
             const type = 'exchange';
             const payload: Omit<ActionExchangePayload, 'tiles'> = {};
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
+    });
+
+    describe('PlayerLeftEvent', () => {
+        const playerWhoLeftId = 'playerWhoLeftId';
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+
+        beforeEach(() => {
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            activeGameServiceStub.playerLeftEvent = new EventEmitter();
+            activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
+
+            gamePlayService = new GamePlayService(activeGameServiceStub as unknown as ActiveGameService);
+        });
+
+        it('On receive player left event, should call handlePlayerLeftEvent', () => {
+            const handlePlayerLeftEventSpy = chai.spy.on(gamePlayService, 'handlePlayerLeftEvent', () => {
+                return;
+            });
+            gamePlayService['activeGameService'].playerLeftEvent.emit('playerLeft', DEFAULT_GAME_ID, playerWhoLeftId);
+            expect(handlePlayerLeftEventSpy).to.have.been.called.with(DEFAULT_GAME_ID, playerWhoLeftId);
+        });
+
+        it('handlePlayerLeftEvent should emit playerLeftFeedback', () => {
+            gameStub.player1 = new Player(DEFAULT_PLAYER_ID, 'Cool Guy Name');
+            gameStub.player2 = new Player(playerWhoLeftId, 'LeaverName');
+            const playerStillInGame: Player = gameStub.player1;
+            const updatedData: GameUpdateData = {};
+            const endOfGameMessages: string[] = ['test'];
+
+            const handleGameOverSpy = chai.spy.on(gamePlayService, 'handleGameOver', () => endOfGameMessages);
+            const emitSpy = chai.spy.on(gamePlayService['activeGameService'].playerLeftEvent, 'emit', () => {
+                return;
+            });
+
+            gamePlayService.handlePlayerLeftEvent(DEFAULT_GAME_ID, playerWhoLeftId);
+            expect(handleGameOverSpy).to.have.been.called.with(playerStillInGame.name, gameStub, updatedData);
+            expect(emitSpy).to.have.been.called.with('playerLeftFeedback', DEFAULT_GAME_ID, endOfGameMessages, updatedData);
         });
     });
 });

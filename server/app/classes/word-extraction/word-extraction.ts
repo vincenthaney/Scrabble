@@ -3,7 +3,7 @@ import { Square } from '@app/classes/square';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import { Tile } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 export class WordExtraction {
     constructor(private board: Board) {}
@@ -52,6 +52,9 @@ export class WordExtraction {
         const word = [...beforeWord, ...newWord, ...afterWord];
 
         if (word.length > 1) wordsCreated.push(word);
+
+        if (wordsCreated.length < 1) throw Error(EXTRACTION_NO_WORDS_CREATED);
+
         return wordsCreated;
     }
 

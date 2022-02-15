@@ -158,6 +158,16 @@ describe('InformationBoxComponent', () => {
         expect(endRoundSpy).toHaveBeenCalled();
     });
 
+    it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {
+        const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
+        const ngOnInitSpy = spyOn(component, 'ngOnInit');
+        const ngAfterViewInitSpy = spyOn(component, 'ngAfterViewInit');
+        mockGameService.rerenderEvent.emit();
+        expect(ngOnDestroySpy).toHaveBeenCalled();
+        expect(ngOnInitSpy).toHaveBeenCalled();
+        expect(ngAfterViewInitSpy).toHaveBeenCalled();
+    });
+
     it('ngAfterViewInit should call updateActivePlayerBorder', () => {
         const spy = spyOn(component, 'ngAfterViewInit');
         component.ngAfterViewInit();

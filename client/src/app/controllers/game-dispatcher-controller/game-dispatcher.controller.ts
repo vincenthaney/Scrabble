@@ -1,37 +1,43 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import GameService from '@app/services/game/game.service';
 import SocketService from '@app/services/socket/socket.service';
+import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GameDispatcherController {
+export class GameDispatcherController implements OnDestroy {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
     leaveLobbyEvent: EventEmitter<string> = new EventEmitter();
     lobbyFullEvent: EventEmitter<void> = new EventEmitter();
     lobbyRequestValidEvent: EventEmitter<void> = new EventEmitter();
-
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
-    joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
-    constructor(private http: HttpClient, public socketService: SocketService, private gameService: GameService) {
+    serviceDestroyed$: Subject<boolean> = new Subject();
+
+    constructor(private http: HttpClient, public socketService: SocketService, private readonly gameService: GameService) {
         this.configureSocket();
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     configureSocket(): void {
         this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
             this.joinRequestEvent.emit(opponent[0].name);
         });
-        this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
-            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
-        );
+        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) => {
+            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]);
+        });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
             this.lobbiesUpdateEvent.emit(lobbies[0]);
         });
@@ -39,9 +45,6 @@ export class GameDispatcherController {
             this.joinerRejectedEvent.emit(hostName[0].name);
         });
         this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
-        this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
-            this.joinerLeaveGameEvent.emit(opponent[0].name);
-        });
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
@@ -63,11 +66,6 @@ export class GameDispatcherController {
 
     handleCancelGame(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/cancel`;
-        this.http.delete(endpoint).subscribe();
-    }
-
-    handleLeaveLobby(gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/leave`;
         this.http.delete(endpoint).subscribe();
     }
 
@@ -95,6 +93,4 @@ export class GameDispatcherController {
             this.canceledGameEvent.emit('Le créateur');
         }
     }
-
-    doNothing(){}
 }

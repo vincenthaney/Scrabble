@@ -27,7 +27,7 @@ import {
 import { GameService } from '@app/services';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
-import SpyObj = jasmine.SpyObj;
+// import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -68,16 +68,7 @@ export class MatDialogMock {
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
-    let gameServiceSpy: SpyObj<GameService>;
-    // const observable = new Observable<void>();
-
-    // const pipedObservable = observable.pipe();
-
-    beforeEach(() => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['isLocalPlayerPlaying', 'noActiveGameEvent']);
-        // spyOn(gameServiceSpy.noActiveGameEvent, 'pipe').and.returnValue(pipedObservable);
-
-    });
+    let gameServiceMock: GameService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -107,10 +98,10 @@ describe('GamePageComponent', () => {
                     provide: MatDialog,
                     useClass: MatDialogMock,
                 },
-                {
-                    provide: GameService,
-                    useValue: gameServiceSpy,
-                },
+                // {
+                //     provide: GameService,
+                //     useValue: gameServiceSpy,
+                // },
             ],
         }).compileComponents();
     });
@@ -119,10 +110,25 @@ describe('GamePageComponent', () => {
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        gameServiceMock = TestBed.inject(GameService);
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should call disconnectGame if there is a gameId', () => {
+        spyOn(gameServiceMock, 'getGameId').and.callFake(() => 'id');
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).toHaveBeenCalled();
+    });
+
+    it('should not call disconnectGame if there no a gameId', () => {
+        spyOn(gameServiceMock, 'getGameId').and.callFake(() => null as unknown as string);
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).not.toHaveBeenCalled();
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {

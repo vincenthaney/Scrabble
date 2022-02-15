@@ -3,9 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { GameDispatcherService } from '@app/services/';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CONTENT,
@@ -13,6 +10,10 @@ import {
     HOST_WAITING_MESSAGE,
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
+import { GameDispatcherService } from '@app/services/';
+import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -28,7 +29,12 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     host: AbstractPlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
-    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
+    constructor(
+        public dialog: MatDialog,
+        public gameDispatcherService: GameDispatcherService,
+        private readonly playerLeavesService: PlayerLeavesService,
+        public router: Router,
+    ) {}
 
     @HostListener('window:beforeunload')
     ngOnDestroy() {
@@ -41,7 +47,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((opponentName: string) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.gameDispatcherService.joinerLeaveGameEvent
+        this.joinerLeaveGameSubscription = this.playerLeavesService.joinerLeaveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((leaverName: string) => this.opponentLeft(leaverName));
     }

@@ -26,6 +26,7 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 
 @Component({
     selector: 'app-game-page',
@@ -43,6 +44,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public gameService: GameService,
         private focusableComponentService: FocusableComponentsService,
         private gameDispatcher: GameDispatcherController,
+        public surrenderDialog: MatDialog,
+        private readonly playerLeavesService: PlayerLeavesService,
     ) {}
 
     @HostListener('document:keypress', ['$event'])
@@ -80,6 +83,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         content: DIALOG_ABANDON_BUTTON_CONFIRM,
                         redirect: '/home',
                         style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
+                        action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
                     },
                     {
                         content: DIALOG_ABANDON_BUTTON_CONTINUE,
@@ -90,6 +94,47 @@ export class GamePageComponent implements OnInit, OnDestroy {
             },
         });
     }
+
+    openDialog(title: string, content: string, buttonsContent: string[]) {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title,
+                content,
+                buttons: [
+                    {
+                        content: buttonsContent[0],
+                        redirect: '/home',
+                        style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
+                        action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
+                    },
+                    {
+                        content: buttonsContent[1],
+                        closeDialog: true,
+                        style: 'background-color: rgb(231, 231, 231)',
+                    },
+                ],
+            },
+        });
+    }
+
+    quitButtonClicked() {
+        let title = '';
+        let content = '';
+        const buttonsContent = ['', ''];
+        if (this.gameService.isGameOver) {
+            title = 'Quitter la partie';
+            content = 'Voulez-vous vraiment quitter la partie?';
+            buttonsContent[0] = 'Quitter la partie';
+            buttonsContent[1] = 'Rester dans la partie';
+        } else {
+            title = 'Abandonner la partie';
+            content = 'Voulez-vous vraiment ABANDONNER?';
+            buttonsContent[0] = 'Abandonner la partie';
+            buttonsContent[1] = 'Continuer la partie';
+        }
+        this.openDialog(title, content, buttonsContent);
+    }
+
     noActiveGameDialog() {
         this.dialog.open(DefaultDialogComponent, {
             data: {
@@ -106,6 +151,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
             },
         });
     }
+
     changeTileFontSize(operation: FontSizeChangeOperations) {
         if (operation === 'smaller') {
             if (this.tileRackComponent.tileFontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.tileFontSize -= RACK_FONT_SIZE_INCREMENT;

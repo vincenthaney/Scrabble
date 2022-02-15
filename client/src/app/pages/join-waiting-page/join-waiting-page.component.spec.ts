@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -77,15 +78,6 @@ describe('JoinWaitingPageComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
-        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
-            return;
-        });
-        const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
-        cancelButton.click();
-        expect(gameDispatcherSpy).toHaveBeenCalled();
-    });
-
     it('ngOnInit should set the values to the gameDispatcherService lobby and name (currentLobby defined)', () => {
         component.currentLobby = EMPTY_LOBBY;
         component.currentName = '';
@@ -119,7 +111,7 @@ describe('JoinWaitingPageComponent', () => {
 
     it('routerChangeMethod should call handleLeaveLobby if the url is diffrent from /game ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.returnValue(of(true) as any);
+        const spyHandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.returnValue(of(true) as any);
         // Create a new component once spies have been applied
         component.routerChangeMethod('notgame');
         expect(spyHandleLeaveLobby).toHaveBeenCalled();
@@ -127,14 +119,14 @@ describe('JoinWaitingPageComponent', () => {
 
     it('routerChangeMethod should not call handleLeaveLobby if the url is /game ', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.returnValue(of(true) as any);
+        const spyHandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.returnValue(of(true) as any);
         // Create a new component once spies have been applied
         component.routerChangeMethod('/game');
         expect(spyHandleLeaveLobby).not.toHaveBeenCalled();
     });
 
     it('onBeforeUnload should call handleLeaveLobby', () => {
-        const spyhandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
+        const spyhandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.callFake(() => {
             return;
         });
 
@@ -161,7 +153,7 @@ describe('JoinWaitingPageComponent', () => {
     });
 
     it('onBeforeUnload should call be handleLeaveLobby', () => {
-        const spyHandleLeaveLobby = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
+        const spyHandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.callFake(() => {
             return;
         });
         component.onBeforeUnload();
