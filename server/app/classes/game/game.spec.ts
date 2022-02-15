@@ -2,10 +2,13 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { Board } from '@app/classes/board';
 import Player from '@app/classes/player/player';
+import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
+import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
@@ -15,7 +18,7 @@ import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD } from './game';
-import { MultiplayerGameConfig } from './game-config';
+import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game.type';
 
 const expect = chai.expect;
@@ -40,7 +43,7 @@ const DEFAULT_AMOUNT_OF_TILES = 25;
 
 const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
-const DEFAULT_MAP = new Map<LetterValue, number>([
+let DEFAULT_MAP = new Map<LetterValue, number>([
     ['A', 0],
     ['B', 0],
 ]);
@@ -418,74 +421,70 @@ describe('Game Service Injection', () => {
         Game.injectServices(boardService);
         expect(Game['getBoardService']).to.have.been.called;
     });
+});
 
-    describe('createStartGameData', () => {
-        const PLAYER_1_ID = 'player1Id';
-        const PLAYER_2_ID = 'player2Id';
-        const PLAYER_1_NAME = 'player1Name';
-        const PLAYER_2_NAME = 'player2Name';
-        const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
-        const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
-        const DEFAULT_TIME = 60;
-        const DEFAULT_DICTIONARY = 'dict';
-        const DEFAULT_GAME_ID = 'gameId';
-        const DEFAULT_MAP = new Map<LetterValue, number>([
-            ['A', 1],
-            ['B', 2],
-            ['C', 2],
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            ['F', 8],
-        ]);
-        const TILE_RESERVE_DATA: TileReserveData[] = [
-            { letter: 'A', amount: 1 },
-            { letter: 'B', amount: 2 },
-            { letter: 'C', amount: 2 },
-            { letter: 'F', amount: 8 },
-        ];
-        const TILE_RESERVE_TOTAL = 13;
-        let gameStub: SinonStubbedInstance<Game>;
-        let roundManagerStub: SinonStubbedInstance<RoundManager>;
-        let round: Round;
-        let boardStub: SinonStubbedInstance<Board>;
-        let game: Game;
+describe('createStartGameData', () => {
+    const PLAYER_1_ID = 'player1Id';
+    const PLAYER_2_ID = 'player2Id';
+    const PLAYER_1_NAME = 'player1Name';
+    const PLAYER_2_NAME = 'player2Name';
+    const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
+    const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
+    const DEFAULT_TIME = 60;
+    const DEFAULT_DICTIONARY = 'dict';
+    DEFAULT_MAP = new Map<LetterValue, number>([
+        ['A', 1],
+        ['B', 2],
+        ['C', 2],
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        ['F', 8],
+    ]);
+    const TILE_RESERVE_DATA: TileReserveData[] = [
+        { letter: 'A', amount: 1 },
+        { letter: 'B', amount: 2 },
+        { letter: 'C', amount: 2 },
+        { letter: 'F', amount: 8 },
+    ];
+    const TILE_RESERVE_TOTAL = 13;
+    let roundManagerStub: SinonStubbedInstance<RoundManager>;
+    let round: Round;
+    let boardStub: SinonStubbedInstance<Board>;
+    let game: Game;
 
-        beforeEach(() => {
-            gameStub = createStubInstance(Game);
-            roundManagerStub = createStubInstance(RoundManager);
-            boardStub = createStubInstance(Board);
+    beforeEach(() => {
+        game = new Game();
+        roundManagerStub = createStubInstance(RoundManager);
+        boardStub = createStubInstance(Board);
 
-            roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-            gameStub.player1 = PLAYER_1;
-            gameStub.player2 = PLAYER_2;
-            gameStub.getTilesLeftPerLetter.returns(DEFAULT_MAP);
-            gameStub.gameType = GameType.Classic;
-            gameStub.dictionnaryName = DEFAULT_DICTIONARY;
-            gameStub.getId.returns(DEFAULT_GAME_ID);
-            gameStub.board = boardStub;
-            gameStub.board.grid = [[]];
-            gameStub.roundManager = roundManagerStub as unknown as RoundManager;
+        roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
+        game.player1 = PLAYER_1;
+        game.player2 = PLAYER_2;
+        chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
+        game.gameType = GameType.Classic;
+        game.dictionnaryName = DEFAULT_DICTIONARY;
+        chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
+        game.board = boardStub;
+        game.board.grid = [[]];
+        game.roundManager = roundManagerStub as unknown as RoundManager;
 
-            round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
-            roundManagerStub.getCurrentRound.returns(round);
+        round = { player: game.player1, startTime: new Date(), limitTime: new Date() };
+        roundManagerStub.getCurrentRound.returns(round);
+    });
 
-            game = gameStub as unknown as Game;
-        });
-
-        it('should return the expected StartMultiplayerGameData', () => {
-            const result = gameDispatcherService['createStartGameData'](game);
-            const expectedMultiplayerGameData: StartMultiplayerGameData = {
-                player1: gameStub.player1,
-                player2: gameStub.player2,
-                gameType: gameStub.gameType,
-                maxRoundTime: DEFAULT_TIME,
-                dictionary: DEFAULT_DICTIONARY,
-                gameId: DEFAULT_GAME_ID,
-                board: gameStub.board.grid,
-                tileReserve: TILE_RESERVE_DATA,
-                tileReserveTotal: TILE_RESERVE_TOTAL,
-                round: roundManagerStub.convertRoundToRoundData(round),
-            };
-            expect(result).to.deep.equal(expectedMultiplayerGameData);
-        });
+    it('should return the expected StartMultiplayerGameData', () => {
+        const result = game['createStartGameData']();
+        const expectedMultiplayerGameData: StartMultiplayerGameData = {
+            player1: game.player1,
+            player2: game.player2,
+            gameType: game.gameType,
+            maxRoundTime: DEFAULT_TIME,
+            dictionary: DEFAULT_DICTIONARY,
+            gameId: DEFAULT_GAME_ID,
+            board: game.board.grid,
+            tileReserve: TILE_RESERVE_DATA,
+            tileReserveTotal: TILE_RESERVE_TOTAL,
+            round: roundManagerStub.convertRoundToRoundData(round),
+        };
+        expect(result).to.deep.equal(expectedMultiplayerGameData);
     });
 });

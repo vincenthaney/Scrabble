@@ -116,7 +116,6 @@ describe('GameDispatcherService', () => {
 
     describe('acceptJoinRequest', () => {
         let id: string;
-        let spy: unknown;
         let gameStub: SinonStubbedInstance<Game>;
         let tileReserveStub: SinonStubbedInstance<TileReserve>;
 
@@ -126,12 +125,6 @@ describe('GameDispatcherService', () => {
             tileReserveStub.init.returns(Promise.resolve());
             gameStub = createStubInstance(Game);
             gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
-            spy = chai.spy.on(gameDispatcherService['activeGameService'], 'beginMultiplayerGame', async () =>
-                Promise.resolve(gameStub as unknown as Game),
-            );
-            spy = chai.spy.on(gameDispatcherService, 'createStartGameData', () => {
-                return;
-            });
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
 
@@ -145,12 +138,6 @@ describe('GameDispatcherService', () => {
             await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
             expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.be.empty;
-        });
-
-        it('should call beginMultiplayerGame', async () => {
-            await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
-
-            expect(spy).to.have.been.called();
         });
 
         it(' should throw error when playerId is invalid', () => {
