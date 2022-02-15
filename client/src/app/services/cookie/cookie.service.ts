@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { EXPIRED_COOKIE_AGE } from '@app/constants/services-errors';
 
 @Injectable({
     providedIn: 'root',
@@ -14,15 +15,15 @@ export class CookieService {
 
     getCookie(name: string): string {
         const nameEQ = name + '=';
-        const ca = document.cookie.split(';');
-        for (let c of ca) {
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        const keyValPairs = document.cookie.split(';');
+        for (let keyPair of keyValPairs) {
+            keyPair = keyPair.trim();
+            if (keyPair.includes(nameEQ)) return keyPair.substring(nameEQ.length);
         }
         return '';
     }
 
     eraseCookie(name: string) {
-        document.cookie = name + '=; Max-Age=-99999999;';
+        document.cookie = `${name}=; Max-Age=${EXPIRED_COOKIE_AGE};`;
     }
 }
