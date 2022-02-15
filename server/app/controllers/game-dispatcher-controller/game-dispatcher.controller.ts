@@ -57,7 +57,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/join', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/join', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { playerName }: { playerName: string } = req.body;
 
@@ -70,7 +70,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/accept', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/accept', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
@@ -83,7 +83,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/reject', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/reject', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
@@ -96,7 +96,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.delete('/games/:gameId/player/:playerId/cancel', (req: GameRequest, res: Response) => {
+        this.router.delete('/games/:gameId/players/:playerId/cancel', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
 
             try {
@@ -108,7 +108,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.delete('/games/:gameId/player/:playerId/leave', (req: GameRequest, res: Response) => {
+        this.router.delete('/games/:gameId/players/:playerId/leave', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
 
             try {
@@ -120,7 +120,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/player/:playerId/reconnect', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/reconnect', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { newPlayerId }: { newPlayerId: string } = req.body;
 
@@ -133,7 +133,7 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.delete('/games/:gameId/player/:playerId/disconnect', (req: GameRequest, res: Response) => {
+        this.router.delete('/games/:gameId/players/:playerId/disconnect', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
 
             try {
@@ -233,7 +233,6 @@ export class GameDispatcherController {
     }
 
     private handleDisconnection(gameId: string, playerId: string) {
-
         const game = this.activeGameService.getGame(gameId, playerId);
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
@@ -253,4 +252,3 @@ export class GameDispatcherController {
         }
     }
 }
-

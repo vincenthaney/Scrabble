@@ -48,12 +48,12 @@ export class GamePlayController {
     }
 
     handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/reconnect`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/reconnect`;
         this.http.post(endpoint, { newPlayerId }).subscribe();
     }
 
     handleDisconnection(gameId: string, playerId: string) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/disconnect`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/disconnect`;
         this.http.delete(endpoint, { observe: 'response' }).subscribe(
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             () => {},

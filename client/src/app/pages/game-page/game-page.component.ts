@@ -37,12 +37,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(
-        public dialog: MatDialog,
-        public gameService: GameService,
-        private focusableComponentService: FocusableComponentsService,
-    ) {
-    }
+    constructor(public dialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
