@@ -47,7 +47,7 @@ export default class InputParserService {
             } catch (e) {
                 if (e instanceof CommandError) {
                     const errorMessageContent =
-                        e.message === CommandErrorMessages.NotYourTurn ? e.message : `La commande "**${input}**" est invalide :<br />${e.message}`;
+                        e.message === CommandErrorMessages.NotYourTurn ? e.message : `La commande **${input}** est invalide :<br />${e.message}`;
 
                     this.controller.sendError(this.gameService.getGameId(), playerId, {
                         content: errorMessageContent,

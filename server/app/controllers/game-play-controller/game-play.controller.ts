@@ -4,6 +4,7 @@ import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
 import { INVALID_WORD_TIMEOUT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { COMMAND_IS_INVALID } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -113,7 +114,7 @@ export class GamePlayController {
                 }
             }
         } catch (e) {
-            this.handleError(e, playerId);
+            this.handleError(e, data.input, playerId);
         }
     }
 
@@ -134,13 +135,13 @@ export class GamePlayController {
         });
     }
 
-    private async handleError(e: Error, playerId: string) {
-        if (e.message.includes('Mot invalide : ')) {
+    private async handleError(e: Error, input: string, playerId: string) {
+        if (e.message.includes(" n'est pas dans le dictionnaire choisi.")) {
             await delay(INVALID_WORD_TIMEOUT);
         }
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
-            content: e.message,
+            content: COMMAND_IS_INVALID(input) + e.message,
             senderId: SYSTEM_ERROR_ID,
         });
     }
