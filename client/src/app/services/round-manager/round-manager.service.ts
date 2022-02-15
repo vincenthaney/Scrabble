@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
 import { RoundData } from '@app/classes/communication/round-data';
-import { IResetableService } from '@app/classes/i-resetable-service';
+import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
@@ -14,7 +14,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export default class RoundManagerService implements IResetableService {
+export default class RoundManagerService implements IResetServiceData {
     gameId: string;
     localPlayerId: string;
     currentRound: Round;

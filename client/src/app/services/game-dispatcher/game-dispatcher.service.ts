@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameType } from '@app/classes/game-type';
-import { IResetableService } from '@app/classes/i-resetable-service';
+import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 @Injectable({
     providedIn: 'root',
 })
-export default class GameDispatcherService implements OnDestroy, IResetableService {
+export default class GameDispatcherService implements OnDestroy, IResetServiceData {
     gameId: string;
     currentLobby: LobbyInfo | undefined;
     currentName: string;

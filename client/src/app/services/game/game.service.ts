@@ -5,7 +5,7 @@ import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
-import { IResetableService } from '@app/classes/i-resetable-service';
+import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { TileReserveData } from '@app/classes/tile/tile.types';
@@ -21,7 +21,7 @@ export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileRese
 @Injectable({
     providedIn: 'root',
 })
-export default class GameService implements OnDestroy, IResetableService {
+export default class GameService implements OnDestroy, IResetServiceData {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;

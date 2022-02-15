@@ -96,7 +96,7 @@ describe('GameDispatcherService', () => {
         });
         service.handleCancelGame();
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
-        expect(service.gameId).toEqual(undefined);
+        expect(service.gameId).toEqual('');
     });
 
     it('handleConfirmation should call gameDispatcherController.handleConfirmationGameCreation with the correct parameters', () => {
@@ -150,9 +150,9 @@ describe('GameDispatcherService', () => {
 
     describe('Subscriptions', () => {
         it('should set gameId on createGameEvent', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service['gameDispatcherController'].createGameEvent.emit(BASE_GAME_ID);
-            expect(service.gameId as string | undefined).toEqual(BASE_GAME_ID);
+            expect(service.gameId).toEqual(BASE_GAME_ID);
         });
 
         it('should call handleJoinRequest on joinRequestEvent', () => {
@@ -214,7 +214,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service.handleCancelGame();
             expect(cancelGameSpy).not.toHaveBeenCalled();
         });
@@ -243,7 +243,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).not.toHaveBeenCalled();
         });
@@ -267,7 +267,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = undefined;
+            service.gameId = '';
             service.handleRejection(TEST_PLAYER_NAME);
             expect(rejectionSpy).not.toHaveBeenCalled();
         });
