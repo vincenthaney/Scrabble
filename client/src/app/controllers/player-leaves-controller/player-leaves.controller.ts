@@ -35,7 +35,7 @@ export class PlayerLeavesController implements OnDestroy {
         });
     }
 
-    handleLeaveGame(gameId: string | undefined): void {
+    handleLeaveGame(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/leave`;
         this.http.delete(endpoint).subscribe();
     }

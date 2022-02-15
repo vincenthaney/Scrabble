@@ -6,14 +6,14 @@ import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameType } from '@app/classes/game-type';
 import { IResetableService } from '@app/classes/i-resetable-service';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export default class GameDispatcherService implements OnDestroy, IResetableService {
-    serviceDestroyed$: Subject<boolean> = new Subject();
+    gameId: string;
     currentLobby: LobbyInfo | undefined;
     currentName: string;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
@@ -21,7 +21,6 @@ export default class GameDispatcherService implements OnDestroy, IResetableServi
     lobbyFullEvent: EventEmitter<void> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
-    gameIdUpdate: BehaviorSubject<string | undefined> = new BehaviorSubject<string | undefined>('');
 
     createGameSubscription: Subscription;
     joinRequestSubscription: Subscription;
@@ -31,16 +30,7 @@ export default class GameDispatcherService implements OnDestroy, IResetableServi
     joinRequestValidSubscription: Subscription;
     joinerRejectedSubscription: Subscription;
 
-    private privateGameId: string | undefined;
-
-    get gameId(): string | undefined {
-        return this.privateGameId;
-    }
-
-    set gameId(gameId: string | undefined) {
-        this.privateGameId = gameId;
-        this.gameIdUpdate.next(this.gameId);
-    }
+    serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent
@@ -78,7 +68,7 @@ export default class GameDispatcherService implements OnDestroy, IResetableServi
         console.log('GameDispatcher reset');
         this.currentLobby = undefined;
         this.currentName = '';
-        this.gameId = undefined;
+        this.gameId = '';
     }
 
     handleJoinLobby(lobby: LobbyInfo, playerName: string) {

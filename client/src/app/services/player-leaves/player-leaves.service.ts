@@ -1,5 +1,4 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { IResetableService } from '@app/classes/i-resetable-service';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
 import { GameService } from '@app/services/';
 import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
@@ -10,12 +9,10 @@ import { takeUntil } from 'rxjs/operators';
 @Injectable({
     providedIn: 'root',
 })
-export class PlayerLeavesService implements OnDestroy, IResetableService {
+export class PlayerLeavesService implements OnDestroy {
     joinerLeaveGameEvent: Subject<string> = new Subject();
     joinerLeaveGameSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
-
-    private gameId: string | undefined;
 
     constructor(
         private readonly playerLeavesController: PlayerLeavesController,
@@ -27,16 +24,15 @@ export class PlayerLeavesService implements OnDestroy, IResetableService {
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((leaverName: string) => this.handleJoinerLeaveGame(leaverName));
 
-        this.gameDispatcherService.gameIdUpdate.pipe(takeUntil(this.serviceDestroyed$)).subscribe((gameId: string | undefined) => {
-            this.gameId = gameId;
-        });
-
         this.playerLeavesController.resetGameEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(() => {
             this.gameService.resetServiceData();
             this.gameDispatcherService.resetServiceData();
             this.roundManagerService.resetServiceData();
-            this.resetServiceData();
         });
+    }
+
+    getGameId(): string {
+        return this.gameDispatcherService.gameId;
     }
 
     handleJoinerLeaveGame(leaverName: string) {
@@ -44,17 +40,12 @@ export class PlayerLeavesService implements OnDestroy, IResetableService {
     }
 
     handleLocalPlayerLeavesGame(): void {
-        this.playerLeavesController.handleLeaveGame(this.gameId);
+        this.playerLeavesController.handleLeaveGame(this.getGameId());
     }
 
     handleLeaveLobby() {
-        if (this.gameId) this.playerLeavesController.handleLeaveGame(this.gameId);
-        this.resetServiceData();
+        if (this.getGameId()) this.playerLeavesController.handleLeaveGame(this.getGameId());
         this.gameDispatcherService.resetServiceData();
-    }
-
-    resetServiceData(): void {
-        this.gameId = '';
     }
 
     ngOnDestroy(): void {
