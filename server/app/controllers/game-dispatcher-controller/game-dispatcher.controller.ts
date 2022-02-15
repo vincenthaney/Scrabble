@@ -233,6 +233,7 @@ export class GameDispatcherController {
     }
 
     private handleDisconnection(gameId: string, playerId: string) {
+
         const game = this.activeGameService.getGame(gameId, playerId);
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
@@ -252,3 +253,4 @@ export class GameDispatcherController {
         }
     }
 }
+

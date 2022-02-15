@@ -10,6 +10,14 @@ import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import {
+    DICTIONARY_REQUIRED,
+    GAME_TYPE_REQUIRED,
+    MAX_ROUND_TIME_REQUIRED,
+    NAME_IS_INVALID,
+    PLAYER_NAME_REQUIRED,
+    GAME_IS_OVER,
+} from '@app/constants/controllers-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -18,14 +26,6 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import {
-    DICTIONARY_REQUIRED,
-    GAME_IS_OVER,
-    GAME_TYPE_REQUIRED,
-    MAX_ROUND_TIME_REQUIRED,
-    NAME_IS_INVALID,
-    PLAYER_NAME_REQUIRED,
-} from '@app/constants/controllers-errors';
 import { GameDispatcherController } from './game-dispatcher.controller';
 import Game from '@app/classes/game/game';
 import { assert } from 'console';
@@ -107,11 +107,11 @@ describe('GameDispatcherController', () => {
             });
         });
 
-        describe('/games/:gameId/player/:playerId/join', () => {
+        describe('/games/:gameId/players/:playerId/join', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleJoinGame', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -119,15 +119,15 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/join`).expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/accept', () => {
+        describe('/games/:gameId/players/:playerId/accept', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleAcceptRequest', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -135,15 +135,17 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/accept`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/accept`)
+                    .expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/reject', () => {
+        describe('/games/:gameId/players/:playerId/reject', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleRejectRequest', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw', async () => {
@@ -151,16 +153,18 @@ describe('GameDispatcherController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/reject`).expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/reject`)
+                    .expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('/games/:gameId/player/:playerId/cancel', () => {
+        describe('/games/:gameId/players/:playerId/cancel', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleCancelGame', () => {});
 
                 return supertest(expressApp)
-                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/cancel`)
                     .expect(StatusCodes.NO_CONTENT);
             });
 
@@ -170,7 +174,7 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp)
-                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/cancel`)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/cancel`)
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
@@ -195,12 +199,13 @@ describe('GameDispatcherController', () => {
             });
         });
 
-
         describe('/games/:gameId/player/:playerId/leave', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleLobbyLeave', () => {});
 
-                return supertest(expressApp).delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/leave`)
+                    .expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw', async () => {
@@ -209,7 +214,7 @@ describe('GameDispatcherController', () => {
                 });
 
                 return supertest(expressApp)
-                    .delete(`/api/games/${DEFAULT_GAME_ID}/player/${DEFAULT_PLAYER_ID}/leave`)
+                    .delete(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/leave`)
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
@@ -226,9 +231,9 @@ describe('GameDispatcherController', () => {
         let gameStub: SinonStubbedInstance<Game>;
         let getGameSpy: SinonStub;
         let addtoRoomStub: SinonStub;
-        let playerStub :SinonStubbedInstance<Player>;
-        let gameDispatcherStub :SinonStubbedInstance<GameDispatcherService>;
-        let socketServiceStub :SinonStubbedInstance<SocketService>;
+        let playerStub: SinonStubbedInstance<Player>;
+        let gameDispatcherStub: SinonStubbedInstance<GameDispatcherService>;
+        let socketServiceStub: SinonStubbedInstance<SocketService>;
 
         beforeEach(() => {
             gameStub = createStubInstance(Game);
@@ -238,7 +243,6 @@ describe('GameDispatcherController', () => {
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             gameStub.getRequestingPlayer.returns(playerStub);
             addtoRoomStub = stub(controller['socketService'], 'addToRoom');
-
         });
 
         it('should call activeGameService.getGame', () => {
@@ -279,44 +283,43 @@ describe('GameDispatcherController', () => {
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(spy).to.have.been.called();
-            });
         });
-
-        // it('should call socketService.addToRoom', () => {
-        //     const spy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-        //     chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
-        //     chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
-        //     controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
-        //     expect(spy).to.have.been.called();
-        // });
-
-        // it('should throw if config.playerName is undefined', () => {
-        //     const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined };
-        //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
-        // });
-
-        // it('should throw if config.gameType is undefined', () => {
-        //     const config = { ...DEFAULT_GAME_CONFIG_DATA, gameType: undefined };
-        //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(GAME_TYPE_REQUIRED);
-        // });
-
-        // it('should throw if config.maxRoundTime is undefined', () => {
-        //     const config = { ...DEFAULT_GAME_CONFIG_DATA, maxRoundTime: undefined };
-        //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(MAX_ROUND_TIME_REQUIRED);
-        // });
-
-        // it('should throw if config.dictionary is undefined', () => {
-        //     const config = { ...DEFAULT_GAME_CONFIG_DATA, dictionary: undefined };
-        //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(DICTIONARY_REQUIRED);
-        // });
-
-        // it('should throw if config.playerName is invalid', () => {
-        //     const playerName = '     ';
-        //     const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
-        //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
-        // });
     });
 
+    // it('should call socketService.addToRoom', () => {
+    //     const spy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
+    //     chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
+    //     chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+    //     controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
+    //     expect(spy).to.have.been.called();
+    // });
+
+    // it('should throw if config.playerName is undefined', () => {
+    //     const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined };
+    //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
+    // });
+
+    // it('should throw if config.gameType is undefined', () => {
+    //     const config = { ...DEFAULT_GAME_CONFIG_DATA, gameType: undefined };
+    //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(GAME_TYPE_REQUIRED);
+    // });
+
+    // it('should throw if config.maxRoundTime is undefined', () => {
+    //     const config = { ...DEFAULT_GAME_CONFIG_DATA, maxRoundTime: undefined };
+    //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(MAX_ROUND_TIME_REQUIRED);
+    // });
+
+    // it('should throw if config.dictionary is undefined', () => {
+    //     const config = { ...DEFAULT_GAME_CONFIG_DATA, dictionary: undefined };
+    //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(DICTIONARY_REQUIRED);
+    // });
+
+    // it('should throw if config.playerName is invalid', () => {
+    //     const playerName = '     ';
+    //     const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
+    //     expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
+    // });
+    // });
 
     describe('handleCreateGame', () => {
         it('should return game id', () => {

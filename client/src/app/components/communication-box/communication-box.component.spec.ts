@@ -15,7 +15,7 @@ import { Player } from '@app/classes/player';
 import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
@@ -44,13 +44,16 @@ describe('CommunicationBoxComponent', () => {
         content: 'content of test message',
         senderId: SYSTEM_ID,
     };
+    const testMessageSystemError: Message = {
+        content: 'content of test message',
+        senderId: SYSTEM_ERROR_ID,
+    };
 
     beforeEach(async () => {
-        inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput', 'emitNewMessage']);
+        inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput']);
         inputParserSpy.parseInput.and.callFake(() => {
             return;
         });
-        inputParserSpy.emitNewMessage.and.callThrough();
 
         virtualScrollSpy = jasmine.createSpyObj('CdkVirtualScrollViewport', ['scrollTo']);
         virtualScrollSpy.scrollTo.and.callFake(() => {
@@ -127,6 +130,12 @@ describe('CommunicationBoxComponent', () => {
     it('should create visualMessage from Message by system', () => {
         const returnValue: VisualMessage = component.createVisualMessage(testMessageSystem);
         const expectedValue: VisualMessage = { ...testMessageSystem, class: 'system' };
+        expect(returnValue).toEqual(expectedValue);
+    });
+
+    it('should create visualMessage from Message by system-error', () => {
+        const returnValue: VisualMessage = component.createVisualMessage(testMessageSystemError);
+        const expectedValue: VisualMessage = { ...testMessageSystemError, class: 'system-error' };
         expect(returnValue).toEqual(expectedValue);
     });
 

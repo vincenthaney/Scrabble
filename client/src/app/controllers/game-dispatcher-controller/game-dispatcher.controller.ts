@@ -52,22 +52,22 @@ export class GameDispatcherController {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/accept`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
 
     handleRejectionGameCreation(opponentName: string, gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/reject`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/reject`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
 
     handleCancelGame(gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/cancel`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/cancel`;
         this.http.delete(endpoint).subscribe();
     }
 
     handleLeaveLobby(gameId: string): void {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/leave`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/leave`;
         this.http.delete(endpoint).subscribe();
     }
 
@@ -77,7 +77,7 @@ export class GameDispatcherController {
     }
 
     handleLobbyJoinRequest(gameId: string, playerName: string) {
-        const endpoint = `${environment.serverUrl}/games/${gameId}/player/${this.socketService.getId()}/join`;
+        const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/join`;
         this.http.post<GameConfig>(endpoint, { playerName }, { observe: 'response' }).subscribe(
             () => {
                 this.lobbyRequestValidEvent.emit();

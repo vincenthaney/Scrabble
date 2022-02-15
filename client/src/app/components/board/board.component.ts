@@ -1,9 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { Message } from '@app/classes/communication/message';
+import { Orientation } from '@app/classes/orientation';
+import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
-import { BoardService } from '@app/services/';
+import { BoardService, GameService } from '@app/services/';
+import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -20,11 +25,14 @@ export class BoardComponent implements OnInit, OnDestroy {
     squareGrid: SquareView[][];
     boardUpdateSubscription: Subscription;
     boardInitializationSubscription: Subscription;
+    notAppliedSquares: SquareView[];
+    tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
-    constructor(private boardService: BoardService) {
+    constructor(private boardService: BoardService, private gameService: GameService) {
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+        this.notAppliedSquares = [];
     }
 
     ngOnInit() {
@@ -35,6 +43,10 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.boardInitializationSubscription = this.boardService.boardInitializationEvent
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((board: Square[][]) => this.initializeBoard(board));
+        this.gameService.playingTiles
+            .pipe(takeUntil(this.boardDestroyed$))
+            .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
+        this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
     }
 
     ngOnDestroy() {
@@ -80,8 +92,43 @@ export class BoardComponent implements OnInit, OnDestroy {
                     (square: Square) =>
                         square.position.row === squareView.square.position.row && square.position.column === squareView.square.position.column,
                 )
-                .map((sameSquare: Square) => (squareView.square = sameSquare));
+                .map((sameSquare: Square) => {
+                    squareView.square = sameSquare;
+                    squareView.applied = true;
+                });
         });
+        this.notAppliedSquares = [];
         return true;
+    }
+
+    private isInBounds(position: Position) {
+        return position.row < this.squareGrid.length && position.column < this.squareGrid[position.row].length;
+    }
+
+    private handlePlaceTiles(payload: ActionPlacePayload) {
+        const position = { ...payload.startPosition };
+        const next = () => (payload.orientation === Orientation.Horizontal ? position.column++ : position.row++);
+
+        for (let i = 0; i < payload.tiles.length; ) {
+            if (!this.isInBounds(position)) return;
+
+            const squareView = this.squareGrid[position.row][position.column];
+
+            if (!squareView.square.tile) {
+                squareView.square.tile = { ...payload.tiles[i] };
+                squareView.applied = false;
+                this.notAppliedSquares.push(squareView);
+                i++;
+            }
+
+            next();
+        }
+    }
+
+    private handleNewMessage(message: Message) {
+        if (message.senderId === 'system-error') {
+            this.notAppliedSquares.forEach((square) => (square.square.tile = null));
+            this.notAppliedSquares = [];
+        }
     }
 }

@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
@@ -10,6 +10,7 @@ import { FocusableComponent } from '@app/services/focusable-components/focusable
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { marked } from 'marked';
 
 export type LetterMapItem = { letter: LetterValue; amount: number };
 
@@ -34,6 +35,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
+
+    loading: boolean = false;
 
     constructor(
         private inputParser: InputParserService,
@@ -87,14 +90,15 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
                 break;
         }
 
-        return { ...newMessage, class: messageClass };
+        return { ...newMessage, content: marked.parseInline(newMessage.content), class: messageClass };
     }
 
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
-        if (message && message.length > 0) {
+        if (message && message.length > 0 && !this.loading) {
             this.inputParser.parseInput(message);
             this.messageForm.reset({ content: '' });
+            this.loading = true;
         }
     }
 
@@ -102,6 +106,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
+        if (!this.isOpponent(newMessage.senderId)) this.loading = false;
+    }
+
+    isOpponent(id: string) {
+        return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
     onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {

@@ -17,6 +17,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Square } from '@app/classes/square';
 import { CookieService } from '@app/services/cookie/cookie.service';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -42,6 +43,7 @@ export default class GameService implements OnDestroy {
     noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
     rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    playingTiles: EventEmitter<ActionPlacePayload>;
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
     private gameId: string;
@@ -60,6 +62,7 @@ export default class GameService implements OnDestroy {
         this.updateTileReserveEvent = new EventEmitter();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
+        this.playingTiles = new EventEmitter();
     }
 
     ngOnDestroy(): void {
@@ -138,9 +141,12 @@ export default class GameService implements OnDestroy {
         this.newMessageValue.next(newMessage);
     }
 
+    getPlayingPlayerId(): string {
+        return this.roundManager.getActivePlayer().id;
+    }
+
     isLocalPlayerPlaying(): boolean {
-        if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
-        return this.localPlayerId === this.roundManager.getActivePlayer().id;
+        return this.getPlayingPlayerId() === this.localPlayerId;
     }
 
     getGameId(): string {

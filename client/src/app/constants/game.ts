@@ -49,6 +49,8 @@ export const UNDEFINED_SQUARE: Square = {
     isCenter: false,
 };
 
+export const VALID_MULTIPLIERS: number[] = [2, 3];
+
 export const SECONDS_TO_MILLISECONDS = 1000;
 export const MINIMUM_TIMER_TIME = 0.01;
 
