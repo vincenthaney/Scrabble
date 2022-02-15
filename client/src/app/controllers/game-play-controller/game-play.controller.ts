@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
+import { HTTP_ABORT_ERROR } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject } from 'rxjs';
@@ -57,8 +58,11 @@ export class GamePlayController {
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             () => {},
             (error) => {
+                // When reloading the page, a the disconnect http request is fired on destruction of the game-page component.
+                // In the initialization of the game-page component, a reconnect request is made which does not allow the 
+                // server to send a response, triggered a Abort 0  error code which is why we catch it if it this this code
                 // eslint-disable-next-line no-empty
-                if (error.status === 0) {
+                if (error.status === HTTP_ABORT_ERROR) {
                 } else {
                     throw new Error(error);
                 }

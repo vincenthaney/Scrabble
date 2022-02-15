@@ -7,15 +7,16 @@ import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { SYSTEM_ID } from '@app/constants/game';
+import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ID, TIME_TO_RECONNECT } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Square } from '@app/classes/square';
+import { CookieService } from '@app/services/cookie/cookie.service';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -52,12 +53,13 @@ export default class GameService implements OnDestroy {
         private roundManager: RoundManagerService,
         private gameController: GamePlayController,
         private socketService: SocketService,
+        private cookieService: CookieService,
     ) {
         this.roundManager.gameId = this.gameId;
         this.updateTileRackEvent = new EventEmitter();
+        this.updateTileReserveEvent = new EventEmitter();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
-        this.updateTileReserveEvent = new EventEmitter();
     }
 
     ngOnDestroy(): void {
@@ -79,22 +81,22 @@ export default class GameService implements OnDestroy {
         this.tileReserve = startGameData.tileReserve;
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
-        // await this.router.navigateByUrl('/', { skipLocationChange: true }).then(async () => this.router.navigateByUrl('game'));
         this.gameIsSetUp = true;
         if (this.router.url !== '/game') {
             this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');
         } else {
-            this.player1.updatePlayerData(startGameData.player1);
-            this.player2.updatePlayerData(startGameData.player2);
-            this.rerenderEvent.emit();
-            this.updateTileRackEvent.emit();
-            const board1D: Square[] = ([] as Square[]).concat(...startGameData.board);
-            this.boardService.updateBoard(board1D);
-            
-            this.roundManager.continueRound(this.roundManager.convertRoundDataToRound(startGameData.round));
-            this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
+            this.reconnectReinitialize(startGameData);
         }
+    }
+    reconnectReinitialize(startGameData: StartMultiplayerGameData) {
+        this.player1.updatePlayerData(startGameData.player1);
+        this.player2.updatePlayerData(startGameData.player2);
+        this.rerenderEvent.emit();
+        this.updateTileRackEvent.emit();
+        this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
+        this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
+        this.roundManager.continueRound(this.roundManager.currentRound);
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
@@ -164,77 +166,41 @@ export default class GameService implements OnDestroy {
     }
 
     reconnectGame() {
-        const gameIdCookie = this.getCookie('gameId');
-        const socketIdCookie = this.getCookie('socketId');
-        // console.log(`reconnectGame gameId : ${gameIdCookie}`);
-        // console.log(`reconnectGame socketIdCookie : ${socketIdCookie}`);
-        // console.log(`reconnectGame newSocketId : ${this.socketService.getId()}`);
+        const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
+        const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
 
-        if (gameIdCookie !== '' && socketIdCookie !== '') {
+        console.log(`reconnectGame gameId : '${gameIdCookie}'`);
+        console.log(`reconnectGame gameId : '${gameIdCookie.length}'`);
+
+        console.log(`reconnectGame socketIdCookie : ${socketIdCookie}`);
+        console.log(`reconnectGame newSocketId : ${this.socketService.getId()}`);
+
+        if (gameIdCookie !== '' && gameIdCookie.length > 0) {
+            console.log('handleReconnection');
+
+            this.cookieService.eraseCookie(GAME_ID_COOKIE);
+            this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
+
             this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
         } else {
+            console.log('noActiveGameEvent');
+
             this.noActiveGameEvent.emit();
         }
     }
 
-    async disconnectGame() {
+    disconnectGame() {
         const gameId = this.gameId;
-        // console.log(`disconnect gameId : ${gameId}`);
-        // console.log(`disconnect socketId : ${this.getLocalPlayerId()}`);
-        this.setCookie('gameId', gameId, 5);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.setCookie('socketId', this.getLocalPlayerId()!, 5);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const localPlayerId = this.getLocalPlayerId()!;
-
+        const localPlayerId = this.getLocalPlayerId();
         this.gameId = '';
         this.player1.id = '';
         this.player2.id = '';
         this.localPlayerId = '';
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await this.gameController.handleDisconnection(gameId, localPlayerId);
+        if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
+        this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
+        this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
+        this.gameController.handleDisconnection(gameId, localPlayerId);
     }
-
-    setCookie(username: string, value: string, expiry: number) {
-        const date = new Date();
-        date.setTime(date.getTime() + expiry * 1000);
-        const expires = 'expires=' + date.toUTCString();
-        document.cookie = username + '=' + value + ';' + expires + ';path=/';
-    }
-
-    getCookie(username: string) {
-        const name = username + '=';
-        const split = document.cookie.split(';');
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let j = 0; j < split.length; j++) {
-            let char = split[j];
-            while (char.charAt(0) === ' ') {
-                char = char.substring(1);
-            }
-            if (char.indexOf(name) === 0) {
-                return char.substring(name.length, char.length);
-            }
-        }
-        return '';
-    }
-
-    // checkCookie() {
-    //     var user = getCookie('username');
-    //     // checking whether user is null or not
-    //     if (user != '') {
-    //         //if user is not null then alert
-    //         alert('Welcome again ' + user);
-    //     }
-    //     //if user is null
-    //     else {
-    //         //take input from user
-    //         user = prompt('Please enter your name:', '');
-    //         //set cookie
-    //         if (user != '' && user != null) {
-    //             setCookie('username', user, 365);
-    //         }
-    //     }
-    // }
 
     // TODO: Maybe rename to sendGame or sendFinishedGame
     sendGameHistory(): void {

@@ -30,7 +30,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public gameService: GameService,
         private focusableComponentService: FocusableComponentsService,
         public reconnectTest: GameDispatcherController,
-    ) {}
+    ) {
+    }
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -38,19 +39,21 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     @HostListener('window:beforeunload')
-    async ngOnDestroy(): Promise<void> {
+    ngOnDestroy() {
+        console.log('destruction gamepage');
         if (this.gameService.getGameId()) {
-            await this.gameService.disconnectGame();
+            this.gameService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
 
     ngOnInit(): void {
+        console.log('init gamepage');
+
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe(() => this.noActiveGameDialog());
-        this.gameService.getGameId();
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
         }
@@ -77,6 +80,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
     noActiveGameDialog() {
+        console.log('noActiveGameDialog');
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_NO_ACTIVE_GAME_TITLE,
@@ -84,7 +88,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 buttons: [
                     {
                         content: DIALOG_NO_ACTIVE_GAME_BUTTON,
-                        closeDialog: true,
+                        closeDialog: false,
                         redirect: '/home',
                         style: 'background-color: rgb(231, 231, 231)',
                     },
