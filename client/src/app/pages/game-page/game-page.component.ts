@@ -25,6 +25,7 @@ import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 
 @Component({
     selector: 'app-game-page',
@@ -37,7 +38,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(public dialog: MatDialog, public gameService: GameService, private focusableComponentService: FocusableComponentsService) {}
+    constructor(
+        public dialog: MatDialog,
+        public gameService: GameService,
+        private focusableComponentService: FocusableComponentsService,
+        private gameDispatcher: GameDispatcherController,
+    ) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -56,6 +62,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         console.log('init gamepage');
+        this.gameDispatcher.configureSocket();
 
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
