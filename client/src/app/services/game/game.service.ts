@@ -175,22 +175,12 @@ export default class GameService implements OnDestroy {
         const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
         const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
 
-        console.log(`reconnectGame gameId : '${gameIdCookie}'`);
-        console.log(`reconnectGame gameId : '${gameIdCookie.length}'`);
-
-        console.log(`reconnectGame socketIdCookie : ${socketIdCookie}`);
-        console.log(`reconnectGame newSocketId : ${this.socketService.getId()}`);
-
         if (gameIdCookie !== '' && gameIdCookie.length > 0) {
-            console.log('handleReconnection');
-
             this.cookieService.eraseCookie(GAME_ID_COOKIE);
             this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
 
             this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
         } else {
-            console.log('noActiveGameEvent');
-
             this.noActiveGameEvent.emit();
         }
     }

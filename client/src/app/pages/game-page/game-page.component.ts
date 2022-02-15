@@ -52,7 +52,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     @HostListener('window:beforeunload')
     ngOnDestroy() {
-        console.log('destruction gamepage');
         if (this.gameService.getGameId()) {
             this.gameService.disconnectGame();
         }
@@ -61,7 +60,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        console.log('init gamepage');
         this.gameDispatcher.configureSocket();
 
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
@@ -93,7 +91,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
     noActiveGameDialog() {
-        console.log('noActiveGameDialog');
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_NO_ACTIVE_GAME_TITLE,

@@ -5,7 +5,6 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import BoardService from '@app/services/board/board.service';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { MultiplayerGameConfig } from './game-config';
-import { GameInfoData } from './game-info';
 import { START_TILES_AMOUNT, END_GAME_HEADER_MESSAGE } from '@app/constants/classes-constants';
 import { GameType } from './game.type';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
@@ -139,37 +138,5 @@ export default class Game {
         } else {
             return this.player1.id === arg;
         }
-    }
-    getInfoData(): GameInfoData {
-        return {
-            player1: this.player1,
-            player2: this.player2,
-            round: this.roundManager.getCurrentRound(),
-            board: this.board.grid,
-            isGameOver: this.isGameOver(),
-        };
-
-        // private createStartGameData(createdGame: Game): StartMultiplayerGameData {
-        //     const tileReserve: TileReserveData[] = [];
-        //     createdGame.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
-        //         tileReserve.push({ letter, amount });
-        //     });
-        //     const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
-        //     const round: Round = createdGame.roundManager.getCurrentRound();
-        //     const roundData: RoundData = createdGame.roundManager.convertRoundToRoundData(round);
-        //     const startMultiplayerGameData: StartMultiplayerGameData = {
-        //         player1: createdGame.player1,
-        //         player2: createdGame.player2,
-        //         gameType: createdGame.gameType,
-        //         maxRoundTime: createdGame.roundManager.getMaxRoundTime(),
-        //         dictionary: createdGame.dictionnaryName,
-        //         gameId: createdGame.getId(),
-        //         board: createdGame.board.grid,
-        //         tileReserve,
-        //         tileReserveTotal,
-        //         round: roundData,
-        //     };
-        //     return startMultiplayerGameData;
-        // }
     }
 }

@@ -184,14 +184,20 @@ describe('Game', () => {
     describe('isGameOver', () => {
         let game: Game;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
 
         beforeEach(() => {
             game = new Game();
             roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
-            game.player1 = DEFAULT_PLAYER_1;
-            game.player2 = DEFAULT_PLAYER_2;
+            // game.player1 = DEFAULT_PLAYER_1;
+            // game.player2 = DEFAULT_PLAYER_2;
 
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
             game.player1.tiles = [
                 { letter: 'A', value: 0 },
                 { letter: 'B', value: 0 },
@@ -200,10 +206,8 @@ describe('Game', () => {
                 { letter: 'A', value: 0 },
                 { letter: 'B', value: 0 },
             ];
-            // game.player1 = player1Stub as unknown as Player;
-            // game.player2 = player2Stub as unknown as Player;
-            // player1Stub.hasTilesLeft.returns(true);
-            // player2Stub.hasTilesLeft.returns(true);
+            player1Stub.hasTilesLeft.returns(true);
+            player2Stub.hasTilesLeft.returns(true);
 
             roundManagerStub.getPassCounter.returns(0);
         });
@@ -220,13 +224,13 @@ describe('Game', () => {
         });
 
         it('should be gameOver when player 1 has no tiles', () => {
-            // player1Stub.hasTilesLeft.returns(false);
+            player1Stub.hasTilesLeft.returns(false);
             expect(game.isGameOver()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
 
         it('should gameOver when player 2 has no tiles', () => {
-            // player2Stub.hasTilesLeft.returns(false);
+            player2Stub.hasTilesLeft.returns(false);
             expect(game.isGameOver()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
