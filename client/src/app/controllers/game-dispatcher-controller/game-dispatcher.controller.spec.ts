@@ -84,12 +84,6 @@ describe('GameDispatcherController', () => {
         expect(cancelGameSpy).toHaveBeenCalled();
     });
 
-    it('On joiner leave game, configureSocket should emit opponent name', () => {
-        const joinerLeaveSpy = spyOn(controller.joinerLeaveGameEvent, 'emit').and.callThrough();
-        socketHelper.peerSideEmit('joinerLeaveGame', DEFAULT_OPPONENT_NAME);
-        expect(joinerLeaveSpy).toHaveBeenCalled();
-    });
-
     it('handleMultiplayerGameCreation should  make an HTTP post request', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
