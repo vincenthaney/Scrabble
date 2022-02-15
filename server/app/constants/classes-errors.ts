@@ -12,3 +12,4 @@ export const TILE_NOT_IN_RESERVE = 'Tile is not in reserve.';
 export const TILE_RESERVE_MUST_BE_INITIATED = 'Tile reserve must be initiated';
 export const EXTRACTION_SQUARE_ALREADY_FILLED = 'There is already a tile at the given Position';
 export const EXTRACTION_TILES_INVALID = 'The tiles to extract are not of the correct length';
+export const EXTRACTION_NO_WORDS_CREATED = "Aucun mot n'a été créé avec le placement de tuile.";
