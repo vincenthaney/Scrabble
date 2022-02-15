@@ -217,6 +217,12 @@ describe('BoardComponent', () => {
         expect(updateSpy).toHaveBeenCalledWith(mockBoardService.grid[0]);
     });
 
+    it('boardInitializationEvent should call initializeBoard', () => {
+        const updateSpy = spyOn<any>(component, 'initializeBoard');
+        mockBoardService.boardInitializationEvent.emit();
+        expect(updateSpy).toHaveBeenCalled();
+    });
+
     it('Update Board with no squares in argument should return false', () => {
         expect(component['updateBoard']([])).toBeFalsy();
     });

@@ -95,6 +95,4 @@ export class GameDispatcherController {
             this.canceledGameEvent.emit('Le créateur');
         }
     }
-
-    doNothing(){}
 }
