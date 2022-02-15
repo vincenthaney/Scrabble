@@ -1,15 +1,17 @@
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
-import { TestBed } from '@angular/core/testing';
-import { GameService } from '@app/services';
+/* eslint-disable dot-notation */
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import SocketService from '@app/services/socket/socket.service';
-import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
-import PlayerName from '@app/classes/communication/player-name';
-import { Socket } from 'socket.io-client';
-import { GameConfigData } from '@app/classes/communication/game-config';
+import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GameConfigData } from '@app/classes/communication/game-config';
+import PlayerName from '@app/classes/communication/player-name';
 import { GameType } from '@app/classes/game-type';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { GameService } from '@app/services';
+import SocketService from '@app/services/socket/socket.service';
 import { Observable, of, throwError } from 'rxjs';
+import { Socket } from 'socket.io-client';
 
 const DEFAULT_SOCKET_ID = 'testSocketID';
 const DEFAULT_PLAYER_NAME = 'grogars';
@@ -251,5 +253,53 @@ describe('GameDispatcherController', () => {
         });
         controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
         expect(errorSpy).toHaveBeenCalled();
+    });
+
+    it('handleJoinError should emit lobyFullEvent if error status is Unauthorized', () => {
+        const lobbyFullEmitSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callFake(() => {
+            return;
+        });
+        const canceledGameEmitSpy = spyOn(controller.canceledGameEvent, 'emit').and.callFake(() => {
+            return;
+        });
+        controller.handleJoinError(
+            new HttpErrorResponse({
+                status: HttpStatusCode.Unauthorized,
+            }),
+        );
+        expect(lobbyFullEmitSpy).toHaveBeenCalled();
+        expect(canceledGameEmitSpy).not.toHaveBeenCalled();
+    });
+
+    it('handleJoinError should emit canceledGameEvent if error status is Gone', () => {
+        const lobbyFullEmitSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callFake(() => {
+            return;
+        });
+        const canceledGameEmitSpy = spyOn(controller.canceledGameEvent, 'emit').and.callFake(() => {
+            return;
+        });
+        controller.handleJoinError(
+            new HttpErrorResponse({
+                status: HttpStatusCode.Gone,
+            }),
+        );
+        expect(lobbyFullEmitSpy).not.toHaveBeenCalled();
+        expect(canceledGameEmitSpy).toHaveBeenCalled();
+    });
+
+    it('handleJoinError should emit nothing if error status is not Unauthorized or Gone', () => {
+        const lobbyFullEmitSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callFake(() => {
+            return;
+        });
+        const canceledGameEmitSpy = spyOn(controller.canceledGameEvent, 'emit').and.callFake(() => {
+            return;
+        });
+        controller.handleJoinError(
+            new HttpErrorResponse({
+                status: HttpStatusCode.BadGateway,
+            }),
+        );
+        expect(lobbyFullEmitSpy).not.toHaveBeenCalled();
+        expect(canceledGameEmitSpy).not.toHaveBeenCalled();
     });
 });
