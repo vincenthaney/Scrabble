@@ -56,7 +56,6 @@
         "module-alias": "^2.2.2",
         "mongodb": "^4.1.0",
         "morgan": "^1.10.0",
-        "node-fetch": "^2.6.1",
         "prettier": "^2.3.2",
         "reflect-metadata": "^0.1.13",
         "serve-favicon": "~2.5.0",
