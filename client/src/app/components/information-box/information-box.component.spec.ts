@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';
 import { EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AbstractPlayer, Player } from '@app/classes/player';
@@ -157,11 +157,12 @@ describe('InformationBoxComponent', () => {
         expect(endRoundSpy).toHaveBeenCalled();
     });
 
-    it('ngAfterViewInit should call updateActivePlayerBorder', () => {
-        const spy = spyOn(component, 'ngAfterViewInit');
+    it('ngAfterViewInit should call updateActivePlayerBorder', fakeAsync(() => {
+        const spy = spyOn(component, 'updateActivePlayerBorder');
         component.ngAfterViewInit();
+        tick(1);
         expect(spy).toHaveBeenCalled();
-    });
+    }));
 
     it('ngOnDestroy should unsubscribe from subscriptions', () => {
         const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
