@@ -169,27 +169,6 @@ describe('GameDispatcherController', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should make an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
-        const httpPostSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
-        controller.handleLeaveGame(DEFAULT_GAME_ID);
-        expect(httpPostSpy).toHaveBeenCalled();
-    });
-
-    it('handleLeaveLobby should subscribe after making an HTTP delete request', () => {
-        // eslint-disable-next-line dot-notation
-        spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
-
-        const observable = new Observable();
-        // eslint-disable-next-line dot-notation
-        spyOn(controller['http'], 'delete').and.returnValue(observable);
-        const spy = spyOn(observable, 'subscribe');
-
-        controller.handleLeaveGame({} as unknown as string);
-
-        expect(spy).toHaveBeenCalled();
-    });
-
     it('handleLobbiesListRequest should make an HTTP get request ', () => {
         // eslint-disable-next-line dot-notation, @typescript-eslint/no-explicit-any
         const httpPostSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
