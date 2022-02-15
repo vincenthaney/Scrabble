@@ -31,14 +31,14 @@ export default class GameDispatcherService implements OnDestroy, IResetableServi
     joinRequestValidSubscription: Subscription;
     joinerRejectedSubscription: Subscription;
 
-    private gId: string | undefined;
+    private privateGameId: string | undefined;
 
     get gameId(): string | undefined {
-        return this.gId;
+        return this.privateGameId;
     }
 
     set gameId(gameId: string | undefined) {
-        this.gId = gameId;
+        this.privateGameId = gameId;
         this.gameIdUpdate.next(this.gameId);
     }
 
