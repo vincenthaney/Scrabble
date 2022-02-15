@@ -7,6 +7,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
+import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
@@ -62,10 +63,6 @@ export default class Game {
 
     static async createSoloGame(/* config: SoloGameConfig */): Promise<Game> {
         throw new Error('Solo mode not implemented');
-    }
-
-    static winnerMessage(winner: string): string {
-        return `Félicitations à ${winner} pour votre victoire!`;
     }
 
     getTilesFromReserve(amount: number): Tile[] {
@@ -143,7 +140,7 @@ export default class Game {
 
     endGameMessage(winnerName: string | undefined): string[] {
         const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
-        const winnerMessage = winnerName ? Game.winnerMessage(winnerName) : this.congratulateWinner();
+        const winnerMessage = winnerName ? WINNER_MESSAGE(winnerName) : this.congratulateWinner();
         messages.push(winnerMessage);
         return messages;
     }
@@ -157,7 +154,7 @@ export default class Game {
         } else {
             winner = this.player1.name + ' et ' + this.player2.name;
         }
-        return Game.winnerMessage(winner);
+        return WINNER_MESSAGE(winner);
     }
 
     isPlayer1(arg: string | Player): boolean {

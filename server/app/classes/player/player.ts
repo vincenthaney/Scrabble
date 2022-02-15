@@ -32,9 +32,4 @@ export default class Player {
     tilesToString(): string {
         return this.tiles.reduce((prev, next) => (prev += next.letter.toLocaleLowerCase()), '');
     }
-
-    forceLost(): void {
-        this.tiles = [];
-        this.score = 0;
-    }
 }

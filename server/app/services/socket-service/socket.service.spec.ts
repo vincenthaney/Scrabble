@@ -1,18 +1,19 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { expect } from 'chai';
-import { SocketService } from './socket.service';
+import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
+import { delay } from '@app/utils/delay';
 import { Server } from 'app/server';
+import { expect } from 'chai';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
-import { delay } from '@app/utils/delay';
-import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
+import { SocketService } from './socket.service';
 
 const RESPONSE_DELAY = 200;
 const SERVER_URL = 'http://localhost:';
 
 const DEFAULT_ROOM = 'default_room';
+const INVALID_ROOM_NAME = 'invalid_room';
 const INVALID_ID = 'invalid-id';
 const DEFAULT_ARGS = 'data';
 
@@ -134,6 +135,49 @@ describe('SocketService', () => {
             });
         });
 
+        describe('removeFromRoom', () => {
+            let id: string;
+            beforeEach(async () => {
+                await clientSocket.connect();
+                id = await getSocketId(clientSocket);
+                service.addToRoom(id, DEFAULT_ROOM);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
+            });
+
+            it('should remove socketId from room', () => {
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
+                service.removeFromRoom(id, DEFAULT_ROOM);
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
+            });
+        });
+
+        describe('doesRoomExist', () => {
+            let id: string;
+            beforeEach(async () => {
+                await clientSocket.connect();
+                id = await getSocketId(clientSocket);
+            });
+
+            afterEach(async () => {
+                await clientSocket.disconnect();
+            });
+
+            it('should return true if room has socket in it', () => {
+                service.addToRoom(id, DEFAULT_ROOM);
+                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
+                expect(service.doesRoomExist(DEFAULT_ROOM)).to.be.true;
+            });
+
+            it('should return false if room has no socket in it', () => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                service['sio']!.sockets.adapter.rooms.get(DEFAULT_ROOM)?.clear();
+                expect(service.doesRoomExist(DEFAULT_ROOM)).to.be.false;
+            });
+        });
+
         describe('emitToRoom', () => {
             let id: string;
 
@@ -220,6 +264,18 @@ describe('SocketService', () => {
         describe('deleteRoom', () => {
             it('should throw if ID is invalid', () => {
                 expect(() => service.deleteRoom(INVALID_ID)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
+            });
+        });
+
+        describe('removeFromRoom', () => {
+            it('should throw if ID is invalid', () => {
+                expect(() => service.removeFromRoom(INVALID_ID, INVALID_ROOM_NAME)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
+            });
+        });
+
+        describe('doesRoomExist', () => {
+            it('should throw if ID is invalid', () => {
+                expect(() => service.doesRoomExist(INVALID_ROOM_NAME)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
             });
         });
     });

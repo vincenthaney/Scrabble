@@ -1,8 +1,6 @@
-import { ActionData } from '@app/classes/communication/action-data';
 import Game from '@app/classes/game/game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
-import Player from '@app/classes/player/player';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { EventEmitter } from 'events';
@@ -45,17 +43,5 @@ export class ActiveGameService {
 
     isGameOver(gameId: string, playerId: string): boolean {
         return this.getGame(gameId, playerId).isGameOver();
-    }
-
-    forcePlayerLose(gameId: string, playerId: string): ActionData {
-        const game = this.getGame(gameId, playerId);
-        const playerLost: Player = game.player1.getId() === playerId ? game.player1 : game.player2;
-        playerLost.forceLost();
-
-        return {
-            type: 'pass',
-            payload: {},
-            input: '',
-        };
     }
 }
