@@ -127,10 +127,10 @@ describe('GameDispatcherService', () => {
         service.currentName = 'default name';
         service.gameId = 'default game id';
 
-        service.resetData();
+        service.resetServiceData();
         expect(service.currentLobby).toBeUndefined();
         expect(service.currentName).toEqual('');
-        expect(service.gameId).toBeUndefined();
+        expect(service.gameId).toEqual('');
     });
 
     describe('handleJoinLobby', () => {
@@ -164,36 +164,6 @@ describe('GameDispatcherService', () => {
         });
         service.handleLobbyListRequest();
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
-    });
-
-    describe('handleLeaveLobby', () => {
-        let spyHandleLobbyJoinRequest: jasmine.Spy;
-
-        beforeEach(() => {
-            spyHandleLobbyJoinRequest = spyOn<any>(gameDispatcherControllerMock, 'handleLeaveLobby').and.callFake(() => {
-                return;
-            });
-        });
-
-        it('handleLeaveLobby should always call resetData', () => {
-            const spy = spyOn(service, 'resetData').and.callFake(() => {
-                return;
-            });
-            service.handleLeaveLobby();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('handleLeaveLobby should call gameDispatcherController.handleLobbiesListRequest if gameId is defined', () => {
-            service.gameId = 'game Id';
-            service.handleLeaveLobby();
-            expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
-        });
-
-        it('handleLeaveLobby should NOT call gameDispatcherController.handleLobbiesListRequest if gameId is undefined', () => {
-            service.gameId = undefined;
-            service.handleLeaveLobby();
-            expect(spyHandleLobbyJoinRequest).not.toHaveBeenCalled();
-        });
     });
 
     it('handleCreateGame should call gameDispatcherController.handleMultiplayerGameCreation \

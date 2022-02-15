@@ -13,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export default class GameDispatcherService implements OnDestroy {
     serviceDestroyed$: Subject<boolean> = new Subject();
-    gameId: string | undefined;
+    gameId: string;
     currentLobby: LobbyInfo | undefined;
     currentName: string;
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
@@ -63,10 +63,10 @@ export default class GameDispatcherService implements OnDestroy {
         this.serviceDestroyed$.complete();
     }
 
-    resetData(): void {
+    resetServiceData(): void {
         this.currentLobby = undefined;
         this.currentName = '';
-        this.gameId = undefined;
+        this.gameId = '';
     }
 
     handleJoinLobby(lobby: LobbyInfo, playerName: string): void {
@@ -93,7 +93,7 @@ export default class GameDispatcherService implements OnDestroy {
 
     handleCancelGame(): void {
         if (this.gameId) this.gameDispatcherController.handleCancelGame(this.gameId);
-        this.resetData();
+        this.resetServiceData();
     }
 
     handleConfirmation(opponentName: string): void {
@@ -110,7 +110,7 @@ export default class GameDispatcherService implements OnDestroy {
 
     handleJoinerRejected(hostName: string): void {
         this.joinerRejectedEvent.emit(hostName);
-        this.resetData();
+        this.resetServiceData();
     }
 
     handleLobbiesUpdate(lobbies: LobbyInfo[]): void {
@@ -119,12 +119,12 @@ export default class GameDispatcherService implements OnDestroy {
 
     handleLobbyFull(): void {
         this.lobbyFullEvent.emit();
-        this.resetData();
+        this.resetServiceData();
     }
 
     handleCanceledGame(hostName: string): void {
         this.canceledGameEvent.emit(hostName);
-        this.resetData();
+        this.resetServiceData();
     }
 
     handleJoinerLeaveGame(leaverName: string): void {
