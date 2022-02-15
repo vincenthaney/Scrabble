@@ -2,7 +2,7 @@ import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
-import { GameService } from '@app/services';
+import GameService from '@app/services/game/game.service';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -17,9 +17,7 @@ export class GameDispatcherController implements OnDestroy {
     leaveLobbyEvent: EventEmitter<string> = new EventEmitter();
     lobbyFullEvent: EventEmitter<void> = new EventEmitter();
     lobbyRequestValidEvent: EventEmitter<void> = new EventEmitter();
-
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
-    joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
     serviceDestroyed$: Subject<boolean> = new Subject();
