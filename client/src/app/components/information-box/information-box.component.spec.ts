@@ -154,7 +154,7 @@ describe('InformationBoxComponent', () => {
 
     it('ngOnInit endRoundEvent subscription should call endRound', () => {
         const endRoundSpy = spyOn(component, 'endRound');
-        mockGameService.rerenderEvent.emit();
+        mockRoundManager.endRoundEvent.emit();
         expect(endRoundSpy).toHaveBeenCalled();
     });
 
@@ -162,7 +162,7 @@ describe('InformationBoxComponent', () => {
         const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
         const ngOnInitSpy = spyOn(component, 'ngOnInit');
         const ngAfterViewInitSpy = spyOn(component, 'ngAfterViewInit');
-        mockRoundManager.endRoundEvent.emit();
+        mockGameService.rerenderEvent.emit();
         expect(ngOnDestroySpy).toHaveBeenCalled();
         expect(ngOnInitSpy).toHaveBeenCalled();
         expect(ngAfterViewInitSpy).toHaveBeenCalled();
