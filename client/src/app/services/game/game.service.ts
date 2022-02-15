@@ -145,13 +145,4 @@ export default class GameService implements OnDestroy {
     gameOver(): boolean {
         throw new Error('Method not implemented.');
     }
-
-    sendScores(): void {
-        throw new Error('Method not implemented.');
-    }
-
-    // TODO: Maybe rename to sendGame or sendFinishedGame
-    sendGameHistory(): void {
-        throw new Error('Method not implemented.');
-    }
 }
