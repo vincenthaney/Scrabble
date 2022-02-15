@@ -64,8 +64,6 @@ export default class GameDispatcherService implements OnDestroy, IResetServiceDa
     }
 
     resetServiceData() {
-        // eslint-disable-next-line no-console
-        console.log('GameDispatcher reset');
         this.currentLobby = undefined;
         this.currentName = '';
         this.gameId = '';
