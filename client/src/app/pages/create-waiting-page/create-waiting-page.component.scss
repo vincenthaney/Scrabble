@@ -1,0 +1,35 @@
+.center{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    gap: 5px;
+}
+.sameline{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+}
+
+.button{
+    margin-bottom: 6px;
+    width: 100%;
+
+}
+
+.button-box{
+    display: flex;
+    flex-direction: column;
+    height: 35%;
+    width: 25%;
+    align-content: center;
+}
+
+.image{
+    padding: 20px;
+    justify-self: center;
+    align-self: center;
+}

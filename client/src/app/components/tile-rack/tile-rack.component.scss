@@ -1,0 +1,57 @@
+$tile-size: 50px;
+
+#rack-grid mat-card {
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    gap: 18px;
+    align-self: center;
+    padding: 12px 16px;
+
+    #rack-card-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: solid 2px rgb(207, 207, 207);
+        border-radius: 8px;
+        padding: 6px;
+
+        app-tile {
+            display: block;
+            height: $tile-size;
+            width: $tile-size;
+            transition: ease-in transform 0.1s;
+
+            &:not(:last-child) {
+                margin-right: 12px;
+            }
+
+            &:hover {
+                transform: translateY(-15%) scale(1.05);
+                transition: ease-in transform 0.15s;
+            }
+
+            &.hidden {
+                display: none !important;
+                visibility: hidden !important;
+            }
+        }
+    }
+
+    #rack-button-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+
+        & > button, & > div {
+            font-size: 0.95em;
+            
+            &:not(:last-child) {
+                margin-bottom: 6px;
+            }
+
+            & > button {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -1,0 +1,147 @@
+@import '../../style/utils.scss';
+
+$name-score-spacing: 12px;
+$primary-color: #1b5e20;
+
+#outer-container {
+    @include no-select;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+
+    #inner-container {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 24px;
+        padding: 8px 12px;
+        box-sizing: border-box;
+
+        p {
+            @include no-select;
+            cursor: default;
+            margin: 0;
+            line-height: 1em;
+        }
+
+        .player-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .player-name {
+                line-height: 1.2em;
+                font-size: 1.5em;
+                font-weight: 500;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                span.name {
+                    display: inline-flex;
+                    align-items: center;
+                    app-icon {
+                        font-size: 0.75em;
+                        color: $primary-color;
+                    }
+                }
+
+                .score {
+                    vertical-align: middle;
+                    font-weight: 400;
+                    background: $primary-color;
+                    color: white;
+                    font-size: 0.7em;
+                    padding: 0.2em 0.5em;
+                    border-radius: 20px;
+                }
+
+                &:not(:last-child) {
+                    margin-bottom: 3px;
+                }
+            }
+
+            &.active-player {
+                border-color: burlywood;
+                border-radius: 4px;
+                border-width: 2px;
+                border-style: solid;
+            }
+
+            &#player-info-1 {
+                text-align: left;
+
+                &.active-player {
+                    margin-right: 50%;
+                    padding-left: 5px;
+                }
+
+                .player-name {
+                    .score {
+                        margin-left: $name-score-spacing;
+                        font-weight: 400;
+                    }
+                    span.name app-icon {
+                        margin-right: 0.35em;
+                    }
+                }
+            }
+            &#player-info-2 {
+                text-align: right;
+
+                &.active-player {
+                    margin-left: 50%;
+                    padding-right: 5px;
+                }
+
+                .player-name {
+                    .score {
+                        margin-right: $name-score-spacing;
+                        font-weight: 400;
+                    }
+                    span.name app-icon {
+                        margin-left: 0.35em;
+                    }
+                }
+            }
+        }
+
+        #time-left-container {
+            text-align: center;
+            #time-left {
+                font-size: 2em;
+                font-weight: 500;
+                margin-top: 4px;
+
+                .separator {
+                    @keyframes blinking {
+                        0% {
+                            visibility: visible;
+                            opacity: 1;
+                        }
+                        74% {
+                            visibility: visible;
+                            opacity: 1;
+                        }
+                        75% {
+                            visibility: hidden;
+                            opacity: 0;
+                        }
+                        100% {
+                            visibility: hidden;
+                            opacity: 0;
+                        }
+                    }
+
+                    animation-name: blinking;
+                    animation-duration: 1.2s;
+                    animation-iteration-count: infinite;
+                }
+            }
+        }
+    }
+}

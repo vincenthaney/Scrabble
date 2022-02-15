@@ -1,0 +1,22 @@
+<div class="form-group">
+    <mat-form-field appearance="outline" [formGroup]="formParameters">
+        <mat-label >Choisissez votre nom de joueur</mat-label>
+        <input matInput id="playerNameValidator" type="text" formControlName="inputName" autocomplete="off" (ngModelChange)="onNameChange($event)">
+    </mat-form-field>
+    <span class="alert-group" *ngIf="formParameters.get('inputName')?.invalid &&
+    (formParameters.get('inputName')?.dirty || formParameters.get('inputName')?.touched)">
+        <mat-error class="alert" *ngIf="formParameters.get('inputName')?.errors?.['minlength']">
+            {{errorNameTooShort}}
+        </mat-error>
+        <mat-error  class="alert"*ngIf="formParameters.get('inputName')?.errors?.['maxlength']">
+            {{errorNameTooLong}}
+        </mat-error>
+        <mat-error class="alert" *ngIf="formParameters.get('inputName')?.errors?.pattern &&
+        !formParameters.get('inputName')?.errors?.maxlength &&
+        !formParameters.get('inputName')?.errors?.minlength">
+           {{errorNameNoMatchRegex}}
+        </mat-error>
+    </span>
+</div>
+
+
