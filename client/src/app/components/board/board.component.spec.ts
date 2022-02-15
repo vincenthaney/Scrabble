@@ -1,6 +1,9 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { CommonModule } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,12 +16,19 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { Message } from '@app/classes/communication/message';
+import { Orientation } from '@app/classes/orientation';
 import { Square, SquareView } from '@app/classes/square';
+import { Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
+
+const OUT_OF_BOUNDS_POSITION = 999;
 
 class MockBoardService {
     static boardServiceGridSize: Vec2 = { x: 5, y: 5 };
@@ -99,6 +109,8 @@ describe('BoardComponent', () => {
                 MatFormFieldModule,
                 FormsModule,
                 MatDialogModule,
+                RouterTestingModule,
+                HttpClientTestingModule,
             ],
             declarations: [BoardComponent],
             providers: [{ provide: BoardService, useValue: mockBoardService }],
@@ -293,5 +305,99 @@ describe('BoardComponent', () => {
         ];
         component['updateBoard'](squaresToUpdate);
         expect(component.squareGrid).toEqual(initBoard);
+    });
+
+    it('should call handlePlaceTiles on playingTiles', () => {
+        const spy = spyOn<any>(component, 'handlePlaceTiles');
+        component['gameService'].playingTiles.emit();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    describe('isInBounds', () => {
+        it('return true if is in bound', () => {
+            const position = { row: 0, column: 0 };
+            expect(component['isInBounds'](position)).toBeTrue();
+        });
+        it('return false if is not in bound', () => {
+            const position = { row: OUT_OF_BOUNDS_POSITION, column: OUT_OF_BOUNDS_POSITION };
+            expect(component['isInBounds'](position)).toBeFalse();
+        });
+    });
+
+    describe('handlePlaceTiles', () => {
+        let payload: ActionPlacePayload;
+
+        beforeEach(() => {
+            payload = {
+                tiles: [new Tile('A', 0), new Tile('B', 0)],
+                orientation: Orientation.Horizontal,
+                startPosition: { row: 0, column: 0 },
+            };
+        });
+
+        it('should add squareView to notAppliedSquares', () => {
+            component['handlePlaceTiles'](payload);
+
+            expect(component['notAppliedSquares'].length).toEqual(payload.tiles.length);
+        });
+
+        it('should place tiles on grid', () => {
+            component['handlePlaceTiles'](payload);
+
+            for (let i = 0; i < payload.tiles.length; ++i) {
+                expect(component.squareGrid[0][i].square.tile).toBeDefined();
+                expect(component.squareGrid[0][i].square.tile!.letter).toEqual(payload.tiles[i].letter);
+                expect(component.squareGrid[0][i].square.tile!.value).toEqual(payload.tiles[i].value);
+                expect(component.squareGrid[0][i].applied).toBeFalse();
+            }
+        });
+
+        it('should place tiles on grid', () => {
+            payload.orientation = Orientation.Vertical;
+
+            component['handlePlaceTiles'](payload);
+
+            for (let i = 0; i < payload.tiles.length; ++i) {
+                expect(component.squareGrid[i][0].square.tile).toBeDefined();
+                expect(component.squareGrid[i][0].square.tile!.letter).toEqual(payload.tiles[i].letter);
+                expect(component.squareGrid[i][0].square.tile!.value).toEqual(payload.tiles[i].value);
+                expect(component.squareGrid[i][0].applied).toBeFalse();
+            }
+        });
+
+        it('should not place tiles when position is out of bounds', () => {
+            payload.startPosition.column = OUT_OF_BOUNDS_POSITION;
+
+            component['handlePlaceTiles'](payload);
+
+            expect(component.squareGrid[0].some((sv) => sv.square.tile !== null)).toBeFalse();
+        });
+
+        it('should not change tile if applied is true', () => {
+            component.squareGrid[0][1].square.tile = new Tile('Z', 0);
+            component.squareGrid[0][1].applied = true;
+
+            component['handlePlaceTiles'](payload);
+
+            expect(component.squareGrid[0][1].square.tile).toBeDefined();
+            expect(component.squareGrid[0][1].square.tile!.letter).not.toEqual(payload.tiles[1].letter);
+            expect(component.squareGrid[0][1].applied).toBeTrue();
+        });
+    });
+
+    describe('handleNewMessage', () => {
+        beforeEach(() => {
+            (component['notAppliedSquares'] as unknown[]) = [{ square: { tile: 1 } }, { square: { tile: 2 } }];
+        });
+
+        it('should clear notAppliedSquares', () => {
+            component['handleNewMessage']({ senderId: 'system-error' } as Message);
+            expect(component['notAppliedSquares'].length).toEqual(0);
+        });
+
+        it('should remove tiles from notAppliedSquares', () => {
+            component['handleNewMessage']({ senderId: 'system-error' } as Message);
+            expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeTrue();
+        });
     });
 });

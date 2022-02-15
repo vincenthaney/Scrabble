@@ -26,7 +26,8 @@ section#text-box-container {
             }
 
             .scroll-item {
-                //padding: 0 12px;
+                padding: 0 12px;
+                box-sizing: border-box;
 
                 p {
                     margin: 0;

@@ -14,6 +14,7 @@ import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -37,6 +38,7 @@ export default class GameService implements OnDestroy {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    playingTiles: EventEmitter<ActionPlacePayload>;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     private gameId: string;
@@ -53,6 +55,7 @@ export default class GameService implements OnDestroy {
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.updateTileReserveEvent = new EventEmitter();
+        this.playingTiles = new EventEmitter();
     }
 
     ngOnDestroy(): void {

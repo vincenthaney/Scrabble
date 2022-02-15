@@ -35,6 +35,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
 
+    loading: boolean = false;
+
     constructor(
         private inputParser: InputParserService,
         private gameService: GameService,
@@ -92,9 +94,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
-        if (message && message.length > 0) {
+        if (message && message.length > 0 && !this.loading) {
             this.inputParser.parseInput(message);
             this.messageForm.reset({ content: '' });
+            this.loading = true;
         }
     }
 
@@ -102,6 +105,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
+        if (!this.isOpponent(newMessage.senderId)) this.loading = false;
+    }
+
+    isOpponent(id: string) {
+        return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
     onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {

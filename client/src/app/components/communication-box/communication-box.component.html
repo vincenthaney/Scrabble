@@ -29,8 +29,8 @@
             <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
                 <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici" #messageInput />
                 <div matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
-                    <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid">
-                        <app-icon icon="arrow-right"></app-icon>
+                    <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid || loading">
+                        <app-icon [icon]="loading ? 'spinner-third' : 'arrow-right'" [animation]="loading ? 'spin' : undefined"></app-icon>
                     </button>
                 </div>
             </form>
