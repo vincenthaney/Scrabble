@@ -240,13 +240,9 @@ export class GameDispatcherController {
             const disconnectedPlayer = game.getRequestingPlayer(playerId);
             disconnectedPlayer.isConnected = false;
             setTimeout(() => {
-                // eslint-disable-next-line no-console
-                console.log('setTimeout EXPIRE ');
-
                 if (!disconnectedPlayer.isConnected) {
                     // END GAME
-                    // eslint-disable-next-line no-console
-                    console.log('setTimeout GIVEUP ');
+                    // this.handleLeave(gameId, playerId);
                 }
             }, TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
         }
