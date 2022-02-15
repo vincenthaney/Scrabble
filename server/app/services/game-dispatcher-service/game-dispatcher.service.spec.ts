@@ -5,9 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
 import Game from '@app/classes/game/game';
-import { GameConfigData } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game.type';
 import WaitingRoom from '@app/classes/game/waiting-room';
+import Player from '@app/classes/player/player';
 import { TileReserve } from '@app/classes/tile';
 import {
     CANNOT_HAVE_SAME_NAME,
@@ -291,6 +292,32 @@ describe('GameDispatcherService', () => {
         it('should throw when id is invalid', () => {
             const invalidId = 'invalidId';
             expect(() => gameDispatcherService['getGameFromId'](invalidId)).to.throw(NO_GAME_FOUND_WITH_ID);
+        });
+    });
+
+    describe('isGameInWaitingRooms', () => {
+        const stubPlayer: SinonStubbedInstance<Player> = createStubInstance(Player);
+        const config: GameConfig = {
+            player1: stubPlayer as unknown as Player,
+            gameType: GameType.Classic,
+            maxRoundTime: 60,
+            dictionary: 'francais',
+        };
+        let waitingRooms: WaitingRoom[];
+
+        beforeEach(() => {
+            waitingRooms = [new WaitingRoom(config)];
+            gameDispatcherService['waitingRooms'] = waitingRooms;
+        });
+
+        it('should return false if gameId is not associated to game in waitingRooms', () => {
+            const gameId = 'NOT_EXISTING_ID';
+            expect(gameDispatcherService.isGameInWaitingRooms(gameId)).to.be.false;
+        });
+
+        it('should return true if gameId is associated to game in waitingRooms', () => {
+            const gameId = waitingRooms[0].getId();
+            expect(gameDispatcherService.isGameInWaitingRooms(gameId)).to.be.true;
         });
     });
 });
