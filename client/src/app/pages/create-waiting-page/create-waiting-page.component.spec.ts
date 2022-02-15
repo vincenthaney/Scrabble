@@ -80,6 +80,7 @@ describe('CreateWaitingPageComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
     it('waitingRoomMessage should change the attributes according to the opponent name', async () => {
         component.setOpponent(testOpponentName);
         expect(component.waitingRoomMessage).toEqual(testOpponentName + OPPONENT_FOUND_MESSAGE);
@@ -97,7 +98,7 @@ describe('CreateWaitingPageComponent', () => {
 
     it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
         const spySubscribeJoinRequestEvent = spyOn(gameDispatcherServiceMock.joinRequestEvent, 'subscribe').and.returnValue(of(true) as any);
-        const spySubscribeJoinerLeaveGameEvent = spyOn(gameDispatcherServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
+        const spySubscribeJoinerLeaveGameEvent = spyOn(playerLeavesServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
 
         component.ngOnInit();
         expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
@@ -217,7 +218,7 @@ describe('CreateWaitingPageComponent', () => {
             const spyOpponentLeft = spyOn(component, 'opponentLeft').and.callFake(() => {
                 return;
             });
-            gameDispatcherServiceMock.joinerLeaveGameEvent.emit(emitName);
+            playerLeavesServiceMock.joinerLeaveGameEvent.next(emitName);
             expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
         });
     });
