@@ -390,7 +390,7 @@ describe('GameDispatcherService', () => {
 
     describe('handleJoinerLeaveGame', () => {
         it('should emit to joinRequestEvent', () => {
-            const spy = spyOn(service.joinerLeaveGameEvent, 'emit');
+            const spy = spyOn(service['joinerLeaveGameEvent'], 'emit');
             service.handleJoinerLeaveGame(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });

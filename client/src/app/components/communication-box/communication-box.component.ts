@@ -8,9 +8,9 @@ import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { marked } from 'marked';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { marked } from 'marked';
 
 export type LetterMapItem = { letter: LetterValue; amount: number };
 
