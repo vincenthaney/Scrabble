@@ -28,6 +28,8 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
 import { BoardComponent } from './board.component';
 
+const OUT_OF_BOUNDS_POSITION = 999;
+
 class MockBoardService {
     static boardServiceGridSize: Vec2 = { x: 5, y: 5 };
     pGrid: Square[][];
@@ -316,7 +318,7 @@ describe('BoardComponent', () => {
             expect(component['isInBounds'](position)).toBeTrue();
         });
         it('return false if is not in bound', () => {
-            const position = { row: 9999, column: 9999 };
+            const position = { row: OUT_OF_BOUNDS_POSITION, column: OUT_OF_BOUNDS_POSITION };
             expect(component['isInBounds'](position)).toBeFalse();
         });
     });
@@ -363,7 +365,7 @@ describe('BoardComponent', () => {
         });
 
         it('should not place tiles when position is out of bounds', () => {
-            payload.startPosition.column = 999;
+            payload.startPosition.column = OUT_OF_BOUNDS_POSITION;
 
             component['handlePlaceTiles'](payload);
 
