@@ -140,6 +140,7 @@ export class GameDispatcherController {
 
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (e) {
+                console.log(e);
                 HttpException.sendError(e, res);
             }
         });

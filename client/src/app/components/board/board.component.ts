@@ -68,9 +68,6 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
-        console.log(squaresToUpdate.length);
-        console.log(this.gridSize.x * this.gridSize.y);
-        console.log(squaresToUpdate.length > this.gridSize.x * this.gridSize.y);
         if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
 
         /* 

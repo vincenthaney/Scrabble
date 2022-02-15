@@ -39,9 +39,10 @@ export default class GameService implements OnDestroy {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
+    rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
     serviceDestroyed$: Subject<boolean> = new Subject();
-
+    gameIsSetUp: boolean;
     private gameId: string;
     private localPlayerId: string;
 
@@ -60,13 +61,11 @@ export default class GameService implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        console.log('ngOnDestroy GameService');
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
-        console.log('initializeMultiplayerGame');
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -80,21 +79,18 @@ export default class GameService implements OnDestroy {
         this.tileReserve = startGameData.tileReserve;
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
-        this.roundManager.startRound(startGameData.maxRoundTime);
         // await this.router.navigateByUrl('/', { skipLocationChange: true }).then(async () => this.router.navigateByUrl('game'));
+        this.gameIsSetUp = true;
         if (this.router.url !== '/game') {
+            this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');
         } else {
-            console.log('reco');
-            console.log(startGameData);
-            this.updateTileRackEvent.emit();
-            const board1D: Square[] = [];
-            const board1D1: Square[] = board1D.concat(...startGameData.board);
-
-            console.log(board1D1);
-            console.log(this.boardService.updateBoard(board1D1));
             this.player1.updatePlayerData(startGameData.player1);
             this.player2.updatePlayerData(startGameData.player2);
+            this.rerenderEvent.emit();
+            this.updateTileRackEvent.emit();
+            const board1D: Square[] = ([] as Square[]).concat(...startGameData.board);
+            this.boardService.updateBoard(board1D);
             
             this.roundManager.continueRound(this.roundManager.convertRoundDataToRound(startGameData.round));
             this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
@@ -168,26 +164,23 @@ export default class GameService implements OnDestroy {
     }
 
     reconnectGame() {
-        console.log(`gameService gameId : ${this.gameId}`);
-
         const gameIdCookie = this.getCookie('gameId');
         const socketIdCookie = this.getCookie('socketId');
-        console.log(`reconnectGame gameId : ${gameIdCookie}`);
-        console.log(`reconnectGame socketIdCookie : ${socketIdCookie}`);
-        console.log(`reconnectGame newSocketId : ${this.socketService.getId()}`);
+        // console.log(`reconnectGame gameId : ${gameIdCookie}`);
+        // console.log(`reconnectGame socketIdCookie : ${socketIdCookie}`);
+        // console.log(`reconnectGame newSocketId : ${this.socketService.getId()}`);
 
         if (gameIdCookie !== '' && socketIdCookie !== '') {
             this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
         } else {
-            console.log(`noActiveGameEvent emit`);
             this.noActiveGameEvent.emit();
         }
     }
 
-    disconnectGame() {
+    async disconnectGame() {
         const gameId = this.gameId;
-        console.log(`disconnect gameId : ${gameId}`);
-        console.log(`disconnect socketId : ${this.getLocalPlayerId()}`);
+        // console.log(`disconnect gameId : ${gameId}`);
+        // console.log(`disconnect socketId : ${this.getLocalPlayerId()}`);
         this.setCookie('gameId', gameId, 5);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         this.setCookie('socketId', this.getLocalPlayerId()!, 5);
@@ -199,7 +192,7 @@ export default class GameService implements OnDestroy {
         this.player2.id = '';
         this.localPlayerId = '';
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.gameController.handleDisconnection(gameId, localPlayerId);
+        await this.gameController.handleDisconnection(gameId, localPlayerId);
     }
 
     setCookie(username: string, value: string, expiry: number) {

@@ -27,42 +27,45 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     timerSource: Observable<number>;
     timerSubscription: Subscription;
     endRoundSubscription: Subscription;
+    rerenderSubscription: Subscription;
     private ngUnsubscribe: Subject<void>;
 
     constructor(private roundManager: RoundManagerService, private gameService: GameService) {}
 
     ngOnInit() {
-        this.ngUnsubscribe = new Subject();
         this.timer = new Timer(0, 0);
-        // if (!this.roundManager.timer) return;
-        // this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
-        //     this.startTimer(timer);
-        //     this.updateActivePlayerBorder(activePlayer);
-                this.roundManager.timer.subscribe(([timer, activePlayer]) => {
-            this.startTimer(timer);
-            this.updateActivePlayerBorder(activePlayer);
+        this.ngUnsubscribe = new Subject();
+        this.rerenderSubscription = this.gameService.rerenderEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+            this.ngOnDestroy();
+            this.ngOnInit();
+            this.ngAfterViewInit();
         });
+        if (this.gameService.gameIsSetUp) {
+            if (!this.roundManager.timer) return;
+            this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
+                this.startTimer(timer);
+                this.updateActivePlayerBorder(activePlayer);
+            });
+            if (!this.roundManager.endRoundEvent) return;
+            this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
 
-        // if (!this.roundManager.endRoundEvent) return;
-        this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
-
-        this.isPlayer1 = this.getIsPlayer1();
-        this.localPlayerIcon = this.getLocalPlayerIcon();
+            this.isPlayer1 = this.getIsPlayer1();
+            this.localPlayerIcon = this.getLocalPlayerIcon();
+        }
     }
 
     ngAfterViewInit() {
-        this.updateActivePlayerBorder(this.roundManager.getActivePlayer());
+        if (this.gameService.gameIsSetUp) this.updateActivePlayerBorder(this.roundManager.getActivePlayer());
     }
 
     ngOnDestroy(): void {
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
-        this.timerSubscription.unsubscribe();
-        this.endRoundSubscription.unsubscribe();
+        if (this.timerSubscription) this.timerSubscription.unsubscribe();
+        if (this.endRoundSubscription) this.endRoundSubscription.unsubscribe();
     }
 
     startTimer(timer: Timer) {
-        console.log('INFOBOX start timer');
         this.timer = timer;
         this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
         this.timerSubscription = this.timerSource.subscribe(() => this.timer.decrement());

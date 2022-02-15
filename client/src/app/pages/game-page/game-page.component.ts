@@ -37,22 +37,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.focusableComponentService.emitKeyboard(event);
     }
 
-    // TODO: Fix if player goes to /game or change attribute when game starts
-    // @HostListener('window:beforeunload')
-    // onBeforeUnload() {
-    //     console.log('beforeunload');
-    //     // if (this.gameService.getGameId()) {
-    //     //     console.log('beforeunloadAVEC GAMEID');
-    //     //     this.gameService.disconnectGame();
-    //     // }
-    // }
-
     @HostListener('window:beforeunload')
-    ngOnDestroy(): void {
-        console.log('ngOnDestroy gamepage');
+    async ngOnDestroy(): Promise<void> {
         if (this.gameService.getGameId()) {
-            console.log('ngOnDestroy gamepage AVEC GAMEID');
-            this.gameService.disconnectGame();
+            await this.gameService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
@@ -62,11 +50,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe(() => this.noActiveGameDialog());
-            
         this.gameService.getGameId();
-        console.log('ngOnInit game page');
         if (!this.gameService.getGameId()) {
-            console.log('ngOnInit SANS GAMEID');
             this.gameService.reconnectGame();
         }
     }

@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
-import { GameInfoData } from '@app/classes/communication/game-info';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { SYSTEM_ID } from '@app/constants/game';
@@ -14,8 +13,6 @@ import { environment } from 'src/environments/environment';
 })
 export class GamePlayController {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    // TODO: Fix
-    gameInfoData = new BehaviorSubject<GameInfoData>({} as unknown as GameInfoData);
     newMessageValue = new BehaviorSubject<Message>({
         content: 'Début de la partie',
         senderId: SYSTEM_ID,
@@ -26,21 +23,10 @@ export class GamePlayController {
     }
 
     configureSocket(): void {
-        // this.socketService.on('gameInfo', (newData: GameInfoData) => this.gameInfoData.next(newData));
-        // this.socketService.on('startGame', async (startGameData: StartMultiplayerGameData[]) =>
-        // this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]),
-    // );
-
         this.socketService.on('gameUpdate', (newData: GameUpdateData[]) => {
-            // eslint-disable-next-line no-console
-            // console.log('game update player1: ' + newData[0].player1?.score);
-            // eslint-disable-next-line no-console
-            // console.log('game update player2: ' + newData[0].player2?.score);
             this.gameUpdateValue.next(newData[0]);
         });
         this.socketService.on('newMessage', (newMessage: Message[]) => {
-            // eslint-disable-next-line no-console
-            // console.log('game update message: ' + newMessage[0].content);
             this.newMessageValue.next(newMessage[0]);
         });
     }
@@ -61,14 +47,22 @@ export class GamePlayController {
     }
 
     handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
-        console.log(`handleReconnection a: ${environment.serverUrl}/games/${gameId}/player/${playerId}/reconnect`);
-        console.log(newPlayerId);
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/reconnect`;
         this.http.post(endpoint, { newPlayerId }).subscribe();
     }
 
     handleDisconnection(gameId: string, playerId: string) {
         const endpoint = `${environment.serverUrl}/games/${gameId}/player/${playerId}/disconnect`;
-        this.http.delete(endpoint).subscribe();
+        this.http.delete(endpoint, { observe: 'response' }).subscribe(
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            () => {},
+            (error) => {
+                // eslint-disable-next-line no-empty
+                if (error.status === 0) {
+                } else {
+                    throw new Error(error);
+                }
+            },
+        );
     }
 }
