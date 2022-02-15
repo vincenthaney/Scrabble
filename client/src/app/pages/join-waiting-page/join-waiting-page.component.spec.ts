@@ -78,7 +78,8 @@ describe('JoinWaitingPageComponent', () => {
     });
 
     it('cancelButton should send to GameDispatcher service that the joining player has left', async () => {
-        const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleLeaveLobby').and.callFake(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const gameDispatcherSpy = spyOn<any>(gameDispatcherServiceMock, 'playerRejected').and.callFake(() => {
             return;
         });
         const cancelButton = fixture.debugElement.nativeElement.querySelector('#cancel-button');
