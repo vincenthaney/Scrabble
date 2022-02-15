@@ -113,7 +113,7 @@ describe('BoardComponent', () => {
                 HttpClientTestingModule,
             ],
             declarations: [BoardComponent],
-            providers: [{ provide: BoardService, useValue: mockBoardService }, MockBoardService],
+            providers: [{ provide: BoardService, useValue: mockBoardService }],
         }).compileComponents();
     });
 
@@ -121,6 +121,7 @@ describe('BoardComponent', () => {
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+
         mockBoardService.createGrid();
         component['initializeBoard'](mockBoardService.grid);
     });

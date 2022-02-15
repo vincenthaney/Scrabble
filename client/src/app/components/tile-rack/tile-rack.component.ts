@@ -3,6 +3,7 @@ import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { Message } from '@app/classes/communication/message';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
+import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -15,7 +16,8 @@ export type RackTile = Tile & { played?: boolean };
     styleUrls: ['./tile-rack.component.scss'],
 })
 export class TileRackComponent implements OnInit, OnDestroy {
-    tiles: RackTile[];
+    tiles: Tile[];
+    tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
     updateTileRackSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
 

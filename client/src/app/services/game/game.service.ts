@@ -8,10 +8,10 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ID } from '@app/constants/game';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
@@ -120,9 +120,12 @@ export default class GameService implements OnDestroy {
         this.newMessageValue.next(newMessage);
     }
 
+    getPlayingPlayerId(): string {
+        return this.roundManager.getActivePlayer().id;
+    }
+
     isLocalPlayerPlaying(): boolean {
-        if (!this.localPlayerId || !this.roundManager.getActivePlayer()) return false;
-        return this.localPlayerId === this.roundManager.getActivePlayer().id;
+        return this.getPlayingPlayerId() === this.localPlayerId;
     }
 
     getGameId(): string {
