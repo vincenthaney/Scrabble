@@ -40,7 +40,13 @@ describe('GameService', () => {
 
     beforeEach(() => {
         boardServiceSpy = jasmine.createSpyObj('BoardService', ['initializeBoard', 'updateBoard']);
-        roundManagerSpy = jasmine.createSpyObj('RoundManagerService', ['convertRoundDataToRound', 'startRound', 'updateRound', 'getActivePlayer']);
+        roundManagerSpy = jasmine.createSpyObj('RoundManagerService', [
+            'convertRoundDataToRound',
+            'startRound',
+            'updateRound',
+            'getActivePlayer',
+            'initialize',
+        ]);
         gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
     });
 
