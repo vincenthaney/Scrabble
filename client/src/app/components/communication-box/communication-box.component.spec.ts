@@ -15,7 +15,7 @@ import { Player } from '@app/classes/player';
 import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
@@ -43,6 +43,10 @@ describe('CommunicationBoxComponent', () => {
     const testMessageSystem: Message = {
         content: 'content of test message',
         senderId: SYSTEM_ID,
+    };
+    const testMessageSystemError: Message = {
+        content: 'content of test message',
+        senderId: SYSTEM_ERROR_ID,
     };
 
     beforeEach(async () => {
@@ -126,6 +130,12 @@ describe('CommunicationBoxComponent', () => {
     it('should create visualMessage from Message by system', () => {
         const returnValue: VisualMessage = component.createVisualMessage(testMessageSystem);
         const expectedValue: VisualMessage = { ...testMessageSystem, class: 'system' };
+        expect(returnValue).toEqual(expectedValue);
+    });
+
+    it('should create visualMessage from Message by system-error', () => {
+        const returnValue: VisualMessage = component.createVisualMessage(testMessageSystemError);
+        const expectedValue: VisualMessage = { ...testMessageSystemError, class: 'system-error' };
         expect(returnValue).toEqual(expectedValue);
     });
 
