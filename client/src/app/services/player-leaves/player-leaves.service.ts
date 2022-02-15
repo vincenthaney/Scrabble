@@ -54,8 +54,6 @@ export class PlayerLeavesService implements OnDestroy, IResetableService {
     }
 
     resetServiceData(): void {
-        // eslint-disable-next-line no-console
-        console.log('PlayerLeave reset');
         this.gameId = '';
     }
 
