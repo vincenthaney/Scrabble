@@ -80,11 +80,6 @@ export default class GameDispatcherService implements OnDestroy, IResetServiceDa
         this.gameDispatcherController.handleLobbiesListRequest();
     }
 
-    handleLeaveLobby() {
-        if (this.gameId) this.gameDispatcherController.handleLeaveLobby(this.gameId);
-        this.resetServiceData();
-    }
-
     handleCreateGame(playerName: string, gameParameters: FormGroup) {
         const gameConfig: GameConfigData = {
             playerName,
