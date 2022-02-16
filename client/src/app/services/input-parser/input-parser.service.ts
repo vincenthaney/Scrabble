@@ -20,7 +20,7 @@ import {
     MIN_LOCATION_COMMAND_LENGTH,
     MIN_ROW_NUMBER,
     ON_YOUR_TURN_ACTIONS,
-    SYSTEM_ERROR_ID
+    SYSTEM_ERROR_ID,
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '..';
