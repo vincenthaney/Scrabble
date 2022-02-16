@@ -148,6 +148,51 @@ describe('RoundManagerService', () => {
             expect(startRoundSpy).toHaveBeenCalled();
         });
     });
+////////////
+    describe('continueRound', () => {
+        let startRoundSpy: unknown;
+        let timeLeftSpy: unknown;
+
+        const updatedRound: Round = {
+            player: DEFAULT_PLAYER,
+            startTime: new Date(CURRENT_DATE),
+            limitTime: new Date(FUTURE_DATE),
+            completedTime: null,
+        };
+
+        beforeEach(() => {
+            startRoundSpy = spyOn(service, 'startRound').and.callFake(() => {
+                return;
+            });
+
+            timeLeftSpy = spyOn(service, 'timeLeft').and.callFake(() => {
+                return 1;
+            });
+            currentRound.completedTime = null;
+            service.currentRound = currentRound;
+        });
+
+        it('continueRound should overwrite old current round ', () => {
+            const numberOfRoundsBefore = service.completedRounds.length;
+            const roundBefore = service.currentRound;
+            service.continueRound(updatedRound);
+            const numberOfRoundsAfter = service.completedRounds.length;
+            expect(numberOfRoundsBefore).toEqual(numberOfRoundsAfter);
+            expect(roundBefore).not.toEqual(service.currentRound);
+        });
+
+        it('updateRound should call timeLeft the new current round to the updatedRound', () => {
+            expect(timeLeftSpy).toHaveBeenCalled();
+        });
+
+        it('updateRound should emit endRoundEvent', () => {
+            expect(timeLeftSpy).toHaveBeenCalled();
+        });
+
+        it('updateRound should call startRound', () => {
+            expect(startRoundSpy).toHaveBeenCalled();
+        });
+    });
 
     it('getActivePlayer should return the player of the current round', () => {
         service.currentRound = currentRound;
@@ -202,6 +247,25 @@ describe('RoundManagerService', () => {
             expect(startTimerSpy).toHaveBeenCalled();
         });
     });
+    
+
+    // describe('timeLeft', () => {
+    //     let startTimerSpy: unknown;
+
+    //     beforeEach(() => {
+    //         startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
+    //             return;
+    //         });
+    //         service.startRound(DEFAULT_MAX_ROUND_TIME);
+    //     });
+
+
+
+    //     it('startRound should call startTimer', () => {
+    //         service.timeLeft()
+    //         expect(startTimerSpy).toHaveBeenCalled();
+    //     });
+    // });
 
     it('startTimer should send new timer with right values', () => {
         const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
