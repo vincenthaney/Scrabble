@@ -46,6 +46,7 @@ describe('GameService', () => {
             'updateRound',
             'getActivePlayer',
             'initialize',
+            'resetTimerData',
         ]);
         gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
     });
@@ -408,9 +409,8 @@ describe('GameService', () => {
         });
 
         it('should call roundManager.resetTimerData()', () => {
-            const roundManagerTimerSpy = spyOn(service['roundManager'], 'resetTimerData');
             service.gameOver();
-            expect(roundManagerTimerSpy).toHaveBeenCalled();
+            expect(roundManagerSpy.resetTimerData).toHaveBeenCalled();
         });
     });
 
