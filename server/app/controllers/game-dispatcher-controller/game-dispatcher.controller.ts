@@ -271,9 +271,7 @@ export class GameDispatcherController {
             disconnectedPlayer.isConnected = false;
             setTimeout(() => {
                 if (!disconnectedPlayer.isConnected) {
-                    // END GAME
-                    console.log('timeout');
-                    this.handleLobbyLeave(gameId, playerId);
+                    this.handleLeave(gameId, playerId);
                 }
             }, TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
         }

@@ -56,7 +56,7 @@ export class GamePlayController {
             () => {},
             (error) => {
                 // When reloading the page, a the disconnect http request is fired on destruction of the game-page component.
-                // In the initialization of the game-page component, a reconnect request is made which does not allow the 
+                // In the initialization of the game-page component, a reconnect request is made which does not allow the
                 // server to send a response, triggered a Abort 0  error code which is why we catch it if it this this code
                 // eslint-disable-next-line no-empty
                 if (error.status === HTTP_ABORT_ERROR) {

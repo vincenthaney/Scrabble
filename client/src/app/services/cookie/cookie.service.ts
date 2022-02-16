@@ -10,7 +10,7 @@ export class CookieService {
         const date = new Date();
         date.setTime(date.getTime() + expiry * SECONDS_TO_MILLISECONDS);
         const expires = 'expires=' + date.toUTCString();
-        document.cookie = username + '=' + value + ';' + expires + ';path=/';
+        document.cookie = username + '=' + value + '; ' + expires + ';path=/ ;SameSite=strict';
     }
 
     getCookie(name: string): string {
@@ -24,6 +24,6 @@ export class CookieService {
     }
 
     eraseCookie(name: string) {
-        document.cookie = `${name}=; Max-Age=${EXPIRED_COOKIE_AGE};`;
+        document.cookie = `${name}=; Max-Age=${EXPIRED_COOKIE_AGE}; SameSite=strict`;
     }
 }

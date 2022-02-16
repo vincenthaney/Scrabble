@@ -101,7 +101,7 @@ export class GamePlayService {
 
     handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string) {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
-        const playerStillInGame = game.player1.getId() === playerWhoLeftId ? game.player2 : game.player1;
+        const playerStillInGame = game.player1.id === playerWhoLeftId ? game.player2 : game.player1;
         const updatedData: GameUpdateData = {};
         const endOfGameMessages = this.handleGameOver(playerStillInGame.name, game, updatedData);
         this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
