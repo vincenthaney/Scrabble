@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-classes-per-file */
 import { CommonModule } from '@angular/common';
@@ -14,7 +15,7 @@ import {
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
-    OPPONENT_FOUND_MESSAGE
+    OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
