@@ -48,6 +48,7 @@ describe('GameService', () => {
             'getActivePlayer',
             'initialize',
             'resetTimerData',
+            'continueRound',
         ]);
         gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
     });
@@ -272,6 +273,78 @@ describe('GameService', () => {
         it('should throw if tiles is undefined', () => {
             const player: Omit<PlayerData, 'tiles'> = { id: DEFAULT_PLAYER_1.id, name: DEFAULT_PLAYER_1.name };
             expect(() => service.initializePlayer(player)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
+        });
+    });
+
+    describe('reconnectReinitialize', () => {
+        let defaultGameData: StartMultiplayerGameData;
+
+        beforeEach(() => {
+            service.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);
+            service.player2 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);
+            defaultGameData = {
+                player1: DEFAULT_PLAYER_1,
+                player2: DEFAULT_PLAYER_2,
+                gameType: GameType.Classic,
+                maxRoundTime: 1,
+                dictionary: 'default',
+                gameId: 'game-id',
+                board: new Array(DEFAULT_GRID_SIZE).map((_, y) => {
+                    return new Array(DEFAULT_GRID_SIZE).map((__, x) => ({ ...DEFAULT_SQUARE, position: { row: y, column: x } }));
+                }),
+                tileReserve: [],
+                tileReserveTotal: 0,
+                round: {
+                    playerData: DEFAULT_PLAYER_1,
+                    startTime: new Date(),
+                    limitTime: new Date(),
+                    completedTime: null,
+                },
+            };
+        });
+
+        it('should create player', () => {
+            const player1Spy = spyOn(service.player1, 'updatePlayerData');
+            const player2Spy = spyOn(service.player2, 'updatePlayerData');
+            const rerenderSpy = spyOn(service.rerenderEvent, 'emit');
+            const updateTileSpy = spyOn(service.updateTileRackEvent, 'emit');
+            const updateTileReserveSpy = spyOn(service.updateTileReserveEvent, 'emit');
+            service.reconnectReinitialize(defaultGameData);
+
+            expect(player1Spy).toHaveBeenCalled();
+            expect(player2Spy).toHaveBeenCalled();
+            expect(rerenderSpy).toHaveBeenCalled();
+            expect(updateTileSpy).toHaveBeenCalled();
+            expect(updateTileReserveSpy).toHaveBeenCalled();
+            expect(boardServiceSpy.updateBoard).toHaveBeenCalled();
+            expect(roundManagerSpy.continueRound).toHaveBeenCalled();
+        });
+    });
+
+    describe('reconnectReinitialize', () => {
+        it('reconnect if there is a cookie', () => {
+            const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('cookie');
+            const eraseCookieSpy = spyOn(service['cookieService'], 'eraseCookie');
+            const handleReconnectionSpy = spyOn(service['gameController'], 'handleReconnection');
+            const socketIdSpy = spyOn(service['socketService'], 'getId');
+
+            service.reconnectGame();
+            expect(getCookieSpy).toHaveBeenCalled();
+            expect(socketIdSpy).toHaveBeenCalled();
+            expect(eraseCookieSpy).toHaveBeenCalled();
+            expect(handleReconnectionSpy).toHaveBeenCalled();
+        });
+
+        it('not reconnect if there is no cookie and emit', () => {
+            const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('');
+            const handleReconnectionSpy = spyOn(service['gameController'], 'handleReconnection');
+
+            const noActiveGameEventSpy = spyOn(service.noActiveGameEvent, 'emit');
+            service.reconnectGame();
+
+            expect(getCookieSpy).toHaveBeenCalled();
+            expect(noActiveGameEventSpy).toHaveBeenCalled();
+            expect(handleReconnectionSpy).not.toHaveBeenCalled();
         });
     });
 

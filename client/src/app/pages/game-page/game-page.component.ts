@@ -6,7 +6,13 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import {
     DIALOG_ABANDON_BUTTON_CONFIRM,
-    DIALOG_ABANDON_BUTTON_CONTINUE, DIALOG_ABANDON_CONTENT, DIALOG_ABANDON_TITLE, DIALOG_NO_ACTIVE_GAME_BUTTON, DIALOG_NO_ACTIVE_GAME_CONTENT, DIALOG_NO_ACTIVE_GAME_TITLE, DIALOG_QUIT_BUTTON_CONFIRM,
+    DIALOG_ABANDON_BUTTON_CONTINUE,
+    DIALOG_ABANDON_CONTENT,
+    DIALOG_ABANDON_TITLE,
+    DIALOG_NO_ACTIVE_GAME_BUTTON,
+    DIALOG_NO_ACTIVE_GAME_CONTENT,
+    DIALOG_NO_ACTIVE_GAME_TITLE,
+    DIALOG_QUIT_BUTTON_CONFIRM,
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
     DIALOG_QUIT_TITLE
@@ -81,6 +87,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         content: buttonsContent[0],
                         redirect: '/home',
                         style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
+                        // We haven't been able to test that the right function is called because this
+                        // arrow function creates a new instance of the function. We cannot spy on it.
+                        // It totally works tho, try it!
                         action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
                     },
                     {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -14,6 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
     RACK_TILE_DEFAULT_FONT_SIZE,
@@ -200,5 +202,16 @@ describe('GamePageComponent', () => {
             expect(component.tileRackComponent.tileFontSize).toEqual(RACK_TILE_MIN_FONT_SIZE);
             expect(component.boardComponent.tileFontSize).toEqual(SQUARE_TILE_MIN_FONT_SIZE);
         });
+    });
+
+    it('Clicking on quit button when the game is over should show quitting dialog', () => {
+        gameServiceMock.isGameOver = true;
+        const spy = spyOn(component, 'openDialog').and.callFake(() => {
+            return;
+        });
+        const buttonsContent = [DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_STAY];
+
+        component.quitButtonClicked();
+        expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
     });
 });
