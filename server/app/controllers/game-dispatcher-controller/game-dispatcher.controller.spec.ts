@@ -30,6 +30,7 @@ import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
+import { SocketService } from '@app/services/socket-service/socket.service';
 
 const expect = chai.expect;
 
@@ -54,10 +55,13 @@ const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
+    let socketServiceStub: SinonStubbedInstance<SocketService>;
 
     beforeEach(() => {
         Container.reset();
         controller = Container.get(GameDispatcherController);
+        socketServiceStub = createStubInstance(SocketService);
+        controller['socketService'] = socketServiceStub as unknown as SocketService;
     });
 
     it('should create', () => {
@@ -705,7 +709,6 @@ describe('GameDispatcherController', () => {
             expect(handleLeaveSpy).to.not.have.been.called();
 
             clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
-            expect(handleLeaveSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             clock.restore();
         });
     });

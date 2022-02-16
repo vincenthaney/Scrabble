@@ -65,6 +65,12 @@ describe('GamePlayController', () => {
     beforeEach(() => {
         Container.reset();
         gamePlayController = Container.get(GamePlayController);
+        stub(gamePlayController['socketService'], 'removeFromRoom').callsFake(() => {
+            return;
+        });
+        stub(gamePlayController['socketService'], 'emitToSocket').callsFake(() => {
+            return;
+        });
     });
 
     it('should create', () => {
