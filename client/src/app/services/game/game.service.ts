@@ -49,7 +49,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
     isGameOver: boolean;
-    private gameId: string;
+    gameId: string;
     private localPlayerId: string;
 
     constructor(
@@ -73,7 +73,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.serviceDestroyed$.complete();
     }
 
-    async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData) {
+    async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData): Promise<void> {
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -92,15 +92,13 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (this.router.url !== '/game') {
             this.roundManager.initialize();
             this.roundManager.startRound(startGameData.maxRoundTime);
-            this.roundManager.initialize();
-            this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');
         } else {
             this.reconnectReinitialize(startGameData);
         }
     }
 
-    reconnectReinitialize(startGameData: StartMultiplayerGameData) {
+    reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
         this.rerenderEvent.emit();
@@ -141,7 +139,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
     }
 
-    updateGameUpdateData(newData: GameUpdateData) {
+    updateGameUpdateData(newData: GameUpdateData): void {
         this.gameUpdateValue.next(newData);
     }
 
@@ -176,7 +174,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.roundManager.resetTimerData();
     }
 
-    reconnectGame() {
+    reconnectGame(): void {
         const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
         const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
 
@@ -190,7 +188,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
     }
 
-    disconnectGame() {
+    disconnectGame(): void {
         const gameId = this.gameId;
         const localPlayerId = this.getLocalPlayerId();
         this.gameId = '';

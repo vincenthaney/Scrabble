@@ -34,7 +34,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.gameParameters
             .get('gameMode')
             ?.valueChanges.pipe(takeUntil(this.serviceDestroyed$))
@@ -48,7 +48,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             });
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }
@@ -57,7 +57,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         return this.gameParameters?.valid && this.child.formParameters?.valid;
     }
 
-    onSubmit() {
+    onSubmit(): void {
         if (this.isFormValid()) {
             this.createGame();
         } else {
@@ -65,7 +65,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    createGame() {
+    createGame(): void {
         this.router.navigateByUrl('waiting-room');
         this.gameDispatcherService.handleCreateGame(this.child.playerName, this.gameParameters);
     }

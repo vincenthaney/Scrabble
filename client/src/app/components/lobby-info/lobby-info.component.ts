@@ -22,7 +22,7 @@ export class LobbyInfoComponent implements OnInit {
         this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 
-    joinLobby() {
+    joinLobby(): void {
         this.joinLobbyId.emit(this.lobby.lobbyId);
     }
 }

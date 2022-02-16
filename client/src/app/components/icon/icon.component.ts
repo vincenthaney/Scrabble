@@ -19,7 +19,7 @@ export class IconComponent implements OnInit {
         this.setClassName();
     }
 
-    setClassName() {
+    setClassName(): void {
         const prefix: IconPrefix = this.getPrefix(this.styling);
 
         this.className = `${prefix} fa-${this.icon}`;
