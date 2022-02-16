@@ -233,7 +233,7 @@ describe('CommunicationBoxComponent', () => {
             expect(component.loading).toBeFalse();
         });
 
-        it('should NIT set loading to false if new message is NOT from opponent', () => {
+        it('should NOT set loading to false if new message is NOT from opponent', () => {
             component.loading = true;
             component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
             expect(component.loading).toBeTrue();
