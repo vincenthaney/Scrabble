@@ -20,6 +20,7 @@ import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constant
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
@@ -274,15 +275,13 @@ describe('GamePlayController', () => {
         });
 
         it('should throw if data.type is undefined', () => {
-            expect(() =>
-                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData),
-            ).to.throw();
+            expect(gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData)).to
+                .eventually.rejected;
         });
 
         it('should throw if data.payload is undefined', () => {
-            expect(() =>
-                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData),
-            ).to.throw();
+            expect(gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData)).to
+                .eventually.rejected;
         });
 
         it('should call emitToSocket in catch if error is generated in treatment', () => {
@@ -294,6 +293,25 @@ describe('GamePlayController', () => {
                 content: COMMAND_IS_INVALID(DEFAULT_DATA.input) + DEFAULT_ERROR_MESSAGE,
                 senderId: SYSTEM_ERROR_ID,
             });
+        });
+
+        it('should call handlePlayAction when playAction throw word not in dictionary', async () => {
+            const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
+            (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
+            gamePlayServiceStub.playAction.throws('error');
+
+            const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
+            isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
+
+            const handleErrorStub = stub<GamePlayController, any>(gamePlayController, 'handleError');
+            handleErrorStub.callsFake(async () => Promise.resolve());
+
+            const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
+            handlePlayActionStub.callThrough();
+
+            await gamePlayController['handlePlayAction']('', '', { type: 'place', payload: {}, input: '' });
+
+            expect(handlePlayActionStub.calledWith('', '', { type: 'pass', payload: {}, input: '' })).to.be.true;
         });
     });
 
@@ -383,11 +401,22 @@ describe('GamePlayController', () => {
 
     describe('handleError', () => {
         let socketServiceStub: SinonStubbedInstance<SocketService>;
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;
 
         beforeEach(() => {
             socketServiceStub = createStubInstance(SocketService);
             (gamePlayController['socketService'] as unknown) = socketServiceStub;
+
+            gameStub = createStubInstance(Game);
+            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.getId(), DEFAULT_PLAYER_1.name));
+
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
+
+            (gamePlayController['activeGameService'] as unknown) = activeGameServiceStub;
+
             delayStub = stub(Delay, 'for');
         });
 
@@ -396,12 +425,12 @@ describe('GamePlayController', () => {
         });
 
         it('should call emitToSocket', async () => {
-            await gamePlayController['handleError'](new Error(), '', '');
+            await gamePlayController['handleError'](new Error(), '', '', '');
             expect(socketServiceStub.emitToSocket.called).to.be.true;
         });
 
-        it('should call emitToSocket', async () => {
-            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '');
+        it('should call delay', async () => {
+            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
             expect(delayStub.called).to.be.true;
         });
     });
