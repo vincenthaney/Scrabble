@@ -5,7 +5,7 @@ import {
     WORD_CONTAINS_APOSTROPHE,
     WORD_CONTAINS_ASTERISK,
     WORD_CONTAINS_HYPHEN,
-    WORD_TOO_SHORT,
+    WORD_TOO_SHORT
 } from '@app/constants/services-errors';
 import * as fs from 'fs';
 import { join } from 'path';
@@ -21,7 +21,7 @@ export class WordsVerificationService {
         this.loadAllDictionaries();
     }
 
-    verifyWords(words: string[], dictionary: string) {
+    verifyWords(words: string[], dictionary: string): void {
         for (let word of words) {
             if (word.length > 0) {
                 word = this.removeAccents(word);
@@ -39,12 +39,11 @@ export class WordsVerificationService {
     // Will be removed during sprint 3
     private fetchDictionary(dictionaryName: string, filePath: string): string[] {
         const dataBuffer = fs.readFileSync(join(filePath, dictionaryName));
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const data: DictionaryData = JSON.parse(dataBuffer.toString());
         return data.words;
     }
 
-    private loadAllDictionaries() {
+    private loadAllDictionaries(): void {
         // TODO: Change this to upload all dictionaries from mongoDB
         // Will be removed during sprint 3
         const filePath = join(__dirname, DICTIONARY_RELATIVE_PATH);
@@ -53,7 +52,7 @@ export class WordsVerificationService {
         });
     }
 
-    private removeAccents(word: string) {
+    private removeAccents(word: string): string {
         return word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     }
 }
