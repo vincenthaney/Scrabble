@@ -7,8 +7,8 @@ import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
-import { BoardService, GameService } from '@app/services/';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
+import { BoardService, GameService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -24,6 +24,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     gridSize: Vec2;
     squareGrid: SquareView[][];
     boardUpdateSubscription: Subscription;
+    boardInitializationSubscription: Subscription;
     notAppliedSquares: SquareView[];
     tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
@@ -34,24 +35,26 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.notAppliedSquares = [];
     }
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.initializeBoard(this.boardService.initialBoard);
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
+        this.boardInitializationSubscription = this.boardService.boardInitializationEvent
+            .pipe(takeUntil(this.boardDestroyed$))
+            .subscribe((board: Square[][]) => this.initializeBoard(board));
         this.gameService.playingTiles
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.boardDestroyed$.next(true);
         this.boardDestroyed$.complete();
-        this.boardUpdateSubscription.unsubscribe();
     }
 
-    private initializeBoard(board: Square[][]) {
+    private initializeBoard(board: Square[][]): void {
         if (!board || !board[0]) {
             this.gridSize = { x: 0, y: 0 };
             return;
@@ -70,7 +73,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
-    private getBoardServiceSquare(board: Square[][], row: number, column: number) {
+    private getBoardServiceSquare(board: Square[][], row: number, column: number): Square {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 
@@ -98,11 +101,11 @@ export class BoardComponent implements OnInit, OnDestroy {
         return true;
     }
 
-    private isInBounds(position: Position) {
+    private isInBounds(position: Position): boolean {
         return position.row < this.squareGrid.length && position.column < this.squareGrid[position.row].length;
     }
 
-    private handlePlaceTiles(payload: ActionPlacePayload) {
+    private handlePlaceTiles(payload: ActionPlacePayload): void {
         const position = { ...payload.startPosition };
         const next = () => (payload.orientation === Orientation.Horizontal ? position.column++ : position.row++);
 
@@ -124,7 +127,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         }
     }
 
-    private handleNewMessage(message: Message) {
+    private handleNewMessage(message: Message): void {
         if (message.senderId === 'system-error') {
             this.notAppliedSquares.forEach((square) => (square.square.tile = null));
             this.notAppliedSquares = [];

@@ -52,6 +52,11 @@ export const UNDEFINED_SQUARE: Square = {
 export const VALID_MULTIPLIERS: number[] = [2, 3];
 
 export const SECONDS_TO_MILLISECONDS = 1000;
+export const MINIMUM_TIMER_TIME = 0.01;
+
+export const GAME_ID_COOKIE = 'gameId';
+export const SOCKET_ID_COOKIE = 'socketId';
+export const TIME_TO_RECONNECT = 5;
 
 export const MIN_COL_NUMBER = 0;
 export const MAX_COL_NUMBER = 14;

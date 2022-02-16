@@ -89,16 +89,16 @@ describe('ActiveGameService', () => {
         });
 
         it('should return game with player1 ID', () => {
-            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_1.getId())).to.exist;
+            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.exist;
         });
 
         it('should return game with player2 ID', () => {
-            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_2.getId())).to.exist;
+            expect(activeGameService.getGame(DEFAULT_ID, DEFAULT_PLAYER_2.id)).to.exist;
         });
 
         it('should throw is ID is invalid', () => {
             const invalidId = 'invalidId';
-            expect(() => activeGameService.getGame(invalidId, DEFAULT_PLAYER_1.getId())).to.throw(NO_GAME_FOUND_WITH_ID);
+            expect(() => activeGameService.getGame(invalidId, DEFAULT_PLAYER_1.id)).to.throw(NO_GAME_FOUND_WITH_ID);
         });
 
         it('should throw is player ID is invalid', () => {
@@ -119,19 +119,19 @@ describe('ActiveGameService', () => {
 
         it('should remove from list with player1 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_1.getId());
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_1.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
 
         it('should remove from list with player2 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.getId());
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
     });
 
     it('isGameOver should return if the game with the game id provided is over', () => {
         chai.spy.on(activeGameService, 'getGame', () => DEFAULT_GAME);
-        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.getId())).to.be.equal(DEFAULT_GAME.isGameOver());
+        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.be.equal(DEFAULT_GAME.isGameOver());
     });
 });

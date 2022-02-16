@@ -37,11 +37,11 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     ) {}
 
     @HostListener('window:beforeunload')
-    onBeforeUnload() {
+    onBeforeUnload(): void {
         this.playerLeavesService.handleLeaveLobby();
     }
 
-    ngOnInit() {
+    ngOnInit(): void {
         if (this.gameDispatcherService.currentLobby) this.currentLobby = this.gameDispatcherService.currentLobby;
         this.currentName = this.gameDispatcherService.currentName;
 
@@ -58,18 +58,18 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((hostName: string) => this.playerRejected(hostName));
     }
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
 
-    routerChangeMethod(url: string) {
+    routerChangeMethod(url: string): void {
         if (url !== '/game') {
             this.playerLeavesService.handleLeaveLobby();
         }
     }
 
-    playerRejected(hostName: string) {
+    playerRejected(hostName: string): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_REJECT_TITLE,
@@ -85,7 +85,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    hostHasCanceled(hostName: string) {
+    hostHasCanceled(hostName: string): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_CANCEL_TITLE,

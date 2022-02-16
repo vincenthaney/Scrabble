@@ -6,16 +6,16 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import CommandError from '@app/classes/command-error';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
+import { CommandErrorMessages, PLAYER_NOT_FOUND } from '@app/constants/command-error-messages';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
-import { CommandErrorMessages, PLAYER_NOT_FOUND } from './command-error-messages';
-import CommandError from './command-errors';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';
@@ -163,6 +163,13 @@ describe('InputParserService', () => {
     });
 
     describe('parseCommand', () => {
+        it('should throw error if game is over', () => {
+            gameServiceSpy.isGameOver = true;
+            expect(() => {
+                service['parseCommand'](VALID_PLACE_INPUT.substring(1).split(' '));
+            }).toThrow(new CommandError(CommandErrorMessages.ImpossibleCommand));
+        });
+
         it("should throw error if PLAY command and it is not the player's turn", () => {
             gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
             expect(() => {

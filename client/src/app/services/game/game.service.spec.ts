@@ -4,7 +4,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
@@ -47,13 +48,20 @@ describe('GameService', () => {
             'getActivePlayer',
             'initialize',
             'resetTimerData',
+            'continueRound',
         ]);
         gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
     });
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([{ path: 'game', component: TestComponent }])],
+            imports: [
+                HttpClientTestingModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'game', component: TestComponent },
+                    { path: 'other', component: TestComponent },
+                ]),
+            ],
             providers: [
                 { provide: BoardService, useValue: boardServiceSpy },
                 { provide: RoundManagerService, useValue: roundManagerSpy },
@@ -194,6 +202,42 @@ describe('GameService', () => {
             expect(boardServiceSpy.initializeBoard).toHaveBeenCalledWith(defaultGameData.board);
         });
 
+        it('should call startRound', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('other');
+            tick();
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(roundManagerSpy.startRound).toHaveBeenCalled();
+        }));
+
+        it('should call initialize', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('other');
+            tick();
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(roundManagerSpy.startRound).toHaveBeenCalled();
+        }));
+
+        it('should call navigateByUrl', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('other');
+            tick();
+            const spy = spyOn(service['router'], 'navigateByUrl');
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(spy).toHaveBeenCalledWith('game');
+        }));
+
+        it('should call reconnectReinitialize', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('game');
+            tick();
+            const spy = spyOn(service, 'reconnectReinitialize').and.callFake(() => {
+                return;
+            });
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(spy).toHaveBeenCalled();
+        }));
+
         it('should call startRound', async () => {
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(roundManagerSpy.startRound).toHaveBeenCalled();
@@ -229,6 +273,78 @@ describe('GameService', () => {
         it('should throw if tiles is undefined', () => {
             const player: Omit<PlayerData, 'tiles'> = { id: DEFAULT_PLAYER_1.id, name: DEFAULT_PLAYER_1.name };
             expect(() => service.initializePlayer(player)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
+        });
+    });
+
+    describe('reconnectReinitialize', () => {
+        let defaultGameData: StartMultiplayerGameData;
+
+        beforeEach(() => {
+            service.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);
+            service.player2 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);
+            defaultGameData = {
+                player1: DEFAULT_PLAYER_1,
+                player2: DEFAULT_PLAYER_2,
+                gameType: GameType.Classic,
+                maxRoundTime: 1,
+                dictionary: 'default',
+                gameId: 'game-id',
+                board: new Array(DEFAULT_GRID_SIZE).map((_, y) => {
+                    return new Array(DEFAULT_GRID_SIZE).map((__, x) => ({ ...DEFAULT_SQUARE, position: { row: y, column: x } }));
+                }),
+                tileReserve: [],
+                tileReserveTotal: 0,
+                round: {
+                    playerData: DEFAULT_PLAYER_1,
+                    startTime: new Date(),
+                    limitTime: new Date(),
+                    completedTime: null,
+                },
+            };
+        });
+
+        it('should create player', () => {
+            const player1Spy = spyOn(service.player1, 'updatePlayerData');
+            const player2Spy = spyOn(service.player2, 'updatePlayerData');
+            const rerenderSpy = spyOn(service.rerenderEvent, 'emit');
+            const updateTileSpy = spyOn(service.updateTileRackEvent, 'emit');
+            const updateTileReserveSpy = spyOn(service.updateTileReserveEvent, 'emit');
+            service.reconnectReinitialize(defaultGameData);
+
+            expect(player1Spy).toHaveBeenCalled();
+            expect(player2Spy).toHaveBeenCalled();
+            expect(rerenderSpy).toHaveBeenCalled();
+            expect(updateTileSpy).toHaveBeenCalled();
+            expect(updateTileReserveSpy).toHaveBeenCalled();
+            expect(boardServiceSpy.updateBoard).toHaveBeenCalled();
+            expect(roundManagerSpy.continueRound).toHaveBeenCalled();
+        });
+    });
+
+    describe('reconnectReinitialize', () => {
+        it('reconnect if there is a cookie', () => {
+            const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('cookie');
+            const eraseCookieSpy = spyOn(service['cookieService'], 'eraseCookie');
+            const handleReconnectionSpy = spyOn(service['gameController'], 'handleReconnection');
+            const socketIdSpy = spyOn(service['socketService'], 'getId');
+
+            service.reconnectGame();
+            expect(getCookieSpy).toHaveBeenCalled();
+            expect(socketIdSpy).toHaveBeenCalled();
+            expect(eraseCookieSpy).toHaveBeenCalled();
+            expect(handleReconnectionSpy).toHaveBeenCalled();
+        });
+
+        it('not reconnect if there is no cookie and emit', () => {
+            const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('');
+            const handleReconnectionSpy = spyOn(service['gameController'], 'handleReconnection');
+
+            const noActiveGameEventSpy = spyOn(service.noActiveGameEvent, 'emit');
+            service.reconnectGame();
+
+            expect(getCookieSpy).toHaveBeenCalled();
+            expect(noActiveGameEventSpy).toHaveBeenCalled();
+            expect(handleReconnectionSpy).not.toHaveBeenCalled();
         });
     });
 
@@ -460,6 +576,56 @@ describe('GameService', () => {
             (service['localPlayerId'] as unknown) = undefined;
             const result = service.getLocalPlayerId();
             expect(result).not.toBeDefined();
+        });
+    });
+
+    describe('disconnectGame', () => {
+        let localPlayerSpy: jasmine.Spy;
+        let cookieGameSpy: jasmine.Spy;
+        let gameControllerSpy: jasmine.Spy;
+        beforeEach(() => {
+            service.player1 = new Player('p1', 'jean', []);
+            service.player2 = new Player('p2', 'paul', []);
+            localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callFake(() => {
+                return 'testyId';
+            });
+
+            cookieGameSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {
+                return;
+            });
+            gameControllerSpy = spyOn(service['gameController'], 'handleDisconnection').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should call getLocalPlayerId();', () => {
+            service.disconnectGame();
+            expect(localPlayerSpy).toHaveBeenCalled();
+        });
+
+        it('should empty gameId, playerId1, playerId2 and localPlayerId', () => {
+            service.disconnectGame();
+            expect(service['gameId']).toEqual('');
+            expect(service['player1'].id).toEqual('');
+            expect(service['player2'].id).toEqual('');
+            expect(service['localPlayerId']).toEqual('');
+        });
+
+        it('!localPlayerId) throw new Error(NO_LOCAL_PLAYER);', () => {
+            localPlayerSpy.and.callFake(() => {
+                return undefined;
+            });
+            expect(() => service.disconnectGame()).toThrow();
+        });
+
+        it('should call cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);', () => {
+            service.disconnectGame();
+            expect(cookieGameSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it('should call gameController.handleDisconnection);', () => {
+            service.disconnectGame();
+            expect(gameControllerSpy).toHaveBeenCalled();
         });
     });
 });

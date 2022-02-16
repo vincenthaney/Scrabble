@@ -32,19 +32,19 @@ export class GameDispatcherController implements OnDestroy {
     }
 
     configureSocket(): void {
-        this.socketService.on('joinRequest', (opponent: PlayerName[]) => {
-            this.joinRequestEvent.emit(opponent[0].name);
+        this.socketService.on('joinRequest', (opponent: PlayerName) => {
+            this.joinRequestEvent.emit(opponent.name);
         });
-        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData[]) => {
-            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData[0]);
+        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData) => {
+            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData);
         });
-        this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[][]) => {
-            this.lobbiesUpdateEvent.emit(lobbies[0]);
+        this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
+            this.lobbiesUpdateEvent.emit(lobbies);
         });
-        this.socketService.on('rejected', (hostName: PlayerName[]) => {
-            this.joinerRejectedEvent.emit(hostName[0].name);
+        this.socketService.on('rejected', (hostName: PlayerName) => {
+            this.joinerRejectedEvent.emit(hostName.name);
         });
-        this.socketService.on('canceledGame', (opponent: PlayerName[]) => this.canceledGameEvent.emit(opponent[0].name));
+        this.socketService.on('canceledGame', (opponent: PlayerName) => this.canceledGameEvent.emit(opponent.name));
     }
 
     handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
@@ -74,7 +74,7 @@ export class GameDispatcherController implements OnDestroy {
         this.http.get(endpoint).subscribe();
     }
 
-    handleLobbyJoinRequest(gameId: string, playerName: string) {
+    handleLobbyJoinRequest(gameId: string, playerName: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/join`;
         this.http.post<GameConfig>(endpoint, { playerName }, { observe: 'response' }).subscribe(
             () => {
@@ -87,7 +87,7 @@ export class GameDispatcherController implements OnDestroy {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleJoinError(error: any) {
+    handleJoinError(error: any): void {
         if (error.status === HttpStatusCode.Unauthorized) {
             this.lobbyFullEvent.emit();
         } else if (error.status === HttpStatusCode.Gone) {

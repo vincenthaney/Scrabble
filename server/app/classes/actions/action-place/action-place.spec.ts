@@ -101,8 +101,8 @@ describe('ActionPlace', () => {
         wordValidatorStub = createStubInstance(WordsVerificationService);
         scoreCalculatorServiceStub = createStubInstance(ScoreCalculatorService);
 
-        gameStub.player1 = new Player(DEFAULT_PLAYER_1.getId(), DEFAULT_PLAYER_1.name);
-        gameStub.player2 = new Player(DEFAULT_PLAYER_2.getId(), DEFAULT_PLAYER_2.name);
+        gameStub.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name);
+        gameStub.player2 = new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name);
         gameStub.player1.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.player2.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.isPlayer1.returns(true);

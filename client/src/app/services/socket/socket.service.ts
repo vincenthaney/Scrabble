@@ -17,14 +17,14 @@ export default class SocketService {
         return this.socket && this.socket.connected;
     }
 
-    async connect() {
+    async connect(): Promise<void> {
         return new Promise<void>((resolve) => {
             this.socket = io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
             this.socket.on('connect', () => resolve());
         });
     }
 
-    disconnect() {
+    disconnect(): boolean {
         if (!this.socket) {
             return false;
         }
@@ -38,14 +38,14 @@ export default class SocketService {
         return this.socket.id;
     }
 
-    on<T>(ev: string, handler: (arg: T) => void) {
+    on<T>(ev: string, handler: (arg: T) => void): void {
         if (!this.socket) {
             return;
         }
         this.socket.on(ev, handler);
     }
 
-    emit<T>(ev: string, ...args: T[]) {
+    emit<T>(ev: string, ...args: T[]): boolean {
         if (!this.socket) {
             return false;
         }

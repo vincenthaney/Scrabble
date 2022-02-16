@@ -88,14 +88,14 @@ export default class Game {
     }
 
     getRequestingPlayer(playerId: string): Player {
-        if (this.player1.getId() === playerId) return this.player1;
-        if (this.player2.getId() === playerId) return this.player2;
+        if (this.player1.id === playerId) return this.player1;
+        if (this.player2.id === playerId) return this.player2;
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
     getOpponentPlayer(playerId: string): Player {
-        if (this.player1.getId() === playerId) return this.player2;
-        if (this.player2.getId() === playerId) return this.player1;
+        if (this.player1.id === playerId) return this.player2;
+        if (this.player2.id === playerId) return this.player1;
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
@@ -155,9 +155,9 @@ export default class Game {
 
     isPlayer1(arg: string | Player): boolean {
         if (arg instanceof Player) {
-            return this.player1.getId() === arg.getId();
+            return this.player1.id === arg.id;
         } else {
-            return this.player1.getId() === arg;
+            return this.player1.id === arg;
         }
     }
 

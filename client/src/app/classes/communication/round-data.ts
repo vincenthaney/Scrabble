@@ -5,5 +5,4 @@ export interface RoundData {
     startTime: Date;
     limitTime: Date;
     completedTime: Date | null;
-    // actionPlayed: IAction | null;
 }

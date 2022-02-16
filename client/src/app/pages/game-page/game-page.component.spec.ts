@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -14,6 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
     RACK_TILE_DEFAULT_FONT_SIZE,
@@ -27,7 +29,7 @@ import {
 import { GameService } from '@app/services';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
-import SpyObj = jasmine.SpyObj;
+// import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -68,11 +70,7 @@ export class MatDialogMock {
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
-    let gameServiceSpy: SpyObj<GameService>;
-
-    beforeEach(() => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['isLocalPlayerPlaying']);
-    });
+    let gameServiceMock: GameService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -102,10 +100,10 @@ describe('GamePageComponent', () => {
                     provide: MatDialog,
                     useClass: MatDialogMock,
                 },
-                {
-                    provide: GameService,
-                    useValue: gameServiceSpy,
-                },
+                // {
+                //     provide: GameService,
+                //     useValue: gameServiceSpy,
+                // },
             ],
         }).compileComponents();
     });
@@ -114,15 +112,30 @@ describe('GamePageComponent', () => {
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        gameServiceMock = TestBed.inject(GameService);
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should call disconnectGame if there is a gameId', () => {
+        spyOn(gameServiceMock, 'getGameId').and.callFake(() => 'id');
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).toHaveBeenCalled();
+    });
+
+    it('should not call disconnectGame if there no a gameId', () => {
+        spyOn(gameServiceMock, 'getGameId').and.callFake(() => null as unknown as string);
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).not.toHaveBeenCalled();
+    });
+
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
         // eslint-disable-next-line -- surrenderDialog is private and we need access for the test
-        const spy = spyOn(component['surrenderDialog'], 'open');
+        const spy = spyOn(component['dialog'], 'open');
         const surrenderButton = fixture.debugElement.nativeElement.querySelector('#surrender-dialog-button');
         surrenderButton.click();
         expect(spy).toHaveBeenCalled();
@@ -189,5 +202,16 @@ describe('GamePageComponent', () => {
             expect(component.tileRackComponent.tileFontSize).toEqual(RACK_TILE_MIN_FONT_SIZE);
             expect(component.boardComponent.tileFontSize).toEqual(SQUARE_TILE_MIN_FONT_SIZE);
         });
+    });
+
+    it('Clicking on quit button when the game is over should show quitting dialog', () => {
+        gameServiceMock.isGameOver = true;
+        const spy = spyOn(component, 'openDialog').and.callFake(() => {
+            return;
+        });
+        const buttonsContent = [DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_STAY];
+
+        component.quitButtonClicked();
+        expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
     });
 });

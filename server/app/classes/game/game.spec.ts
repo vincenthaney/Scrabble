@@ -28,8 +28,11 @@ chai.use(spies);
 chai.use(chaiAsPromised);
 
 const DEFAULT_GAME_ID = 'gameId';
-const DEFAULT_PLAYER_1 = new Player('id1', 'player1');
-const DEFAULT_PLAYER_2 = new Player('id2', 'player2');
+
+const DEFAULT_PLAYER_1_ID = '1';
+const DEFAULT_PLAYER_2_ID = '2';
+const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
+const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
 const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
@@ -42,8 +45,6 @@ const DEFAULT_TILE_2: Tile = { letter: 'B', value: 5 };
 
 const DEFAULT_AMOUNT_OF_TILES = 25;
 
-const DEFAULT_PLAYER_1_ID = '1';
-const DEFAULT_PLAYER_2_ID = '2';
 let DEFAULT_MAP = new Map<LetterValue, number>([
     ['A', 0],
     ['B', 0],
@@ -152,12 +153,12 @@ describe('Game', () => {
 
         describe('getActivePlayer', () => {
             it('should return player with same id (player 1)', () => {
-                const player = game.getRequestingPlayer(DEFAULT_PLAYER_1.getId());
+                const player = game.getRequestingPlayer(DEFAULT_PLAYER_1.id);
                 expect(player).to.equal(DEFAULT_PLAYER_1);
             });
 
             it('should return player with same id (player 2)', () => {
-                const player = game.getRequestingPlayer(DEFAULT_PLAYER_2.getId());
+                const player = game.getRequestingPlayer(DEFAULT_PLAYER_2.id);
                 expect(player).to.equal(DEFAULT_PLAYER_2);
             });
 
@@ -169,12 +170,12 @@ describe('Game', () => {
 
         describe('getOpponentPlayer', () => {
             it('should return player with other id (player 1)', () => {
-                const player = game.getOpponentPlayer(DEFAULT_PLAYER_1.getId());
+                const player = game.getOpponentPlayer(DEFAULT_PLAYER_1.id);
                 expect(player).to.equal(DEFAULT_PLAYER_2);
             });
 
             it('should return player with other id (player 2)', () => {
-                const player = game.getOpponentPlayer(DEFAULT_PLAYER_2.getId());
+                const player = game.getOpponentPlayer(DEFAULT_PLAYER_2.id);
                 expect(player).to.equal(DEFAULT_PLAYER_1);
             });
 
@@ -197,8 +198,19 @@ describe('Game', () => {
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
+            // game.player1 = DEFAULT_PLAYER_1;
+            // game.player2 = DEFAULT_PLAYER_2;
+
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
+            game.player1.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+            ];
             player1Stub.hasTilesLeft.returns(true);
             player2Stub.hasTilesLeft.returns(true);
 
@@ -395,27 +407,28 @@ describe('Game', () => {
 
     describe('isPlayer1', () => {
         let game: Game;
-        let player1Stub: SinonStubbedInstance<Player>;
-        let player2Stub: SinonStubbedInstance<Player>;
 
         beforeEach(() => {
             game = new Game();
-            player1Stub = createStubInstance(Player);
-            player2Stub = createStubInstance(Player);
+            game.player1 = DEFAULT_PLAYER_1;
+            game.player2 = DEFAULT_PLAYER_2;
 
-            player1Stub.getId.returns(DEFAULT_PLAYER_1_ID);
-            player2Stub.getId.returns(DEFAULT_PLAYER_2_ID);
-
-            game.player1 = player1Stub as unknown as Player;
-            game.player2 = player2Stub as unknown as Player;
+            game.player1.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+            ];
         });
 
         it('should be true if player is player 1', () => {
-            expect(game.isPlayer1(player1Stub as unknown as Player)).to.be.true;
+            expect(game.isPlayer1(DEFAULT_PLAYER_1)).to.be.true;
         });
 
         it('should be false if player is player 2', () => {
-            expect(game.isPlayer1(player2Stub as unknown as Player)).to.be.false;
+            expect(game.isPlayer1(DEFAULT_PLAYER_2)).to.be.false;
         });
 
         it('should be true if player id is player 1 id', () => {
