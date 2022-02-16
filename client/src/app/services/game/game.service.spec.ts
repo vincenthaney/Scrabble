@@ -578,4 +578,54 @@ describe('GameService', () => {
             expect(result).not.toBeDefined();
         });
     });
+
+    describe('disconnectGame', () => {
+        let localPlayerSpy: jasmine.Spy;
+        let cookieGameSpy: jasmine.Spy;
+        let gameControllerSpy: jasmine.Spy;
+        beforeEach(() => {
+            service.player1 = new Player('p1', 'jean', []);
+            service.player2 = new Player('p2', 'paul', []);
+            localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callFake(() => {
+                return 'testyId';
+            });
+
+            cookieGameSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {
+                return;
+            });
+            gameControllerSpy = spyOn(service['gameController'], 'handleDisconnection').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should call getLocalPlayerId();', () => {
+            service.disconnectGame();
+            expect(localPlayerSpy).toHaveBeenCalled();
+        });
+
+        it('should empty gameId, playerId1, playerId2 and localPlayerId', () => {
+            service.disconnectGame();
+            expect(service['gameId']).toEqual('');
+            expect(service['player1'].id).toEqual('');
+            expect(service['player2'].id).toEqual('');
+            expect(service['localPlayerId']).toEqual('');
+        });
+
+        it('!localPlayerId) throw new Error(NO_LOCAL_PLAYER);', () => {
+            localPlayerSpy.and.callFake(() => {
+                return undefined;
+            });
+            expect(() => service.disconnectGame()).toThrow();
+        });
+
+        it('should call cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);', () => {
+            service.disconnectGame();
+            expect(cookieGameSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it('should call gameController.handleDisconnection);', () => {
+            service.disconnectGame();
+            expect(gameControllerSpy).toHaveBeenCalled();
+        });
+    });
 });

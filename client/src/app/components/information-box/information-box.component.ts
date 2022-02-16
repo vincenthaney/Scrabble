@@ -63,10 +63,9 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     ngOnDestroy(): void {
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
-        this.endRoundSubscription.unsubscribe();
+        if (this.endRoundSubscription) this.endRoundSubscription.unsubscribe();
 
-        if (!this.timerSubscription) return;
-        this.timerSubscription.unsubscribe();
+        if (this.timerSubscription) this.timerSubscription.unsubscribe();
     }
 
     startTimer(timer: Timer): void {
@@ -82,8 +81,11 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         }
     }
 
-    updateActivePlayerBorder(activePlayer: AbstractPlayer): void {
-        if (activePlayer.id === this.gameService.player1.id) {
+    updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
+        if (!activePlayer) {
+            this.isPlayer1Active = false;
+            this.isPlayer2Active = false;
+        } else if (activePlayer.id === this.gameService.player1.id) {
             this.isPlayer1Active = true;
             this.isPlayer2Active = false;
         } else if (activePlayer.id === this.gameService.player2.id) {
