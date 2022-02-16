@@ -406,7 +406,7 @@ describe('GamePlayController', () => {
             (gamePlayController['socketService'] as unknown) = socketServiceStub;
 
             gameStub = createStubInstance(Game);
-            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.getId(), DEFAULT_PLAYER_1.name));
+            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name));
 
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);

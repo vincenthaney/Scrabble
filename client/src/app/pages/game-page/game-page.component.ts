@@ -15,7 +15,7 @@ import {
     DIALOG_QUIT_BUTTON_CONFIRM,
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
-    DIALOG_QUIT_TITLE
+    DIALOG_QUIT_TITLE,
 } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -23,7 +23,7 @@ import {
     RACK_TILE_MIN_FONT_SIZE,
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE
+    SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
@@ -90,7 +90,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         // We haven't been able to test that the right function is called because this
                         // arrow function creates a new instance of the function. We cannot spy on it.
                         // It totally works tho, try it!
-                        action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
+                        action: () => this.handlePlayerLeave(),
                     },
                     {
                         content: buttonsContent[1],
@@ -145,5 +145,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
             if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
             if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
         }
+    }
+
+    private handlePlayerLeave(): void {
+        this.gameService.gameId = '';
+        this.playerLeavesService.handleLocalPlayerLeavesGame();
     }
 }
