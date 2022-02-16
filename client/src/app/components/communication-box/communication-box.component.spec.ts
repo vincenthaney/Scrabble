@@ -227,14 +227,16 @@ describe('CommunicationBoxComponent', () => {
             expect(component.messages).toEqual([DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE]);
         });
 
-        it('should set loading to false if new message is from opponent', () => {
+        it('should set loading to false if new message is NOT from opponent', () => {
             component.loading = true;
+            spyOn(component, 'isOpponent').and.returnValue(false);
             component.onReceiveNewMessage(DEFAULT_PLAYER2_MESSAGE);
             expect(component.loading).toBeFalse();
         });
 
-        it('should NOT set loading to false if new message is NOT from opponent', () => {
+        it('should NOT set loading to true if new message is from opponent', () => {
             component.loading = true;
+            spyOn(component, 'isOpponent').and.returnValue(true);
             component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
             expect(component.loading).toBeTrue();
         });
@@ -255,7 +257,7 @@ describe('CommunicationBoxComponent', () => {
         });
 
         it('should return true if id is other', () => {
-            expect(component.isOpponent('other id')).toBeFalse();
+            expect(component.isOpponent('other id')).toBeTrue();
         });
     });
 
