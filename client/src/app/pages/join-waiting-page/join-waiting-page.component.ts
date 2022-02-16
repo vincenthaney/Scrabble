@@ -15,6 +15,7 @@ import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -34,7 +35,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         private readonly playerLeavesService: PlayerLeavesService,
         public router: Router,
     ) {}
-    // TODO: Fix if player goes to /game or change attribute when game starts
+
     @HostListener('window:beforeunload')
     onBeforeUnload() {
         this.playerLeavesService.handleLeaveLobby();
