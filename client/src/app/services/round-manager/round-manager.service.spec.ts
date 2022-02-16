@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
@@ -6,10 +7,12 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionType } from '@app/classes/actions/action-data';
+import { PlayerData } from '@app/classes/communication';
+import { RoundData } from '@app/classes/communication/round-data';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
-import { NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
+import { CONVERT_ROUND_DATA, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SpyObj = jasmine.SpyObj;
@@ -43,6 +46,10 @@ const TIME_INTERVAL = 1000;
 const PAST_DATE = new Date(Date.now() - TIME_INTERVAL);
 const CURRENT_DATE = new Date(Date.now());
 const FUTURE_DATE = new Date(Date.now() + TIME_INTERVAL);
+
+const DEFAULT_PLAYER_NAME = 'defaultName';
+const DEFAULT_PLAYER_ID = 'defaultId';
+const DEFAULT_PLAYER_DATA: PlayerData = { name: DEFAULT_PLAYER_NAME, id: DEFAULT_PLAYER_ID, tiles: [], score: 1 };
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
@@ -148,7 +155,7 @@ describe('RoundManagerService', () => {
             expect(startRoundSpy).toHaveBeenCalled();
         });
     });
-////////////
+
     describe('continueRound', () => {
         let startRoundSpy: unknown;
         let timeLeftSpy: unknown;
@@ -181,17 +188,57 @@ describe('RoundManagerService', () => {
             expect(roundBefore).not.toEqual(service.currentRound);
         });
 
-        it('updateRound should call timeLeft the new current round to the updatedRound', () => {
+        it('continueRound should call timeLeft the new current round to the updatedRound', () => {
+            service.continueRound(updatedRound);
+
             expect(timeLeftSpy).toHaveBeenCalled();
         });
 
-        it('updateRound should emit endRoundEvent', () => {
-            expect(timeLeftSpy).toHaveBeenCalled();
+        it('continueRound should emit endRoundEvent', () => {
+            const spy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+                return;
+            });
+            service.continueRound(updatedRound);
+            expect(spy).toHaveBeenCalled();
         });
 
-        it('updateRound should call startRound', () => {
+        it('continueRound should call startRound', () => {
+            service.continueRound(updatedRound);
             expect(startRoundSpy).toHaveBeenCalled();
         });
+    });
+
+    describe('convertRoundDataToRound', () => {
+        const roundData: RoundData = {
+            playerData: DEFAULT_PLAYER_DATA,
+            startTime: new Date(CURRENT_DATE),
+            limitTime: new Date(FUTURE_DATE),
+            completedTime: null,
+        };
+
+        it('should throw an error if roundData is missing information', () => {
+            roundData.playerData.id = undefined;
+            let result = () => service.convertRoundDataToRound(roundData);
+            expect(result).toThrowError(CONVERT_ROUND_DATA);
+            roundData.playerData.id = DEFAULT_PLAYER_DATA.id;
+            roundData.playerData.name = undefined;
+            result = () => service.convertRoundDataToRound(roundData);
+            expect(result).toThrowError(CONVERT_ROUND_DATA);
+            roundData.playerData.name = DEFAULT_PLAYER_DATA.name;
+            roundData.playerData.tiles = undefined;
+            result = () => service.convertRoundDataToRound(roundData);
+            expect(result).toThrowError(CONVERT_ROUND_DATA);
+        });
+
+        it('should not throw an error if roundData has all the information', () => {
+            const result = () => service.convertRoundDataToRound(roundData);
+            expect(result).not.toThrow();
+        });
+    });
+
+    it('timeLeft should return a number for the time', () => {
+        service.currentRound = currentRound;
+        expect(service.timeLeft(FUTURE_DATE)).toBeInstanceOf(Number);
     });
 
     it('getActivePlayer should return the player of the current round', () => {
@@ -247,25 +294,6 @@ describe('RoundManagerService', () => {
             expect(startTimerSpy).toHaveBeenCalled();
         });
     });
-    
-
-    // describe('timeLeft', () => {
-    //     let startTimerSpy: unknown;
-
-    //     beforeEach(() => {
-    //         startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
-    //             return;
-    //         });
-    //         service.startRound(DEFAULT_MAX_ROUND_TIME);
-    //     });
-
-
-
-    //     it('startRound should call startTimer', () => {
-    //         service.timeLeft()
-    //         expect(startTimerSpy).toHaveBeenCalled();
-    //     });
-    // });
 
     it('startTimer should send new timer with right values', () => {
         const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
