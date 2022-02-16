@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import {
-    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
+    DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
@@ -77,7 +77,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
                 content: leaverName + DIALOG_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
+                        content: DIALOG_BUTTON_CONTENT_REJECTED,
                         closeDialog: true,
                     },
                 ],
