@@ -133,7 +133,7 @@ export class GamePlayController {
         });
     }
 
-    private async handleError(e: Error, input: string, playerId: string, gameId: string) {
+    private async handleError(e: Error, input: string, playerId: string, gameId: string): Promise<void> {
         if (this.isWordNotInDictionaryError(e)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
 

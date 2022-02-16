@@ -74,7 +74,7 @@ export class GamePlayService {
         }
     }
 
-    getActionPlacePayload(actionData: ActionData) {
+    getActionPlacePayload(actionData: ActionData): ActionPlacePayload {
         const payload = actionData.payload as ActionPlacePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
         if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
@@ -82,7 +82,7 @@ export class GamePlayService {
         return payload;
     }
 
-    getActionExchangePayload(actionData: ActionData) {
+    getActionExchangePayload(actionData: ActionData): ActionExchangePayload {
         const payload = actionData.payload as ActionExchangePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
         return payload;
@@ -99,7 +99,7 @@ export class GamePlayService {
         return game.endGameMessage(winnerName);
     }
 
-    handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string) {
+    handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): void {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.player1.id === playerWhoLeftId ? game.player2 : game.player1;
         const updatedData: GameUpdateData = {};

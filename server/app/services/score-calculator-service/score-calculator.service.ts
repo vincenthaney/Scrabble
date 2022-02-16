@@ -2,12 +2,12 @@ import { BINGO_BONUS_POINTS, MAX_TILE_PER_PLAYER } from '@app/classes/actions/ac
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
-import { Service } from 'typedi';
 import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from '@app/constants/services-constants/score-calculator.const';
+import { Service } from 'typedi';
 
 @Service()
 export class ScoreCalculatorService {
-    calculatePoints(wordsToScore: [Square, Tile][][]) {
+    calculatePoints(wordsToScore: [Square, Tile][][]): number {
         return wordsToScore.reduce((total, word) => (total += this.calculatePointsPerWord(word)), DEFAULT_SCORE);
     }
 
@@ -19,7 +19,7 @@ export class ScoreCalculatorService {
         return tilesToPlace.length === MAX_TILE_PER_PLAYER;
     }
 
-    private calculatePointsPerWord(word: [Square, Tile][]) {
+    private calculatePointsPerWord(word: [Square, Tile][]): number {
         let wordScore = DEFAULT_SCORE;
         let wordMultiplier = DEFAULT_MULTIPLIER;
 

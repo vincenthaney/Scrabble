@@ -15,7 +15,7 @@ import {
     NO_GAME_FOUND_WITH_ID,
     NO_OPPONENT_IN_WAITING_GAME,
     OPPONENT_NAME_DOES_NOT_MATCH,
-    PLAYER_ALREADY_TRYING_TO_JOIN,
+    PLAYER_ALREADY_TRYING_TO_JOIN
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -43,11 +43,11 @@ export class GameDispatcherService {
         return waitingRoom.getId();
     }
 
-    getLobbiesRoom() {
+    getLobbiesRoom(): Room {
         return this.lobbiesRoom;
     }
 
-    requestJoinGame(waitingRoomId: string, playerId: string, playerName: string) {
+    requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
         const waitingRoom = this.getGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {
             throw new HttpException(PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
@@ -115,7 +115,7 @@ export class GameDispatcherService {
         return [hostPlayerId, leaverName];
     }
 
-    cancelGame(waitingRoomId: string, playerId: string) {
+    cancelGame(waitingRoomId: string, playerId: string): void {
         const waitingRoom = this.getGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
@@ -127,7 +127,7 @@ export class GameDispatcherService {
         this.waitingRooms.splice(index, 1);
     }
 
-    getAvailableWaitingRooms() {
+    getAvailableWaitingRooms(): LobbyData[] {
         const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
         const lobbyData: LobbyData[] = [];
         for (const room of waitingRooms) {

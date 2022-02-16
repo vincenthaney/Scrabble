@@ -2,6 +2,16 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
+import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
+import {
+    DICTIONARY_REQUIRED,
+    GAME_IS_OVER,
+    GAME_TYPE_REQUIRED,
+    MAX_ROUND_TIME_REQUIRED,
+    NAME_IS_INVALID,
+    PLAYER_NAME_REQUIRED
+} from '@app/constants/controllers-errors';
+import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -9,16 +19,6 @@ import { validateName } from '@app/utils/validate-name';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import {
-    DICTIONARY_REQUIRED,
-    GAME_IS_OVER,
-    GAME_TYPE_REQUIRED,
-    MAX_ROUND_TIME_REQUIRED,
-    NAME_IS_INVALID,
-    PLAYER_NAME_REQUIRED,
-} from '@app/constants/controllers-errors';
-import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
-import { SYSTEM_ID } from '@app/constants/game';
 @Service()
 export class GameDispatcherController {
     router: Router;
@@ -153,7 +153,7 @@ export class GameDispatcherController {
         });
     }
 
-    private handleCancelGame(gameId: string, playerId: string) {
+    private handleCancelGame(gameId: string, playerId: string): void {
         const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
         if (waitingRoom.joinedPlayer) {
             this.socketService.emitToSocket(waitingRoom.joinedPlayer.id, 'canceledGame', { name: waitingRoom.getConfig().player1.name });
@@ -163,7 +163,7 @@ export class GameDispatcherController {
         this.handleLobbiesUpdate();
     }
 
-    private handleLeave(gameId: string, playerId: string) {
+    private handleLeave(gameId: string, playerId: string): void {
         if (this.gameDispatcherService.isGameInWaitingRooms(gameId)) {
             const result = this.gameDispatcherService.leaveLobbyRequest(gameId, playerId);
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
@@ -182,7 +182,7 @@ export class GameDispatcherController {
         }
     }
 
-    private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData) {
+    private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', updatedData);
         for (const message of endOfGameMessages) {
             this.socketService.emitToRoom(gameId, 'newMessage', {
@@ -207,7 +207,7 @@ export class GameDispatcherController {
         return gameId;
     }
 
-    private handleJoinGame(gameId: string, playerId: string, playerName: string) {
+    private handleJoinGame(gameId: string, playerId: string, playerName: string): void {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (!validateName(playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
         this.gameDispatcherService.requestJoinGame(gameId, playerId, playerName);
@@ -217,7 +217,7 @@ export class GameDispatcherController {
         this.handleLobbiesUpdate();
     }
 
-    private async handleAcceptRequest(gameId: string, playerId: string, playerName: string) {
+    private async handleAcceptRequest(gameId: string, playerId: string, playerName: string): Promise<void> {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
 
         const gameConfig = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
@@ -227,25 +227,25 @@ export class GameDispatcherController {
         this.socketService.emitToRoom(gameId, 'startGame', startGameData);
     }
 
-    private handleRejectRequest(gameId: string, playerId: string, playerName: string) {
+    private handleRejectRequest(gameId: string, playerId: string, playerName: string): void {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         const [rejectedPlayer, hostName] = this.gameDispatcherService.rejectJoinRequest(gameId, playerId, playerName);
         this.socketService.emitToSocket(rejectedPlayer.id, 'rejected', { name: hostName });
         this.handleLobbiesUpdate();
     }
 
-    private handleLobbiesRequest(playerId: string) {
+    private handleLobbiesRequest(playerId: string): void {
         const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
         this.socketService.addToRoom(playerId, this.gameDispatcherService.getLobbiesRoom().getId());
         this.socketService.emitToSocket(playerId, 'lobbiesUpdate', waitingRooms);
     }
 
-    private handleLobbiesUpdate() {
+    private handleLobbiesUpdate(): void {
         const waitingRooms = this.gameDispatcherService.getAvailableWaitingRooms();
         this.socketService.emitToRoom(this.gameDispatcherService.getLobbiesRoom().getId(), 'lobbiesUpdate', waitingRooms);
     }
 
-    private handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
+    private handleReconnection(gameId: string, playerId: string, newPlayerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
 
         // TODO: Add condition once we have singleplayer games
@@ -262,7 +262,7 @@ export class GameDispatcherController {
         this.socketService.emitToSocket(newPlayerId, 'startGame', data);
     }
 
-    private handleDisconnection(gameId: string, playerId: string) {
+    private handleDisconnection(gameId: string, playerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
