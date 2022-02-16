@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export default class WordDictionnaryService {
+    // NOT IMPLEMENTED YET
     // constructor(private http: HttpClient) {}
     // fetchWordDictionnaries(): WordDictionnary[] {
     //     throw new Error('Method not implemented.');

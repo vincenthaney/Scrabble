@@ -38,7 +38,7 @@ export class DefaultDialogComponent {
         }
     }
 
-    handleButtonClick(button: DefaultDialogButtonParameters) {
+    handleButtonClick(button: DefaultDialogButtonParameters): void {
         if (button.action) button.action();
         if (button.redirect) this.router.navigate([button.redirect]);
     }

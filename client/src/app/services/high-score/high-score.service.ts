@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export default class HighScoreService {
+    // NOT IMPLEMENTED YET
     // private lowestHighScoreOfGameType: Map<GameType, number>;
     // constructor(private http: HttpClient) {}
     // fetchHighScores(gameType: GameType): HighScore[] {

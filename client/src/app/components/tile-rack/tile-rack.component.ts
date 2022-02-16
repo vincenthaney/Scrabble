@@ -23,7 +23,7 @@ export class TileRackComponent implements OnInit, OnDestroy {
 
     constructor(public gameService: GameService) {}
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.updateTileRack();
         this.updateTileRackSubscription = this.gameService.updateTileRackEvent
             .pipe(takeUntil(this.serviceDestroyed$))
@@ -34,12 +34,12 @@ export class TileRackComponent implements OnInit, OnDestroy {
         this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }
 
-    private updateTileRack() {
+    private updateTileRack(): void {
         this.tiles = [];
         const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
         if (!localPlayer || !localPlayer.getTiles()) {

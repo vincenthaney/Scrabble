@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export default class VirtualPlayerProfilesService {
+    // NOT IMPLEMENTED YET
     // constructor(private http: HttpClient) {}
     // fetchVirtualPlayerProfiles(level: string): VirtualPlayerProfile[] {
     //     throw new Error('Method not implemented.');
