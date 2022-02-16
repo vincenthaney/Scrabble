@@ -24,7 +24,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('messageInput') messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
-    serviceDestroyed$: Subject<boolean> = new Subject();
+    componentDestroyed$: Subject<boolean> = new Subject();
 
     messages: VisualMessage[] = [];
     messageForm = new FormGroup({
@@ -52,10 +52,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
 
-        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
+        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
         });
-        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
+        this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
     }
@@ -65,12 +65,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         const handleKeyEvent = () => {
             this.messageInputElement.nativeElement.focus();
         };
-        this.focusEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(handleKeyEvent);
+        this.focusEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(handleKeyEvent);
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
