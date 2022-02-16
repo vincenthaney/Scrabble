@@ -15,8 +15,9 @@ import { Player } from '@app/classes/player';
 import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
+import { marked } from 'marked';
 import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
 describe('CommunicationBoxComponent', () => {
@@ -47,6 +48,11 @@ describe('CommunicationBoxComponent', () => {
     const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
         content: 'content of test message',
         senderId: SYSTEM_ERROR_ID,
+    };
+    const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: VisualMessage = {
+        ...DEFAULT_SYSTEM_ERROR_MESSAGE,
+        content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
+        class: 'system-error',
     };
 
     beforeEach(async () => {
@@ -101,27 +107,58 @@ describe('CommunicationBoxComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
-        const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
-        gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
-        expect(onReceiveSpy).toHaveBeenCalled();
+    describe('ngOnInit', () => {
+        let spyTile: jasmine.Spy;
+        let spyMessage: jasmine.Spy;
+
+        beforeEach(() => {
+            spyTile = spyOn(component['gameService'].updateTileReserveEvent, 'subscribe');
+            spyMessage = spyOn(component['gameService'].newMessageValue, 'subscribe');
+        });
+
+        afterEach(() => {
+            spyTile.and.callThrough();
+            spyMessage.and.callThrough();
+        });
+
+        it('should subscribe to updateTileReserveEvent', () => {
+            component.ngOnInit();
+            expect(spyTile).toHaveBeenCalled();
+        });
+
+        it('should call onTileReserveUpdate on updateTileReserveEvent', () => {
+            const spy = spyOn(component, 'onTileReserveUpdate');
+            component.ngOnInit();
+            component['gameService'].updateTileReserveEvent.emit({ tileReserve: [], tileReserveTotal: 0 });
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should subscribe to updateTileReserveEvent', () => {
+            component.ngOnInit();
+            expect(spyMessage).toHaveBeenCalled();
+        });
     });
 
-    it('onReceiveNewMessage should call appropriate functions and receive new message', () => {
-        const messagesLengthBefore: number = component.messages.length;
-        gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
-        const messagesLengthAfter: number = component.messages.length;
-        expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
-        expect(scrollToBottomSpy).toHaveBeenCalled();
+    describe('ngAfterViewInit', () => {
+        it('should call focus on handleKeyEvent', () => {
+            const spy = spyOn(component.messageInputElement.nativeElement, 'focus');
+            component.focusEvent.emit(new KeyboardEvent('keypress'));
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
-    it('scrollToBottom should call scrollTo on viewport', async () => {
-        jasmine.clock().install();
-        const spy = spyOn(component.scrollViewport, 'scrollTo');
-        scrollToBottomSpy.call(component, {});
-        expect(scrollToBottomSpy).toHaveBeenCalled();
-        Promise.resolve().then(() => {
-            jasmine.clock().tick(1);
+    describe('ngOnDestroy', () => {
+        it('should call next', () => {
+            const spy = spyOn(component.componentDestroyed$, 'next');
+            spyOn(component.componentDestroyed$, 'complete');
+            component.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call complete', () => {
+            spyOn(component.componentDestroyed$, 'next');
+            const spy = spyOn(component.componentDestroyed$, 'complete');
+            component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -168,43 +205,57 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    describe('ngOnInit', () => {
-        let spyTile: jasmine.Spy;
-        let spyMessage: jasmine.Spy;
-
-        beforeEach(() => {
-            spyTile = spyOn(component['gameService'].updateTileReserveEvent, 'subscribe');
-            spyMessage = spyOn(component['gameService'].newMessageValue, 'subscribe');
+    describe('onReceiveMessage', () => {
+        it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
+            const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
+            gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
+            expect(onReceiveSpy).toHaveBeenCalled();
         });
 
-        afterEach(() => {
-            spyTile.and.callThrough();
-            spyMessage.and.callThrough();
+        it('onReceiveNewMessage should call appropriate functions and receive new message', () => {
+            const messagesLengthBefore: number = component.messages.length;
+            gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
+            const messagesLengthAfter: number = component.messages.length;
+            expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
+            expect(scrollToBottomSpy).toHaveBeenCalled();
         });
 
-        it('should subscribe to updateTileReserveEvent', () => {
-            component.ngOnInit();
-            expect(spyTile).toHaveBeenCalled();
+        it('should add new visualmessage to messages', () => {
+            component.messages = [];
+            spyOn(component, 'createVisualMessage').and.returnValue(DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE);
+            component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            expect(component.messages).toEqual([DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE]);
         });
 
-        it('should call onTileReserveUpdate on updateTileReserveEvent', () => {
-            const spy = spyOn(component, 'onTileReserveUpdate');
-            component.ngOnInit();
-            component['gameService'].updateTileReserveEvent.emit({ tileReserve: [], tileReserveTotal: 0 });
-            expect(spy).toHaveBeenCalled();
+        it('should set loading to false if new message is from opponent', () => {
+            component.loading = true;
+            component.onReceiveNewMessage(DEFAULT_PLAYER2_MESSAGE);
+            expect(component.loading).toBeFalse();
         });
 
-        it('should subscribe to updateTileReserveEvent', () => {
-            component.ngOnInit();
-            expect(spyMessage).toHaveBeenCalled();
+        it('should NIT set loading to false if new message is NOT from opponent', () => {
+            component.loading = true;
+            component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            expect(component.loading).toBeTrue();
         });
     });
 
-    describe('ngAfterViewInit', () => {
-        it('should call focus on handleKeyEvent', () => {
-            const spy = spyOn(component.messageInputElement.nativeElement, 'focus');
-            component.focusEvent.emit(new KeyboardEvent('keypress'));
-            expect(spy).toHaveBeenCalled();
+    describe('isOpponent', () => {
+        it('should return false if id = system', () => {
+            expect(component.isOpponent('system')).toBeFalse();
+        });
+
+        it('should return false if id = system-error ', () => {
+            expect(component.isOpponent('system-error')).toBeFalse();
+        });
+
+        it('should return false if id = local player id', () => {
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue(DEFAULT_PLAYER.id);
+            expect(component.isOpponent(DEFAULT_PLAYER.id)).toBeFalse();
+        });
+
+        it('should return true if id is other', () => {
+            expect(component.isOpponent('other id')).toBeFalse();
         });
     });
 
@@ -222,6 +273,17 @@ describe('CommunicationBoxComponent', () => {
 
             expect(component.lettersLeft).toEqual(expectedLettersLeft);
             expect(component.lettersLeftTotal).toEqual(expectedLettersLeftTotal);
+        });
+    });
+
+    it('scrollToBottom should call scrollTo on viewport', async () => {
+        jasmine.clock().install();
+        const spy = spyOn(component.scrollViewport, 'scrollTo');
+        scrollToBottomSpy.call(component, {});
+        expect(scrollToBottomSpy).toHaveBeenCalled();
+        Promise.resolve().then(() => {
+            jasmine.clock().tick(1);
+            expect(spy).toHaveBeenCalled();
         });
     });
 });
