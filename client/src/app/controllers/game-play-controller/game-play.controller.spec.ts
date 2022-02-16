@@ -15,18 +15,8 @@ import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { GamePlayController } from './game-play.controller';
 
-// const DEFAULT_SOCKET_ID = 'testSocketID';
-// const DEFAULT_PLAYER_NAME = 'grogars';
 const DEFAULT_GAME_ID = 'grogarsID';
 const DEFAULT_PLAYER_ID = 'testPlayerID';
-// const DEFAULT_OPPONENT_NAME: PlayerName[] = [{ name: DEFAULT_PLAYER_NAME }];
-// const DEFAULT_GAME_DATA: GameConfigData = {
-//     playerName: DEFAULT_PLAYER_NAME,
-//     playerId: 'tessId',
-//     gameType: GameType.Classic,
-//     maxRoundTime: 0,
-//     dictionary: '',
-// };
 
 describe('GamePlayController', () => {
     let controller: GamePlayController;
