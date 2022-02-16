@@ -8,7 +8,7 @@ import {
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
-    OPPONENT_FOUND_MESSAGE
+    OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
