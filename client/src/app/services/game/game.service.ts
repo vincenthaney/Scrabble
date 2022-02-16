@@ -88,6 +88,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
         this.gameIsSetUp = true;
+        // this.roundManager.initialize();
+        // this.roundManager.startRound();
+        this.isGameOver = false;
+        // await this.router.navigateByUrl('game');
         if (this.router.url !== '/game') {
             this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');

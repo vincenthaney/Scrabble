@@ -85,6 +85,7 @@ export class GameDispatcherController implements OnDestroy {
             },
         );
     }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleJoinError(error: any) {
         if (error.status === HttpStatusCode.Unauthorized) {

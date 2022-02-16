@@ -5,6 +5,7 @@ import { LobbyInfo } from '@app/classes/communication';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
+    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCEL_CONTENT,
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
@@ -90,7 +91,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
                 content: hostName + DIALOG_CANCEL_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT_REJECTED,
+                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
                         redirect: '/lobby',
                         closeDialog: true,
                     },

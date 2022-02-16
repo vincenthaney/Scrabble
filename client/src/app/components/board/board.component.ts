@@ -119,6 +119,8 @@ export class BoardComponent implements OnInit, OnDestroy {
                 squareView.applied = false;
                 this.notAppliedSquares.push(squareView);
                 i++;
+            } else if (i === 0) {
+                return;
             }
 
             next();

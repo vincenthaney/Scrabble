@@ -3,12 +3,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';
 import { EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
+import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -94,68 +95,77 @@ describe('InformationBoxComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('ngOnInit should create ngUnsubscribe object', () => {
-        spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
-        spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
-        component.ngOnInit();
-        expect(component['ngUnsubscribe']).toBeTruthy();
-    });
-
-    it('ngOnInit should create Timer object', () => {
-        spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
-        spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
-        component.ngOnInit();
-        expect(component.timer).toBeTruthy();
-    });
-
-    it('ngOnInit should subscribe to RoundManager timer property', () => {
-        const timerObs = new Observable<Timer>();
-        const pipedObservable = timerObs.pipe();
-        const pipedSpy = spyOn(pipedObservable, 'subscribe');
-        spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(timerObs);
-        spyOn(mockRoundManager.timer, 'pipe').and.returnValue(pipedObservable);
-        component.ngOnInit();
-        expect(pipedSpy).toHaveBeenCalled();
-    });
-
-    it('ngOnInit timer subscription should call startTimer', () => {
-        const startTimerSpy = spyOn(component, 'startTimer').and.callFake(() => {
-            return;
+    describe('ngOnInit', () => {
+        it('ngOnInit should create ngUnsubscribe object', () => {
+            spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
+            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
+            component.ngOnInit();
+            expect(component['ngUnsubscribe']).toBeTruthy();
         });
-        spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
-            return false;
+
+        it('ngOnInit should create Timer object', () => {
+            spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
+            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
+            component.ngOnInit();
+            expect(component.timer).toBeTruthy();
         });
-        const newTimer = new Timer(1, 0);
-        mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
-        expect(startTimerSpy).toHaveBeenCalledWith(newTimer);
-    });
 
-    it('ngOnInit timer subscription should call updateActivePlayerBorder', () => {
-        spyOn(component, 'startTimer').and.callFake(() => {
-            return;
+        it('ngOnInit should subscribe to RoundManager timer property', () => {
+            const timerObs = new Observable<Timer>();
+            const pipedObservable = timerObs.pipe();
+            const pipedSpy = spyOn(pipedObservable, 'subscribe');
+            spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(timerObs);
+            spyOn(mockRoundManager.timer, 'pipe').and.returnValue(pipedObservable);
+            component.ngOnInit();
+            expect(pipedSpy).toHaveBeenCalled();
         });
-        const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
-            return false;
+
+        it('ngOnInit timer subscription should call startTimer', () => {
+            const startTimerSpy = spyOn(component, 'startTimer').and.callFake(() => {
+                return;
+            });
+            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+                return false;
+            });
+            const newTimer = new Timer(1, 0);
+            mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
+            expect(startTimerSpy).toHaveBeenCalledWith(newTimer);
         });
-        const newTimer = new Timer(1, 0);
-        mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
-        expect(updateBorderSpy).toHaveBeenCalled();
-    });
 
-    it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
-        const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
-        component.ngOnInit();
-        expect(subscribeSpy).toHaveBeenCalled();
+        it('ngOnInit timer subscription should call updateActivePlayerBorder', () => {
+            spyOn(component, 'startTimer').and.callFake(() => {
+                return;
+            });
+            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+                return false;
+            });
+            const newTimer = new Timer(1, 0);
+            mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
+            expect(updateBorderSpy).toHaveBeenCalled();
+        });
 
-        const endRoundSpy = spyOn(component, 'endRound');
-        mockRoundManager.endRoundEvent.emit();
-        expect(endRoundSpy).toHaveBeenCalled();
-    });
+        it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
+            const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
+            component.ngOnInit();
+            expect(subscribeSpy).toHaveBeenCalled();
 
-    it('ngOnInit endRoundEvent subscription should call endRound', () => {
-        const endRoundSpy = spyOn(component, 'endRound');
-        mockRoundManager.endRoundEvent.emit();
-        expect(endRoundSpy).toHaveBeenCalled();
+            const endRoundSpy = spyOn(component, 'endRound');
+            mockRoundManager.endRoundEvent.emit();
+            expect(endRoundSpy).toHaveBeenCalled();
+        });
+
+        it('ngOnInit should NOT subscribe to RoundManager endRoundEvent if roundManager.endRoundEvent is undefined', () => {
+            const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
+            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(undefined);
+            component.ngOnInit();
+            expect(subscribeSpy).not.toHaveBeenCalled();
+        });
+
+        it('ngOnInit endRoundEvent subscription should call endRound', () => {
+            const endRoundSpy = spyOn(component, 'endRound');
+            mockRoundManager.endRoundEvent.emit();
+            expect(endRoundSpy).toHaveBeenCalled();
+        });
     });
 
     it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {
@@ -168,100 +178,160 @@ describe('InformationBoxComponent', () => {
         expect(ngAfterViewInitSpy).toHaveBeenCalled();
     });
 
-    it('ngAfterViewInit should call updateActivePlayerBorder', () => {
-        const spy = spyOn(component, 'ngAfterViewInit');
+    // it('ngAfterViewInit should call updateActivePlayerBorder', () => {
+    // const spy = spyOn(component, 'ngAfterViewInit');
+    it('ngAfterViewInit should call updateActivePlayerBorder', fakeAsync(() => {
+        const spy = spyOn(component, 'updateActivePlayerBorder');
         component.ngAfterViewInit();
+        tick(1);
         expect(spy).toHaveBeenCalled();
-    });
+    }));
 
-    it('ngOnDestroy should unsubscribe from subscriptions', () => {
-        const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
-        const ngUnsubscribeCompleteSpy = spyOn(component['ngUnsubscribe'], 'complete');
-        const timerSubscriptionSpy = spyOn(component.timerSubscription, 'unsubscribe');
-        const endRoundSubscriptionSpy = spyOn(component.endRoundSubscription, 'unsubscribe');
-
-        component.ngOnDestroy();
-        expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
-        expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
-        expect(timerSubscriptionSpy).toHaveBeenCalled();
-        expect(endRoundSubscriptionSpy).toHaveBeenCalled();
-    });
-
-    it('StartTimer should update timer attribute', () => {
-        const observable = new Observable<number>();
-        spyOn<any>(component, 'createTimer').and.returnValue(observable);
-        spyOn(observable, 'subscribe').and.callFake(() => {
-            return new Subscription();
+    describe('ngOndestroy', () => {
+        beforeEach(() => {
+            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
+            spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         });
-        spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
-            return false;
+
+        it('should always call next and complete on ngUnsubscribe', () => {
+            const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn(component['ngUnsubscribe'], 'complete');
+
+            component.ngOnDestroy();
+            expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
+            expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
         });
-        const newTimer: Timer = new Timer(1, 0);
-        component.startTimer(newTimer);
-        expect(component.timer).toEqual(newTimer);
     });
 
-    it('StartTimer should create TimerSource', () => {
-        const observable = new Observable<number>();
-        spyOn<any>(component, 'createTimer').and.returnValue(observable);
-        spyOn(observable, 'subscribe').and.callFake(() => {
-            return new Subscription();
+    describe('startTimer', () => {
+        it('StartTimer should update timer attribute', () => {
+            const observable = new Observable<number>();
+            spyOn<any>(component, 'createTimer').and.returnValue(observable);
+            spyOn(observable, 'subscribe').and.callFake(() => {
+                return new Subscription();
+            });
+            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+                return false;
+            });
+            const newTimer: Timer = new Timer(1, 0);
+            component.startTimer(newTimer);
+            expect(component.timer).toEqual(newTimer);
         });
-        spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
-            return false;
+
+        it('StartTimer should create TimerSource', () => {
+            const observable = new Observable<number>();
+            spyOn<any>(component, 'createTimer').and.returnValue(observable);
+            spyOn(observable, 'subscribe').and.callFake(() => {
+                return new Subscription();
+            });
+            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+                return false;
+            });
+            const newTimer: Timer = new Timer(1, 0);
+            component.startTimer(newTimer);
+            expect(component.timerSource).toEqual(observable);
         });
-        const newTimer: Timer = new Timer(1, 0);
-        component.startTimer(newTimer);
-        expect(component.timerSource).toEqual(observable);
-    });
 
-    it('StartTimer should subscribe timerSubscription to timerSource and call timer.decrement', () => {
-        const newTimer: Timer = new Timer(1, 0);
-        spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
-            return false;
+        it('StartTimer should subscribe timerSubscription to timerSource and call timer.decrement', () => {
+            const newTimer: Timer = new Timer(1, 0);
+            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+                return false;
+            });
+            component.startTimer(newTimer);
+            expect(component.timerSubscription).toBeTruthy();
         });
-        component.startTimer(newTimer);
-        expect(component.timerSubscription).toBeTruthy();
     });
 
-    it('EndRound should set Timer to 0:00', () => {
-        component.endRound();
-        expect(component.timer).toEqual(new Timer(0, 0));
+    describe('endRound', () => {
+        it('EndRound should set Timer to 0:00', () => {
+            component.endRound();
+            expect(component.timer).toEqual(new Timer(0, 0));
+        });
+
+        it('EndRound should unsubscribe from timerSubscription', () => {
+            component.startTimer(new Timer(1, 0));
+            const spy = spyOn(component.timerSubscription, 'unsubscribe');
+            component.endRound();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('EndRound should not unsubscribe if timerSubscription is not defined', () => {
+            component.startTimer(new Timer(1, 0));
+            const spy = spyOn(component.timerSubscription, 'unsubscribe');
+            component.timerSubscription = undefined as unknown as Subscription;
+            // spyOnProperty<any>(component, 'timerSubscription', 'set').and.returnValue(null);
+            component.endRound();
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
-    it('EndRound should unsubscribe from timerSubscription', () => {
-        component.startTimer(new Timer(1, 0));
-        const spy = spyOn(component.timerSubscription, 'unsubscribe');
-        component.endRound();
-        expect(spy).toHaveBeenCalled();
+    describe('updateActivePlayerBorder', () => {
+        it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
+            const player1 = new Player('1', 'Player1', []);
+            const player2 = new Player('2', 'Player2', []);
+            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
+            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
+
+            component.updateActivePlayerBorder(player1);
+
+            expect(component.isPlayer1Active).toBeTrue();
+            expect(component.isPlayer2Active).toBeFalse();
+        });
+
+        it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
+            const player1 = new Player('1', 'Player1', []);
+            const player2 = new Player('2', 'Player2', []);
+            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
+            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
+
+            component.updateActivePlayerBorder(player2);
+
+            expect(component.isPlayer2Active).toBeTrue();
+            expect(component.isPlayer1Active).toBeFalse();
+        });
     });
 
-    it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
-        const player1 = new Player('1', 'Player1', []);
-        const player2 = new Player('2', 'Player2', []);
-        spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
-        spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
+    describe('getPlayer', () => {
+        it('getPlayer1 should return current gameservice player1 if it exists', () => {
+            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(DEFAULT_PLAYER);
+            expect(component.getPlayer1()).toEqual(DEFAULT_PLAYER);
+        });
 
-        component.updateActivePlayerBorder(player1);
+        it('getPlayer1 should return a new player if gameservice player1 does not exist', () => {
+            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(undefined);
+            expect(component.getPlayer1()).toEqual(new Player('', 'Player1', []));
+        });
 
-        expect(component.isPlayer1Active).toBeTrue();
-        expect(component.isPlayer2Active).toBeFalse();
-    });
+        it('getPlayer2 should return current gameservice player2 if it exists', () => {
+            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(DEFAULT_PLAYER);
+            expect(component.getPlayer2()).toEqual(DEFAULT_PLAYER);
+        });
 
-    it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
-        const player1 = new Player('1', 'Player1', []);
-        const player2 = new Player('2', 'Player2', []);
-        spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
-        spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
-
-        component.updateActivePlayerBorder(player2);
-
-        expect(component.isPlayer2Active).toBeTrue();
-        expect(component.isPlayer1Active).toBeFalse();
+        it('getPlayer2 should return a new player if gameservice player2 does not exist', () => {
+            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(undefined);
+            expect(component.getPlayer2()).toEqual(new Player('', 'Player2', []));
+        });
     });
 
     it('CreateTimer should return timer from rxjs', () => {
         const timerEl = component['createTimer'](SECONDS_TO_MILLISECONDS);
         expect(typeof timerEl).toEqual(typeof timer(0, SECONDS_TO_MILLISECONDS));
+    });
+
+    it('checkIfIsPlayer1 should return true if player1 is localPlayer', () => {
+        spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(DEFAULT_PLAYER);
+        spyOn(component['gameService'], 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
+        expect(component['checkIfIsPlayer1']()).toEqual(true);
+    });
+
+    it('checkIfIsPlayer1 should return false if player1 is not localPlayer', () => {
+        spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(DEFAULT_PLAYER);
+        spyOn(component['gameService'], 'getLocalPlayer').and.returnValue(new Player('id2', 'name of player2', []));
+        expect(component['checkIfIsPlayer1']()).toEqual(false);
+    });
+
+    it('getLocalPlayericon should return an icon from the list LOCAL_PLAYER_ICON', () => {
+        const chosenIcon = component['getLocalPlayerIcon']();
+        expect(LOCAL_PLAYER_ICON.includes(chosenIcon)).toBeTrue();
     });
 });
