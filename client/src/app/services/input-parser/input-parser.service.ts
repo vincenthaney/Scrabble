@@ -64,6 +64,8 @@ export default class InputParserService {
     }
 
     private parseCommand(inputWords: string[]): ActionData {
+        if (this.gameService.isGameOver) throw new CommandError(CommandErrorMessages.ImpossibleCommand);
+
         const actionName: string = inputWords[0];
 
         let actionData: ActionData;

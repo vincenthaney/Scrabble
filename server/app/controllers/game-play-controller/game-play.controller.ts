@@ -4,7 +4,7 @@ import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
 import { INVALID_WORD_TIMEOUT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
-import { COMMAND_IS_INVALID } from '@app/constants/services-errors';
+import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -36,11 +36,6 @@ export class GamePlayController {
         this.router.post('/games/:gameId/players/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
-
-            // eslint-disable-next-line no-console
-            console.log('Action type: ' + data.type);
-            // eslint-disable-next-line no-console
-            console.log('Action Payload: ' + data.payload);
 
             try {
                 this.handlePlayAction(gameId, playerId, data);
@@ -75,14 +70,14 @@ export class GamePlayController {
         });
     }
 
-    private handlePlayAction(gameId: string, playerId: string, data: ActionData): void {
+    private async handlePlayAction(gameId: string, playerId: string, data: ActionData): Promise<void> {
         if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         try {
             const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
-                this.socketService.emitToRoom(gameId, 'newMessage', {
+                this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
                     senderId: playerId,
                 });
@@ -114,7 +109,11 @@ export class GamePlayController {
                 }
             }
         } catch (e) {
-            this.handleError(e, data.input, playerId);
+            await this.handleError(e, data.input, playerId, gameId);
+
+            if (this.isWordNotInDictionaryError(e)) {
+                this.handlePlayAction(gameId, playerId, { type: 'pass', payload: {}, input: '' });
+            }
         }
     }
 
@@ -135,14 +134,24 @@ export class GamePlayController {
         });
     }
 
-    private async handleError(e: Error, input: string, playerId: string) {
-        if (e.message.includes(" n'est pas dans le dictionnaire choisi.")) {
+    private async handleError(e: Error, input: string, playerId: string, gameId: string) {
+        if (this.isWordNotInDictionaryError(e)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
+
+            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+            this.socketService.emitToSocket(opponentId, 'newMessage', {
+                content: OPPONENT_PLAYED_INVALID_WORD,
+                senderId: SYSTEM_ID,
+            });
         }
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: COMMAND_IS_INVALID(input) + e.message,
             senderId: SYSTEM_ERROR_ID,
         });
+    }
+
+    private isWordNotInDictionaryError(e: Error): boolean {
+        return e.message.includes(" n'est pas dans le dictionnaire choisi.");
     }
 }

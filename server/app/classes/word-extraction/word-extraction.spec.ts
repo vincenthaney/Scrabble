@@ -123,6 +123,13 @@ describe('WordExtract', () => {
 
             expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
         });
+
+        it('should throw if letter is not adjacent', () => {
+            const tiles = tilesFromLetters(['X']);
+            const position = new Position(4, 4);
+            const orientation = Orientation.Horizontal;
+            expect(() => extraction.extract(tiles, position, orientation)).to.throw();
+        });
     });
 
     describe('extractWordInDirection', () => {

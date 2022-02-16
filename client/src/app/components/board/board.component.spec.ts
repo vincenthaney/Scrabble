@@ -383,6 +383,14 @@ describe('BoardComponent', () => {
             expect(component.squareGrid[0][1].square.tile!.letter).not.toEqual(payload.tiles[1].letter);
             expect(component.squareGrid[0][1].applied).toBeTrue();
         });
+
+        it('should not change tile if applied is true', () => {
+            component.squareGrid[0][0].square.tile = new Tile('Z', 0);
+
+            component['handlePlaceTiles'](payload);
+
+            expect(component.squareGrid[0][1].square.tile).toEqual(null);
+        });
     });
 
     describe('handleNewMessage', () => {

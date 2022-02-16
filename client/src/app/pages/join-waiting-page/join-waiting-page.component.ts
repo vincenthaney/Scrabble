@@ -3,16 +3,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { NavigationStart, Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
+    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCEL_CONTENT,
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
     DIALOG_REJECT_TITLE,
 } from '@app/constants/pages-constants';
+import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
+import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 @Component({
     selector: 'app-waiting-page',
     templateUrl: './join-waiting-page.component.html',
@@ -26,11 +29,16 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     currentLobby: LobbyInfo;
     currentName: string;
 
-    constructor(public dialog: MatDialog, public gameDispatcherService: GameDispatcherService, public router: Router) {}
-    // TODO: Fix if player goes to /game or change attribute when game starts
+    constructor(
+        public dialog: MatDialog,
+        public gameDispatcherService: GameDispatcherService,
+        private readonly playerLeavesService: PlayerLeavesService,
+        public router: Router,
+    ) {}
+
     @HostListener('window:beforeunload')
     onBeforeUnload() {
-        this.gameDispatcherService.handleLeaveLobby();
+        this.playerLeavesService.handleLeaveLobby();
     }
 
     ngOnInit() {
@@ -57,7 +65,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
 
     routerChangeMethod(url: string) {
         if (url !== '/game') {
-            this.gameDispatcherService.handleLeaveLobby();
+            this.playerLeavesService.handleLeaveLobby();
         }
     }
 
@@ -84,7 +92,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
                 content: hostName + DIALOG_CANCEL_CONTENT,
                 buttons: [
                     {
-                        content: DIALOG_BUTTON_CONTENT_REJECTED,
+                        content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
                         redirect: '/lobby',
                         closeDialog: true,
                     },
