@@ -2,13 +2,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
-import { SocketService } from '@app/services/socket-service/socket.service';
-import { validateName } from '@app/utils/validate-name';
-import { Response, Router } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import { Service } from 'typedi';
+import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
     GAME_IS_OVER,
@@ -17,8 +11,14 @@ import {
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
-import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import { SYSTEM_ID } from '@app/constants/game';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { validateName } from '@app/utils/validate-name';
+import { Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
 @Service()
 export class GameDispatcherController {
     router: Router;
@@ -258,7 +258,7 @@ export class GameDispatcherController {
         player.isConnected = true;
         this.socketService.addToRoom(newPlayerId, gameId);
 
-        const data = this.gameDispatcherService.createStartGameData(game);
+        const data = game.createStartGameData();
         this.socketService.emitToSocket(newPlayerId, 'startGame', data);
     }
 
