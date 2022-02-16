@@ -15,7 +15,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { BoardService, GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -580,14 +580,17 @@ describe('GameService', () => {
     });
 
     describe('disconnectGame', () => {
+        let localPlayerSpy: jasmine.Spy;
         let cookieGameSpy: jasmine.Spy;
-        let cookieSocketSpy: jasmine.Spy;
         let gameControllerSpy: jasmine.Spy;
         beforeEach(() => {
-            cookieGameSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {
-                return;
+            service.player1 = new Player('p1', 'jean', []);
+            service.player2 = new Player('p2', 'paul', []);
+            localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callFake(() => {
+                return 'testyId';
             });
-            cookieSocketSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {
+
+            cookieGameSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {
                 return;
             });
             gameControllerSpy = spyOn(service['gameController'], 'handleDisconnection').and.callFake(() => {
@@ -596,15 +599,12 @@ describe('GameService', () => {
         });
 
         it('should call getLocalPlayerId();', () => {
-            const localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callFake(() => {
-                return 'testyId';
-            });
-            service.gameOver();
+            service.disconnectGame();
             expect(localPlayerSpy).toHaveBeenCalled();
         });
 
         it('should empty gameId, playerId1, playerId2 and localPlayerId', () => {
-            service.gameOver();
+            service.disconnectGame();
             expect(service['gameId']).toEqual('');
             expect(service['player1'].id).toEqual('');
             expect(service['player2'].id).toEqual('');
@@ -612,25 +612,19 @@ describe('GameService', () => {
         });
 
         it('!localPlayerId) throw new Error(NO_LOCAL_PLAYER);', () => {
-            spyOn(service, 'getLocalPlayerId').and.callFake(() => {
+            localPlayerSpy.and.callFake(() => {
                 return undefined;
             });
-
-            expect(service.gameOver()).toThrow(new Error(NO_LOCAL_PLAYER));
+            expect(() => service.disconnectGame()).toThrow();
         });
 
         it('should call cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);', () => {
-            service.gameOver();
-            expect(cookieGameSpy).toHaveBeenCalled();
+            service.disconnectGame();
+            expect(cookieGameSpy).toHaveBeenCalledTimes(2);
         });
 
-        it('should call this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);', () => {
-            service.gameOver();
-            expect(cookieSocketSpy).toHaveBeenCalled();
-        });
-
-        it('should call gameController.handleDisconnection(gameId, localPlayerId);', () => {
-            service.gameOver();
+        it('should call gameController.handleDisconnection);', () => {
+            service.disconnectGame();
             expect(gameControllerSpy).toHaveBeenCalled();
         });
     });
