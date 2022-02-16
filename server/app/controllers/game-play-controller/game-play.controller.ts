@@ -137,7 +137,7 @@ export class GamePlayController {
         if (this.isWordNotInDictionaryError(e)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
 
-            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).id;
             this.socketService.emitToSocket(opponentId, 'newMessage', {
                 content: OPPONENT_PLAYED_INVALID_WORD,
                 senderId: SYSTEM_ID,
