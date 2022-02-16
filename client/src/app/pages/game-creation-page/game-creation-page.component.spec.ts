@@ -1,10 +1,12 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { CommonModule, Location } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
@@ -15,6 +17,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { GameMode } from '@app/classes/game-mode';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
@@ -93,6 +96,199 @@ describe('GameCreationPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    describe('ngOnInit', () => {
+        it('should add validator required to level if game mode is Solo', () => {
+            const spy = spyOn<any>(component.gameParameters.get('level'), 'setValidators');
+            component.ngOnInit();
+            component.gameParameters.get('gameMode')?.setValue(GameMode.Solo);
+            expect(spy).toHaveBeenCalledWith([Validators.required]);
+        });
+
+        it('should remove validator required to level if game mode is not Solo', () => {
+            const spy = spyOn<any>(component.gameParameters.get('level'), 'clearValidators');
+            component.ngOnInit();
+            component.gameParameters.get('gameMode')?.setValue(GameMode.Multiplayer);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should always call updateValueAndValidity to level', () => {
+            const spy = spyOn<any>(component.gameParameters.get('level'), 'updateValueAndValidity');
+            component.ngOnInit();
+            component.gameParameters.get('gameMode')?.setValue(undefined);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
+            const subscribeSpy = spyOn<any>(component.gameParameters.get('gameMode')?.valueChanges, 'subscribe');
+            component.ngOnInit();
+            expect(subscribeSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('ngOndestroy', () => {
+        it('should always call next and complete on ngUnsubscribe', () => {
+            const ngUnsubscribeNextSpy = spyOn<any>(component.serviceDestroyed$, 'next');
+            const ngUnsubscribeCompleteSpy = spyOn<any>(component.serviceDestroyed$, 'complete');
+
+            component.ngOnDestroy();
+            expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
+            expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('form', () => {
+        it('form should have the right default values', async () => {
+            const defaultFormValues = {
+                gameType: component.gameTypes.Classic,
+                gameMode: component.gameModes.Multiplayer,
+                level: component.virtualPlayerLevels.Beginner,
+                timer: EMPTY_VALUE,
+                dictionary: EMPTY_VALUE,
+            };
+            const defaultNameValue = EMPTY_VALUE;
+
+            expect(gameParameters.value).toEqual(defaultFormValues);
+            expect(component.child.formParameters.get('inputName')?.value).toEqual(defaultNameValue);
+        });
+
+        it('form should be valid if all required fields are filled', () => {
+            setValidFormValues();
+            expect(component.isFormValid()).toBeTruthy();
+        });
+
+        it('form should be invalid if gameType is empty', async () => {
+            setValidFormValues();
+            gameParameters.get('gameType')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeFalsy();
+        });
+
+        it('form should be invalid if gameMode is empty', async () => {
+            setValidFormValues();
+            gameParameters.get('gameMode')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeFalsy();
+        });
+
+        it('form should be invalid if level is empty while gameMode is solo', async () => {
+            setValidFormValues();
+            gameParameters.get('level')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeFalsy();
+        });
+
+        it('form should be valid if level is empty while gameMode is multiplayer', async () => {
+            setValidFormValues();
+            gameParameters.get('gameMode')?.setValue(component.gameModes.Multiplayer);
+            gameParameters.get('level')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeTruthy();
+        });
+
+        it('form should not be valid if timer is empty', () => {
+            setValidFormValues();
+            gameParameters.get('timer')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeFalsy();
+        });
+
+        it('form should not be valid if dictionary is empty', () => {
+            setValidFormValues();
+            gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeFalsy();
+        });
+
+        it('form should not be valid if name is empty', () => {
+            setValidFormValues();
+            component.child.formParameters.get('inputName')?.setValue(EMPTY_VALUE);
+
+            expect(component.isFormValid()).toBeFalsy();
+        });
+
+        it('form should call onSubmit when submit button is clicked', async () => {
+            const spy = spyOn(component, 'onSubmit');
+            const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+            submitButton.click();
+
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onSubmit', () => {
+        it('form should call createGame on submit if form is valid', async () => {
+            const spy = spyOn(component, 'createGame');
+            setValidFormValues();
+
+            component.onSubmit();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT call createGame on submit if form is invalid', async () => {
+            const spy = spyOn(component, 'createGame');
+
+            const gameParametersForm = component.gameParameters;
+            gameParametersForm.setErrors({ error: true });
+
+            component.onSubmit();
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should mark child form as touched if form is invalid', async () => {
+            const spy = spyOn(component.child.formParameters, 'markAllAsTouched');
+
+            const gameParametersForm = component.gameParameters;
+            gameParametersForm.setErrors({ error: true });
+
+            component.onSubmit();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT mark child form as touched if form is valid', async () => {
+            const spy = spyOn(component.child.formParameters, 'markAllAsTouched');
+            setValidFormValues();
+
+            component.onSubmit();
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('createGame', () => {
+        it('createGame button should reroute to waiting-room page if form is valid', async () => {
+            const location: Location = TestBed.inject(Location);
+            setValidFormValues();
+
+            const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+            createButton.click();
+
+            return fixture.whenStable().then(() => {
+                expect(location.path()).toBe('/waiting-room');
+            });
+        });
+
+        it('createGame button should send game to GameDispatcher service if valid', async () => {
+            setValidFormValues();
+
+            const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+            createButton.click();
+
+            expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
+        });
+    });
+
+    it('clicking on Classic button should set gameType attribute to Classic', async () => {
+        const gameTypeField = component.gameParameters.get('gameType');
+        gameTypeField?.setValue(component.gameTypes.LOG2990);
+
+        const classicButton = await loader.getHarness(
+            MatButtonToggleHarness.with({
+                selector: '#classic-button',
+            }),
+        );
+        await classicButton.toggle();
+        expect(gameTypeField?.value).toEqual(component.gameTypes.Classic);
+    });
+
     // NOT YET IMPLEMENTED
     // it('clicking on LOG2990 button should set gameType attribute to LOG2990', async () => {
     //     const gameTypeField = component.gameParameters.get('gameType');
@@ -108,19 +304,6 @@ describe('GameCreationPageComponent', () => {
     //     await log2990Button.toggle();
     //     expect(gameTypeField?.value).toEqual(component.gameTypes.LOG2990);
     // });
-
-    it('clicking on Classic button should set gameType attribute to Classic', async () => {
-        const gameTypeField = component.gameParameters.get('gameType');
-        gameTypeField?.setValue(component.gameTypes.LOG2990);
-
-        const classicButton = await loader.getHarness(
-            MatButtonToggleHarness.with({
-                selector: '#classic-button',
-            }),
-        );
-        await classicButton.toggle();
-        expect(gameTypeField?.value).toEqual(component.gameTypes.Classic);
-    });
 
     // NOT YET IMPLEMENTED
     // it('clicking on Solo button should set gameMode attribute to Solo', async () => {
@@ -173,126 +356,6 @@ describe('GameCreationPageComponent', () => {
 
         expect(levelLabel).toBeFalsy();
         expect(levelButtons).toBeFalsy();
-    });
-
-    it('form should have the right default values', async () => {
-        const defaultFormValues = {
-            gameType: component.gameTypes.Classic,
-            gameMode: component.gameModes.Multiplayer,
-            level: component.virtualPlayerLevels.Beginner,
-            timer: EMPTY_VALUE,
-            dictionary: EMPTY_VALUE,
-        };
-        const defaultNameValue = EMPTY_VALUE;
-
-        expect(gameParameters.value).toEqual(defaultFormValues);
-        expect(component.child.formParameters.get('inputName')?.value).toEqual(defaultNameValue);
-    });
-
-    it('form should be valid if all required fields are filled', () => {
-        setValidFormValues();
-        expect(component.isFormValid()).toBeTruthy();
-    });
-
-    it('form should be invalid if gameType is empty', async () => {
-        setValidFormValues();
-        gameParameters.get('gameType')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeFalsy();
-    });
-
-    it('form should be invalid if gameMode is empty', async () => {
-        setValidFormValues();
-        gameParameters.get('gameMode')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeFalsy();
-    });
-
-    it('form should be invalid if level is empty while gameMode is solo', async () => {
-        setValidFormValues();
-        gameParameters.get('level')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeFalsy();
-    });
-
-    it('form should be valid if level is empty while gameMode is multiplayer', async () => {
-        setValidFormValues();
-        gameParameters.get('gameMode')?.setValue(component.gameModes.Multiplayer);
-        gameParameters.get('level')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeTruthy();
-    });
-
-    it('form should not be valid if timer is empty', () => {
-        setValidFormValues();
-        gameParameters.get('timer')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeFalsy();
-    });
-
-    it('form should not be valid if dictionary is empty', () => {
-        setValidFormValues();
-        gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeFalsy();
-    });
-
-    it('form should not be valid if name is empty', () => {
-        setValidFormValues();
-        component.child.formParameters.get('inputName')?.setValue(EMPTY_VALUE);
-
-        expect(component.isFormValid()).toBeFalsy();
-    });
-
-    it('form should call onSubmit when submit button is clicked', async () => {
-        const spy = spyOn(component, 'onSubmit');
-        const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-        submitButton.click();
-
-        expect(spy).toHaveBeenCalled();
-    });
-
-    it('form should not call createGame on submit if invalid', async () => {
-        const spy = spyOn(component, 'createGame');
-
-        const gameParametersForm = component.gameParameters;
-        gameParametersForm.setErrors({ error: true });
-
-        const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-        submitButton.click();
-
-        expect(spy).not.toHaveBeenCalled();
-    });
-
-    it('form should call createGame on submit if valid', async () => {
-        const spy = spyOn(component, 'createGame');
-        setValidFormValues();
-
-        const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-        submitButton.click();
-
-        expect(spy).toHaveBeenCalled();
-    });
-
-    it('createGame button should reroute to waiting-room page if form is valid', async () => {
-        const location: Location = TestBed.inject(Location);
-        setValidFormValues();
-
-        const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-        createButton.click();
-
-        return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/waiting-room');
-        });
-    });
-
-    it('createGame button should send game to GameDispatcher service if valid', async () => {
-        setValidFormValues();
-
-        const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-        createButton.click();
-
-        expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
     });
 
     it('back button should reroute to home page', async () => {

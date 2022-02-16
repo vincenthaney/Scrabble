@@ -9,11 +9,11 @@ export default class BoardService {
     boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
     boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
 
-    initializeBoard(board: Square[][]) {
+    initializeBoard(board: Square[][]): void {
         this.initialBoard = [...board];
     }
 
-    updateBoard(squareUpdated: Square[]) {
+    updateBoard(squareUpdated: Square[]): void {
         this.boardUpdateEvent.emit(squareUpdated);
     }
 }

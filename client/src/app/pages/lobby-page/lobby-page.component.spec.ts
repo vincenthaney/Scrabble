@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -31,8 +32,6 @@ export class GameDispatcherServiceSpy extends GameDispatcherService {
     handleJoinLobby() {
         return;
     }
-    // lobbiesUpdateEvent: {subscribe: createSpy('lobbiesUpdateEvent subscribe')};
-    // lobbiesUpdateEvent
 }
 
 export class MatDialogMock {
@@ -102,40 +101,67 @@ describe('LobbyPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
-        component.nameField.formParameters.patchValue({ inputName: 'differentName' });
-        component.validateName();
-        for (const lobby of component.lobbies) {
-            expect(lobby.canJoin).toBeTruthy();
-        }
+    describe('validateName', () => {
+        it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
+            component.nameField.formParameters.patchValue({ inputName: 'differentName' });
+            component.validateName();
+            for (const lobby of component.lobbies) {
+                expect(lobby.canJoin).toBeTrue();
+            }
+        });
+
+        it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
+            component.nameField.formParameters.patchValue({ inputName: 'Name1' });
+            const expected = [false, true, true];
+            component.validateName();
+            expect(component.lobbies).toBeTruthy();
+            for (let i = 0; i++; i < component.lobbies.length) {
+                expect(component.lobbies[i].canJoin).toEqual(expected[i]);
+            }
+        });
     });
 
-    it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
-        component.nameField.formParameters.patchValue({ inputName: 'Name1' });
-        const expected = [false, true, true];
-        component.validateName();
-        expect(component.lobbies).toBeTruthy();
-        for (let i = 0; i++; i < component.lobbies.length) {
-            expect(component.lobbies[i].canJoin).toEqual(expected[i]);
-        }
+    describe('onNameChange', () => {
+        it('onNameChange should call validateName', () => {
+            const spy = spyOn(component, 'validateName').and.callFake(() => {
+                return false;
+            });
+            component.onNameChange();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('onNameChange should call validateName', () => {
+            const spy = spyOn(component['ref'], 'markForCheck').and.callFake(() => {
+                return false;
+            });
+            component.onNameChange();
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
-    it('onNameChange should call validateName', () => {
-        const fakeValidateName = () => {
-            return false;
-        };
-        const spy = spyOn(component, 'validateName').and.callFake(fakeValidateName);
-        component.onNameChange();
-        expect(spy).toHaveBeenCalled();
-    });
+    describe('updateLobbies', () => {
+        it('updateLobbies should call validateName', () => {
+            const spy = spyOn(component, 'validateName').and.callFake(() => {
+                return false;
+            });
+            component.updateLobbies(component.lobbies);
+            expect(spy).toHaveBeenCalled();
+        });
 
-    it('updateLobbies should call validateName', () => {
-        const fakeValidateName = () => {
-            return false;
-        };
-        const spy = spyOn(component, 'validateName').and.callFake(fakeValidateName);
-        component.updateLobbies(component.lobbies);
-        expect(spy).toHaveBeenCalled();
+        it('updateLobbies should set lobbies to right value', () => {
+            component.lobbies = [
+                {
+                    lobbyId: 'id',
+                    playerName: 'name',
+                    gameType: GameType.Classic,
+                    maxRoundTime: 60,
+                    dictionary: 'dictionary',
+                    canJoin: true,
+                },
+            ];
+            component.updateLobbies([]);
+            expect(component.lobbies).toEqual([]);
+        });
     });
 
     it('joinLobby should send to GameDispatcher service to join a lobby', () => {
