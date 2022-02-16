@@ -401,6 +401,19 @@ describe('GameService', () => {
         });
     });
 
+    describe('gameOver', () => {
+        it('should change attribute "isGameOver" to true', () => {
+            service.gameOver();
+            expect(service['isGameOver']).toEqual(true);
+        });
+
+        it('should call roundManager.resetTimerData()', () => {
+            const roundManagerTimerSpy = spyOn(service['roundManager'], 'resetTimerData');
+            service.gameOver();
+            expect(roundManagerTimerSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('getLocalPlayer and getLocalPlayerId', () => {
         let player1: Player;
         let player2: Player;
