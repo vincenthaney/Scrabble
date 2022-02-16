@@ -90,7 +90,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         // We haven't been able to test that the right function is called because this
                         // arrow function creates a new instance of the function. We cannot spy on it.
                         // It totally works tho, try it!
-                        action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
+                        action: () => this.handlePlayerLeave(),
                     },
                     {
                         content: buttonsContent[1],
@@ -145,5 +145,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
             if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
             if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
         }
+    }
+
+    private handlePlayerLeave(): void {
+        this.gameService.gameId = '';
+        this.playerLeavesService.handleLocalPlayerLeavesGame();
     }
 }

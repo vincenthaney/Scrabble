@@ -49,7 +49,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
     isGameOver: boolean;
-    private gameId: string;
+    gameId: string;
     private localPlayerId: string;
 
     constructor(
@@ -90,8 +90,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameIsSetUp = true;
         this.isGameOver = false;
         if (this.router.url !== '/game') {
-            this.roundManager.initialize();
-            this.roundManager.startRound(startGameData.maxRoundTime);
             this.roundManager.initialize();
             this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');
