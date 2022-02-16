@@ -11,7 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import {
-    DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
+    DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
@@ -206,7 +206,7 @@ describe('CreateWaitingPageComponent', () => {
                     content: leaverName + DIALOG_CONTENT,
                     buttons: [
                         {
-                            content: DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
+                            content: DIALOG_BUTTON_CONTENT_REJECTED,
                             closeDialog: true,
                         },
                     ],
