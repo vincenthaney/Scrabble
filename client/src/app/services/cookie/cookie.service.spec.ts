@@ -30,7 +30,7 @@ describe('CookieService', () => {
         it('should set document.cookie', () => {
             const date = new Date();
             date.setTime(date.getTime() + EXPIRY * SECONDS_TO_MILLISECONDS);
-            const expected = `${USERNAME}=${VALUE};expires=${date.toUTCString()};path=/`;
+            const expected = `${USERNAME}=${VALUE}; expires=${date.toUTCString()};path=/ ;SameSite=strict`;
             service.setCookie(USERNAME, VALUE, EXPIRY);
 
             expect(documentCookieSpy).toHaveBeenCalledWith(expected);
@@ -68,7 +68,7 @@ describe('CookieService', () => {
         });
 
         it('should set document cookie to expired', () => {
-            const expected = `${USERNAME}=; Max-Age=${EXPIRED_COOKIE_AGE};`;
+            const expected = `${USERNAME}=; Max-Age=${EXPIRED_COOKIE_AGE}; SameSite=strict`;
             service.eraseCookie(USERNAME);
             expect(documentCookieSpy).toHaveBeenCalledWith(expected);
         });
