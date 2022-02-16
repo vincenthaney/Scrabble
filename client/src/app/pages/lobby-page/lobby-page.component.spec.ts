@@ -26,8 +26,6 @@ export class TestComponent {}
 
 export class GameDispatcherServiceSpy extends GameDispatcherService {
     handleLobbyListRequest() {
-        // eslint-disable-next-line no-console
-        console.log('handleLobbyListRequest');
         return;
     }
     handleJoinLobby() {
