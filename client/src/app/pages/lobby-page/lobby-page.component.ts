@@ -3,9 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
-import { GameDispatcherService } from '@app/services/';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import {
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCELED_CONTENT,
@@ -13,6 +10,9 @@ import {
     DIALOG_FULL_CONTENT,
     DIALOG_FULL_TITLE,
 } from '@app/constants/pages-constants';
+import { GameDispatcherService } from '@app/services/';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-lobby-page',
@@ -29,7 +29,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbies: LobbyInfo[];
     constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((lobbies) => this.updateLobbies(lobbies));
@@ -42,7 +42,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService.handleLobbyListRequest();
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
@@ -55,7 +55,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    onNameChange() {
+    onNameChange(): void {
         this.validateName();
         this.ref.markForCheck();
     }
@@ -65,14 +65,14 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.validateName();
     }
 
-    joinLobby(lobbyId: string) {
+    joinLobby(lobbyId: string): void {
         this.gameDispatcherService.handleJoinLobby(
             this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
             this.nameField.formParameters.get('inputName')?.value,
         );
     }
 
-    lobbyFullDialog() {
+    lobbyFullDialog(): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_FULL_TITLE,
@@ -87,7 +87,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    lobbyCanceledDialog() {
+    lobbyCanceledDialog(): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_CANCELED_TITLE,

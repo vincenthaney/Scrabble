@@ -19,7 +19,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
-    // TODO : when dictionnaries and timers are implemented, create mat-options with ngFor on the available lists
+    // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
     dictionaryOptions: string[];
     serviceDestroyed$: Subject<boolean> = new Subject();
@@ -34,7 +34,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
-    // TODO: Check if this causes memory leak
     ngOnInit() {
         this.gameParameters
             .get('gameMode')

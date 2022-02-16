@@ -67,10 +67,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     opponentLeft(leaverName: string) {
-        this.opponentName = undefined;
-        this.waitingRoomMessage = HOST_WAITING_MESSAGE;
-        this.isOpponentFound = false;
-
+        this.disconnectOpponent();
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_TITLE,

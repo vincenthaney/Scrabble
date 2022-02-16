@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameType } from '@app/classes/game-type';
-import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -12,7 +11,8 @@ import { takeUntil } from 'rxjs/operators';
 @Injectable({
     providedIn: 'root',
 })
-export default class GameDispatcherService implements OnDestroy, IResetServiceData {
+export default class GameDispatcherService implements OnDestroy {
+    serviceDestroyed$: Subject<boolean> = new Subject();
     gameId: string;
     currentLobby: LobbyInfo | undefined;
     currentName: string;
@@ -20,6 +20,7 @@ export default class GameDispatcherService implements OnDestroy, IResetServiceDa
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
     lobbyFullEvent: EventEmitter<void> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
+    joinerLeaveGameEvent: EventEmitter<string> = new EventEmitter();
     joinerRejectedEvent: EventEmitter<string> = new EventEmitter();
 
     createGameSubscription: Subscription;
@@ -27,10 +28,9 @@ export default class GameDispatcherService implements OnDestroy, IResetServiceDa
     lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
     canceledGameSubscription: Subscription;
+    joinerLeaveGameSubscription: Subscription;
     joinRequestValidSubscription: Subscription;
     joinerRejectedSubscription: Subscription;
-
-    serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
         this.createGameSubscription = this.gameDispatcherController.createGameEvent
@@ -63,24 +63,24 @@ export default class GameDispatcherService implements OnDestroy, IResetServiceDa
         this.serviceDestroyed$.complete();
     }
 
-    resetServiceData() {
+    resetServiceData(): void {
         this.currentLobby = undefined;
         this.currentName = '';
         this.gameId = '';
     }
 
-    handleJoinLobby(lobby: LobbyInfo, playerName: string) {
+    handleJoinLobby(lobby: LobbyInfo, playerName: string): void {
         this.currentLobby = lobby;
         this.currentName = playerName;
         this.gameId = lobby.lobbyId;
         this.gameDispatcherController.handleLobbyJoinRequest(this.gameId, playerName);
     }
 
-    handleLobbyListRequest() {
+    handleLobbyListRequest(): void {
         this.gameDispatcherController.handleLobbiesListRequest();
     }
 
-    handleCreateGame(playerName: string, gameParameters: FormGroup) {
+    handleCreateGame(playerName: string, gameParameters: FormGroup): void {
         const gameConfig: GameConfigData = {
             playerName,
             playerId: this.gameDispatcherController.socketService.getId(),
@@ -91,39 +91,43 @@ export default class GameDispatcherService implements OnDestroy, IResetServiceDa
         this.gameDispatcherController.handleMultiplayerGameCreation(gameConfig);
     }
 
-    handleCancelGame() {
+    handleCancelGame(): void {
         if (this.gameId) this.gameDispatcherController.handleCancelGame(this.gameId);
         this.resetServiceData();
     }
 
-    handleConfirmation(opponentName: string) {
+    handleConfirmation(opponentName: string): void {
         if (this.gameId) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.gameId);
     }
 
-    handleRejection(opponentName: string) {
+    handleRejection(opponentName: string): void {
         if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
     }
 
-    handleJoinRequest(opponentName: string) {
+    handleJoinRequest(opponentName: string): void {
         this.joinRequestEvent.emit(opponentName);
     }
 
-    handleJoinerRejected(hostName: string) {
+    handleJoinerRejected(hostName: string): void {
         this.joinerRejectedEvent.emit(hostName);
         this.resetServiceData();
     }
 
-    handleLobbiesUpdate(lobbies: LobbyInfo[]) {
+    handleLobbiesUpdate(lobbies: LobbyInfo[]): void {
         this.lobbiesUpdateEvent.emit(lobbies);
     }
 
-    handleLobbyFull() {
+    handleLobbyFull(): void {
         this.lobbyFullEvent.emit();
         this.resetServiceData();
     }
 
-    handleCanceledGame(hostName: string) {
+    handleCanceledGame(hostName: string): void {
         this.canceledGameEvent.emit(hostName);
         this.resetServiceData();
+    }
+
+    handleJoinerLeaveGame(leaverName: string): void {
+        this.joinerLeaveGameEvent.emit(leaverName);
     }
 }
