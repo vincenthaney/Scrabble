@@ -4,7 +4,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
@@ -52,7 +53,13 @@ describe('GameService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([{ path: 'game', component: TestComponent }])],
+            imports: [
+                HttpClientTestingModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'game', component: TestComponent },
+                    { path: 'other', component: TestComponent },
+                ]),
+            ],
             providers: [
                 { provide: BoardService, useValue: boardServiceSpy },
                 { provide: RoundManagerService, useValue: roundManagerSpy },
@@ -192,6 +199,42 @@ describe('GameService', () => {
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(boardServiceSpy.initializeBoard).toHaveBeenCalledWith(defaultGameData.board);
         });
+
+        it('should call startRound', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('other');
+            tick();
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(roundManagerSpy.startRound).toHaveBeenCalled();
+        }));
+
+        it('should call initialize', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('other');
+            tick();
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(roundManagerSpy.startRound).toHaveBeenCalled();
+        }));
+
+        it('should call navigateByUrl', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('other');
+            tick();
+            const spy = spyOn(service['router'], 'navigateByUrl');
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(spy).toHaveBeenCalledWith('game');
+        }));
+
+        it('should call reconnectReinitialize', fakeAsync(() => {
+            const router: Router = TestBed.inject(Router);
+            router.navigateByUrl('game');
+            tick();
+            const spy = spyOn(service, 'reconnectReinitialize').and.callFake(() => {
+                return;
+            });
+            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            expect(spy).toHaveBeenCalled();
+        }));
 
         it('should call startRound', async () => {
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);

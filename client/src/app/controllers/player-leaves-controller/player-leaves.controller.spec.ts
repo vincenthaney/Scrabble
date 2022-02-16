@@ -12,7 +12,6 @@ describe('PlayerLeavesController', () => {
     let controller: PlayerLeavesController;
     let httpMock: HttpTestingController;
     let socketServiceMock: SocketService;
-    // let gameServiceMock: GameService;
     let socketHelper: SocketTestHelper;
 
     beforeEach(async () => {
@@ -26,7 +25,6 @@ describe('PlayerLeavesController', () => {
         });
         controller = TestBed.inject(PlayerLeavesController);
         httpMock = TestBed.inject(HttpTestingController);
-        // gameServiceMock = TestBed.inject(GameService);
     });
 
     afterEach(() => {

@@ -49,7 +49,7 @@ const FUTURE_DATE = new Date(Date.now() + TIME_INTERVAL);
 
 const DEFAULT_PLAYER_NAME = 'defaultName';
 const DEFAULT_PLAYER_ID = 'defaultId';
-const DEFAULT_PLAYER_DATA: PlayerData = { name: DEFAULT_PLAYER_NAME, id: DEFAULT_PLAYER_ID, tiles: [], score: 1 };
+const DEFAULT_PLAYER_DATA: PlayerData = { name: DEFAULT_PLAYER_NAME, id: DEFAULT_PLAYER_ID, tiles: [{ letter: 'A', value: 1 }], score: 1 };
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
@@ -134,12 +134,12 @@ describe('RoundManagerService', () => {
             service.updateRound(updatedRound);
         });
 
-        it('updateRound should set the old current round completed time to new round start time', () => {
+        it('startRound should set the old current round completed time to new round start time', () => {
             const numberOfRounds = service.completedRounds.length;
             expect(service.completedRounds[numberOfRounds - 1].completedTime).toEqual(updatedRound.startTime);
         });
 
-        it('updateRound should append old current round to the completed rounds array', () => {
+        it('startRound should append old current round to the completed rounds array', () => {
             const numberOfRounds = service.completedRounds.length;
             const lastRoundInArray = service.completedRounds[numberOfRounds - 1];
             currentRound.completedTime = updatedRound.startTime;
@@ -147,11 +147,11 @@ describe('RoundManagerService', () => {
             expect(lastRoundInArray).toEqual(currentRound);
         });
 
-        it('updateRound should set the new current round to the updatedRound', () => {
+        it('startRound should set the new current round to the updatedRound', () => {
             expect(service.currentRound).toEqual(updatedRound);
         });
 
-        it('updateRound should call startRound', () => {
+        it('startRound should call startRound', () => {
             expect(startRoundSpy).toHaveBeenCalled();
         });
     });
@@ -216,6 +216,11 @@ describe('RoundManagerService', () => {
             completedTime: null,
         };
 
+        it('should not throw an error if roundData has all the information', () => {
+            const result = () => service.convertRoundDataToRound({ ...roundData });
+            expect(result).not.toThrowError();
+        });
+
         it('should throw an error if roundData is missing information', () => {
             roundData.playerData.id = undefined;
             let result = () => service.convertRoundDataToRound(roundData);
@@ -228,11 +233,6 @@ describe('RoundManagerService', () => {
             roundData.playerData.tiles = undefined;
             result = () => service.convertRoundDataToRound(roundData);
             expect(result).toThrowError(CONVERT_ROUND_DATA);
-        });
-
-        it('should not throw an error if roundData has all the information', () => {
-            const result = () => service.convertRoundDataToRound(roundData);
-            expect(result).not.toThrow();
         });
     });
 
