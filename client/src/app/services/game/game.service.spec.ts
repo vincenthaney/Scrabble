@@ -47,6 +47,7 @@ describe('GameService', () => {
             'updateRound',
             'getActivePlayer',
             'initialize',
+            'resetTimerData',
         ]);
         gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
     });
@@ -441,6 +442,18 @@ describe('GameService', () => {
             const expected = 'expected-id';
             service['gameId'] = expected;
             expect(service.getGameId()).toEqual(expected);
+        });
+    });
+
+    describe('gameOver', () => {
+        it('should change attribute "isGameOver" to true', () => {
+            service.gameOver();
+            expect(service['isGameOver']).toEqual(true);
+        });
+
+        it('should call roundManager.resetTimerData()', () => {
+            service.gameOver();
+            expect(roundManagerSpy.resetTimerData).toHaveBeenCalled();
         });
     });
 

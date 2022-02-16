@@ -8,17 +8,17 @@ import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
+import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ID, TIME_TO_RECONNECT } from '@app/constants/game';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
+import { CookieService } from '@app/services/cookie/cookie.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Square } from '@app/classes/square';
-import { CookieService } from '@app/services/cookie/cookie.service';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
@@ -92,11 +92,14 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (this.router.url !== '/game') {
             this.roundManager.initialize();
             this.roundManager.startRound(startGameData.maxRoundTime);
+            this.roundManager.initialize();
+            this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');
         } else {
             this.reconnectReinitialize(startGameData);
         }
     }
+
     reconnectReinitialize(startGameData: StartMultiplayerGameData) {
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
