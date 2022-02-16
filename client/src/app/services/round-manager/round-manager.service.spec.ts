@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
@@ -7,12 +8,11 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionType } from '@app/classes/actions/action-data';
-import { PlayerData } from '@app/classes/communication';
-import { RoundData } from '@app/classes/communication/round-data';
 import { Round } from '@app/classes/round';
+import { Tile } from '@app/classes/tile';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
-import { CONVERT_ROUND_DATA, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
+import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SpyObj = jasmine.SpyObj;
@@ -47,9 +47,10 @@ const PAST_DATE = new Date(Date.now() - TIME_INTERVAL);
 const CURRENT_DATE = new Date(Date.now());
 const FUTURE_DATE = new Date(Date.now() + TIME_INTERVAL);
 
+const DEFAULT_PLAYER_SCORE = 420;
+const DEFAULT_PLAYER_TILES: Tile[] = [];
 const DEFAULT_PLAYER_NAME = 'defaultName';
 const DEFAULT_PLAYER_ID = 'defaultId';
-const DEFAULT_PLAYER_DATA: PlayerData = { name: DEFAULT_PLAYER_NAME, id: DEFAULT_PLAYER_ID, tiles: [{ letter: 'A', value: 1 }], score: 1 };
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
@@ -84,6 +85,73 @@ describe('RoundManagerService', () => {
         expect(service).toBeTruthy();
     });
 
+    it('initialize should define attributes', () => {
+        service.initialize();
+        expect(service.completedRounds).toBeTruthy();
+        expect(service['timerSource']).toBeTruthy();
+        expect(service.timer).toBeTruthy();
+        expect(service.endRoundEvent).toBeTruthy();
+    });
+
+    describe('convertRoundDataToRound', () => {
+        it('should throw error if roundData.playerData.id is undefined', () => {
+            const roundData = {
+                playerData: {
+                    name: DEFAULT_PLAYER_NAME,
+                    score: DEFAULT_PLAYER_SCORE,
+                    tiles: DEFAULT_PLAYER_TILES,
+                },
+                startTime: CURRENT_DATE,
+                limitTime: CURRENT_DATE,
+                completedTime: null,
+            };
+            expect(() => service.convertRoundDataToRound(roundData)).toThrowError(INVALID_ROUND_DATA_PLAYER);
+        });
+
+        it('should throw error if roundData.playerData.name is undefined', () => {
+            const roundData = {
+                playerData: {
+                    id: DEFAULT_PLAYER_ID,
+                    score: DEFAULT_PLAYER_SCORE,
+                    tiles: DEFAULT_PLAYER_TILES,
+                },
+                startTime: CURRENT_DATE,
+                limitTime: CURRENT_DATE,
+                completedTime: null,
+            };
+            expect(() => service.convertRoundDataToRound(roundData)).toThrowError(INVALID_ROUND_DATA_PLAYER);
+        });
+
+        it('should throw error if roundData.playerData.tiles is undefined', () => {
+            const roundData = {
+                playerData: {
+                    name: DEFAULT_PLAYER_NAME,
+                    id: DEFAULT_PLAYER_ID,
+                    score: DEFAULT_PLAYER_SCORE,
+                },
+                startTime: CURRENT_DATE,
+                limitTime: CURRENT_DATE,
+                completedTime: null,
+            };
+            expect(() => service.convertRoundDataToRound(roundData)).toThrowError(INVALID_ROUND_DATA_PLAYER);
+        });
+
+        it('should throw error if roundData.playerData.id is undefined', () => {
+            const roundData = {
+                playerData: {
+                    name: DEFAULT_PLAYER_NAME,
+                    id: DEFAULT_PLAYER_ID,
+                    score: DEFAULT_PLAYER_SCORE,
+                    tiles: DEFAULT_PLAYER_TILES,
+                },
+                startTime: CURRENT_DATE,
+                limitTime: CURRENT_DATE,
+                completedTime: null,
+            };
+            expect(() => service.convertRoundDataToRound(roundData)).not.toThrow();
+        });
+    });
+
     describe('ResetServiceData', () => {
         let timeSourceSpy: unknown;
 
@@ -113,6 +181,25 @@ describe('RoundManagerService', () => {
         it('resetServiceData should complete timerSource', () => {
             expect(timeSourceSpy).toHaveBeenCalled();
         });
+    });
+
+    it('resetRoundData should reset round data attributes', () => {
+        service.resetRoundData();
+        expect(service.currentRound).toBeFalsy();
+        expect(service.completedRounds).toEqual([]);
+        expect(service.maxRoundTime).toEqual(0);
+    });
+
+    it('resetTimerData should call clearTimeout and timerSource.complete', () => {
+        const clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callFake(() => {
+            return;
+        });
+        const completeSpy = spyOn(service['timerSource'], 'complete').and.callFake(() => {
+            return;
+        });
+        service.resetTimerData();
+        expect(clearTimeoutSpy).toHaveBeenCalled();
+        expect(completeSpy).toHaveBeenCalled();
     });
 
     describe('UpdateRound', () => {
@@ -208,72 +295,45 @@ describe('RoundManagerService', () => {
         });
     });
 
-    describe('convertRoundDataToRound', () => {
-        const roundData: RoundData = {
-            playerData: DEFAULT_PLAYER_DATA,
-            startTime: new Date(CURRENT_DATE),
-            limitTime: new Date(FUTURE_DATE),
-            completedTime: null,
-        };
-
-        it('should not throw an error if roundData has all the information', () => {
-            const result = () => service.convertRoundDataToRound({ ...roundData });
-            expect(result).not.toThrowError();
+    describe('getActivePlayer', () => {
+        it('getActivePlayer should return the player of the current round', () => {
+            service.currentRound = currentRound;
+            expect(service.getActivePlayer()).toEqual(currentRound.player);
         });
 
-        it('should throw an error if roundData is missing information', () => {
-            roundData.playerData.id = undefined;
-            let result = () => service.convertRoundDataToRound(roundData);
-            expect(result).toThrowError(CONVERT_ROUND_DATA);
-            roundData.playerData.id = DEFAULT_PLAYER_DATA.id;
-            roundData.playerData.name = undefined;
-            result = () => service.convertRoundDataToRound(roundData);
-            expect(result).toThrowError(CONVERT_ROUND_DATA);
-            roundData.playerData.name = DEFAULT_PLAYER_DATA.name;
-            roundData.playerData.tiles = undefined;
-            result = () => service.convertRoundDataToRound(roundData);
-            expect(result).toThrowError(CONVERT_ROUND_DATA);
+        it('getActivePlayer should throw error if there is no current round', () => {
+            const wrapper = new RoundManagerServiceWrapper(service);
+            spyOnProperty(wrapper, 'currentRound', 'get').and.returnValue(null);
+            service.currentRound = wrapper.currentRound;
+
+            expect(() => service.getActivePlayer()).toThrowError(NO_CURRENT_ROUND);
         });
     });
 
-    it('timeLeft should return a number for the time', () => {
-        service.currentRound = currentRound;
-        expect(service.timeLeft(FUTURE_DATE)).toBeInstanceOf(Number);
+    describe('isActivePlayerLocalPlayer', () => {
+        it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
+            service.localPlayerId = DEFAULT_PLAYER.id;
+            service.currentRound = currentRound;
+            expect(service.isActivePlayerLocalPlayer()).toBeTrue();
+        });
+
+        it('isActivePlayerLocalPlayer should throw error if there is no current round', () => {
+            service.localPlayerId = 'unknown';
+            service.currentRound = currentRound;
+            expect(service.isActivePlayerLocalPlayer()).toBeFalse();
+        });
     });
 
-    it('getActivePlayer should return the player of the current round', () => {
-        service.currentRound = currentRound;
-        expect(service.getActivePlayer()).toEqual(currentRound.player);
-    });
+    describe('getStartGameTime', () => {
+        it('getStartGameTime should return the first round start time if there is one', () => {
+            service.completedRounds = [currentRound];
+            expect(service.getStartGameTime()).toEqual(currentRound.startTime);
+        });
 
-    it('getActivePlayer should throw error if there is no current round', () => {
-        const wrapper = new RoundManagerServiceWrapper(service);
-        spyOnProperty(wrapper, 'currentRound', 'get').and.returnValue(null);
-        service.currentRound = wrapper.currentRound;
-
-        expect(() => service.getActivePlayer()).toThrowError(NO_CURRENT_ROUND);
-    });
-
-    it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
-        service.localPlayerId = DEFAULT_PLAYER.id;
-        service.currentRound = currentRound;
-        expect(service.isActivePlayerLocalPlayer()).toBeTrue();
-    });
-
-    it('getActivePlayer should throw error if there is no current round', () => {
-        service.localPlayerId = 'unknown';
-        service.currentRound = currentRound;
-        expect(service.isActivePlayerLocalPlayer()).toBeFalse();
-    });
-
-    it('getStartGameTime should return the first round start time if there is one', () => {
-        service.completedRounds = [currentRound];
-        expect(service.getStartGameTime()).toEqual(currentRound.startTime);
-    });
-
-    it('getStartGameTime should throw error if there is no first round', () => {
-        service.completedRounds = [];
-        expect(() => service.getStartGameTime()).toThrowError(NO_START_GAME_TIME);
+        it('getStartGameTime should throw error if there is no first round', () => {
+            service.completedRounds = [];
+            expect(() => service.getStartGameTime()).toThrowError(NO_START_GAME_TIME);
+        });
     });
 
     describe('StartRound', () => {
@@ -341,7 +401,6 @@ describe('RoundManagerService', () => {
             const router: Router = TestBed.inject(Router);
             router.navigateByUrl('/game');
             tick();
-
             spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
 
             service.roundTimeout();
@@ -352,7 +411,6 @@ describe('RoundManagerService', () => {
             const router: Router = TestBed.inject(Router);
             router.navigateByUrl('/game');
             tick();
-
             spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
 
             const actionPass = {

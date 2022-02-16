@@ -20,6 +20,7 @@ import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constant
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
@@ -39,8 +40,7 @@ chai.use(chaiAsPromised);
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_INPUT = 'input';
-const DEFAULT_DATA: ActionData = { type: 'exchange', payload: {}, input: DEFAULT_INPUT };
+const DEFAULT_DATA: ActionData = { type: 'exchange', payload: {}, input: '' };
 const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_FEEDBACK = 'this is a feedback';
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
@@ -206,40 +206,40 @@ describe('GamePlayController', () => {
             expect(spy).to.have.been.called();
         });
 
-        it('should call emitToRoom if data.input is not empty', () => {
+        it('should call emitToSocket if data.input is not empty', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 type: 'pass',
                 payload: {},
                 input: '!passer',
             });
-            expect(emitToRoomSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.have.been.called();
         });
 
-        it('should NOT call emitToRoom if data.input is empty', () => {
+        it('should NOT call emitToSocket if data.input is empty', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 type: 'pass',
                 payload: {},
                 input: '',
             });
-            expect(emitToRoomSpy).to.not.have.been.called();
+            expect(emitToSocketSpy).to.not.have.been.called();
         });
 
         it('should call gameUpdate if updateData exists', () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(gameUpdateSpy).to.have.been.called();
         });
 
         it("should not call gameUpdate if updateData doesn't exist", () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(gameUpdateSpy).to.not.have.been.called();
         });
 
         it("should not call emitToSocket if feedback doesn't exist", () => {
-            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined]);
+            chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [{}, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.not.have.been.called();
         });
@@ -271,15 +271,13 @@ describe('GamePlayController', () => {
         });
 
         it('should throw if data.type is undefined', () => {
-            expect(() =>
-                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData),
-            ).to.throw();
+            expect(gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { payload: DEFAULT_DATA.payload } as ActionData)).to
+                .eventually.rejected;
         });
 
         it('should throw if data.payload is undefined', () => {
-            expect(() =>
-                gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData),
-            ).to.throw();
+            expect(gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, { type: DEFAULT_DATA.type } as ActionData)).to
+                .eventually.rejected;
         });
 
         it('should call emitToSocket in catch if error is generated in treatment', () => {
@@ -291,6 +289,25 @@ describe('GamePlayController', () => {
                 content: COMMAND_IS_INVALID(DEFAULT_DATA.input) + DEFAULT_ERROR_MESSAGE,
                 senderId: SYSTEM_ERROR_ID,
             });
+        });
+
+        it('should call handlePlayAction when playAction throw word not in dictionary', async () => {
+            const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
+            (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
+            gamePlayServiceStub.playAction.throws('error');
+
+            const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
+            isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
+
+            const handleErrorStub = stub<GamePlayController, any>(gamePlayController, 'handleError');
+            handleErrorStub.callsFake(async () => Promise.resolve());
+
+            const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
+            handlePlayActionStub.callThrough();
+
+            await gamePlayController['handlePlayAction']('', '', { type: 'place', payload: {}, input: '' });
+
+            expect(handlePlayActionStub.calledWith('', '', { type: 'pass', payload: {}, input: '' })).to.be.true;
         });
     });
 
@@ -380,11 +397,22 @@ describe('GamePlayController', () => {
 
     describe('handleError', () => {
         let socketServiceStub: SinonStubbedInstance<SocketService>;
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;
 
         beforeEach(() => {
             socketServiceStub = createStubInstance(SocketService);
             (gamePlayController['socketService'] as unknown) = socketServiceStub;
+
+            gameStub = createStubInstance(Game);
+            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.getId(), DEFAULT_PLAYER_1.name));
+
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
+
+            (gamePlayController['activeGameService'] as unknown) = activeGameServiceStub;
+
             delayStub = stub(Delay, 'for');
         });
 
@@ -393,12 +421,12 @@ describe('GamePlayController', () => {
         });
 
         it('should call emitToSocket', async () => {
-            await gamePlayController['handleError'](new Error(), '', '');
+            await gamePlayController['handleError'](new Error(), '', '', '');
             expect(socketServiceStub.emitToSocket.called).to.be.true;
         });
 
-        it('should call emitToSocket', async () => {
-            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '');
+        it('should call delay', async () => {
+            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
             expect(delayStub.called).to.be.true;
         });
     });

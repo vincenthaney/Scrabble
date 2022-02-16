@@ -39,6 +39,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
             this.ngOnInit();
             this.ngAfterViewInit();
         });
+
         if (this.gameService.gameIsSetUp) {
             if (!this.roundManager.timer) return;
 
@@ -62,8 +63,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     ngOnDestroy(): void {
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
-        if (this.timerSubscription) this.timerSubscription.unsubscribe();
-        if (this.endRoundSubscription) this.endRoundSubscription.unsubscribe();
+        this.endRoundSubscription.unsubscribe();
+
+        if (!this.timerSubscription) return;
+        this.timerSubscription.unsubscribe();
     }
 
     startTimer(timer: Timer) {
