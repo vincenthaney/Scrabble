@@ -6,7 +6,7 @@ import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
-import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -71,7 +71,17 @@ export default class RoundManagerService implements IResetServiceData {
         this.completedRounds.push(this.currentRound);
         this.currentRound = round;
         this.endRoundEvent.emit();
-        this.startRound();
+        this.startRound(this.maxRoundTime);
+    }
+
+    continueRound(round: Round): void {
+        this.currentRound = round;
+        this.endRoundEvent.emit();
+        this.startRound(this.timeLeft(round.limitTime));
+    }
+
+    timeLeft(limitTime: Date): number {
+        return Math.max((new Date(limitTime).getTime() - new Date(Date.now()).getTime()) / SECONDS_TO_MILLISECONDS, MINIMUM_TIMER_TIME);
     }
 
     getActivePlayer(): AbstractPlayer {
@@ -90,14 +100,14 @@ export default class RoundManagerService implements IResetServiceData {
         return this.completedRounds[0].startTime;
     }
 
-    startRound(): void {
+    startRound(roundTime: number): void {
         clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.roundTimeout(), this.maxRoundTime * SECONDS_TO_MILLISECONDS);
-        this.startTimer();
+        this.timeout = setTimeout(() => this.roundTimeout(), roundTime * SECONDS_TO_MILLISECONDS);
+        this.startTimer(roundTime);
     }
 
-    startTimer(): void {
-        this.timerSource.next([Timer.convertTime(this.maxRoundTime), this.getActivePlayer()]);
+    startTimer(time: number): void {
+        this.timerSource.next([Timer.convertTime(time), this.getActivePlayer()]);
     }
 
     roundTimeout(): void {

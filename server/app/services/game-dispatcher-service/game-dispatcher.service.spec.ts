@@ -73,7 +73,7 @@ describe('GameDispatcherService', () => {
 
         it('should create a WaitingRoom with same config', () => {
             expect(waitingRoom.getConfig().player1.name).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerName);
-            expect(waitingRoom.getConfig().player1.getId()).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
+            expect(waitingRoom.getConfig().player1.id).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
             expect(waitingRoom.getConfig().gameType).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.gameType);
             expect(waitingRoom.getConfig().maxRoundTime).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.maxRoundTime);
             expect(waitingRoom.getConfig().dictionary).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.dictionary);
@@ -96,7 +96,7 @@ describe('GameDispatcherService', () => {
         it('should add the player to the waiting game', () => {
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
 
-            expect(waitingRoom.joinedPlayer?.getId()).to.equal(DEFAULT_OPPONENT_ID);
+            expect(waitingRoom.joinedPlayer?.id).to.equal(DEFAULT_OPPONENT_ID);
             expect(waitingRoom.joinedPlayer?.name).to.equal(DEFAULT_OPPONENT_NAME);
         });
 

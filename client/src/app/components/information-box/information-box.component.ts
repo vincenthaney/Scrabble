@@ -26,55 +26,66 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     timerSource: Observable<number>;
     timerSubscription: Subscription;
     endRoundSubscription: Subscription;
+    rerenderSubscription: Subscription;
     private ngUnsubscribe: Subject<void>;
 
     constructor(private roundManager: RoundManagerService, private gameService: GameService) {}
 
-    ngOnInit() {
-        this.ngUnsubscribe = new Subject();
+    ngOnInit(): void {
         this.timer = new Timer(0, 0);
+        this.ngUnsubscribe = new Subject();
+        this.rerenderSubscription = this.gameService.rerenderEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+            this.ngOnDestroy();
+            this.ngOnInit();
+            this.ngAfterViewInit();
+        });
 
-        if (this.roundManager.timer)
-            this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
-                this.startTimer(timer);
-                this.updateActivePlayerBorder(activePlayer);
-            });
+        if (this.gameService.gameIsSetUp) {
+            if (!this.roundManager.timer) return;
 
-        if (this.roundManager.endRoundEvent)
+            if (this.roundManager.timer)
+                this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
+                    this.startTimer(timer);
+                    this.updateActivePlayerBorder(activePlayer);
+                });
+            if (!this.roundManager.endRoundEvent) return;
             this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
 
-        this.isPlayer1 = this.checkIfIsPlayer1();
-        this.localPlayerIcon = this.getLocalPlayerIcon();
+            this.isPlayer1 = this.checkIfIsPlayer1();
+            this.localPlayerIcon = this.getLocalPlayerIcon();
+        }
     }
 
-    ngAfterViewInit() {
+    ngAfterViewInit(): void {
         setTimeout(() => this.updateActivePlayerBorder(this.roundManager.getActivePlayer()), 0);
     }
 
     ngOnDestroy(): void {
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
-        this.endRoundSubscription.unsubscribe();
+        if (this.endRoundSubscription) this.endRoundSubscription.unsubscribe();
 
-        if (!this.timerSubscription) return;
-        this.timerSubscription.unsubscribe();
+        if (this.timerSubscription) this.timerSubscription.unsubscribe();
     }
 
-    startTimer(timer: Timer) {
+    startTimer(timer: Timer): void {
         this.timer = timer;
         this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
         this.timerSubscription = this.timerSource.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.timer.decrement());
     }
 
-    endRound() {
+    endRound(): void {
         this.timer = new Timer(0, 0);
         if (this.timerSubscription) {
             this.timerSubscription.unsubscribe();
         }
     }
 
-    updateActivePlayerBorder(activePlayer: AbstractPlayer): void {
-        if (activePlayer.id === this.gameService.player1.id) {
+    updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
+        if (!activePlayer) {
+            this.isPlayer1Active = false;
+            this.isPlayer2Active = false;
+        } else if (activePlayer.id === this.gameService.player1.id) {
             this.isPlayer1Active = true;
             this.isPlayer2Active = false;
         } else if (activePlayer.id === this.gameService.player2.id) {
@@ -97,11 +108,11 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         return timerCreationFunction(0, length);
     }
 
-    private checkIfIsPlayer1() {
+    private checkIfIsPlayer1(): boolean {
         return this.gameService.getLocalPlayer() === this.gameService.player1;
     }
 
-    private getLocalPlayerIcon() {
+    private getLocalPlayerIcon(): IconName {
         return LOCAL_PLAYER_ICON[Math.floor(Math.random() * LOCAL_PLAYER_ICON.length)];
     }
 }

@@ -12,7 +12,6 @@ describe('PlayerLeavesController', () => {
     let controller: PlayerLeavesController;
     let httpMock: HttpTestingController;
     let socketServiceMock: SocketService;
-    // let gameServiceMock: GameService;
     let socketHelper: SocketTestHelper;
 
     beforeEach(async () => {
@@ -26,7 +25,6 @@ describe('PlayerLeavesController', () => {
         });
         controller = TestBed.inject(PlayerLeavesController);
         httpMock = TestBed.inject(HttpTestingController);
-        // gameServiceMock = TestBed.inject(GameService);
     });
 
     afterEach(() => {
@@ -70,19 +68,21 @@ describe('PlayerLeavesController', () => {
         expect(deleteSpy).toHaveBeenCalled();
     });
 
-    it('ngDestroy should call serviceDestroyed$.next', () => {
-        const nextSpy = spyOn(controller.serviceDestroyed$, 'next').and.callFake(() => {
-            return;
+    describe('ngOnDestroy', () => {
+        it('ngOnDestroy should call serviceDestroyed$.next', () => {
+            const nextSpy = spyOn(controller.serviceDestroyed$, 'next').and.callFake(() => {
+                return;
+            });
+            controller.ngOnDestroy();
+            expect(nextSpy).toHaveBeenCalled();
         });
-        controller.ngOnDestroy();
-        expect(nextSpy).toHaveBeenCalled();
-    });
 
-    it('handleLeaveGame should call serviceDestroyed$.complete', () => {
-        const completeSpy = spyOn(controller.serviceDestroyed$, 'complete').and.callFake(() => {
-            return;
+        it('ngOnDestroy should call serviceDestroyed$.complete', () => {
+            const completeSpy = spyOn(controller.serviceDestroyed$, 'complete').and.callFake(() => {
+                return;
+            });
+            controller.ngOnDestroy();
+            expect(completeSpy).toHaveBeenCalled();
         });
-        controller.ngOnDestroy();
-        expect(completeSpy).toHaveBeenCalled();
     });
 });

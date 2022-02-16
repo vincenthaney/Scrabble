@@ -74,7 +74,7 @@ export class GameDispatcherController implements OnDestroy {
         this.http.get(endpoint).subscribe();
     }
 
-    handleLobbyJoinRequest(gameId: string, playerName: string) {
+    handleLobbyJoinRequest(gameId: string, playerName: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/join`;
         this.http.post<GameConfig>(endpoint, { playerName }, { observe: 'response' }).subscribe(
             () => {
@@ -87,7 +87,7 @@ export class GameDispatcherController implements OnDestroy {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleJoinError(error: any) {
+    handleJoinError(error: any): void {
         if (error.status === HttpStatusCode.Unauthorized) {
             this.lobbyFullEvent.emit();
         } else if (error.status === HttpStatusCode.Gone) {

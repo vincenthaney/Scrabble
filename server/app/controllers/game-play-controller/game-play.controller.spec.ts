@@ -65,6 +65,12 @@ describe('GamePlayController', () => {
     beforeEach(() => {
         Container.reset();
         gamePlayController = Container.get(GamePlayController);
+        stub(gamePlayController['socketService'], 'removeFromRoom').callsFake(() => {
+            return;
+        });
+        stub(gamePlayController['socketService'], 'emitToSocket').callsFake(() => {
+            return;
+        });
     });
 
     it('should create', () => {
@@ -173,7 +179,6 @@ describe('GamePlayController', () => {
         let emitToRoomSpy: any;
         let gameUpdateSpy: any;
         let getGameStub: any;
-        let getIdStub: any;
         let gameStub: SinonStubbedInstance<Game>;
         let tileReserveStub: SinonStubbedInstance<TileReserve>;
         let boardStub: SinonStubbedInstance<Board>;
@@ -195,12 +200,10 @@ describe('GamePlayController', () => {
             emitToRoomSpy = chai.spy.on(gamePlayController['socketService'], 'emitToRoom', () => {});
             gameUpdateSpy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
             getGameStub = stub(ActiveGameService.prototype, 'getGame').returns(gameStub as unknown as Game);
-            getIdStub = stub(Player.prototype, 'getId').returns(gameStub.player2['id']);
         });
 
         afterEach(() => {
             getGameStub.restore();
-            getIdStub.restore();
         });
 
         it('should call playAction', () => {
@@ -409,7 +412,7 @@ describe('GamePlayController', () => {
             (gamePlayController['socketService'] as unknown) = socketServiceStub;
 
             gameStub = createStubInstance(Game);
-            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.getId(), DEFAULT_PLAYER_1.name));
+            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name));
 
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);

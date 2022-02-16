@@ -18,7 +18,7 @@ import {
     RejectEmitArgs,
     SocketEmitEvents,
     // eslint-disable-next-line prettier/prettier
-    StartGameEmitArgs,
+    StartGameEmitArgs
 } from './socket-types';
 
 @Service()
@@ -30,7 +30,7 @@ export class SocketService {
         this.sockets = new Map();
     }
 
-    initialize(server: http.Server) {
+    initialize(server: http.Server): void {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
 
@@ -47,19 +47,19 @@ export class SocketService {
         });
     }
 
-    addToRoom(socketId: string, room: string) {
+    addToRoom(socketId: string, room: string): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
         const socket = this.getSocket(socketId);
         socket.join(room);
     }
 
-    removeFromRoom(socketId: string, room: string) {
+    removeFromRoom(socketId: string, room: string): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
         const socket = this.getSocket(socketId);
         socket.leave(room);
     }
 
-    deleteRoom(roomName: string) {
+    deleteRoom(roomName: string): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
         this.sio.sockets.in(roomName).socketsLeave(roomName);
     }
@@ -77,7 +77,7 @@ export class SocketService {
     emitToRoom(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
-    emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]) {
+    emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
 
         this.sio.to(room).emit(ev, ...args);

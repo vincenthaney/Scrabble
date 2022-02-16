@@ -11,6 +11,7 @@ export default class BoardService {
 
     initializeBoard(board: Square[][]): void {
         this.initialBoard = [...board];
+        this.boardInitializationEvent.emit(this.initialBoard);
     }
 
     updateBoard(squareUpdated: Square[]): void {

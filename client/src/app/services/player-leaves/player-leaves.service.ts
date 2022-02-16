@@ -35,7 +35,7 @@ export class PlayerLeavesService implements OnDestroy {
         return this.gameDispatcherService.gameId;
     }
 
-    handleJoinerLeaveGame(leaverName: string) {
+    handleJoinerLeaveGame(leaverName: string): void {
         this.joinerLeaveGameEvent.next(leaverName);
     }
 
@@ -43,7 +43,7 @@ export class PlayerLeavesService implements OnDestroy {
         this.playerLeavesController.handleLeaveGame(this.getGameId());
     }
 
-    handleLeaveLobby() {
+    handleLeaveLobby(): void {
         if (this.getGameId()) this.playerLeavesController.handleLeaveGame(this.getGameId());
         this.gameDispatcherService.resetServiceData();
     }

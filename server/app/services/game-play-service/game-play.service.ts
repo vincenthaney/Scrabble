@@ -22,7 +22,7 @@ export class GamePlayService {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getRequestingPlayer(playerId);
 
-        if (player.getId() !== playerId) throw Error(NOT_PLAYER_TURN);
+        if (player.id !== playerId) throw Error(NOT_PLAYER_TURN);
 
         const action: Action = this.getAction(player, game, actionData);
         const localPlayerFeedback = action.getMessage();
@@ -74,7 +74,7 @@ export class GamePlayService {
         }
     }
 
-    getActionPlacePayload(actionData: ActionData) {
+    getActionPlacePayload(actionData: ActionData): ActionPlacePayload {
         const payload = actionData.payload as ActionPlacePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
         if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
@@ -82,7 +82,7 @@ export class GamePlayService {
         return payload;
     }
 
-    getActionExchangePayload(actionData: ActionData) {
+    getActionExchangePayload(actionData: ActionData): ActionExchangePayload {
         const payload = actionData.payload as ActionExchangePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
         return payload;
@@ -99,9 +99,9 @@ export class GamePlayService {
         return game.endGameMessage(winnerName);
     }
 
-    handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string) {
+    handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): void {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
-        const playerStillInGame = game.player1.getId() === playerWhoLeftId ? game.player2 : game.player1;
+        const playerStillInGame = game.player1.id === playerWhoLeftId ? game.player2 : game.player1;
         const updatedData: GameUpdateData = {};
         const endOfGameMessages = this.handleGameOver(playerStillInGame.name, game, updatedData);
         this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);

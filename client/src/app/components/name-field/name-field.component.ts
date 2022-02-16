@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { NAME_VALIDATION } from '@app/classes/name-validation';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { NAME_TOO_SHORT, NAME_TOO_LONG, NAME_NO_MATCH_REGEX } from '@app/constants/name-field';
+import { NAME_VALIDATION } from '@app/classes/name-validation';
+import { NAME_NO_MATCH_REGEX, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
 
 @Component({
     selector: 'app-name-field',
@@ -24,7 +24,7 @@ export class NameFieldComponent {
         ]),
     });
 
-    onNameChange(newName: string) {
+    onNameChange(newName: string): void {
         this.playerName = newName;
         this.isInputNameValid.emit(this.formParameters.get('inputName')?.valid);
     }

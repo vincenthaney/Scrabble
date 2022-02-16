@@ -4,8 +4,8 @@ import { Multiplier } from '@app/classes/square/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
 import { BOARD_SIZE } from '@app/constants/game';
-import { Service } from 'typedi';
 import { BOARD_CONFIG_UNDEFINED_AT, NO_MULTIPLIER_MAPPED_TO_INPUT } from '@app/constants/services-errors';
+import { Service } from 'typedi';
 
 @Service()
 export default class BoardService {
@@ -52,10 +52,4 @@ export default class BoardService {
             position.column >= 0
         );
     }
-    // private placeTile(position: Position, tile: Tile): boolean {
-    //     throw new Error('Method not implemented.');
-    // } // Verify if there is already a tile in that square
-    // private removePlayedTiles(): void {
-    //     throw new Error('Method not implemented.');
-    // }
 }

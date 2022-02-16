@@ -1,10 +1,12 @@
 /* eslint-disable dot-notation */
 import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import CommandError from '@app/classes/command-error';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
+import { CommandErrorMessages, PLAYER_NOT_FOUND } from '@app/constants/command-error-messages';
 import {
     EXPECTED_WORD_COUNT_EXCHANGE,
     EXPECTED_WORD_COUNT_HELP,
@@ -22,8 +24,6 @@ import {
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '..';
-import { CommandErrorMessages, PLAYER_NOT_FOUND } from './command-error-messages';
-import CommandError from './command-errors';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 

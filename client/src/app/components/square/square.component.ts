@@ -21,7 +21,7 @@ export class SquareComponent implements OnInit {
     multiplierType: string | undefined;
     multiplierValue: string | undefined;
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.setText();
         this.initializeStyle();
     }
@@ -33,11 +33,11 @@ export class SquareComponent implements OnInit {
         return this.squareView.squareSize;
     }
 
-    setText() {
+    setText(): void {
         [this.multiplierType, this.multiplierValue] = this.squareView.getText();
     }
 
-    private initializeStyle() {
+    private initializeStyle(): void {
         this.style = {
             'background-color': this.squareView.getColor(),
         };

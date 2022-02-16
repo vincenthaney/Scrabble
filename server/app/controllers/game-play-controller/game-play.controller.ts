@@ -36,7 +36,6 @@ export class GamePlayController {
         this.router.post('/games/:gameId/players/:playerId/action', (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
-
             try {
                 this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
@@ -93,7 +92,7 @@ export class GamePlayController {
                     });
                 }
                 if (feedback.opponentFeedback) {
-                    const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+                    const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).id;
                     this.socketService.emitToSocket(opponentId, 'newMessage', {
                         content: feedback.opponentFeedback,
                         senderId: SYSTEM_ID,
@@ -134,11 +133,11 @@ export class GamePlayController {
         });
     }
 
-    private async handleError(e: Error, input: string, playerId: string, gameId: string) {
+    private async handleError(e: Error, input: string, playerId: string, gameId: string): Promise<void> {
         if (this.isWordNotInDictionaryError(e)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
 
-            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).getId();
+            const opponentId = this.activeGameService.getGame(gameId, playerId).getOpponentPlayer(playerId).id;
             this.socketService.emitToSocket(opponentId, 'newMessage', {
                 content: OPPONENT_PLAYED_INVALID_WORD,
                 senderId: SYSTEM_ID,
