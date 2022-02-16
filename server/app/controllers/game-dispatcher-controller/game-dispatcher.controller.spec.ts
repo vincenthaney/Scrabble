@@ -709,7 +709,7 @@ describe('GameDispatcherController', () => {
             clock.restore();
         });
 
-        it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
+        it('Disconnection should keep player in game if they reconnect within 5 seconds', () => {
             const clock = useFakeTimers();
             gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
