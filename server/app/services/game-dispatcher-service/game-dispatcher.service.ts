@@ -10,7 +10,7 @@ import {
     NO_GAME_FOUND_WITH_ID,
     NO_OPPONENT_IN_WAITING_GAME,
     OPPONENT_NAME_DOES_NOT_MATCH,
-    PLAYER_ALREADY_TRYING_TO_JOIN
+    PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

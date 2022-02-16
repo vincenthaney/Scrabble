@@ -5,7 +5,7 @@ import {
     WORD_CONTAINS_APOSTROPHE,
     WORD_CONTAINS_ASTERISK,
     WORD_CONTAINS_HYPHEN,
-    WORD_TOO_SHORT
+    WORD_TOO_SHORT,
 } from '@app/constants/services-errors';
 import * as fs from 'fs';
 import { join } from 'path';
