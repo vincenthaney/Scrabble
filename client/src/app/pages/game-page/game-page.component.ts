@@ -15,7 +15,7 @@ import {
     DIALOG_QUIT_BUTTON_CONFIRM,
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
-    DIALOG_QUIT_TITLE,
+    DIALOG_QUIT_TITLE
 } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -23,7 +23,7 @@ import {
     RACK_TILE_MIN_FONT_SIZE,
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE,
+    SQUARE_TILE_MIN_FONT_SIZE
 } from '@app/constants/tile-font-size';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
@@ -53,12 +53,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ) {}
 
     @HostListener('document:keypress', ['$event'])
-    handleKeyboardEvent(event: KeyboardEvent) {
+    handleKeyboardEvent(event: KeyboardEvent): void {
         this.focusableComponentService.emitKeyboard(event);
     }
 
     @HostListener('window:beforeunload')
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         if (this.gameService.getGameId()) {
             this.gameService.disconnectGame();
         }
@@ -77,7 +77,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    openDialog(title: string, content: string, buttonsContent: string[]) {
+    openDialog(title: string, content: string, buttonsContent: string[]): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title,
@@ -102,7 +102,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    quitButtonClicked() {
+    quitButtonClicked(): void {
         let title = '';
         let content = '';
         const buttonsContent = ['', ''];
@@ -120,7 +120,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.openDialog(title, content, buttonsContent);
     }
 
-    noActiveGameDialog() {
+    noActiveGameDialog(): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_NO_ACTIVE_GAME_TITLE,
@@ -137,7 +137,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    changeTileFontSize(operation: FontSizeChangeOperations) {
+    changeTileFontSize(operation: FontSizeChangeOperations): void {
         if (operation === 'smaller') {
             if (this.tileRackComponent.tileFontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.tileFontSize -= RACK_FONT_SIZE_INCREMENT;
             if (this.boardComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) this.boardComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
