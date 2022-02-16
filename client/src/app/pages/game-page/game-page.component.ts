@@ -11,6 +11,10 @@ import {
     DIALOG_NO_ACTIVE_GAME_TITLE,
     DIALOG_NO_ACTIVE_GAME_CONTENT,
     DIALOG_NO_ACTIVE_GAME_BUTTON,
+    DIALOG_QUIT_BUTTON_CONFIRM,
+    DIALOG_QUIT_CONTENT,
+    DIALOG_QUIT_STAY,
+    DIALOG_QUIT_TITLE,
 } from '@app/constants/pages-constants';
 import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import {
@@ -73,28 +77,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    abandonDialog() {
-        this.dialog.open(DefaultDialogComponent, {
-            data: {
-                title: DIALOG_ABANDON_TITLE,
-                content: DIALOG_ABANDON_CONTENT,
-                buttons: [
-                    {
-                        content: DIALOG_ABANDON_BUTTON_CONFIRM,
-                        redirect: '/home',
-                        style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
-                        action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
-                    },
-                    {
-                        content: DIALOG_ABANDON_BUTTON_CONTINUE,
-                        closeDialog: true,
-                        style: 'background-color: rgb(231, 231, 231)',
-                    },
-                ],
-            },
-        });
-    }
-
     openDialog(title: string, content: string, buttonsContent: string[]) {
         this.dialog.open(DefaultDialogComponent, {
             data: {
@@ -122,15 +104,15 @@ export class GamePageComponent implements OnInit, OnDestroy {
         let content = '';
         const buttonsContent = ['', ''];
         if (this.gameService.isGameOver) {
-            title = 'Quitter la partie';
-            content = 'Voulez-vous vraiment quitter la partie?';
-            buttonsContent[0] = 'Quitter la partie';
-            buttonsContent[1] = 'Rester dans la partie';
+            title = DIALOG_QUIT_TITLE;
+            content = DIALOG_QUIT_CONTENT;
+            buttonsContent[0] = DIALOG_QUIT_BUTTON_CONFIRM;
+            buttonsContent[1] = DIALOG_QUIT_STAY;
         } else {
-            title = 'Abandonner la partie';
-            content = 'Voulez-vous vraiment ABANDONNER?';
-            buttonsContent[0] = 'Abandonner la partie';
-            buttonsContent[1] = 'Continuer la partie';
+            title = DIALOG_ABANDON_TITLE;
+            content = DIALOG_ABANDON_CONTENT;
+            buttonsContent[0] = DIALOG_ABANDON_BUTTON_CONFIRM;
+            buttonsContent[1] = DIALOG_ABANDON_BUTTON_CONTINUE;
         }
         this.openDialog(title, content, buttonsContent);
     }
