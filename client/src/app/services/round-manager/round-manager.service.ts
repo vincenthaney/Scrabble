@@ -7,7 +7,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
-import { NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
+import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -37,8 +37,7 @@ export default class RoundManagerService implements IResetServiceData {
     }
 
     convertRoundDataToRound(roundData: RoundData): Round {
-        if (!roundData.playerData.id || !roundData.playerData.name || !roundData.playerData.tiles)
-            throw Error('INVALID PLAYER TO CONVERT ROUND DATA');
+        if (!roundData.playerData.id || !roundData.playerData.name || !roundData.playerData.tiles) throw Error(INVALID_ROUND_DATA_PLAYER);
         const player = new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles);
         return {
             player,
