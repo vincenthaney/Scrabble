@@ -77,7 +77,7 @@ export class GamePlayController {
         try {
             const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
-                this.socketService.emitToRoom(gameId, 'newMessage', {
+                this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
                     senderId: playerId,
                 });

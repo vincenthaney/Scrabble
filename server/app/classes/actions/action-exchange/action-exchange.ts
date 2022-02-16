@@ -31,7 +31,7 @@ export default class ActionExchange extends ActionPlay {
     }
 
     getMessage(): string {
-        return `${this.player.name} a échangé ${this.tilesToExchange.length === 1 ? 'la tuile' : 'les tuiles'} ${this.lettersToSwap()}`;
+        return `Vous avez échangé ${this.tilesToExchange.length === 1 ? 'la tuile' : 'les tuiles'} ${this.lettersToSwap()}`;
     }
 
     lettersToSwap(): string {
