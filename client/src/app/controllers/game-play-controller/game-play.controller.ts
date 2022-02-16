@@ -29,27 +29,27 @@ export class GamePlayController {
         });
     }
 
-    sendAction(gameId: string, playerId: string, action: ActionData, typedInput: string) {
+    sendAction(gameId: string, playerId: string, action: ActionData, typedInput: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/action`;
         this.http.post(endpoint, { type: action.type, payload: action.payload, input: typedInput }).subscribe();
     }
 
-    sendMessage(gameId: string, playerId: string, message: Message) {
+    sendMessage(gameId: string, playerId: string, message: Message): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/message`;
         this.http.post(endpoint, message).subscribe();
     }
 
-    sendError(gameId: string, playerId: string, message: Message) {
+    sendError(gameId: string, playerId: string, message: Message): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/error`;
         this.http.post(endpoint, message).subscribe();
     }
 
-    handleReconnection(gameId: string, playerId: string, newPlayerId: string) {
+    handleReconnection(gameId: string, playerId: string, newPlayerId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/reconnect`;
         this.http.post(endpoint, { newPlayerId }).subscribe();
     }
 
-    handleDisconnection(gameId: string, playerId: string) {
+    handleDisconnection(gameId: string, playerId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/disconnect`;
         // When reloading the page, a the disconnect http request is fired on destruction of the game-page component.
         // In the initialization of the game-page component, a reconnect request is made which does not allow the
