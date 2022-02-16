@@ -163,6 +163,13 @@ describe('InputParserService', () => {
     });
 
     describe('parseCommand', () => {
+        it('should throw error if game is over', () => {
+            gameServiceSpy.isGameOver = true;
+            expect(() => {
+                service['parseCommand'](VALID_PLACE_INPUT.substring(1).split(' '));
+            }).toThrow(new CommandError(CommandErrorMessages.ImpossibleCommand));
+        });
+
         it("should throw error if PLAY command and it is not the player's turn", () => {
             gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
             expect(() => {
