@@ -209,15 +209,19 @@ describe('RoundManagerService', () => {
     });
 
     describe('convertRoundDataToRound', () => {
-        const roundData: RoundData = {
-            playerData: DEFAULT_PLAYER_DATA,
-            startTime: new Date(CURRENT_DATE),
-            limitTime: new Date(FUTURE_DATE),
-            completedTime: null,
-        };
+        let roundData: RoundData;
+
+        beforeEach(() => {
+            roundData = {
+                playerData: { ...DEFAULT_PLAYER_DATA },
+                startTime: new Date(CURRENT_DATE),
+                limitTime: new Date(FUTURE_DATE),
+                completedTime: null,
+            };
+        });
 
         it('should not throw an error if roundData has all the information', () => {
-            const result = () => service.convertRoundDataToRound({ ...roundData });
+            const result = () => service.convertRoundDataToRound(roundData);
             expect(result).not.toThrowError();
         });
 
@@ -226,10 +230,12 @@ describe('RoundManagerService', () => {
             let result = () => service.convertRoundDataToRound(roundData);
             expect(result).toThrowError(CONVERT_ROUND_DATA);
             roundData.playerData.id = DEFAULT_PLAYER_DATA.id;
+
             roundData.playerData.name = undefined;
             result = () => service.convertRoundDataToRound(roundData);
             expect(result).toThrowError(CONVERT_ROUND_DATA);
             roundData.playerData.name = DEFAULT_PLAYER_DATA.name;
+
             roundData.playerData.tiles = undefined;
             result = () => service.convertRoundDataToRound(roundData);
             expect(result).toThrowError(CONVERT_ROUND_DATA);
