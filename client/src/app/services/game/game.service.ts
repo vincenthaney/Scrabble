@@ -92,8 +92,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (this.router.url !== '/game') {
             this.roundManager.initialize();
             this.roundManager.startRound(startGameData.maxRoundTime);
-            this.roundManager.initialize();
-            this.roundManager.startRound(startGameData.maxRoundTime);
             await this.router.navigateByUrl('game');
         } else {
             this.reconnectReinitialize(startGameData);
