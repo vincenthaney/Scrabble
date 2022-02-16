@@ -26,6 +26,10 @@ export default class RoundManagerService implements IResetServiceData {
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
 
     constructor(private gameplayController: GamePlayController, private router: Router) {
+        this.initialize();
+    }
+
+    initialize(): void {
         this.completedRounds = [];
         this.timerSource = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([new Timer(0, 0), DEFAULT_PLAYER]);
         this.timer = this.timerSource.asObservable();
