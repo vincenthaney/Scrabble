@@ -195,7 +195,7 @@ describe('SocketService', () => {
                     service.addToRoom(id, DEFAULT_ROOM);
 
                     clientSocket.on('_test_event', (args: unknown[]) => {
-                        expect(args[0]).to.equal(DEFAULT_ARGS);
+                        expect(args).to.equal(DEFAULT_ARGS);
                         resolve();
                     });
 
@@ -226,7 +226,7 @@ describe('SocketService', () => {
             it('should emit to socket', async () => {
                 return new Promise((resolve) => {
                     clientSocket.on('_test_event', (args: unknown[]) => {
-                        expect(args[0]).to.equal(DEFAULT_ARGS);
+                        expect(args).to.equal(DEFAULT_ARGS);
                         resolve();
                     });
                     service.emitToSocket(id, '_test_event', DEFAULT_ARGS);

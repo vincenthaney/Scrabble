@@ -43,16 +43,15 @@ class TestComponent {}
 
 const DEFAULT_MAX_ROUND_TIME = 60;
 const ONE_MINUTE_TIMER = new Timer(1, 0);
+const DEFAULT_PLAYER_NAME = 'name';
+const DEFAULT_PLAYER_ID = 'id';
+const DEFAULT_PLAYER_SCORE = 420;
+const DEFAULT_PLAYER_TILES: Tile[] = [];
 
 const TIME_INTERVAL = 1000;
 const PAST_DATE = new Date(Date.now() - TIME_INTERVAL);
 const CURRENT_DATE = new Date(Date.now());
 const FUTURE_DATE = new Date(Date.now() + TIME_INTERVAL);
-
-const DEFAULT_PLAYER_SCORE = 420;
-const DEFAULT_PLAYER_TILES: Tile[] = [];
-const DEFAULT_PLAYER_NAME = 'defaultName';
-const DEFAULT_PLAYER_ID = 'defaultId';
 
 const DEFAULT_PLAYER_DATA: PlayerData = { name: 'name', id: 'id', score: 1, tiles: [{ letter: 'A', value: 1 }] };
 
@@ -366,96 +365,132 @@ describe('RoundManagerService', () => {
             expect(service.getStartGameTime()).toEqual(currentRound.startTime);
         });
 
-        it('getStartGameTime should throw error if there is no first round', () => {
-            service.completedRounds = [];
-            expect(() => service.getStartGameTime()).toThrowError(NO_START_GAME_TIME);
-        });
-    });
-
-    describe('StartRound', () => {
-        let startTimerSpy: unknown;
-
-        beforeEach(() => {
-            startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
-                return;
+        describe('getActivePlayer', () => {
+            it('getActivePlayer should return the player of the current round', () => {
+                service.currentRound = currentRound;
+                expect(service.getActivePlayer()).toEqual(currentRound.player);
             });
-            service.startRound(DEFAULT_MAX_ROUND_TIME);
-        });
 
-        it('startRound should set new timeout', () => {
-            expect(service.timeout).toBeTruthy();
-        });
+            it('getActivePlayer should throw error if there is no current round', () => {
+                const wrapper = new RoundManagerServiceWrapper(service);
+                spyOnProperty(wrapper, 'currentRound', 'get').and.returnValue(null);
+                service.currentRound = wrapper.currentRound;
 
-        it('startRound should call startTimer', () => {
-            expect(startTimerSpy).toHaveBeenCalled();
-        });
-    });
-
-    it('startTimer should send new timer with right values', () => {
-        const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
-            return;
-        });
-        service.maxRoundTime = DEFAULT_MAX_ROUND_TIME;
-        const newTimer = ONE_MINUTE_TIMER;
-
-        service.currentRound = currentRound;
-        const activePlayer = currentRound.player;
-
-        service.startTimer(DEFAULT_MAX_ROUND_TIME);
-        expect(timerSourceSpy).toHaveBeenCalledOnceWith([newTimer, activePlayer]);
-    });
-
-    describe('RoundTimeout', () => {
-        let endRoundEventSpy: unknown;
-
-        beforeEach(() => {
-            endRoundEventSpy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
-                return;
-            });
-            spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
-            gameplayControllerSpy.sendAction.and.callFake(() => {
-                return;
+                expect(() => service.getActivePlayer()).toThrowError(NO_CURRENT_ROUND);
             });
         });
 
-        it('RoundTimeout should not timeout if user is not on /game', fakeAsync(() => {
-            const router: Router = TestBed.inject(Router);
-            router.navigateByUrl('/home');
-            tick();
+        describe('isActivePlayerLocalPlayer', () => {
+            it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
+                service.localPlayerId = DEFAULT_PLAYER.id;
+                service.currentRound = currentRound;
+                expect(service.isActivePlayerLocalPlayer()).toBeTrue();
+            });
 
-            service.roundTimeout();
-            expect(endRoundEventSpy).not.toHaveBeenCalled();
-        }));
-
-        it('RoundTimeout should not send pass event if the local player is not the active player', () => {
-            spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
-            service.roundTimeout();
-            expect(gameplayControllerSpy.sendAction).not.toHaveBeenCalled();
+            it('isActivePlayerLocalPlayer should throw error if there is no current round', () => {
+                service.localPlayerId = 'unknown';
+                service.currentRound = currentRound;
+                expect(service.isActivePlayerLocalPlayer()).toBeFalse();
+            });
         });
 
-        it('RoundTimeout should emit endRoundEvent', fakeAsync(() => {
-            const router: Router = TestBed.inject(Router);
-            router.navigateByUrl('/game');
-            tick();
-            spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
+        describe('getStartGameTime', () => {
+            it('getStartGameTime should return the first round start time if there is one', () => {
+                service.completedRounds = [currentRound];
+                expect(service.getStartGameTime()).toEqual(currentRound.startTime);
+            });
 
-            service.roundTimeout();
-            expect(endRoundEventSpy).toHaveBeenCalled();
-        }));
+            it('getStartGameTime should throw error if there is no first round', () => {
+                service.completedRounds = [];
+                expect(() => service.getStartGameTime()).toThrowError(NO_START_GAME_TIME);
+            });
+        });
 
-        it('RoundTimeout should send pass action when local player is active player', fakeAsync(() => {
-            const router: Router = TestBed.inject(Router);
-            router.navigateByUrl('/game');
-            tick();
-            spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
+        describe('StartRound', () => {
+            let startTimerSpy: unknown;
 
-            const actionPass = {
-                type: ActionType.PASS,
-                payload: {},
-            };
+            beforeEach(() => {
+                startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
+                    return;
+                });
+                service.startRound(DEFAULT_MAX_ROUND_TIME);
+            });
 
-            service.roundTimeout();
-            expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass, '');
-        }));
+            it('startRound should set new timeout', () => {
+                expect(service.timeout).toBeTruthy();
+            });
+
+            it('startRound should call startTimer', () => {
+                expect(startTimerSpy).toHaveBeenCalled();
+            });
+        });
+
+        it('startTimer should send new timer with right values', () => {
+            const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
+                return;
+            });
+            service.maxRoundTime = DEFAULT_MAX_ROUND_TIME;
+            const newTimer = ONE_MINUTE_TIMER;
+
+            service.currentRound = currentRound;
+            const activePlayer = currentRound.player;
+
+            service.startTimer(DEFAULT_MAX_ROUND_TIME);
+            expect(timerSourceSpy).toHaveBeenCalledOnceWith([newTimer, activePlayer]);
+        });
+
+        describe('RoundTimeout', () => {
+            let endRoundEventSpy: unknown;
+
+            beforeEach(() => {
+                endRoundEventSpy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+                    return;
+                });
+                spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
+                gameplayControllerSpy.sendAction.and.callFake(() => {
+                    return;
+                });
+            });
+
+            it('RoundTimeout should not timeout if user is not on /game', fakeAsync(() => {
+                const router: Router = TestBed.inject(Router);
+                router.navigateByUrl('/home');
+                tick();
+
+                service.roundTimeout();
+                expect(endRoundEventSpy).not.toHaveBeenCalled();
+            }));
+
+            it('RoundTimeout should not send pass event if the local player is not the active player', () => {
+                spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
+                service.roundTimeout();
+                expect(gameplayControllerSpy.sendAction).not.toHaveBeenCalled();
+            });
+
+            it('RoundTimeout should emit endRoundEvent', fakeAsync(() => {
+                const router: Router = TestBed.inject(Router);
+                router.navigateByUrl('/game');
+                tick();
+                spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
+
+                service.roundTimeout();
+                expect(endRoundEventSpy).toHaveBeenCalled();
+            }));
+
+            it('RoundTimeout should send pass action when local player is active player', fakeAsync(() => {
+                const router: Router = TestBed.inject(Router);
+                router.navigateByUrl('/game');
+                tick();
+                spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
+
+                const actionPass = {
+                    type: ActionType.PASS,
+                    payload: {},
+                };
+
+                service.roundTimeout();
+                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass, '');
+            }));
+        });
     });
 });

@@ -80,7 +80,7 @@ export class SocketService {
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
 
-        this.sio.to(room).emit(ev, args);
+        this.sio.to(room).emit(ev, ...args);
     }
 
     isInitialized(): boolean {
@@ -105,6 +105,6 @@ export class SocketService {
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
-        this.getSocket(id).emit(ev, args);
+        this.getSocket(id).emit(ev, ...args);
     }
 }

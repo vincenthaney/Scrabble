@@ -21,9 +21,11 @@ import {
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import { EventEmitter } from 'events';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import { Socket } from 'socket.io';
@@ -549,10 +551,25 @@ describe('GameDispatcherController', () => {
     describe('handleLeave', () => {
         let isGameInWaitingRoomsSpy: unknown;
         let emitToSocketSpy: unknown;
+        let emitToRoomSpy: unknown;
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        let gameStub: SinonStubbedInstance<Game>;
+        let player: Player;
 
         beforeEach(() => {
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
+            emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
+
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            gameStub = createStubInstance(Game);
+            player = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+
+            (controller['activeGameService'] as unknown) = activeGameServiceStub;
+            activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
+            activeGameServiceStub.playerLeftEvent = new EventEmitter();
+            gameStub.getRequestingPlayer.returns(player);
         });
+
         describe('Player leave before game', () => {
             let leaveLobbyRequestSpy: unknown;
             let handleLobbiesUpdateSpy: unknown;
@@ -639,6 +656,15 @@ describe('GameDispatcherController', () => {
 
                 controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
                 expect(playerLeftEventSpy).to.have.been.called.with('playerLeft', DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            });
+
+            it('should send message explaining the user left', () => {
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
+                isGameOverSpy = chai.spy.on(controller['activeGameService'], 'isGameOver', () => true);
+                playerLeftEventSpy = chai.spy.on(controller['activeGameService'].playerLeftEvent, 'emit', () => {});
+
+                controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+                expect(emitToRoomSpy).to.have.been.called();
             });
         });
     });

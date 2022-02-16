@@ -9,7 +9,7 @@ import {
     GAME_TYPE_REQUIRED,
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
-    PLAYER_NAME_REQUIRED
+    PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -171,6 +171,10 @@ export class GameDispatcherController {
         } else {
             this.socketService.removeFromRoom(playerId, gameId);
             this.socketService.emitToSocket(playerId, 'cleanup');
+
+            const playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
+            this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
+
             // Check if there is no player left --> cleanup server and client
             if (!this.socketService.doesRoomExist(gameId)) {
                 this.activeGameService.removeGame(gameId, playerId);

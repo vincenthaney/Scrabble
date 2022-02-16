@@ -25,8 +25,8 @@ export class PlayerLeavesController implements OnDestroy {
     }
 
     configureSocket(): void {
-        this.socketService.on('joinerLeaveGame', (opponent: PlayerName[]) => {
-            this.joinerLeaveGameEvent.emit(opponent[0].name);
+        this.socketService.on('joinerLeaveGame', (opponent: PlayerName) => {
+            this.joinerLeaveGameEvent.emit(opponent.name);
         });
 
         this.socketService.on('cleanup', () => {
