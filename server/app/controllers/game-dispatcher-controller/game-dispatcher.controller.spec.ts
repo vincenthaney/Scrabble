@@ -2,9 +2,9 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Application } from '@app/app';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameType } from '@app/classes/game/game.type';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
@@ -19,8 +19,8 @@ import {
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
-import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SYSTEM_ID } from '@app/constants/game';
+import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -259,7 +259,7 @@ describe('GameDispatcherController', () => {
             playerStub = createStubInstance(Player);
             playerStub.id = DEFAULT_PLAYER_ID;
             playerStub.isConnected = true;
-            gameDispatcherStub.createStartGameData.callsFake(() => undefined as unknown as StartMultiplayerGameData);
+            gameStub.createStartGameData.callsFake(() => undefined as unknown as StartMultiplayerGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
             gameStub.getRequestingPlayer.returns(playerStub);
@@ -301,7 +301,7 @@ describe('GameDispatcherController', () => {
             gameStub.isGameOver.returns(false);
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            chai.assert(gameDispatcherStub.createStartGameData.calledOnce);
+            chai.assert(gameStub.createStartGameData.calledOnce);
         });
 
         it('should call emit to socket', () => {
@@ -706,6 +706,18 @@ describe('GameDispatcherController', () => {
 
             clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
             expect(handleLeaveSpy).to.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            clock.restore();
+        });
+
+        it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
+            const clock = useFakeTimers();
+            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(handleLeaveSpy).to.not.have.been.called();
+            playerStub.isConnected = true;
+
+            clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            expect(handleLeaveSpy).to.not.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             clock.restore();
         });
     });
