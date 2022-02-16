@@ -1,22 +1,22 @@
-import { Component, OnInit, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import {
-    DIALOG_ABANDON_TITLE,
-    DIALOG_ABANDON_CONTENT,
     DIALOG_ABANDON_BUTTON_CONFIRM,
     DIALOG_ABANDON_BUTTON_CONTINUE,
-    DIALOG_NO_ACTIVE_GAME_TITLE,
-    DIALOG_NO_ACTIVE_GAME_CONTENT,
+    DIALOG_ABANDON_CONTENT,
+    DIALOG_ABANDON_TITLE,
     DIALOG_NO_ACTIVE_GAME_BUTTON,
+    DIALOG_NO_ACTIVE_GAME_CONTENT,
+    DIALOG_NO_ACTIVE_GAME_TITLE,
     DIALOG_QUIT_BUTTON_CONFIRM,
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
     DIALOG_QUIT_TITLE,
 } from '@app/constants/pages-constants';
-import { TileRackComponent } from '@app/components/tile-rack/tile-rack.component';
 import {
     RACK_FONT_SIZE_INCREMENT,
     RACK_TILE_MAX_FONT_SIZE,
@@ -25,12 +25,12 @@ import {
     SQUARE_TILE_MAX_FONT_SIZE,
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 
 @Component({
     selector: 'app-game-page',
@@ -87,6 +87,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         content: buttonsContent[0],
                         redirect: '/home',
                         style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
+                        // We haven't been able to test that the right function is called because this
+                        // arrow function creates a new instance of the function. We cannot spy on it.
+                        // It totally works tho, try it!
                         action: () => this.playerLeavesService.handleLocalPlayerLeavesGame(),
                     },
                     {
