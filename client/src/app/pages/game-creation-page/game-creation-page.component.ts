@@ -28,8 +28,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-        timer: new FormControl('', Validators.required),
-        dictionary: new FormControl('', Validators.required),
+        timer: new FormControl('60', Validators.required),
+        dictionary: new FormControl('default-dictionary', Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
