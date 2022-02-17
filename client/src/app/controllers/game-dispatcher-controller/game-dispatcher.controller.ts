@@ -95,31 +95,31 @@ export class GameDispatcherController implements OnDestroy {
         }
     }
 
-    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (gameId: string) => void) {
+    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (gameId: string) => void): void {
         this.createGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToJoinRequestEvent(serviceDestroyed$: Subject<boolean>, callback: (opponentName: string) => void) {
+    subscribeToJoinRequestEvent(serviceDestroyed$: Subject<boolean>, callback: (opponentName: string) => void): void {
         this.joinRequestEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToCanceledGameEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void) {
+    subscribeToCanceledGameEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.canceledGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToLobbyFullEvent(serviceDestroyed$: Subject<boolean>, callback: () => void) {
+    subscribeToLobbyFullEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
         this.lobbyFullEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToLobbyRequestValidEvent(serviceDestroyed$: Subject<boolean>, callback: () => void) {
+    subscribeToLobbyRequestValidEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
         this.lobbyRequestValidEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToLobbiesUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbies: LobbyInfo[]) => void) {
+    subscribeToLobbiesUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbies: LobbyInfo[]) => void): void {
         this.lobbiesUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToJoinerRejectedEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void) {
+    subscribeToJoinerRejectedEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 }
