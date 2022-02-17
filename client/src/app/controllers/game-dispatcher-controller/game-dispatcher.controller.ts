@@ -5,6 +5,7 @@ import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/class
 import GameService from '@app/services/game/game.service';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -14,7 +15,6 @@ export class GameDispatcherController implements OnDestroy {
     createGameEvent: EventEmitter<string> = new EventEmitter();
     joinRequestEvent: EventEmitter<string> = new EventEmitter();
     canceledGameEvent: EventEmitter<string> = new EventEmitter();
-    leaveLobbyEvent: EventEmitter<string> = new EventEmitter();
     lobbyFullEvent: EventEmitter<void> = new EventEmitter();
     lobbyRequestValidEvent: EventEmitter<void> = new EventEmitter();
     lobbiesUpdateEvent: EventEmitter<LobbyInfo[]> = new EventEmitter();
@@ -93,5 +93,33 @@ export class GameDispatcherController implements OnDestroy {
         } else if (error.status === HttpStatusCode.Gone) {
             this.canceledGameEvent.emit('Le créateur');
         }
+    }
+
+    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (gameId: string) => void) {
+        this.createGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToJoinRequestEvent(serviceDestroyed$: Subject<boolean>, callback: (opponentName: string) => void) {
+        this.joinRequestEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToCanceledGameEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void) {
+        this.canceledGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToLobbyFullEvent(serviceDestroyed$: Subject<boolean>, callback: () => void) {
+        this.lobbyFullEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToLobbyRequestValidEvent(serviceDestroyed$: Subject<boolean>, callback: () => void) {
+        this.lobbyRequestValidEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToLobbiesUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbies: LobbyInfo[]) => void) {
+        this.lobbiesUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToJoinerRejectedEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void) {
+        this.joinerRejectedEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 }
