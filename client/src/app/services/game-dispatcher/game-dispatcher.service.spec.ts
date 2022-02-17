@@ -64,44 +64,44 @@ describe('GameDispatcherService', () => {
     describe('Subscriptions', () => {
         it('should set gameId on createGameEvent', () => {
             service.gameId = '';
-            service['gameDispatcherController'].createGameEvent.emit(BASE_GAME_ID);
+            service['gameDispatcherController'].createGameEvent.next(BASE_GAME_ID);
             expect(service.gameId).toEqual(BASE_GAME_ID);
         });
 
         it('should call handleJoinRequest on joinRequestEvent', () => {
             const spy = spyOn(service, 'handleJoinRequest');
-            service['gameDispatcherController'].joinRequestEvent.emit(TEST_PLAYER_NAME);
+            service['gameDispatcherController'].joinRequestEvent.next(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call handleLobbyFull on lobbyFullEvent', () => {
             const spy = spyOn(service, 'handleLobbyFull');
-            service['gameDispatcherController'].lobbyFullEvent.emit();
+            service['gameDispatcherController'].lobbyFullEvent.next();
             expect(spy).toHaveBeenCalled();
         });
 
         it('should call navigateByUrl on lobbyRequestValidEvent', () => {
             const spy = spyOn(service.router, 'navigateByUrl');
-            service['gameDispatcherController'].lobbyRequestValidEvent.emit();
+            service['gameDispatcherController'].lobbyRequestValidEvent.next();
             expect(spy).toHaveBeenCalled();
         });
 
         it('should call handleCanceledGame on canceledGameEvent', () => {
             const spy = spyOn(service, 'handleCanceledGame');
-            service['gameDispatcherController'].canceledGameEvent.emit(TEST_PLAYER_NAME);
+            service['gameDispatcherController'].canceledGameEvent.next(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call handleJoinerRejected on joinerRejectedEvent', () => {
             const spy = spyOn(service, 'handleJoinerRejected');
-            service['gameDispatcherController'].joinerRejectedEvent.emit(TEST_PLAYER_NAME);
+            service['gameDispatcherController'].joinerRejectedEvent.next(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call handleJoinerRejected on lobbiesUpdateEvent', () => {
             const lobbies: LobbyInfo[] = [];
             const spy = spyOn(service, 'handleLobbiesUpdate');
-            service['gameDispatcherController'].lobbiesUpdateEvent.emit(lobbies);
+            service['gameDispatcherController'].lobbiesUpdateEvent.next(lobbies);
             expect(spy).toHaveBeenCalledWith(lobbies);
         });
     });
@@ -268,7 +268,7 @@ describe('GameDispatcherService', () => {
 
     describe('handleJoinRequest', () => {
         it('should emit to joinRequestEvent', () => {
-            const spy = spyOn(service.joinRequestEvent, 'emit');
+            const spy = spyOn(service.joinRequestEvent, 'next');
             service.handleJoinRequest(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
@@ -280,7 +280,7 @@ describe('GameDispatcherService', () => {
 
         beforeEach(() => {
             resetSpy = spyOn<any>(service, 'resetServiceData');
-            emitSpy = spyOn(service.joinerRejectedEvent, 'emit');
+            emitSpy = spyOn(service.joinerRejectedEvent, 'next');
         });
 
         afterEach(() => {
@@ -302,7 +302,7 @@ describe('GameDispatcherService', () => {
     describe('handleLobbiesUpdate', () => {
         it('should emit to joinRequestEvent', () => {
             const args: LobbyInfo[] = [];
-            const spy = spyOn(service.lobbiesUpdateEvent, 'emit');
+            const spy = spyOn(service.lobbiesUpdateEvent, 'next');
             service.handleLobbiesUpdate(args);
             expect(spy).toHaveBeenCalledWith(args);
         });
@@ -314,7 +314,7 @@ describe('GameDispatcherService', () => {
 
         beforeEach(() => {
             resetSpy = spyOn<any>(service, 'resetServiceData');
-            emitSpy = spyOn(service.lobbyFullEvent, 'emit');
+            emitSpy = spyOn(service.lobbyFullEvent, 'next');
         });
 
         afterEach(() => {
@@ -339,7 +339,7 @@ describe('GameDispatcherService', () => {
 
         beforeEach(() => {
             resetSpy = spyOn<any>(service, 'resetServiceData');
-            emitSpy = spyOn(service.canceledGameEvent, 'emit');
+            emitSpy = spyOn(service.canceledGameEvent, 'next');
         });
 
         afterEach(() => {
@@ -360,7 +360,7 @@ describe('GameDispatcherService', () => {
 
     describe('handleJoinerLeaveGame', () => {
         it('should emit to joinRequestEvent', () => {
-            const spy = spyOn(service['joinerLeaveGameEvent'], 'emit');
+            const spy = spyOn(service['joinerLeaveGameEvent'], 'next');
             service.handleJoinerLeaveGame(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
