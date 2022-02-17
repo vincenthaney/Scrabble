@@ -1,7 +1,7 @@
-// /* eslint-disable @typescript-eslint/no-magic-numbers */
-// /* eslint-disable dot-notation */
-// /* eslint-disable no-unused-expressions */
-// /* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable dot-notation */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 // import { Board, Position } from '@app/classes/board';
 // import { Square } from '@app/classes/square';
 // import ScoreMultiplier, { MultiplierEffect } from '@app/classes/square/score-multiplier';
@@ -11,120 +11,34 @@
 // import * as chai from 'chai';
 // import * as chaiAsPromised from 'chai-as-promised';
 // import * as spies from 'chai-spies';
-// import BoardService from './board.service';
+import { Board } from '@app/classes/board';
+import { Tile } from '@app/classes/tile';
+import { WordFindingQuery } from '@app/classes/word-finding';
+import { expect } from 'chai';
+import { Container } from 'typedi';
+import WordFindingService from './word-finding';
 // import { BOARD_CONFIG_UNDEFINED_AT, NO_MULTIPLIER_MAPPED_TO_INPUT } from '@app/constants/services-errors';
 
 // const expect = chai.expect;
 // chai.use(spies);
 // chai.use(chaiAsPromised);
 
-// describe('BoardService', () => {
-//     let service: BoardService;
+describe('WordFindingservice', () => {
+    let service: WordFindingService;
 
-//     const boardConfigSize: Vec2 = {
-//         x: BOARD_CONFIG.length,
-//         y: BOARD_CONFIG[0] ? BOARD_CONFIG[0].length : 0,
-//     };
+    beforeEach(() => {
+        service = Container.get(WordFindingService);
+    });
 
-//     /*
-//         If the board configuration size is smaller or equal to 0
-//         then the board configuration will not be defined no matter
-//         the square => isBoardDefined = false
-//         If it is bigger than 0, then it will be defined at the 
-//         different test cases below
-//     */
-//     const isBoardDefined = boardConfigSize.x > 0 && boardConfigSize.y > 0;
-//     const isBoardDefinedTestCases: Map<Position, boolean> = new Map([
-//         [new Position(-1, -1), false],
-//         [new Position(0, 0), isBoardDefined],
-//         [new Position(boardConfigSize.y / 2, boardConfigSize.x / 2), isBoardDefined],
-//         [new Position(boardConfigSize.y - 1, boardConfigSize.x - 1), isBoardDefined],
-//         [new Position(boardConfigSize.y, boardConfigSize.x), false],
-//         [new Position(boardConfigSize.y + 1, boardConfigSize.x + 1), false],
-//     ]);
+    it('should be created', () => {
+        expect(service).to.exist;
+    });
 
-//     type MapTypes = ScoreMultiplier | null | undefined;
-//     const boardConfigTestCases: Map<string, MapTypes> = new Map([
-//         ['x', null],
-//         ['L2', { multiplier: 2, multiplierEffect: MultiplierEffect.LETTER }],
-//         ['L3', { multiplier: 3, multiplierEffect: MultiplierEffect.LETTER }],
-//         ['W2', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
-//         ['W3', { multiplier: 3, multiplierEffect: MultiplierEffect.WORD }],
-//         ['S', { multiplier: 2, multiplierEffect: MultiplierEffect.WORD }],
-//         ['?', undefined],
-//         ['undefined', undefined],
-//     ]);
-
-//     const boardInitializationTestCases: Map<Position, Square | undefined> = new Map([
-//         [
-//             new Position(0, 0),
-//             {
-//                 tile: null,
-//                 position: new Position(0, 0),
-//                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
-//                 wasMultiplierUsed: false,
-//                 isCenter: false,
-//             },
-//         ],
-//         [
-//             new Position(1, 1),
-//             {
-//                 tile: null,
-//                 position: new Position(1, 1),
-//                 scoreMultiplier: { multiplier: 2, multiplierEffect: MultiplierEffect.WORD },
-//                 wasMultiplierUsed: false,
-//                 isCenter: false,
-//             },
-//         ],
-//         [
-//             new Position(0, BOARD_SIZE.x - 1),
-//             {
-//                 tile: null,
-//                 position: new Position(0, BOARD_SIZE.x - 1),
-//                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
-//                 wasMultiplierUsed: false,
-//                 isCenter: false,
-//             },
-//         ],
-//         [new Position(0, BOARD_SIZE.x), undefined],
-//         [
-//             new Position(BOARD_SIZE.y - 1, 0),
-//             {
-//                 tile: null,
-//                 position: new Position(BOARD_SIZE.y - 1, 0),
-//                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
-//                 wasMultiplierUsed: false,
-//                 isCenter: false,
-//             },
-//         ],
-//         [new Position(BOARD_SIZE.y, 0), undefined],
-//         [
-//             new Position(BOARD_SIZE.y - 1, BOARD_SIZE.x - 1),
-//             {
-//                 tile: null,
-//                 position: new Position(BOARD_SIZE.y - 1, BOARD_SIZE.x - 1),
-//                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
-//                 wasMultiplierUsed: false,
-//                 isCenter: false,
-//             },
-//         ],
-//         [new Position(BOARD_SIZE.y, BOARD_SIZE.x), undefined],
-//     ]);
-
-//     beforeEach(() => {
-//         service = new BoardService();
-//     });
-
-//     it('should be created', () => {
-//         expect(service).to.exist;
-//     });
-
-//     isBoardDefinedTestCases.forEach((isDefined: boolean, position: Position) => {
-//         const textToAdd: string = isDefined ? 'defined' : 'undefined';
-//         it('Board Configuration at ' + position.row + '/' + position.column + ' should be ' + textToAdd, () => {
-//             expect(service['isBoardConfigDefined'](position)).to.equal(isDefined);
-//         });
-//     });
+    it('should throw', () => {
+        const result = () => service.findWords({} as unknown as Board, [] as unknown as Tile[], {} as unknown as WordFindingQuery);
+        expect(result).to.throw();
+    });
+});
 
 //     boardConfigTestCases.forEach((value: MapTypes, key: string) => {
 //         it('Parsing Square config for data ' + key + ' should return ' + value, () => {
