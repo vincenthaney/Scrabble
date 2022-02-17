@@ -168,7 +168,7 @@ describe('JoinWaitingPageComponent', () => {
         const spyPlayerRejected = spyOn(component, 'playerRejected').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.joinerRejectedEvent.emit(emitName);
+        gameDispatcherServiceMock.joinerRejectedEvent.next(emitName);
         expect(spyPlayerRejected).toHaveBeenCalledWith(emitName);
     });
 
@@ -177,7 +177,7 @@ describe('JoinWaitingPageComponent', () => {
         const spyHostHasCanceled = spyOn(component, 'hostHasCanceled').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.canceledGameEvent.emit(emitName);
+        gameDispatcherServiceMock.canceledGameEvent.next(emitName);
         expect(spyHostHasCanceled).toHaveBeenCalledWith(emitName);
     });
 

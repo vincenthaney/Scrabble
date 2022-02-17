@@ -204,7 +204,7 @@ describe('LobbyPageComponent', () => {
         const spySetOpponent = spyOn(component, 'updateLobbies').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.lobbiesUpdateEvent.emit(emitLobbies);
+        gameDispatcherServiceMock.lobbiesUpdateEvent.next(emitLobbies);
         expect(spySetOpponent).toHaveBeenCalledWith(emitLobbies);
     });
 
@@ -212,7 +212,7 @@ describe('LobbyPageComponent', () => {
         const spyLobbyFull = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.lobbyFullEvent.emit();
+        gameDispatcherServiceMock.lobbyFullEvent.next();
         expect(spyLobbyFull).toHaveBeenCalled();
     });
 
@@ -220,7 +220,7 @@ describe('LobbyPageComponent', () => {
         const spyLobbyCanceled = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.canceledGameEvent.emit();
+        gameDispatcherServiceMock.canceledGameEvent.next();
         expect(spyLobbyCanceled).toHaveBeenCalled();
     });
 
