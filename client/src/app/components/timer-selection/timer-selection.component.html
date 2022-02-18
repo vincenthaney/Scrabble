@@ -1,5 +1,9 @@
-<mat-label floatLabel="always">Choisissez le temps par tour</mat-label>
-<div>
-    <app-icon icon="hourglass-half" size="lg"></app-icon>
-    <p>{{ timerValue }}:{{ timerValue }}</p>
+<div id="timer-selection-container">
+    <mat-label floatLabel="always">Choisissez le temps par tour</mat-label>
+    <div>
+        <app-icon icon="hourglass-half" size="lg"></app-icon>
+        <p>{{ timerValue }}:{{ timerValue }}</p>
+        <button mat-flat-button (click)="(incrementTimerValue)">+</button>
+        <button mat-flat-button (click)="(decrementTimerValue)">-</button>
+    </div>
 </div>
