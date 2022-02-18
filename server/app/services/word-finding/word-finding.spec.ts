@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
-import { WordFindingQuery } from '@app/classes/word-finding';
+import { WordFindingRequest } from '@app/classes/word-finding';
 import { expect } from 'chai';
 import { Container } from 'typedi';
 import WordFindingService from './word-finding';
@@ -21,7 +21,7 @@ describe('WordFindingservice', () => {
     });
 
     it('should throw', () => {
-        const result = () => service.findWords({} as unknown as Board, [] as unknown as Tile[], {} as unknown as WordFindingQuery);
+        const result = () => service.findWords({} as unknown as Board, [] as unknown as Tile[], {} as unknown as WordFindingRequest);
         expect(result).to.throw();
     });
 });
