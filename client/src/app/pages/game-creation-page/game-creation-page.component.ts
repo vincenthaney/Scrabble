@@ -22,12 +22,15 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
     timerOptions: number[];
     dictionaryOptions: string[];
+    virtualPlayerNames: string[] = ['Victoria', 'Vladimir', 'Herménégilde'];
+
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
+        virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
         timer: new FormControl('60', Validators.required),
         dictionary: new FormControl('default-dictionary', Validators.required),
     });

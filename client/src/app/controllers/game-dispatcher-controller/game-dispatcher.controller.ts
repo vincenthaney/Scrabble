@@ -1,7 +1,7 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { LobbyInfo, PlayerName } from '@app/classes/communication/';
-import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameConfig, GameConfigData, StartGameData } from '@app/classes/communication/game-config';
 import GameService from '@app/services/game/game.service';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
@@ -35,8 +35,8 @@ export class GameDispatcherController implements OnDestroy {
         this.socketService.on('joinRequest', (opponent: PlayerName) => {
             this.joinRequestEvent.emit(opponent.name);
         });
-        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData) => {
-            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData);
+        this.socketService.on('startGame', (startGameData: StartGameData) => {
+            this.gameService.initializeGame(this.socketService.getId(), startGameData);
         });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
             this.lobbiesUpdateEvent.emit(lobbies);

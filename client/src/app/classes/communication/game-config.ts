@@ -1,3 +1,4 @@
+import { VirtualPlayerProfile } from '@app/classes/admin';
 import { GameType } from '@app/classes/game-type';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
@@ -14,20 +15,18 @@ export interface GameConfigData {
 
 export interface SoloGameConfigData extends GameConfigData {
     virtualPlayerName: string;
+    virtualPlayerLevel: VirtualPlayerProfile;
 }
 
 export interface GameConfig {
     player1: PlayerData;
+    player2: PlayerData;
     gameType: GameType;
     maxRoundTime: number;
     dictionary: string;
 }
 
-export interface MultiplayerGameConfig extends GameConfig {
-    player2: PlayerData;
-}
-
-export interface StartMultiplayerGameData extends MultiplayerGameConfig {
+export interface StartGameData extends GameConfig {
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];
