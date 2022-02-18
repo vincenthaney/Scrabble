@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { FocusableComponent } from './focusable-component';
@@ -40,7 +41,7 @@ describe('FocusableComponentsService', () => {
             const component1 = new ComponentKeyboard();
             const component2 = new ComponentKeyboard();
             service['activeKeyboardComponent'] = component1;
-            const spy = spyOn(component1.looseFocusEvent, 'emit');
+            const spy = spyOn(component1['looseFocusEvent'], 'next');
             service.setActiveKeyboardComponent(component2);
             expect(spy).toHaveBeenCalled();
         });
@@ -50,14 +51,14 @@ describe('FocusableComponentsService', () => {
         it('should call emit when activeKeyboardComponent is defined', () => {
             const component = new ComponentKeyboard();
             service['activeKeyboardComponent'] = component;
-            const spy = spyOn(component.focusEvent, 'emit');
-            service.emitKeyboard();
+            const spy = spyOn(component['focusableEvent'], 'next');
+            service.emitKeyboard(new KeyboardEvent('a'));
             expect(spy).toHaveBeenCalled();
         });
 
         it('should return false if activeKeyboardComponent is undefined', () => {
             service['activeKeyboardComponent'] = undefined;
-            const result = service.emitKeyboard();
+            const result = service.emitKeyboard(new KeyboardEvent('a'));
             expect(result).toBeFalse();
         });
     });

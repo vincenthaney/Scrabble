@@ -20,20 +20,20 @@ export abstract class FocusableComponent<T> {
         this.looseFocusEvent.next();
     }
 
-    subscribeToFocusableEvent(destroy$: Subject<boolean>, next: (value: T) => void) {
+    protected subscribeToFocusableEvent(destroy$: Subject<boolean>, next: (value: T) => void) {
         this.focusableEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
-    subscribeToLooseFocusEvent(destroy$: Subject<boolean>, next: () => void) {
+    protected subscribeToLooseFocusEvent(destroy$: Subject<boolean>, next: () => void) {
         this.looseFocusEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
-    subscribe(): void {
+    protected subscribe(): void {
         this.focusableEvent.pipe(takeUntil(this.focusableComponentDestroyed$)).subscribe(this.onFocusableEvent);
         this.looseFocusEvent.pipe(takeUntil(this.focusableComponentDestroyed$)).subscribe(this.onLooseFocusEvent);
     }
 
-    destroy(): void {
+    protected destroy(): void {
         this.focusableComponentDestroyed$.next(true);
         this.focusableComponentDestroyed$.complete();
     }
