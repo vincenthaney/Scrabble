@@ -5,6 +5,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -20,7 +21,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
-    timerOptions: number[];
+    timerValue: number;
     dictionaryOptions: string[];
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -28,13 +29,14 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-        timer: new FormControl('', Validators.required),
+        timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
         dictionary: new FormControl('', Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit(): void {
+        this.timerValue = DEFAULT_TIMER_VALUE;
         this.gameParameters
             .get('gameMode')
             ?.valueChanges.pipe(takeUntil(this.serviceDestroyed$))

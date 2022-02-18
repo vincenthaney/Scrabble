@@ -37,14 +37,17 @@
                 </div>
             </mat-button-toggle-group>
 
-            <span id="form-fields">
-                <mat-form-field appearance="outline">
-                    <mat-label floatLabel="always">Choisissez le temps par tour</mat-label>
-                    <mat-select formControlName="timer">
-                        <mat-option value="60">1 minute</mat-option>
-                    </mat-select>
-                </mat-form-field>
+            <span id="timer">
+                <mat-label floatLabel="always">Choisissez le temps par tour</mat-label>
+                <app-timer-selection
+                    formControlName="timer"
+                    value="timerValue"
+                    [timerValue]="timerValue"
+                    (timerChangeEvent)="timerValue = $event"
+                ></app-timer-selection>
+            </span>
 
+            <span id="form-fields">
                 <mat-form-field appearance="outline">
                     <mat-label floatLabel="always">Choisissez le dictionnaire à utiliser</mat-label>
                     <mat-select formControlName="dictionary">
