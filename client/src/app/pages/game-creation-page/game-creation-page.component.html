@@ -38,13 +38,7 @@
             </mat-button-toggle-group>
 
             <span id="timer">
-                <mat-label floatLabel="always">Choisissez le temps par tour</mat-label>
-                <app-timer-selection
-                    formControlName="timer"
-                    value="timerValue"
-                    [timerValue]="timerValue"
-                    (timerChangeEvent)="timerValue = $event"
-                ></app-timer-selection>
+                <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
             </span>
 
             <span id="form-fields">

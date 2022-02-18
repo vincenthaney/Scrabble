@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { MAXIMUM_TIMER_VALUE, MINIMUM_TIMER_VALUE } from '@app/constants/pages-constants';
 
 @Component({
@@ -7,11 +8,10 @@ import { MAXIMUM_TIMER_VALUE, MINIMUM_TIMER_VALUE } from '@app/constants/pages-c
     styleUrls: ['./timer-selection.component.scss'],
 })
 export class TimerSelectionComponent {
-    @Input() timerValue: number;
-    @Output() timerChangeEvent: EventEmitter<number> = new EventEmitter();
+    @Input() parentForm: FormGroup;
+    timerValue: number;
 
     changeTimerValue(delta: number): void {
         this.timerValue = Math.min(MAXIMUM_TIMER_VALUE, Math.max(MINIMUM_TIMER_VALUE, this.timerValue + delta));
-        this.timerChangeEvent.emit(this.timerValue);
     }
 }
