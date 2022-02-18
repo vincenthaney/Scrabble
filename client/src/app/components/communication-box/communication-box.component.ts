@@ -21,7 +21,7 @@ export type LetterMapItem = { letter: LetterValue; amount: number };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy, AfterViewInit {
-    @ViewChild('messageInput') messageInputElement: ElementRef;
+    @ViewChild('messageInput', { static: true }) messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
     componentDestroyed$: Subject<boolean> = new Subject();
@@ -31,7 +31,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
+    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
 
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
@@ -61,11 +61,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngAfterViewInit(): void {
-        this.messageInputElement.nativeElement.focus();
-        const handleKeyEvent = () => {
-            this.messageInputElement.nativeElement.focus();
-        };
-        this.focusEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(handleKeyEvent);
+        const messageInputFocus = () => this.messageInputElement?.nativeElement?.focus();
+        this.subscribeToFocusableEvent(this.componentDestroyed$, messageInputFocus);
     }
 
     ngOnDestroy(): void {
