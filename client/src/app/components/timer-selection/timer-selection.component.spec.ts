@@ -43,9 +43,7 @@ describe('TimerSelectionComponent', () => {
     });
 
     it('Should have DEFAULT_TIMER_VALUE on creation', () => {
-        component.timerValue = undefined as unknown as number;
-        expect(component.timerValue).toBeUndefined();
-
+        component.timerValue = -DEFAULT_TIMER_VALUE;
         component.ngOnInit();
         expect(component.timerValue).toEqual(DEFAULT_TIMER_VALUE);
     });
@@ -78,16 +76,17 @@ describe('TimerSelectionComponent', () => {
                 return;
             });
             middleValue = MINIMUM_TIMER_VALUE + (MAXIMUM_TIMER_VALUE - MINIMUM_TIMER_VALUE) / 2;
-            component.timerValue = middleValue;
-            delta = -middleValue / 2;
+            delta = middleValue / 2;
         });
 
         it('changeTimerValue should add delta if timerValue is within the min and max', () => {
+            component.timerValue = middleValue;
             component.changeTimerValue(delta);
             expect(component.timerValue).toEqual(middleValue + delta);
         });
 
         it('changeTimerValue should remove delta if timerValue is within the min and max', () => {
+            component.timerValue = middleValue;
             component.changeTimerValue(-delta);
             expect(component.timerValue).toEqual(middleValue - delta);
         });
