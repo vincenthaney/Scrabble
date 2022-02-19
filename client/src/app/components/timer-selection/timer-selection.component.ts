@@ -1,15 +1,19 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { MAXIMUM_TIMER_VALUE, MINIMUM_TIMER_VALUE, TIMER_VALUE_INCREMENTS } from '@app/constants/pages-constants';
+import { DEFAULT_TIMER_VALUE, MAXIMUM_TIMER_VALUE, MINIMUM_TIMER_VALUE, TIMER_VALUE_INCREMENTS } from '@app/constants/pages-constants';
 
 @Component({
     selector: 'app-timer-selection',
     templateUrl: './timer-selection.component.html',
     styleUrls: ['./timer-selection.component.scss'],
 })
-export class TimerSelectionComponent {
+export class TimerSelectionComponent implements OnInit {
     @Input() parentForm: FormGroup;
     timerValue: number;
+
+    ngOnInit(): void {
+        this.timerValue = DEFAULT_TIMER_VALUE;
+    }
 
     incrementTimerValue(): void {
         this.changeTimerValue(TIMER_VALUE_INCREMENTS);

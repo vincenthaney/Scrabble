@@ -21,7 +21,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
-    timerValue: number;
+    // timerValue: number;
     dictionaryOptions: string[];
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -36,7 +36,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
 
     ngOnInit(): void {
-        this.timerValue = DEFAULT_TIMER_VALUE;
         this.gameParameters
             .get('gameMode')
             ?.valueChanges.pipe(takeUntil(this.serviceDestroyed$))

@@ -37,10 +37,6 @@
                 </div>
             </mat-button-toggle-group>
 
-            <span id="timer-selection">
-                <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
-            </span>
-
             <span id="form-fields">
                 <mat-form-field appearance="outline">
                     <mat-label floatLabel="always">Choisissez le dictionnaire à utiliser</mat-label>
@@ -48,8 +44,14 @@
                         <mat-option value="default-dictionary">Par défaut (Français)</mat-option>
                     </mat-select>
                 </mat-form-field>
+
+                <span id="timer-selection">
+                    <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
+                </span>
+
                 <app-name-field (keydown.enter)="$event.preventDefault()"></app-name-field>
             </span>
+
             <span id="bottom-buttons">
                 <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>
                 <button mat-flat-button type="submit" id="create-game-button" cdkFocusInitial>Créer la partie</button>
