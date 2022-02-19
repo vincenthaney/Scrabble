@@ -107,6 +107,7 @@ describe('TimerSelectionComponent', () => {
         });
 
         it('changeTimerValue should assign new timerValue to form', () => {
+            component.timerValue = middleValue;
             component.changeTimerValue(delta);
             expect(patchValueSpy).toHaveBeenCalledWith({ timer: middleValue + delta });
         });
