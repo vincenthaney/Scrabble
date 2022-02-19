@@ -1,7 +1,7 @@
 <span class="game-creation-container">
     <img src="https://bit.ly/3m206ss" width="400" height="80" alt="Logo Scrabble" />
 
-    <section id="game-parameters">
+    <section id="game-creation-fields">
         <h1>Créez une partie</h1>
         <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
             <mat-label>Choisissez un type de partie</mat-label>
@@ -48,9 +48,8 @@
                 <span id="timer-selection">
                     <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
                 </span>
-
-                <app-name-field (keydown.enter)="$event.preventDefault()"></app-name-field>
             </span>
+            <app-name-field (keydown.enter)="$event.preventDefault()"></app-name-field>
 
             <span id="bottom-buttons">
                 <button mat-flat-button id="back-button" routerLink="home">Retour à l'accueil</button>
