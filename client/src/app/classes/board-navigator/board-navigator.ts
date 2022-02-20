@@ -43,18 +43,25 @@ export class BoardNavigator {
         return this.move(Direction.Backward, distance);
     }
 
-    nextEmpty(): SquareView | undefined {
-        const navigator = this.clone();
-
+    moveUntil(direction: Direction, predicate: () => boolean): SquareView | undefined {
         do {
-            navigator.forward();
-        } while (navigator.isWithinBounds() && !navigator.isEmpty());
+            this.move(direction);
+        } while (this.isWithinBounds() && !predicate());
 
-        return navigator.isWithinBounds() ? navigator.squareView : undefined;
+        return this.isWithinBounds() ? this.squareView : undefined;
+    }
+
+    nextEmpty(direction: Direction, allowNotApplied: boolean): SquareView | undefined {
+        return this.moveUntil(direction, () => this.isEmpty(allowNotApplied));
     }
 
     isWithinBounds(): boolean {
-        return this.position.row < this.squareGrid.length && this.position.column < this.squareGrid[this.position.row].length;
+        return (
+            this.position.row >= 0 &&
+            this.position.column >= 0 &&
+            this.position.row < this.squareGrid.length &&
+            this.position.column < this.squareGrid[this.position.row].length
+        );
     }
 
     switchOrientation(): BoardNavigator {
@@ -62,8 +69,8 @@ export class BoardNavigator {
         return this;
     }
 
-    isEmpty(): boolean {
-        return this.squareView.square.tile === null;
+    isEmpty(allowNotApplied: boolean = false): boolean {
+        return this.squareView.square.tile === null || (allowNotApplied && this.squareView.applied === false);
     }
 
     clone(): BoardNavigator {

@@ -150,18 +150,18 @@ describe('BoardNavigator', () => {
     describe('nextEmpty', () => {
         it('should return next squareView if empty', () => {
             const expected = board[0][1];
-            expect(navigator.nextEmpty()).toEqual(expected);
+            expect(navigator.nextEmpty(Direction.Forward, false)).toEqual(expected);
         });
 
         it('should return next empty squareView when neighbors is not empty', () => {
             navigator.position = { row: 2, column: 1 };
             const expected = board[2][3];
-            expect(navigator.nextEmpty()).toEqual(expected);
+            expect(navigator.nextEmpty(Direction.Forward, false)).toEqual(expected);
         });
 
         it('should return undefined when no next empty', () => {
             navigator.position = { row: 4, column: 4 };
-            expect(navigator.nextEmpty()).not.toBeDefined();
+            expect(navigator.nextEmpty(Direction.Forward, false)).not.toBeDefined();
         });
     });
 
@@ -208,6 +208,12 @@ describe('BoardNavigator', () => {
         it('should be false if has tile', () => {
             navigator.position = { row: 2, column: 2 };
             expect(navigator.isEmpty()).toBeFalse();
+        });
+
+        it('should return true if not applied', () => {
+            board[2][2].applied = false;
+            navigator.position = { row: 2, column: 2 };
+            expect(navigator.isEmpty(true)).toBeTrue();
         });
     });
 
