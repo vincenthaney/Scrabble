@@ -142,7 +142,7 @@ describe('CommunicationBoxComponent', () => {
     describe('ngAfterViewInit', () => {
         it('should call focus on handleKeyEvent', () => {
             const spy = spyOn(component.messageInputElement.nativeElement, 'focus');
-            component.focusEvent.emit(new KeyboardEvent('keypress'));
+            component.emitFocusableEvent(new KeyboardEvent('keypress'));
             expect(spy).toHaveBeenCalled();
         });
     });
