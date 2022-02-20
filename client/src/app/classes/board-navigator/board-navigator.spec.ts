@@ -49,7 +49,7 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
     return board;
 };
 
-fdescribe('BoardNavigator', () => {
+describe('BoardNavigator', () => {
     let board: SquareView[][];
     let navigator: BoardNavigator;
 
