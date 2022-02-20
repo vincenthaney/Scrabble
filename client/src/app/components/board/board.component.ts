@@ -1,14 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
-import { LetterValue } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
+import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
+import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -17,7 +20,7 @@ import { takeUntil } from 'rxjs/operators';
     templateUrl: './board.component.html',
     styleUrls: ['./board.component.scss'],
 })
-export class BoardComponent implements OnInit, OnDestroy {
+export class BoardComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
     boardDestroyed$: Subject<boolean> = new Subject();
     marginLetters: LetterValue[];
     readonly marginColumnSize: number;
@@ -28,7 +31,12 @@ export class BoardComponent implements OnInit, OnDestroy {
     notAppliedSquares: SquareView[];
     tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
-    constructor(private boardService: BoardService, private gameService: GameService) {
+    navigator: BoardNavigator;
+    selectedSquare: SquareView | undefined;
+    selectedOrientation: Orientation = Orientation.Horizontal;
+
+    constructor(private boardService: BoardService, private gameService: GameService, private focusableComponentService: FocusableComponentsService) {
+        super();
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
@@ -47,11 +55,59 @@ export class BoardComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+
+        const keyboardEventHandler = (e: KeyboardEvent): void => {
+            if (this.selectedSquare) {
+                this.selectedSquare.square.tile = new Tile(e.key.toUpperCase() as LetterValue, 0);
+                this.selectedSquare.applied = false;
+                this.notAppliedSquares.push(this.selectedSquare);
+                this.selectedSquare = this.navigator.nextEmpty();
+            }
+        };
+
+        const looseFocusEventHandler = (): void => {
+            this.selectedSquare = undefined;
+            this.selectedOrientation = Orientation.Horizontal;
+            this.clearNotAppliedSquare();
+        };
+
+        this.subscribeToFocusableEvent(this.boardDestroyed$, keyboardEventHandler);
+        this.subscribeToLooseFocusEvent(this.boardDestroyed$, looseFocusEventHandler);
     }
 
     ngOnDestroy(): void {
         this.boardDestroyed$.next(true);
         this.boardDestroyed$.complete();
+    }
+
+    onSquareClick(squareView: SquareView) {
+        if (squareView.square.tile !== null) return;
+        if (!this.gameService.isLocalPlayerPlaying()) return;
+
+        this.focusableComponentService.setActiveKeyboardComponent(this);
+        this.clearNotAppliedSquare();
+
+        if (this.selectedSquare === squareView) {
+            this.selectedOrientation = this.selectedOrientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+        } else {
+            this.selectedSquare = squareView;
+        }
+
+        this.navigator = new BoardNavigator(this.squareGrid, this.selectedSquare.square.position, this.selectedOrientation);
+    }
+
+    isSamePosition(s1: SquareView | undefined, s2: SquareView | undefined): boolean {
+        return (
+            s1 !== undefined &&
+            s2 !== undefined &&
+            s1.square.position.row === s2.square.position.row &&
+            s1.square.position.column === s2.square.position.column
+        );
+    }
+
+    private clearNotAppliedSquare() {
+        this.notAppliedSquares.forEach((s) => (s.square.tile = null));
+        this.notAppliedSquares = [];
     }
 
     private initializeBoard(board: Square[][]): void {
@@ -79,6 +135,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
         if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
+        this.clearNotAppliedSquare();
 
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
@@ -97,7 +154,7 @@ export class BoardComponent implements OnInit, OnDestroy {
                     squareView.applied = true;
                 });
         });
-        this.notAppliedSquares = [];
+        this.selectedSquare = undefined;
         return true;
     }
 
