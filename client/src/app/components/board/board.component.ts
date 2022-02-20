@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
+import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
@@ -56,23 +57,32 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
 
-        const keyboardEventHandler = (e: KeyboardEvent): void => {
+        this.onFocusableEvent = (e: KeyboardEvent): void => {
             if (this.selectedSquare) {
-                this.selectedSquare.square.tile = new Tile(e.key.toUpperCase() as LetterValue, 0);
-                this.selectedSquare.applied = false;
-                this.notAppliedSquares.push(this.selectedSquare);
-                this.selectedSquare = this.navigator.nextEmpty();
+                if (e.key === 'Backspace') {
+                    this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
+                    if (this.selectedSquare) {
+                        const index = this.notAppliedSquares.indexOf(this.selectedSquare);
+                        if (index >= 0) this.notAppliedSquares.splice(index, 1);
+                        this.selectedSquare.square.tile = null;
+                    }
+                } else {
+                    this.selectedSquare.square.tile = new Tile(e.key.toUpperCase() as LetterValue, 0);
+                    this.selectedSquare.applied = false;
+                    this.notAppliedSquares.push(this.selectedSquare);
+                    this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
+                }
             }
         };
 
-        const looseFocusEventHandler = (): void => {
+        this.onLooseFocusEvent = (): void => {
             this.selectedSquare = undefined;
             this.selectedOrientation = Orientation.Horizontal;
             this.clearNotAppliedSquare();
         };
 
-        this.subscribeToFocusableEvent(this.boardDestroyed$, keyboardEventHandler);
-        this.subscribeToLooseFocusEvent(this.boardDestroyed$, looseFocusEventHandler);
+        this.subscribeToFocusableEvent(this.boardDestroyed$, this.onFocusableEvent);
+        this.subscribeToLooseFocusEvent(this.boardDestroyed$, this.onLooseFocusEvent);
     }
 
     ngOnDestroy(): void {
@@ -80,9 +90,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.boardDestroyed$.complete();
     }
 
-    onSquareClick(squareView: SquareView) {
-        if (squareView.square.tile !== null) return;
-        if (!this.gameService.isLocalPlayerPlaying()) return;
+    onSquareClick(squareView: SquareView): boolean {
+        if (squareView.square.tile !== null) return false;
+        if (!this.gameService.isLocalPlayerPlaying()) return false;
 
         this.focusableComponentService.setActiveKeyboardComponent(this);
         this.clearNotAppliedSquare();
@@ -94,6 +104,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
 
         this.navigator = new BoardNavigator(this.squareGrid, this.selectedSquare.square.position, this.selectedOrientation);
+        return true;
     }
 
     isSamePosition(s1: SquareView | undefined, s2: SquareView | undefined): boolean {

@@ -18,6 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
+import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { Square, SquareView } from '@app/classes/square';
@@ -412,6 +414,259 @@ describe('BoardComponent', () => {
         it('should remove tiles from notAppliedSquares', () => {
             component['handleNewMessage']({ senderId: 'system-error' } as Message);
             expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeTrue();
+        });
+    });
+
+    describe('onFocusableEvent', () => {
+        let selectedSquare: SquareView;
+        let event: KeyboardEvent;
+        let nextEmptySpy: jasmine.Spy;
+
+        beforeEach(() => {
+            selectedSquare = new SquareView(
+                {
+                    tile: null,
+                    position: { row: 0, column: 0 },
+                    scoreMultiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                },
+                {
+                    x: 1,
+                    y: 1,
+                },
+            );
+
+            component.selectedSquare = selectedSquare;
+
+            component.navigator = new BoardNavigator(component.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
+            nextEmptySpy = spyOn(component.navigator, 'nextEmpty').and.returnValue(undefined);
+
+            event = new KeyboardEvent('e');
+            component.ngOnInit();
+        });
+
+        it('should set tile on selectedSquare', () => {
+            component.onFocusableEvent!(event);
+
+            expect(selectedSquare.square.tile).not.toBeNull();
+            expect(selectedSquare.applied).toBeFalse();
+        });
+
+        it('should add selectedSquare to notAppliedSquares', () => {
+            component.notAppliedSquares = [];
+            component.onFocusableEvent!(event);
+
+            expect(component.notAppliedSquares.includes(selectedSquare)).toBeTrue();
+        });
+
+        it('should call nextEmptySpy', () => {
+            component.onFocusableEvent!(event);
+            expect(nextEmptySpy).toHaveBeenCalled();
+        });
+
+        it('should do nothing if selectedSquare is undefined', () => {
+            component.selectedSquare = undefined;
+            component.notAppliedSquares = [];
+
+            component.onFocusableEvent!(event);
+
+            expect(nextEmptySpy).not.toHaveBeenCalled();
+            expect(component.notAppliedSquares.length).toEqual(0);
+        });
+
+        describe('Backspace', () => {
+            beforeEach(() => {
+                event = { key: 'Backspace' } as unknown as KeyboardEvent;
+            });
+
+            it('should call nextEmpty with Backward if backspace', () => {
+                component.onFocusableEvent!(event);
+                expect(nextEmptySpy).toHaveBeenCalledOnceWith(Direction.Backward, true);
+            });
+
+            it('should go back and remove tile (with notAppliedSquares)', () => {
+                (selectedSquare.square.tile as unknown) = 'not null';
+                nextEmptySpy.and.returnValue(selectedSquare);
+                component.notAppliedSquares = [selectedSquare];
+
+                component.onFocusableEvent!(event);
+
+                expect(component.notAppliedSquares.length).toEqual(0);
+                expect(selectedSquare.square.tile).toBeNull();
+            });
+
+            it('should go back and remove tile', () => {
+                (selectedSquare.square.tile as unknown) = 'not null';
+                nextEmptySpy.and.returnValue(selectedSquare);
+
+                component.onFocusableEvent!(event);
+
+                expect(selectedSquare.square.tile).toBeNull();
+            });
+        });
+    });
+
+    describe('onLooseFocusEvent', () => {
+        beforeEach(() => {
+            component.ngOnInit();
+        });
+
+        it('should reset attributes', () => {
+            (component.selectedSquare as unknown) = 'not-empty';
+            (component.selectedOrientation as unknown) = 'not-horizontal';
+
+            component.onLooseFocusEvent!();
+
+            expect(component.selectedSquare).toBeUndefined();
+            expect(component.selectedOrientation).toEqual(Orientation.Horizontal);
+        });
+
+        it('should call clearNotAppliedSquare', () => {
+            const spy = spyOn<any>(component, 'clearNotAppliedSquare');
+
+            component.onLooseFocusEvent!();
+
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onSquareClick', () => {
+        let squareView: SquareView;
+        let isLocalPlayerPlaying: jasmine.Spy;
+
+        beforeEach(() => {
+            squareView = new SquareView(
+                {
+                    tile: null,
+                    position: { row: 0, column: 0 },
+                    scoreMultiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                },
+                {
+                    x: 1,
+                    y: 0,
+                },
+            );
+
+            isLocalPlayerPlaying = spyOn(component['gameService'], 'isLocalPlayerPlaying');
+            isLocalPlayerPlaying.and.returnValue(true);
+        });
+
+        it('should set component as active keyboard component', () => {
+            const spy = spyOn(component['focusableComponentService'], 'setActiveKeyboardComponent');
+
+            component.onSquareClick(squareView);
+
+            expect(spy).toHaveBeenCalledOnceWith(component);
+        });
+
+        it('should clear not applied square', () => {
+            const spy = spyOn<any>(component, 'clearNotAppliedSquare');
+
+            component.onSquareClick(squareView);
+
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should set selectedSquare is squareView is not selectedSquareView', () => {
+            component.selectedSquare = undefined;
+
+            component.onSquareClick(squareView);
+
+            expect(component.selectedSquare as unknown as SquareView).toEqual(squareView);
+        });
+
+        it('should switch orientation if squareView is selectedSquare (horizontal)', () => {
+            component.selectedOrientation = Orientation.Horizontal as Orientation;
+            component.selectedSquare = squareView;
+
+            component.onSquareClick(squareView);
+
+            expect(component.selectedOrientation).toEqual(Orientation.Vertical);
+        });
+
+        it('should switch orientation if squareView is selectedSquare (vertical)', () => {
+            component.selectedOrientation = Orientation.Vertical as Orientation;
+            component.selectedSquare = squareView;
+
+            component.onSquareClick(squareView);
+
+            expect(component.selectedOrientation).toEqual(Orientation.Horizontal);
+        });
+
+        it('should create new navigator', () => {
+            (component.navigator as unknown) = undefined;
+
+            component.onSquareClick(squareView);
+
+            expect(component.navigator).toBeDefined();
+        });
+
+        it('should do nothing if squareView has a tile', () => {
+            (squareView.square.tile as unknown) = 'a tile';
+            expect(component.onSquareClick(squareView)).toBeFalse();
+        });
+
+        it('should do nothing is localPlayerIsNotPlaying', () => {
+            isLocalPlayerPlaying.and.returnValue(false);
+            expect(component.onSquareClick(squareView)).toBeFalse();
+        });
+    });
+
+    describe('isSamePosition', () => {
+        let s1: SquareView;
+        let s2: SquareView;
+
+        beforeEach(() => {
+            s1 = new SquareView(
+                {
+                    tile: null,
+                    position: { row: 0, column: 0 },
+                    scoreMultiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                },
+                {
+                    x: 1,
+                    y: 0,
+                },
+            );
+            s2 = new SquareView(
+                {
+                    tile: null,
+                    position: { row: 0, column: 0 },
+                    scoreMultiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                },
+                {
+                    x: 1,
+                    y: 0,
+                },
+            );
+        });
+
+        it('should return false if undefined (both)', () => {
+            expect(component.isSamePosition(undefined, undefined)).toBeFalse();
+        });
+
+        it('should return false if undefined (s1)', () => {
+            expect(component.isSamePosition(undefined, s2)).toBeFalse();
+        });
+
+        it('should return false if undefined (s2)', () => {
+            expect(component.isSamePosition(s1, undefined)).toBeFalse();
+        });
+
+        it('should return false if not same position', () => {
+            s1.square.position = { row: 1, column: 1 };
+            expect(component.isSamePosition(s1, s2)).toBeFalse();
+        });
+
+        it('should return true if same position', () => {
+            expect(component.isSamePosition(s1, s2)).toBeTrue();
         });
     });
 });
