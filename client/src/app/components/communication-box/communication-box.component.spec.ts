@@ -17,6 +17,7 @@ import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
+import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { marked } from 'marked';
 import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
@@ -84,6 +85,7 @@ describe('CommunicationBoxComponent', () => {
                 { provide: InputParserService, useValue: inputParserSpy },
                 { provide: CdkVirtualScrollViewport, useValue: virtualScrollSpy },
                 GameService,
+                FocusableComponentsService,
             ],
         }).compileComponents();
 
@@ -275,6 +277,14 @@ describe('CommunicationBoxComponent', () => {
 
             expect(component.lettersLeft).toEqual(expectedLettersLeft);
             expect(component.lettersLeftTotal).toEqual(expectedLettersLeftTotal);
+        });
+    });
+
+    describe('onContainerClick', () => {
+        it('should call setActiveKeyboardComponent', () => {
+            const spy = spyOn(component['focusableComponentsService'], 'setActiveKeyboardComponent');
+            component.onContainerClick(); 
+            expect(spy).toHaveBeenCalled();
         });
     });
 
