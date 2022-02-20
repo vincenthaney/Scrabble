@@ -4,14 +4,22 @@ import { Position } from '@app/classes/position';
 import Direction from './direction';
 
 export class BoardNavigator {
+    position: Position;
+    orientation: Orientation;
     private squareGrid: SquareView[][];
-    private position: Position;
-    private orientation: Orientation;
 
     constructor(squareGrid: SquareView[][], position: Position, orientation: Orientation) {
         this.squareGrid = squareGrid;
         this.position = { ...position };
         this.orientation = orientation;
+    }
+
+    get row() {
+        return this.position.row;
+    }
+
+    get column() {
+        return this.position.column;
     }
 
     get squareView() {
