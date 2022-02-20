@@ -21,7 +21,7 @@ export type LetterMapItem = { letter: LetterValue; amount: number };
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy, AfterViewInit {
-    @ViewChild('messageInput', { static: true }) messageInputElement: ElementRef;
+    @ViewChild('messageInput') messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
     componentDestroyed$: Subject<boolean> = new Subject();
