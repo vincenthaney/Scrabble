@@ -61,7 +61,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private socketService: SocketService,
         private cookieService: CookieService,
     ) {
-        this.updateTileRack$ = new EventEmitter();
+        this.updateTileRack$ = new Subject();
         this.updateTileReserveEvent = new EventEmitter();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
