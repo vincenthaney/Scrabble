@@ -17,7 +17,7 @@ import BoardService from '@app/services/board/board.service';
 import { CookieService } from '@app/services/cookie/cookie.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
@@ -40,7 +40,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     });
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
-    updateTileRackEvent: EventEmitter<void>;
     noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
     rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
@@ -50,7 +49,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
     gameIsSetUp: boolean;
     isGameOver: boolean;
     gameId: string;
+
     private localPlayerId: string;
+    private updateTileRack$: Subject<void>;
 
     constructor(
         private router: Router,
@@ -60,7 +61,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private socketService: SocketService,
         private cookieService: CookieService,
     ) {
-        this.updateTileRackEvent = new EventEmitter();
+        this.updateTileRack$ = new EventEmitter();
         this.updateTileReserveEvent = new EventEmitter();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
@@ -102,7 +103,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
         this.rerenderEvent.emit();
-        this.updateTileRackEvent.emit();
+        this.updateTileRack$.next();
         this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
         this.roundManager.continueRound(this.roundManager.currentRound);
@@ -116,11 +117,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.player1) {
             this.player1.updatePlayerData(gameUpdateData.player1);
-            this.updateTileRackEvent.emit();
+            this.updateTileRack$.next();
         }
         if (gameUpdateData.player2) {
             this.player2.updatePlayerData(gameUpdateData.player2);
-            this.updateTileRackEvent.emit();
+            this.updateTileRack$.next();
         }
         if (gameUpdateData.board) {
             this.boardService.updateBoard(gameUpdateData.board);
@@ -211,5 +212,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.isGameOver = false;
         this.gameId = '';
         this.localPlayerId = '';
+    }
+
+    subscribeToUpdateTileRackEvent(destroy$: Observable<boolean>, next: () => void): Subscription {
+        return this.updateTileRack$.pipe(takeUntil(destroy$)).subscribe(next);
     }
 }

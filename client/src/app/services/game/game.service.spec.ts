@@ -307,7 +307,7 @@ describe('GameService', () => {
             const player1Spy = spyOn(service.player1, 'updatePlayerData');
             const player2Spy = spyOn(service.player2, 'updatePlayerData');
             const rerenderSpy = spyOn(service.rerenderEvent, 'emit');
-            const updateTileSpy = spyOn(service.updateTileRackEvent, 'emit');
+            const updateTileSpy = spyOn(service['updateTileRack$'], 'next');
             const updateTileReserveSpy = spyOn(service.updateTileReserveEvent, 'emit');
             service.reconnectReinitialize(defaultGameData);
 
@@ -359,8 +359,8 @@ describe('GameService', () => {
             service.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);
             service.player2 = new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name, DEFAULT_PLAYER_2.tiles);
 
-            service.updateTileRackEvent = new EventEmitter();
-            updateTileRackEventEmitSpy = spyOn(service.updateTileRackEvent, 'emit');
+            service['updateTileRack$'] = new Subject();
+            updateTileRackEventEmitSpy = spyOn(service['updateTileRack$'], 'next');
             service.updateTileReserveEvent = new EventEmitter();
             updateTileReserveEventEmitSpy = spyOn(service.updateTileReserveEvent, 'emit');
         });
