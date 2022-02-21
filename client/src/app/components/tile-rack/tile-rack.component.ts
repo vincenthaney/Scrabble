@@ -7,7 +7,6 @@ import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 export type RackTile = Tile & { played?: boolean };
 
@@ -29,7 +28,7 @@ export class TileRackComponent implements OnInit, OnDestroy {
         this.gameViewEventManagerService.subscribeToPlayingTiles(this.componentDestroyed$, (payload: ActionPlacePayload) =>
             this.handlePlaceTiles(payload),
         );
-        this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.gameViewEventManagerService.subscribeToMessages(this.componentDestroyed$, (message: Message) => this.handleNewMessage(message));
     }
 
     ngOnDestroy(): void {

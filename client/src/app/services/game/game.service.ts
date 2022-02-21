@@ -9,7 +9,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ID, TIME_TO_RECONNECT } from '@app/constants/game';
+import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
@@ -17,7 +17,7 @@ import { CookieService } from '@app/services/cookie/cookie.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
@@ -31,20 +31,15 @@ export default class GameService implements OnDestroy, IResetServiceData {
     player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
-    gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>({
-        content: 'Début de la partie',
-        senderId: SYSTEM_ID,
-    });
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
 
-    serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
     isGameOver: boolean;
     gameId: string;
 
     private localPlayerId: string;
+    private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
         private router: Router,
@@ -136,12 +131,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
     }
 
-    updateGameUpdateData(newData: GameUpdateData): void {
-        this.gameUpdateValue.next(newData);
-    }
-
     handleNewMessage(newMessage: Message): void {
-        this.newMessageValue.next(newMessage);
+        this.gameViewEventManagerService.emitNewMessage(newMessage);
     }
 
     getPlayingPlayerId(): string {

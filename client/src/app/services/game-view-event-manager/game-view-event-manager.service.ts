@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Message } from '@app/classes/communication/message';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UpdateTileReserveEventArgs } from './event-arguments';
 
@@ -13,6 +15,8 @@ export class GameViewEventManagerService {
     private noActiveGame$: Subject<void> = new Subject();
     private reRender$: Subject<void> = new Subject();
     private updateTileReserve$: Subject<UpdateTileReserveEventArgs> = new Subject();
+
+    private newMessage$: BehaviorSubject<Message> = new BehaviorSubject(INITIAL_MESSAGE);
 
     emitTileRackUpdate(): void {
         this.updateTileRack$.next();
@@ -47,5 +51,12 @@ export class GameViewEventManagerService {
     }
     subscribeToTileReserveUpdate(destroy$: Observable<boolean>, next: (payload: UpdateTileReserveEventArgs) => void): Subscription {
         return this.updateTileReserve$.pipe(takeUntil(destroy$)).subscribe(next);
+    }
+
+    emitNewMessage(newMessage: Message): void {
+        this.newMessage$.next(newMessage);
+    }
+    subscribeToMessages(destroy$: Observable<boolean>, next: (newMessage: Message) => void): Subscription {
+        return this.newMessage$.pipe(takeUntil(destroy$)).subscribe(next);
     }
 }
