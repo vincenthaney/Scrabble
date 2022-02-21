@@ -70,9 +70,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
-        this.noActiveGameSubscription = this.gameViewEventManagerService.subscribeToNoActiveGameEvent(
-            this.componentDestroyed$,
-            this.noActiveGameDialog,
+        this.noActiveGameSubscription = this.gameViewEventManagerService.subscribeToNoActiveGameEvent(this.componentDestroyed$, () =>
+            this.noActiveGameDialog(),
         );
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();

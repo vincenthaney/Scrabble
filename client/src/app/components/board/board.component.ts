@@ -8,7 +8,7 @@ import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
-import { BoardService } from '@app/services/';
+import { BoardService, GameService } from '@app/services/';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -29,7 +29,11 @@ export class BoardComponent implements OnInit, OnDestroy {
     notAppliedSquares: SquareView[];
     tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
 
-    constructor(private boardService: BoardService, private gameViewEventManagerService: GameViewEventManagerService) {
+    constructor(
+        private boardService: BoardService,
+        private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
@@ -43,8 +47,10 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.boardInitializationSubscription = this.boardService.boardInitializationEvent
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((board: Square[][]) => this.initializeBoard(board));
-        this.gameViewEventManagerService.subscribeToPlayingTiles(this.boardDestroyed$, this.handlePlaceTiles);
-        // this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.gameViewEventManagerService.subscribeToPlayingTiles(this.boardDestroyed$, (payload: ActionPlacePayload) =>
+            this.handlePlaceTiles(payload),
+        );
+        this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
 
         if (!this.boardService.readInitialBoard()) return;
         this.initializeBoard(this.boardService.readInitialBoard());
