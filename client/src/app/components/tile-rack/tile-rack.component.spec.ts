@@ -86,12 +86,6 @@ describe('TileRackComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('ngOnDestroy should unsubscribe from startGameEvent', () => {
-        const spy = spyOn<any>(component.updateTileRackSubscription, 'unsubscribe');
-        component.ngOnDestroy();
-        expect(spy).toHaveBeenCalled();
-    });
-
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
         component['updateTileRack']();
