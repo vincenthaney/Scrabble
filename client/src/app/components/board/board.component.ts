@@ -38,10 +38,10 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.boardUpdateSubscription = this.boardService.boardUpdateEvent
+        this.boardService.boardUpdateEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
-        this.boardInitializationSubscription = this.boardService.boardInitializationEvent
+        this.boardService.boardInitializationEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe((board: Square[][]) => this.initializeBoard(board));
         this.gameViewEventManagerService.subscribeToPlayingTiles(this.componentDestroyed$, (payload: ActionPlacePayload) =>
