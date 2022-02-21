@@ -1,7 +1,6 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonModule } from '@angular/common';
-import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,8 +40,6 @@ describe('TileRackComponent', () => {
         );
         gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
-        gameServiceSpy.subscribeToUpdateTileRackEvent.and.callThrough();
-        gameServiceSpy.playingTiles = new EventEmitter();
     });
 
     beforeEach(async () => {

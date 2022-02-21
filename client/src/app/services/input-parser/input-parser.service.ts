@@ -23,6 +23,7 @@ import {
     SYSTEM_ERROR_ID,
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { GameService } from '..';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
@@ -31,7 +32,11 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
     providedIn: 'root',
 })
 export default class InputParserService {
-    constructor(private controller: GamePlayController, private gameService: GameService) {}
+    constructor(
+        private controller: GamePlayController,
+        private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {}
 
     parseInput(input: string): void {
         const playerId = this.getLocalPlayer().id;
@@ -143,7 +148,7 @@ export default class InputParserService {
             orientation: Orientation.Horizontal,
         };
 
-        this.gameService.playingTiles.emit(placeActionPayload);
+        this.gameViewEventManagerService.emitTilesPlayed(placeActionPayload);
 
         return placeActionPayload;
     }
@@ -155,7 +160,7 @@ export default class InputParserService {
             orientation: this.getOrientation(location.charAt(location.length - 1)),
         };
 
-        this.gameService.playingTiles.emit(placeActionPayload);
+        this.gameViewEventManagerService.emitTilesPlayed(placeActionPayload);
 
         return placeActionPayload;
     }

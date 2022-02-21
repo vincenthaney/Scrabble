@@ -8,6 +8,8 @@ import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { UpdateTileReserveEventArgs } from '@app/services/game-view-event-manager/event-arguments';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -43,6 +45,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         private gameService: GameService,
         private focusableComponentsService: FocusableComponentsService,
         private changeDetectorRef: ChangeDetectorRef,
+        private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
@@ -52,9 +55,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
 
-        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
-            this.onTileReserveUpdate(tileReserve, tileReserveTotal);
-        });
+        this.gameViewEventManagerService.subscribeToTileReserveUpdate(this.componentDestroyed$, this.onTileReserveUpdate);
         this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
@@ -113,9 +114,9 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
-    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
-        this.lettersLeft = tileReserve;
-        this.lettersLeftTotal = tileReserveTotal;
+    onTileReserveUpdate(payload: UpdateTileReserveEventArgs): void {
+        this.lettersLeft = payload.tileReserve;
+        this.lettersLeftTotal = payload.tileReserveTotal;
     }
 
     private scrollToBottom(): void {

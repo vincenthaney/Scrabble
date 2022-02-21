@@ -28,9 +28,9 @@ import {
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-game-page',
@@ -49,7 +49,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private focusableComponentService: FocusableComponentsService,
         private gameDispatcher: GameDispatcherController,
         public surrenderDialog: MatDialog,
-        private readonly playerLeavesService: PlayerLeavesService,
+        private playerLeavesService: PlayerLeavesService,
+        private gameViewEventManagerService: GameViewEventManagerService,
     ) {}
 
     @HostListener('document:keypress', ['$event'])
@@ -69,9 +70,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
-        this.noActiveGameSubscription = this.gameService.noActiveGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.noActiveGameDialog());
+        this.noActiveGameSubscription = this.gameViewEventManagerService.subscribeToNoActiveGameEvent(
+            this.componentDestroyed$,
+            this.noActiveGameDialog,
+        );
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
         }

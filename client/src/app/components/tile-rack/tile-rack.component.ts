@@ -5,6 +5,7 @@ import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -18,22 +19,20 @@ export type RackTile = Tile & { played?: boolean };
 export class TileRackComponent implements OnInit, OnDestroy {
     tiles: RackTile[];
     tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
-    serviceDestroyed$: Subject<boolean> = new Subject();
+    componentDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(public gameService: GameService) {}
+    constructor(public gameService: GameService, private gameViewEventManagerService: GameViewEventManagerService) {}
 
     ngOnInit(): void {
         this.updateTileRack();
-        this.gameService.subscribeToUpdateTileRackEvent(this.serviceDestroyed$, this.updateTileRack);
-        this.gameService.playingTiles
-            .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
-        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.gameViewEventManagerService.subscribeToUpdateTileRackEvent(this.componentDestroyed$, this.updateTileRack);
+        this.gameViewEventManagerService.subscribeToPlayingTiles(this.componentDestroyed$, this.handlePlaceTiles);
+        this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     private updateTileRack(): void {

@@ -1,6 +1,5 @@
-import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
@@ -15,12 +14,11 @@ import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constan
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import { CookieService } from '@app/services/cookie/cookie.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
 @Injectable({
     providedIn: 'root',
@@ -40,18 +38,13 @@ export default class GameService implements OnDestroy, IResetServiceData {
     });
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
-    noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
-    rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
-    updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
-    playingTiles: EventEmitter<ActionPlacePayload>;
-    leaveGameSubject: Subject<string>;
+
     serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
     isGameOver: boolean;
     gameId: string;
 
     private localPlayerId: string;
-    private updateTileRack$: Subject<void>;
 
     constructor(
         private router: Router,
@@ -60,13 +53,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private gameController: GamePlayController,
         private socketService: SocketService,
         private cookieService: CookieService,
+        private gameViewEventManagerService: GameViewEventManagerService,
     ) {
-        this.updateTileRack$ = new Subject();
-        this.updateTileReserveEvent = new EventEmitter();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
-        this.leaveGameSubject = new Subject<string>();
-        this.playingTiles = new EventEmitter();
     }
 
     ngOnDestroy(): void {
@@ -102,9 +92,12 @@ export default class GameService implements OnDestroy, IResetServiceData {
     reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
-        this.rerenderEvent.emit();
-        this.updateTileRack$.next();
-        this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
+        this.gameViewEventManagerService.emitReRender();
+        this.gameViewEventManagerService.emitTileRackUpdate();
+        this.gameViewEventManagerService.emitTileReserveUpdate({
+            tileReserve: startGameData.tileReserve,
+            tileReserveTotal: startGameData.tileReserveTotal,
+        });
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
         this.roundManager.continueRound(this.roundManager.currentRound);
     }
@@ -117,11 +110,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.player1) {
             this.player1.updatePlayerData(gameUpdateData.player1);
-            this.updateTileRack$.next();
+            this.gameViewEventManagerService.emitTileRackUpdate();
         }
         if (gameUpdateData.player2) {
             this.player2.updatePlayerData(gameUpdateData.player2);
-            this.updateTileRack$.next();
+            this.gameViewEventManagerService.emitTileRackUpdate();
         }
         if (gameUpdateData.board) {
             this.boardService.updateBoard(gameUpdateData.board);
@@ -133,7 +126,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
             this.tileReserve = gameUpdateData.tileReserve;
             this.tileReserveTotal = gameUpdateData.tileReserveTotal;
-            this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
+            this.gameViewEventManagerService.emitTileReserveUpdate({
+                tileReserve: gameUpdateData.tileReserve,
+                tileReserveTotal: gameUpdateData.tileReserveTotal,
+            });
         }
         if (gameUpdateData.isGameOver) {
             this.gameOver();
@@ -185,7 +181,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
             this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
         } else {
-            this.noActiveGameEvent.emit();
+            this.gameViewEventManagerService.emitNoActiveGameEvent();
         }
     }
 
@@ -212,9 +208,5 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.isGameOver = false;
         this.gameId = '';
         this.localPlayerId = '';
-    }
-
-    subscribeToUpdateTileRackEvent(destroy$: Observable<boolean>, next: () => void): Subscription {
-        return this.updateTileRack$.pipe(takeUntil(destroy$)).subscribe(next);
     }
 }

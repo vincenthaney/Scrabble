@@ -5,6 +5,7 @@ import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
 import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Observable, Subject, Subscription, timer as timerCreationFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -25,16 +26,18 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     timer: Timer;
     timerSource: Observable<number>;
     timerSubscription: Subscription;
-    endRoundSubscription: Subscription;
-    rerenderSubscription: Subscription;
-    private ngUnsubscribe: Subject<void>;
+    private componentDestroyed$: Subject<boolean>;
 
-    constructor(private roundManager: RoundManagerService, private gameService: GameService) {}
+    constructor(
+        private roundManager: RoundManagerService,
+        private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {}
 
     ngOnInit(): void {
         this.timer = new Timer(0, 0);
-        this.ngUnsubscribe = new Subject();
-        this.rerenderSubscription = this.gameService.rerenderEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.componentDestroyed$ = new Subject();
+        this.gameViewEventManagerService.subscribeToReRender(this.componentDestroyed$, () => {
             this.ngOnDestroy();
             this.ngOnInit();
             this.ngAfterViewInit();
@@ -44,12 +47,12 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
             if (!this.roundManager.timer) return;
 
             if (this.roundManager.timer)
-                this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
+                this.roundManager.timer.pipe(takeUntil(this.componentDestroyed$)).subscribe(([timer, activePlayer]) => {
                     this.startTimer(timer);
                     this.updateActivePlayerBorder(activePlayer);
                 });
             if (!this.roundManager.endRoundEvent) return;
-            this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
+            this.roundManager.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.endRound());
 
             this.isPlayer1 = this.checkIfIsPlayer1();
             this.localPlayerIcon = this.getLocalPlayerIcon();
@@ -61,17 +64,14 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngOnDestroy(): void {
-        this.ngUnsubscribe.next();
-        this.ngUnsubscribe.complete();
-        if (this.endRoundSubscription) this.endRoundSubscription.unsubscribe();
-
-        if (this.timerSubscription) this.timerSubscription.unsubscribe();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     startTimer(timer: Timer): void {
         this.timer = timer;
         this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
-        this.timerSubscription = this.timerSource.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.timer.decrement());
+        this.timerSubscription = this.timerSource.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.timer.decrement());
     }
 
     endRound(): void {

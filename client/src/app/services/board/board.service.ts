@@ -5,9 +5,9 @@ import { Square } from '@app/classes/square';
     providedIn: 'root',
 })
 export default class BoardService {
-    initialBoard: Square[][];
     boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
     boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
+    private initialBoard: Square[][];
 
     initializeBoard(board: Square[][]): void {
         this.initialBoard = [...board];
@@ -16,5 +16,9 @@ export default class BoardService {
 
     updateBoard(squareUpdated: Square[]): void {
         this.boardUpdateEvent.emit(squareUpdated);
+    }
+
+    readInitialBoard(): Square[][] {
+        return [...this.initialBoard];
     }
 }
