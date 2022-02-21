@@ -11,7 +11,6 @@ import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService } from '@app/services/';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-board',
@@ -38,12 +37,8 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.boardService.boardUpdateEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
-        this.boardService.boardInitializationEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((board: Square[][]) => this.initializeBoard(board));
+        this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
+        this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
         this.gameViewEventManagerService.subscribeToPlayingTiles(this.componentDestroyed$, (payload: ActionPlacePayload) =>
             this.handlePlaceTiles(payload),
         );
