@@ -26,6 +26,16 @@ export default class Board {
         return this.grid[position.row][position.column];
     }
 
+    getPlacedTileSquares(): Square[] {
+        const squares: Square[] = [];
+        for (const row of this.grid) {
+            for (const square of row) {
+                if (square.tile) squares.push(square);
+            }
+        }
+        return squares;
+    }
+
     navigate(position: Position) {
         return new BoardNavigator(this, position);
     }
