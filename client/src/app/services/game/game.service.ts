@@ -87,9 +87,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
     reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
-        this.gameViewEventManagerService.emitReRender();
-        this.gameViewEventManagerService.emitTileRackUpdate();
-        this.gameViewEventManagerService.emitTileReserveUpdate({
+        this.gameViewEventManagerService.emitGameViewEvent('reRender');
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+        this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
             tileReserve: startGameData.tileReserve,
             tileReserveTotal: startGameData.tileReserveTotal,
         });
@@ -105,11 +105,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.player1) {
             this.player1.updatePlayerData(gameUpdateData.player1);
-            this.gameViewEventManagerService.emitTileRackUpdate();
+            this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
         }
         if (gameUpdateData.player2) {
             this.player2.updatePlayerData(gameUpdateData.player2);
-            this.gameViewEventManagerService.emitTileRackUpdate();
+            this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
         }
         if (gameUpdateData.board) {
             this.boardService.updateBoard(gameUpdateData.board);
@@ -121,7 +121,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
             this.tileReserve = gameUpdateData.tileReserve;
             this.tileReserveTotal = gameUpdateData.tileReserveTotal;
-            this.gameViewEventManagerService.emitTileReserveUpdate({
+            this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
                 tileReserve: gameUpdateData.tileReserve,
                 tileReserveTotal: gameUpdateData.tileReserveTotal,
             });
@@ -132,7 +132,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     handleNewMessage(newMessage: Message): void {
-        this.gameViewEventManagerService.emitNewMessage(newMessage);
+        this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
     }
 
     getPlayingPlayerId(): string {
@@ -172,7 +172,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
             this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
         } else {
-            this.gameViewEventManagerService.emitNoActiveGameEvent();
+            this.gameViewEventManagerService.emitGameViewEvent('noActiveGame');
         }
     }
 

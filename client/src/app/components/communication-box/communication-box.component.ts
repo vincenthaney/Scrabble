@@ -55,10 +55,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
 
-        this.gameViewEventManagerService.subscribeToTileReserveUpdate(this.componentDestroyed$, (payload: UpdateTileReserveEventArgs) =>
-            this.onTileReserveUpdate(payload),
+        this.gameViewEventManagerService.subscribeToGameViewEvent(
+            'tileReserveUpdate',
+            this.componentDestroyed$,
+            (payload: UpdateTileReserveEventArgs) => this.onTileReserveUpdate(payload),
         );
-        this.gameViewEventManagerService.subscribeToMessages(this.componentDestroyed$, (newMessage) => {
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
     }

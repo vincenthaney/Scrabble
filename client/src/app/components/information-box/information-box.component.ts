@@ -37,7 +37,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     ngOnInit(): void {
         this.timer = new Timer(0, 0);
         this.componentDestroyed$ = new Subject();
-        this.gameViewEventManagerService.subscribeToReRender(this.componentDestroyed$, () => {
+        this.gameViewEventManagerService.subscribeToGameViewEvent('reRender', this.componentDestroyed$, () => {
             this.ngOnDestroy();
             this.ngOnInit();
             this.ngAfterViewInit();

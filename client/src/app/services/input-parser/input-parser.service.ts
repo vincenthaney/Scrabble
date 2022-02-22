@@ -148,7 +148,7 @@ export default class InputParserService {
             orientation: Orientation.Horizontal,
         };
 
-        this.gameViewEventManagerService.emitTilesPlayed(placeActionPayload);
+        this.gameViewEventManagerService.emitGameViewEvent('tilesPlayed', placeActionPayload);
 
         return placeActionPayload;
     }
@@ -160,7 +160,7 @@ export default class InputParserService {
             orientation: this.getOrientation(location.charAt(location.length - 1)),
         };
 
-        this.gameViewEventManagerService.emitTilesPlayed(placeActionPayload);
+        this.gameViewEventManagerService.emitGameViewEvent('tilesPlayed', placeActionPayload);
 
         return placeActionPayload;
     }
