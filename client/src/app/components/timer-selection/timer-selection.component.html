@@ -6,8 +6,8 @@
             <mat-label id="timer-selection-value">{{ timerValue * 1000 | date: 'm:ss' }}</mat-label>
         </span>
         <span id="timer-selection-button-container">
-            <button mat-flat-button type="button" color="primary" (click)="incrementTimerValue()">+</button>
             <button mat-flat-button type="button" color="primary" (click)="decrementTimerValue()">-</button>
+            <button mat-flat-button type="button" color="primary" (click)="incrementTimerValue()">+</button>
         </span>
     </div>
 </div>
