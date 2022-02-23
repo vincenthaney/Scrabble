@@ -61,7 +61,7 @@ describe('BoardNavigator', () => {
     describe('getSquareView', () => {
         it('should return squareView', () => {
             const pos: Position = { row: 2, column: 2 };
-            navigator.position = pos;
+            navigator.setPosition(pos);
             const expected = board[pos.row][pos.column];
             const result = navigator.currentSquareView;
 
@@ -154,7 +154,7 @@ describe('BoardNavigator', () => {
         });
 
         it('should return next empty squareView when neighbors is not empty', () => {
-            navigator.position = { row: 2, column: 1 };
+            navigator.setPosition({ row: 2, column: 1 });
             const expected = board[2][3];
             expect(navigator.nextEmpty(Direction.Forward, false)).toEqual(expected);
         });
@@ -171,17 +171,17 @@ describe('BoardNavigator', () => {
         });
 
         it('should return false if is not within bounds', () => {
-            navigator.position = OUT_OF_BOUNDS_POSITION;
+            navigator.setPosition(OUT_OF_BOUNDS_POSITION);
             expect(navigator.isWithinBounds()).toBeFalse();
         });
 
         it('should return false if is row not within bounds', () => {
-            navigator.position = OUT_OF_BOUNDS_ROW;
+            navigator.setPosition(OUT_OF_BOUNDS_ROW);
             expect(navigator.isWithinBounds()).toBeFalse();
         });
 
         it('should return false if is column not within bounds', () => {
-            navigator.position = OUT_OF_BOUNDS_COLUMN;
+            navigator.setPosition(OUT_OF_BOUNDS_COLUMN);
             expect(navigator.isWithinBounds()).toBeFalse();
         });
     });
@@ -206,13 +206,13 @@ describe('BoardNavigator', () => {
         });
 
         it('should be false if has tile', () => {
-            navigator.position = { row: 2, column: 2 };
+            navigator.setPosition({ row: 2, column: 2 });
             expect(navigator.isEmpty()).toBeFalse();
         });
 
         it('should return true if not applied', () => {
             board[2][2].applied = false;
-            navigator.position = { row: 2, column: 2 };
+            navigator.setPosition({ row: 2, column: 2 });
             expect(navigator.isEmpty(true)).toBeTrue();
         });
     });
@@ -221,7 +221,7 @@ describe('BoardNavigator', () => {
         it('should return different instance with same values', () => {
             const clone = navigator.clone();
 
-            expect(clone.position).toEqual(clone.position);
+            expect(clone['position']).toEqual(clone['position']);
             expect(clone.orientation).toEqual(clone.orientation);
         });
     });
