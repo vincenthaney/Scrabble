@@ -8,6 +8,7 @@ import { Orientation, Position, BoardNavigator, Board } from '@app/classes/board
 import Direction from './direction';
 import { expect } from 'chai';
 import * as chai from 'chai';
+import { stub } from 'sinon';
 type LetterValues = (LetterValue | ' ')[][];
 
 const BOARD: LetterValues = [
@@ -192,22 +193,37 @@ describe.only('BoardNavigator', () => {
     });
 
     describe('moveUntil', () => {
-        it('should call isWithinBounds and the predicate function', () => {
-            const spy = chai.spy.on(navigator['position'], 'move');
+        it('should call isWithinBounds and move ', () => {
+            const stubIsWithinBounds = stub(navigator, 'isWithinBounds');
+            stubIsWithinBounds.onCall(0).returns(true);
+            stubIsWithinBounds.onCall(1).returns(false);
+            stubIsWithinBounds.onCall(2).returns(false);
 
-            navigator.backward();
-            expect(spy).to.have.been.called.with(Orientation.Horizontal, Direction.Backward, 1);
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const spy = chai.spy.on(navigator['position'], 'move', () => {});
+
+            navigator.moveUntil(Direction.Forward, () => false);
+            expect(stubIsWithinBounds.callCount).to.equal(3);
+            expect(spy).to.have.been.called.once;
         });
 
-        it('should call move with distance', () => {
-            const spy = chai.spy.on(navigator['position'], 'move');
-            const distance = 2;
+        it('should return  POSITIVE_INFINITY if endNavigator is not WithinBounds', () => {
+            stub(navigator, 'isWithinBounds').returns(false);
+            expect(navigator.moveUntil(Direction.Forward, () => true)).to.equal(Number.POSITIVE_INFINITY);
+        });
 
-            navigator.backward(distance);
-            expect(spy).to.have.been.called.with(Orientation.Horizontal, Direction.Backward, distance);
+        it('should return the distance travelled (amount of loops) if endNavigator is WithinBounds', () => {
+            stub(navigator, 'isWithinBounds').returns(true);
+            const loops = 2;
+            let loopsDone = 0;
+
+            expect(
+                navigator.moveUntil(Direction.Forward, () => {
+                    return loopsDone++ >= loops;
+                }),
+            ).to.equal(loops);
         });
     });
-
 
     describe('isWithinBounds', () => {
         it('should return true if is within bounds', () => {
