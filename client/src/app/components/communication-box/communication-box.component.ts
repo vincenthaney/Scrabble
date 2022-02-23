@@ -49,14 +49,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnInit(): void {
-        // this.lettersLeft = this.gameService.tileReserve;
-        // this.lettersLeftTotal = this.gameService.getTotalNumberOfTilesLeft();
-
-        // this.gameViewEventManagerService.subscribeToGameViewEvent(
-        //     'tileReserveUpdate',
-        //     this.componentDestroyed$,
-        //     (payload: UpdateTileReserveEventArgs) => this.onTileReserveUpdate(payload),
-        // );
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
@@ -114,11 +106,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     isOpponent(id: string) {
         return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
-
-    // onTileReserveUpdate(payload: UpdateTileReserveEventArgs): void {
-    //     this.lettersLeft = payload.tileReserve;
-    //     this.lettersLeftTotal = payload.tileReserveTotal;
-    // }
 
     getLettersLeft(): TileReserveData[] {
         return this.gameService.tileReserve;
