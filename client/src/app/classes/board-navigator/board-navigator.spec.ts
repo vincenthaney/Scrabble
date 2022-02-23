@@ -204,6 +204,7 @@ describe('BoardNavigator', () => {
 
     describe('isEmpty', () => {
         it('should be true if no tile', () => {
+            navigator.setPosition(0, 0);
             expect(navigator.isEmpty()).toBeTrue();
         });
 
