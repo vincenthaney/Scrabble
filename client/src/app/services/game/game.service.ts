@@ -61,8 +61,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData): Promise<void> {
         this.gameId = startGameData.gameId;
-        this.playerContainer = new PlayerContainer(localPlayerId);
-        this.playerContainer.initializePlayers(startGameData.player1, startGameData.player2);
+        this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
         this.roundManager.gameId = startGameData.gameId;
@@ -145,6 +144,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     getGameId(): string {
         return this.gameId;
+    }
+
+    getPlayer(playerNumber: number): AbstractPlayer {
+        return this.playerContainer.getPlayer(playerNumber);
     }
 
     getLocalPlayer(): AbstractPlayer | undefined {
