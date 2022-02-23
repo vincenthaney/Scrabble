@@ -8,6 +8,7 @@ import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { BACKSPACE, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
@@ -58,30 +59,43 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
 
-        // Thus must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onFocusableEvent = (e: KeyboardEvent): void => {
+        const handleBackspace = (): void => {
+            this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
             if (this.selectedSquare) {
-                if (e.key === 'Backspace') {
-                    this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
-                    if (this.selectedSquare) {
-                        const index = this.notAppliedSquares.indexOf(this.selectedSquare);
-                        if (index >= 0) this.notAppliedSquares.splice(index, 1);
-                        this.selectedSquare.square.tile = null;
-                    }
-                } else {
-                    this.selectedSquare.square.tile = new Tile(e.key.toUpperCase() as LetterValue, 0);
-                    this.selectedSquare.applied = false;
-                    this.notAppliedSquares.push(this.selectedSquare);
-                    this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
-                }
+                const index = this.notAppliedSquares.indexOf(this.selectedSquare);
+                if (index >= 0) this.notAppliedSquares.splice(index, 1);
+                this.selectedSquare.square.tile = null;
+            }
+        };
+        const clearCursor = (): void => {
+            this.selectedSquare = undefined;
+            this.clearNotAppliedSquare();
+        };
+        const handlePlaceLetter = (letter: string, squareView: SquareView): void => {
+            squareView.square.tile = new Tile(letter.toUpperCase() as LetterValue, 0);
+            squareView.applied = false;
+            this.notAppliedSquares.push(squareView);
+            this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
+        };
+
+        // This must be defined in the onInit, otherwise selectedSquare is undefined
+        this.onFocusableEvent = (e: KeyboardEvent): void => {
+            if (!this.selectedSquare) return;
+
+            switch (e.key) {
+                case BACKSPACE:
+                    if (e.type === KEYDOWN) handleBackspace();
+                    break;
+                case ESCAPE:
+                    if (e.type === KEYDOWN) clearCursor();
+                    break;
+                default:
+                    handlePlaceLetter(e.key, this.selectedSquare);
             }
         };
 
         // Thus must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onLooseFocusEvent = (): void => {
-            this.selectedSquare = undefined;
-            this.clearNotAppliedSquare();
-        };
+        this.onLooseFocusEvent = (): void => clearCursor();
 
         this.subscribeToFocusableEvent(this.boardDestroyed$, this.onFocusableEvent);
         this.subscribeToLooseFocusEvent(this.boardDestroyed$, this.onLooseFocusEvent);
