@@ -8,6 +8,7 @@ export class PlayerContainer {
     private localPlayerId: string;
 
     constructor(localPlayerId: string) {
+        this.players = new Set();
         this.localPlayerId = localPlayerId;
     }
 

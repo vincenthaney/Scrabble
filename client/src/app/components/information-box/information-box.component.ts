@@ -85,23 +85,23 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         if (!activePlayer) {
             this.isPlayer1Active = false;
             this.isPlayer2Active = false;
-        } else if (activePlayer.id === this.gameService.player1.id) {
+        } else if (activePlayer.id === this.gameService.getPlayerByNumber(1).id) {
             this.isPlayer1Active = true;
             this.isPlayer2Active = false;
-        } else if (activePlayer.id === this.gameService.player2.id) {
+        } else if (activePlayer.id === this.gameService.getPlayerByNumber(2).id) {
             this.isPlayer2Active = true;
             this.isPlayer1Active = false;
         }
     }
 
     getPlayer1(): AbstractPlayer {
-        if (!this.gameService.player1) return new Player('', 'Player1', []);
-        return this.gameService.player1;
+        if (!this.gameService.getPlayerByNumber(1)) return new Player('', 'Player1', []);
+        return this.gameService.getPlayerByNumber(1);
     }
 
     getPlayer2(): AbstractPlayer {
-        if (!this.gameService.player2) return new Player('', 'Player2', []);
-        return this.gameService.player2;
+        if (!this.gameService.getPlayerByNumber(2)) return new Player('', 'Player2', []);
+        return this.gameService.getPlayerByNumber(2);
     }
 
     private createTimer(length: number): Observable<number> {
@@ -109,7 +109,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private checkIfIsPlayer1(): boolean {
-        return this.gameService.getLocalPlayer() === this.gameService.player1;
+        return this.gameService.getLocalPlayer() === this.gameService.getPlayerByNumber(1);
     }
 
     private getLocalPlayerIcon(): IconName {

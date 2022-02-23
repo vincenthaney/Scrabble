@@ -146,7 +146,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.gameId;
     }
 
-    getPlayer(playerNumber: number): AbstractPlayer {
+    getPlayerByNumber(playerNumber: number): AbstractPlayer {
         return this.playerContainer.getPlayer(playerNumber);
     }
 
