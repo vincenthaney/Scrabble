@@ -5,6 +5,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { NAME_SAME_AS_VIRTUAL_PLAYER } from '@app/constants/name-field';
 import { GameDispatcherService } from '@app/services';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -23,6 +24,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     timerOptions: number[];
     dictionaryOptions: string[];
     virtualPlayerNames: string[] = ['Victoria', 'Vladimir', 'Herménégilde'];
+    errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
 
     serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -57,7 +59,13 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     isFormValid(): boolean {
-        return this.gameParameters?.valid && this.child.formParameters?.valid;
+        console.log(this.gameParameters.get('virtualPlayerName')?.value);
+        console.log(this.child.formParameters.get('inputName')?.value);
+        return this.gameParameters?.valid && this.child.formParameters?.valid && this.isNameDifferentFromVirtualPlayer();
+    }
+
+    isNameDifferentFromVirtualPlayer(): boolean {
+        return this.gameParameters.get('virtualPlayerName')?.value !== this.child.formParameters.get('inputName')?.value;
     }
 
     onSubmit(): void {
