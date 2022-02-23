@@ -14,10 +14,18 @@ export default class BoardNavigator {
         return this.board.getSquare(this.position);
     }
 
+    get row(): number {
+        return this.position.row;
+    }
+
+    get column(): number {
+        return this.position.column;
+    }
+
     verify(shouldBeFilled: boolean): boolean {
         try {
             return this.board.verifySquare(this.position, shouldBeFilled);
-        } catch (e) {
+        } catch (error) {
             return false;
         }
     }
@@ -27,7 +35,10 @@ export default class BoardNavigator {
     }
 
     verifyAllNeighbors(shouldBeFilled: boolean) {
-        return this.verifyNeighbors(Orientation.Horizontal, shouldBeFilled) || this.verifyNeighbors(Orientation.Vertical, shouldBeFilled);
+        return (
+            this.board.verifyNeighbors(this.position, Orientation.Horizontal, shouldBeFilled) ||
+            this.board.verifyNeighbors(this.position, Orientation.Vertical, shouldBeFilled)
+        );
     }
 
     move(direction: Direction, distance: number = 1): BoardNavigator {
