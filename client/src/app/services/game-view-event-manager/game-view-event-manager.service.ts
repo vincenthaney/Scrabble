@@ -6,13 +6,13 @@ import * as SERVICE_ERRORS from '@app/constants/services-errors';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UpdateTileReserveEventArgs } from './event-arguments';
-import { EventArgs } from './event-types';
+import { EventTypes } from './event-types';
 @Injectable({
     providedIn: 'root',
 })
 export class GameViewEventManagerService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private eventMap: Map<keyof EventArgs, Subject<any>> = new Map();
+    private eventMap: Map<keyof EventTypes, Subject<any>> = new Map();
 
     constructor() {
         this.eventMap.set('tileRackUpdate', new Subject<void>());
@@ -23,7 +23,7 @@ export class GameViewEventManagerService {
         this.eventMap.set('newMessage', new BehaviorSubject<Message>(INITIAL_MESSAGE));
     }
 
-    emitGameViewEvent<T extends keyof EventArgs, S extends EventArgs[T]>(eventType: T, payload?: S) {
+    emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S) {
         const subject: Subject<S> = this.getSubjectFromMap(eventType);
 
         if (payload) {
@@ -33,7 +33,7 @@ export class GameViewEventManagerService {
         }
     }
 
-    subscribeToGameViewEvent<T extends keyof EventArgs, S extends EventArgs[T]>(
+    subscribeToGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(
         eventType: T,
         destroy$: Observable<boolean>,
         next: (payload: S) => void,
@@ -42,7 +42,7 @@ export class GameViewEventManagerService {
         return subject.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
-    private getSubjectFromMap<T extends keyof EventArgs, S extends EventArgs[T]>(eventType: T): Subject<S> {
+    private getSubjectFromMap<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T): Subject<S> {
         if (!this.eventMap.get(eventType)) {
             throw new Error(SERVICE_ERRORS.NO_SUBJECT_FOR_EVENT);
         }
