@@ -71,10 +71,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameIsSetUp = true;
         this.isGameOver = false;
 
-        await this.handleReroute(startGameData);
+        await this.handleReRouteOrReconnect(startGameData);
     }
 
-    async handleReroute(startGameData: StartMultiplayerGameData): Promise<void> {
+    async handleReRouteOrReconnect(startGameData: StartMultiplayerGameData): Promise<void> {
         if (this.router.url !== '/game') {
             this.roundManager.initializeEvents();
             this.roundManager.startRound();
