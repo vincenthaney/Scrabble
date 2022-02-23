@@ -315,7 +315,7 @@ describe('BoardComponent', () => {
 
     it('should call handlePlaceTiles on playingTiles', () => {
         const spy = spyOn<any>(component, 'handlePlaceTiles');
-        component['gameService'].playingTiles.emit();
+        component['gameViewEventManagerService'].emitGameViewEvent('tilesPlayed');
         expect(spy).toHaveBeenCalled();
     });
 

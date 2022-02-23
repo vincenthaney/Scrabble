@@ -7,7 +7,7 @@ import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/c
 import { AbstractPlayer, Player } from '.';
 import { PlayerContainer } from './player-container';
 
-describe('PlayerContainer', () => {
+fdescribe('PlayerContainer', () => {
     let playerContainer: PlayerContainer;
 
     const DEFAULT_LOCAL_PLAYER_ID = '1';
