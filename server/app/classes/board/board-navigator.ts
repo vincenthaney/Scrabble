@@ -1,4 +1,5 @@
 import { Board, Orientation, Position } from '.';
+import { Square } from '../square';
 import Direction from './direction';
 
 export default class BoardNavigator {
@@ -37,6 +38,24 @@ export default class BoardNavigator {
     backward(orientation: Orientation, distance: number = 1): BoardNavigator {
         this.position.move(orientation, Direction.Backward, distance);
         return this;
+    }
+
+    
+    moveUntil(orientation: Orientation, direction: Direction, predicate: () => boolean): Square | undefined {
+        do {
+            this.move(orientation, direction);
+        } while (this.isWithinBounds() && !predicate());
+
+        return this.isWithinBounds() ? this.square : undefined;
+    }
+
+    nextEmpty(orientation: Orientation, direction: Direction): Square | undefined {
+        return this.moveUntil(orientation, direction, () => this.isEmpty());
+    }
+
+    
+    isEmpty(): boolean {
+        return this.square.tile === null;
     }
 
     isWithinBounds(): boolean {
