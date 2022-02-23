@@ -22,7 +22,7 @@ export class BoardNavigator {
         return this.position.column;
     }
 
-    get squareView() {
+    get currentSquareView() {
         return this.squareGrid[this.position.row][this.position.column];
     }
 
@@ -48,7 +48,7 @@ export class BoardNavigator {
             this.move(direction);
         } while (this.isWithinBounds() && !predicate());
 
-        return this.isWithinBounds() ? this.squareView : undefined;
+        return this.isWithinBounds() ? this.currentSquareView : undefined;
     }
 
     nextEmpty(direction: Direction, allowNotApplied: boolean): SquareView | undefined {
@@ -70,7 +70,7 @@ export class BoardNavigator {
     }
 
     isEmpty(allowNotApplied: boolean = false): boolean {
-        return this.squareView.square.tile === null || (allowNotApplied && this.squareView.applied === false);
+        return this.currentSquareView.square.tile === null || (allowNotApplied && this.currentSquareView.applied === false);
     }
 
     clone(): BoardNavigator {

@@ -63,7 +63,7 @@ describe('BoardNavigator', () => {
             const pos: Position = { row: 2, column: 2 };
             navigator.position = pos;
             const expected = board[pos.row][pos.column];
-            const result = navigator.squareView;
+            const result = navigator.currentSquareView;
 
             expect(result).toEqual(expected);
         });
