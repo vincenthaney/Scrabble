@@ -45,7 +45,7 @@ export default class RoundManagerService implements IResetServiceData {
     }
 
     convertRoundDataToRound(roundData: RoundData): Round {
-        if (!roundData.playerData.id || !roundData.playerData.name || !roundData.playerData.tiles) throw Error(INVALID_ROUND_DATA_PLAYER);
+        if (!roundData.playerData.name || !roundData.playerData.tiles) throw Error(INVALID_ROUND_DATA_PLAYER);
         const player = new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles);
         return {
             player,

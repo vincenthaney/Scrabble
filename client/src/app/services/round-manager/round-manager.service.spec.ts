@@ -100,6 +100,7 @@ describe('RoundManagerService', () => {
         it('should throw error if roundData.playerData.id is undefined', () => {
             const roundData = {
                 playerData: {
+                    id: DEFAULT_PLAYER_ID,
                     name: DEFAULT_PLAYER_NAME,
                     score: DEFAULT_PLAYER_SCORE,
                     tiles: DEFAULT_PLAYER_TILES,
@@ -314,9 +315,7 @@ describe('RoundManagerService', () => {
         });
 
         it('should throw an error if roundData is missing information', () => {
-            roundData.playerData.id = undefined;
             let result = () => service.convertRoundDataToRound(roundData);
-            expect(result).toThrowError(INVALID_ROUND_DATA_PLAYER);
             roundData.playerData.id = DEFAULT_PLAYER_DATA.id;
 
             roundData.playerData.name = undefined;
