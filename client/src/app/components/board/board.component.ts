@@ -34,7 +34,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     navigator: BoardNavigator;
     selectedSquare: SquareView | undefined;
-    selectedOrientation: Orientation = Orientation.Horizontal;
 
     constructor(private boardService: BoardService, private gameService: GameService, private focusableComponentService: FocusableComponentsService) {
         super();
@@ -46,6 +45,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     ngOnInit(): void {
         this.initializeBoard(this.boardService.initialBoard);
+        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
+
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
@@ -77,7 +78,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         this.onLooseFocusEvent = (): void => {
             this.selectedSquare = undefined;
-            this.selectedOrientation = Orientation.Horizontal;
             this.clearNotAppliedSquare();
         };
 
@@ -98,12 +98,13 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.clearNotAppliedSquare();
 
         if (this.selectedSquare === squareView) {
-            this.selectedOrientation = this.selectedOrientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+            this.navigator.switchOrientation();
         } else {
             this.selectedSquare = squareView;
+            this.navigator.orientation = Orientation.Horizontal;
+            this.navigator.setPosition(squareView.square.position);
         }
 
-        this.navigator = new BoardNavigator(this.squareGrid, this.selectedSquare.square.position, this.selectedOrientation);
         return true;
     }
 
