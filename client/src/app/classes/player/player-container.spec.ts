@@ -7,7 +7,7 @@ import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/c
 import { AbstractPlayer, Player } from '.';
 import { PlayerContainer } from './player-container';
 
-fdescribe('PlayerContainer', () => {
+describe('PlayerContainer', () => {
     let playerContainer: PlayerContainer;
 
     const DEFAULT_LOCAL_PLAYER_ID = '1';
@@ -146,6 +146,7 @@ fdescribe('PlayerContainer', () => {
             },
         ];
 
+        playerContainer['players'] = new Set(testPlayers);
         playerContainer.updatePlayersData(...playerDatas);
         expect(player1UpdateSpy).toHaveBeenCalledWith(playerDatas[0]);
         expect(player2UpdateSpy).toHaveBeenCalledWith(playerDatas[1]);
