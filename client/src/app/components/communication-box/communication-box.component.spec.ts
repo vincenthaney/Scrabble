@@ -283,7 +283,7 @@ describe('CommunicationBoxComponent', () => {
     describe('onContainerClick', () => {
         it('should call setActiveKeyboardComponent', () => {
             const spy = spyOn(component['focusableComponentsService'], 'setActiveKeyboardComponent');
-            component.onContainerClick(); 
+            component.onContainerClick();
             expect(spy).toHaveBeenCalled();
         });
     });
