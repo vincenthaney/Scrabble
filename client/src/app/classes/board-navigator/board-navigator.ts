@@ -1,3 +1,4 @@
+/* eslint-disable no-dupe-class-members */
 import { SquareView } from '@app/classes/square';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
@@ -26,8 +27,11 @@ export class BoardNavigator {
         return this.squareGrid[this.position.row][this.position.column];
     }
 
-    setPosition(position: Position): void {
-        this.position = { ...position };
+    setPosition(row: number, colum: number): void;
+    setPosition(position: Position): void;
+    setPosition(arg1: Position | number, arg2?: number): void {
+        if (arg1 instanceof Object && 'row' in arg1 && 'column' in arg1) this.position = { ...arg1 };
+        else if (arg2) this.position = { row: arg1, column: arg2 };
     }
 
     move(direction: Direction, distance: number = 1): BoardNavigator {
