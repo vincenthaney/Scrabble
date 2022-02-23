@@ -157,7 +157,7 @@ describe.only('Board', () => {
         });
         it('should be true when there is a neighbour horizontally', () => {
             grid[1][1].tile = DEFAULT_TILE_A;
-            expect(board.verifyNeighbors(new Position(1, 2), Orientation.Horizontal)).to.be.true;
+            expect(board.verifyNeighbors(new Position(1, 2), Orientation.Vertical)).to.be.true;
         });
         it('should be true when there is a neighbour vertically', () => {
             grid[1][1].tile = DEFAULT_TILE_A;
