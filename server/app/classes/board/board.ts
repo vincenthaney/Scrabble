@@ -26,14 +26,14 @@ export default class Board {
         return this.grid[position.row][position.column];
     }
 
-    getPlacedTileSquares(): Square[] {
-        const squares: Square[] = [];
+    getDesiredSquares(predicate: (square: Square) => boolean): Square[] {
+        const desiredSquares: Square[] = [];
         for (const row of this.grid) {
             for (const square of row) {
-                if (square.tile) squares.push(square);
+                if (predicate(square)) desiredSquares.push(square);
             }
         }
-        return squares;
+        return desiredSquares;
     }
 
     navigate(position: Position) {
