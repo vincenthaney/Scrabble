@@ -2,6 +2,7 @@ import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 
 export default class BoardNavigator {
+    orientation: Orientation;
     readonly position: Position;
 
     constructor(private board: Board, position: Position) {

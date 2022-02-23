@@ -24,7 +24,7 @@ describe('Board', () => {
             for (let j = 0; j < BOARD_SIZE.x; j++) {
                 const square: Square = {
                     tile: null,
-                    position: new Position(j, i),
+                    position: new Position(i, j),
                     scoreMultiplier: null,
                     wasMultiplierUsed: false,
                     isCenter: false,
@@ -42,13 +42,13 @@ describe('Board', () => {
     });
 
     it('place Tile should place a Tile and return true at the desired Square', () => {
-        const targetPosition = new Position(3, 5);
+        const targetPosition = new Position(5, 3);
         expect(board.placeTile(DEFAULT_TILE_A, targetPosition)).to.be.true;
         expect(board.grid[targetPosition.row][targetPosition.column].tile === DEFAULT_TILE_A).to.be.true;
     });
 
     it('place Tile should not place a Tile and return false if it is outside of the board', () => {
-        const targetPosition = new Position(3, board.grid.length + 1);
+        const targetPosition = new Position(board.grid.length + 1, 3);
         const result = () => board.placeTile(DEFAULT_TILE_A, targetPosition);
         expect(result).to.throw(POSITION_OUT_OF_BOARD);
     });
@@ -62,20 +62,20 @@ describe('Board', () => {
     });
 
     it('placeWord should place a single letter word and return true', () => {
-        const startingSquare = new Position(3, 5);
+        const startingSquare = new Position(5, 3);
         expect(board.placeWord([DEFAULT_TILE_A], startingSquare, Orientation.Horizontal)).to.be.true;
         expect(board.grid[startingSquare.row][startingSquare.column].tile === DEFAULT_TILE_A).to.be.true;
     });
 
     it('placeWord should place a horizontal 2 word letter word and return true', () => {
-        const startingSquare = new Position(3, 5);
+        const startingSquare = new Position(5, 3);
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.true;
         expect(board.grid[startingSquare.row][startingSquare.column].tile === DEFAULT_TILE_C).to.be.true;
         expect(board.grid[startingSquare.row][startingSquare.column + 1].tile === DEFAULT_TILE_D).to.be.true;
     });
 
     it('placeWord should place a vertical 3 word letter word and return true', () => {
-        const startingSquare = new Position(3, 5);
+        const startingSquare = new Position(5, 3);
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Vertical)).to.be.true;
         expect(board.grid[startingSquare.row][startingSquare.column].tile === DEFAULT_TILE_C).to.be.true;
         expect(board.grid[startingSquare.row + 1][startingSquare.column].tile === DEFAULT_TILE_A).to.be.true;
@@ -83,14 +83,14 @@ describe('Board', () => {
     });
 
     it('placeWord should not place a letter if it would exceed the board dimensions and return false', () => {
-        const startingSquare = new Position(13, 9);
+        const startingSquare = new Position(9, 13);
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.false;
         expect(board.grid[startingSquare.row][startingSquare.column].tile === DEFAULT_TILE_C).to.be.false;
         expect(board.grid[startingSquare.row][startingSquare.column + 1].tile === DEFAULT_TILE_A).to.be.false;
     });
 
     it('placeWord should place the word and skip over a Square with a tile and return true', () => {
-        const startingSquare = new Position(5, 8);
+        const startingSquare = new Position(8, 5);
         board.grid[startingSquare.row][startingSquare.column + 1].tile = DEFAULT_TILE_B;
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.true;
         expect(board.grid[startingSquare.row][startingSquare.column].tile === DEFAULT_TILE_C).to.be.true;
@@ -100,7 +100,7 @@ describe('Board', () => {
     });
 
     it('placeWord should not place the word if the starting square is occupied and return false', () => {
-        const startingSquare = new Position(5, 8);
+        const startingSquare = new Position(8, 5);
         board.grid[startingSquare.row][startingSquare.column].tile = DEFAULT_TILE_B;
         expect(board.placeWord([DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_D], startingSquare, Orientation.Horizontal)).to.be.false;
         expect(board.grid[startingSquare.row][startingSquare.column].tile === DEFAULT_TILE_C).to.be.false;
@@ -109,7 +109,7 @@ describe('Board', () => {
     });
 
     it('verifySquare should throw an EXTRACTION_POSITION_OUT_OF_BOARD when the position is outside the array no matter if a tile is expected', () => {
-        const position: Position = new Position(board.grid[0].length + 1, 1);
+        const position: Position = new Position(1, board.grid[0].length + 1);
         const result1 = () => board.verifySquare(position, SHOULD_HAVE_A_TILE);
         expect(result1).to.throw(POSITION_OUT_OF_BOARD);
         const result2 = () => board.verifySquare(position, SHOULD_HAVE_NO_TILE);
@@ -117,24 +117,24 @@ describe('Board', () => {
     });
 
     it('verifySquare should return true when the position is valid and there is no tile as expected', () => {
-        const position: Position = new Position(7, 1);
+        const position: Position = new Position(1, 7);
         expect(board.verifySquare(position, SHOULD_HAVE_NO_TILE)).to.be.true;
     });
 
     it('verifySquare should return false when the position is valid but there a tile which was not expected', () => {
-        const position: Position = new Position(7, 1);
+        const position: Position = new Position(1, 7);
         board.grid[position.row][position.column].tile = DEFAULT_TILE_A;
         expect(board.verifySquare(position, SHOULD_HAVE_NO_TILE)).to.be.false;
     });
 
     it('verifySquare should return true when the position is valid and there a tile as expected', () => {
-        const position: Position = new Position(7, 1);
+        const position: Position = new Position(1, 7);
         board.grid[position.row][position.column].tile = DEFAULT_TILE_A;
         expect(board.verifySquare(position, SHOULD_HAVE_A_TILE)).to.be.true;
     });
 
     it('verifySquare should return false when the position is valid but there are no tile when one was expected', () => {
-        const position: Position = new Position(7, 1);
+        const position: Position = new Position(1, 7);
         expect(board.verifySquare(position, SHOULD_HAVE_A_TILE)).to.be.false;
     });
 
@@ -152,7 +152,28 @@ describe('Board', () => {
 
     describe('verifyNeighbors', () => {
         it('should be false when forward is out of bounds', () => {
-            expect(board.verifyNeighbors(new Position(grid[0].length, grid.length), Orientation.Horizontal)).to.be.false;
+            expect(board.verifyNeighbors(new Position(grid.length, grid[0].length), Orientation.Horizontal)).to.be.false;
+        });
+        it('should be true when there is a neighbour horizontally', () => {
+            grid[1][1].tile = DEFAULT_TILE_A;
+            expect(board.verifyNeighbors(new Position(2, 1), Orientation.Vertical)).to.be.true;
+        });
+        it('should be true when there is a neighbour vertically', () => {
+            grid[1][1].tile = DEFAULT_TILE_A;
+            expect(board.verifyNeighbors(new Position(1, 2), Orientation.Horizontal)).to.be.true;
+        });
+    });
+
+    describe('getSize', () => {
+        it('should return correctSize', () => {
+            expect(board.getSize()).to.deep.equal(BOARD_SIZE);
+        });
+    });
+
+    describe('navigate', () => {
+        it('should return a BoardNavigator', () => {
+            const position = new Position(2, 4);
+            expect(board.navigate(position, Orientation.Horizontal)).to.be.instanceOf(BoardNavigator);
         });
     });
 
