@@ -4,7 +4,7 @@ import { Tile } from '@app/classes/tile';
 import { BOARD_SIZE } from '@app/constants/game';
 import { expect } from 'chai';
 import { createStubInstance } from 'sinon';
-import { Board, Orientation, Position } from '.';
+import { Board, BoardNavigator, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
 import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
