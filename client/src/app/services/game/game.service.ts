@@ -32,7 +32,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     gameType: GameType;
     dictionnaryName: string;
     tileReserve: TileReserveData[];
-    tileReserveTotal: number;
 
     gameIsSetUp: boolean;
     isGameOver: boolean;
@@ -66,7 +65,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.dictionnaryName = startGameData.dictionary;
         this.roundManager.initialize(localPlayerId, startGameData);
         this.tileReserve = startGameData.tileReserve;
-        this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
         this.gameIsSetUp = true;
         this.isGameOver = false;
@@ -88,10 +86,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
         this.gameViewEventManagerService.emitGameViewEvent('reRender');
         this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
-        this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
-            tileReserve: startGameData.tileReserve,
-            tileReserveTotal: startGameData.tileReserveTotal,
-        });
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
         this.roundManager.continueRound(this.roundManager.currentRound);
     }
@@ -110,8 +104,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
             const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
             this.roundManager.updateRound(round);
         }
-        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
-            this.handleTileReserveUpdate(gameUpdateData.tileReserve, gameUpdateData.tileReserveTotal);
+        if (gameUpdateData.tileReserve) {
+            this.handleTileReserveUpdate(gameUpdateData.tileReserve);
         }
         if (gameUpdateData.isGameOver) {
             this.gameOver();
@@ -123,13 +117,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
     }
 
-    handleTileReserveUpdate(tileReserve: TileReserveData[], tileReserveTotal: number): void {
+    handleTileReserveUpdate(tileReserve: TileReserveData[]): void {
         this.tileReserve = tileReserve;
-        this.tileReserveTotal = tileReserveTotal;
-        this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
-            tileReserve,
-            tileReserveTotal,
-        });
     }
 
     handleNewMessage(newMessage: Message): void {
@@ -158,6 +147,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     getLocalPlayerId(): string | undefined {
         return this.playerContainer.getIdOfLocalPlayer();
+    }
+
+    getTotalNumberOfTilesLeft(): number {
+        return this.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
     }
 
     gameOver(): void {
@@ -195,7 +188,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameType = undefined as unknown as GameType;
         this.dictionnaryName = '';
         this.tileReserve = [];
-        this.tileReserveTotal = 0;
         this.isGameOver = false;
         this.gameId = '';
     }

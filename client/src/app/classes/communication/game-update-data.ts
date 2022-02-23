@@ -11,5 +11,4 @@ export default interface GameUpdateData {
     board?: Square[] | undefined;
     round?: RoundData;
     tileReserve?: TileReserveData[];
-    tileReserveTotal?: number;
 }

@@ -2,19 +2,16 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
-import { LetterValue } from '@app/classes/tile';
+import { TileReserveData } from '@app/classes/tile/tile.types';
 import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
 import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { UpdateTileReserveEventArgs } from '@app/services/game-view-event-manager/event-arguments';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-export type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
     selector: 'app-communication-box',
@@ -35,8 +32,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
 
-    lettersLeftTotal: number = 0;
-    lettersLeft: LetterMapItem[] = [];
+    // lettersLeftTotal: number = 0;
+    // lettersLeft: TileReserveData[] = [];
 
     loading: boolean = false;
 
@@ -52,14 +49,14 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnInit(): void {
-        this.lettersLeft = this.gameService.tileReserve;
-        this.lettersLeftTotal = this.gameService.tileReserveTotal;
+        // this.lettersLeft = this.gameService.tileReserve;
+        // this.lettersLeftTotal = this.gameService.getTotalNumberOfTilesLeft();
 
-        this.gameViewEventManagerService.subscribeToGameViewEvent(
-            'tileReserveUpdate',
-            this.componentDestroyed$,
-            (payload: UpdateTileReserveEventArgs) => this.onTileReserveUpdate(payload),
-        );
+        // this.gameViewEventManagerService.subscribeToGameViewEvent(
+        //     'tileReserveUpdate',
+        //     this.componentDestroyed$,
+        //     (payload: UpdateTileReserveEventArgs) => this.onTileReserveUpdate(payload),
+        // );
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
@@ -118,9 +115,17 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
-    onTileReserveUpdate(payload: UpdateTileReserveEventArgs): void {
-        this.lettersLeft = payload.tileReserve;
-        this.lettersLeftTotal = payload.tileReserveTotal;
+    // onTileReserveUpdate(payload: UpdateTileReserveEventArgs): void {
+    //     this.lettersLeft = payload.tileReserve;
+    //     this.lettersLeftTotal = payload.tileReserveTotal;
+    // }
+
+    getLettersLeft(): TileReserveData[] {
+        return this.gameService.tileReserve;
+    }
+
+    getNumberOfTilesLeft(): number {
+        return this.gameService.getTotalNumberOfTilesLeft();
     }
 
     private scrollToBottom(): void {

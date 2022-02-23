@@ -5,7 +5,6 @@ import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import * as SERVICE_ERRORS from '@app/constants/services-errors';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UpdateTileReserveEventArgs } from './event-arguments';
 import { EventTypes } from './event-types';
 @Injectable({
     providedIn: 'root',
@@ -19,7 +18,6 @@ export class GameViewEventManagerService {
         this.eventMap.set('tilesPlayed', new Subject<ActionPlacePayload>());
         this.eventMap.set('noActiveGame', new Subject<void>());
         this.eventMap.set('reRender', new Subject<void>());
-        this.eventMap.set('tileReserveUpdate', new Subject<UpdateTileReserveEventArgs>());
         this.eventMap.set('newMessage', new BehaviorSubject<Message>(INITIAL_MESSAGE));
     }
 
