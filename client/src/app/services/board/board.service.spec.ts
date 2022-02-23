@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { Square } from '@app/classes/square';
 import { BoardService } from '@app/services';
@@ -34,13 +35,13 @@ describe('BoardService', () => {
     });
 
     it('initializeBoard should set value of initialBoard', () => {
-        service.initialBoard = [[]];
+        service['initialBoard'] = [[]];
         service.initializeBoard(DEFAULT_BOARD);
-        expect(service.initialBoard).toEqual(DEFAULT_BOARD);
+        expect(service['initialBoard']).toEqual(DEFAULT_BOARD);
     });
 
     it('updateBoard should emit boardUpdateEvent', () => {
-        const spy = spyOn(service.boardUpdateEvent, 'emit');
+        const spy = spyOn(service['boardUpdateEvent$'], 'next');
         const squaresUpdated = [DEFAULT_SQUARE];
         service.updateBoard(squaresUpdated);
         expect(spy).toHaveBeenCalledWith(squaresUpdated);
