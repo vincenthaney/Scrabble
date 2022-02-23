@@ -30,7 +30,7 @@ import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-game-page',
@@ -40,7 +40,6 @@ import { Subject, Subscription } from 'rxjs';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
-    noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     playerLeftWithQuitButton: boolean = false;
 
@@ -71,9 +70,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
-        this.noActiveGameSubscription = this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () =>
-            this.noActiveGameDialog(),
-        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
         }
