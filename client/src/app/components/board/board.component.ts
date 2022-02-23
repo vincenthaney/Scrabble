@@ -58,6 +58,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
 
+        // Thus must be defined in the onInit, otherwise selectedSquare is undefined
         this.onFocusableEvent = (e: KeyboardEvent): void => {
             if (this.selectedSquare) {
                 if (e.key === 'Backspace') {
@@ -76,6 +77,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
         };
 
+        // Thus must be defined in the onInit, otherwise selectedSquare is undefined
         this.onLooseFocusEvent = (): void => {
             this.selectedSquare = undefined;
             this.clearNotAppliedSquare();
