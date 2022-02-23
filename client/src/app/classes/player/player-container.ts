@@ -40,7 +40,7 @@ export class PlayerContainer {
     }
 
     getPlayer(playerNumber: number): AbstractPlayer {
-        return [...this.players][playerNumber];
+        return [...this.players][playerNumber - 1];
     }
 
     addPlayer(player: AbstractPlayer): this {
