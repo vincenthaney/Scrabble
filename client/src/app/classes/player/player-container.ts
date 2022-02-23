@@ -1,5 +1,5 @@
 import { PlayerData } from '@app/classes/communication';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
+import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
 import AbstractPlayer from './abstract-player';
 import Player from './player';
 
@@ -35,6 +35,7 @@ export class PlayerContainer {
     }
 
     getPlayer(playerNumber: number): AbstractPlayer {
+        if (playerNumber > this.players.size) throw new Error(PLAYER_NUMBER_INVALID(playerNumber));
         return [...this.players][playerNumber - 1];
     }
 

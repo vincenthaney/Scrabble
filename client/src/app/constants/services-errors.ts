@@ -7,3 +7,4 @@ export const SOCKET_ID_UNDEFINED = 'The socket id is undefined';
 export const INVALID_ROUND_DATA_PLAYER = 'Invalid player to convert round data';
 export const EXPIRED_COOKIE_AGE = '-99999999';
 export const NO_SUBJECT_FOR_EVENT = 'There is no subject for the event requested';
+export const PLAYER_NUMBER_INVALID = (playerNumber: number) => `There is no player ${playerNumber} in the game`;
