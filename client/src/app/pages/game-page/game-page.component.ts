@@ -42,6 +42,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
     noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
+    playerLeftWithQuitButton: boolean = false;
 
     constructor(
         public dialog: MatDialog,
@@ -60,7 +61,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
-        if (this.gameService.getGameId()) {
+        if (!this.playerLeftWithQuitButton) {
             this.gameService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
@@ -149,7 +150,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     private handlePlayerLeave(): void {
-        this.gameService.gameId = '';
+        this.playerLeftWithQuitButton = true;
         this.playerLeavesService.handleLocalPlayerLeavesGame();
     }
 }

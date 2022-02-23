@@ -35,8 +35,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     gameIsSetUp: boolean;
     isGameOver: boolean;
-    gameId: string;
 
+    private gameId: string;
     private serviceDestroyed$: Subject<boolean>;
 
     constructor(
