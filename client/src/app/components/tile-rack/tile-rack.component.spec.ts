@@ -79,7 +79,7 @@ describe('TileRackComponent', () => {
 
     it('should call initializeTileRack when startGameEvent is received', () => {
         const spy = spyOn<any>(component, 'updateTileRack');
-        gameServiceSpy['updateTileRack$'].next();
+        gameServiceSpy['gameViewEventManagerService'].emitGameViewEvent('tileRackUpdate');
         expect(spy).toHaveBeenCalled();
     });
 
@@ -113,7 +113,7 @@ describe('TileRackComponent', () => {
     });
 
     it('should call handlePlaceTiles on playTiles event', () => {
-        component['gameService'].playingTiles.emit();
+        gameServiceSpy['gameViewEventManagerService'].emitGameViewEvent('tilesPlayed');
         expect(handlePlaceTileSpy).toHaveBeenCalled();
     });
 
