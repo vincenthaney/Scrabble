@@ -14,6 +14,7 @@ import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -36,7 +37,12 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     navigator: BoardNavigator;
     selectedSquare: SquareView | undefined;
 
-    constructor(private boardService: BoardService, private gameService: GameService, private focusableComponentService: FocusableComponentsService) {
+    constructor(
+        private boardService: BoardService,
+        private gameService: GameService,
+        private roundManagerService: RoundManagerService,
+        private focusableComponentService: FocusableComponentsService,
+    ) {
         super();
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
@@ -48,6 +54,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.initializeBoard(this.boardService.initialBoard);
         this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
+        const clearCursor = (): void => {
+            this.selectedSquare = undefined;
+            this.clearNotAppliedSquare();
+        };
+
         this.boardUpdateSubscription = this.boardService.boardUpdateEvent
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
@@ -58,6 +69,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.boardDestroyed$)).subscribe(() => clearCursor());
 
         const handleBackspace = (): void => {
             this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
@@ -66,10 +78,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 if (index >= 0) this.notAppliedSquares.splice(index, 1);
                 this.selectedSquare.square.tile = null;
             }
-        };
-        const clearCursor = (): void => {
-            this.selectedSquare = undefined;
-            this.clearNotAppliedSquare();
         };
         const handlePlaceLetter = (letter: string, squareView: SquareView): void => {
             squareView.square.tile = new Tile(letter.toUpperCase() as LetterValue, 0);
