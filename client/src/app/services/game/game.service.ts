@@ -25,15 +25,12 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameService implements OnDestroy, IResetServiceData {
-    // highScoreService: HighScoreService;
-    // gameHistoryService: GameHistoryService;
-    // objectiveManagerService: ObjectiveManagerService;
     playerContainer: PlayerContainer;
     gameType: GameType;
     dictionnaryName: string;
     tileReserve: TileReserveData[];
 
-    gameIsSetUp: boolean;
+    isGameSetUp: boolean;
     isGameOver: boolean;
 
     private gameId: string;
@@ -68,7 +65,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
 
-        this.gameIsSetUp = true;
+        this.isGameSetUp = true;
         this.isGameOver = false;
 
         await this.handleReRouteOrReconnect(startGameData);
@@ -140,7 +137,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     getLocalPlayerId(): string | undefined {
-        return this.playerContainer.getIdOfLocalPlayer();
+        return this.playerContainer.getLocalPlayerId();
     }
 
     getTotalNumberOfTilesLeft(): number {

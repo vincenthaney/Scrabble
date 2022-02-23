@@ -23,11 +23,6 @@ export class PlayerContainer {
         return filteredPlayers[0] ? filteredPlayers[0] : undefined;
     }
 
-    getIdOfLocalPlayer(): string | undefined {
-        const localPlayerResult = this.getLocalPlayer();
-        return localPlayerResult ? localPlayerResult.id : undefined;
-    }
-
     initializePlayer(playerData: PlayerData): this {
         if (!playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
         this.addPlayer(new Player(playerData.id, playerData.name, playerData.tiles));

@@ -43,7 +43,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
             this.ngAfterViewInit();
         });
 
-        if (this.gameService.gameIsSetUp) {
+        if (this.gameService.isGameSetUp) {
             if (!this.roundManager.timer) return;
 
             if (this.roundManager.timer)
