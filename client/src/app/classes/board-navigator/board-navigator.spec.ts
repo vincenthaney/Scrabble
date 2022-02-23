@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
@@ -154,19 +155,20 @@ describe('BoardNavigator', () => {
         });
 
         it('should return next empty squareView when neighbors is not empty', () => {
-            navigator.setPosition({ row: 2, column: 1 });
+            navigator.setPosition(2, 1);
             const expected = board[2][3];
             expect(navigator.nextEmpty(Direction.Forward, false)).toEqual(expected);
         });
 
         it('should return undefined when no next empty', () => {
-            navigator.setPosition({ row: 4, column: 4 });
+            navigator.setPosition(4, 4);
             expect(navigator.nextEmpty(Direction.Forward, false)).toBeUndefined();
         });
     });
 
     describe('isWithinBounds', () => {
         it('should return true if is within bounds', () => {
+            navigator.setPosition(0, 0);
             expect(navigator.isWithinBounds()).toBeTrue();
         });
 
@@ -206,13 +208,13 @@ describe('BoardNavigator', () => {
         });
 
         it('should be false if has tile', () => {
-            navigator.setPosition({ row: 2, column: 2 });
+            navigator.setPosition(2, 2);
             expect(navigator.isEmpty()).toBeFalse();
         });
 
         it('should return true if not applied', () => {
             board[2][2].applied = false;
-            navigator.setPosition({ row: 2, column: 2 });
+            navigator.setPosition(2, 2);
             expect(navigator.isEmpty(true)).toBeTrue();
         });
     });
