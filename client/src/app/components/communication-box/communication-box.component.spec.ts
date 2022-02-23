@@ -89,9 +89,9 @@ describe('CommunicationBoxComponent', () => {
         }).compileComponents();
 
         gameServiceMock = TestBed.inject(GameService);
-        gameServiceMock.playerContainer = new PlayerContainer(CURRENT_PLAYER_ID);
-        gameServiceMock.playerContainer['players'].add(new Player(CURRENT_PLAYER_ID, 'player1', []));
-        gameServiceMock.playerContainer['players'].add(new Player(OPPONENT_PLAYER_ID, 'player2', []));
+        gameServiceMock['playerContainer'] = new PlayerContainer(CURRENT_PLAYER_ID);
+        gameServiceMock['playerContainer']['players'].add(new Player(CURRENT_PLAYER_ID, 'player1', []));
+        gameServiceMock['playerContainer']['players'].add(new Player(OPPONENT_PLAYER_ID, 'player2', []));
     });
 
     beforeEach(() => {
