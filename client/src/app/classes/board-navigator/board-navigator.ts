@@ -14,19 +14,19 @@ export class BoardNavigator {
         this.orientation = orientation;
     }
 
-    get row() {
+    get row(): number {
         return this.position.row;
     }
 
-    get column() {
+    get column(): number {
         return this.position.column;
     }
 
-    get currentSquareView() {
+    get currentSquareView(): SquareView {
         return this.squareGrid[this.position.row][this.position.column];
     }
 
-    setPosition(position: Position) {
+    setPosition(position: Position): void {
         this.position = { ...position };
     }
 
