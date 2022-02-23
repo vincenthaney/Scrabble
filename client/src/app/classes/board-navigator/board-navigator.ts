@@ -4,8 +4,8 @@ import { Position } from '@app/classes/position';
 import Direction from './direction';
 
 export class BoardNavigator {
-    position: Position;
     orientation: Orientation;
+    private position: Position;
     private squareGrid: SquareView[][];
 
     constructor(squareGrid: SquareView[][], position: Position, orientation: Orientation) {
@@ -24,6 +24,10 @@ export class BoardNavigator {
 
     get currentSquareView() {
         return this.squareGrid[this.position.row][this.position.column];
+    }
+
+    setPosition(position: Position) {
+        this.position = { ...position };
     }
 
     move(direction: Direction, distance: number = 1): BoardNavigator {
