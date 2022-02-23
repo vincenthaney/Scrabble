@@ -5,8 +5,9 @@ export default class BoardNavigator {
     orientation: Orientation;
     readonly position: Position;
 
-    constructor(private board: Board, position: Position) {
+    constructor(private board: Board, position: Position, orientation: Orientation) {
         this.position = position.copy();
+        this.orientation = orientation;
     }
 
     get square() {
@@ -25,19 +26,41 @@ export default class BoardNavigator {
         return this.board.verifyNeighbors(this.position, orientation, shouldBeFilled);
     }
 
-    move(orientation: Orientation, direction: Direction, distance: number = 1): BoardNavigator {
-        this.position.move(orientation, direction, distance);
+    verifyAllNeighbors(shouldBeFilled: boolean) {
+        return this.verifyNeighbors(Orientation.Horizontal, shouldBeFilled) || this.verifyNeighbors(Orientation.Vertical, shouldBeFilled);
+    }
+
+    move(direction: Direction, distance: number = 1): BoardNavigator {
+        this.position.move(this.orientation, direction, distance);
         return this;
     }
 
-    forward(orientation: Orientation, distance: number = 1): BoardNavigator {
-        this.position.move(orientation, Direction.Forward, distance);
+    forward(distance: number = 1): BoardNavigator {
+        this.position.move(this.orientation, Direction.Forward, distance);
         return this;
     }
 
-    backward(orientation: Orientation, distance: number = 1): BoardNavigator {
-        this.position.move(orientation, Direction.Backward, distance);
+    backward(distance: number = 1): BoardNavigator {
+        this.position.move(this.orientation, Direction.Backward, distance);
         return this;
+    }
+
+    moveUntil(direction: Direction, predicate: () => boolean): number {
+        let distanceTravelled = 0;
+        while (this.isWithinBounds() && !predicate()) {
+            this.move(direction);
+            distanceTravelled++;
+        }
+        return this.isWithinBounds() ? distanceTravelled : Number.POSITIVE_INFINITY;
+    }
+
+    switchOrientation(): BoardNavigator {
+        this.orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+        return this;
+    }
+
+    isEmpty(): boolean {
+        return this.square.tile === null;
     }
 
     isWithinBounds(): boolean {
@@ -45,6 +68,6 @@ export default class BoardNavigator {
     }
 
     clone(): BoardNavigator {
-        return new BoardNavigator(this.board, this.position);
+        return new BoardNavigator(this.board, this.position, this.orientation);
     }
 }
