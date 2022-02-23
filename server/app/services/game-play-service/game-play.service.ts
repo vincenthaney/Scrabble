@@ -32,6 +32,7 @@ export class GamePlayService {
         let updatedData: void | GameUpdateData = action.execute();
 
         if (updatedData) {
+            updatedData = this.addMissingPlayerId(gameId, playerId, updatedData);
             updatedData.tileReserve = Array.from(game.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
             updatedData.tileReserveTotal = updatedData.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
         }
@@ -91,9 +92,9 @@ export class GamePlayService {
     handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): string[] {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
-        else updatedData.player1 = { score: updatedScorePlayer1 };
+        else updatedData.player1 = { id: game.player1.id, score: updatedScorePlayer1 };
         if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
-        else updatedData.player2 = { score: updatedScorePlayer2 };
+        else updatedData.player2 = { id: game.player2.id, score: updatedScorePlayer2 };
 
         updatedData.isGameOver = true;
         return game.endGameMessage(winnerName);
@@ -102,8 +103,21 @@ export class GamePlayService {
     handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): void {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.player1.id === playerWhoLeftId ? game.player2 : game.player1;
-        const updatedData: GameUpdateData = {};
+        let updatedData: GameUpdateData = {};
         const endOfGameMessages = this.handleGameOver(playerStillInGame.name, game, updatedData);
+        updatedData = this.addMissingPlayerId(gameId, playerStillInGame.id, updatedData);
         this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
+    }
+
+    private addMissingPlayerId(gameId: string, playerId: string, gameUpdateData: GameUpdateData): GameUpdateData {
+        const game: Game = this.activeGameService.getGame(gameId, playerId);
+        const newgameUpdateData: GameUpdateData = { ...gameUpdateData };
+        if (newgameUpdateData.player1) {
+            newgameUpdateData.player1.id = game.player1.id;
+        }
+        if (newgameUpdateData.player2) {
+            newgameUpdateData.player2.id = game.player2.id;
+        }
+        return newgameUpdateData;
     }
 }
