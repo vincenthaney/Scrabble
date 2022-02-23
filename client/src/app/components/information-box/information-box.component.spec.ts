@@ -100,7 +100,7 @@ describe('InformationBoxComponent', () => {
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
             spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
             component.ngOnInit();
-            expect(component['ngUnsubscribe']).toBeTruthy();
+            expect(component['componentDestroyed$']).toBeTruthy();
         });
 
         it('ngOnInit should create Timer object', () => {
@@ -192,8 +192,8 @@ describe('InformationBoxComponent', () => {
         });
 
         it('should always call next and complete on ngUnsubscribe', () => {
-            const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
-            const ngUnsubscribeCompleteSpy = spyOn(component['ngUnsubscribe'], 'complete');
+            const ngUnsubscribeNextSpy = spyOn(component['componentDestroyed$'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn(component['componentDestroyed$'], 'complete');
 
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
