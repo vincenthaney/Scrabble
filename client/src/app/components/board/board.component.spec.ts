@@ -25,6 +25,7 @@ import { Orientation } from '@app/classes/orientation';
 import { Square, SquareView } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { BACKSPACE, KEYDOWN } from '@app/constants/components-constants';
 import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
@@ -440,10 +441,11 @@ describe('BoardComponent', () => {
             component.selectedSquare = selectedSquare;
 
             component.navigator = new BoardNavigator(component.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
-            nextEmptySpy = spyOn(component.navigator, 'nextEmpty').and.returnValue(undefined);
 
             event = new KeyboardEvent('e');
             component.ngOnInit();
+
+            nextEmptySpy = spyOn(component.navigator, 'nextEmpty').and.returnValue(undefined);
         });
 
         it('should set tile on selectedSquare', () => {
@@ -477,7 +479,7 @@ describe('BoardComponent', () => {
 
         describe('Backspace', () => {
             beforeEach(() => {
-                event = { key: 'Backspace' } as unknown as KeyboardEvent;
+                event = { key: BACKSPACE, type: KEYDOWN } as unknown as KeyboardEvent;
             });
 
             it('should call nextEmpty with Backward if backspace', () => {
@@ -514,12 +516,10 @@ describe('BoardComponent', () => {
 
         it('should reset attributes', () => {
             (component.selectedSquare as unknown) = 'not-empty';
-            (component.navigator.orientation as unknown) = 'not-horizontal';
 
             component.onLooseFocusEvent!();
 
             expect(component.selectedSquare).toBeUndefined();
-            expect(component.navigator.orientation).toEqual(Orientation.Horizontal);
         });
 
         it('should call clearNotAppliedSquare', () => {
@@ -594,14 +594,6 @@ describe('BoardComponent', () => {
             component.onSquareClick(squareView);
 
             expect(component.navigator.orientation).toEqual(Orientation.Horizontal);
-        });
-
-        it('should create new navigator', () => {
-            (component.navigator as unknown) = undefined;
-
-            component.onSquareClick(squareView);
-
-            expect(component.navigator).toBeDefined();
         });
 
         it('should do nothing if squareView has a tile', () => {
