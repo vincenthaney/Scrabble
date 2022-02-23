@@ -514,12 +514,12 @@ describe('BoardComponent', () => {
 
         it('should reset attributes', () => {
             (component.selectedSquare as unknown) = 'not-empty';
-            (component.selectedOrientation as unknown) = 'not-horizontal';
+            (component.navigator.orientation as unknown) = 'not-horizontal';
 
             component.onLooseFocusEvent!();
 
             expect(component.selectedSquare).toBeUndefined();
-            expect(component.selectedOrientation).toEqual(Orientation.Horizontal);
+            expect(component.navigator.orientation).toEqual(Orientation.Horizontal);
         });
 
         it('should call clearNotAppliedSquare', () => {
@@ -579,21 +579,21 @@ describe('BoardComponent', () => {
         });
 
         it('should switch orientation if squareView is selectedSquare (horizontal)', () => {
-            component.selectedOrientation = Orientation.Horizontal as Orientation;
+            component.navigator.orientation = Orientation.Horizontal as Orientation;
             component.selectedSquare = squareView;
 
             component.onSquareClick(squareView);
 
-            expect(component.selectedOrientation).toEqual(Orientation.Vertical);
+            expect(component.navigator.orientation).toEqual(Orientation.Vertical);
         });
 
         it('should switch orientation if squareView is selectedSquare (vertical)', () => {
-            component.selectedOrientation = Orientation.Vertical as Orientation;
+            component.navigator.orientation = Orientation.Vertical as Orientation;
             component.selectedSquare = squareView;
 
             component.onSquareClick(squareView);
 
-            expect(component.selectedOrientation).toEqual(Orientation.Horizontal);
+            expect(component.navigator.orientation).toEqual(Orientation.Horizontal);
         });
 
         it('should create new navigator', () => {
