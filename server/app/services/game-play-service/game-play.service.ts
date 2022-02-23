@@ -34,7 +34,6 @@ export class GamePlayService {
         if (updatedData) {
             updatedData = this.addMissingPlayerId(gameId, playerId, updatedData);
             updatedData.tileReserve = Array.from(game.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
-            updatedData.tileReserveTotal = updatedData.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
         }
 
         if (action.willEndTurn()) {

@@ -63,9 +63,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
-        this.roundManager.initialize(localPlayerId, startGameData);
         this.tileReserve = startGameData.tileReserve;
+
+        this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
+
         this.gameIsSetUp = true;
         this.isGameOver = false;
 
@@ -80,14 +82,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         } else {
             this.reconnectReinitialize(startGameData);
         }
-    }
-
-    reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
-        this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
-        this.gameViewEventManagerService.emitGameViewEvent('reRender');
-        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
-        this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
-        this.roundManager.continueRound(this.roundManager.currentRound);
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
@@ -108,7 +102,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
             this.handleTileReserveUpdate(gameUpdateData.tileReserve);
         }
         if (gameUpdateData.isGameOver) {
-            this.gameOver();
+            this.handleGameOver();
         }
     }
 
@@ -153,9 +147,26 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
     }
 
-    gameOver(): void {
+    handleGameOver(): void {
         this.isGameOver = true;
         this.roundManager.resetTimerData();
+    }
+
+    resetServiceData(): void {
+        this.playerContainer.resetPlayers();
+        this.gameType = undefined as unknown as GameType;
+        this.dictionnaryName = '';
+        this.tileReserve = [];
+        this.isGameOver = false;
+        this.gameId = '';
+    }
+
+    reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
+        this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
+        this.gameViewEventManagerService.emitGameViewEvent('reRender');
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+        this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
+        this.roundManager.continueRound(this.roundManager.currentRound);
     }
 
     reconnectGame(): void {
@@ -181,14 +192,5 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
         this.gameController.handleDisconnection(gameId, localPlayerId);
-    }
-
-    resetServiceData(): void {
-        this.playerContainer.resetPlayers();
-        this.gameType = undefined as unknown as GameType;
-        this.dictionnaryName = '';
-        this.tileReserve = [];
-        this.isGameOver = false;
-        this.gameId = '';
     }
 }

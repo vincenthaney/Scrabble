@@ -520,12 +520,12 @@ describe('GameService', () => {
 
     describe('gameOver', () => {
         it('should change attribute "isGameOver" to true', () => {
-            service.gameOver();
+            service.handleGameOver();
             expect(service['isGameOver']).toEqual(true);
         });
 
         it('should call roundManager.resetTimerData()', () => {
-            service.gameOver();
+            service.handleGameOver();
             expect(roundManagerSpy.resetTimerData).toHaveBeenCalled();
         });
     });

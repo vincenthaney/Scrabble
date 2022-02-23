@@ -31,6 +31,5 @@ export interface StartMultiplayerGameData extends MultiplayerGameConfig {
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];
-    tileReserveTotal: number;
     round: RoundData;
 }

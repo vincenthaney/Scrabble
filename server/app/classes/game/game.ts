@@ -166,7 +166,6 @@ export default class Game {
         this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });
         });
-        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
         const round: Round = this.roundManager.getCurrentRound();
         const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
         const startMultiplayerGameData: StartMultiplayerGameData = {
@@ -178,7 +177,6 @@ export default class Game {
             gameId: this.getId(),
             board: this.board.grid,
             tileReserve,
-            tileReserveTotal,
             round: roundData,
         };
         return startMultiplayerGameData;
