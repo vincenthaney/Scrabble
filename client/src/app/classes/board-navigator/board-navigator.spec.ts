@@ -160,8 +160,8 @@ describe('BoardNavigator', () => {
         });
 
         it('should return undefined when no next empty', () => {
-            navigator.position = { row: 4, column: 4 };
-            expect(navigator.nextEmpty(Direction.Forward, false)).not.toBeDefined();
+            navigator.setPosition({ row: 4, column: 4 });
+            expect(navigator.nextEmpty(Direction.Forward, false)).toBeUndefined();
         });
     });
 
