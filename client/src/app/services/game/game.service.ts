@@ -5,12 +5,13 @@ import { StartMultiplayerGameData } from '@app/classes/communication/game-config
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
+import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
+import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import { CookieService } from '@app/services/cookie/cookie.service';
@@ -27,8 +28,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     // highScoreService: HighScoreService;
     // gameHistoryService: GameHistoryService;
     // objectiveManagerService: ObjectiveManagerService;
-    player1: AbstractPlayer;
-    player2: AbstractPlayer;
+    playerContainer: PlayerContainer;
     gameType: GameType;
     dictionnaryName: string;
     tileReserve: TileReserveData[];
@@ -38,8 +38,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     isGameOver: boolean;
     gameId: string;
 
-    private localPlayerId: string;
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+    private serviceDestroyed$: Subject<boolean>;
 
     constructor(
         private router: Router,
@@ -50,6 +49,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private cookieService: CookieService,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
+        this.serviceDestroyed$ = new Subject();
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
     }
@@ -61,13 +61,12 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData): Promise<void> {
         this.gameId = startGameData.gameId;
-        this.localPlayerId = localPlayerId;
-        this.player1 = this.initializePlayer(startGameData.player1);
-        this.player2 = this.initializePlayer(startGameData.player2);
+        this.playerContainer = new PlayerContainer(localPlayerId);
+        this.playerContainer.initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
         this.roundManager.gameId = startGameData.gameId;
-        this.roundManager.localPlayerId = this.localPlayerId;
+        this.roundManager.localPlayerId = this.playerContainer.getLocalPlayerId();
         this.roundManager.maxRoundTime = startGameData.maxRoundTime;
         this.roundManager.currentRound = this.roundManager.convertRoundDataToRound(startGameData.round);
         this.tileReserve = startGameData.tileReserve;
@@ -85,8 +84,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
-        this.player1.updatePlayerData(startGameData.player1);
-        this.player2.updatePlayerData(startGameData.player2);
+        this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
         this.gameViewEventManagerService.emitGameViewEvent('reRender');
         this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
         this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
@@ -97,19 +95,12 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.roundManager.continueRound(this.roundManager.currentRound);
     }
 
-    initializePlayer(playerData: PlayerData): AbstractPlayer {
-        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
-        return new Player(playerData.id, playerData.name, playerData.tiles);
-    }
-
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.player1) {
-            this.player1.updatePlayerData(gameUpdateData.player1);
-            this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+            this.handleUpdatePlayerData(gameUpdateData.player1);
         }
         if (gameUpdateData.player2) {
-            this.player2.updatePlayerData(gameUpdateData.player2);
-            this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+            this.handleUpdatePlayerData(gameUpdateData.player2);
         }
         if (gameUpdateData.board) {
             this.boardService.updateBoard(gameUpdateData.board);
@@ -119,16 +110,25 @@ export default class GameService implements OnDestroy, IResetServiceData {
             this.roundManager.updateRound(round);
         }
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
-            this.tileReserve = gameUpdateData.tileReserve;
-            this.tileReserveTotal = gameUpdateData.tileReserveTotal;
-            this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
-                tileReserve: gameUpdateData.tileReserve,
-                tileReserveTotal: gameUpdateData.tileReserveTotal,
-            });
+            this.handleTileReserveUpdate(gameUpdateData.tileReserve, gameUpdateData.tileReserveTotal);
         }
         if (gameUpdateData.isGameOver) {
             this.gameOver();
         }
+    }
+
+    handleUpdatePlayerData(playerData: PlayerData): void {
+        this.playerContainer.updatePlayersData(playerData);
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+    }
+
+    handleTileReserveUpdate(tileReserve: TileReserveData[], tileReserveTotal: number): void {
+        this.tileReserve = tileReserve;
+        this.tileReserveTotal = tileReserveTotal;
+        this.gameViewEventManagerService.emitGameViewEvent('tileReserveUpdate', {
+            tileReserve,
+            tileReserveTotal,
+        });
     }
 
     handleNewMessage(newMessage: Message): void {
@@ -140,7 +140,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     isLocalPlayerPlaying(): boolean {
-        return this.getPlayingPlayerId() === this.localPlayerId;
+        return this.getPlayingPlayerId() === this.playerContainer.getLocalPlayerId();
     }
 
     getGameId(): string {
@@ -148,13 +148,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     getLocalPlayer(): AbstractPlayer | undefined {
-        if (!this.localPlayerId) return undefined;
-        return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
+        return this.playerContainer.getLocalPlayer();
     }
 
     getLocalPlayerId(): string | undefined {
-        if (!this.localPlayerId) return undefined;
-        return this.player1.id === this.localPlayerId ? this.player1.id : this.player2.id;
+        return this.playerContainer.getIdOfLocalPlayer();
     }
 
     gameOver(): void {
@@ -180,9 +178,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         const gameId = this.gameId;
         const localPlayerId = this.getLocalPlayerId();
         this.gameId = '';
-        this.player1.id = '';
-        this.player2.id = '';
-        this.localPlayerId = '';
+        this.playerContainer.resetData();
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
@@ -190,14 +186,12 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     resetServiceData(): void {
-        this.player1 = undefined as unknown as AbstractPlayer;
-        this.player2 = undefined as unknown as AbstractPlayer;
+        this.playerContainer.resetData();
         this.gameType = undefined as unknown as GameType;
         this.dictionnaryName = '';
         this.tileReserve = [];
         this.tileReserveTotal = 0;
         this.isGameOver = false;
         this.gameId = '';
-        this.localPlayerId = '';
     }
 }
