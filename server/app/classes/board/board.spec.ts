@@ -7,13 +7,14 @@ import { createStubInstance } from 'sinon';
 import { Board, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
 import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import BoardNavigator from './board-navigator';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
 const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
 const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
 
-describe('Board', () => {
+describe.only('Board', () => {
     let board: Board;
     let grid: Square[][];
 
@@ -153,6 +154,44 @@ describe('Board', () => {
     describe('verifyNeighbors', () => {
         it('should be false when forward is out of bounds', () => {
             expect(board.verifyNeighbors(new Position(grid[0].length, grid.length), Orientation.Horizontal)).to.be.false;
+        });
+        it('should be true when there is a neighbour horizontally', () => {
+            grid[1][1].tile = DEFAULT_TILE_A;
+            expect(board.verifyNeighbors(new Position(1, 2), Orientation.Horizontal)).to.be.true;
+        });
+        it('should be true when there is a neighbour vertically', () => {
+            grid[1][1].tile = DEFAULT_TILE_A;
+            expect(board.verifyNeighbors(new Position(2, 1), Orientation.Horizontal)).to.be.true;
+        });
+    });
+
+    describe('getSize', () => {
+        it('should return correctSize', () => {
+            expect(board.getSize()).to.deep.equal(BOARD_SIZE);
+        });
+    });
+
+    describe('getDesiredSquares', () => {
+        it('should return all squares if predicate is always true', () => {
+            expect(board.getDesiredSquares(() => true)).to.deep.equal(grid.flat());
+        });
+        it('should return no squares if predicate is always false', () => {
+            expect(board.getDesiredSquares(() => false)).to.deep.equal([]);
+        });
+        it('should return squares with tiles', () => {
+            grid[1][1].tile = DEFAULT_TILE_A;
+            grid[2][2].tile = DEFAULT_TILE_B;
+            grid[3][1].tile = DEFAULT_TILE_C;
+            grid[4][1].tile = DEFAULT_TILE_D;
+
+            expect(board.getDesiredSquares((square: Square) => square.tile !== null).length).to.equal(4);
+        });
+    });
+
+    describe('navigate', () => {
+        it('should return a BoardNavigator', () => {
+            const position = new Position(2, 4);
+            expect(board.navigate(position)).to.be.instanceOf(BoardNavigator);
         });
     });
 
