@@ -64,18 +64,20 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
-        this.roundManager.gameId = startGameData.gameId;
-        this.roundManager.localPlayerId = this.playerContainer.getLocalPlayerId();
-        this.roundManager.maxRoundTime = startGameData.maxRoundTime;
-        this.roundManager.currentRound = this.roundManager.convertRoundDataToRound(startGameData.round);
+        this.roundManager.initialize(localPlayerId, startGameData);
         this.tileReserve = startGameData.tileReserve;
         this.tileReserveTotal = startGameData.tileReserveTotal;
         this.boardService.initializeBoard(startGameData.board);
         this.gameIsSetUp = true;
         this.isGameOver = false;
+
+        await this.handleReroute(startGameData);
+    }
+
+    async handleReroute(startGameData: StartMultiplayerGameData): Promise<void> {
         if (this.router.url !== '/game') {
-            this.roundManager.initialize();
-            this.roundManager.startRound(startGameData.maxRoundTime);
+            this.roundManager.initializeEvents();
+            this.roundManager.startRound();
             await this.router.navigateByUrl('game');
         } else {
             this.reconnectReinitialize(startGameData);
@@ -181,7 +183,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         const gameId = this.gameId;
         const localPlayerId = this.getLocalPlayerId();
         this.gameId = '';
-        this.playerContainer.resetData();
+        this.playerContainer.resetPlayers();
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
@@ -189,7 +191,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     resetServiceData(): void {
-        this.playerContainer.resetData();
+        this.playerContainer.resetPlayers();
         this.gameType = undefined as unknown as GameType;
         this.dictionnaryName = '';
         this.tileReserve = [];

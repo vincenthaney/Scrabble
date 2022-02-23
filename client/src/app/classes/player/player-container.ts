@@ -5,7 +5,7 @@ import Player from './player';
 
 export class PlayerContainer {
     private players: Set<AbstractPlayer>;
-    private localPlayerId: string;
+    private readonly localPlayerId: string;
 
     constructor(localPlayerId: string) {
         this.players = new Set();
@@ -55,12 +55,6 @@ export class PlayerContainer {
 
     resetPlayers(): this {
         this.players.clear();
-        return this;
-    }
-
-    resetData(): this {
-        this.resetPlayers();
-        this.localPlayerId = '';
         return this;
     }
 

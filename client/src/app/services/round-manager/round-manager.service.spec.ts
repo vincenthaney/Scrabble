@@ -89,7 +89,7 @@ describe('RoundManagerService', () => {
     });
 
     it('initialize should define attributes', () => {
-        service.initialize();
+        service.initializeEvents();
         expect(service.completedRounds).toBeTruthy();
         expect(service['timerSource']).toBeTruthy();
         expect(service.timer).toBeTruthy();
