@@ -1,4 +1,4 @@
-import { DEFAULT_DISTANCE } from '@app/constants/board-navigator';
+import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 
