@@ -1,4 +1,4 @@
-<div [class]="'square' + (squareView.square.tile ? ' has-tile' : ' no-tile')" [ngStyle]="style">
+<div [class]="'square' + (squareView.square.tile ? ' has-tile ' : ' no-tile ') + getOrientationClass()" [ngClass]="{'cursor': isCursor}" [ngStyle]="style">
     <div class="content">
         <ng-container *ngIf="squareView.square.tile; else noTile">
             <app-tile [tile]="squareView.square.tile" [ngStyle]="{'fontSize': tileFontSize+'em'}" [applied]="squareView.applied"></app-tile>

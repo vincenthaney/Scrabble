@@ -56,6 +56,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
     handleKeyboardEvent(event: KeyboardEvent): void {
         this.focusableComponentService.emitKeyboard(event);
     }
+    @HostListener('document:keydown.escape', ['$event'])
+    handleKeyboardEventEsc(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.backspace', ['$event'])
+    handleKeyboardEventBackspace(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
 
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {

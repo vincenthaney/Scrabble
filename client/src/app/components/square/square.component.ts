@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Orientation } from '@app/classes/orientation';
 import { SquareView } from '@app/classes/square';
 import { Vec2 } from '@app/classes/vec2';
 import { UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
@@ -17,6 +18,8 @@ export interface CssStyleProperty {
 export class SquareComponent implements OnInit {
     @Input() squareView: SquareView;
     @Input() tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
+    @Input() isCursor: boolean = false;
+    @Input() cursorOrientation: Orientation = Orientation.Horizontal;
     style: { [key: string]: string } = {};
     multiplierType: string | undefined;
     multiplierValue: string | undefined;
@@ -35,6 +38,10 @@ export class SquareComponent implements OnInit {
 
     setText(): void {
         [this.multiplierType, this.multiplierValue] = this.squareView.getText();
+    }
+
+    getOrientationClass(): string {
+        return `cursor-${this.cursorOrientation === Orientation.Horizontal ? 'horizontal' : 'vertical'}`;
     }
 
     private initializeStyle(): void {
