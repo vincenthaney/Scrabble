@@ -97,9 +97,9 @@ export default class WordFindingService {
     findWords(board: Board, tiles: Tile[], query: WordFindingRequest): WordPlacement[] {
         // eslint-disable-next-line no-unused-vars
         // const emptySquares = board.getTileSquares((square: Square) => square.tile !== null);
-        board.getDesiredSquares((square: Square) => square.tile !== null);
+        // const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
 
-        // let anchorSquare = this.getRandomSquare(placedSquares);
+        // let anchorSquare = this.getRandomSquare(emptySquares);
 
         // const rowMap; // {0: tried = false, 1: tried = true,...}
         // const columnMap;
@@ -123,7 +123,9 @@ export default class WordFindingService {
 
         throw new Error('not implemented');
     }
-
+    getRandomSquare(squares: Square[]): Square {
+        return squares.splice(Math.floor(Math.random() * squares.length), 1)[0];
+    }
     // generateWords(row: Square[], rackPermutations: string[], navigator: BoardNavigator): WordPlacement[] {
     //     let anchorPlacement = [];
     //     let anchorWord = '';
@@ -183,10 +185,6 @@ export default class WordFindingService {
     //         }
     //     }
     // }
-
-    getRandomSquare(squares: Square[]): Square {
-        return squares[Math.floor(Math.random() * squares.length) + 1];
-    }
 
     // findPermutations(word: string): string[] {
     //     if (word.length < 2) {

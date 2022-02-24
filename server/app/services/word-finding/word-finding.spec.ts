@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
@@ -21,6 +22,12 @@ const BOARD: LetterValues = [
     [' ', ' ', ' ', ' ', 'E', ' '],
     [' ', ' ', ' ', ' ', 'E', ' '],
 ];
+
+const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_3: Square = { tile: null, position: new Position(0, 2), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_4: Square = { tile: null, position: new Position(0, 3), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_ARRAY = [DEFAULT_SQUARE_1, DEFAULT_SQUARE_2, DEFAULT_SQUARE_3, DEFAULT_SQUARE_4];
 // const OUT_OF_BOUNDS_POSITION: Position = new Position(999, 999);
 // const OUT_OF_BOUNDS_ROW: Position = new Position(999, 0);
 // const OUT_OF_BOUNDS_COLUMN: Position = new Position(0, 999);
@@ -176,6 +183,18 @@ describe.only('WordFindingservice', () => {
             });
             expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
             expect(spyFindMaximumWordTileLeftLength).to.have.been.called.with(navigator, DEFAULT_TILES_LEFT_SIZE - minLength);
+        });
+    });
+
+    describe('getRandomSquare', () => {
+        it('should remove 1 element form array and return it', () => {
+            const arrayCopy: Square[] = JSON.parse(JSON.stringify(DEFAULT_SQUARE_ARRAY));
+            const removedSquare = service.getRandomSquare(arrayCopy);
+            console.log(arrayCopy);
+            console.log(removedSquare);
+            expect(arrayCopy.length).to.equal(DEFAULT_SQUARE_ARRAY.length - 1);
+            expect(DEFAULT_SQUARE_ARRAY.some((square) => JSON.stringify(square) === JSON.stringify(removedSquare))).to.be.true;
+            expect(arrayCopy.includes(removedSquare)).to.be.false;
         });
     });
 
