@@ -532,7 +532,7 @@ describe('BoardComponent', () => {
                 expect(spy).toHaveBeenCalled();
             });
 
-            it('should it do nothing if not keydown', () => {
+            it('should do nothing if not keydown', () => {
                 event = { key: ESCAPE } as unknown as KeyboardEvent;
                 (component.selectedSquare as unknown) = 'not-undefined';
                 component.onFocusableEvent!(event);
