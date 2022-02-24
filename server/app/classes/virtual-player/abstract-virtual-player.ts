@@ -1,5 +1,5 @@
 import Player from '@app/classes/player/player';
-import { PointRange, WordFindingRequest } from '@app/classes/word-finding';
+import { PointRange } from '@app/classes/word-finding';
 import WordFindingService from '@app/services/word-finding/word-finding';
 import { Router } from 'express';
 // import { ActionData } from '@app/classes/communication/action-data';
@@ -28,26 +28,11 @@ export abstract class AbstractVirtualPlayer extends Player {
 
     playTurn(): void {
         this.findAction();
-        
-    }
-
-    generateExchangeAction(): void {
-        return undefined;
-    }
-
-    generatePassAction(): void {
-        return undefined;
-    }
-
-    generatePlaceAction(): void {
-        return undefined;
     }
 
     sendPayload() {
         // API call
     }
-
-    abstract generateWordRequest(): WordFindingRequest;
 
     abstract findRange(): PointRange;
 
