@@ -1,26 +1,37 @@
 import Player from '@app/classes/player/player';
 import { WordFindingRequest } from '@app/classes/word-finding';
 
-export default class VirtualPlayer extends Player {
-
-    constructor(){
-        // subscribe
+abstract class VirtualPlayer extends Player {
+    pointsHistoric: number[];
+    playTurn(): void {
+        return;
     }
 
-    decideAction(){};
-
-    sendPayload(){};
-
-    generateExchangeAction(){;}
-
-    generatePassAction(){};
-
-    generatePlaceAction(){};
-
-    generateWordRequest(): WordFindingRequest {
-
+    sendPayload(): void {
+        return;
     }
-    
-    findRange(){};
 
+    generateExchangeAction(): void {
+        return;
+    }
+
+    generatePassAction(): void {
+        return;
+    }
+
+    generatePlaceAction(): void {
+        return;
+    }
+
+    generateWordRequest(): void {
+        return;
+    }
+
+    findRange(): void {
+        return;
+    }
+
+    findAction(): void {
+        return;
+    }
 }
