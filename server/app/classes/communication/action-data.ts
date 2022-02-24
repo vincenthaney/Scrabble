@@ -1,7 +1,13 @@
 import { Orientation } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 
-export type ActionType = 'place' | 'exchange' | 'pass' | 'help' | 'reserve';
+export enum ActionType {
+    PLACE = 'placer',
+    EXCHANGE = 'échanger',
+    PASS = 'passer',
+    RESERVE = 'réserve',
+    HELP = 'aide',
+}
 
 export interface ActionPlacePayload {
     tiles: Tile[];
