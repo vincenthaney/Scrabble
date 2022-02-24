@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GameUpdateData } from '@app/classes/communication';
+import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
@@ -18,8 +18,10 @@ import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { BoardService, GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import SpyObj = jasmine.SpyObj;
 
 const DEFAULT_PLAYER_ID = 'cov-id';
@@ -38,6 +40,7 @@ describe('GameService', () => {
     let boardServiceSpy: SpyObj<BoardService>;
     let roundManagerSpy: SpyObj<RoundManagerService>;
     let gameDispatcherControllerSpy: SpyObj<GameDispatcherController>;
+    let gameViewEventManagerSpy: SpyObj<GameViewEventManagerService>;
 
     beforeEach(() => {
         boardServiceSpy = jasmine.createSpyObj('BoardService', ['initializeBoard', 'updateBoard']);
@@ -49,8 +52,44 @@ describe('GameService', () => {
             'initialize',
             'resetTimerData',
             'continueRound',
+            'initializeEvents',
         ]);
         gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
+
+        const tileRackUpdate$ = new Subject();
+        const message$ = new Subject();
+        const reRender$ = new Subject();
+        const noActiveGame$ = new Subject();
+        gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
+        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
+            switch (eventType) {
+                case 'tileRackUpdate':
+                    tileRackUpdate$.next();
+                    break;
+                case 'reRender':
+                    reRender$.next();
+                    break;
+                case 'noActiveGame':
+                    noActiveGame$.next();
+                    break;
+                case 'newMessage':
+                    message$.next();
+            }
+        });
+
+        gameViewEventManagerSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any): Subscription => {
+            switch (eventType) {
+                case 'tileRackUpdate':
+                    return tileRackUpdate$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'reRender':
+                    return reRender$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'noActiveGame':
+                    return noActiveGame$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'newMessage':
+                    return message$.pipe(takeUntil(destroy$)).subscribe(next);
+            }
+            return new Subscription();
+        });
     });
 
     beforeEach(() => {
@@ -66,6 +105,7 @@ describe('GameService', () => {
                 { provide: BoardService, useValue: boardServiceSpy },
                 { provide: RoundManagerService, useValue: roundManagerSpy },
                 { provide: GameDispatcherController, useValue: gameDispatcherControllerSpy },
+                { provide: GameViewEventManagerService, useValue: gameViewEventManagerSpy },
             ],
         });
         service = TestBed.inject(GameService);
@@ -146,27 +186,9 @@ describe('GameService', () => {
             expect(service.dictionnaryName).toEqual(defaultGameData.dictionary);
         });
 
-        it('should set roundManager.gameId', async () => {
-            expect(service['roundManager'].gameId).not.toBeDefined();
+        it('should initialize roundManager', async () => {
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service['roundManager'].gameId).toEqual(defaultGameData.gameId);
-        });
-
-        it('should set roundManager.localPlayerId', async () => {
-            expect(service['roundManager'].localPlayerId).not.toBeDefined();
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service['roundManager'].localPlayerId).toEqual(DEFAULT_PLAYER_ID);
-        });
-
-        it('should set roundManager.maxRoundTime', async () => {
-            expect(service['roundManager'].maxRoundTime).not.toBeDefined();
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service['roundManager'].maxRoundTime).toEqual(defaultGameData.maxRoundTime);
-        });
-
-        it('should call convertRoundData to round', async () => {
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(roundManagerSpy.convertRoundDataToRound).toHaveBeenCalledWith(defaultGameData.round);
+            expect(roundManagerSpy.initialize).toHaveBeenCalled();
         });
 
         it('should set tileReserve', async () => {
@@ -232,6 +254,7 @@ describe('GameService', () => {
         let defaultGameData: StartMultiplayerGameData;
 
         beforeEach(() => {
+            service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
             service['playerContainer']['players'].add(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles));
             service['playerContainer']['players'].add(new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name, DEFAULT_PLAYER_2.tiles));
             defaultGameData = {
@@ -256,8 +279,8 @@ describe('GameService', () => {
 
         it('should create player', () => {
             const player1Spy = spyOn(service['playerContainer'].getPlayer(1), 'updatePlayerData');
-            const player2Spy = spyOn(service['playerContainer'].getPlayer(1), 'updatePlayerData');
-            const emitSpy = spyOn(service['gameViewEventManagerService'], 'emitGameViewEvent');
+            const player2Spy = spyOn(service['playerContainer'].getPlayer(2), 'updatePlayerData');
+            const emitSpy = gameViewEventManagerSpy.emitGameViewEvent;
             service.reconnectReinitialize(defaultGameData);
 
             expect(player1Spy).toHaveBeenCalled();
@@ -287,7 +310,7 @@ describe('GameService', () => {
             const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('');
             const handleReconnectionSpy = spyOn(service['gameController'], 'handleReconnection');
 
-            const emitSpy = spyOn(service['gameViewEventManagerService'], 'emitGameViewEvent');
+            const emitSpy = gameViewEventManagerSpy.emitGameViewEvent;
             service.reconnectGame();
 
             expect(getCookieSpy).toHaveBeenCalled();
@@ -311,7 +334,7 @@ describe('GameService', () => {
             service['playerContainer']['players'].add(player1);
             service['playerContainer']['players'].add(player2);
 
-            updateTileRackEventEmitSpy = spyOn(service['gameViewEventManagerService'], 'emitGameViewEvent');
+            updateTileRackEventEmitSpy = gameViewEventManagerSpy.emitGameViewEvent;
         });
 
         it('should call updatePlayerDate and emit with player1 if defined', () => {
@@ -326,7 +349,7 @@ describe('GameService', () => {
             const spy = spyOn(player1, 'updatePlayerData');
             service.handleGameUpdate(gameUpdateData);
             expect(spy).not.toHaveBeenCalledWith(DEFAULT_PLAYER_1);
-            expect(updateTileRackEventEmitSpy).not.toHaveBeenCalled();
+            expect(updateTileRackEventEmitSpy).not.toHaveBeenCalledWith('tileRackUpdate');
         });
 
         it('should call updatePlayerDate and emit with player2 if defined', () => {
@@ -339,9 +362,10 @@ describe('GameService', () => {
 
         it('should not call updatePlayerDate and emit with player2 if undefined', () => {
             const spy = spyOn(player2, 'updatePlayerData');
+            gameUpdateData.player2 = undefined as unknown as PlayerData;
             service.handleGameUpdate(gameUpdateData);
             expect(spy).not.toHaveBeenCalledWith(DEFAULT_PLAYER_2);
-            expect(updateTileRackEventEmitSpy).not.toHaveBeenCalled();
+            expect(updateTileRackEventEmitSpy).not.toHaveBeenCalledWith('tileRackUpdate');
         });
 
         it('should call updateBoard if board is defined', () => {
@@ -407,7 +431,7 @@ describe('GameService', () => {
 
     describe('handleNewMessage', () => {
         it('should call newMessageValue next', () => {
-            const spy = spyOn(service['gameViewEventManagerService'], 'emitGameViewEvent');
+            const spy = gameViewEventManagerSpy.emitGameViewEvent;
 
             const message: Message = {} as Message;
             service.handleNewMessage(message);
@@ -531,11 +555,10 @@ describe('GameService', () => {
         let cookieGameSpy: jasmine.Spy;
         let gameControllerSpy: jasmine.Spy;
         beforeEach(() => {
+            service['playerContainer'] = new PlayerContainer('p1');
             service['playerContainer']['players'].add(new Player('p1', 'jean', []));
             service['playerContainer']['players'].add(new Player('p2', 'paul', []));
-            localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callFake(() => {
-                return 'testyId';
-            });
+            localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callThrough();
 
             cookieGameSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {
                 return;
@@ -553,8 +576,7 @@ describe('GameService', () => {
         it('should empty gameId, playerId1, playerId2 and localPlayerId', () => {
             service.disconnectGame();
             expect(service['gameId']).toEqual('');
-            expect(service['playerContainer'].getPlayer(1).id).toEqual('');
-            expect(service['playerContainer'].getPlayer(2).id).toEqual('');
+            expect(service['playerContainer']['players'].size).toEqual(0);
         });
 
         it('!localPlayerId) throw new Error(NO_LOCAL_PLAYER);', () => {
