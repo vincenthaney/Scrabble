@@ -1,3 +1,6 @@
+/* eslint-disable max-lines */
+/* eslint-disable max-classes-per-file */
+/* eslint-disable no-console */
 import { Board, Orientation } from '@app/classes/board';
 import BoardNavigator from '@app/classes/board/board-navigator';
 import Direction from '@app/classes/board/direction';
@@ -23,6 +26,21 @@ export interface SquareProperties {
     isEmpty: boolean;
 }
 const INITIAL_TILE = 1;
+
+// class UniqueTileArraySet extends Set {
+//     constructor(array) {
+//         super(array);
+
+//         const names = [];
+//         for (let value of this) {
+//             if (names.includes(value.name)) {
+//                 this.delete(value);
+//             } else {
+//                 names.push(value.name);
+//             }
+//         }
+//     }
+// }
 
 @Service()
 export default class WordFindingService {
@@ -149,17 +167,6 @@ export default class WordFindingService {
 
     // }
 
-    // getRackPermutations(tiles: Tile[], currentWord: string, index: number, length: number): string[] {
-    //     let result: string[] = [];
-    //     if (length === currentWord.length) {
-    //         result.push(currentWord);
-    //         return result;
-    //     }
-    //     result.concat(this.getRackPermutations(tiles, currentWord, index + 1, length));
-    //     result.concat(this.getRackPermutations(tiles, currentWord + tiles[index].letter, index + 1, length));
-    //     return result;
-    // }
-
     // tryPossibleWords(row: Square[], rackPermutations: string[]) {
     //     const anchorWords: [string, number][] = [];
     //     let currentWord = '';
@@ -217,25 +224,191 @@ export default class WordFindingService {
     //     }
 
     // }
+    // subsetsOfString(str: string, result: string[], curr: string = '', index: number = 0): void {
+    //     if (index === str.length) {
+    //         result.push(curr);
+    //         return;
+    //     }
+    //     this.subsetsOfString(str, result, curr, index + 1);
+    //     this.subsetsOfString(str, result, curr + str[index], index + 1);
+    // }
 
-    findPermutations(tiles: Tile[]): Tile[][] {
-        if (tiles.length < 2) {
-            return [tiles];
+    subsetsOfTiles(str: Tile[], result: Tile[][], curr: Tile[] = [], index: number = 0): void {
+        if (index === str.length) {
+            result.push(curr);
+            return;
         }
+        this.subsetsOfTiles(str, result, curr, index + 1);
+        this.subsetsOfTiles(str, result, curr.concat(str[index]), index + 1);
+    }
 
-        const permutationsArray = [];
+    getAllSubTiles(tiles: Tile[]): Tile[][] {
+        let i;
+        let j;
+        const result: Tile[][] = [];
+        for (i = 0; i < tiles.length; i++) {
+            for (j = i + 1; j < tiles.length + 1; j++) {
+                result.push(tiles.slice(i, j));
+            }
+        }
+        return result;
+    }
+
+    // buildSubstrings(str: string = '') {
+    //     let i, j;
+    //     const res = [];
+    //     for (i = 0; i < str.length; i++) {
+    //         for (j = i + 1; j < str.length + 1; j++) {
+    //             res.push(str.slice(i, j));
+    //         }
+    //     }
+    //     return res;
+    // }
+
+    // permute(s: string, result: string[], answer: string = '') {
+    //     if (s.length === 0) {
+    //         result.push(answer);
+    //         return;
+    //     }
+
+    //     for (let i = 0; i < s.length; i++) {
+    //         const ch = s[i];
+    //         const leftSubstr = s.slice(0, i);
+    //         const rightSubstr = s.slice(i + 1);
+    //         const rest = leftSubstr + rightSubstr;
+    //         this.permute(rest, result, answer + ch);
+    //     }
+    // }
+
+    permut(tiles: string): Set<string> {
+        if (tiles.length < 2) return new Set<string>(tiles);
+
+        const permutations: Set<string> = new Set<string>();
+
+        for (let i = 0; i < tiles.length; i++) {
+            const char = tiles[i];
+
+            // skip duplicates
+            if (tiles.indexOf(char) !== i) continue;
+
+            const remainingString = tiles.slice(0, i) + tiles.slice(i + 1, tiles.length);
+
+            for (const subPermutation of this.permut(remainingString)) {
+                permutations.add(char + subPermutation);
+                // if (permutations.has(subPermutation)) continue;
+                permutations.add(subPermutation);
+            }
+        }
+        return permutations;
+    }
+
+    permutations(tiles: Tile[]): Set<Tile[]> {
+        if (tiles.length < 2) return new Set<Tile[]>([tiles]);
+
+        // if (tiles.length < 2) {
+        //     const set = new Set<Tile[]>();
+        //     set.add(tiles);
+        //     return set;
+        // }
+
+        const permutations: Set<Tile[]> = new Set<Tile[]>();
 
         for (let i = 0; i < tiles.length; i++) {
             const tile = tiles[i];
 
+            // skip duplicates
             if (tiles.indexOf(tile) !== i) continue;
 
-            const remainingChars = tiles.slice(0, i).concat(tiles.slice(i + 1, tiles.length));
+            const remainingString = tiles.slice(0, i).concat(tiles.slice(i + 1, tiles.length));
 
-            for (const permutation of this.findPermutations(remainingChars)) {
-                permutationsArray.push([tile].concat(permutation));
+            for (const subPermutation of this.permutations(remainingString)) {
+                // const newPermutation = subPermutation;
+                // newPermutation.unshift(tile);
+                // permutations.add(newPermutation);
+                permutations.add([tile].concat(subPermutation));
+                // if (permutations.has(subPermutation)) continue;
+                permutations.add(subPermutation);
             }
         }
-        return permutationsArray;
+        return permutations;
     }
+
+    combination(arr: Tile[]) {
+        const res: Tile[][] = [[]];
+        let temp;
+        // Try every combination of either including or excluding each Tile of the array
+        // eslint-disable-next-line no-bitwise
+        const maxCombinations = 1 << arr.length;
+        for (let i = 0; i < maxCombinations; ++i) {
+            temp = [];
+            for (let j = 0; j < arr.length; ++j) {
+                // If the tile has to be included in the current combination
+                // eslint-disable-next-line no-bitwise
+                if (i & (1 << j)) {
+                    temp.push(arr[j]);
+                }
+            }
+            res.push(temp);
+        }
+        return res.filter((l) => l.length > 0);
+    }
+
+    permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []) {
+        if (tiles.length === 0) {
+            result.push(current);
+            return;
+        }
+
+        for (let i = 0; i < tiles.length; i++) {
+            const ch = tiles[i];
+            const leftSubstr = tiles.slice(0, i);
+            const rightSubstr = tiles.slice(i + 1);
+            const rest = leftSubstr.concat(rightSubstr);
+            this.permuteTiles(rest, result, current.concat(ch));
+        }
+    }
+
+    getRackPermutations(tiles: Tile[]): Tile[][] {
+        const result: Tile[][] = [];
+        const tileRackPermutations: Tile[][] = this.combination(tiles);
+        
+        for (const permutation of tileRackPermutations) {
+            this.permuteTiles(permutation, result);
+            result.concat(this.combination(permutation));
+        }
+        return result;
+    }
+
+    // getRackPermutations(tiles: Tile[], currentTiles: Tile[], index: number, length: number, result: Tile[][]): Tile[][] {
+    //     // const result: Tile[][] = [];
+    //     if (index === currentTiles.length) {
+    //         result.push(currentTiles);
+    //         return result;
+    //     }
+    //     result.concat(this.getRackPermutations(tiles, currentTiles, index + 1, length, result));
+    //     result.concat(this.getRackPermutations(tiles, currentTiles.concat(tiles[index]), index + 1, length, result));
+
+    //     return result;
+    // }
+
+    // findPermutations(tiles: Tile[]): Tile[][] {
+    //     if (tiles.length < 2) {
+    //         return [tiles];
+    //     }
+
+    //     const permutationsArray = [];
+
+    //     for (let i = 0; i < tiles.length; i++) {
+    //         const tile = tiles[i];
+
+    //         if (tiles.indexOf(tile) !== i) continue;
+
+    //         const remainingChars = tiles.slice(0, i).concat(tiles.slice(i + 1, tiles.length));
+
+    //         for (const permutation of this.findPermutations(remainingChars)) {
+    //             permutationsArray.push([tile].concat(permutation));
+    //         }
+    //     }
+    //     return permutationsArray;
+    // }
 }

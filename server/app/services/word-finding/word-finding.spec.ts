@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
-import { LetterValue } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 // import { WordFindingRequest } from '@app/classes/word-finding';
 import { expect } from 'chai';
 import { Container } from 'typedi';
@@ -23,6 +23,21 @@ const BOARD: LetterValues = [
     [' ', ' ', ' ', ' ', 'E', ' '],
 ];
 
+const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
+// const DEFAULT_TILE_A_2: Tile = { letter: 'A', value: 1 };
+const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
+const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
+const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
+const DEFAULT_TILE_E: Tile = { letter: 'E', value: 5 };
+const DEFAULT_TILE_F: Tile = { letter: 'F', value: 6 };
+const DEFAULT_TILE_G: Tile = { letter: 'G', value: 7 };
+// const DEFAULT_TILE_WILD: Tile = { letter: '*', value: 0 };
+const EMPTY_TILE_RACK: Tile[] = [];
+const SINGLE_TILE_TILE_RACK = [DEFAULT_TILE_A];
+const SMALL_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C];
+const BIG_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C, DEFAULT_TILE_D, DEFAULT_TILE_E, DEFAULT_TILE_F, DEFAULT_TILE_G];
+// const REPEATING_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_A_2, DEFAULT_TILE_B, DEFAULT_TILE_C];
+
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_3: Square = { tile: null, position: new Position(0, 2), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
@@ -35,6 +50,22 @@ const DEFAULT_SQUARE_ARRAY = [DEFAULT_SQUARE_1, DEFAULT_SQUARE_2, DEFAULT_SQUARE
 const DEFAULT_TILES_LEFT_SIZE = 7;
 const DEFAULT_SMALL_TILES_LEFT_SIZE = 3;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
+
+const permutationAmount = (total: number, wanted: number) => {
+    return factorial(total) / factorial(total - wanted);
+};
+
+const factorial = (number: number) => {
+    let answer = 1;
+    if (number === 0 || number === 1) {
+        return answer;
+    } else {
+        for (let i = number; i >= 1; i--) {
+            answer = answer * i;
+        }
+        return answer;
+    }
+};
 
 const boardFromLetterValues = (letterValues: LetterValues) => {
     const grid: Square[][] = [];
@@ -190,11 +221,60 @@ describe.only('WordFindingservice', () => {
         it('should remove 1 element form array and return it', () => {
             const arrayCopy: Square[] = JSON.parse(JSON.stringify(DEFAULT_SQUARE_ARRAY));
             const removedSquare = service.getRandomSquare(arrayCopy);
-            console.log(arrayCopy);
-            console.log(removedSquare);
             expect(arrayCopy.length).to.equal(DEFAULT_SQUARE_ARRAY.length - 1);
             expect(DEFAULT_SQUARE_ARRAY.some((square) => JSON.stringify(square) === JSON.stringify(removedSquare))).to.be.true;
             expect(arrayCopy.includes(removedSquare)).to.be.false;
+        });
+    });
+
+    describe('findPermutations / / getRackPermutations', () => {
+        it('should return an empty array if the tile rack is empty', () => {
+            const expected: Tile[][] = [];
+            const result: Tile[][] = service.getRackPermutations(EMPTY_TILE_RACK);
+            expect(result).to.deep.equal(expected);
+        });
+
+        it('should return an array containing the only tile in the rack', () => {
+            const expected: Tile[][] = [SINGLE_TILE_TILE_RACK];
+            const result: Tile[][] = service.getRackPermutations(SINGLE_TILE_TILE_RACK);
+
+            expect(result).to.deep.equal(expected);
+        });
+
+        it('should return an array containing all possible permutations of the tilerack (3)', () => {
+            const expected: Tile[][] = [
+                [DEFAULT_TILE_A],
+                [DEFAULT_TILE_B],
+                [DEFAULT_TILE_A, DEFAULT_TILE_B],
+                [DEFAULT_TILE_B, DEFAULT_TILE_A],
+                [DEFAULT_TILE_C],
+                [DEFAULT_TILE_A, DEFAULT_TILE_C],
+                [DEFAULT_TILE_C, DEFAULT_TILE_A],
+                [DEFAULT_TILE_B, DEFAULT_TILE_C],
+                [DEFAULT_TILE_C, DEFAULT_TILE_B],
+                [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C],
+                [DEFAULT_TILE_A, DEFAULT_TILE_C, DEFAULT_TILE_B],
+                [DEFAULT_TILE_B, DEFAULT_TILE_A, DEFAULT_TILE_C],
+                [DEFAULT_TILE_B, DEFAULT_TILE_C, DEFAULT_TILE_A],
+                [DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_B],
+                [DEFAULT_TILE_C, DEFAULT_TILE_B, DEFAULT_TILE_A],
+            ];
+            const result: Tile[][] = service.getRackPermutations(SMALL_TILE_RACK);
+            expect(result).to.deep.equal(expected);
+        });
+
+        it('should return an array containing all possible permutations of the tilerack (5)', () => {
+            const expectedlength: number =
+                permutationAmount(7, 1) +
+                permutationAmount(7, 2) +
+                permutationAmount(7, 3) +
+                permutationAmount(7, 4) +
+                permutationAmount(7, 5) +
+                permutationAmount(7, 6) +
+                permutationAmount(7, 7);
+            const result: Tile[][] = service.getRackPermutations(BIG_TILE_RACK);
+            console.log(expectedlength);
+            expect(result.length).to.deep.equal(expectedlength);
         });
     });
 
