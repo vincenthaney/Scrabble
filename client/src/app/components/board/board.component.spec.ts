@@ -4,7 +4,6 @@
 /* eslint-disable dot-notation */
 import { CommonModule } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,21 +25,25 @@ import { Vec2 } from '@app/classes/vec2';
 import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { BoardComponent } from './board.component';
+import SpyObj = jasmine.SpyObj;
 
 const OUT_OF_BOUNDS_POSITION = 999;
 
-class MockBoardService {
-    static boardServiceGridSize: Vec2 = { x: 5, y: 5 };
-    pGrid: Square[][];
-    boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
-    boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
+fdescribe('BoardComponent', () => {
+    let boardServiceSpy: SpyObj<BoardService>;
+    let component: BoardComponent;
+    let fixture: ComponentFixture<BoardComponent>;
+    let getBoardServiceSquareSpy: jasmine.Spy;
 
-    createGrid() {
-        this.grid = [];
-        for (let i = 0; i < this.getGridSize().y; i++) {
-            this.grid.push([]);
-            for (let j = 0; j < this.getGridSize().x; j++) {
+    const BOARD_SERVICE_GRID_SIZE: Vec2 = { x: 5, y: 5 };
+    const createGrid = (gridSize: Vec2): Square[][] => {
+        const grid: Square[][] = [];
+        for (let i = 0; i < gridSize.y; i++) {
+            grid.push([]);
+            for (let j = 0; j < gridSize.x; j++) {
                 const mockSquare: Square = {
                     tile: null,
                     position: { row: i, column: j },
@@ -48,27 +51,11 @@ class MockBoardService {
                     wasMultiplierUsed: false,
                     isCenter: false,
                 };
-                this.grid[i].push(mockSquare);
+                grid[i].push(mockSquare);
             }
         }
-    }
-
-    get grid(): Square[][] {
-        return this.pGrid;
-    }
-    set grid(grid: Square[][]) {
-        this.pGrid = grid;
-    }
-
-    getGridSize(): Vec2 {
-        return MockBoardService.boardServiceGridSize;
-    }
-}
-
-describe('BoardComponent', () => {
-    let mockBoardService: MockBoardService;
-    let component: BoardComponent;
-    let fixture: ComponentFixture<BoardComponent>;
+        return grid;
+    };
 
     const boardSizesToTest = [
         [
@@ -90,7 +77,24 @@ describe('BoardComponent', () => {
     ];
 
     beforeEach(() => {
-        mockBoardService = new MockBoardService();
+        boardServiceSpy = jasmine.createSpyObj(
+            'BoardService',
+            ['initializeBoard', 'subscribeToInitializeBoard', 'subscribeToBoardUpdate', 'updateBoard', 'readInitialBoard'],
+            ['boardInitialization$', 'boardUpdateEvent$', 'initialBoard'],
+        );
+
+        const updateObs = new Subject<Square[]>();
+        const initObs = new Subject<Square[][]>();
+
+        boardServiceSpy.readInitialBoard.and.returnValue(createGrid(BOARD_SERVICE_GRID_SIZE));
+        boardServiceSpy.subscribeToInitializeBoard.and.callFake((destroy$: Observable<boolean>, next: (board: Square[][]) => void) => {
+            return initObs.pipe(takeUntil(destroy$)).subscribe(next);
+        });
+        boardServiceSpy.subscribeToBoardUpdate.and.callFake((destroy$: Observable<boolean>, next: (squaresToUpdate: Square[]) => void) => {
+            return updateObs.pipe(takeUntil(destroy$)).subscribe(next);
+        });
+        boardServiceSpy.initializeBoard.and.callFake((board: Square[][]) => initObs.next(board));
+        boardServiceSpy.updateBoard.and.callFake((squares: Square[]) => updateObs.next(squares));
     });
 
     beforeEach(async () => {
@@ -113,7 +117,7 @@ describe('BoardComponent', () => {
                 HttpClientTestingModule,
             ],
             declarations: [BoardComponent],
-            providers: [{ provide: BoardService, useValue: mockBoardService }],
+            providers: [{ provide: BoardService, useValue: boardServiceSpy }],
         }).compileComponents();
     });
 
@@ -122,8 +126,11 @@ describe('BoardComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
 
-        mockBoardService.createGrid();
-        component['initializeBoard'](mockBoardService.grid);
+        const grid: Square[][] = createGrid(BOARD_SERVICE_GRID_SIZE);
+        getBoardServiceSquareSpy = spyOn<any>(component, 'getBoardServiceSquare').and.callFake((board: Square[][], row: number, column: number) => {
+            return board[row][column];
+        });
+        component['initializeBoard'](grid);
     });
 
     it('should create', () => {
@@ -153,14 +160,14 @@ describe('BoardComponent', () => {
                 ' : ' +
                 expectedBoardSize.y,
             () => {
-                spyOn<any>(mockBoardService, 'getGridSize').and.returnValue(boardSize);
-                mockBoardService.createGrid();
-                // Recreate the component so it reads the new grid size
-                fixture = TestBed.createComponent(BoardComponent);
-                component = fixture.componentInstance;
-                fixture.detectChanges();
+                component.squareGrid = [];
+                component.gridSize = { x: 0, y: 0 };
+                const grid: Square[][] = createGrid(boardSize);
+                getBoardServiceSquareSpy.and.callFake((board: Square[][], row: number, column: number) => {
+                    return board[row][column];
+                });
 
-                component['initializeBoard'](mockBoardService.grid);
+                component['initializeBoard'](grid);
 
                 let actualRowAmount = 0;
                 let actualColAmount = 0;
@@ -182,7 +189,7 @@ describe('BoardComponent', () => {
     });
 
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {
-        expect(component.gridSize).toEqual(mockBoardService.getGridSize());
+        expect(component.gridSize).toEqual(BOARD_SERVICE_GRID_SIZE);
     });
 
     it('If BoardService returns grid with null squares, should assign UNDEFINED_SQUARE to board', () => {
@@ -194,16 +201,14 @@ describe('BoardComponent', () => {
             [UNDEFINED_SQUARE, UNDEFINED_SQUARE],
             [UNDEFINED_SQUARE, UNDEFINED_SQUARE],
         ];
-        spyOn<any>(mockBoardService, 'getGridSize').and.returnValue({ x: 2, y: 2 });
-
-        // We need to spy on the property otherwise we cannot return a grid with null
-        // values because of TypeScript's type enforcing
-        spyOnProperty(mockBoardService, 'grid', 'get').and.returnValue(grid);
+        getBoardServiceSquareSpy.and.callFake((board: Square[][], row: number, column: number) => {
+            return board[row][column];
+        });
 
         fixture = TestBed.createComponent(BoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        component['initializeBoard'](mockBoardService.grid);
+        component['initializeBoard'](grid as unknown as Square[][]);
 
         const actualSquareGrid = component.squareGrid.map((row: SquareView[]) => {
             return row.map((sv: SquareView) => sv.square);
@@ -213,14 +218,17 @@ describe('BoardComponent', () => {
 
     it('BoardService update event should update board', () => {
         const updateSpy = spyOn<any>(component, 'updateBoard');
-        mockBoardService.boardUpdateEvent.emit(mockBoardService.grid[0]);
-        expect(updateSpy).toHaveBeenCalledWith(mockBoardService.grid[0]);
+        boardServiceSpy.updateBoard([component.squareGrid[0][0].square]);
+        expect(updateSpy).toHaveBeenCalledWith([component.squareGrid[0][0].square]);
     });
 
     it('boardInitializationEvent should call initializeBoard', () => {
-        const updateSpy = spyOn<any>(component, 'initializeBoard');
-        mockBoardService.boardInitializationEvent.emit();
-        expect(updateSpy).toHaveBeenCalled();
+        const grid: Square[][] = createGrid(BOARD_SERVICE_GRID_SIZE);
+        const initSpy = spyOn<any>(component, 'initializeBoard').and.callFake(() => {
+            return;
+        });
+        boardServiceSpy.initializeBoard(grid);
+        expect(initSpy).toHaveBeenCalled();
     });
 
     it('Update Board with no squares in argument should return false', () => {
