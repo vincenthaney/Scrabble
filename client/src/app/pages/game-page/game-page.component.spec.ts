@@ -214,4 +214,14 @@ describe('GamePageComponent', () => {
         component.quitButtonClicked();
         expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
     });
+
+    it('handlePlayerLeave should tell the playerLeavesService', () => {
+        const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
+            return;
+        });
+        expect(component.playerLeftWithQuitButton).toBeFalse();
+        component['handlePlayerLeave']();
+        expect(component.playerLeftWithQuitButton).toBeTrue();
+        expect(leaveSpy).toHaveBeenCalled();
+    });
 });
