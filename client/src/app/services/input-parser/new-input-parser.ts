@@ -10,7 +10,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import { CommandErrorMessages, PLAYER_NOT_FOUND } from '@app/constants/command-error-messages';
 import { BOARD_SIZE, ExpectedCommandWordCount, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { GameService } from '@app/services';
+import { GameService } from '..';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -222,7 +222,7 @@ export default class InputParserService {
             else if (locationLastChar === 'v') orientation = Orientation.Vertical;
             else throw new CommandError(CommandErrorMessages.BadSyntax);
         } else {
-            if (nLettersToPlace === 1) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
+            if (nLettersToPlace !== 1) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
             orientation = Orientation.Horizontal;
         }
 
