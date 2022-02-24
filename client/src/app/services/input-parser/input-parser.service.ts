@@ -34,21 +34,6 @@ export default class InputParserService {
         }
     }
 
-    private separateCommandWords(input: string): string[] {
-        return input.substring(1).split(' ');
-    }
-
-    private isAction(input: string) {
-        return input[0] === ACTION_COMMAND_INDICATOR;
-    }
-
-    private verifyActionValidity(actionName: ActionType) {
-        if (!actionName) throw new CommandError(CommandErrorMessages.InvalidEntry);
-        if (this.gameService.isGameOver) throw new CommandError(CommandErrorMessages.GameOver);
-        if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName))
-            throw new CommandError(CommandErrorMessages.NotYourTurn);
-    }
-
     private parseCommand(input: string, gameId: string, playerId: string): void {
         try {
             this.controller.sendAction(gameId, playerId, this.createActionData(input));
@@ -107,7 +92,7 @@ export default class InputParserService {
                     payload: {},
                 };
                 break;
-            // case ActionType.Hint:
+            // case ActionType.HINT:
             //     if (inputWords.length !== ExpectedCommandWordCount.Hint) throw new CommandError(CommandErrorMessages.BadSyntax);
             //     // this.controller.sendHintAction();
             //     break;
@@ -125,92 +110,6 @@ export default class InputParserService {
         return actionData;
     }
 
-    private createPlaceActionPayload(locationString: string, lettersToPlace: string): ActionPlacePayload {
-        const location: Location = this.createLocation(locationString, lettersToPlace.length);
-
-        const placeActionPayload: ActionPlacePayload = {
-            tiles: this.parsePlaceLettersToTiles(lettersToPlace),
-            startPosition: this.getStartPosition(location),
-            orientation: Orientation.Horizontal,
-        };
-
-        this.gameService.playingTiles.emit(placeActionPayload);
-        return placeActionPayload;
-    }
-
-    // private createPlaceActionPayloadMultipleLetters(location: string, lettersToPlace: string): ActionPlacePayload {
-    //     const placeActionPayload: ActionPlacePayload = {
-    //         tiles: this.parsePlaceLettersToTiles(lettersToPlace),
-    //         startPosition: this.getStartPosition(location.substring(0, location.length - 1)),
-    //         orientation: this.getOrientation(location.charAt(location.length - 1)),
-    //     };
-
-    //     this.gameService.playingTiles.emit(placeActionPayload);
-
-    //     return placeActionPayload;
-    // }
-
-    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
-        return {
-            tiles: this.parseExchangeLettersToTiles(lettersToExchange),
-        };
-    }
-
-    private parsePlaceLettersToTiles(lettersToPlace: string): Tile[] {
-        const player: AbstractPlayer = this.getLocalPlayer();
-        const playerTiles: Tile[] = [];
-        player.getTiles().forEach((tile: Tile) => {
-            playerTiles.push(new Tile(tile.letter, tile.value));
-        });
-        const tilesToPlace: Tile[] = [];
-
-        for (const letter of lettersToPlace) {
-            for (let i = Object.values(playerTiles).length - 1; i >= 0; i--) {
-                if (playerTiles[i].letter.toLowerCase() === letter) {
-                    tilesToPlace.push(playerTiles.splice(i, 1)[0]);
-                    break;
-                } else if (playerTiles[i].letter === '*' && (letter as LetterValue) && letter === letter.toUpperCase()) {
-                    const tile = playerTiles.splice(i, 1)[0];
-                    tilesToPlace.push(new Tile(letter as LetterValue, tile.value, true));
-                    break;
-                }
-            }
-        }
-
-        if (tilesToPlace.length !== lettersToPlace.length) throw new CommandError(CommandErrorMessages.DontHaveTiles);
-
-        return tilesToPlace;
-    }
-
-    private parseExchangeLettersToTiles(lettersToExchange: string): Tile[] {
-        if (lettersToExchange !== lettersToExchange.toLowerCase()) throw new CommandError(CommandErrorMessages.ExhangeRequireLowercaseLettes);
-
-        const player: AbstractPlayer = this.getLocalPlayer();
-        const playerTiles: Tile[] = [];
-        player.getTiles().forEach((tile: Tile) => {
-            playerTiles.push(new Tile(tile.letter, tile.value));
-        });
-        const tilesToExchange: Tile[] = [];
-
-        for (const letter of lettersToExchange) {
-            for (let i = Object.values(playerTiles).length - 1; i >= 0; i--) {
-                if (playerTiles[i].letter.toLowerCase() === letter) {
-                    const tile = playerTiles.splice(i, 1)[0];
-                    tilesToExchange.push(tile);
-                    break;
-                }
-            }
-        }
-
-        if (tilesToExchange.length !== lettersToExchange.length) throw new CommandError(CommandErrorMessages.DontHaveTiles);
-
-        return tilesToExchange;
-    }
-
-    private isNumber(char: string): boolean {
-        return !isNaN(parseInt(char, 10));
-    }
-
     private createLocation(locationString: string, nLettersToPlace: number): Location {
         const locationLastChar = locationString.charAt(locationString.length - 1);
         const rowNumber: number = locationString.charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
@@ -218,12 +117,12 @@ export default class InputParserService {
         let orientation: Orientation;
 
         if (this.isNumber(locationLastChar)) {
+            if (nLettersToPlace !== 1) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
+            orientation = Orientation.Horizontal;
+        } else {
             if (locationLastChar === 'h') orientation = Orientation.Horizontal;
             else if (locationLastChar === 'v') orientation = Orientation.Vertical;
             else throw new CommandError(CommandErrorMessages.BadSyntax);
-        } else {
-            if (nLettersToPlace === 1) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
-            orientation = Orientation.Horizontal;
         }
 
         return {
@@ -231,6 +130,82 @@ export default class InputParserService {
             col: colNumber,
             orientation,
         };
+    }
+
+    private createPlaceActionPayload(locationString: string, lettersToPlace: string): ActionPlacePayload {
+        const location: Location = this.createLocation(locationString, lettersToPlace.length);
+
+        const placeActionPayload: ActionPlacePayload = {
+            tiles: this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
+            startPosition: this.getStartPosition(location),
+            orientation: location.orientation,
+        };
+
+        this.gameService.playingTiles.emit(placeActionPayload);
+        return placeActionPayload;
+    }
+
+    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
+        return {
+            tiles: this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE),
+        };
+    }
+
+    private parseLettersToTiles(lettersToParse: string, actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {
+        if (actionType === ActionType.EXCHANGE) {
+            if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandError(CommandErrorMessages.ExhangeRequireLowercaseLettes);
+        }
+
+        const player: AbstractPlayer = this.getLocalPlayer();
+        const playerTiles: Tile[] = [];
+        player.getTiles().forEach((tile: Tile) => {
+            playerTiles.push(new Tile(tile.letter, tile.value));
+        });
+        const parsedTiles: Tile[] = [];
+
+        for (const letter of lettersToParse) {
+            for (let i = Object.values(playerTiles).length - 1; i >= 0; i--) {
+                if (playerTiles[i].letter.toLowerCase() === letter) {
+                    parsedTiles.push(playerTiles.splice(i, 1)[0]);
+                    break;
+                } else if (actionType === ActionType.PLACE && this.isValidBlankTileCombination(playerTiles[i].letter, letter)) {
+                    const tile = playerTiles.splice(i, 1)[0];
+                    parsedTiles.push(new Tile(letter as LetterValue, tile.value, true));
+                    break;
+                }
+            }
+        }
+
+        if (parsedTiles.length !== lettersToParse.length) throw new CommandError(CommandErrorMessages.DontHaveTiles);
+
+        return parsedTiles;
+    }
+
+    private isValidBlankTileCombination(playerLetter: string, placeLetter: string): boolean {
+        return playerLetter === '*' && (placeLetter as LetterValue) && placeLetter === placeLetter.toUpperCase();
+    }
+
+    private isNumber(char: string): boolean {
+        return !isNaN(parseInt(char, 10));
+    }
+
+    private isPositionWithinBounds(position: Position) {
+        return position.row >= 0 && position.column >= 0 && position.row < BOARD_SIZE && position.column < BOARD_SIZE;
+    }
+
+    private isAction(input: string) {
+        return input[0] === ACTION_COMMAND_INDICATOR;
+    }
+
+    private separateCommandWords(input: string): string[] {
+        return input.substring(1).split(' ');
+    }
+
+    private verifyActionValidity(actionName: ActionType) {
+        if (!actionName) throw new CommandError(CommandErrorMessages.InvalidEntry);
+        if (this.gameService.isGameOver) throw new CommandError(CommandErrorMessages.GameOver);
+        if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName))
+            throw new CommandError(CommandErrorMessages.NotYourTurn);
     }
 
     private getStartPosition(location: Location): Position {
@@ -241,10 +216,6 @@ export default class InputParserService {
 
         if (!this.isPositionWithinBounds(inputStartPosition)) throw new CommandError(CommandErrorMessages.PositionFormat);
         return inputStartPosition;
-    }
-
-    private isPositionWithinBounds(position: Position) {
-        return position.row >= 0 && position.column >= 0 && position.row < BOARD_SIZE && position.column < BOARD_SIZE;
     }
 
     private getLocalPlayer(): AbstractPlayer {
