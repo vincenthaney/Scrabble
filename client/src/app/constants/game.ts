@@ -62,6 +62,7 @@ export const MIN_COL_NUMBER = 0;
 export const MAX_COL_NUMBER = 14;
 export const MIN_ROW_NUMBER = 0;
 export const MAX_ROW_NUMBER = 14;
+export const BOARD_SIZE = 15;
 
 export const MAX_LOCATION_COMMAND_LENGTH = 3;
 export const MIN_LOCATION_COMMAND_LENGTH = 2;
@@ -77,9 +78,11 @@ export const SYSTEM_ERROR_ID = 'system-error';
 
 export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
 
-export const EXPECTED_WORD_COUNT_PLACE = 3;
-export const EXPECTED_WORD_COUNT_EXCHANGE = 2;
-export const EXPECTED_WORD_COUNT_PASS = 1;
-// export const EXPECTED_WORD_COUNT_HINT = 1;
-export const EXPECTED_WORD_COUNT_HELP = 1;
-export const EXPECTED_WORD_COUNT_RESERVE = 1;
+export enum ExpectedCommandWordCount {
+    Place = 3,
+    Exchange = 2,
+    Pass = 1,
+    Hint = 1,
+    Help = 1,
+    Reserve = 1,
+}
