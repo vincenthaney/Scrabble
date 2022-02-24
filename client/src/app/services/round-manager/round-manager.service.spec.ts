@@ -97,21 +97,6 @@ describe('RoundManagerService', () => {
     });
 
     describe('convertRoundDataToRound', () => {
-        it('should throw error if roundData.playerData.id is undefined', () => {
-            const roundData = {
-                playerData: {
-                    id: DEFAULT_PLAYER_ID,
-                    name: DEFAULT_PLAYER_NAME,
-                    score: DEFAULT_PLAYER_SCORE,
-                    tiles: DEFAULT_PLAYER_TILES,
-                },
-                startTime: CURRENT_DATE,
-                limitTime: CURRENT_DATE,
-                completedTime: null,
-            };
-            expect(() => service.convertRoundDataToRound(roundData)).toThrowError(INVALID_ROUND_DATA_PLAYER);
-        });
-
         it('should throw error if roundData.playerData.name is undefined', () => {
             const roundData = {
                 playerData: {
