@@ -74,6 +74,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handleBackspace = (): void => {
+            if (!this.selectedSquare) return;
             this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
             if (this.selectedSquare) {
                 const index = this.notAppliedSquares.indexOf(this.selectedSquare);
@@ -82,7 +83,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
         };
         // This must be defined in the onInit, otherwise selectedSquare is undefined
-        const handlePlaceLetter = (letter: string, squareView: SquareView): void => {
+        const handlePlaceLetter = (letter: string, squareView: SquareView | undefined): void => {
+            if (!squareView) return;
             squareView.square.tile = new Tile(letter.toUpperCase() as LetterValue, 0);
             squareView.applied = false;
             this.notAppliedSquares.push(squareView);
@@ -91,8 +93,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         this.onFocusableEvent = (e: KeyboardEvent): void => {
-            if (!this.selectedSquare) return;
-
             switch (e.key) {
                 case BACKSPACE:
                     if (e.type === KEYDOWN) handleBackspace();
@@ -122,7 +122,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (!this.gameService.isLocalPlayerPlaying()) return false;
 
         this.focusableComponentService.setActiveKeyboardComponent(this);
-        this.clearNotAppliedSquare();
 
         if (this.selectedSquare === squareView && this.notAppliedSquares.length === 0) {
             this.navigator.switchOrientation();
@@ -131,6 +130,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.navigator.orientation = Orientation.Horizontal;
             this.navigator.setPosition(squareView.square.position);
         }
+
+        this.clearNotAppliedSquare();
 
         return true;
     }
