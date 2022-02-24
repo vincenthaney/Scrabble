@@ -73,30 +73,6 @@ export default class WordFindingService {
         };
     }
 
-    // const minimumLength = 1 + navigator.moveUntil(Orientation.Horizontal, Direction.Forward, () => navigator.verifyAllNeighbors(HAS_TILE));
-    // let length = minimumLength;
-    // const maximumLength = navigator.moveUntil(Orientation.Horizontal, Direction.Forward, () => {
-    //     length++;
-    //     return !navigator.isWithinBounds() || length < 7});
-
-    // while (navigator.move(Orientation.Horizontal, Direction.Forward).verify(HAS_NO_TILE)) {
-
-    //     // We know that square has a tile because it was checked in the while condition
-    //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    //     anchorPlacement.push([endNavigator.square, endNavigator.square.tile!]);
-    //     anchorWord+=(endNavigator.square.tile!.letter);
-    // }
-
-    // const squaresProperties: SquareProperties[][] = [];
-    // for (const row of board.grid) {
-    //     const rowProperties: SquareProperties[] = [];
-    //     for (const square of row) {
-    //         rowProperties.push({square, horizontal:{isTried: false, minimumLength: Number.MIN_VALUE, maximumLength: Number.MAX_VALUE},
-    // vertical:{isTried: false, minimumLength: Number.MIN_VALUE, maximumLength: Number.MAX_VALUE}, isEmpty: !square.tile})
-    //     }
-    //     squaresProperties.push(rowProperties);
-    // }
-
     // eslint-disable-next-line no-unused-vars
     findWords(board: Board, tiles: Tile[], query: WordFindingRequest): WordPlacement[] {
         const rackPermutation = this.getRackPermutations(tiles);
@@ -108,16 +84,20 @@ export default class WordFindingService {
             const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
 
             for (const permutation of rackPermutation) {
-                let result = this.attemptMove(squareProperties, permutation, Orientation.Horizontal);
-                if (result) validMoves.push(result);
-                result = this.attemptMove(squareProperties, permutation, Orientation.Vertical);
-                if (result) validMoves.push(result);
+                this.attemptMove(squareProperties, permutation, validMoves);
             }
         }
         return validMoves;
     }
 
-    attemptMove(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): WordPlacement | undefined {
+    attemptMove(squareProperties: SquareProperties, permutation: Tile[], validMoves: WordPlacement[]): void {
+        let result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Horizontal);
+        if (result) validMoves.push(result);
+        result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Vertical);
+        if (result) validMoves.push(result);
+    }
+
+    attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): WordPlacement | undefined {
         const movePossibilities = this.getCorrespondingMovePossibility(squareProperties, orientation);
         if (movePossibilities.isTried && this.isWithin(movePossibilities, permutation.length)) {
             try {
@@ -185,84 +165,4 @@ export default class WordFindingService {
         }
         return result;
     }
-    // generateWords(row: Square[], rackPermutations: string[], navigator: BoardNavigator): WordPlacement[] {
-    //     let anchorPlacement = [];
-    //     let anchorWord = '';
-    //     let endNavigator = navigator.clone();
-    //     while (endNavigator.move(Orientation.Horizontal, Direction.Forward).verify(HAS_TILE)) {
-    //         // We know that square has a tile because it was checked in the while condition
-    //         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    //         anchorPlacement.push([endNavigator.square, endNavigator.square.tile!]);
-    //         anchorWord+=(endNavigator.square.tile!.letter);
-    //     }
-    //     while (navigator.move(Orientation.Horizontal, Direction.Backward).verify(HAS_TILE)) {
-    //         // We know that square has a tile because it was checked in the while condition
-    //         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    //         anchorPlacement.unshift([navigator.square, navigator.square.tile!]);
-    //         anchorWord=(endNavigator.square.tile!.letter) + anchorWord;
-    //     }
-    //     let currentWord = anchorWord;
-    //     currentWord+=tiles[0].letter;
-    //     try
-    //     this.wordVerification.verifyWords([currentWord], 'dict');
-
-    // }
-
-    // tryPossibleWords(row: Square[], rackPermutations: string[]) {
-    //     const anchorWords: [string, number][] = [];
-    //     let currentWord = '';
-    //     for (let i = row.length - 1; i >= 0; i--) {
-    //         if (row[i].tile) {
-    //             currentWord += row[i].tile?.letter;
-    //         } else if (currentWord !== '') {
-    //             anchorWords.push([currentWord, i]);
-    //             currentWord = '';
-    //         }
-    //     }
-    //     if (anchorWords.length === 0) return;
-    // }
-
-    // for (const letter of lettersToPlace) {
-    //         if (playerTiles[i].letter.toLowerCase() === letter) {
-    //             tilesToPlace.push(playerTiles.splice(i, 1)[0]);
-    //             break;
-    //         } else if (playerTiles[i].letter === '*' && (letter as LetterValue) && letter === letter.toUpperCase()) {
-    //             const tile = playerTiles.splice(i, 1)[0];
-    //             tilesToPlace.push(new Tile(letter as LetterValue, tile.value, true));
-    //             break;
-    //         }
-    //     }
-    // }
-
-    // findPermutations(word: string): string[] {
-    //     if (word.length < 2) {
-    //         return [word];
-    //     }
-
-    //     const permutationsArray = [];
-
-    //     for (let i = 0; i < word.length; i++) {
-    //         const char = word[i];
-
-    //         if (word.indexOf(char) !== i) continue;
-
-    //         const remainingChars = word.slice(0, i) + word.slice(i + 1, word.length);
-
-    //         for (const permutation of this.findPermutations(remainingChars)) {
-    //             permutationsArray.push(char + permutation);
-    //         }
-    //     }
-    //     return permutationsArray;
-    // }
-
-    // findPlacements(row: Square[], maxNewLetters: number): string[] {
-    //     // |****A*BON*ES***|
-    //     const possiblePlacements: string[] = [];
-    //     for (const square of row) {
-    //         if (!square.tile) {
-    //             this.findPlacements(row.slice(0, i).concat(row.slice(i + 1, row.length));)
-    //         }
-    //     }
-
-    // }
 }
