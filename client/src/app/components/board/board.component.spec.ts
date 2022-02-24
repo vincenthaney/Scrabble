@@ -25,7 +25,7 @@ import { Orientation } from '@app/classes/orientation';
 import { Square, SquareView } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { BACKSPACE, KEYDOWN } from '@app/constants/components-constants';
+import { BACKSPACE, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
 import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
@@ -505,6 +505,38 @@ describe('BoardComponent', () => {
                 component.onFocusableEvent!(event);
 
                 expect(selectedSquare.square.tile).toBeNull();
+            });
+
+            it('should do nothing if not keydown', () => {
+                event = { key: BACKSPACE } as unknown as KeyboardEvent;
+                (selectedSquare.square.tile as unknown) = 'not null';
+                component.onFocusableEvent!(event);
+                expect(nextEmptySpy).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('Escape', () => {
+            beforeEach(() => {
+                event = { key: ESCAPE, type: KEYDOWN } as unknown as KeyboardEvent;
+            });
+
+            it('should clear selectedSquare', () => {
+                (component.selectedSquare as unknown) = 'not-undefined';
+                component.onFocusableEvent!(event);
+                expect(component.selectedSquare).toBeUndefined();
+            });
+
+            it('should call clearNotAppliedSquare', () => {
+                const spy = spyOn<any>(component, 'clearNotAppliedSquare');
+                component.onFocusableEvent!(event);
+                expect(spy).toHaveBeenCalled();
+            });
+
+            it('should it do nothing if not keydown', () => {
+                event = { key: ESCAPE } as unknown as KeyboardEvent;
+                (component.selectedSquare as unknown) = 'not-undefined';
+                component.onFocusableEvent!(event);
+                expect(component.selectedSquare).toBeDefined();
             });
         });
     });
