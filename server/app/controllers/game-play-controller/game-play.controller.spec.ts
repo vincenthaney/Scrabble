@@ -49,10 +49,10 @@ const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), sco
 const DEFAULT_BOARD: Square[][] = [
     [
         { ...DEFAULT_SQUARE_1, position: new Position(0, 0) },
-        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
     ],
     [
-        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
         { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];

@@ -3,7 +3,7 @@ import { Vec2 } from '@app/classes/vec2';
 import Direction from './direction';
 
 export default class Position {
-    constructor(public column: number, public row: number) {}
+    constructor(public row: number, public column: number) {}
 
     forward(orientation: Orientation, distance: number = 1): Position {
         this.move(orientation, Direction.Forward, distance);
@@ -22,7 +22,7 @@ export default class Position {
     }
 
     copy(): Position {
-        return new Position(this.column, this.row);
+        return new Position(this.row, this.column);
     }
 
     isWithinBounds(size: Vec2) {
