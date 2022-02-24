@@ -4,11 +4,19 @@ import { PointRange, WordFindingRequest } from '@app/classes/word-finding';
 import WordFindingService from '@app/services/word-finding/word-finding';
 
 export abstract class AbstractVirtualPlayer extends Player {
-    constructor() {
-        super();
-    }
+    private static wordFindingService: WordFindingService;
 
     pointsHistoric: number[];
+
+    static getWordFindingService(): WordFindingService {
+        return AbstractVirtualPlayer.wordFindingService;
+    }
+
+    static injectServices(wordFindingService: WordFindingService): void {
+        if (!this.getWordFindingService()) {
+            AbstractVirtualPlayer.wordFindingService = wordFindingService;
+        }
+    }
 
     abstract playTurn(): Action;
 
