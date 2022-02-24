@@ -11,7 +11,7 @@ import {
     wordPlacementToCommandString,
 } from './word-placement';
 
-describe.only('WordPlacement utils', () => {
+describe('WordPlacement utils', () => {
     describe('positionNumberToLetter', () => {
         it('should convert 0 to a', () => {
             expect(positionNumberToLetter(0)).to.equal('a');
