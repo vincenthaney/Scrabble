@@ -25,7 +25,7 @@ export default class BoardNavigator {
     verify(shouldBeFilled: boolean): boolean {
         try {
             return this.board.verifySquare(this.position, shouldBeFilled);
-        } catch (error) {
+        } catch (exception) {
             return false;
         }
     }
