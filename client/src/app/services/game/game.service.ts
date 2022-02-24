@@ -141,6 +141,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     getTotalNumberOfTilesLeft(): number {
+        if (!this.tileReserve) return 0;
         return this.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
     }
 

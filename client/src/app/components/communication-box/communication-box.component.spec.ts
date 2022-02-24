@@ -109,28 +109,19 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('ngOnInit', () => {
-        let spyTile: jasmine.Spy;
         let spyMessage: jasmine.Spy;
 
         beforeEach(() => {
-            spyMessage = spyOn(component['gameViewEventManagerService'], 'subscribeToGameViewEvent');
+            spyMessage = spyOn(component['gameViewEventManagerService'], 'subscribeToGameViewEvent').and.callThrough();
         });
 
         afterEach(() => {
-            spyTile.and.callThrough();
             spyMessage.and.callThrough();
         });
 
-        it('should subscribe to updateTileReserveEvent', () => {
+        it('should subscribe to newMessage', () => {
             component.ngOnInit();
-            expect(spyTile).toHaveBeenCalled();
-        });
-
-        it('should subscribe to updateTileReserveEvent', () => {
-            component.ngOnInit();
-            expect(spyMessage).toHaveBeenCalledWith('newMessage', component.componentDestroyed$, (newMessage: Message) =>
-                component.onReceiveNewMessage(newMessage),
-            );
+            expect(spyMessage).toHaveBeenCalled();
         });
     });
 
