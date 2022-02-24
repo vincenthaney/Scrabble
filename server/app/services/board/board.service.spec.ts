@@ -37,10 +37,10 @@ describe('BoardService', () => {
     const isBoardDefinedTestCases: Map<Position, boolean> = new Map([
         [new Position(-1, -1), false],
         [new Position(0, 0), isBoardDefined],
-        [new Position(boardConfigSize.y / 2, boardConfigSize.x / 2), isBoardDefined],
-        [new Position(boardConfigSize.y - 1, boardConfigSize.x - 1), isBoardDefined],
-        [new Position(boardConfigSize.y, boardConfigSize.x), false],
-        [new Position(boardConfigSize.y + 1, boardConfigSize.x + 1), false],
+        [new Position(boardConfigSize.x / 2, boardConfigSize.y / 2), isBoardDefined],
+        [new Position(boardConfigSize.x - 1, boardConfigSize.y - 1), isBoardDefined],
+        [new Position(boardConfigSize.x, boardConfigSize.y), false],
+        [new Position(boardConfigSize.x + 1, boardConfigSize.y + 1), false],
     ]);
 
     type MapTypes = ScoreMultiplier | null | undefined;
@@ -77,38 +77,38 @@ describe('BoardService', () => {
             },
         ],
         [
-            new Position(0, BOARD_SIZE.x - 1),
+            new Position(BOARD_SIZE.x - 1, 0),
             {
                 tile: null,
-                position: new Position(0, BOARD_SIZE.x - 1),
+                position: new Position(BOARD_SIZE.x - 1, 0),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
-        [new Position(0, BOARD_SIZE.x), undefined],
+        [new Position(BOARD_SIZE.x, 0), undefined],
         [
-            new Position(BOARD_SIZE.y - 1, 0),
+            new Position(0, BOARD_SIZE.y - 1),
             {
                 tile: null,
-                position: new Position(BOARD_SIZE.y - 1, 0),
+                position: new Position(0, BOARD_SIZE.y - 1),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
-        [new Position(BOARD_SIZE.y, 0), undefined],
+        [new Position(0, BOARD_SIZE.y), undefined],
         [
-            new Position(BOARD_SIZE.y - 1, BOARD_SIZE.x - 1),
+            new Position(BOARD_SIZE.x - 1, BOARD_SIZE.y - 1),
             {
                 tile: null,
-                position: new Position(BOARD_SIZE.y - 1, BOARD_SIZE.x - 1),
+                position: new Position(BOARD_SIZE.x - 1, BOARD_SIZE.y - 1),
                 scoreMultiplier: { multiplier: 3, multiplierEffect: MultiplierEffect.WORD },
                 wasMultiplierUsed: false,
                 isCenter: false,
             },
         ],
-        [new Position(BOARD_SIZE.y, BOARD_SIZE.x), undefined],
+        [new Position(BOARD_SIZE.x, BOARD_SIZE.y), undefined],
     ]);
 
     beforeEach(() => {
