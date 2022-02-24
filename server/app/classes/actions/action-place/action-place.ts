@@ -13,6 +13,7 @@ import { WordsVerificationService } from '@app/services/words-verification-servi
 import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
+import { StringConversion } from '@app/utils/string-conversion';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -36,7 +37,7 @@ export default class ActionPlace extends ActionPlay {
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        this.wordValidator.verifyWords(this.wordToString(createdWords), DICTIONARY_NAME);
+        this.wordValidator.verifyWords(StringConversion.wordToString(createdWords), DICTIONARY_NAME);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
@@ -53,12 +54,6 @@ export default class ActionPlace extends ActionPlay {
         else response.player2 = playerData;
 
         return response;
-    }
-
-    wordToString(words: [Square, Tile][][]): string[] {
-        return words.map((word) =>
-            word.reduce((previous, [, tile]) => (tile.playedLetter ? (previous += tile.playedLetter) : (previous += tile.letter)), ''),
-        );
     }
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {
