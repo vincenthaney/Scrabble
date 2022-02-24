@@ -21,7 +21,7 @@ export const tilesToString = (tiles: Tile[]) => {
 };
 
 export const positionAndOrientationToString = (position: Position, orientation: Orientation): string => {
-    return `${positionNumberToLetter(position.column)}${position.row + 1}${orientationToLetter(orientation)}`;
+    return `${positionNumberToLetter(position.row)}${position.column + 1}${orientationToLetter(orientation)}`;
 };
 
 export const wordPlacementToCommandString = (placement: WordPlacement) => {
