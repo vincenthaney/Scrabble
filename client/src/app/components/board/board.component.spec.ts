@@ -137,10 +137,17 @@ describe('BoardComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('Component should call initializeBoard on init', () => {
+    it('Component should call initializeBoard on init if service has a board', () => {
         const initSpy = spyOn<any>(component, 'initializeBoard');
         component.ngOnInit();
         expect(initSpy).toHaveBeenCalled();
+    });
+
+    it('Component should NOT call initializeBoard on init if service has NO board', () => {
+        boardServiceSpy.readInitialBoard.and.returnValue(undefined as unknown as Square[][]);
+        const initSpy = spyOn<any>(component, 'initializeBoard');
+        component.ngOnInit();
+        expect(initSpy).not.toHaveBeenCalled();
     });
 
     boardSizesToTest.forEach((testCase) => {
