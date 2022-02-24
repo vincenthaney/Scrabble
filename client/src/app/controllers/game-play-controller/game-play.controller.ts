@@ -29,9 +29,9 @@ export class GamePlayController {
         });
     }
 
-    sendAction(gameId: string, playerId: string, action: ActionData, typedInput: string): void {
+    sendAction(gameId: string, playerId: string, action: ActionData): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/action`;
-        this.http.post(endpoint, { type: action.type, payload: action.payload, input: typedInput }).subscribe();
+        this.http.post(endpoint, { type: action.type, payload: action.payload, input: action.input }).subscribe();
     }
 
     sendMessage(gameId: string, playerId: string, message: Message): void {
