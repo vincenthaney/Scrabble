@@ -37,6 +37,13 @@ describe('PlayerContainer', () => {
         expect(playerContainer.getLocalPlayer()).toEqual(localPlayer);
     });
 
+    it('getLocalPlayer should return undefined if there is no player which id matchers localPlayerId', () => {
+        const notLocalPlayer = new Player('not-local-player', 'test', []);
+        playerContainer['players'].add(notLocalPlayer);
+
+        expect(playerContainer.getLocalPlayer()).toBeUndefined();
+    });
+
     it('initializePlayer should call addPlayer if playerData is valid', () => {
         const playerData: PlayerData = {
             id: '1',
