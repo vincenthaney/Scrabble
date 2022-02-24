@@ -5,7 +5,7 @@ import Player from '@app/classes/player/player';
 import { WordPlacement } from '@app/classes/word-finding';
 import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
 import WordFindingService from '@app/services/word-finding/word-finding';
-import { wordPlacementToCommandString } from '@app/utils/word-placement';
+import { WordPlacementUtils } from '@app/utils/word-placement';
 import { Container } from 'typedi';
 
 export default class ActionHint extends ActionInfo {
@@ -26,7 +26,7 @@ export default class ActionHint extends ActionInfo {
     getMessage(): string | undefined {
         let message = '**Mots trouvés** :<br>';
 
-        this.wordsPlacement.forEach((placement) => (message += `\`${wordPlacementToCommandString(placement)}\`<br>`));
+        message += this.wordsPlacement.map((placement) => `\`${WordPlacementUtils.wordPlacementToCommandString(placement)}\``).join('<br>');
 
         return message;
     }

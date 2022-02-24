@@ -3,27 +3,29 @@ import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
 
-export const positionNumberToLetter = (position: number): string => {
-    return String.fromCharCode(position + 'a'.charCodeAt(0));
-};
-
-export const orientationToLetter = (orientation: Orientation): string => {
-    switch (orientation) {
-        case Orientation.Horizontal:
-            return ORIENTATION_HORIZONTAL_LETTER;
-        case Orientation.Vertical:
-            return ORIENTATION_VERTICAL_LETTER;
+export class WordPlacementUtils {
+    static positionNumberToLetter(position: number): string {
+        return String.fromCharCode(position + 'a'.charCodeAt(0));
     }
-};
 
-export const tilesToString = (tiles: Tile[]) => {
-    return tiles.reduce((str, tile) => str + tile.letter, '');
-};
+    static orientationToLetter(orientation: Orientation): string {
+        switch (orientation) {
+            case Orientation.Horizontal:
+                return ORIENTATION_HORIZONTAL_LETTER;
+            case Orientation.Vertical:
+                return ORIENTATION_VERTICAL_LETTER;
+        }
+    }
 
-export const positionAndOrientationToString = (position: Position, orientation: Orientation): string => {
-    return `${positionNumberToLetter(position.row)}${position.column + 1}${orientationToLetter(orientation)}`;
-};
+    static positionAndOrientationToString(position: Position, orientation: Orientation): string {
+        return `${this.positionNumberToLetter(position.row)}${position.column + 1}${this.orientationToLetter(orientation)}`;
+    }
 
-export const wordPlacementToCommandString = (placement: WordPlacement) => {
-    return `${positionAndOrientationToString(placement.startPosition, placement.orientation)} ${tilesToString(placement.tilesToPlace)}`;
-};
+    static tilesToString(tiles: Tile[]) {
+        return tiles.reduce((str, tile) => str + tile.letter, '');
+    }
+
+    static wordPlacementToCommandString(placement: WordPlacement) {
+        return `${this.positionAndOrientationToString(placement.startPosition, placement.orientation)} ${this.tilesToString(placement.tilesToPlace)}`;
+    }
+}
