@@ -33,7 +33,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     isGameOver: boolean;
 
     private gameId: string;
-    private playerContainer: PlayerContainer;
+    private playerContainer?: PlayerContainer;
     private serviceDestroyed$: Subject<boolean>;
 
     constructor(
@@ -104,7 +104,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     handleUpdatePlayerData(playerData: PlayerData): void {
-        this.playerContainer.updatePlayersData(playerData);
+        if (this.playerContainer) {
+            this.playerContainer.updatePlayersData(playerData);
+        }
         this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
     }
 
@@ -121,6 +123,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     isLocalPlayerPlaying(): boolean {
+        if (!this.playerContainer) return false;
         return this.getPlayingPlayerId() === this.playerContainer.getLocalPlayerId();
     }
 
@@ -128,15 +131,18 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.gameId;
     }
 
-    getPlayerByNumber(playerNumber: number): AbstractPlayer {
+    getPlayerByNumber(playerNumber: number): AbstractPlayer | undefined {
+        if (!this.playerContainer) return undefined;
         return this.playerContainer.getPlayer(playerNumber);
     }
 
     getLocalPlayer(): AbstractPlayer | undefined {
+        if (!this.playerContainer) return undefined;
         return this.playerContainer.getLocalPlayer();
     }
 
     getLocalPlayerId(): string | undefined {
+        if (!this.playerContainer) return undefined;
         return this.playerContainer.getLocalPlayerId();
     }
 
@@ -156,12 +162,13 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.tileReserve = [];
         this.isGameOver = false;
         this.gameId = '';
-        if (!this.playerContainer) return;
-        this.playerContainer.resetPlayers();
+        this.playerContainer = undefined;
     }
 
     reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
-        this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
+        if (this.playerContainer) {
+            this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
+        }
         this.gameViewEventManagerService.emitGameViewEvent('reRender');
         this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));

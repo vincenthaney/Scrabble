@@ -166,12 +166,12 @@ describe('GameService', () => {
 
         it('should set player 1', async () => {
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service['playerContainer'].getPlayer(1)).toBeDefined();
+            expect(service['playerContainer']!.getPlayer(1)).toBeDefined();
         });
 
         it('should set player 2', async () => {
             await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service['playerContainer'].getPlayer(2)).toBeDefined();
+            expect(service['playerContainer']!.getPlayer(2)).toBeDefined();
         });
 
         it('should set gameType', async () => {
@@ -278,8 +278,8 @@ describe('GameService', () => {
         });
 
         it('should create player', () => {
-            const player1Spy = spyOn(service['playerContainer'].getPlayer(1), 'updatePlayerData');
-            const player2Spy = spyOn(service['playerContainer'].getPlayer(2), 'updatePlayerData');
+            const player1Spy = spyOn(service['playerContainer']!.getPlayer(1), 'updatePlayerData');
+            const player2Spy = spyOn(service['playerContainer']!.getPlayer(2), 'updatePlayerData');
             const emitSpy = gameViewEventManagerSpy.emitGameViewEvent;
             service.reconnectReinitialize(defaultGameData);
 
@@ -576,7 +576,7 @@ describe('GameService', () => {
         it('should empty gameId, playerId1, playerId2 and localPlayerId', () => {
             service.disconnectGame();
             expect(service['gameId']).toEqual('');
-            expect(service['playerContainer']['players'].size).toEqual(0);
+            expect(service['playerContainer']).toBeUndefined();
         });
 
         it('!localPlayerId) throw new Error(NO_LOCAL_PLAYER);', () => {
