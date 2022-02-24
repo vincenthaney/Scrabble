@@ -549,7 +549,7 @@ describe('BoardComponent', () => {
         it('should reset attributes', () => {
             (component.selectedSquare as unknown) = 'not-empty';
 
-            component.onLooseFocusEvent!();
+            component.onLoseFocusEvent!();
 
             expect(component.selectedSquare).toBeUndefined();
         });
@@ -557,7 +557,7 @@ describe('BoardComponent', () => {
         it('should call clearNotAppliedSquare', () => {
             const spy = spyOn<any>(component, 'clearNotAppliedSquare');
 
-            component.onLooseFocusEvent!();
+            component.onLoseFocusEvent!();
 
             expect(spy).toHaveBeenCalled();
         });

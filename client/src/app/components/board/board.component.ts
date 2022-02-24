@@ -103,10 +103,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         };
 
         // Thus must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onLooseFocusEvent = (): void => clearCursor();
+        this.onLoseFocusEvent = (): void => clearCursor();
 
         this.subscribeToFocusableEvent(this.boardDestroyed$, this.onFocusableEvent);
-        this.subscribeToLooseFocusEvent(this.boardDestroyed$, this.onLooseFocusEvent);
+        this.subscribeToLooseFocusEvent(this.boardDestroyed$, this.onLoseFocusEvent);
     }
 
     ngOnDestroy(): void {
