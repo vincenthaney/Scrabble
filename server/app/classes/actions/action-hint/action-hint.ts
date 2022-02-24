@@ -1,13 +1,37 @@
 import ActionInfo from '@app/classes/actions/action-info';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import { WordPlacement } from '@app/classes/word-finding';
+import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
+import WordFindingService from '@app/services/word-finding/word-finding';
+import { wordPlacementToCommandString } from '@app/utils/word-placement';
+import { Container } from 'typedi';
 
 export default class ActionHint extends ActionInfo {
+    private wordFindingService: WordFindingService;
+    private wordsPlacement: WordPlacement[];
+
+    constructor(player: Player, game: Game) {
+        super(player, game);
+        this.wordFindingService = Container.get(WordFindingService);
+    }
+
     execute(): GameUpdateData | void {
-        // TODO: find words and send message only to current player
-        throw new Error('Method not implemented.');
+        this.wordsPlacement = this.wordFindingService.findWords(this.game.board, this.player.tiles, {
+            numberOfWordsToFind: HINT_ACTION_NUMBER_OF_WORDS,
+        });
     }
 
     getMessage(): string | undefined {
+        let message = '**Mots trouvés** :<br>';
+
+        this.wordsPlacement.forEach((placement) => (message += `\`${wordPlacementToCommandString(placement)}\`<br>`));
+
+        return message;
+    }
+
+    getOpponentMessage(): string | undefined {
         return undefined;
     }
 }
