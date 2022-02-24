@@ -113,10 +113,15 @@ describe('TileRackComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call initializeTileRack when startGameEvent is received', () => {
+    it('should call updateTileRack when tileRackUpdate is received', () => {
         const spy = spyOn<any>(component, 'updateTileRack');
         gameViewEventManagerSpy.emitGameViewEvent('tileRackUpdate');
         expect(spy).toHaveBeenCalled();
+    });
+
+    it('should call handleNewMessage when newMessage is received', () => {
+        gameViewEventManagerSpy.emitGameViewEvent('newMessage');
+        expect(handleNewMessageSpy).toHaveBeenCalled();
     });
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
@@ -180,5 +185,18 @@ describe('TileRackComponent', () => {
         component['handleNewMessage']({ senderId: 'system-error' } as Message);
 
         for (const tile of tiles) expect(tile.played).toBeFalse();
+    });
+
+    it('should set all tiles to not played when call handleNewMessage', () => {
+        const tiles: RackTile[] = [
+            { letter: 'A', value: 0, played: true },
+            { letter: 'B', value: 0, played: true },
+        ];
+        component.tiles = tiles;
+
+        handleNewMessageSpy.and.callThrough();
+        component['handleNewMessage']({ senderId: 'not-system-error' } as Message);
+
+        for (const tile of tiles) expect(tile.played).toEqual(tile.played);
     });
 });
