@@ -263,7 +263,7 @@ describe.only('WordFindingservice', () => {
             expect(result).to.deep.equal(expected);
         });
 
-        it('should return an array containing all possible permutations of the tilerack (5)', () => {
+        it('should return an array containing all possible permutations of the tilerack (7)', () => {
             const expectedlength: number =
                 permutationAmount(7, 1) +
                 permutationAmount(7, 2) +
@@ -273,7 +273,6 @@ describe.only('WordFindingservice', () => {
                 permutationAmount(7, 6) +
                 permutationAmount(7, 7);
             const result: Tile[][] = service.getRackPermutations(BIG_TILE_RACK);
-            console.log(expectedlength);
             expect(result.length).to.deep.equal(expectedlength);
         });
     });

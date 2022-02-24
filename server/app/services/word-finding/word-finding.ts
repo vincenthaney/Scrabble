@@ -10,9 +10,11 @@ import { WordFindingRequest, WordPlacement } from '@app/classes/word-finding';
 import { Service } from 'typedi';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 
-// import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
+import { StringConversion } from '@app/utils/string-conversion';
 // import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-// import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 
 export interface MovePossibilities {
     isTried: boolean;
@@ -27,28 +29,12 @@ export interface SquareProperties {
 }
 const INITIAL_TILE = 1;
 
-// class UniqueTileArraySet extends Set {
-//     constructor(array) {
-//         super(array);
-
-//         const names = [];
-//         for (let value of this) {
-//             if (names.includes(value.name)) {
-//                 this.delete(value);
-//             } else {
-//                 names.push(value.name);
-//             }
-//         }
-//     }
-// }
-
 @Service()
 export default class WordFindingService {
-    // constructor(
-    //     private wordExtraction: WordExtraction,
-    //     private wordVerification: WordsVerificationService,
-    //     private scoreCalculator: ScoreCalculatorService,
-    // ) {}
+    constructor(
+        private wordExtraction: WordExtraction,
+        private wordVerification: WordsVerificationService, // private scoreCalculator: ScoreCalculatorService,
+    ) {}
 
     findProperties(navigator: BoardNavigator, tileRackSize: number): MovePossibilities {
         const movePossibilities = { isTried: false, minimumLength: Number.POSITIVE_INFINITY, maximumLength: Number.POSITIVE_INFINITY };
@@ -113,36 +99,91 @@ export default class WordFindingService {
 
     // eslint-disable-next-line no-unused-vars
     findWords(board: Board, tiles: Tile[], query: WordFindingRequest): WordPlacement[] {
-        // eslint-disable-next-line no-unused-vars
-        // const emptySquares = board.getTileSquares((square: Square) => square.tile !== null);
-        // const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
+        const rackPermutation = this.getRackPermutations(tiles);
+        const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
+        const validMoves: WordPlacement[] = [];
 
-        // let anchorSquare = this.getRandomSquare(emptySquares);
+        while (emptySquares.length > 0) {
+            const emptySquare = this.getRandomSquare(emptySquares);
+            const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
 
-        // const rowMap; // {0: tried = false, 1: tried = true,...}
-        // const columnMap;
-        // const pivotSquare = pivotSquares[Math.floor(Math.random() * pivotSquares.length)];
-
-        // let anchorSquare = this.getRandomSquare(placedSquares);
-        // let anchorRow = {...board.grid[anchorSquare.position.row]};
-        // let anchorWord = [];
-
-        // let navigator: BoardNavigator = new BoardNavigator(board, anchorSquare.position);
-        // while (navigator.move(Orientation.Horizontal, Direction.Forward).verify(HAS_TILE)) {
-        //     // We know that square has a tile because it was checked in the while condition
-        //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        //     anchorWord.push([navigator.square, navigator.square.tile!]);
-        // }
-
-        // navigator.
-
-        // navigator.clone()
-        // for (board.)
-
-        throw new Error('not implemented');
+            for (const permutation of rackPermutation) {
+                let result = this.attemptMove(squareProperties, permutation, Orientation.Horizontal);
+                if (result) validMoves.push(result);
+                result = this.attemptMove(squareProperties, permutation, Orientation.Vertical);
+                if (result) validMoves.push(result);
+            }
+        }
+        return validMoves;
     }
+
+    attemptMove(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): WordPlacement | undefined {
+        const movePossibilities = this.getCorrespondingMovePossibility(squareProperties, orientation);
+        if (movePossibilities.isTried && this.isWithin(movePossibilities, permutation.length)) {
+            try {
+                const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
+                this.wordVerification.verifyWords(StringConversion.wordToString(createdWords), DICTIONARY_NAME);
+                return { tilesToPlace: permutation, orientation, startPosition: squareProperties.square.position };
+                // eslint-disable-next-line no-empty
+            } catch (exception) {}
+        }
+        return undefined;
+    }
+
     getRandomSquare(squares: Square[]): Square {
         return squares.splice(Math.floor(Math.random() * squares.length), 1)[0];
+    }
+
+    getCorrespondingMovePossibility(squareProperties: SquareProperties, orientation: Orientation): MovePossibilities {
+        return orientation === Orientation.Horizontal ? squareProperties.horizontal : squareProperties.vertical;
+    }
+
+    isWithin(movePossibility: MovePossibilities, target: number): boolean {
+        return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
+    }
+
+    combination(arr: Tile[]) {
+        const res: Tile[][] = [[]];
+        let temp;
+        // Try every combination of either including or excluding each Tile of the array
+        // eslint-disable-next-line no-bitwise
+        const maxCombinations = 1 << arr.length;
+        for (let i = 0; i < maxCombinations; ++i) {
+            temp = [];
+            for (let j = 0; j < arr.length; ++j) {
+                // If the tile has to be included in the current combination
+                // eslint-disable-next-line no-bitwise
+                if (i & (1 << j)) {
+                    temp.push(arr[j]);
+                }
+            }
+            res.push(temp);
+        }
+        return res.filter((l) => l.length > 0);
+    }
+
+    permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []) {
+        if (tiles.length === 0) {
+            result.push(current);
+            return;
+        }
+
+        for (let i = 0; i < tiles.length; i++) {
+            const ch = tiles[i];
+            const leftSubstr = tiles.slice(0, i);
+            const rightSubstr = tiles.slice(i + 1);
+            const rest = leftSubstr.concat(rightSubstr);
+            this.permuteTiles(rest, result, current.concat(ch));
+        }
+    }
+
+    getRackPermutations(tiles: Tile[]): Tile[][] {
+        const result: Tile[][] = [];
+        const tileRackPermutations: Tile[][] = this.combination(tiles);
+        for (const permutation of tileRackPermutations) {
+            this.permuteTiles(permutation, result);
+        }
+        return result;
     }
     // generateWords(row: Square[], rackPermutations: string[], navigator: BoardNavigator): WordPlacement[] {
     //     let anchorPlacement = [];
@@ -223,192 +264,5 @@ export default class WordFindingService {
     //         }
     //     }
 
-    // }
-    // subsetsOfString(str: string, result: string[], curr: string = '', index: number = 0): void {
-    //     if (index === str.length) {
-    //         result.push(curr);
-    //         return;
-    //     }
-    //     this.subsetsOfString(str, result, curr, index + 1);
-    //     this.subsetsOfString(str, result, curr + str[index], index + 1);
-    // }
-
-    subsetsOfTiles(str: Tile[], result: Tile[][], curr: Tile[] = [], index: number = 0): void {
-        if (index === str.length) {
-            result.push(curr);
-            return;
-        }
-        this.subsetsOfTiles(str, result, curr, index + 1);
-        this.subsetsOfTiles(str, result, curr.concat(str[index]), index + 1);
-    }
-
-    getAllSubTiles(tiles: Tile[]): Tile[][] {
-        let i;
-        let j;
-        const result: Tile[][] = [];
-        for (i = 0; i < tiles.length; i++) {
-            for (j = i + 1; j < tiles.length + 1; j++) {
-                result.push(tiles.slice(i, j));
-            }
-        }
-        return result;
-    }
-
-    // buildSubstrings(str: string = '') {
-    //     let i, j;
-    //     const res = [];
-    //     for (i = 0; i < str.length; i++) {
-    //         for (j = i + 1; j < str.length + 1; j++) {
-    //             res.push(str.slice(i, j));
-    //         }
-    //     }
-    //     return res;
-    // }
-
-    // permute(s: string, result: string[], answer: string = '') {
-    //     if (s.length === 0) {
-    //         result.push(answer);
-    //         return;
-    //     }
-
-    //     for (let i = 0; i < s.length; i++) {
-    //         const ch = s[i];
-    //         const leftSubstr = s.slice(0, i);
-    //         const rightSubstr = s.slice(i + 1);
-    //         const rest = leftSubstr + rightSubstr;
-    //         this.permute(rest, result, answer + ch);
-    //     }
-    // }
-
-    permut(tiles: string): Set<string> {
-        if (tiles.length < 2) return new Set<string>(tiles);
-
-        const permutations: Set<string> = new Set<string>();
-
-        for (let i = 0; i < tiles.length; i++) {
-            const char = tiles[i];
-
-            // skip duplicates
-            if (tiles.indexOf(char) !== i) continue;
-
-            const remainingString = tiles.slice(0, i) + tiles.slice(i + 1, tiles.length);
-
-            for (const subPermutation of this.permut(remainingString)) {
-                permutations.add(char + subPermutation);
-                // if (permutations.has(subPermutation)) continue;
-                permutations.add(subPermutation);
-            }
-        }
-        return permutations;
-    }
-
-    permutations(tiles: Tile[]): Set<Tile[]> {
-        if (tiles.length < 2) return new Set<Tile[]>([tiles]);
-
-        // if (tiles.length < 2) {
-        //     const set = new Set<Tile[]>();
-        //     set.add(tiles);
-        //     return set;
-        // }
-
-        const permutations: Set<Tile[]> = new Set<Tile[]>();
-
-        for (let i = 0; i < tiles.length; i++) {
-            const tile = tiles[i];
-
-            // skip duplicates
-            if (tiles.indexOf(tile) !== i) continue;
-
-            const remainingString = tiles.slice(0, i).concat(tiles.slice(i + 1, tiles.length));
-
-            for (const subPermutation of this.permutations(remainingString)) {
-                // const newPermutation = subPermutation;
-                // newPermutation.unshift(tile);
-                // permutations.add(newPermutation);
-                permutations.add([tile].concat(subPermutation));
-                // if (permutations.has(subPermutation)) continue;
-                permutations.add(subPermutation);
-            }
-        }
-        return permutations;
-    }
-
-    combination(arr: Tile[]) {
-        const res: Tile[][] = [[]];
-        let temp;
-        // Try every combination of either including or excluding each Tile of the array
-        // eslint-disable-next-line no-bitwise
-        const maxCombinations = 1 << arr.length;
-        for (let i = 0; i < maxCombinations; ++i) {
-            temp = [];
-            for (let j = 0; j < arr.length; ++j) {
-                // If the tile has to be included in the current combination
-                // eslint-disable-next-line no-bitwise
-                if (i & (1 << j)) {
-                    temp.push(arr[j]);
-                }
-            }
-            res.push(temp);
-        }
-        return res.filter((l) => l.length > 0);
-    }
-
-    permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []) {
-        if (tiles.length === 0) {
-            result.push(current);
-            return;
-        }
-
-        for (let i = 0; i < tiles.length; i++) {
-            const ch = tiles[i];
-            const leftSubstr = tiles.slice(0, i);
-            const rightSubstr = tiles.slice(i + 1);
-            const rest = leftSubstr.concat(rightSubstr);
-            this.permuteTiles(rest, result, current.concat(ch));
-        }
-    }
-
-    getRackPermutations(tiles: Tile[]): Tile[][] {
-        const result: Tile[][] = [];
-        const tileRackPermutations: Tile[][] = this.combination(tiles);
-        
-        for (const permutation of tileRackPermutations) {
-            this.permuteTiles(permutation, result);
-            result.concat(this.combination(permutation));
-        }
-        return result;
-    }
-
-    // getRackPermutations(tiles: Tile[], currentTiles: Tile[], index: number, length: number, result: Tile[][]): Tile[][] {
-    //     // const result: Tile[][] = [];
-    //     if (index === currentTiles.length) {
-    //         result.push(currentTiles);
-    //         return result;
-    //     }
-    //     result.concat(this.getRackPermutations(tiles, currentTiles, index + 1, length, result));
-    //     result.concat(this.getRackPermutations(tiles, currentTiles.concat(tiles[index]), index + 1, length, result));
-
-    //     return result;
-    // }
-
-    // findPermutations(tiles: Tile[]): Tile[][] {
-    //     if (tiles.length < 2) {
-    //         return [tiles];
-    //     }
-
-    //     const permutationsArray = [];
-
-    //     for (let i = 0; i < tiles.length; i++) {
-    //         const tile = tiles[i];
-
-    //         if (tiles.indexOf(tile) !== i) continue;
-
-    //         const remainingChars = tiles.slice(0, i).concat(tiles.slice(i + 1, tiles.length));
-
-    //         for (const permutation of this.findPermutations(remainingChars)) {
-    //             permutationsArray.push([tile].concat(permutation));
-    //         }
-    //     }
-    //     return permutationsArray;
     // }
 }
