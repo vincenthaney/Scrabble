@@ -151,12 +151,13 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     resetServiceData(): void {
-        this.playerContainer.resetPlayers();
         this.gameType = undefined as unknown as GameType;
         this.dictionnaryName = '';
         this.tileReserve = [];
         this.isGameOver = false;
         this.gameId = '';
+        if (!this.playerContainer) return;
+        this.playerContainer.resetPlayers();
     }
 
     reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
@@ -184,8 +185,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
     disconnectGame(): void {
         const gameId = this.gameId;
         const localPlayerId = this.getLocalPlayerId();
-        this.gameId = '';
-        this.playerContainer.resetPlayers();
+        this.resetServiceData();
+
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);

@@ -53,7 +53,6 @@ describe('PlayerLeavesService', () => {
         const spy = spyOn(service['roundManagerService'], 'resetServiceData').and.callFake(() => {
             return;
         });
-        // eslint-disable-next-line dot-notation
         playerLeavesController.resetGameEvent.emit();
         expect(spy).toHaveBeenCalled();
     });
