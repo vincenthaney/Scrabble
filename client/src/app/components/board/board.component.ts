@@ -54,6 +54,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.initializeBoard(this.boardService.initialBoard);
         this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
+        // This must be defined in the onInit, otherwise selectedSquare is undefined
         const clearCursor = (): void => {
             this.selectedSquare = undefined;
             this.clearNotAppliedSquare();
@@ -71,6 +72,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
         this.roundManagerService.endRoundEvent.pipe(takeUntil(this.boardDestroyed$)).subscribe(() => clearCursor());
 
+        // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handleBackspace = (): void => {
             this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
             if (this.selectedSquare) {
@@ -79,6 +81,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 this.selectedSquare.square.tile = null;
             }
         };
+        // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handlePlaceLetter = (letter: string, squareView: SquareView): void => {
             squareView.square.tile = new Tile(letter.toUpperCase() as LetterValue, 0);
             squareView.applied = false;
@@ -102,11 +105,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
         };
 
-        // Thus must be defined in the onInit, otherwise selectedSquare is undefined
+        // This must be defined in the onInit, otherwise selectedSquare is undefined
         this.onLoseFocusEvent = (): void => clearCursor();
 
         this.subscribeToFocusableEvent(this.boardDestroyed$, this.onFocusableEvent);
-        this.subscribeToLooseFocusEvent(this.boardDestroyed$, this.onLoseFocusEvent);
+        this.subscribeToLoseFocusEvent(this.boardDestroyed$, this.onLoseFocusEvent);
     }
 
     ngOnDestroy(): void {
@@ -121,7 +124,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.focusableComponentService.setActiveKeyboardComponent(this);
         this.clearNotAppliedSquare();
 
-        if (this.selectedSquare === squareView) {
+        if (this.selectedSquare === squareView && this.notAppliedSquares.length === 0) {
             this.navigator.switchOrientation();
         } else {
             this.selectedSquare = squareView;
