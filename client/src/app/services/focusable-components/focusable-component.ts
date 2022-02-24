@@ -24,7 +24,7 @@ export abstract class FocusableComponent<T> {
         this.focusableEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
-    protected subscribeToLooseFocusEvent(destroy$: Subject<boolean>, next: () => void) {
+    protected subscribeToLoseFocusEvent(destroy$: Subject<boolean>, next: () => void) {
         this.loseFocusEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
