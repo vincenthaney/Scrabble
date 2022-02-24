@@ -1,0 +1,3 @@
+class ExpertVirtualPlayer extends AbstractVirtualPlayer{
+
+}
