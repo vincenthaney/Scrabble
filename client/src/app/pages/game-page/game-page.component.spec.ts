@@ -119,15 +119,15 @@ describe('GamePageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call disconnectGame if there is a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => 'id');
+    it('should call disconnectGame if player left abnormally', () => {
+        component.playerLeftWithQuitButton = false;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).toHaveBeenCalled();
     });
 
-    it('should not call disconnectGame if there no a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => null as unknown as string);
+    it('should not call disconnectGame if player left normally', () => {
+        component.playerLeftWithQuitButton = true;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
