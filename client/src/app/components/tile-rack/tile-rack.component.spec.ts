@@ -187,7 +187,7 @@ describe('TileRackComponent', () => {
         for (const tile of tiles) expect(tile.played).toBeFalse();
     });
 
-    it('should set all tiles to not played when call handleNewMessage', () => {
+    it('should not reset tiles if message is not from system', () => {
         const tiles: RackTile[] = [
             { letter: 'A', value: 0, played: true },
             { letter: 'B', value: 0, played: true },
