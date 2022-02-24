@@ -14,6 +14,11 @@ export default class ActionExchange extends ActionPlay {
         this.tilesToExchange = tilesToExchange;
     }
 
+    static createPayload(): ActionPayload {
+        
+    }
+
+
     execute(): GameUpdateData {
         const [tilesToExchange, unusedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToExchange, this.player);
 

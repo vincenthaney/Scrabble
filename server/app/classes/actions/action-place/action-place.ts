@@ -13,6 +13,7 @@ import { WordsVerificationService } from '@app/services/words-verification-servi
 import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
+import { ActionPayload } from '@app/classes/communication/action-data';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -28,6 +29,10 @@ export default class ActionPlace extends ActionPlay {
 
         this.scoreCalculator = Container.get(ScoreCalculatorService);
         this.wordValidator = Container.get(WordsVerificationService);
+    }
+
+    static createPayload(): ActionPayload {
+        
     }
 
     execute(): void | GameUpdateData {

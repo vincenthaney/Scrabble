@@ -3,15 +3,16 @@ import { Tile } from '@app/classes/tile';
 
 export type ActionType = 'place' | 'exchange' | 'pass' | 'help' | 'reserve';
 
-export interface ActionPlacePayload {
+export interface ActionPayload {
     tiles: Tile[];
+}
+export interface ActionPlacePayload extends ActionPayload {
     startPosition: { column: number; row: number };
     orientation: Orientation;
 }
 
-export interface ActionExchangePayload {
-    tiles: Tile[];
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ActionExchangePayload extends ActionPayload {}
 
 export interface ActionData<T extends unknown = unknown> {
     type: ActionType;
