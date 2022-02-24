@@ -54,7 +54,7 @@ export default class WordFindingService {
     findMaximumWordTileLeftLength(navigator: BoardNavigator, tilesLeftSize: number): number {
         navigator.moveUntil(Direction.Forward, () => {
             if (navigator.isEmpty()) tilesLeftSize--;
-            return tilesLeftSize > 1;
+            return tilesLeftSize === 0;
         });
         return tilesLeftSize;
     }

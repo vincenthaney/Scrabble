@@ -7,14 +7,13 @@ import { createStubInstance } from 'sinon';
 import { Board, BoardNavigator, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
 import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
-import BoardNavigator from './board-navigator';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
 const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
 const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
 
-describe.only('Board', () => {
+describe('Board', () => {
     let board: Board;
     let grid: Square[][];
 
@@ -176,14 +175,6 @@ describe.only('Board', () => {
             const position = new Position(2, 4);
             expect(board.navigate(position, Orientation.Horizontal)).to.be.instanceOf(BoardNavigator);
         });
-        it('should be true when there is a neighbour horizontally', () => {
-            grid[1][1].tile = DEFAULT_TILE_A;
-            expect(board.verifyNeighbors(new Position(1, 2), Orientation.Vertical)).to.be.true;
-        });
-        it('should be true when there is a neighbour vertically', () => {
-            grid[1][1].tile = DEFAULT_TILE_A;
-            expect(board.verifyNeighbors(new Position(2, 1), Orientation.Horizontal)).to.be.true;
-        });
     });
 
     describe('getSize', () => {
@@ -212,7 +203,7 @@ describe.only('Board', () => {
     describe('navigate', () => {
         it('should return a BoardNavigator', () => {
             const position = new Position(2, 4);
-            expect(board.navigate(position)).to.be.instanceOf(BoardNavigator);
+            expect(board.navigate(position, Orientation.Horizontal)).to.be.instanceOf(BoardNavigator);
         });
     });
 
