@@ -1,3 +1,4 @@
+import { DEFAULT_DISTANCE } from '@app/constants/board-navigator';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 
@@ -41,7 +42,7 @@ export default class BoardNavigator {
         );
     }
 
-    move(direction: Direction, distance: number = 1): BoardNavigator {
+    move(direction: Direction, distance: number = DEFAULT_DISTANCE): BoardNavigator {
         this.position.move(this.orientation, direction, distance);
         return this;
     }

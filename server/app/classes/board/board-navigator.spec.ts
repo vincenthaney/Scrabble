@@ -95,14 +95,13 @@ describe('BoardNavigator', () => {
         });
 
         it('should move vertically', () => {
-            const distance = 2;
             const direction = Direction.Forward;
             const orientation = Orientation.Vertical;
             navigator.orientation = orientation;
 
-            const expected = navigator.row + distance * direction;
+            const expected = navigator.row + direction;
 
-            navigator.move(direction, distance);
+            navigator.move(direction);
 
             expect(navigator.row).to.equal(expected);
         });
