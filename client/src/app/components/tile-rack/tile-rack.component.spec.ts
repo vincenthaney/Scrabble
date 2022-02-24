@@ -20,6 +20,9 @@ import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 // import { BehaviorSubject } from 'rxjs';
 import { RackTile, TileRackComponent } from './tile-rack.component';
 import SpyObj = jasmine.SpyObj;
@@ -27,6 +30,7 @@ import SpyObj = jasmine.SpyObj;
 describe('TileRackComponent', () => {
     const EMPTY_TILE_RACK: Tile[] = [];
     let gameServiceSpy: SpyObj<GameService>;
+    let gameViewEventManagerSpy: SpyObj<GameViewEventManagerService>;
     let component: TileRackComponent;
     let fixture: ComponentFixture<TileRackComponent>;
     let handlePlaceTileSpy: jasmine.Spy;
@@ -40,6 +44,35 @@ describe('TileRackComponent', () => {
         );
         gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+
+        const tileRackUpdate$ = new Subject();
+        const tilesPlayed$ = new Subject();
+        const message$ = new Subject();
+        gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
+        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
+            switch (eventType) {
+                case 'tileRackUpdate':
+                    tileRackUpdate$.next();
+                    break;
+                case 'tilesPlayed':
+                    tilesPlayed$.next();
+                    break;
+                case 'newMessage':
+                    message$.next();
+            }
+        });
+
+        gameViewEventManagerSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any): Subscription => {
+            switch (eventType) {
+                case 'tileRackUpdate':
+                    return tileRackUpdate$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'tilesPlayed':
+                    return tilesPlayed$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'newMessage':
+                    return message$.pipe(takeUntil(destroy$)).subscribe(next);
+            }
+            return new Subscription();
+        });
     });
 
     beforeEach(async () => {
@@ -60,7 +93,10 @@ describe('TileRackComponent', () => {
                 MatDialogModule,
             ],
             declarations: [TileRackComponent, IconComponent, TileComponent],
-            providers: [{ provide: GameService, useValue: gameServiceSpy }],
+            providers: [
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: GameViewEventManagerService, useValue: gameViewEventManagerSpy },
+            ],
         }).compileComponents();
     });
 
@@ -79,7 +115,7 @@ describe('TileRackComponent', () => {
 
     it('should call initializeTileRack when startGameEvent is received', () => {
         const spy = spyOn<any>(component, 'updateTileRack');
-        gameServiceSpy['gameViewEventManagerService'].emitGameViewEvent('tileRackUpdate');
+        gameViewEventManagerSpy.emitGameViewEvent('tileRackUpdate');
         expect(spy).toHaveBeenCalled();
     });
 
@@ -113,7 +149,7 @@ describe('TileRackComponent', () => {
     });
 
     it('should call handlePlaceTiles on playTiles event', () => {
-        gameServiceSpy['gameViewEventManagerService'].emitGameViewEvent('tilesPlayed');
+        gameViewEventManagerSpy.emitGameViewEvent('tilesPlayed');
         expect(handlePlaceTileSpy).toHaveBeenCalled();
     });
 
