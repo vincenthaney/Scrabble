@@ -10,26 +10,26 @@ import { Container } from 'typedi';
 
 export default class ActionHint extends ActionInfo {
     private wordFindingService: WordFindingService;
-    private wordsPlacement: WordPlacement[];
+    private hintResult: WordPlacement[];
 
     constructor(player: Player, game: Game) {
         super(player, game);
         this.wordFindingService = Container.get(WordFindingService);
-        this.wordsPlacement = [];
+        this.hintResult = [];
     }
 
     execute(): GameUpdateData | void {
-        this.wordsPlacement = this.wordFindingService.findWords(this.game.board, this.player.tiles, {
+        this.hintResult = this.wordFindingService.findWords(this.game.board, this.player.tiles, {
             numberOfWordsToFind: HINT_ACTION_NUMBER_OF_WORDS,
         });
     }
 
     getMessage(): string | undefined {
-        if (this.wordsPlacement.length === 0) {
+        if (this.hintResult.length === 0) {
             return NO_WORDS_FOUND;
         } else {
             let message = `${FOUND_WORDS} :<br>`;
-            message += this.wordsPlacement.map((placement) => `\`${WordPlacementUtils.wordPlacementToCommandString(placement)}\``).join('<br>');
+            message += this.hintResult.map((placement) => `\`${WordPlacementUtils.wordPlacementToCommandString(placement)}\``).join('<br>');
             return message;
         }
     }
