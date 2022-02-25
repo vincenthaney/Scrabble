@@ -22,7 +22,7 @@ export class WordPlacementUtils {
     }
 
     static tilesToString(tiles: Tile[]) {
-        return tiles.reduce((str, tile) => str + tile.letter, '');
+        return tiles.reduce((str, tile) => str + tile.letter.toLowerCase(), '');
     }
 
     static wordPlacementToCommandString(placement: WordPlacement) {
