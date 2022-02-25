@@ -183,6 +183,11 @@ describe('InputParserService', () => {
                 input: VALID_LETTERS_INPUT_SINGLE,
                 payload: EXPECTED_PLACE_PAYLOAD_SINGLE,
             });
+            expect(service['createActionData'](VALID_PLACE_INPUT)).toEqual({
+                type: ActionType.PLACE,
+                input: VALID_LETTERS_INPUT_MULTI,
+                payload: EXPECTED_PLACE_PAYLOAD_MULTI,
+            });
         });
 
         it('should call createPlaceActionPayload if input is a valid place command', () => {
