@@ -12,15 +12,15 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameDispatcherController implements OnDestroy {
-    createGameEvent: Subject<string> = new Subject();
-    joinRequestEvent: Subject<string> = new Subject();
-    canceledGameEvent: Subject<string> = new Subject();
-    lobbyFullEvent: Subject<void> = new Subject();
-    lobbyRequestValidEvent: Subject<void> = new Subject();
-    lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
-    joinerRejectedEvent: Subject<string> = new Subject();
+    private createGameEvent: Subject<string> = new Subject();
+    private joinRequestEvent: Subject<string> = new Subject();
+    private canceledGameEvent: Subject<string> = new Subject();
+    private lobbyFullEvent: Subject<void> = new Subject();
+    private lobbyRequestValidEvent: Subject<void> = new Subject();
+    private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
+    private joinerRejectedEvent: Subject<string> = new Subject();
 
-    serviceDestroyed$: Subject<boolean> = new Subject();
+    private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private http: HttpClient, public socketService: SocketService, private readonly gameService: GameService) {
         this.configureSocket();

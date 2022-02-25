@@ -12,40 +12,41 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameDispatcherService implements OnDestroy {
-    serviceDestroyed$: Subject<boolean> = new Subject();
     gameId: string;
     currentLobby: LobbyInfo | undefined;
     currentName: string;
-    joinRequestEvent: Subject<string> = new Subject();
-    lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
-    lobbyFullEvent: Subject<void> = new Subject();
-    canceledGameEvent: Subject<string> = new Subject();
-    joinerLeaveGameEvent: Subject<string> = new Subject();
-    joinerRejectedEvent: Subject<string> = new Subject();
+
+    private joinRequestEvent: Subject<string> = new Subject();
+    private canceledGameEvent: Subject<string> = new Subject();
+    private lobbyFullEvent: Subject<void> = new Subject();
+    private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
+    private joinerRejectedEvent: Subject<string> = new Subject();
+
+    private componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
-        this.gameDispatcherController.createGameEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe((gameId: string) => {
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.componentDestroyed$, (gameId: string) => {
             this.gameId = gameId;
         });
-        this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
+        this.gameDispatcherController.subscribeToJoinRequestEvent(this.componentDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
-        this.gameDispatcherController.subscribeToLobbyFullEvent(this.serviceDestroyed$, () => this.handleLobbyFull());
-        this.gameDispatcherController.subscribeToLobbyRequestValidEvent(this.serviceDestroyed$, async () =>
+        this.gameDispatcherController.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.handleLobbyFull());
+        this.gameDispatcherController.subscribeToLobbyRequestValidEvent(this.componentDestroyed$, async () =>
             this.router.navigateByUrl('join-waiting-room'),
         );
-        this.gameDispatcherController.subscribeToCanceledGameEvent(this.serviceDestroyed$, (hostName: string) => this.handleCanceledGame(hostName));
-        this.gameDispatcherController.subscribeToJoinerRejectedEvent(this.serviceDestroyed$, (hostName: string) =>
+        this.gameDispatcherController.subscribeToCanceledGameEvent(this.componentDestroyed$, (hostName: string) => this.handleCanceledGame(hostName));
+        this.gameDispatcherController.subscribeToJoinerRejectedEvent(this.componentDestroyed$, (hostName: string) =>
             this.handleJoinerRejected(hostName),
         );
-        this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.serviceDestroyed$, (lobbies: LobbyInfo[]) =>
+        this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.componentDestroyed$, (lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     resetServiceData(): void {
@@ -112,7 +113,23 @@ export default class GameDispatcherService implements OnDestroy {
         this.resetServiceData();
     }
 
-    handleJoinerLeaveGame(leaverName: string): void {
-        this.joinerLeaveGameEvent.next(leaverName);
+    subscribeToJoinRequestEvent(componentDestroyed$: Subject<boolean>, callback: (opponentName: string) => void): void {
+        this.joinRequestEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToCanceledGameEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
+        this.canceledGameEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToLobbyFullEvent(componentDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.lobbyFullEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToLobbiesUpdateEvent(componentDestroyed$: Subject<boolean>, callback: (lobbies: LobbyInfo[]) => void): void {
+        this.lobbiesUpdateEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
+        this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 }

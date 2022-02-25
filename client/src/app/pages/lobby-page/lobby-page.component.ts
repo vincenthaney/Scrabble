@@ -8,11 +8,10 @@ import {
     DIALOG_CANCELED_CONTENT,
     DIALOG_CANCELED_TITLE,
     DIALOG_FULL_CONTENT,
-    DIALOG_FULL_TITLE,
+    DIALOG_FULL_TITLE
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-lobby-page',
@@ -22,23 +21,17 @@ import { takeUntil } from 'rxjs/operators';
 export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
 
-    lobbiesUpdateSubscription: Subscription;
-    lobbyFullSubscription: Subscription;
-    lobbyCanceledSubscription: Subscription;
+    // lobbiesUpdateSubscription: Subscription;
+    // lobbyFullSubscription: Subscription;
+    // lobbyCanceledSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     lobbies: LobbyInfo[];
     constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
 
     ngOnInit(): void {
-        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((lobbies) => this.updateLobbies(lobbies));
-        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.lobbyFullDialog());
-        this.lobbyCanceledSubscription = this.gameDispatcherService.canceledGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.lobbyCanceledDialog());
+        this.gameDispatcherService.subscribeToLobbiesUpdateEvent(this.componentDestroyed$, (lobbies) => this.updateLobbies(lobbies));
+        this.gameDispatcherService.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.lobbyFullDialog());
+        this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
     }
 
