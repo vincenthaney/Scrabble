@@ -115,6 +115,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeftTotal = tileReserveTotal;
     }
 
+    onContainerClick() {
+        this.focusableComponentsService.setActiveKeyboardComponent(this);
+    }
+
     private scrollToBottom(): void {
         setTimeout(() => {
             this.scrollViewport.scrollTo({

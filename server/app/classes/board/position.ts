@@ -1,28 +1,29 @@
 import { Orientation } from '.';
 import { Vec2 } from '@app/classes/vec2';
 import Direction from './direction';
+import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
 
 export default class Position {
-    constructor(public column: number, public row: number) {}
+    constructor(public row: number, public column: number) {}
 
-    forward(orientation: Orientation, distance: number = 1): Position {
+    forward(orientation: Orientation, distance: number = DEFAULT_DISTANCE): Position {
         this.move(orientation, Direction.Forward, distance);
         return this;
     }
 
-    backward(orientation: Orientation, distance: number = 1): Position {
+    backward(orientation: Orientation, distance: number = DEFAULT_DISTANCE): Position {
         this.move(orientation, Direction.Backward, distance);
         return this;
     }
 
-    move(orientation: Orientation, direction: Direction, distance: number = 1): Position {
+    move(orientation: Orientation, direction: Direction, distance: number = DEFAULT_DISTANCE): Position {
         if (orientation === Orientation.Horizontal) this.column += direction * distance;
         else this.row += direction * distance;
         return this;
     }
 
     copy(): Position {
-        return new Position(this.column, this.row);
+        return new Position(this.row, this.column);
     }
 
     isWithinBounds(size: Vec2) {

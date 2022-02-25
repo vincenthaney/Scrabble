@@ -52,7 +52,7 @@ export class GamePlayService {
         switch (actionData.type) {
             case ActionType.PLACE: {
                 const payload = this.getActionPlacePayload(actionData);
-                const position = new Position(payload.startPosition.column, payload.startPosition.row);
+                const position = new Position(payload.startPosition.row, payload.startPosition.column);
                 return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
             }
             case ActionType.EXCHANGE: {

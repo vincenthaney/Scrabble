@@ -48,13 +48,13 @@ describe('FocusableComponent', () => {
         });
     });
 
-    describe('subscribeToLooseFocusEvent', () => {
+    describe('subscribeToLoseFocusEvent', () => {
         it('should call pipe', () => {
-            testSubscribeMethodPipe(component, 'looseFocusEvent', 'subscribeToLooseFocusEvent');
+            testSubscribeMethodPipe(component, 'loseFocusEvent', 'subscribeToLoseFocusEvent');
         });
 
         it('should call subscribe with next', () => {
-            testSubscribeMethodSubscribe(component, 'looseFocusEvent', 'subscribeToLooseFocusEvent');
+            testSubscribeMethodSubscribe(component, 'loseFocusEvent', 'subscribeToLoseFocusEvent');
         });
     });
 
@@ -74,7 +74,7 @@ describe('FocusableComponent', () => {
         });
 
         it('should subscribe to focusableEvent', () => {
-            testSubscribe('looseFocusEvent');
+            testSubscribe('loseFocusEvent');
         });
 
         it('should call onFocusableEvent when subscribed', () => {
@@ -87,10 +87,10 @@ describe('FocusableComponent', () => {
         });
 
         it('should call onFocusableEvent when subscribed', () => {
-            component.onLooseFocusEvent = () => {};
-            const spy = spyOn<any>(component, 'onLooseFocusEvent');
+            component.onLoseFocusEvent = () => {};
+            const spy = spyOn<any>(component, 'onLoseFocusEvent');
             component['subscribe']();
-            component.emitLooseFocusEvent();
+            component.emitLoseFocusEvent();
             expect(spy).toHaveBeenCalled();
         });
     });

@@ -15,6 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { BACKSPACE, ESCAPE } from '@app/constants/components-constants';
 import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -148,6 +149,26 @@ describe('GamePageComponent', () => {
         });
         const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
         component.handleKeyboardEvent(event);
+        expect(spy).toHaveBeenCalledWith(event);
+    });
+
+    it('should call emitKeyboard on keydown.escape', () => {
+        const event: KeyboardEvent = new KeyboardEvent('keypress', {
+            key: ESCAPE,
+            cancelable: true,
+        });
+        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
+        component.handleKeyboardEventEsc(event);
+        expect(spy).toHaveBeenCalledWith(event);
+    });
+
+    it('should call emitKeyboard on keydown.escape', () => {
+        const event: KeyboardEvent = new KeyboardEvent('keypress', {
+            key: BACKSPACE,
+            cancelable: true,
+        });
+        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
+        component.handleKeyboardEventBackspace(event);
         expect(spy).toHaveBeenCalledWith(event);
     });
 

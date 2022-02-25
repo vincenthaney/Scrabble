@@ -23,7 +23,7 @@ describe('position', () => {
     let position: Position;
 
     beforeEach(() => {
-        position = new Position(DEFAULT_COLUMN, DEFAULT_ROW);
+        position = new Position(DEFAULT_ROW, DEFAULT_COLUMN);
     });
 
     describe('move', () => {

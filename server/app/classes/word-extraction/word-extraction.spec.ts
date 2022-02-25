@@ -18,7 +18,7 @@ const tilesFromLetters = (letters: LetterValue[]) => letters.map(tileFromLetter)
 const gridFromLetterArray = (letters: LetterOrEmpty[][]) => {
     return letters.map<Square[]>((row, i) =>
         row.map<Square>((letter, j) => ({
-            position: new Position(j, i),
+            position: new Position(i, j),
             scoreMultiplier: null,
             wasMultiplierUsed: false,
             isCenter: false,
@@ -35,7 +35,7 @@ const DEFAULT_LETTER_ARRAY: LetterOrEmpty[][] = [
     [' ', ' ', ' ', ' ', ' ', ' '],
     [' ', ' ', ' ', ' ', ' ', ' '],
 ];
-const HAS_TILE_POSITION: Position = new Position(2, 1);
+const HAS_TILE_POSITION: Position = new Position(1, 2);
 const DEFAULT_ORIENTATION: Orientation = Orientation.Horizontal;
 
 describe('WordExtract', () => {
@@ -56,7 +56,7 @@ describe('WordExtract', () => {
     describe('extract', () => {
         const testWords = (letters: LetterValue[], column: number, row: number, orientation: Orientation, expected: string[]) => {
             const tiles: Tile[] = tilesFromLetters(letters);
-            const position = new Position(column, row);
+            const position = new Position(row, column);
 
             const result = extraction.extract(tiles, position, orientation);
             const resultWords = result.map((word) => word.reduce((prev, [, t]) => (prev += t.letter), ''));
@@ -111,7 +111,7 @@ describe('WordExtract', () => {
 
         it('should throw if tiles go outside board', () => {
             const tiles = tilesFromLetters(['X', 'Y', 'Z']);
-            const position = new Position(4, 0);
+            const position = new Position(0, 4);
             const orientation = Orientation.Horizontal;
             expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
         });
@@ -136,7 +136,7 @@ describe('WordExtract', () => {
         it('should throw if tile is occupied', () => {
             const orientation = Orientation.Horizontal;
             const direction = Direction.Forward;
-            const position = new Position(2, 1);
+            const position = new Position(1, 2);
             expect(() => extraction['extractWordInDirection'](orientation, direction, position)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
         });
     });

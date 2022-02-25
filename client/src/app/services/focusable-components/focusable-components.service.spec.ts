@@ -41,7 +41,7 @@ describe('FocusableComponentsService', () => {
             const component1 = new ComponentKeyboard();
             const component2 = new ComponentKeyboard();
             service['activeKeyboardComponent'] = component1;
-            const spy = spyOn(component1['looseFocusEvent'], 'next');
+            const spy = spyOn(component1['loseFocusEvent'], 'next');
             service.setActiveKeyboardComponent(component2);
             expect(spy).toHaveBeenCalled();
         });
