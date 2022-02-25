@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
@@ -7,6 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import CommandError from '@app/classes/command-error';
+import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
@@ -24,14 +26,16 @@ describe('InputParserService', () => {
     const VALID_LETTERS_INPUT_MULTI = 'abc';
     const VALID_LETTERS_INPUT_SINGLE = 'a';
 
-    const VALID_PLACE_INPUT = `!placer ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
-    const VALID_PLACE_INPUT_SINGLE = `!placer ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
-    const VALID_EXCHANGE_INPUT = `!échanger ${VALID_LETTERS_INPUT_MULTI}`;
-    const VALID_PASS_INPUT = '!passer';
+    const VALID_PLACE_INPUT = `!${ActionType.PLACE} ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
+    const VALID_PLACE_INPUT_SINGLE = `!${ActionType.PLACE} ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
+    const VALID_EXCHANGE_INPUT = `!${ActionType.EXCHANGE} ${VALID_LETTERS_INPUT_MULTI}`;
+    const VALID_PASS_INPUT = `!${ActionType.PASS}`;
     const VALID_PASS_ACTION_DATA = { type: ActionType.PASS, payload: {} };
-    const VALID_RESERVE_INPUT = '!réserve';
+    const VALID_RESERVE_INPUT = `!${ActionType.PLACE}`;
     // const VALID_HINT_INPUT = '!indice';
-    const VALID_HELP_INPUT = '!aide';
+    const VALID_HELP_INPUT = `!${ActionType.HELP}`;
+    const VALID_POSITION: Position = { row: 0, column: 0 };
+    const VALID_LOCATION: Location = { row: 0, col: 1, orientation: Orientation.Horizontal };
 
     const DEFAULT_GAME_ID = 'default game id';
     const DEFAULT_PLAYER_ID = 'default player id';
@@ -121,118 +125,102 @@ describe('InputParserService', () => {
             service.parseInput(VALID_PASS_INPUT);
             expect(spy).toHaveBeenCalled();
         });
+    });
 
-        it('should call sendAction if input starts with ! and actionData doesnt throw error', () => {
-            spyOn<any>(service, 'parseCommand').and.returnValue(VALID_PASS_ACTION_DATA);
-            service.parseInput(VALID_PASS_INPUT);
+    describe('parseCommand', () => {
+        it('should call sendAction if actionData doesnt throw error', () => {
+            spyOn<any>(service, 'createActionData').and.returnValue(VALID_PASS_ACTION_DATA);
+            service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendAction).toHaveBeenCalled();
         });
 
-        it('should have right error message content if input starts with ! and parseCommand throws error NotYourTurn', () => {
+        it('should have right error message content if createActionData throws error NotYourTurn', () => {
             spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
-            spyOn<any>(service, 'parseCommand').and.callFake(() => {
+            spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new CommandError(DEFAULT_COMMAND_ERROR_MESSAGE);
             });
-            service.parseInput(VALID_PASS_INPUT);
+            service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 content: `La commande **${VALID_PASS_INPUT}** est invalide :<br />${DEFAULT_COMMAND_ERROR_MESSAGE}`,
                 senderId: SYSTEM_ERROR_ID,
             });
         });
 
-        it('should have right error message content if input starts with ! and parseCommand throws other commandError', () => {
+        it('should have right error message content if createActionData throws other commandError', () => {
             spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
-            spyOn<any>(service, 'parseCommand').and.callFake(() => {
+            spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new CommandError(CommandErrorMessages.NotYourTurn);
             });
-            service.parseInput(VALID_PASS_INPUT);
+            service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 content: CommandErrorMessages.NotYourTurn,
                 senderId: SYSTEM_ERROR_ID,
             });
         });
 
-        it('should have right error message content if error thrown by parseCommand is not a CommandError', () => {
+        it('should not throw if error thrown by createActionData is not a CommandError', () => {
             spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
-            spyOn<any>(service, 'parseCommand').and.callFake(() => {
+            spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new Error('other error message');
             });
-            service.parseInput(VALID_PASS_INPUT);
+            expect(service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID)).not.toThrow();
             expect(gamePlayControllerSpy.sendError).not.toHaveBeenCalled();
         });
     });
 
-    describe('parseCommand', () => {
-        it('should throw error if game is over', () => {
-            gameServiceSpy.isGameOver = true;
-            expect(() => {
-                service['parseCommand'](VALID_PLACE_INPUT.substring(1).split(' '));
-            }).toThrow(new CommandError(CommandErrorMessages.ImpossibleCommand));
+    describe('createActionData', () => {
+        it('should call separateCommandWords and verifyActionValidity', () => {
+            const separateSpy = spyOn<any>(service, 'separateCommandWords');
+            const verifyValiditySpy = spyOn<any>(service, 'verifyActionValidity');
+            service['createActionData'](VALID_PASS_INPUT);
+            expect(separateSpy).toHaveBeenCalled();
+            expect(verifyValiditySpy).toHaveBeenCalled();
         });
 
-        it("should throw error if PLAY command and it is not the player's turn", () => {
-            gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
-            expect(() => {
-                service['parseCommand'](VALID_PLACE_INPUT.substring(1).split(' '));
-            }).toThrow(new CommandError(CommandErrorMessages.NotYourTurn));
-        });
-
-        it('should return right ActionData if input is a valid place command (single letter)', () => {
-            expect(service['parseCommand'](VALID_PLACE_INPUT_SINGLE.substring(1).split(' '))).toEqual({
+        it('should return right ActionData if input is a valid place command', () => {
+            expect(service['createActionData'](VALID_PLACE_INPUT_SINGLE)).toEqual({
                 type: ActionType.PLACE,
+                input: VALID_LETTERS_INPUT_SINGLE,
                 payload: EXPECTED_PLACE_PAYLOAD_SINGLE,
             });
         });
 
-        it('should call createPlaceActionPayloadSingleLetter if input is a valid place command (single letter)', () => {
-            const spy = spyOn<any>(service, 'createPlaceActionPayloadSingleLetter').and.returnValue(EXPECTED_PLACE_PAYLOAD_SINGLE);
-            service['parseCommand'](VALID_PLACE_INPUT_SINGLE.substring(1).split(' '));
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should return right ActionData if input is a valid place command (multiple letters)', () => {
-            expect(service['parseCommand'](VALID_PLACE_INPUT.substring(1).split(' '))).toEqual({
-                type: ActionType.PLACE,
-                payload: EXPECTED_PLACE_PAYLOAD_MULTI,
-            });
-        });
-
-        it('should call createPlaceActionPayloadMultipleLetters if input is a valid place command (multiple letters)', () => {
-            const spy = spyOn<any>(service, 'createPlaceActionPayloadMultipleLetters').and.returnValue(EXPECTED_PLACE_PAYLOAD_MULTI);
-            service['parseCommand'](VALID_PLACE_INPUT.substring(1).split(' '));
+        it('should call createPlaceActionPayload if input is a valid place command', () => {
+            const spy = spyOn<any>(service, 'createPlaceActionPayload').and.returnValue(EXPECTED_PLACE_PAYLOAD_SINGLE);
+            service['createActionData'](VALID_PLACE_INPUT_SINGLE);
             expect(spy).toHaveBeenCalled();
         });
 
         it('should return right ActionData if input is a valid exchange command', () => {
-            expect(service['parseCommand'](VALID_EXCHANGE_INPUT.substring(1).split(' '))).toEqual({
+            expect(service['createActionData'](VALID_EXCHANGE_INPUT)).toEqual({
                 type: ActionType.EXCHANGE,
+                input: VALID_EXCHANGE_INPUT,
                 payload: EXPECTED_EXCHANGE_PAYLOAD,
             });
         });
 
         it('should call createExchangeActionPayload if input is a valid exchange command', () => {
             const spy = spyOn<any>(service, 'createExchangeActionPayload').and.returnValue(EXPECTED_EXCHANGE_PAYLOAD);
-            service['parseCommand'](VALID_EXCHANGE_INPUT.substring(1).split(' '));
+            service['createActionData'](VALID_EXCHANGE_INPUT);
             expect(spy).toHaveBeenCalled();
         });
 
         it('should return right Actiondata if input is a valid pass command', () => {
-            expect(service['parseCommand'](VALID_PASS_INPUT.substring(1).split(' '))).toEqual({ type: ActionType.PASS, payload: {} });
+            expect(service['createActionData'](VALID_PASS_INPUT)).toEqual({ type: ActionType.PASS, input: VALID_PASS_INPUT, payload: {} });
         });
 
         it('should return right Actiondata if input is a valid reserve command', () => {
-            expect(service['parseCommand'](VALID_RESERVE_INPUT.substring(1).split(' '))).toEqual({
+            expect(service['createActionData'](VALID_RESERVE_INPUT)).toEqual({
                 type: ActionType.RESERVE,
+                input: VALID_RESERVE_INPUT,
                 payload: {},
             });
         });
 
-        // it('should call sendHintAction if input is a valid hint command', () => {
-        //     expect(service['parseCommand'](VALID_HINT_INPUT.substring(1).split(' '))).toEqual({ type: ActionType.HINT, payload: {} });
-        // });
+        // it('should call sendHintAction if input is a valid hint command', () => { });
 
         it('should return right Actiondata if input is a valid help command', () => {
-            expect(service['parseCommand'](VALID_HELP_INPUT.substring(1).split(' '))).toEqual({ type: ActionType.HELP, payload: {} });
+            expect(service['createActionData'](VALID_HELP_INPUT)).toEqual({ type: ActionType.HELP, input: VALID_HELP_INPUT, payload: {} });
         });
 
         it('should throw error if commands have incorrect lengths', () => {
@@ -245,81 +233,87 @@ describe('InputParserService', () => {
                 ['!aide help', CommandErrorMessages.BadSyntax],
             ];
             for (const [command, error] of invalidCommands) {
-                const inputWords = command.substring(1).split(' ');
-                expect(() => service['parseCommand'](inputWords)).toThrow(new CommandError(error));
+                expect(() => service['createActionData'](command)).toThrow(new CommandError(error));
             }
         });
 
         it('should throw error if command does not exist', () => {
             expect(() => {
-                service['parseCommand']('!trouver un ami'.substring(1).split(' '));
+                service['createActionData']('!trouver un ami');
             }).toThrow(new CommandError(CommandErrorMessages.InvalidEntry));
         });
     });
 
-    describe('createPlaceActionPayloadSingleLetter', () => {
-        it('createPlaceActionPayloadSingleLetter should call parsePlaceLettersToTiles', () => {
-            const placeParserSpy = spyOn<any>(service, 'parsePlaceLettersToTiles');
-            service['createPlaceActionPayloadSingleLetter'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
-            expect(placeParserSpy).toHaveBeenCalled();
+    describe('createLocation', () => {
+        it('should return right rowNumber and columnNumber', () => {
+            const locationStrings: string[] = ['a1h', 'a15v', 'b18', 'g12h', 'f1v', 'z12v', 'o15h', 'o1'];
+            const expectedPositions: number[][] = [
+                [0, 0],
+                [0, 14],
+                [1, 17],
+                [6, 11],
+                [5, 0],
+                [25, 11],
+                [14, 14],
+                [14, 0],
+            ];
+
+            for (let i = 0; i < locationStrings.length; i++) {
+                const result = service['createLocation'](locationStrings[i], 1);
+                expect(result.row).toEqual(expectedPositions[i][0]);
+                expect(result.col).toEqual(expectedPositions[i][1]);
+            }
         });
 
-        it('createPlaceActionPayloadSingleLetter should call getStartPosition', () => {
-            const positionSpy = spyOn<any>(service, 'getStartPosition');
-            service['createPlaceActionPayloadSingleLetter'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
-            expect(positionSpy).toHaveBeenCalled();
+        it('should throw if lastChar is a number and trying to place multiple letters', () => {
+            expect(() => {
+                service['createLocation'](VALID_LOCATION_INPUT_SINGLE, VALID_LETTERS_INPUT_MULTI.length);
+            }).toThrow(new CommandError(CommandErrorMessages.PlaceBadSyntax));
         });
 
-        it('createPlaceActionPayloadSingleLetter should NOT call getOrientation', () => {
-            const orientationSpy = spyOn<any>(service, 'getOrientation');
-            service['createPlaceActionPayloadSingleLetter'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
-            expect(orientationSpy).not.toHaveBeenCalled();
+        it('should have horizontal orientation if last char is number and trying to place one letter', () => {
+            expect(service['createLocation'](VALID_LETTERS_INPUT_MULTI, 1).orientation).toEqual(Orientation.Horizontal);
+            expect(service['createLocation'](VALID_LETTERS_INPUT_SINGLE, 1).orientation).toEqual(Orientation.Horizontal);
         });
 
-        it('createPlaceActionPayloadSingleLetter should return expected payload (with orientation)', () => {
-            expect(service['createPlaceActionPayloadSingleLetter'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE)).toEqual(
-                EXPECTED_PLACE_PAYLOAD_SINGLE,
-            );
+        it('should throw if last char is not a number and is not h or v', () => {
+            expect(() => {
+                service['createLocation']('a1x', VALID_LETTERS_INPUT_MULTI.length);
+            }).toThrow(new CommandError(CommandErrorMessages.BadSyntax));
         });
 
-        it('createPlaceActionPayloadSingleLetter should return expected payload (without orientation)', () => {
-            expect(service['createPlaceActionPayloadSingleLetter'](VALID_LOCATION_INPUT_SINGLE, VALID_LETTERS_INPUT_SINGLE)).toEqual(
-                EXPECTED_PLACE_PAYLOAD_SINGLE,
-            );
+        it('should have horizontal orientation if last char is h', () => {
+            expect(service['createLocation']('a1h', 1).row).toEqual(Orientation.Horizontal);
+        });
+
+        it('should have vertical orientation if last char is v', () => {
+            expect(service['createLocation']('a1v', 1).row).toEqual(Orientation.Vertical);
         });
     });
 
-    describe('createPlaceActionMultipleLetters', () => {
-        it('createPlaceActionPayloadMultipleLetters should call parsePlaceLettersToTiles', () => {
-            const placeParserSpy = spyOn<any>(service, 'parsePlaceLettersToTiles');
-            service['createPlaceActionPayloadMultipleLetters'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_MULTI);
-            expect(placeParserSpy).toHaveBeenCalled();
-        });
-
-        it('createPlaceActionPayloadMultipleLetters should call getStartPosition', () => {
+    describe('createPlaceActionPayload', () => {
+        it('should call createLocation, parsePlaceLettersToTiles et getStartPosition', () => {
+            const createLocationSpy = spyOn<any>(service, 'createLocation');
+            const lettersToTilesSpy = spyOn<any>(service, 'parseLettersToTiles');
             const positionSpy = spyOn<any>(service, 'getStartPosition');
-            service['createPlaceActionPayloadMultipleLetters'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_MULTI);
+            service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
+            expect(createLocationSpy).toHaveBeenCalledWith(VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE.length);
+            expect(lettersToTilesSpy).toHaveBeenCalledWith(VALID_LETTERS_INPUT_SINGLE, ActionType.PLACE);
             expect(positionSpy).toHaveBeenCalled();
         });
 
-        it('createPlaceActionPayloadMultipleLetters should call getOrientation', () => {
-            const orientationSpy = spyOn<any>(service, 'getOrientation');
-            service['createPlaceActionPayloadMultipleLetters'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_MULTI);
-            expect(orientationSpy).toHaveBeenCalled();
-        });
-
-        it('createPlaceActionPayloadMultipleLetters should return expected payload', () => {
-            expect(service['createPlaceActionPayloadMultipleLetters'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_MULTI)).toEqual(
-                EXPECTED_PLACE_PAYLOAD_MULTI,
-            );
+        it('should emit playingTiles', () => {
+            const emitSpy = spyOn<any>(service['gameService']['playingTiles'], 'emit');
+            service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
+            expect(emitSpy).toHaveBeenCalled();
         });
     });
 
     describe('createExchangeActionPayload', () => {
-        it('createExchangeActionPayload should call parseExchangeLettersToTiles', () => {
-            const exchangeParserSpy = spyOn<any>(service, 'parseExchangeLettersToTiles');
+        it('should call parseLettersToTiles with right attributes', () => {
+            const letterToTilesSpy = spyOn<any>(service, 'parseLettersToTiles');
             service['createExchangeActionPayload'](VALID_LETTERS_INPUT_MULTI);
-            expect(exchangeParserSpy).toHaveBeenCalled();
+            expect(letterToTilesSpy).toHaveBeenCalledWith(VALID_LETTERS_INPUT_MULTI, ActionType.EXCHANGE);
         });
 
         it('createExchangeActionPayload should return expected payload', () => {
@@ -327,8 +321,8 @@ describe('InputParserService', () => {
         });
     });
 
-    describe('parsePlaceLettersToTiles', () => {
-        it('should return valid tiles with valid input', () => {
+    describe('parseLettersToTiles', () => {
+        it('should return valid tiles with valid input for place actions', () => {
             const validLetters = ['abce', 'ceX', 'bKcc', 'ccee'];
             const expectedTiles: Tile[][] = [
                 [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
@@ -343,11 +337,11 @@ describe('InputParserService', () => {
             ];
 
             for (let i = 0; i < validLetters.length; i++) {
-                expect(service['parsePlaceLettersToTiles'](validLetters[i])).toEqual(expectedTiles[i]);
+                expect(service['parseLettersToTiles'](validLetters[i], ActionType.PLACE)).toEqual(expectedTiles[i]);
             }
         });
 
-        it('should throw error with invalid input', () => {
+        it('should throw error with invalid input for place actions', () => {
             const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
             const errorMessages: CommandErrorMessages[] = [
                 CommandErrorMessages.DontHaveTiles,
@@ -360,14 +354,12 @@ describe('InputParserService', () => {
 
             for (let i = 0; i < invalidLetters.length; i++) {
                 expect(() => {
-                    service['parsePlaceLettersToTiles'](invalidLetters[i]);
+                    service['parseLettersToTiles'](invalidLetters[i], ActionType.PLACE);
                 }).toThrow(new CommandError(errorMessages[i]));
             }
         });
-    });
 
-    describe('parseExchangeLettersToTiles', () => {
-        it('should return valid tiles with valid input', () => {
+        it('should return valid tiles with valid input for exchange actions', () => {
             const validLetters = ['abce', 'ab*', 'ccee'];
             const expectedTiles: Tile[][] = [
                 [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
@@ -376,11 +368,11 @@ describe('InputParserService', () => {
             ];
 
             for (let i = 0; i < validLetters.length; i++) {
-                expect(service['parseExchangeLettersToTiles'](validLetters[i])).toEqual(expectedTiles[i]);
+                expect(service['parseLettersToTiles'](validLetters[i], ActionType.EXCHANGE)).toEqual(expectedTiles[i]);
             }
         });
 
-        it('should throw error with invalid input', () => {
+        it('should throw error with invalid input for exchange actions', () => {
             const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
             const errorMessages: CommandErrorMessages[] = [
                 CommandErrorMessages.DontHaveTiles,
@@ -392,70 +384,124 @@ describe('InputParserService', () => {
 
             for (let i = 0; i < invalidLetters.length; i++) {
                 expect(() => {
-                    service['parseExchangeLettersToTiles'](invalidLetters[i]);
+                    service['parseLettersToTiles'](invalidLetters[i], ActionType.EXCHANGE);
                 }).toThrow(new CommandError(errorMessages[i]));
             }
+        });
+    });
+
+    describe('isValidBlankTileCombination', () => {
+        const VALID_PLAYER_LETTER = '*';
+        const VALID_PLACE_LETTER = 'a';
+
+        it('should return true if combination for blank tile is valid', () => {
+            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, VALID_PLACE_LETTER)).toBeTrue();
+        });
+
+        it('should return false if player tile is not *', () => {
+            expect(service['isValidBlankTileCombination']('A', VALID_PLACE_LETTER)).toBeFalse();
+        });
+
+        it('should return false if placeLetter is not a valid LetterValue', () => {
+            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, '8')).toBeFalse();
+        });
+
+        it('should return false if placeLetter is in upper case', () => {
+            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, 'A')).toBeFalse();
+        });
+    });
+
+    describe('isNumber', () => {
+        it('should return true if char is a number', () => {
+            expect(service['isNumber']('6')).toBeTrue();
+        });
+
+        it('should return false if char is not a number', () => {
+            const notNumberChars: string[] = ['a', 'F', '&', '^', ' '];
+
+            for (const notNumberChar of notNumberChars) {
+                expect(service['isNumber'](notNumberChar)).toBeFalse();
+            }
+            expect(service['isNumber']('6')).toBeTrue();
+        });
+    });
+
+    describe('isPositionWithinBounds', () => {
+        it('should retrun false if position is invalid', () => {
+            // const invalidLocations: string[] = ['abcde', 'g', 'a143', 'A12', 'B3', '%4', 'a17', 'f0', 'o0', '14a'];
+            const invalidPositions: Position[] = [
+                { row: -2, column: 0 },
+                { row: -2, column: -5 },
+                { row: 5, column: 18 },
+                { row: 88, column: 693 },
+            ];
+
+            for (const invalidPosition of invalidPositions) {
+                expect(service['isPositionWithinBounds'](invalidPosition)).toBeFalse();
+            }
+        });
+
+        it('should return true if position if in bounds', () => {
+            expect(service['isPositionWithinBounds'](VALID_POSITION)).toBeTrue();
+        });
+    });
+
+    describe('isAction', () => {
+        it('should return true if input starts with right indicator', () => {
+            expect(service['isAction'](VALID_EXCHANGE_INPUT)).toBeTrue();
+        });
+
+        it('should return false if input does not start with right indicator', () => {
+            expect(service['isAction'](VALID_MESSAGE_INPUT)).toBeFalse();
+        });
+    });
+
+    describe('separateCommandWords', () => {
+        it('should return right input words from command', () => {
+            const expected = [ActionType.PLACE, VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_MULTI];
+            expect(service['separateCommandWords'](VALID_PLACE_INPUT)).toEqual(expected);
+        });
+    });
+
+    describe('verifyActionValidity', () => {
+        it('should throw error if actionType is undefined', () => {
+            expect(() => {
+                service['verifyActionValidity'](undefined as unknown as ActionType);
+            }).toThrow(new CommandError(CommandErrorMessages.InvalidEntry));
+        });
+
+        it('should throw error if game is over', () => {
+            gameServiceSpy.isGameOver = true;
+            expect(() => {
+                service['verifyActionValidity'](ActionType.RESERVE);
+            }).toThrow(new CommandError(CommandErrorMessages.GameOver));
+        });
+
+        it("should throw error if on your turn command and it is not the player's turn", () => {
+            gameServiceSpy.isGameOver = false;
+            gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
+            expect(() => {
+                service['verifyActionValidity'](ActionType.PASS);
+            }).toThrow(new CommandError(CommandErrorMessages.NotYourTurn));
         });
     });
 
     describe('getStartPosition', () => {
-        it('should throw error if location string is invalid', () => {
-            const invalidLocations: string[] = ['abcde', 'g', 'a143', 'A12', 'B3', '%4', 'a17', 'f0', 'o0', '14a'];
-            const errorMessages: CommandErrorMessages[] = [
-                CommandErrorMessages.BadSyntax,
-                CommandErrorMessages.BadSyntax,
-                CommandErrorMessages.BadSyntax,
-                CommandErrorMessages.PositionFormat,
-                CommandErrorMessages.PositionFormat,
-                CommandErrorMessages.PositionFormat,
-                CommandErrorMessages.PositionFormat,
-                CommandErrorMessages.PositionFormat,
-                CommandErrorMessages.PositionFormat,
-                CommandErrorMessages.PositionFormat,
-            ];
-
-            for (let i = 0; i < invalidLocations.length; i++) {
-                expect(() => {
-                    service['getStartPosition'](invalidLocations[i]);
-                }).toThrow(new CommandError(errorMessages[i]));
-            }
+        it('should call isPositionWithinBounds', () => {
+            const isWithinBoundsSpy = spyOn<any>(service, 'isPositionWithinBounds').and.returnValue(true);
+            service['getStartPosition'](VALID_LOCATION);
+            expect(isWithinBoundsSpy).toHaveBeenCalledWith(VALID_LOCATION);
         });
 
-        it('should return valid Position if location string is valid', () => {
-            const validLocationStrings: string[] = ['a1', 'a15', 'b12', 'g12', 'f1', 'm12', 'o15', 'o1'];
-            const expectedPositions: Position[] = [
-                { row: 0, column: 0 },
-                { row: 0, column: 14 },
-                { row: 1, column: 11 },
-                { row: 6, column: 11 },
-                { row: 5, column: 0 },
-                { row: 12, column: 11 },
-                { row: 14, column: 14 },
-                { row: 14, column: 0 },
-            ];
-
-            for (let i = 0; i < validLocationStrings.length; i++) {
-                expect(service['getStartPosition'](validLocationStrings[i])).toEqual(expectedPositions[i]);
-            }
-        });
-    });
-
-    describe('getOrientation', () => {
-        it('should throw error if orientation string is invalid', () => {
-            const invalidOrientationStrings: string[] = ['vh', 'H', 'V', 'j', 'K', '*', '8'];
-
-            for (const invalidOrientationString of invalidOrientationStrings) {
-                expect(() => {
-                    service['getOrientation'](invalidOrientationString);
-                }).toThrow(new CommandError(CommandErrorMessages.BadSyntax));
-            }
+        it('should return right position with valid location', () => {
+            expect(service['getStartPosition'](VALID_LOCATION)).toEqual(VALID_POSITION);
         });
 
-        it('should return valid orientation if orientation string is valid', () => {
-            const validLocationStrings: string[] = ['v', 'h'];
-
-            expect(service['getOrientation'](validLocationStrings[0])).toBe(Orientation.Vertical);
-            expect(service['getOrientation'](validLocationStrings[1])).toBe(Orientation.Horizontal);
+        it('should throw if position is not within bounds', () => {
+            spyOn<any>(service, 'isPositionWithinBounds').and.returnValue(false);
+            expect(() => {
+                service['getStartPosition'](VALID_LOCATION);
+            }).toThrow(new CommandError(CommandErrorMessages.PositionFormat));
         });
     });
 

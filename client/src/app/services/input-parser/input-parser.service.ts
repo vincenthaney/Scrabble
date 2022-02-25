@@ -1,4 +1,3 @@
-/* eslint-disable dot-notation */
 import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
 import CommandError from '@app/classes/command-error';
@@ -59,14 +58,12 @@ export default class InputParserService {
 
         switch (actionName) {
             case ActionType.PLACE:
-                {
-                    if (inputWords.length !== ExpectedCommandWordCount.Place) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
-                    actionData = {
-                        type: ActionType.PLACE,
-                        input,
-                        payload: this.createPlaceActionPayload(inputWords[1], inputWords[2]),
-                    };
-                }
+                if (inputWords.length !== ExpectedCommandWordCount.Place) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
+                actionData = {
+                    type: ActionType.PLACE,
+                    input,
+                    payload: this.createPlaceActionPayload(inputWords[1], inputWords[2]),
+                };
                 break;
             case ActionType.EXCHANGE:
                 if (inputWords.length !== ExpectedCommandWordCount.Exchange) throw new CommandError(CommandErrorMessages.ExchangeBadSyntax);
