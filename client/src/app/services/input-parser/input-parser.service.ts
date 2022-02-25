@@ -7,7 +7,7 @@ import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { CommandErrorMessages, PLAYER_NOT_FOUND } from '@app/constants/command-error-messages';
-import { BOARD_SIZE, ExpectedCommandWordCount, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
+import { BOARD_SIZE, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
 
@@ -179,7 +179,7 @@ export default class InputParserService {
     }
 
     private isValidBlankTileCombination(playerLetter: string, placeLetter: string): boolean {
-        return playerLetter === '*' && (placeLetter as LetterValue) && placeLetter === placeLetter.toUpperCase();
+        return playerLetter === '*' && LETTER_VALUES.includes(placeLetter as LetterValue) && placeLetter === placeLetter.toUpperCase();
     }
 
     private isNumber(char: string): boolean {
