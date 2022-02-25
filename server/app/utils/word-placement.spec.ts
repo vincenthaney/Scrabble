@@ -21,7 +21,7 @@ describe('WordPlacement utils', () => {
             expect(WordPlacementUtils.orientationToLetter(Orientation.Horizontal)).to.equal('h');
         });
 
-        it('should convert horizontal to h', () => {
+        it('should convert vertical to v', () => {
             expect(WordPlacementUtils.orientationToLetter(Orientation.Vertical)).to.equal('v');
         });
     });
