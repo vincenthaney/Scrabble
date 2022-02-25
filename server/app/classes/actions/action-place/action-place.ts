@@ -31,7 +31,7 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator = Container.get(WordsVerificationService);
     }
 
-    static createPayload(): ActionData {
+    static createPayload(tiles: Tile[], ): ActionData {
         return {
             tiles: [new Tile('A', 0), new Tile('B', 0)],
             orientation: Orientation.Horizontal,

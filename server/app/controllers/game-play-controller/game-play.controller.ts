@@ -1,4 +1,4 @@
-import { ActionData } from '@app/classes/communication/action-data';
+import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
@@ -111,7 +111,7 @@ export class GamePlayController {
             await this.handleError(e, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(e)) {
-                this.handlePlayAction(gameId, playerId, { type: 'pass', payload: {}, input: '' });
+                this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
             }
         }
     }
