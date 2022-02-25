@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
     <div>
         <div class="info" id="opponent">
             <app-icon icon="chess-rook" size="lg"></app-icon>
@@ -29,4 +29,23 @@
             </button>
         </div>
     </div>
-</div>
+</div> -->
+
+<mat-card class="content">
+    <div class="info">
+        <p class="name">{{ lobby.playerName }}</p>
+        <div class="chip-list">
+            <div class="chip"><app-icon icon="hourglass-half" size="sm"></app-icon> {{ roundTime.minutes }}:{{ roundTime.getTimerSecondsPadded() }}</div>
+            <div class="chip"><app-icon icon="gamepad"></app-icon> {{ lobby.gameType }}</div>
+        </div>
+    </div>
+    <div class="button" 
+        matTooltip="Veuillez entrer un nom valide différent de {{ lobby.playerName }}"
+        matTooltipClass="example-tooltip-red"
+        [matTooltipDisabled]="lobby.canJoin"
+    >
+        <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()">
+            <app-icon icon="swords" size="lg"></app-icon> Joindre
+        </button>
+    </div>
+</mat-card>
