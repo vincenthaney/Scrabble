@@ -33,7 +33,7 @@ describe('WordPlacement utils', () => {
                 { letter: 'B', value: 0 },
                 { letter: 'C', value: 0 },
             ];
-            expect(WordPlacementUtils.tilesToString(tiles)).to.equal('ABC');
+            expect(WordPlacementUtils.tilesToString(tiles)).to.equal('abc');
         });
 
         it('should convert', () => {
@@ -66,7 +66,7 @@ describe('WordPlacement utils', () => {
                 orientation,
             };
 
-            expect(WordPlacementUtils.wordPlacementToCommandString(placement)).to.equal('g3v XYZ');
+            expect(WordPlacementUtils.wordPlacementToCommandString(placement)).to.equal('g3v xyz');
         });
     });
 });
