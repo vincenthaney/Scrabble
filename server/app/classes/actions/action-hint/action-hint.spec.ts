@@ -9,6 +9,7 @@ import ActionHint from './action-hint';
 import WordFindingService from '@app/services/word-finding/word-finding';
 import { Orientation, Position } from '@app/classes/board';
 import { WordPlacementUtils } from '@app/utils/word-placement';
+import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -68,6 +69,11 @@ describe('ActionReserve', () => {
             expect(wordPlacementToCommandStringSpy.callCount).to.equal(placementsAmount);
 
             wordPlacementToCommandStringSpy.restore();
+        });
+
+        it('should return no words found if empty', () => {
+            const message = action.getMessage();
+            expect(message).to.equal(NO_WORDS_FOUND);
         });
     });
 

@@ -35,3 +35,6 @@ export const END_GAME_HEADER_MESSAGE = 'Fin de partie - lettres restantes';
 
 export const ORIENTATION_HORIZONTAL_LETTER = 'h';
 export const ORIENTATION_VERTICAL_LETTER = 'v';
+
+export const NO_WORDS_FOUND = 'Aucun mot trouvé.';
+export const FOUND_WORDS = '**Mots trouvés**';
