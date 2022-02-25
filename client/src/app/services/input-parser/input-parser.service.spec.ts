@@ -31,11 +31,11 @@ describe('InputParserService', () => {
     const VALID_EXCHANGE_INPUT = `!${ActionType.EXCHANGE} ${VALID_LETTERS_INPUT_MULTI}`;
     const VALID_PASS_INPUT = `!${ActionType.PASS}`;
     const VALID_PASS_ACTION_DATA = { type: ActionType.PASS, payload: {} };
-    const VALID_RESERVE_INPUT = `!${ActionType.PLACE}`;
+    const VALID_RESERVE_INPUT = `!${ActionType.RESERVE}`;
     // const VALID_HINT_INPUT = '!indice';
     const VALID_HELP_INPUT = `!${ActionType.HELP}`;
     const VALID_POSITION: Position = { row: 0, column: 0 };
-    const VALID_LOCATION: Location = { row: 0, col: 1, orientation: Orientation.Horizontal };
+    const VALID_LOCATION: Location = { row: 0, col: 0, orientation: Orientation.Horizontal };
 
     const DEFAULT_GAME_ID = 'default game id';
     const DEFAULT_PLAYER_ID = 'default player id';
@@ -163,14 +163,14 @@ describe('InputParserService', () => {
             spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new Error('other error message');
             });
-            expect(service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID)).not.toThrow();
+            expect(() => service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID)).not.toThrow();
             expect(gamePlayControllerSpy.sendError).not.toHaveBeenCalled();
         });
     });
 
     describe('createActionData', () => {
         it('should call separateCommandWords and verifyActionValidity', () => {
-            const separateSpy = spyOn<any>(service, 'separateCommandWords');
+            const separateSpy = spyOn<any>(service, 'separateCommandWords').and.returnValue([ActionType.PASS]);
             const verifyValiditySpy = spyOn<any>(service, 'verifyActionValidity');
             service['createActionData'](VALID_PASS_INPUT);
             expect(separateSpy).toHaveBeenCalled();
@@ -180,12 +180,12 @@ describe('InputParserService', () => {
         it('should return right ActionData if input is a valid place command', () => {
             expect(service['createActionData'](VALID_PLACE_INPUT_SINGLE)).toEqual({
                 type: ActionType.PLACE,
-                input: VALID_LETTERS_INPUT_SINGLE,
+                input: VALID_PLACE_INPUT_SINGLE,
                 payload: EXPECTED_PLACE_PAYLOAD_SINGLE,
             });
             expect(service['createActionData'](VALID_PLACE_INPUT)).toEqual({
                 type: ActionType.PLACE,
-                input: VALID_LETTERS_INPUT_MULTI,
+                input: VALID_PLACE_INPUT,
                 payload: EXPECTED_PLACE_PAYLOAD_MULTI,
             });
         });
@@ -277,8 +277,8 @@ describe('InputParserService', () => {
         });
 
         it('should have horizontal orientation if last char is number and trying to place one letter', () => {
-            expect(service['createLocation'](VALID_LETTERS_INPUT_MULTI, 1).orientation).toEqual(Orientation.Horizontal);
-            expect(service['createLocation'](VALID_LETTERS_INPUT_SINGLE, 1).orientation).toEqual(Orientation.Horizontal);
+            expect(service['createLocation'](VALID_LOCATION_INPUT, 1).orientation).toEqual(Orientation.Horizontal);
+            expect(service['createLocation'](VALID_LOCATION_INPUT_SINGLE, 1).orientation).toEqual(Orientation.Horizontal);
         });
 
         it('should throw if last char is not a number and is not h or v', () => {
@@ -288,19 +288,19 @@ describe('InputParserService', () => {
         });
 
         it('should have horizontal orientation if last char is h', () => {
-            expect(service['createLocation']('a1h', 1).row).toEqual(Orientation.Horizontal);
+            expect(service['createLocation']('a1h', 1).orientation).toEqual(Orientation.Horizontal);
         });
 
         it('should have vertical orientation if last char is v', () => {
-            expect(service['createLocation']('a1v', 1).row).toEqual(Orientation.Vertical);
+            expect(service['createLocation']('a1v', 1).orientation).toEqual(Orientation.Vertical);
         });
     });
 
     describe('createPlaceActionPayload', () => {
         it('should call createLocation, parsePlaceLettersToTiles et getStartPosition', () => {
-            const createLocationSpy = spyOn<any>(service, 'createLocation');
+            const createLocationSpy = spyOn<any>(service, 'createLocation').and.returnValue(VALID_LOCATION);
             const lettersToTilesSpy = spyOn<any>(service, 'parseLettersToTiles');
-            const positionSpy = spyOn<any>(service, 'getStartPosition');
+            const positionSpy = spyOn<any>(service, 'getStartPosition').and.returnValue(VALID_POSITION);
             service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
             expect(createLocationSpy).toHaveBeenCalledWith(VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE.length);
             expect(lettersToTilesSpy).toHaveBeenCalledWith(VALID_LETTERS_INPUT_SINGLE, ActionType.PLACE);
@@ -397,7 +397,7 @@ describe('InputParserService', () => {
 
     describe('isValidBlankTileCombination', () => {
         const VALID_PLAYER_LETTER = '*';
-        const VALID_PLACE_LETTER = 'a';
+        const VALID_PLACE_LETTER = 'A';
 
         it('should return true if combination for blank tile is valid', () => {
             expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, VALID_PLACE_LETTER)).toBeTrue();
@@ -408,11 +408,11 @@ describe('InputParserService', () => {
         });
 
         it('should return false if placeLetter is not a valid LetterValue', () => {
-            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, '8')).toBeFalse();
+            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, '^')).toBeFalse();
         });
 
-        it('should return false if placeLetter is in upper case', () => {
-            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, 'A')).toBeFalse();
+        it('should return false if placeLetter is in lower case', () => {
+            expect(service['isValidBlankTileCombination'](VALID_PLAYER_LETTER, 'a')).toBeFalse();
         });
     });
 
@@ -495,7 +495,7 @@ describe('InputParserService', () => {
         it('should call isPositionWithinBounds', () => {
             const isWithinBoundsSpy = spyOn<any>(service, 'isPositionWithinBounds').and.returnValue(true);
             service['getStartPosition'](VALID_LOCATION);
-            expect(isWithinBoundsSpy).toHaveBeenCalledWith(VALID_LOCATION);
+            expect(isWithinBoundsSpy).toHaveBeenCalledWith(VALID_POSITION);
         });
 
         it('should return right position with valid location', () => {
