@@ -1,36 +1,3 @@
-<!-- <div class="container">
-    <div>
-        <div class="info" id="opponent">
-            <app-icon icon="chess-rook" size="lg"></app-icon>
-            &nbsp; Adversaire: {{ lobby.playerName }}
-        </div>
-        <div class="info">
-            <app-icon icon="gamepad" size="lg"> </app-icon>
-            &nbsp; Type de partie: {{ lobby.gameType }}
-        </div>
-    </div>
-    <div>
-        <div class="info">
-            <app-icon icon="hourglass-half" size="lg"></app-icon>
-            &nbsp; Temps par tour: {{ roundTime.minutes }}:{{ roundTime.getTimerSecondsPadded() }}
-        </div>
-    </div>
-
-    <div class="right-side">
-        <div
-            class="button-container"
-            matTooltip="Veuillez entrer un nom valide différent de {{ lobby.playerName }}"
-            matTooltipClass="example-tooltip-red"
-            [matTooltipDisabled]="lobby.canJoin"
-        >
-            <button mat-flat-button id="join-button" color="primary" [disabled]="!lobby.canJoin" (click)="joinLobby()">
-                <app-icon icon="swords" size="lg"></app-icon>
-                &nbsp; Joindre
-            </button>
-        </div>
-    </div>
-</div> -->
-
 <mat-card class="content">
     <div class="info">
         <p class="name">{{ lobby.playerName }}</p>
@@ -39,7 +6,7 @@
             <div class="chip"><app-icon icon="gamepad"></app-icon> {{ lobby.gameType }}</div>
         </div>
     </div>
-    <div class="button" 
+    <div class="button-container" 
         matTooltip="Veuillez entrer un nom valide différent de {{ lobby.playerName }}"
         matTooltipClass="example-tooltip-red"
         [matTooltipDisabled]="lobby.canJoin"

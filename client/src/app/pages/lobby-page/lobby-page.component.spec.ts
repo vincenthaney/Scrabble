@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
@@ -9,6 +11,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -19,6 +23,10 @@ import { NameFieldComponent } from '@app/components/name-field/name-field.compon
 import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
+
+const DEFAULT_FILTER_VALUES = {
+    gameType: 'all',
+};
 
 @Component({
     template: '',
@@ -41,10 +49,12 @@ export class MatDialogMock {
         };
     }
 }
+
 describe('LobbyPageComponent', () => {
     let component: LobbyPageComponent;
     let fixture: ComponentFixture<LobbyPageComponent>;
     let gameDispatcherServiceMock: GameDispatcherService;
+    let validateNameSpy: jasmine.Spy;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -56,6 +66,8 @@ describe('LobbyPageComponent', () => {
                 HttpClientTestingModule,
                 MatDialogModule,
                 MatTooltipModule,
+                MatFormFieldModule,
+                MatSelectModule,
                 BrowserAnimationsModule,
                 FormsModule,
                 ReactiveFormsModule,
@@ -70,6 +82,7 @@ describe('LobbyPageComponent', () => {
                     provide: MatDialog,
                     useClass: MatDialogMock,
                 },
+                MatSnackBar,
             ],
         }).compileComponents();
     });
@@ -85,6 +98,11 @@ describe('LobbyPageComponent', () => {
         });
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
+
+        validateNameSpy = spyOn(component, 'validateName');
+        spyOn<any>(component.filterFormGroup.get('gameType'), 'setValidators');
+        component.filterFormGroup.setValue(DEFAULT_FILTER_VALUES);
+
         fixture.detectChanges();
     });
 
@@ -94,6 +112,7 @@ describe('LobbyPageComponent', () => {
             { lobbyId: '2', playerName: 'Name2', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: true },
             { lobbyId: '3', playerName: 'Name3', gameType: GameType.LOG2990, dictionary: 'default', maxRoundTime: 90, canJoin: false },
         ];
+
         component.nameField = new NameFieldComponent();
     });
 
@@ -102,6 +121,10 @@ describe('LobbyPageComponent', () => {
     });
 
     describe('validateName', () => {
+        beforeEach(() => {
+            validateNameSpy.and.callThrough();
+        });
+
         it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
             component.nameField.formParameters.patchValue({ inputName: 'differentName' });
             component.validateName();
@@ -123,17 +146,13 @@ describe('LobbyPageComponent', () => {
 
     describe('onNameChange', () => {
         it('onNameChange should call validateName', () => {
-            const spy = spyOn(component, 'validateName').and.callFake(() => {
-                return false;
-            });
+            const spy = validateNameSpy.and.returnValue(false);
             component.onNameChange();
             expect(spy).toHaveBeenCalled();
         });
 
         it('onNameChange should call validateName', () => {
-            const spy = spyOn(component['ref'], 'markForCheck').and.callFake(() => {
-                return false;
-            });
+            const spy = validateNameSpy.and.returnValue(false);
             component.onNameChange();
             expect(spy).toHaveBeenCalled();
         });
@@ -141,9 +160,7 @@ describe('LobbyPageComponent', () => {
 
     describe('updateLobbies', () => {
         it('updateLobbies should call validateName', () => {
-            const spy = spyOn(component, 'validateName').and.callFake(() => {
-                return false;
-            });
+            const spy = validateNameSpy.and.returnValue(false);
             component.updateLobbies(component.lobbies);
             expect(spy).toHaveBeenCalled();
         });
