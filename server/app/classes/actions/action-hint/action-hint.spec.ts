@@ -14,7 +14,7 @@ import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
 
-describe('ActionReserve', () => {
+describe('ActionHint', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
     let action: ActionHint;
@@ -38,24 +38,24 @@ describe('ActionReserve', () => {
         });
 
         it('should set wordsPlacement', () => {
-            (action['wordsPlacement'] as unknown) = undefined;
+            (action['hintResult'] as unknown) = undefined;
             action.execute();
-            expect(action['wordsPlacement']).to.not.be.undefined;
+            expect(action['hintResult']).to.not.be.undefined;
         });
     });
 
     describe('getMessage', () => {
         it('should return message', () => {
-            action['wordsPlacement'] = [];
+            action['hintResult'] = [];
             expect(action.getMessage()).to.not.be.undefined;
         });
 
         it('should return message with content', () => {
             const placementsAmount = 3;
-            action['wordsPlacement'] = [];
+            action['hintResult'] = [];
 
             for (let i = 0; i < placementsAmount; ++i) {
-                action['wordsPlacement'].push({
+                action['hintResult'].push({
                     orientation: Orientation.Horizontal,
                     startPosition: new Position(0, 0),
                     tilesToPlace: [],
