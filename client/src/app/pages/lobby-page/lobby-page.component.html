@@ -7,6 +7,8 @@
             </div>
         
             <div class="title">Sélection de partie</div>
+
+            <a routerLink="/game-creation" class="link">Créer une partie</a>
         </div>
     </mat-card>
 
@@ -51,7 +53,7 @@
                                     <mat-select formControlName="gameType">
                                         <mat-option value="all">Tous</mat-option>
                                         <mat-option value="Classique">Classique</mat-option>
-                                        <mat-option value="LOG2990">LOG2990</mat-option>
+                                        <mat-option value="LOG2990" disabled>LOG2990</mat-option>
                                     </mat-select>
                                 </mat-form-field>
                             </form>
