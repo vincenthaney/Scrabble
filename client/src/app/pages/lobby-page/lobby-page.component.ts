@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { NO_LOBBY_CAN_BE_JOINED } from '@app/constants/component-errors';
 import {
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCELED_CONTENT,
@@ -135,7 +136,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
 
     getRandomLobby() {
         const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters !== false);
-        if (filteredLobbies.length === 0) throw new Error('Aucun lobby peut être rejoint.');
+        if (filteredLobbies.length === 0) throw new Error(NO_LOBBY_CAN_BE_JOINED);
         return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
     }
 
