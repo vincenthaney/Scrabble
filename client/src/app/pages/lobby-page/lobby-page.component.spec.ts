@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -6,7 +7,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,10 +17,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { LobbyInfo } from '@app/classes/communication';
 import { GameType } from '@app/classes/game-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { NO_LOBBY_CAN_BE_JOINED } from '@app/constants/component-errors';
 import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
@@ -178,6 +181,111 @@ describe('LobbyPageComponent', () => {
             ];
             component.updateLobbies([]);
             expect(component.lobbies).toEqual([]);
+        });
+    });
+
+    describe('joinRandomLobby', () => {
+        let getRandomLobbySpy: jasmine.Spy;
+        let joinLobbySpy: jasmine.Spy;
+        let snackBarOpenSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            getRandomLobbySpy = spyOn(component, 'getRandomLobby');
+            joinLobbySpy = spyOn(component, 'joinLobby');
+            snackBarOpenSpy = spyOn(component['snackBar'], 'open');
+        });
+
+        it('should call getRandomLobby', () => {
+            component.joinRandomLobby();
+            expect(getRandomLobbySpy).toHaveBeenCalled();
+        });
+
+        it('should call joinLobby with lobby id from getRandomLobby', () => {
+            const lobby = { lobbyId: 'game-id' };
+            getRandomLobbySpy.and.returnValue(lobby);
+            component.joinRandomLobby();
+            expect(joinLobbySpy).toHaveBeenCalledWith(lobby.lobbyId);
+        });
+
+        it('should open snack bar if an error occurs', () => {
+            getRandomLobbySpy.and.throwError('Error');
+            component.joinRandomLobby();
+            expect(snackBarOpenSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('getRandomLobby', () => {
+        it('should return a lobby randomly from lobbies list', () => {
+            (component.lobbies as unknown[]) = [
+                { lobbyId: '1', canJoin: true, meetFilters: true },
+                { lobbyId: '2', canJoin: true, meetFilters: true },
+                { lobbyId: '3', canJoin: true, meetFilters: true },
+                { lobbyId: '4', canJoin: true, meetFilters: true },
+                { lobbyId: '5', canJoin: true, meetFilters: true },
+                { lobbyId: '6', canJoin: true, meetFilters: true },
+            ];
+
+            let lobby = component.getRandomLobby();
+            let lastLobby: unknown;
+            do {
+                lastLobby = lobby;
+                lobby = component.getRandomLobby();
+                expect(component.lobbies.includes(lobby)).toBeTrue();
+            } while (lastLobby === lobby);
+
+            expect(lastLobby).not.toEqual(lobby); // returns random lobby, not always the same
+        });
+
+        it('should throw if no lobby', () => {
+            component.lobbies = [];
+            expect(() => component.getRandomLobby()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+        });
+
+        it('should throw if no lobby can be joined', () => {
+            component.lobbies = component.lobbies.map((lobby) => ({ ...lobby, canJoin: false }));
+            expect(() => component.getRandomLobby()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+        });
+
+        it('should throw if no lobby fits filters', () => {
+            component.lobbies = component.lobbies.map((lobby) => ({ ...lobby, meetFilters: false }));
+            expect(() => component.getRandomLobby()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+        });
+    });
+
+    describe('updateLobbyAttributes', () => {
+        let lobby: LobbyInfo;
+        let getGameTypeSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            lobby = {
+                lobbyId: '1',
+                playerName: 'player',
+                gameType: GameType.Classic,
+                maxRoundTime: 0,
+                dictionary: 'default',
+            };
+
+            getGameTypeSpy = spyOn(component.filterFormGroup, 'get').and.returnValue({ value: 'all' } as AbstractControl);
+        });
+
+        it('should set meetFilters based on gameType', () => {
+            const data: [filter: GameType | 'all', gameType: GameType, expected: boolean][] = [
+                ['all', GameType.Classic, true],
+                ['all', GameType.LOG2990, true],
+                [GameType.Classic, GameType.Classic, true],
+                [GameType.Classic, GameType.LOG2990, false],
+                [GameType.LOG2990, GameType.Classic, false],
+                [GameType.LOG2990, GameType.LOG2990, true],
+            ];
+
+            for (const [filter, gameType, expected] of data) {
+                lobby.meetFilters = undefined;
+                lobby.gameType = gameType;
+                getGameTypeSpy.and.returnValue({ value: filter } as AbstractControl);
+                component.updateLobbyAttributes(lobby);
+                console.log(filter, gameType, expected, lobby.meetFilters);
+                expect<boolean | undefined>(lobby.meetFilters).toEqual(expected);
+            }
         });
     });
 
