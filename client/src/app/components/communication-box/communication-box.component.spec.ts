@@ -142,9 +142,9 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('ngAfterViewInit', () => {
-        it('should call focus on handleKeyEvent', () => {
-            const spy = spyOn(component.messageInputElement.nativeElement, 'focus');
-            component.emitFocusableEvent(new KeyboardEvent('keypress'));
+        it('should subscribe to focusable event', () => {
+            const spy = spyOn<any>(component, 'subscribeToFocusableEvent');
+            component.ngAfterViewInit();
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -285,6 +285,31 @@ describe('CommunicationBoxComponent', () => {
             const spy = spyOn(component['focusableComponentsService'], 'setActiveKeyboardComponent');
             component.onContainerClick();
             expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('handleKeyInput', () => {
+        let focusSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            focusSpy = spyOn(component.messageInputElement.nativeElement, 'focus');
+        });
+
+        it('should call focus', () => {
+            const event = new KeyboardEvent('keypress');
+            component['handleKeyInput'](event);
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        it('should not call focus with CTR+C or CMD+C', () => {
+            const keys = ['ctrlKey', 'metaKey'];
+
+            for (const key of keys) {
+                const event: any = { key: 'c' };
+                event[key] = true;
+                component['handleKeyInput'](event as KeyboardEvent);
+                expect(focusSpy).not.toHaveBeenCalled();
+            }
         });
     });
 
