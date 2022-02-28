@@ -11,6 +11,7 @@ import { expect } from 'chai';
 import { Container } from 'typedi';
 import WordFindingService from './word-finding';
 import * as chai from 'chai';
+import { stub } from 'sinon';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -50,6 +51,15 @@ const DEFAULT_SQUARE_ARRAY = [DEFAULT_SQUARE_1, DEFAULT_SQUARE_2, DEFAULT_SQUARE
 const DEFAULT_TILES_LEFT_SIZE = 7;
 const DEFAULT_SMALL_TILES_LEFT_SIZE = 3;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
+
+const DEFAULT_HORIZONTAL_PROPERTIES = { isTried: false, minimumLength: 1, maximumLength: 2 };
+const DEFAULT_VERTICAL_PROPERTIES = { isTried: false, minimumLength: 1, maximumLength: 3 };
+const DEFAULT_SQUARE_PROPERTIES = {
+    square: DEFAULT_SQUARE_1,
+    horizontal: DEFAULT_HORIZONTAL_PROPERTIES,
+    vertical: DEFAULT_VERTICAL_PROPERTIES,
+    isEmpty: true,
+};
 
 const permutationAmount = (total: number, wanted: number) => {
     return factorial(total) / factorial(total - wanted);
@@ -217,6 +227,25 @@ describe.only('WordFindingservice', () => {
         });
     });
 
+    describe('findSquareProperties', () => {
+        it('should call findProperties twice', () => {
+            const spy = chai.spy.on(service, 'findProperties');
+            service.findSquareProperties(board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE);
+            expect(spy).to.have.been.called.twice;
+        });
+
+        it('should return the correct SquareProperties  ', () => {
+            const stubFindProperties = stub(service, 'findProperties');
+            stubFindProperties.onCall(0).returns(DEFAULT_HORIZONTAL_PROPERTIES);
+            stubFindProperties.onCall(1).returns(DEFAULT_VERTICAL_PROPERTIES);
+
+            chai.spy.on(BoardNavigator, 'isEmpty', () => {
+                return true;
+            });
+            expect(service.findSquareProperties(board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(DEFAULT_SQUARE_PROPERTIES);
+        });
+    });
+
     describe('getRandomSquare', () => {
         it('should remove 1 element form array and return it', () => {
             const arrayCopy: Square[] = JSON.parse(JSON.stringify(DEFAULT_SQUARE_ARRAY));
@@ -226,6 +255,40 @@ describe.only('WordFindingservice', () => {
             expect(arrayCopy.includes(removedSquare)).to.be.false;
         });
     });
+
+
+    describe('getCorrespondingMovePossibility', () => {
+        it('should the horizontal move property if asked', () => {
+            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
+                DEFAULT_SQUARE_PROPERTIES.horizontal,
+            );
+        });
+
+        it('should the vertical move property if asked', () => {
+            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
+                DEFAULT_SQUARE_PROPERTIES.vertical,
+            );
+        });
+    });
+
+
+    //////////////////////
+
+    describe('getCorrespondingMovePossibility', () => {
+        it('should the horizontal move property if asked', () => {
+            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
+                DEFAULT_SQUARE_PROPERTIES.horizontal,
+            );
+        });
+
+        it('should the vertical move property if asked', () => {
+            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
+                DEFAULT_SQUARE_PROPERTIES.vertical,
+            );
+        });
+    });
+
+    ////////////////////
 
     describe('findPermutations / / getRackPermutations', () => {
         it('should return an empty array if the tile rack is empty', () => {
