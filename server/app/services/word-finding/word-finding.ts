@@ -14,12 +14,17 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { StringConversion } from '@app/utils/string-conversion';
-// import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { Random } from '@app/utils/random';
 
 export interface MovePossibilities {
     isTried: boolean;
     minimumLength: number;
     maximumLength: number;
+}
+
+export interface EvaluatedPlacement extends WordPlacement {
+    score: number;
 }
 export interface SquareProperties {
     square: Square;
@@ -28,13 +33,71 @@ export interface SquareProperties {
     isEmpty: boolean;
 }
 const INITIAL_TILE = 1;
+const QUICK_MOVE_TIME = 3000;
+const LONG_MOVE_TIME = 20000;
 
 @Service()
 export default class WordFindingService {
-    constructor(
-        private wordExtraction: WordExtraction,
-        private wordVerification: WordsVerificationService, // private scoreCalculator: ScoreCalculatorService,
-    ) {}
+    private wordExtraction: WordExtraction;
+    constructor(private wordVerification: WordsVerificationService, private scoreCalculator: ScoreCalculatorService) {}
+
+    // eslint-disable-next-line no-unused-vars
+    findWords(board: Board, tiles: Tile[], query: WordFindingRequest): EvaluatedPlacement[] {
+        const validMoves: EvaluatedPlacement[] = [];
+        // const validMoves: EvaluatedPlacement[] = [];
+        let isOver = false;
+
+        setTimeout(() => {
+            if (validMoves.length > query.numberOfWordsToFind) {
+                isOver = true;
+            } else {
+                setTimeout(() => {
+                    isOver = true;
+                }, LONG_MOVE_TIME - QUICK_MOVE_TIME);
+            }
+        }, QUICK_MOVE_TIME);
+
+        const rackPermutation = this.getRackPermutations(tiles);
+        this.wordExtraction = new WordExtraction(board);
+        const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
+
+        while (emptySquares.length > 0 && !isOver) {
+            const emptySquare = this.getRandomSquare(emptySquares);
+            const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
+
+            for (const permutation of rackPermutation) {
+                this.attemptMove(squareProperties, permutation, validMoves);
+            }
+        }
+        return this.chooseMove(validMoves, query);
+    }
+
+    // Hint if I find only 2 moves and we want 3, what to do
+    // If we find no possible moves, what to do?
+    // What do we want Hint to return? best moves? random moves?
+    chooseMove(validMoves: EvaluatedPlacement[], query: WordFindingRequest): EvaluatedPlacement[] {
+        if (query.numberOfWordsToFind >= validMoves.length) {
+            return validMoves;
+        } else if (query.maximiseScore) {
+            return validMoves.sort((previous, current) => previous.score - current.score).slice(0, query.numberOfWordsToFind);
+        } else if (!query.pointRange || !query.pointHistoric) {
+            return Random.getRandomElementsFromArray(validMoves, query.numberOfWordsToFind);
+        }
+
+        // Get the lowest frequency score move from available moves
+        const foundMoves = new Map<number, EvaluatedPlacement>();
+        for (const move of validMoves) {
+            if (query.pointRange.minimum <= move.score && move.score <= query.pointRange.maximum && !foundMoves.has(move.score)) {
+                foundMoves.set(move.score, move);
+            }
+        }
+        let lowestFrequency = Number.POSITIVE_INFINITY;
+        for (const move of foundMoves) {
+            const frequency = query.pointHistoric.get(move[0]);
+            if (frequency && frequency < lowestFrequency) lowestFrequency = frequency;
+        }
+        return [foundMoves[lowestFrequency]];
+    }
 
     findProperties(navigator: BoardNavigator, tileRackSize: number): MovePossibilities {
         const movePossibilities = { isTried: false, minimumLength: Number.POSITIVE_INFINITY, maximumLength: Number.POSITIVE_INFINITY };
@@ -73,39 +136,32 @@ export default class WordFindingService {
         };
     }
 
-    // eslint-disable-next-line no-unused-vars
-    findWords(board: Board, tiles: Tile[], query: WordFindingRequest): WordPlacement[] {
-        const rackPermutation = this.getRackPermutations(tiles);
-        const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
-        const validMoves: WordPlacement[] = [];
-
-        while (emptySquares.length > 0) {
-            const emptySquare = this.getRandomSquare(emptySquares);
-            const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
-
-            for (const permutation of rackPermutation) {
-                this.attemptMove(squareProperties, permutation, validMoves);
-            }
-        }
-        return validMoves;
-    }
-
-    attemptMove(squareProperties: SquareProperties, permutation: Tile[], validMoves: WordPlacement[]): void {
+    attemptMove(squareProperties: SquareProperties, permutation: Tile[], validMoves: EvaluatedPlacement[]): void {
         let result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Horizontal);
         if (result) validMoves.push(result);
         result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Vertical);
         if (result) validMoves.push(result);
     }
 
-    attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): WordPlacement | undefined {
+    attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {
         const movePossibilities = this.getCorrespondingMovePossibility(squareProperties, orientation);
-        if (movePossibilities.isTried && this.isWithin(movePossibilities, permutation.length)) {
+        if (!movePossibilities.isTried && this.isWithin(movePossibilities, permutation.length)) {
             try {
+                // console.log('before extract');
+                // console.log('before verifyWords');
+                // console.log('before return');
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
                 this.wordVerification.verifyWords(StringConversion.wordToString(createdWords), DICTIONARY_NAME);
-                return { tilesToPlace: permutation, orientation, startPosition: squareProperties.square.position };
+                return {
+                    tilesToPlace: permutation,
+                    orientation,
+                    startPosition: squareProperties.square.position,
+                    score: this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(permutation),
+                };
                 // eslint-disable-next-line no-empty
-            } catch (exception) {}
+            } catch (exception) {
+                // console.log('word invalid');
+            }
         }
         return undefined;
     }
@@ -142,7 +198,7 @@ export default class WordFindingService {
         return res.filter((l) => l.length > 0);
     }
 
-    permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []) {
+    permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []): void {
         if (tiles.length === 0) {
             result.push(current);
             return;
