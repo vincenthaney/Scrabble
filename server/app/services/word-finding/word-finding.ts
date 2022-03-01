@@ -33,7 +33,7 @@ export interface SquareProperties {
     isEmpty: boolean;
 }
 const INITIAL_TILE = 1;
-const QUICK_MOVE_TIME = 3000;
+// const QUICK_MOVE_TIME = 3000;
 const LONG_MOVE_TIME = 20000;
 
 @Service()
@@ -44,21 +44,24 @@ export default class WordFindingService {
     // eslint-disable-next-line no-unused-vars
     findWords(board: Board, tiles: Tile[], query: WordFindingRequest): EvaluatedPlacement[] {
         const validMoves: EvaluatedPlacement[] = [];
-        // const validMoves: EvaluatedPlacement[] = [];
         let isOver = false;
 
-        setTimeout(() => {
-            if (validMoves.length > query.numberOfWordsToFind) {
-                isOver = true;
-            } else {
-                setTimeout(() => {
-                    isOver = true;
-                }, LONG_MOVE_TIME - QUICK_MOVE_TIME);
-            }
-        }, QUICK_MOVE_TIME);
+        // setTimeout(() => {
+        //     if (validMoves.length > query.numberOfWordsToFind) {
+        //         isOver = true;
+        //     } else {
+        //         setTimeout(() => {
+        //             isOver = true;
+        //         }, LONG_MOVE_TIME - QUICK_MOVE_TIME);
+        //     }
+        // }, QUICK_MOVE_TIME);
 
-        const rackPermutation = this.getRackPermutations(tiles);
+        setTimeout(() => {
+            isOver = true;
+        }, LONG_MOVE_TIME);
+
         this.wordExtraction = new WordExtraction(board);
+        const rackPermutation = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
 
         while (emptySquares.length > 0 && !isOver) {
@@ -69,6 +72,7 @@ export default class WordFindingService {
                 this.attemptMove(squareProperties, permutation, validMoves);
             }
         }
+        // cleartimeout??
         return this.chooseMove(validMoves, query);
     }
 
@@ -76,7 +80,7 @@ export default class WordFindingService {
     // If we find no possible moves, what to do?
     // What do we want Hint to return? best moves? random moves?
     chooseMove(validMoves: EvaluatedPlacement[], query: WordFindingRequest): EvaluatedPlacement[] {
-        if (query.numberOfWordsToFind >= validMoves.length) {
+        if (validMoves.length <= query.numberOfWordsToFind) {
             return validMoves;
         } else if (query.maximiseScore) {
             return validMoves.sort((previous, current) => previous.score - current.score).slice(0, query.numberOfWordsToFind);
@@ -147,9 +151,6 @@ export default class WordFindingService {
         const movePossibilities = this.getCorrespondingMovePossibility(squareProperties, orientation);
         if (!movePossibilities.isTried && this.isWithin(movePossibilities, permutation.length)) {
             try {
-                // console.log('before extract');
-                // console.log('before verifyWords');
-                // console.log('before return');
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
                 this.wordVerification.verifyWords(StringConversion.wordToString(createdWords), DICTIONARY_NAME);
                 return {
@@ -159,9 +160,7 @@ export default class WordFindingService {
                     score: this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(permutation),
                 };
                 // eslint-disable-next-line no-empty
-            } catch (exception) {
-                // console.log('word invalid');
-            }
+            } catch (exception) {}
         }
         return undefined;
     }
