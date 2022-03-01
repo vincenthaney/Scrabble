@@ -12,11 +12,14 @@ import { expect } from 'chai';
 import { Container } from 'typedi';
 import WordFindingService, { EvaluatedPlacement } from './word-finding';
 import * as chai from 'chai';
-import { stub } from 'sinon';
+import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { StringConversion } from '@app/utils/string-conversion';
 import { assert } from 'console';
-import { WordPlacement } from '@app/classes/word-finding';
+import { WordFindingRequest } from '@app/classes/word-finding';
+import { Random } from '@app/utils/random';
+import { NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { LONG_MOVE_TIME, FINAL_COMPUTE_TIME } from '@app/constants/services-constants/word-finding.const';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -49,10 +52,6 @@ const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(0, 1), sco
 const DEFAULT_SQUARE_3: Square = { tile: null, position: new Position(0, 2), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_4: Square = { tile: null, position: new Position(0, 3), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_ARRAY = [DEFAULT_SQUARE_1, DEFAULT_SQUARE_2, DEFAULT_SQUARE_3, DEFAULT_SQUARE_4];
-// const OUT_OF_BOUNDS_POSITION: Position = new Position(999, 999);
-// const OUT_OF_BOUNDS_ROW: Position = new Position(999, 0);
-// const OUT_OF_BOUNDS_COLUMN: Position = new Position(0, 999);
-// const SHOULD_BE_FILLED = true;
 const DEFAULT_TILES_LEFT_SIZE = 7;
 const DEFAULT_SMALL_TILES_LEFT_SIZE = 3;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
@@ -65,6 +64,53 @@ const DEFAULT_SQUARE_PROPERTIES = {
     vertical: DEFAULT_VERTICAL_PROPERTIES,
     isEmpty: true,
 };
+
+const DEFAULT_HISTORIC = new Map<number, number>([
+    [1, 1],
+    [2, 2],
+    [4, 1],
+    [8, 2],
+    [15, 3],
+]);
+
+const DEFAULT_REQUEST: WordFindingRequest = {
+    pointRange: { minimum: 2, maximum: 8 },
+    numberOfWordsToFind: 1,
+    pointHistoric: DEFAULT_HISTORIC,
+    maximiseScore: false,
+};
+
+const BEST_MOVE = {
+    tilesToPlace: SMALL_TILE_RACK,
+    orientation: Orientation.Horizontal,
+    startPosition: DEFAULT_SQUARE_2.position,
+    score: 15,
+};
+
+const DEFAULT_MOVE_4 = {
+    tilesToPlace: SMALL_TILE_RACK,
+    orientation: Orientation.Horizontal,
+    startPosition: DEFAULT_SQUARE_2.position,
+    score: 4,
+};
+
+const DEFAULT_MOVE_2 = {
+    tilesToPlace: SINGLE_TILE_TILE_RACK,
+    orientation: Orientation.Horizontal,
+    startPosition: DEFAULT_SQUARE_1.position,
+    score: 2,
+};
+
+const DEFAULT_MOVE_3 = {
+    tilesToPlace: SINGLE_TILE_TILE_RACK,
+    orientation: Orientation.Horizontal,
+    startPosition: DEFAULT_SQUARE_3.position,
+    score: 3,
+};
+
+const SINGLE_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_4];
+
+const DEFAULT_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_2, BEST_MOVE, DEFAULT_MOVE_3, DEFAULT_MOVE_4, DEFAULT_MOVE_4, DEFAULT_MOVE_2];
 
 const permutationAmount = (total: number, wanted: number) => {
     return factorial(total) / factorial(total - wanted);
@@ -90,7 +136,7 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
 
         line.forEach((letter, column) => {
             boardRow.push({
-                tile: letter === ' ' ? null : { letter: letter as LetterValue, value: 0 },
+                tile: letter === ' ' ? null : { letter: letter as LetterValue, value: 1 },
                 position: new Position(row, column),
                 scoreMultiplier: null,
                 wasMultiplierUsed: false,
@@ -104,7 +150,7 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
     return new Board(grid);
 };
 
-describe.only('WordFindingservice', () => {
+describe('WordFindingservice', () => {
     let board: Board;
     let navigator: BoardNavigator;
     let service: WordFindingService;
@@ -121,6 +167,58 @@ describe.only('WordFindingservice', () => {
 
     it('should be created', () => {
         expect(service).to.exist;
+    });
+
+    describe('findWords', () => {
+        let request: WordFindingRequest;
+        beforeEach(() => {
+            request = { ...DEFAULT_REQUEST };
+        });
+        it('should call the correct functions', () => {
+            const spyGetRackPermutations = chai.spy.on(service, 'getRackPermutations', () => {
+                return [SMALL_TILE_RACK, SINGLE_TILE_TILE_RACK];
+            });
+            const spyGetDesiredSquares = chai.spy.on(service, 'getDesiredSquares', () => {
+                return DEFAULT_SQUARE_ARRAY;
+            });
+            const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
+            const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
+            const spyAttemptMove = chai.spy.on(service, 'attemptMove');
+            const spyChooseMove = chai.spy.on(service, 'chooseMove');
+
+            service.findWords(board, BIG_TILE_RACK, request);
+            expect(spyGetRackPermutations).to.have.been.called;
+            expect(spyGetDesiredSquares).to.have.been.called;
+            expect(spyGetRandomSquare).to.have.been.called;
+            expect(spyFindSquareProperties).to.have.been.called;
+            expect(spyAttemptMove).to.have.been.called;
+            expect(spyChooseMove).to.have.been.called;
+        });
+
+        it('should set timeOver to true and stop processing when timeout ', () => {
+            const clock = useFakeTimers();
+            const spyGetRackPermutations = chai.spy.on(service, 'getRackPermutations', () => {
+                clock.tick(LONG_MOVE_TIME - FINAL_COMPUTE_TIME);
+                return [SMALL_TILE_RACK, SINGLE_TILE_TILE_RACK];
+            });
+            const spyGetDesiredSquares = chai.spy.on(service, 'getDesiredSquares', () => {
+                return DEFAULT_SQUARE_ARRAY;
+            });
+            const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
+            const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
+            const spyAttemptMove = chai.spy.on(service, 'attemptMove');
+            const spyChooseMove = chai.spy.on(service, 'chooseMove');
+
+            service.findWords(board, BIG_TILE_RACK, request);
+            expect(spyGetRackPermutations).to.have.been.called;
+            expect(spyGetDesiredSquares).to.have.been.called;
+            expect(spyGetRandomSquare).not.to.have.been.called;
+            expect(spyFindSquareProperties).not.to.have.been.called;
+            expect(spyAttemptMove).not.to.have.been.called;
+            expect(spyChooseMove).to.have.been.called;
+
+            clock.restore();
+        });
     });
 
     describe('attemptMoveDirection', () => {
@@ -189,6 +287,7 @@ describe.only('WordFindingservice', () => {
                 tilesToPlace: SMALL_TILE_RACK,
                 orientation: Orientation.Horizontal,
                 startPosition: DEFAULT_SQUARE_PROPERTIES.square.position,
+                score: 13,
             };
 
             expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.deep.equal(expected);
@@ -196,28 +295,100 @@ describe.only('WordFindingservice', () => {
         });
     });
 
-    /////////////////////
-
     describe('chooseMove', () => {
-        it('should return all validMoves if the query asks for more than there is', () => {
-            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection').returns(undefined);
-            const validMoves: EvaluatedPlacement[] = [];
-            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
-            assert(stubAttemptMoveDirection.calledTwice);
+        let request: WordFindingRequest;
+        beforeEach(() => {
+            request = { ...DEFAULT_REQUEST };
         });
 
-        it('should add the EvaluatedPlacement that are valid', () => {
-            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
-            stubAttemptMoveDirection.onCall(0).returns(undefined);
-            stubAttemptMoveDirection.onCall(1).returns({} as unknown as EvaluatedPlacement);
-            const validMoves: EvaluatedPlacement[] = [{} as unknown as EvaluatedPlacement];
-            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
-            assert(stubAttemptMoveDirection.calledTwice);
-            expect(validMoves.length).to.equal(2);
+        it('should return all validMoves if the query asks for more than there is', () => {
+            request.numberOfWordsToFind = SINGLE_VALID_MOVES.length + 1;
+            expect(service.chooseMove(SINGLE_VALID_MOVES, request)).to.deep.equal(SINGLE_VALID_MOVES);
+        });
+
+        it('should return the best move if maximizeScore', () => {
+            request.maximiseScore = true;
+            expect(service.chooseMove(DEFAULT_VALID_MOVES, request)).to.deep.equal([BEST_MOVE]);
+        });
+
+        it('should call getRandomElementsFromArray if query has  no pointHistoric', () => {
+            request.pointHistoric = undefined;
+            const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
+            service.chooseMove(DEFAULT_VALID_MOVES, request);
+            assert(stubGetRandomElementsFromArray.calledOnce);
+            stubGetRandomElementsFromArray.restore();
+        });
+
+        it('should call getRandomElementsFromArray if query has no pointRange ', () => {
+            request.pointRange = undefined;
+            const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
+            service.chooseMove(DEFAULT_VALID_MOVES, request);
+            assert(stubGetRandomElementsFromArray.calledOnce);
+            stubGetRandomElementsFromArray.restore();
+        });
+
+        it('should call getMovesInRange and  selectLowestFrequencyScoreMove if there is a pointRange and a pointHistoric  ', () => {
+            const stubGetMovesInRange = stub(service, 'getMovesInRange').returns({} as unknown as Map<number, EvaluatedPlacement>);
+            const stubSelectLowestFrequencyScoreMove = stub(service, 'selectLowestFrequencyScoreMove');
+            service.chooseMove(DEFAULT_VALID_MOVES, request);
+            assert(stubGetMovesInRange.calledOnce);
+            assert(stubSelectLowestFrequencyScoreMove.calledOnce);
         });
     });
 
-    ////////////////////
+    describe('getMovesInRange', () => {
+        let request: WordFindingRequest;
+        beforeEach(() => {
+            request = { ...DEFAULT_REQUEST };
+        });
+
+        it('should throw if there is no pointRange', () => {
+            request.pointRange = undefined;
+            const result = () => service.getMovesInRange(SINGLE_VALID_MOVES, request);
+            expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
+        });
+
+        it('should return a map containing 1 of each score ', () => {
+            const expected: Map<number, EvaluatedPlacement> = new Map([
+                [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
+                [DEFAULT_MOVE_3.score, DEFAULT_MOVE_3],
+                [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
+            ]);
+            expect(service.getMovesInRange(DEFAULT_VALID_MOVES, request)).to.deep.equal(expected);
+        });
+    });
+
+    describe('selectLowestFrequencyScoreMove', () => {
+        let request: WordFindingRequest;
+        beforeEach(() => {
+            request = { ...DEFAULT_REQUEST };
+        });
+
+        it('should throw if there is no pointHistoric', () => {
+            const foundMovesMap = new Map();
+            request.pointHistoric = undefined;
+            const result = () => service.selectLowestFrequencyScoreMove(foundMovesMap, request);
+            expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
+        });
+
+        it('should return the first move with a score that was never played ', () => {
+            const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
+                [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
+                [DEFAULT_MOVE_3.score, DEFAULT_MOVE_3],
+                [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
+            ]);
+            expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_3);
+        });
+
+        it('should return the move with the lowest frequency amongst scores that were alreayd played', () => {
+            const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
+                [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
+                [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
+                [BEST_MOVE.score, BEST_MOVE],
+            ]);
+            expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_4);
+        });
+    });
 
     describe('attemptMove', () => {
         it('should call attemptMoveDirection', () => {
@@ -227,7 +398,17 @@ describe.only('WordFindingservice', () => {
             assert(stubAttemptMoveDirection.calledTwice);
         });
 
-        it('should add the EvaluatedPlacement that are valid', () => {
+        it('should add the EvaluatedPlacement that are valid (0)', () => {
+            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
+            stubAttemptMoveDirection.onCall(0).returns({} as unknown as EvaluatedPlacement);
+            stubAttemptMoveDirection.onCall(1).returns(undefined);
+            const validMoves: EvaluatedPlacement[] = [{} as unknown as EvaluatedPlacement];
+            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            assert(stubAttemptMoveDirection.calledTwice);
+            expect(validMoves.length).to.equal(2);
+        });
+
+        it('should add the EvaluatedPlacement that are valid (1)', () => {
             const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
             stubAttemptMoveDirection.onCall(0).returns(undefined);
             stubAttemptMoveDirection.onCall(1).returns({} as unknown as EvaluatedPlacement);
@@ -255,6 +436,12 @@ describe.only('WordFindingservice', () => {
         it('should return the correct amount of tiles if there is a neighbor on the side', () => {
             navigator = new BoardNavigator(board, new Position(0, 1), Orientation.Horizontal);
             expect(service.findMinimumWordLength(navigator)).to.equal(2);
+        });
+
+        it('should return the correct amount of tiles if there the center', () => {
+            board.grid[2][0].isCenter = true;
+            navigator = new BoardNavigator(board, new Position(0, 0), Orientation.Horizontal);
+            expect(service.findMinimumWordLength(navigator)).to.equal(3);
         });
 
         it('should return the correct amount of tiles if there is a neighbor on the path', () => {
@@ -469,7 +656,7 @@ describe.only('WordFindingservice', () => {
         });
     });
 
-    describe('findPermutations / / getRackPermutations', () => {
+    describe('getRackPermutations', () => {
         it('should call combination and permuteTiles', () => {
             const spyCombination = chai.spy.on(service, 'combination');
             const spyPermuteTiles = chai.spy.on(service, 'permuteTiles');
@@ -526,9 +713,4 @@ describe.only('WordFindingservice', () => {
             expect(result.length).to.deep.equal(expectedlength);
         });
     });
-
-    // it('should throw', () => {
-    //     const result = () => service.findWords({} as unknown as Board, [] as unknown as Tile[], {} as unknown as WordFindingRequest);
-    //     expect(result).to.throw();
-    // });
 });
