@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
@@ -12,6 +13,10 @@ import { Container } from 'typedi';
 import WordFindingService from './word-finding';
 import * as chai from 'chai';
 import { stub } from 'sinon';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { StringConversion } from '@app/utils/string-conversion';
+import { assert } from 'console';
+import { WordPlacement } from '@app/classes/word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -107,15 +112,107 @@ describe.only('WordFindingservice', () => {
     beforeEach(() => {
         board = boardFromLetterValues(BOARD);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
+        service = Container.get(WordFindingService);
     });
 
-    beforeEach(() => {
+    afterEach(() => {
         Container.reset();
-        service = Container.get(WordFindingService);
     });
 
     it('should be created', () => {
         expect(service).to.exist;
+    });
+
+    describe('attemptMoveDirection', () => {
+        beforeEach(() => {
+            service['wordExtraction'] = new WordExtraction(board);
+        });
+
+        it('should call the correct functions', () => {
+            const spyGetCorrespondingMovePossibility = chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
+                return DEFAULT_SQUARE_PROPERTIES.horizontal;
+            });
+            const spyIsWithin = chai.spy.on(service, 'isWithin', () => {
+                return true;
+            });
+
+            const stubWordToString = stub(StringConversion, 'wordToString');
+
+            const spyExtract = chai.spy.on(service['wordExtraction'], 'extract');
+            const spyVerifyWords = chai.spy.on(service['wordVerification'], 'verifyWords');
+
+            service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal);
+            expect(spyGetCorrespondingMovePossibility).to.have.been.called;
+            expect(spyIsWithin).to.have.been.called;
+            assert(stubWordToString.calledOnce);
+            expect(spyExtract).to.have.been.called;
+            expect(spyVerifyWords).to.have.been.called;
+            stubWordToString.restore();
+        });
+
+        it('should return undefined if an error is thrown', () => {
+            chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
+                return DEFAULT_SQUARE_PROPERTIES.horizontal;
+            });
+            chai.spy.on(service, 'isWithin', () => {
+                return true;
+            });
+            chai.spy.on(service['wordExtraction'], 'extract', () => {
+                throw new Error();
+            });
+
+            expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
+        });
+
+        it('should return undefined if it isnt within the possible range', () => {
+            chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
+                return DEFAULT_SQUARE_PROPERTIES.horizontal;
+            });
+            chai.spy.on(service, 'isWithin', () => {
+                return false;
+            });
+            expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
+        });
+
+        it('should return the current permutation as a WordPlacement if everything succeeds', () => {
+            chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
+                return DEFAULT_SQUARE_PROPERTIES.horizontal;
+            });
+            chai.spy.on(service, 'isWithin', () => {
+                return true;
+            });
+            const stubWordToString = stub(StringConversion, 'wordToString').returns(['']);
+
+            chai.spy.on(service['wordExtraction'], 'extract');
+            chai.spy.on(service['wordVerification'], 'verifyWords');
+            const expected = {
+                tilesToPlace: SMALL_TILE_RACK,
+                orientation: Orientation.Horizontal,
+                startPosition: DEFAULT_SQUARE_PROPERTIES.square.position,
+            };
+
+            expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.deep.equal(expected);
+            stubWordToString.restore();
+        });
+    });
+
+    describe('attemptMove', () => {
+        it('should call attemptMoveDirection', () => {
+            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection').returns(undefined);
+            const validMoves: WordPlacement[] = [];
+            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            assert(stubAttemptMoveDirection.calledTwice);
+        });
+
+        it('should add the wordPlacement that are valid', () => {
+            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
+            stubAttemptMoveDirection.onCall(0).returns(undefined);
+            stubAttemptMoveDirection.onCall(1).returns({} as unknown as WordPlacement);
+            const validMoves: WordPlacement[] = [{} as unknown as WordPlacement];
+            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            assert(stubAttemptMoveDirection.calledTwice);
+            expect(validMoves.length).to.equal(2);
+        });
     });
 
     describe('findMinimumWordLength', () => {
@@ -127,7 +224,7 @@ describe.only('WordFindingservice', () => {
             expect(spy).to.have.been.called;
         });
 
-        it('should return POSITIVE_INFINITY if there is no neighbour', () => {
+        it('should return POSITIVE_INFINITY if there is no neighbor', () => {
             navigator = navigator.switchOrientation();
             expect(service.findMinimumWordLength(navigator)).to.equal(Number.POSITIVE_INFINITY);
         });
@@ -256,7 +353,6 @@ describe.only('WordFindingservice', () => {
         });
     });
 
-
     describe('getCorrespondingMovePossibility', () => {
         it('should the horizontal move property if asked', () => {
             expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
@@ -271,26 +367,94 @@ describe.only('WordFindingservice', () => {
         });
     });
 
-
-    //////////////////////
-
     describe('getCorrespondingMovePossibility', () => {
-        it('should the horizontal move property if asked', () => {
+        it('should get the horizontal move property if asked', () => {
             expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
                 DEFAULT_SQUARE_PROPERTIES.horizontal,
             );
         });
 
-        it('should the vertical move property if asked', () => {
+        it('should get the vertical move property if asked', () => {
             expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
                 DEFAULT_SQUARE_PROPERTIES.vertical,
             );
         });
     });
 
-    ////////////////////
+    describe('isWithin', () => {
+        it('should return true if the target if within the movePossibilities range', () => {
+            expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
+        });
+
+        it('should return false if the target if within the movePossibilities range', () => {
+            expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
+        });
+    });
+
+    describe('combination', () => {
+        it('should return an empty array if the rack is empty (0 tiles)', () => {
+            const expected: Tile[][] = [];
+            expect(service.combination(EMPTY_TILE_RACK)).to.deep.equal(expected);
+        });
+
+        it('should return all combinations of the given tiles (1 tile)', () => {
+            const expected: Tile[][] = [[DEFAULT_TILE_A]];
+            expect(service.combination(SINGLE_TILE_TILE_RACK)).to.deep.equal(expected);
+        });
+
+        it('should return all combinations of the given tiles (3 tiles)', () => {
+            const expected: Tile[][] = [
+                [DEFAULT_TILE_A],
+                [DEFAULT_TILE_B],
+                [DEFAULT_TILE_A, DEFAULT_TILE_B],
+                [DEFAULT_TILE_C],
+                [DEFAULT_TILE_A, DEFAULT_TILE_C],
+                [DEFAULT_TILE_B, DEFAULT_TILE_C],
+                [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C],
+            ];
+            expect(service.combination(SMALL_TILE_RACK)).to.deep.equal(expected);
+        });
+    });
+
+    describe('permuteTiles', () => {
+        it('should result should be an empty array if the rack is empty (0 tiles)', () => {
+            const expected: Tile[][] = [[]];
+            const result: Tile[][] = [];
+            service.permuteTiles(EMPTY_TILE_RACK, result);
+            expect(result).to.deep.equal(expected);
+        });
+
+        it('should return all combinations of the given tiles (1 tile)', () => {
+            const expected: Tile[][] = [[DEFAULT_TILE_A]];
+            const result: Tile[][] = [];
+            service.permuteTiles(SINGLE_TILE_TILE_RACK, result);
+            expect(result).to.deep.equal(expected);
+        });
+
+        it('should return all combinations of the given tiles (3 tiles)', () => {
+            const result: Tile[][] = [];
+            const expected: Tile[][] = [
+                [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C],
+                [DEFAULT_TILE_A, DEFAULT_TILE_C, DEFAULT_TILE_B],
+                [DEFAULT_TILE_B, DEFAULT_TILE_A, DEFAULT_TILE_C],
+                [DEFAULT_TILE_B, DEFAULT_TILE_C, DEFAULT_TILE_A],
+                [DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_B],
+                [DEFAULT_TILE_C, DEFAULT_TILE_B, DEFAULT_TILE_A],
+            ];
+            service.permuteTiles(SMALL_TILE_RACK, result);
+            expect(result).to.deep.equal(expected);
+        });
+    });
 
     describe('findPermutations / / getRackPermutations', () => {
+        it('should call combination and permuteTiles', () => {
+            const spyCombination = chai.spy.on(service, 'combination');
+            const spyPermuteTiles = chai.spy.on(service, 'permuteTiles');
+            service.getRackPermutations(SINGLE_TILE_TILE_RACK);
+            expect(spyCombination).to.have.been.called;
+            expect(spyPermuteTiles).to.have.been.called;
+        });
+
         it('should return an empty array if the tile rack is empty', () => {
             const expected: Tile[][] = [];
             const result: Tile[][] = service.getRackPermutations(EMPTY_TILE_RACK);
