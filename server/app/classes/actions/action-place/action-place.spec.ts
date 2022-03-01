@@ -14,6 +14,7 @@ import { Tile, TileReserve } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { StringConversion } from '@app/utils/string-conversion';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -147,7 +148,7 @@ describe('ActionPlace', () => {
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
-                wordToStringSpy = chai.spy.on(ActionPlace.prototype, 'wordToString', () => []);
+                wordToStringSpy = chai.spy.on(StringConversion, 'wordToString', () => []);
             });
 
             afterEach(() => {
