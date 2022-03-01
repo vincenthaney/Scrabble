@@ -16,7 +16,11 @@ import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verific
 import { StringConversion } from '@app/utils/string-conversion';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Random } from '@app/utils/random';
+import { NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { FINAL_COMPUTE_TIME, INITIAL_TILE, LONG_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 
+// Not currently considering wildcards
+// Not currently ignoring repeating tiles
 export interface MovePossibilities {
     isTried: boolean;
     minimumLength: number;
@@ -32,22 +36,18 @@ export interface SquareProperties {
     vertical: MovePossibilities;
     isEmpty: boolean;
 }
-const INITIAL_TILE = 1;
-// const QUICK_MOVE_TIME = 3000;
-const LONG_MOVE_TIME = 20000;
 
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
     constructor(private wordVerification: WordsVerificationService, private scoreCalculator: ScoreCalculatorService) {}
 
-    // eslint-disable-next-line no-unused-vars
-    findWords(board: Board, tiles: Tile[], query: WordFindingRequest): EvaluatedPlacement[] {
+    findWords(board: Board, tiles: Tile[], request: WordFindingRequest): EvaluatedPlacement[] {
         const validMoves: EvaluatedPlacement[] = [];
-        let isOver = false;
+        let timeOver = false;
 
         // setTimeout(() => {
-        //     if (validMoves.length > query.numberOfWordsToFind) {
+        //     if (validMoves.length > request.numberOfWordsToFind) {
         //         isOver = true;
         //     } else {
         //         setTimeout(() => {
@@ -56,15 +56,15 @@ export default class WordFindingService {
         //     }
         // }, QUICK_MOVE_TIME);
 
-        setTimeout(() => {
-            isOver = true;
-        }, LONG_MOVE_TIME);
+        const timer = setTimeout(() => {
+            timeOver = true;
+        }, LONG_MOVE_TIME - FINAL_COMPUTE_TIME);
 
         this.wordExtraction = new WordExtraction(board);
         const rackPermutation = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
 
-        while (emptySquares.length > 0 && !isOver) {
+        while (emptySquares.length > 0 && !timeOver) {
             const emptySquare = this.getRandomSquare(emptySquares);
             const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
 
@@ -73,34 +73,52 @@ export default class WordFindingService {
             }
         }
         // cleartimeout??
-        return this.chooseMove(validMoves, query);
+        clearTimeout(timer);
+        return this.chooseMove(validMoves, request);
     }
 
     // Hint if I find only 2 moves and we want 3, what to do
     // If we find no possible moves, what to do?
     // What do we want Hint to return? best moves? random moves?
-    chooseMove(validMoves: EvaluatedPlacement[], query: WordFindingRequest): EvaluatedPlacement[] {
-        if (validMoves.length <= query.numberOfWordsToFind) {
+    chooseMove(validMoves: EvaluatedPlacement[], request: WordFindingRequest): EvaluatedPlacement[] {
+        if (validMoves.length <= request.numberOfWordsToFind) {
             return validMoves;
-        } else if (query.maximiseScore) {
-            return validMoves.sort((previous, current) => previous.score - current.score).slice(0, query.numberOfWordsToFind);
-        } else if (!query.pointRange || !query.pointHistoric) {
-            return Random.getRandomElementsFromArray(validMoves, query.numberOfWordsToFind);
+        } else if (request.maximiseScore) {
+            return validMoves.sort((previous, current) => current.score - previous.score).slice(0, request.numberOfWordsToFind);
+        } else if (!request.pointRange || !request.pointHistoric) {
+            return Random.getRandomElementsFromArray(validMoves, request.numberOfWordsToFind);
         }
+        return [this.selectLowestFrequencyScoreMove(this.getMovesInRange(validMoves, request), request)];
+    }
 
-        // Get the lowest frequency score move from available moves
+    getMovesInRange(validMoves: EvaluatedPlacement[], request: WordFindingRequest): Map<number, EvaluatedPlacement> {
+        if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         const foundMoves = new Map<number, EvaluatedPlacement>();
         for (const move of validMoves) {
-            if (query.pointRange.minimum <= move.score && move.score <= query.pointRange.maximum && !foundMoves.has(move.score)) {
+            if (request.pointRange.minimum <= move.score && move.score <= request.pointRange.maximum && !foundMoves.has(move.score)) {
                 foundMoves.set(move.score, move);
             }
         }
+        return foundMoves;
+    }
+
+    selectLowestFrequencyScoreMove(foundMovesMap: Map<number, EvaluatedPlacement>, request: WordFindingRequest): EvaluatedPlacement {
+        if (!request.pointHistoric) throw new Error(NO_REQUEST_POINT_HISTORIC);
+
         let lowestFrequency = Number.POSITIVE_INFINITY;
-        for (const move of foundMoves) {
-            const frequency = query.pointHistoric.get(move[0]);
-            if (frequency && frequency < lowestFrequency) lowestFrequency = frequency;
+        let [selectedMove] = foundMovesMap.values();
+        for (const move of foundMovesMap) {
+            const frequency = request.pointHistoric.get(move[0]);
+            if (!frequency) {
+                lowestFrequency = 0;
+                selectedMove = move[1];
+                break;
+            } else if (frequency < lowestFrequency) {
+                lowestFrequency = frequency;
+                selectedMove = move[1];
+            }
         }
-        return [foundMoves[lowestFrequency]];
+        return selectedMove;
     }
 
     findProperties(navigator: BoardNavigator, tileRackSize: number): MovePossibilities {
@@ -119,7 +137,7 @@ export default class WordFindingService {
     }
 
     findMinimumWordLength(navigator: BoardNavigator): number {
-        return INITIAL_TILE + navigator.moveUntil(Direction.Forward, () => navigator.verifyAllNeighbors(HAS_TILE));
+        return INITIAL_TILE + navigator.moveUntil(Direction.Forward, () => navigator.verifyAllNeighbors(HAS_TILE) || navigator.square.isCenter);
     }
 
     findMaximumWordTileLeftLength(navigator: BoardNavigator, tilesLeftSize: number): number {
