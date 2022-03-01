@@ -6,7 +6,7 @@ import BoardNavigator from '@app/classes/board/board-navigator';
 import Direction from '@app/classes/board/direction';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
-import { WordFindingRequest, WordPlacement } from '@app/classes/word-finding';
+import { WordFindingRequest } from '@app/classes/word-finding';
 import { Service } from 'typedi';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 
@@ -18,25 +18,12 @@ import { ScoreCalculatorService } from '@app/services/score-calculator-service/s
 import { Random } from '@app/utils/random';
 import { NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { FINAL_COMPUTE_TIME, INITIAL_TILE, LONG_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
+import { MovePossibilities } from '@app/classes/word-finding/move-possibilities';
+import { SquareProperties } from '@app/classes/word-finding/square-properties';
+import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 // Not currently considering wildcards
 // Not currently ignoring repeating tiles
-export interface MovePossibilities {
-    isTried: boolean;
-    minimumLength: number;
-    maximumLength: number;
-}
-
-export interface EvaluatedPlacement extends WordPlacement {
-    score: number;
-}
-export interface SquareProperties {
-    square: Square;
-    horizontal: MovePossibilities;
-    vertical: MovePossibilities;
-    isEmpty: boolean;
-}
-
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
@@ -72,14 +59,10 @@ export default class WordFindingService {
                 this.attemptMove(squareProperties, permutation, validMoves);
             }
         }
-        // cleartimeout??
         clearTimeout(timer);
         return this.chooseMove(validMoves, request);
     }
 
-    // Hint if I find only 2 moves and we want 3, what to do
-    // If we find no possible moves, what to do?
-    // What do we want Hint to return? best moves? random moves?
     chooseMove(validMoves: EvaluatedPlacement[], request: WordFindingRequest): EvaluatedPlacement[] {
         if (validMoves.length <= request.numberOfWordsToFind) {
             return validMoves;
