@@ -1,16 +1,12 @@
 /* eslint-disable max-lines */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
-// import { WordFindingRequest } from '@app/classes/word-finding';
 import { expect } from 'chai';
 import { Container } from 'typedi';
-import WordFindingService, { EvaluatedPlacement } from './word-finding';
+import WordFindingService from './word-finding';
 import * as chai from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
@@ -20,6 +16,7 @@ import { WordFindingRequest } from '@app/classes/word-finding';
 import { Random } from '@app/utils/random';
 import { NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { LONG_MOVE_TIME, FINAL_COMPUTE_TIME } from '@app/constants/services-constants/word-finding.const';
+import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -65,6 +62,7 @@ const DEFAULT_SQUARE_PROPERTIES = {
     isEmpty: true,
 };
 
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 const DEFAULT_HISTORIC = new Map<number, number>([
     [1, 1],
     [2, 2],
@@ -72,6 +70,7 @@ const DEFAULT_HISTORIC = new Map<number, number>([
     [8, 2],
     [15, 3],
 ]);
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 const DEFAULT_REQUEST: WordFindingRequest = {
     pointRange: { minimum: 2, maximum: 8 },
@@ -223,6 +222,7 @@ describe('WordFindingservice', () => {
 
     describe('attemptMoveDirection', () => {
         beforeEach(() => {
+            // eslint-disable-next-line dot-notation
             service['wordExtraction'] = new WordExtraction(board);
         });
 
@@ -235,8 +235,9 @@ describe('WordFindingservice', () => {
             });
 
             const stubWordToString = stub(StringConversion, 'wordToString');
-
+            // eslint-disable-next-line dot-notation
             const spyExtract = chai.spy.on(service['wordExtraction'], 'extract');
+            // eslint-disable-next-line dot-notation
             const spyVerifyWords = chai.spy.on(service['wordVerification'], 'verifyWords');
 
             service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal);
@@ -255,6 +256,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'isWithin', () => {
                 return true;
             });
+            // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract', () => {
                 throw new Error();
             });
@@ -281,7 +283,9 @@ describe('WordFindingservice', () => {
             });
             const stubWordToString = stub(StringConversion, 'wordToString').returns(['']);
 
+            // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract');
+            // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordVerification'], 'verifyWords');
             const expected = {
                 tilesToPlace: SMALL_TILE_RACK,
@@ -445,6 +449,7 @@ describe('WordFindingservice', () => {
         });
 
         it('should return the correct amount of tiles if there is a neighbor on the path', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             navigator = new BoardNavigator(board, new Position(1, 4), Orientation.Vertical);
             expect(service.findMinimumWordLength(navigator)).to.equal(3);
         });
@@ -701,16 +706,12 @@ describe('WordFindingservice', () => {
         });
 
         it('should return an array containing all possible permutations of the tilerack (7)', () => {
-            const expectedlength: number =
-                permutationAmount(7, 1) +
-                permutationAmount(7, 2) +
-                permutationAmount(7, 3) +
-                permutationAmount(7, 4) +
-                permutationAmount(7, 5) +
-                permutationAmount(7, 6) +
-                permutationAmount(7, 7);
+            let expectedLength = 0;
+            for (let tilesToChoose = BIG_TILE_RACK.length; tilesToChoose > 0; tilesToChoose--) {
+                expectedLength += permutationAmount(BIG_TILE_RACK.length, tilesToChoose);
+            }
             const result: Tile[][] = service.getRackPermutations(BIG_TILE_RACK);
-            expect(result.length).to.deep.equal(expectedlength);
+            expect(result.length).to.deep.equal(expectedLength);
         });
     });
 });
