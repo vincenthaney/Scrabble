@@ -10,7 +10,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 // import { WordFindingRequest } from '@app/classes/word-finding';
 import { expect } from 'chai';
 import { Container } from 'typedi';
-import WordFindingService from './word-finding';
+import WordFindingService, { EvaluatedPlacement } from './word-finding';
 import * as chai from 'chai';
 import { stub } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
@@ -196,19 +196,42 @@ describe.only('WordFindingservice', () => {
         });
     });
 
-    describe('attemptMove', () => {
-        it('should call attemptMoveDirection', () => {
+    /////////////////////
+
+    describe('chooseMove', () => {
+        it('should return all validMoves if the query asks for more than there is', () => {
             const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection').returns(undefined);
-            const validMoves: WordPlacement[] = [];
+            const validMoves: EvaluatedPlacement[] = [];
             service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
             assert(stubAttemptMoveDirection.calledTwice);
         });
 
-        it('should add the wordPlacement that are valid', () => {
+        it('should add the EvaluatedPlacement that are valid', () => {
             const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
             stubAttemptMoveDirection.onCall(0).returns(undefined);
-            stubAttemptMoveDirection.onCall(1).returns({} as unknown as WordPlacement);
-            const validMoves: WordPlacement[] = [{} as unknown as WordPlacement];
+            stubAttemptMoveDirection.onCall(1).returns({} as unknown as EvaluatedPlacement);
+            const validMoves: EvaluatedPlacement[] = [{} as unknown as EvaluatedPlacement];
+            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            assert(stubAttemptMoveDirection.calledTwice);
+            expect(validMoves.length).to.equal(2);
+        });
+    });
+
+    ////////////////////
+
+    describe('attemptMove', () => {
+        it('should call attemptMoveDirection', () => {
+            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection').returns(undefined);
+            const validMoves: EvaluatedPlacement[] = [];
+            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            assert(stubAttemptMoveDirection.calledTwice);
+        });
+
+        it('should add the EvaluatedPlacement that are valid', () => {
+            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
+            stubAttemptMoveDirection.onCall(0).returns(undefined);
+            stubAttemptMoveDirection.onCall(1).returns({} as unknown as EvaluatedPlacement);
+            const validMoves: EvaluatedPlacement[] = [{} as unknown as EvaluatedPlacement];
             service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
             assert(stubAttemptMoveDirection.calledTwice);
             expect(validMoves.length).to.equal(2);
