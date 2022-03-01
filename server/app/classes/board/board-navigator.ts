@@ -1,3 +1,4 @@
+import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 
@@ -25,7 +26,7 @@ export default class BoardNavigator {
     verify(shouldBeFilled: boolean): boolean {
         try {
             return this.board.verifySquare(this.position, shouldBeFilled);
-        } catch (error) {
+        } catch (exception) {
             return false;
         }
     }
@@ -41,7 +42,7 @@ export default class BoardNavigator {
         );
     }
 
-    move(direction: Direction, distance: number = 1): BoardNavigator {
+    move(direction: Direction, distance: number = DEFAULT_DISTANCE): BoardNavigator {
         this.position.move(this.orientation, direction, distance);
         return this;
     }

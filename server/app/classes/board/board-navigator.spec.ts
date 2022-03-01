@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { Square } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
@@ -11,16 +10,18 @@ import * as chai from 'chai';
 import { stub } from 'sinon';
 type LetterValues = (LetterValue | ' ')[][];
 
-const BOARD: LetterValues = [
+const GRID: LetterValues = [
     [' ', ' ', ' ', ' ', ' '],
     [' ', ' ', 'A', ' ', ' '],
     [' ', ' ', 'B', ' ', ' '],
     [' ', ' ', 'C', ' ', ' '],
     [' ', ' ', ' ', ' ', ' '],
 ];
-const OUT_OF_BOUNDS_POSITION: Position = new Position(999, 999);
-const OUT_OF_BOUNDS_ROW: Position = new Position(999, 0);
-const OUT_OF_BOUNDS_COLUMN: Position = new Position(0, 999);
+
+const OUT_OF_BOUND_VALUE = 999;
+const OUT_OF_BOUNDS_POSITION: Position = new Position(OUT_OF_BOUND_VALUE, OUT_OF_BOUND_VALUE);
+const OUT_OF_BOUNDS_ROW: Position = new Position(OUT_OF_BOUND_VALUE, 0);
+const OUT_OF_BOUNDS_COLUMN: Position = new Position(0, OUT_OF_BOUND_VALUE);
 const SHOULD_BE_FILLED = true;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
@@ -51,7 +52,7 @@ describe('BoardNavigator', () => {
     let navigator: BoardNavigator;
 
     beforeEach(() => {
-        board = boardFromLetterValues(BOARD);
+        board = boardFromLetterValues(GRID);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
     });
 
@@ -73,7 +74,7 @@ describe('BoardNavigator', () => {
             const orientation = Orientation.Horizontal;
             navigator.orientation = orientation;
 
-            const expected = navigator.column + direction;
+            const expected: number = navigator.column + direction;
 
             navigator.move(direction);
 
@@ -94,6 +95,18 @@ describe('BoardNavigator', () => {
         });
 
         it('should move vertically', () => {
+            const direction = Direction.Forward;
+            const orientation = Orientation.Vertical;
+            navigator.orientation = orientation;
+
+            const expected = navigator.row + direction;
+
+            navigator.move(direction);
+
+            expect(navigator.row).to.equal(expected);
+        });
+
+        it('should move vertically with distance', () => {
             const distance = 2;
             const direction = Direction.Forward;
             const orientation = Orientation.Vertical;
@@ -108,7 +121,7 @@ describe('BoardNavigator', () => {
     });
 
     describe('verify', () => {
-        it('should call board.verify', () => {
+        it('should call board.verifySquare', () => {
             const spy = chai.spy.on(navigator['board'], 'verifySquare', () => {
                 return true;
             });
@@ -117,7 +130,7 @@ describe('BoardNavigator', () => {
             expect(spy).to.have.been.called.with(navigator.position, SHOULD_BE_FILLED);
         });
 
-        it('should return false if board.verify throws', () => {
+        it('should return false if board.verifySquare throws', () => {
             chai.spy.on(navigator['board'], 'verifySquare', () => {
                 throw new Error();
             });
@@ -125,7 +138,7 @@ describe('BoardNavigator', () => {
             expect(navigator.verify(SHOULD_BE_FILLED)).to.be.false;
         });
 
-        it('should return what board.verify returns', () => {
+        it('should return what board.verifySquare returns', () => {
             chai.spy.on(navigator['board'], 'verifySquare', () => {
                 return true;
             });
@@ -178,9 +191,9 @@ describe('BoardNavigator', () => {
     describe('backward', () => {
         it('should call move', () => {
             const spy = chai.spy.on(navigator['position'], 'move');
-
+            const defaultDistance = 1;
             navigator.backward();
-            expect(spy).to.have.been.called.with(Orientation.Horizontal, Direction.Backward, 1);
+            expect(spy).to.have.been.called.with(Orientation.Horizontal, Direction.Backward, defaultDistance);
         });
 
         it('should call move with distance', () => {
@@ -199,12 +212,11 @@ describe('BoardNavigator', () => {
             stubIsWithinBounds.onCall(1).returns(false);
             stubIsWithinBounds.onCall(2).returns(false);
 
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const spy = chai.spy.on(navigator['position'], 'move', () => {});
+            const spyMove = chai.spy.on(navigator['position'], 'move');
 
             navigator.moveUntil(Direction.Forward, () => false);
             expect(stubIsWithinBounds.callCount).to.equal(3);
-            expect(spy).to.have.been.called.once;
+            expect(spyMove).to.have.been.called.once;
         });
 
         it('should return  POSITIVE_INFINITY if endNavigator is not WithinBounds', () => {
