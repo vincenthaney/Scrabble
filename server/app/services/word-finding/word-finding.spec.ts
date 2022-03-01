@@ -4,14 +4,13 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { Container } from 'typedi';
 import WordFindingService from './word-finding';
 import * as chai from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { StringConversion } from '@app/utils/string-conversion';
-import { assert } from 'console';
 import { WordFindingRequest } from '@app/classes/word-finding';
 import { Random } from '@app/utils/random';
 import { NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
