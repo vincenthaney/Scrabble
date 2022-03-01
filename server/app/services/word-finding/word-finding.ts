@@ -46,7 +46,7 @@ export default class WordFindingService {
 
         this.wordExtraction = new WordExtraction(board);
         const rackPermutation = this.getRackPermutations(tiles);
-        const emptySquares = board.getDesiredSquares((square: Square) => square.tile !== null);
+        const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && !timeOver) {
             const emptySquare = this.getRandomSquare(emptySquares);
