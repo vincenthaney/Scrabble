@@ -1,9 +1,9 @@
 export class Random {
     static getRandomElementsFromArray<T>(array: T[], elementsToTake: number = 1): T[] {
+        if (elementsToTake > array.length) return array;
         const result = new Array(elementsToTake);
         let length = array.length;
         const taken = new Array(length);
-        if (elementsToTake > length) return result;
         while (elementsToTake--) {
             const x = Math.floor(Math.random() * length);
             result[elementsToTake] = array[x in taken ? taken[x] : x];

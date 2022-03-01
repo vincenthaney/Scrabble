@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { Random } from './random';
 
 const DEFAULT_ARRAY = ['a', 'b', 'c'];
-describe('wordToString', () => {
+describe('random -> getRandomElementsFromArray', () => {
     it('should an array of the desired length', () => {
         expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY).length).to.equal(1);
         expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, 2).length).to.equal(2);
