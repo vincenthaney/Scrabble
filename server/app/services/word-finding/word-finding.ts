@@ -1,6 +1,3 @@
-/* eslint-disable max-lines */
-/* eslint-disable max-classes-per-file */
-/* eslint-disable no-console */
 import { Board, Orientation } from '@app/classes/board';
 import BoardNavigator from '@app/classes/board/board-navigator';
 import Direction from '@app/classes/board/direction';
