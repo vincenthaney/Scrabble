@@ -22,8 +22,8 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./join-waiting-page.component.scss'],
 })
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
-    canceledGameSubscription: Subscription;
-    joinerRejectedSubscription: Subscription;
+    // canceledGameSubscription: Subscription;
+    // joinerRejectedSubscription: Subscription;
     routingSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     currentLobby: LobbyInfo;
@@ -51,12 +51,8 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((hostName: string) => this.hostHasCanceled(hostName));
-        this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((hostName: string) => this.playerRejected(hostName));
+        this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, (hostName: string) => this.hostHasCanceled(hostName));
+        this.gameDispatcherService.subscribeToJoinerRejectedEvent(this.componentDestroyed$, (hostName: string) => this.playerRejected(hostName));
     }
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
