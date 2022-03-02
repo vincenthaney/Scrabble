@@ -16,7 +16,6 @@ import {
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-// import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-lobby-page',
