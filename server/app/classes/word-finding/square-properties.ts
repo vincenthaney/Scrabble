@@ -1,7 +1,7 @@
 import { Square } from '@app/classes/square';
-import { MovePossibilities } from './move-possibilities';
+import { MovePossibilities } from '.';
 
-export interface SquareProperties {
+export default interface SquareProperties {
     square: Square;
     horizontal: MovePossibilities;
     vertical: MovePossibilities;
