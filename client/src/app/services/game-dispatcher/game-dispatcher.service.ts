@@ -22,31 +22,31 @@ export default class GameDispatcherService implements OnDestroy {
     private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
     private joinerRejectedEvent: Subject<string> = new Subject();
 
-    private componentDestroyed$: Subject<boolean> = new Subject();
+    private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
-        this.gameDispatcherController.subscribeToCreateGameEvent(this.componentDestroyed$, (gameId: string) => {
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (gameId: string) => {
             this.gameId = gameId;
         });
-        this.gameDispatcherController.subscribeToJoinRequestEvent(this.componentDestroyed$, (opponentName: string) =>
+        this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
-        this.gameDispatcherController.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.handleLobbyFull());
-        this.gameDispatcherController.subscribeToLobbyRequestValidEvent(this.componentDestroyed$, async () =>
+        this.gameDispatcherController.subscribeToLobbyFullEvent(this.serviceDestroyed$, () => this.handleLobbyFull());
+        this.gameDispatcherController.subscribeToLobbyRequestValidEvent(this.serviceDestroyed$, async () =>
             this.router.navigateByUrl('join-waiting-room'),
         );
-        this.gameDispatcherController.subscribeToCanceledGameEvent(this.componentDestroyed$, (hostName: string) => this.handleCanceledGame(hostName));
-        this.gameDispatcherController.subscribeToJoinerRejectedEvent(this.componentDestroyed$, (hostName: string) =>
+        this.gameDispatcherController.subscribeToCanceledGameEvent(this.serviceDestroyed$, (hostName: string) => this.handleCanceledGame(hostName));
+        this.gameDispatcherController.subscribeToJoinerRejectedEvent(this.serviceDestroyed$, (hostName: string) =>
             this.handleJoinerRejected(hostName),
         );
-        this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.componentDestroyed$, (lobbies: LobbyInfo[]) =>
+        this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.serviceDestroyed$, (lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
     }
 
     ngOnDestroy(): void {
-        this.componentDestroyed$.next(true);
-        this.componentDestroyed$.complete();
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     resetServiceData(): void {

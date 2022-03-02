@@ -20,10 +20,6 @@ import { Subject } from 'rxjs';
 })
 export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
-
-    // lobbiesUpdateSubscription: Subscription;
-    // lobbyFullSubscription: Subscription;
-    // lobbyCanceledSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     lobbies: LobbyInfo[];
     constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
