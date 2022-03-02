@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
