@@ -1,7 +1,7 @@
 import { Orientation } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 
-export type ActionType = 'place' | 'exchange' | 'pass' | 'help' | 'reserve';
+export type ActionType = 'place' | 'exchange' | 'pass' | 'help' | 'reserve' | 'hint';
 
 export interface ActionPlacePayload {
     tiles: Tile[];
