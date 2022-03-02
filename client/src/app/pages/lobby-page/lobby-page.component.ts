@@ -45,15 +45,9 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((lobbies) => this.updateLobbies(lobbies));
-        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.lobbyFullDialog());
-        this.lobbyCanceledSubscription = this.gameDispatcherService.canceledGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.lobbyCanceledDialog());
+        this.gameDispatcherService.subscribeToLobbiesUpdateEvent(this.componentDestroyed$, (lobbies) => this.updateLobbies(lobbies));
+        this.gameDispatcherService.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.lobbyFullDialog());
+        this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
         this.filterFormGroup.get('gameType')?.valueChanges.pipe(takeUntil(this.componentDestroyed$)).subscribe(this.validateName.bind(this));
 
