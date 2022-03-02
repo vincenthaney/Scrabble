@@ -12,8 +12,7 @@ import {
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -23,12 +22,11 @@ import { takeUntil } from 'rxjs/operators';
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponentName: string | undefined;
     isStartingGame: boolean = false;
-    joinRequestSubscription: Subscription;
-    joinerLeaveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     host: AbstractPlayer;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     isOpponentFound: boolean;
+
     constructor(
         public dialog: MatDialog,
         public gameDispatcherService: GameDispatcherService,
@@ -44,12 +42,8 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((opponentName: string) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.playerLeavesService.joinerLeaveGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((leaverName: string) => this.opponentLeft(leaverName));
+        this.gameDispatcherService.subscribeToJoinRequestEvent(this.componentDestroyed$, (opponentName: string) => this.setOpponent(opponentName));
+        this.playerLeavesService.subscribeToJoinerLeavesGameEvent(this.componentDestroyed$, (leaverName: string) => this.opponentLeft(leaverName));
     }
 
     setOpponent(opponentName: string): void {
