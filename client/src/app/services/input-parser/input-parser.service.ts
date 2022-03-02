@@ -7,7 +7,7 @@ import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
-import { BOARD_SIZE, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
+import { BOARD_SIZE, DEFAULT_ORIENTATION, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
 import { isNumber } from '@app/utils/is-number';
@@ -118,7 +118,7 @@ export default class InputParserService {
 
         if (isNumber(locationLastChar)) {
             if (nLettersToPlace !== 1) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
-            orientation = Orientation.Horizontal;
+            orientation = DEFAULT_ORIENTATION;
         } else {
             if (locationLastChar === 'h') orientation = Orientation.Horizontal;
             else if (locationLastChar === 'v') orientation = Orientation.Vertical;

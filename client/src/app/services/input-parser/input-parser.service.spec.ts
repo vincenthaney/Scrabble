@@ -14,7 +14,7 @@ import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
-import { SYSTEM_ERROR_ID } from '@app/constants/game';
+import { DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
@@ -35,7 +35,7 @@ describe('InputParserService', () => {
     // const VALID_HINT_INPUT = '${ACTION_COMMAND_INDICATOR}indice';
     const VALID_HELP_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.HELP}`;
     const VALID_POSITION: Position = { row: 0, column: 0 };
-    const VALID_LOCATION: Location = { row: 0, col: 0, orientation: Orientation.Horizontal };
+    const VALID_LOCATION: Location = { row: 0, col: 0, orientation: DEFAULT_ORIENTATION };
 
     const DEFAULT_GAME_ID = 'default game id';
     const DEFAULT_PLAYER_ID = 'default player id';
@@ -277,8 +277,8 @@ describe('InputParserService', () => {
         });
 
         it('should have horizontal orientation if last char is number and trying to place one letter', () => {
-            expect(service['createLocation'](VALID_LOCATION_INPUT, 1).orientation).toEqual(Orientation.Horizontal);
-            expect(service['createLocation'](VALID_LOCATION_INPUT_SINGLE, 1).orientation).toEqual(Orientation.Horizontal);
+            expect(service['createLocation'](VALID_LOCATION_INPUT, 1).orientation).toEqual(DEFAULT_ORIENTATION);
+            expect(service['createLocation'](VALID_LOCATION_INPUT_SINGLE, 1).orientation).toEqual(DEFAULT_ORIENTATION);
         });
 
         it('should throw if last char is not a number and is not h or v', () => {

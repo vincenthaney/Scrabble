@@ -1,3 +1,4 @@
+import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Square } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
@@ -68,6 +69,7 @@ export const MAX_LOCATION_COMMAND_LENGTH = 3;
 export const MIN_LOCATION_COMMAND_LENGTH = 2;
 
 export const MAX_INPUT_LENGTH = 512;
+export const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
 export const MAX_TILE_PER_PLAYER = 7;
 
