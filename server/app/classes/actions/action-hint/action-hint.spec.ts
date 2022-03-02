@@ -71,6 +71,23 @@ describe('ActionHint', () => {
             wordPlacementToCommandStringSpy.restore();
         });
 
+        it('should have special message if less than 3 words', () => {
+            const placementsAmount = 2;
+            action['hintResult'] = [];
+
+            for (let i = 0; i < placementsAmount; ++i) {
+                action['hintResult'].push({
+                    orientation: Orientation.Horizontal,
+                    startPosition: new Position(0, 0),
+                    tilesToPlace: [],
+                });
+            }
+
+            const message = action.getMessage();
+
+            expect(message).to.include('mot(s) ont été trouvé');
+        });
+
         it('should return no words found if empty', () => {
             const message = action.getMessage();
             expect(message).to.equal(NO_WORDS_FOUND);

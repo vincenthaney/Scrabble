@@ -29,6 +29,7 @@ export default class ActionHint extends ActionInfo {
             return NO_WORDS_FOUND;
         } else {
             let message = `${FOUND_WORDS} :<br>`;
+            if (this.hintResult.length < HINT_ACTION_NUMBER_OF_WORDS) message += `*Seulement ${this.hintResult.length} mot(s) ont été trouvé(s)*<br>`;
             message += this.hintResult.map((placement) => `\`${WordPlacementUtils.wordPlacementToCommandString(placement)}\``).join('<br>');
             return message;
         }
