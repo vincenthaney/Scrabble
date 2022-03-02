@@ -9,7 +9,7 @@ import {
     DIALOG_CANCEL_CONTENT,
     DIALOG_CANCEL_TITLE,
     DIALOG_REJECT_CONTENT,
-    DIALOG_REJECT_TITLE
+    DIALOG_REJECT_TITLE,
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
