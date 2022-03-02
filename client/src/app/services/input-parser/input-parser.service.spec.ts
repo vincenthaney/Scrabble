@@ -248,7 +248,28 @@ describe('InputParserService', () => {
         });
     });
 
+    describe('getRowNumberFromChar', () => {
+        it('should return right value', () => {
+            /* eslint-disable @typescript-eslint/no-magic-numbers */
+            const rowChars: string[] = ['a', 'b', 'g', 'o', 'z'];
+            const expectedRows: number[] = [0, 1, 6, 14, 25];
+            /* eslint-enable @typescript-eslint/no-magic-numbers */
+
+            for (let i = 0; i < rowChars.length; i++) {
+                const result = service['createLocation'](rowChars[i], 1);
+                expect(result.row).toEqual(expectedRows[i]);
+                expect(result.col).toEqual(expectedRows[i]);
+            }
+        });
+    });
+
     describe('createLocation', () => {
+        it('should call getRowNumberFromChar', () => {
+            const spy = spyOn<any>(service, 'getRowNumberFromChar');
+            service['createLocation'](VALID_LOCATION_INPUT_SINGLE, VALID_LETTERS_INPUT_MULTI.length);
+            expect(spy).toHaveBeenCalled();
+        });
+
         it('should return right rowNumber and columnNumber', () => {
             /* eslint-disable @typescript-eslint/no-magic-numbers */
             const locationStrings: string[] = ['a1h', 'a15v', 'b18', 'g12h', 'f1v', 'z12v', 'o15h', 'o1'];

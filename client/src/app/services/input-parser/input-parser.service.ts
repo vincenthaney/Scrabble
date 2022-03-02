@@ -112,7 +112,7 @@ export default class InputParserService {
 
     private createLocation(locationString: string, nLettersToPlace: number): Location {
         const locationLastChar = locationString.charAt(locationString.length - 1);
-        const rowNumber: number = locationString.charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
+        const rowNumber: number = this.getRowNumberFromChar(locationString[0]);
         const colNumber = parseInt(locationString.substring(1), 10) - 1;
         let orientation: Orientation;
 
@@ -220,5 +220,9 @@ export default class InputParserService {
             return localPlayer;
         }
         throw new Error(PLAYER_NOT_FOUND);
+    }
+
+    private getRowNumberFromChar(char: string): number {
+        return char.charCodeAt(0) - ASCII_VALUE_OF_LOWERCASE_A;
     }
 }
