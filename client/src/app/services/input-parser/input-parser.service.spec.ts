@@ -6,7 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
 import CommandError from '@app/classes/command-error';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -26,14 +26,14 @@ describe('InputParserService', () => {
     const VALID_LETTERS_INPUT_MULTI = 'abc';
     const VALID_LETTERS_INPUT_SINGLE = 'a';
 
-    const VALID_PLACE_INPUT = `!${ActionType.PLACE} ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
-    const VALID_PLACE_INPUT_SINGLE = `!${ActionType.PLACE} ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
-    const VALID_EXCHANGE_INPUT = `!${ActionType.EXCHANGE} ${VALID_LETTERS_INPUT_MULTI}`;
-    const VALID_PASS_INPUT = `!${ActionType.PASS}`;
+    const VALID_PLACE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
+    const VALID_PLACE_INPUT_SINGLE = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
+    const VALID_EXCHANGE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.EXCHANGE} ${VALID_LETTERS_INPUT_MULTI}`;
+    const VALID_PASS_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PASS}`;
     const VALID_PASS_ACTION_DATA = { type: ActionType.PASS, payload: {} };
-    const VALID_RESERVE_INPUT = `!${ActionType.RESERVE}`;
-    // const VALID_HINT_INPUT = '!indice';
-    const VALID_HELP_INPUT = `!${ActionType.HELP}`;
+    const VALID_RESERVE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.RESERVE}`;
+    // const VALID_HINT_INPUT = '${ACTION_COMMAND_INDICATOR}indice';
+    const VALID_HELP_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.HELP}`;
     const VALID_POSITION: Position = { row: 0, column: 0 };
     const VALID_LOCATION: Location = { row: 0, col: 0, orientation: Orientation.Horizontal };
 
@@ -230,12 +230,12 @@ describe('InputParserService', () => {
 
         it('should throw error if commands have incorrect lengths', () => {
             const invalidCommands: [command: string, error: CommandErrorMessages][] = [
-                ['!placer abc', CommandErrorMessages.PlaceBadSyntax],
-                ['!échanger one two three', CommandErrorMessages.ExchangeBadSyntax],
-                ['!passer thing', CommandErrorMessages.PassBadSyntax],
-                ['!réserve second word', CommandErrorMessages.BadSyntax],
-                // '!indice not length of two',
-                ['!aide help', CommandErrorMessages.BadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}placer abc`, CommandErrorMessages.PlaceBadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}échanger one two three`, CommandErrorMessages.ExchangeBadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}passer thing`, CommandErrorMessages.PassBadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}réserve second word`, CommandErrorMessages.BadSyntax],
+                // `${ACTION_COMMAND_INDICATOR}indice not length of two`,
+                [`${ACTION_COMMAND_INDICATOR}aide help`, CommandErrorMessages.BadSyntax],
             ];
             for (const [command, error] of invalidCommands) {
                 expect(() => service['createActionData'](command)).toThrow(new CommandError(error));
@@ -433,7 +433,6 @@ describe('InputParserService', () => {
 
     describe('isPositionWithinBounds', () => {
         it('should retrun false if position is invalid', () => {
-            // const invalidLocations: string[] = ['abcde', 'g', 'a143', 'A12', 'B3', '%4', 'a17', 'f0', 'o0', '14a'];
             const invalidPositions: Position[] = [
                 { row: -2, column: 0 },
                 { row: -2, column: -5 },
@@ -446,7 +445,7 @@ describe('InputParserService', () => {
             }
         });
 
-        it('should return true if position if in bounds', () => {
+        it('should return true if position if is in bounds', () => {
             expect(service['isPositionWithinBounds'](VALID_POSITION)).toBeTrue();
         });
     });
