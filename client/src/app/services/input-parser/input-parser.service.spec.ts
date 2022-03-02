@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
@@ -251,6 +250,7 @@ describe('InputParserService', () => {
 
     describe('createLocation', () => {
         it('should return right rowNumber and columnNumber', () => {
+            /* eslint-disable @typescript-eslint/no-magic-numbers */
             const locationStrings: string[] = ['a1h', 'a15v', 'b18', 'g12h', 'f1v', 'z12v', 'o15h', 'o1'];
             const expectedPositions: number[][] = [
                 [0, 0],
@@ -262,6 +262,7 @@ describe('InputParserService', () => {
                 [14, 14],
                 [14, 0],
             ];
+            /* eslint-enable @typescript-eslint/no-magic-numbers */
 
             for (let i = 0; i < locationStrings.length; i++) {
                 const result = service['createLocation'](locationStrings[i], 1);
@@ -383,7 +384,7 @@ describe('InputParserService', () => {
                 CommandExceptionMessages.DontHaveTiles,
                 CommandExceptionMessages.DontHaveTiles,
                 CommandExceptionMessages.DontHaveTiles,
-                CommandExceptionMessages.ExhangeRequireLowercaseLettes,
+                CommandExceptionMessages.ExchangeRequireLowercaseLetters,
                 CommandExceptionMessages.DontHaveTiles,
             ];
 

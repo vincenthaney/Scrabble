@@ -153,7 +153,7 @@ export default class InputParserService {
 
     private parseLettersToTiles(lettersToParse: string, actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {
         if (actionType === ActionType.EXCHANGE) {
-            if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandException(CommandExceptionMessages.ExhangeRequireLowercaseLettes);
+            if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandException(CommandExceptionMessages.ExchangeRequireLowercaseLetters);
         }
 
         const player: AbstractPlayer = this.getLocalPlayer();
