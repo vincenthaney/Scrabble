@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
-/* eslint-disable no-console */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -282,7 +281,6 @@ describe('LobbyPageComponent', () => {
                 lobby.gameType = gameType;
                 getGameTypeSpy.and.returnValue({ value: filter } as AbstractControl);
                 component.updateLobbyAttributes(lobby);
-                console.log(filter, gameType, expected, lobby.meetFilters);
                 expect<boolean | undefined>(lobby.meetFilters).toEqual(expected);
             }
         });
