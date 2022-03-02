@@ -118,9 +118,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.focusableComponentsService.setActiveKeyboardComponent(this);
     }
 
-    private handleKeyInput(event: KeyboardEvent) {
-        if (event.key === 'c' && (event.ctrlKey || event.metaKey)) return;
-        this.messageInputElement?.nativeElement?.focus();
+    private handleKeyInput(event: KeyboardEvent): void {
+        if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private isCtrlC(event: KeyboardEvent): boolean {
+        return event.key === 'c' && (event.ctrlKey || event.metaKey);
     }
 
     private scrollToBottom(): void {
