@@ -1,8 +1,6 @@
-import PointRange from './point-range';
-
+import { PointRange, WordFindingUsage } from '.';
 export default interface WordFindingRequest {
+    usage: WordFindingUsage;
     pointRange?: PointRange;
-    numberOfWordsToFind: number;
     pointHistoric?: Map<number, number>;
-    maximiseScore?: boolean;
 }
