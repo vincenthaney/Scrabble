@@ -256,9 +256,7 @@ describe('InputParserService', () => {
             /* eslint-enable @typescript-eslint/no-magic-numbers */
 
             for (let i = 0; i < rowChars.length; i++) {
-                const result = service['createLocation'](rowChars[i], 1);
-                expect(result.row).toEqual(expectedRows[i]);
-                expect(result.col).toEqual(expectedRows[i]);
+                expect(service['getRowNumberFromChar'](rowChars[i])).toEqual(expectedRows[i]);
             }
         });
     });
@@ -266,7 +264,7 @@ describe('InputParserService', () => {
     describe('createLocation', () => {
         it('should call getRowNumberFromChar', () => {
             const spy = spyOn<any>(service, 'getRowNumberFromChar');
-            service['createLocation'](VALID_LOCATION_INPUT_SINGLE, VALID_LETTERS_INPUT_MULTI.length);
+            service['createLocation'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_MULTI.length);
             expect(spy).toHaveBeenCalled();
         });
 
