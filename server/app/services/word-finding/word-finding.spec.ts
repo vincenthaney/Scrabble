@@ -53,8 +53,8 @@ const DEFAULT_TILES_LEFT_SIZE = 7;
 const DEFAULT_SMALL_TILES_LEFT_SIZE = 3;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
-const DEFAULT_HORIZONTAL_PROPERTIES = { isTried: false, minimumLength: 1, maximumLength: 2 };
-const DEFAULT_VERTICAL_PROPERTIES = { isTried: false, minimumLength: 1, maximumLength: 3 };
+const DEFAULT_HORIZONTAL_PROPERTIES = { isValid: true, minimumLength: 1, maximumLength: 2 };
+const DEFAULT_VERTICAL_PROPERTIES = { isValid: true, minimumLength: 1, maximumLength: 3 };
 const DEFAULT_SQUARE_PROPERTIES = {
     square: DEFAULT_SQUARE_1,
     horizontal: DEFAULT_HORIZONTAL_PROPERTIES,
@@ -800,26 +800,26 @@ describe('WordFindingservice', () => {
             expect(spyFindMaximumWordTileLeftLength).to.have.been.called;
         });
 
-        it('should return isTried = true if findMinimumWordLength is POSITIVE_INFINITY ', () => {
+        it('should return isValid = false if findMinimumWordLength is POSITIVE_INFINITY ', () => {
             const spyFindMinimumWordLength = chai.spy.on(service, 'findMinimumWordLength', () => {
                 return Number.POSITIVE_INFINITY;
             });
             const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
                 return 0;
             });
-            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE).isTried).to.be.true;
+            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyFindMaximumWordTileLeftLength).not.to.have.been.called;
         });
 
-        it('should return isTried = true if findMinimumWordLength is too big ', () => {
+        it('should return isValid = false if findMinimumWordLength is too big ', () => {
             const spyFindMinimumWordLength = chai.spy.on(service, 'findMinimumWordLength', () => {
                 return DEFAULT_TILES_LEFT_SIZE + 1;
             });
             const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
                 return 0;
             });
-            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE).isTried).to.be.true;
+            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyFindMaximumWordTileLeftLength).not.to.have.been.called;
         });
@@ -827,7 +827,7 @@ describe('WordFindingservice', () => {
         it('should return the correct moveProperties ', () => {
             const minLength = 1;
             const maxLength = 4;
-            const expected = { isTried: false, minimumLength: minLength, maximumLength: DEFAULT_TILES_LEFT_SIZE - maxLength };
+            const expected = { isValid: true, minimumLength: minLength, maximumLength: DEFAULT_TILES_LEFT_SIZE - maxLength };
             chai.spy.on(service, 'findMinimumWordLength', () => {
                 return minLength;
             });

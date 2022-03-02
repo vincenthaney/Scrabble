@@ -1,5 +1,5 @@
 export default interface MovePossibilities {
-    isTried: boolean;
+    isValid: boolean;
     minimumLength: number;
     maximumLength: number;
 }

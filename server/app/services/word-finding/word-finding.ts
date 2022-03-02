@@ -39,7 +39,7 @@ export default class WordFindingService {
         let pointDistributionChance = new Map();
         if (request.usage === WordFindingUsage.Beginner) pointDistributionChance = this.distributeChance(request);
 
-        const rackPermutation = this.getRackPermutations(tiles);
+        const rackPermutations = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
@@ -47,7 +47,7 @@ export default class WordFindingService {
             const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
             const foundMoves: EvaluatedPlacement[] = [];
 
-            for (const permutation of rackPermutation) {
+            for (const permutation of rackPermutations) {
                 this.attemptMove(squareProperties, permutation, foundMoves);
             }
             currentTime = new Date();
@@ -208,12 +208,10 @@ export default class WordFindingService {
     // }
 
     findProperties(navigator: BoardNavigator, tileRackSize: number): MovePossibilities {
-        const movePossibilities = { isTried: false, minimumLength: Number.POSITIVE_INFINITY, maximumLength: Number.POSITIVE_INFINITY };
-
-        movePossibilities.minimumLength = this.findMinimumWordLength(navigator);
+        const movePossibilities = { isValid: true, minimumLength: this.findMinimumWordLength(navigator), maximumLength: Number.POSITIVE_INFINITY };
 
         if (movePossibilities.minimumLength > tileRackSize) {
-            movePossibilities.isTried = true; // isvalid?
+            movePossibilities.isValid = false; // isvalid?
             return movePossibilities;
         }
         movePossibilities.maximumLength =
@@ -253,7 +251,7 @@ export default class WordFindingService {
 
     attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {
         const movePossibilities = this.getCorrespondingMovePossibility(squareProperties, orientation);
-        if (!movePossibilities.isTried && this.isWithin(movePossibilities, permutation.length)) {
+        if (movePossibilities.isValid && this.isWithin(movePossibilities, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
                 this.wordVerification.verifyWords(StringConversion.wordToString(createdWords), DICTIONARY_NAME);
