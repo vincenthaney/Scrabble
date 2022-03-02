@@ -10,6 +10,7 @@ import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/comma
 import { BOARD_SIZE, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
+import { isNumber } from '@app/utils/is-number';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -115,7 +116,7 @@ export default class InputParserService {
         const colNumber = parseInt(locationString.substring(1), 10) - 1;
         let orientation: Orientation;
 
-        if (this.isNumber(locationLastChar)) {
+        if (isNumber(locationLastChar)) {
             if (nLettersToPlace !== 1) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
             orientation = Orientation.Horizontal;
         } else {
@@ -182,10 +183,6 @@ export default class InputParserService {
 
     private isValidBlankTileCombination(playerLetter: string, placeLetter: string): boolean {
         return playerLetter === '*' && LETTER_VALUES.includes(placeLetter as LetterValue) && placeLetter === placeLetter.toUpperCase();
-    }
-
-    private isNumber(char: string): boolean {
-        return !isNaN(parseInt(char, 10));
     }
 
     private isPositionWithinBounds(position: Position) {

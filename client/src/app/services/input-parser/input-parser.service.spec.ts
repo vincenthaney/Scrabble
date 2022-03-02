@@ -416,21 +416,6 @@ describe('InputParserService', () => {
         });
     });
 
-    describe('isNumber', () => {
-        it('should return true if char is a number', () => {
-            expect(service['isNumber']('6')).toBeTrue();
-        });
-
-        it('should return false if char is not a number', () => {
-            const notNumberChars: string[] = ['a', 'F', '&', '^', ' '];
-
-            for (const notNumberChar of notNumberChars) {
-                expect(service['isNumber'](notNumberChar)).toBeFalse();
-            }
-            expect(service['isNumber']('6')).toBeTrue();
-        });
-    });
-
     describe('isPositionWithinBounds', () => {
         it('should retrun false if position is invalid', () => {
             const invalidPositions: Position[] = [
