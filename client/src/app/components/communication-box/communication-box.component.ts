@@ -61,8 +61,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngAfterViewInit(): void {
-        const messageInputFocus = () => this.messageInputElement?.nativeElement?.focus();
-        this.subscribeToFocusableEvent(this.componentDestroyed$, messageInputFocus);
+        this.subscribeToFocusableEvent(this.componentDestroyed$, this.handleKeyInput.bind(this));
     }
 
     ngOnDestroy(): void {
@@ -117,6 +116,14 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     onContainerClick() {
         this.focusableComponentsService.setActiveKeyboardComponent(this);
+    }
+
+    private handleKeyInput(event: KeyboardEvent): void {
+        if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private isCtrlC(event: KeyboardEvent): boolean {
+        return event.key === 'c' && (event.ctrlKey || event.metaKey);
     }
 
     private scrollToBottom(): void {

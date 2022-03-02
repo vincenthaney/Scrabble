@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable dot-notation */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { DEFAULT_GAME_ID, DEFAULT_OPPONENT_NAME } from '@app/constants/controller-constants';
 import { GameService, SocketService } from '@app/services';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { PlayerLeavesController } from './player-leaves.controller';
 
@@ -17,7 +19,6 @@ describe('PlayerLeavesController', () => {
     beforeEach(async () => {
         socketHelper = new SocketTestHelper();
         socketServiceMock = new SocketService();
-        // eslint-disable-next-line dot-notation
         socketServiceMock['socket'] = socketHelper as unknown as Socket;
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
@@ -36,7 +37,7 @@ describe('PlayerLeavesController', () => {
     });
 
     it('On joinerLeaveGame, configureSocket should emit opponent name', () => {
-        const joinerLeaveGameSpy = spyOn(controller.joinerLeaveGameEvent, 'emit').and.callFake(async () => {
+        const joinerLeaveGameSpy = spyOn(controller['joinerLeavesGameEvent'], 'emit').and.callFake(async () => {
             return;
         });
         socketHelper.peerSideEmit('joinerLeaveGame', DEFAULT_OPPONENT_NAME);
@@ -44,7 +45,7 @@ describe('PlayerLeavesController', () => {
     });
 
     it('On cleanup, configureSocket should emit resetGameEvent', async () => {
-        const cleanupSpy = spyOn(controller.resetGameEvent, 'emit').and.callFake(async () => {
+        const cleanupSpy = spyOn(controller['resetGameEvent'], 'emit').and.callFake(async () => {
             return;
         });
         socketHelper.peerSideEmit('cleanup');
@@ -52,7 +53,6 @@ describe('PlayerLeavesController', () => {
     });
 
     it('On cleanup, configureSocket should call gamePlayController.newMessageValue.next', async () => {
-        // eslint-disable-next-line dot-notation
         const cleanupSpy = spyOn(controller['gamePlayController'].newMessageValue, 'next').and.callFake(async () => {
             return;
         });
@@ -62,7 +62,6 @@ describe('PlayerLeavesController', () => {
 
     it('handleLeaveGame should send delete request', () => {
         const fakeObservable = of<string>('fakeResponse');
-        // eslint-disable-next-line dot-notation
         const deleteSpy = spyOn(controller['http'], 'delete').and.returnValue(fakeObservable);
         controller.handleLeaveGame(DEFAULT_GAME_ID);
         expect(deleteSpy).toHaveBeenCalled();
@@ -70,7 +69,7 @@ describe('PlayerLeavesController', () => {
 
     describe('ngOnDestroy', () => {
         it('ngOnDestroy should call serviceDestroyed$.next', () => {
-            const nextSpy = spyOn(controller.serviceDestroyed$, 'next').and.callFake(() => {
+            const nextSpy = spyOn(controller['serviceDestroyed$'], 'next').and.callFake(() => {
                 return;
             });
             controller.ngOnDestroy();
@@ -78,11 +77,35 @@ describe('PlayerLeavesController', () => {
         });
 
         it('ngOnDestroy should call serviceDestroyed$.complete', () => {
-            const completeSpy = spyOn(controller.serviceDestroyed$, 'complete').and.callFake(() => {
+            const completeSpy = spyOn(controller['serviceDestroyed$'], 'complete').and.callFake(() => {
                 return;
             });
             controller.ngOnDestroy();
             expect(completeSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('subcription methods', () => {
+        let serviceDestroyed$: Subject<boolean>;
+        let callback: () => void;
+
+        beforeEach(() => {
+            serviceDestroyed$ = new Subject();
+            callback = () => {
+                return;
+            };
+        });
+
+        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+            const subscriptionSpy = spyOn<any>(controller['joinerLeavesGameEvent'], 'subscribe');
+            controller.subscribeToJoinerLeavesGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+            const subscriptionSpy = spyOn<any>(controller['resetGameEvent'], 'subscribe');
+            controller.subscribeToResetGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
         });
     });
 });
