@@ -19,10 +19,8 @@ import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POIN
 import { HINT_AMOUNT_OF_WORDS, INITIAL_TILE, LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
-// Not currently considering wildcards
+// wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
-
-
 
 @Service()
 export default class WordFindingService {
@@ -33,7 +31,7 @@ export default class WordFindingService {
         const startTime = new Date();
         let previousTime = new Date();
         let currentTime;
-        let timeState = SearchState.Selective;
+        let searchState = SearchState.Selective;
         this.wordExtraction = new WordExtraction(board);
         let chosenMoves: EvaluatedPlacement[] | undefined;
         const validMoves: EvaluatedPlacement[] = [];
@@ -44,7 +42,7 @@ export default class WordFindingService {
         const rackPermutation = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
-        while (emptySquares.length > 0 && timeState !== SearchState.Over) {
+        while (emptySquares.length > 0 && searchState !== SearchState.Over) {
             const emptySquare = this.getRandomSquare(emptySquares);
             const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
             const foundMoves: EvaluatedPlacement[] = [];
@@ -55,47 +53,62 @@ export default class WordFindingService {
             currentTime = new Date();
             console.log(
                 // eslint-disable-next-line max-len
-                `timeOver: ${timeState} Total time: ${currentTime.getTime() - startTime.getTime()} | Time Elapsed: ${
+                `timeOver: ${searchState} Total time: ${currentTime.getTime() - startTime.getTime()} | Time Elapsed: ${
                     currentTime.getTime() - previousTime.getTime()
                 } | Squares left ${emptySquares.length}`,
             );
             previousTime = currentTime;
-            timeState = this.updateState(currentTime.getTime() - startTime.getTime());
-            chosenMoves = this.evaluate(timeState, request, { foundMoves, validMoves, rejectedValidMoves, pointDistributionChance });
+            searchState = this.updateState(currentTime.getTime() - startTime.getTime());
+            chosenMoves = this.evaluate(searchState, request, { foundMoves, validMoves, rejectedValidMoves, pointDistributionChance });
             if (chosenMoves) return chosenMoves;
         }
         currentTime = new Date();
         console.log(`Total time: ${currentTime.getTime() - startTime.getTime()} `);
         console.log(validMoves.length);
 
-        chosenMoves = this.evaluate(timeState, request, { foundMoves: [], validMoves, rejectedValidMoves, pointDistributionChance });
+        chosenMoves = this.evaluate(searchState, request, { foundMoves: [], validMoves, rejectedValidMoves, pointDistributionChance });
         return chosenMoves ? chosenMoves : [];
     }
 
-    evaluate(timeState: SearchState, request: WordFindingRequest, evalutionInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+    evaluate(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
         if (request.usage === WordFindingUsage.Beginner) {
-            const movesInRange = this.getMovesInRange(evalutionInfo.foundMoves, request);
-            for (const movesScore of movesInRange.values()) {
-                for (const move of movesScore) {
-                    if (timeState === SearchState.Selective && this.acceptMove(move, evalutionInfo.pointDistributionChance)) {
-                        return [move];
-                    } else {
-                        evalutionInfo.rejectedValidMoves.push([evalutionInfo.pointDistributionChance[move.score], move]);
-                    }
+            return this.evaluateBeginner(searchState, request, evaluationInfo);
+        } else if (request.usage === WordFindingUsage.Hint) {
+            return this.evaluateHint(evaluationInfo);
+        } else {
+            return this.evaluateExpert(searchState, evaluationInfo);
+        }
+    }
+
+    evaluateBeginner(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+        const movesInRange = this.getMovesInRange(evaluationInfo.foundMoves, request);
+        for (const movesScore of movesInRange.values()) {
+            for (const move of movesScore) {
+                if (searchState === SearchState.Selective && this.acceptMove(move, evaluationInfo.pointDistributionChance)) {
+                    return [move];
+                } else {
+                    const acceptChance = evaluationInfo.pointDistributionChance.get(move.score);
+                    if (acceptChance) evaluationInfo.rejectedValidMoves.push([acceptChance, move]);
                 }
             }
-            if (timeState !== SearchState.Selective && evalutionInfo.rejectedValidMoves.length > 0)
-                return [evalutionInfo.rejectedValidMoves.sort((previous, current) => current[0] - previous[0]).slice(0, 1)[0][1]];
-        } else if (request.usage === WordFindingUsage.Hint) {
-            evalutionInfo.validMoves.concat(evalutionInfo.foundMoves);
-            if (evalutionInfo.validMoves.length > HINT_AMOUNT_OF_WORDS) {
-                return Random.getRandomElementsFromArray(evalutionInfo.validMoves, HINT_AMOUNT_OF_WORDS);
-            }
-        } else {
-            evalutionInfo.validMoves.concat(evalutionInfo.foundMoves);
-            if (timeState === SearchState.Over) {
-                return evalutionInfo.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
-            }
+        }
+        if (searchState !== SearchState.Selective && evaluationInfo.rejectedValidMoves.length > 0)
+            return [evaluationInfo.rejectedValidMoves.sort((previous, current) => current[0] - previous[0]).slice(0, 1)[0][1]];
+        return undefined;
+    }
+
+    evaluateHint(evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+        evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
+        if (evaluationInfo.validMoves.length > HINT_AMOUNT_OF_WORDS) {
+            return Random.getRandomElementsFromArray(evaluationInfo.validMoves, HINT_AMOUNT_OF_WORDS);
+        }
+        return undefined;
+    }
+
+    evaluateExpert(searchState: SearchState, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+        evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
+        if (searchState === SearchState.Over) {
+            return evaluationInfo.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
         }
         return undefined;
     }
@@ -120,14 +133,13 @@ export default class WordFindingService {
         if (!request.pointHistoric) throw new Error(NO_REQUEST_POINT_HISTORIC);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
-        const [minFrequency, maxFrequency] = this.findMinMaxRangeFrequency(request);
-        const frequencyDifference = maxFrequency - minFrequency;
+        const minFrequency = this.findMinRangeFrequency(request);
         const scoreChanceDistribution = new Map<number, number>();
 
         for (let score = request.pointRange.minimum; score < request.pointRange.maximum + 1; score++) {
             const scoreFrequency = request.pointHistoric.get(score);
             if (scoreFrequency) {
-                scoreChanceDistribution.set(score, 1 / (frequencyDifference + 1));
+                scoreChanceDistribution.set(score, 1 / (scoreFrequency - minFrequency + 1));
             } else {
                 scoreChanceDistribution.set(score, 1);
             }
@@ -135,21 +147,19 @@ export default class WordFindingService {
         return scoreChanceDistribution;
     }
 
-    findMinMaxRangeFrequency(request: WordFindingRequest): [number, number] {
+    findMinRangeFrequency(request: WordFindingRequest): number {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistoric) throw new Error(NO_REQUEST_POINT_HISTORIC);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
-        let maxFrequency = 0;
         let minFrequency = Number.MAX_VALUE;
         for (let score = request.pointRange.minimum; score < request.pointRange.maximum + 1; score++) {
             const scoreFrequency = request.pointHistoric.get(score);
-            if (scoreFrequency) {
-                if (scoreFrequency < minFrequency) minFrequency = scoreFrequency;
-                if (scoreFrequency > maxFrequency) maxFrequency = scoreFrequency;
+            if (scoreFrequency && scoreFrequency < minFrequency) {
+                minFrequency = scoreFrequency;
             }
         }
-        return [minFrequency, maxFrequency];
+        return minFrequency;
     }
 
     // chooseMove(validMoves: EvaluatedPlacement[], request: WordFindingRequest): EvaluatedPlacement[] {
@@ -271,19 +281,25 @@ export default class WordFindingService {
         return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
     }
 
-    combination(arr: Tile[]) {
+    combination(tiles: Tile[]) {
         const res: Tile[][] = [[]];
         let temp;
+        for (const tile of tiles) {
+            if (tile.isBlank) {
+                tile.letter = 'E';
+                tile.value = 0;
+            }
+        }
         // Try every combination of either including or excluding each Tile of the array
         // eslint-disable-next-line no-bitwise
-        const maxCombinations = 1 << arr.length;
+        const maxCombinations = 1 << tiles.length;
         for (let i = 0; i < maxCombinations; ++i) {
             temp = [];
-            for (let j = 0; j < arr.length; ++j) {
+            for (let j = 0; j < tiles.length; ++j) {
                 // If the tile has to be included in the current combination
                 // eslint-disable-next-line no-bitwise
                 if (i & (1 << j)) {
-                    temp.push(arr[j]);
+                    temp.push(tiles[j]);
                 }
             }
             res.push(temp);
@@ -298,11 +314,11 @@ export default class WordFindingService {
         }
 
         for (let i = 0; i < tiles.length; i++) {
-            const ch = tiles[i];
-            const leftSubstr = tiles.slice(0, i);
-            const rightSubstr = tiles.slice(i + 1);
-            const rest = leftSubstr.concat(rightSubstr);
-            this.permuteTiles(rest, result, current.concat(ch));
+            const tile = tiles[i];
+            const leftTiles = tiles.slice(0, i);
+            const rightTiles = tiles.slice(i + 1);
+            const rest = leftTiles.concat(rightTiles);
+            this.permuteTiles(rest, result, current.concat(tile));
         }
     }
 
