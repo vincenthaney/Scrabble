@@ -11,11 +11,11 @@ import * as chai from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { StringConversion } from '@app/utils/string-conversion';
-import { WordFindingRequest } from '@app/classes/word-finding';
-import { Random } from '@app/utils/random';
-import { NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { LONG_MOVE_TIME, FINAL_COMPUTE_TIME } from '@app/constants/services-constants/word-finding.const';
+// import { Random } from '@app/utils/random';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { LONG_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
+import { EvaluationInfo, SearchState, WordFindingRequest, WordFindingUsage } from '@app/classes/word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -34,9 +34,10 @@ const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
 const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
 const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
 const DEFAULT_TILE_E: Tile = { letter: 'E', value: 5 };
+const DEFAULT_TILE_BLANK_E: Tile = { letter: 'E', value: 0, isBlank: true };
 const DEFAULT_TILE_F: Tile = { letter: 'F', value: 6 };
 const DEFAULT_TILE_G: Tile = { letter: 'G', value: 7 };
-// const DEFAULT_TILE_WILD: Tile = { letter: '*', value: 0 };
+const DEFAULT_TILE_WILD: Tile = { letter: '*', value: 0, isBlank: true };
 const EMPTY_TILE_RACK: Tile[] = [];
 const SINGLE_TILE_TILE_RACK = [DEFAULT_TILE_A];
 const SMALL_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C];
@@ -73,9 +74,8 @@ const DEFAULT_HISTORIC = new Map<number, number>([
 
 const DEFAULT_REQUEST: WordFindingRequest = {
     pointRange: { minimum: 2, maximum: 8 },
-    numberOfWordsToFind: 1,
+    usage: WordFindingUsage.Beginner,
     pointHistoric: DEFAULT_HISTORIC,
-    maximiseScore: false,
 };
 
 const BEST_MOVE = {
@@ -106,7 +106,14 @@ const DEFAULT_MOVE_3 = {
     score: 3,
 };
 
-const SINGLE_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_4];
+const DEFAULT_MOVE_5 = {
+    tilesToPlace: SINGLE_TILE_TILE_RACK,
+    orientation: Orientation.Horizontal,
+    startPosition: DEFAULT_SQUARE_3.position,
+    score: 5,
+};
+
+const SINGLE_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_5];
 
 const DEFAULT_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_2, BEST_MOVE, DEFAULT_MOVE_3, DEFAULT_MOVE_4, DEFAULT_MOVE_4, DEFAULT_MOVE_2];
 
@@ -196,7 +203,7 @@ describe('WordFindingservice', () => {
         it('should set timeOver to true and stop processing when timeout ', () => {
             const clock = useFakeTimers();
             const spyGetRackPermutations = chai.spy.on(service, 'getRackPermutations', () => {
-                clock.tick(LONG_MOVE_TIME - FINAL_COMPUTE_TIME);
+                clock.tick(LONG_MOVE_TIME + 1);
                 return [SMALL_TILE_RACK, SINGLE_TILE_TILE_RACK];
             });
             const spyGetDesiredSquares = chai.spy.on(service, 'getDesiredSquares', () => {
@@ -205,7 +212,7 @@ describe('WordFindingservice', () => {
             const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
             const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
             const spyAttemptMove = chai.spy.on(service, 'attemptMove');
-            const spyChooseMove = chai.spy.on(service, 'chooseMove');
+            const spyEvaluate = chai.spy.on(service, 'evaluate');
 
             service.findWords(board, BIG_TILE_RACK, request);
             expect(spyGetRackPermutations).to.have.been.called;
@@ -213,7 +220,7 @@ describe('WordFindingservice', () => {
             expect(spyGetRandomSquare).not.to.have.been.called;
             expect(spyFindSquareProperties).not.to.have.been.called;
             expect(spyAttemptMove).not.to.have.been.called;
-            expect(spyChooseMove).to.have.been.called;
+            expect(spyEvaluate).to.have.been.called;
 
             clock.restore();
         });
@@ -298,44 +305,248 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('chooseMove', () => {
+    // describe('chooseMove', () => {
+    //     let request: WordFindingRequest;
+    //     beforeEach(() => {
+    //         request = { ...DEFAULT_REQUEST };
+    //     });
+
+    //     it('should return all validMoves if the query asks for more than there is', () => {
+    //         request.usage = WordFindingUsage.Hint;
+    //         expect(service.chooseMove(SINGLE_VALID_MOVES, request)).to.deep.equal(SINGLE_VALID_MOVES);
+    //     });
+
+    //     it('should return the best move if maximizeScore', () => {
+    //         request.usage = WordFindingUsage.Expert;
+    //         expect(service.chooseMove(DEFAULT_VALID_MOVES, request)).to.deep.equal([BEST_MOVE]);
+    //     });
+
+    //     it('should call getRandomElementsFromArray if query has  no pointHistoric', () => {
+    //         request.pointHistoric = undefined;
+    //         const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
+    //         service.chooseMove(DEFAULT_VALID_MOVES, request);
+    //         assert(stubGetRandomElementsFromArray.calledOnce);
+    //         stubGetRandomElementsFromArray.restore();
+    //     });
+
+    //     it('should call getRandomElementsFromArray if query has no pointRange ', () => {
+    //         request.pointRange = undefined;
+    //         const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
+    //         service.chooseMove(DEFAULT_VALID_MOVES, request);
+    //         assert(stubGetRandomElementsFromArray.calledOnce);
+    //         stubGetRandomElementsFromArray.restore();
+    //     });
+
+    //     it('should call getMovesInRange and  selectLowestFrequencyScoreMove if there is a pointRange and a pointHistoric  ', () => {
+    //         const stubGetMovesInRange = stub(service, 'getMovesInRange').returns({} as unknown as Map<number, EvaluatedPlacement[]>);
+    //         const stubSelectLowestFrequencyScoreMove = stub(service, 'selectLowestFrequencyScoreMove');
+    //         service.chooseMove(DEFAULT_VALID_MOVES, request);
+    //         assert(stubGetMovesInRange.calledOnce);
+    //         assert(stubSelectLowestFrequencyScoreMove.calledOnce);
+    //     });
+    // });
+
+    describe('evaluate', () => {
         let request: WordFindingRequest;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
         });
 
-        it('should return all validMoves if the query asks for more than there is', () => {
-            request.numberOfWordsToFind = SINGLE_VALID_MOVES.length + 1;
-            expect(service.chooseMove(SINGLE_VALID_MOVES, request)).to.deep.equal(SINGLE_VALID_MOVES);
+        it('should call evaluateHint if the request usage is Hint', () => {
+            request.usage = WordFindingUsage.Hint;
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const spy = chai.spy.on(service, 'evaluateHint', () => {});
+            service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            expect(spy).to.have.been.called;
         });
 
-        it('should return the best move if maximizeScore', () => {
-            request.maximiseScore = true;
-            expect(service.chooseMove(DEFAULT_VALID_MOVES, request)).to.deep.equal([BEST_MOVE]);
+        it('should call evaluateExpert if the request usage is Expert', () => {
+            request.usage = WordFindingUsage.Expert;
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const spy = chai.spy.on(service, 'evaluateExpert', () => {});
+            service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            expect(spy).to.have.been.called;
         });
 
-        it('should call getRandomElementsFromArray if query has  no pointHistoric', () => {
-            request.pointHistoric = undefined;
-            const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
-            service.chooseMove(DEFAULT_VALID_MOVES, request);
-            assert(stubGetRandomElementsFromArray.calledOnce);
-            stubGetRandomElementsFromArray.restore();
+        it('should call evaluateBeginner if the request usage is Beginner', () => {
+            request.usage = WordFindingUsage.Beginner;
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const spy = chai.spy.on(service, 'evaluateBeginner', () => {});
+            service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            expect(spy).to.have.been.called;
+        });
+    });
+
+    describe('evaluateHint', () => {
+        it('should return 3 moves if there are atleast 3 of them', () => {
+            const info = {
+                foundMoves: [],
+                rejectedValidMoves: [],
+                validMoves: DEFAULT_VALID_MOVES,
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            expect(service.evaluateHint(info)?.length).to.equal(3);
         });
 
-        it('should call getRandomElementsFromArray if query has no pointRange ', () => {
-            request.pointRange = undefined;
-            const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
-            service.chooseMove(DEFAULT_VALID_MOVES, request);
-            assert(stubGetRandomElementsFromArray.calledOnce);
-            stubGetRandomElementsFromArray.restore();
+        it('should return undefined if there are less than 3 moves', () => {
+            const info = {
+                foundMoves: [{} as unknown as EvaluatedPlacement, {} as unknown as EvaluatedPlacement],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            expect(service.evaluateHint(info)).to.be.undefined;
         });
 
-        it('should call getMovesInRange and  selectLowestFrequencyScoreMove if there is a pointRange and a pointHistoric  ', () => {
-            const stubGetMovesInRange = stub(service, 'getMovesInRange').returns({} as unknown as Map<number, EvaluatedPlacement>);
-            const stubSelectLowestFrequencyScoreMove = stub(service, 'selectLowestFrequencyScoreMove');
-            service.chooseMove(DEFAULT_VALID_MOVES, request);
-            assert(stubGetMovesInRange.calledOnce);
-            assert(stubSelectLowestFrequencyScoreMove.calledOnce);
+        it('should add foundMoves to validMoves ', () => {
+            const info = {
+                foundMoves: SINGLE_VALID_MOVES,
+                rejectedValidMoves: [],
+                validMoves: DEFAULT_VALID_MOVES,
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            service.evaluateHint(info);
+            expect(info.validMoves.length).to.equal(DEFAULT_VALID_MOVES.length + SINGLE_VALID_MOVES.length);
+        });
+    });
+
+    describe('evaluateExpert', () => {
+        it('should return 1 move if the searchState is over and there is atleast 1 move', () => {
+            const expected = { score: 3 } as unknown as EvaluatedPlacement;
+            const info = {
+                foundMoves: [
+                    { score: 1 } as unknown as EvaluatedPlacement,
+                    { score: 2 } as unknown as EvaluatedPlacement,
+                    expected,
+                    { score: 1 } as unknown as EvaluatedPlacement,
+                ],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            expect(service.evaluateExpert(SearchState.Over, info)).to.deep.equal([expected]);
+        });
+
+        it('should return undefined if the searchState is not over', () => {
+            const info = {
+                foundMoves: [{} as unknown as EvaluatedPlacement, {} as unknown as EvaluatedPlacement],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            expect(service.evaluateExpert(SearchState.Selective, info)).to.be.undefined;
+        });
+
+        it('should add foundMoves to validMoves ', () => {
+            const info = {
+                foundMoves: [{} as unknown as EvaluatedPlacement, {} as unknown as EvaluatedPlacement],
+                rejectedValidMoves: [],
+                validMoves: [{} as unknown as EvaluatedPlacement],
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            service.evaluateExpert(SearchState.Over, info);
+            expect(info.validMoves.length).to.equal(3);
+        });
+    });
+
+    describe('evaluateBeginner', () => {
+        let request: WordFindingRequest;
+        beforeEach(() => {
+            request = { ...DEFAULT_REQUEST };
+        });
+
+        it('should call getMovesInRange', () => {
+            const spy = chai.spy.on(service, 'getMovesInRange');
+            const info = {
+                foundMoves: [],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            service.evaluateBeginner(SearchState.Over, request, info);
+            expect(spy).to.have.been.called;
+        });
+
+        it('should call acceptMove and return the first accepted move if in Selective state', () => {
+            const scoreMap: Map<number, EvaluatedPlacement[]> = new Map([
+                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
+                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
+                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
+            ]);
+            chai.spy.on(service, 'getMovesInRange', () => {
+                return scoreMap;
+            });
+            const spyAcceptMove = chai.spy.on(service, 'acceptMove', () => {
+                return true;
+            });
+            const info = {
+                foundMoves: [],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance: {} as unknown as Map<number, number>,
+            };
+            expect(service.evaluateBeginner(SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
+            expect(spyAcceptMove).to.have.been.called;
+        });
+
+        it('should add the rejected moves to rejectedValidMoves', () => {
+            const scoreMap: Map<number, EvaluatedPlacement[]> = new Map([
+                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
+                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
+                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
+            ]);
+            chai.spy.on(service, 'getMovesInRange', () => {
+                return scoreMap;
+            });
+            const pointDistributionChance: Map<number, number> = new Map([
+                [DEFAULT_MOVE_2.score, 1],
+                [DEFAULT_MOVE_3.score, 2],
+                [DEFAULT_MOVE_4.score, 3],
+            ]);
+            const expected: [number, EvaluatedPlacement][] = [
+                [1, DEFAULT_MOVE_2],
+                [1, DEFAULT_MOVE_2],
+                [2, DEFAULT_MOVE_3],
+                [3, DEFAULT_MOVE_4],
+                [3, DEFAULT_MOVE_4],
+            ];
+            chai.spy.on(service, 'acceptMove', () => {
+                return false;
+            });
+            const info = {
+                foundMoves: [],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance,
+            };
+            expect(service.evaluateBeginner(SearchState.Selective, request, info)).to.be.undefined;
+            expect(info.rejectedValidMoves).to.deep.equal(expected);
+        });
+
+        it('should return the highest chance rejected move if not in Selective mode', () => {
+            const scoreMap: Map<number, EvaluatedPlacement[]> = new Map([
+                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
+                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
+                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
+            ]);
+            chai.spy.on(service, 'getMovesInRange', () => {
+                return scoreMap;
+            });
+            const pointDistributionChance: Map<number, number> = new Map([
+                [DEFAULT_MOVE_2.score, 1],
+                [DEFAULT_MOVE_3.score, 2],
+                [DEFAULT_MOVE_4.score, 3],
+            ]);
+            chai.spy.on(service, 'acceptMove', () => {
+                return false;
+            });
+            const info = {
+                foundMoves: [],
+                rejectedValidMoves: [],
+                validMoves: [],
+                pointDistributionChance,
+            };
+            expect(service.evaluateBeginner(SearchState.Unselective, request, info)).to.deep.equal([DEFAULT_MOVE_4]);
         });
     });
 
@@ -351,47 +562,137 @@ describe('WordFindingservice', () => {
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
-        it('should return a map containing 1 of each score ', () => {
-            const expected: Map<number, EvaluatedPlacement> = new Map([
-                [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
-                [DEFAULT_MOVE_3.score, DEFAULT_MOVE_3],
-                [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
+        it('should return a map containing an array of each score ', () => {
+            const expected: Map<number, EvaluatedPlacement[]> = new Map([
+                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
+                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
+                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
             ]);
             expect(service.getMovesInRange(DEFAULT_VALID_MOVES, request)).to.deep.equal(expected);
         });
     });
 
-    describe('selectLowestFrequencyScoreMove', () => {
+    describe('findMinRangeFrequency', () => {
         let request: WordFindingRequest;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
         });
 
+        it('should throw if there is no pointRange', () => {
+            request.pointRange = undefined;
+            const result = () => service.findMinRangeFrequency(request);
+            expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
+        });
+
         it('should throw if there is no pointHistoric', () => {
-            const foundMovesMap = new Map();
             request.pointHistoric = undefined;
-            const result = () => service.selectLowestFrequencyScoreMove(foundMovesMap, request);
+            const result = () => service.findMinRangeFrequency(request);
             expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
         });
 
-        it('should return the first move with a score that was never played ', () => {
-            const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
-                [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
-                [DEFAULT_MOVE_3.score, DEFAULT_MOVE_3],
-                [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
-            ]);
-            expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_3);
+        it('should throw if there is an invalid pointRange', () => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.minimum = request.pointRange!.maximum + 1;
+            const result = () => service.findMinRangeFrequency(request);
+            expect(result).to.Throw(INVALID_REQUEST_POINT_RANGE);
         });
 
-        it('should return the move with the lowest frequency amongst scores that were alreayd played', () => {
-            const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
-                [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
-                [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
-                [BEST_MOVE.score, BEST_MOVE],
-            ]);
-            expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_4);
+        it('should return the correct maximum and minimum in the given range ', () => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.minimum = 2;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.maximum = 8;
+            expect(service.findMinRangeFrequency(request)).to.deep.equal(1);
+        });
+
+        it('should return the correct maximum and minimum in the given range ', () => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.minimum = 0;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.maximum = 20;
+            expect(service.findMinRangeFrequency(request)).to.deep.equal(1);
         });
     });
+
+    describe('distributeChance', () => {
+        let request: WordFindingRequest;
+        beforeEach(() => {
+            request = { ...DEFAULT_REQUEST };
+        });
+
+        it('should throw if there is no pointRange', () => {
+            request.pointRange = undefined;
+            const result = () => service.distributeChance(request);
+            expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
+        });
+
+        it('should throw if there is no pointHistoric', () => {
+            request.pointHistoric = undefined;
+            const result = () => service.distributeChance(request);
+            expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
+        });
+
+        it('should throw if there is an invalid pointRange', () => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.minimum = request.pointRange!.maximum + 1;
+            const result = () => service.distributeChance(request);
+            expect(result).to.Throw(INVALID_REQUEST_POINT_RANGE);
+        });
+
+        it('should return the chances for scores in the given range ', () => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.minimum = 2;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            request.pointRange!.maximum = 8;
+            /* eslint-disable @typescript-eslint/no-magic-numbers */
+            const expected: Map<number, number> = new Map([
+                [2, 0.5],
+                [3, 1],
+                [4, 1],
+                [5, 1],
+                [6, 1],
+                [7, 1],
+                [8, 0.5],
+            ]);
+            /* eslint-enable @typescript-eslint/no-magic-numbers */
+            expect(service.distributeChance(request)).to.deep.equal(expected);
+        });
+    });
+
+    // [2, 2],
+    // [4, 1],
+    // [8, 2],
+    // describe('selectLowestFrequencyScoreMove', () => {
+    //     let request: WordFindingRequest;
+    //     beforeEach(() => {
+    //         request = { ...DEFAULT_REQUEST };
+    //     });
+
+    //     it('should throw if there is no pointHistoric', () => {
+    //         const foundMovesMap = new Map();
+    //         request.pointHistoric = undefined;
+    //         const result = () => service.selectLowestFrequencyScoreMove(foundMovesMap, request);
+    //         expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
+    //     });
+
+    //     it('should return the first move with a score that was never played ', () => {
+    //         const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
+    //             [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
+    //             [DEFAULT_MOVE_3.score, DEFAULT_MOVE_3],
+    //             [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
+    //         ]);
+    //         expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_3);
+    //     });
+
+    //     it('should return the move with the lowest frequency amongst scores that were alreayd played', () => {
+    //         const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
+    //             [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
+    //             [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
+    //             [BEST_MOVE.score, BEST_MOVE],
+    //         ]);
+    //         expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_4);
+    //     });
+    // });
 
     describe('attemptMove', () => {
         it('should call attemptMoveDirection', () => {
@@ -605,6 +906,57 @@ describe('WordFindingservice', () => {
         });
     });
 
+    describe('updateState', () => {
+        it('should return SearchState.Over if the time exceeds the limit', () => {
+            expect(service.updateState(LONG_MOVE_TIME + 1)).to.deep.equal(SearchState.Over);
+        });
+
+        it('should return SearchState.Unselective if the time exceeds the limit short time limit but not the long time limit', () => {
+            expect(service.updateState(LONG_MOVE_TIME - 1)).to.deep.equal(SearchState.Unselective);
+        });
+
+        it('should return SearchState.Selective if the time exceeds the limit', () => {
+            expect(service.updateState(1)).to.deep.equal(SearchState.Selective);
+        });
+    });
+
+    describe('acceptMove', () => {
+        it('should not always return true if the chance is not 100%', () => {
+            let result;
+            let sameResult = true;
+            const iterations = 100;
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            const map = new Map([[2, 0.5]]);
+            for (let i = 0; i < iterations; i++) {
+                const tmp = service.acceptMove({ score: 2 } as unknown as EvaluatedPlacement, map);
+                if (tmp !== result && i !== 0) {
+                    sameResult = false;
+                    break;
+                } else {
+                    result = tmp;
+                }
+            }
+            expect(sameResult).to.be.false;
+        });
+
+        it('should not always  true if the chance is 100%', () => {
+            let result;
+            let sameResult = true;
+            const iterations = 10;
+            const map = new Map([[2, 1]]);
+            for (let i = 0; i < iterations; i++) {
+                const tmp = service.acceptMove({ score: 2 } as unknown as EvaluatedPlacement, map);
+                if (tmp !== result && i !== 0) {
+                    sameResult = false;
+                    break;
+                } else {
+                    result = tmp;
+                }
+            }
+            expect(sameResult).to.be.true;
+        });
+    });
+
     describe('combination', () => {
         it('should return an empty array if the rack is empty (0 tiles)', () => {
             const expected: Tile[][] = [];
@@ -614,6 +966,11 @@ describe('WordFindingservice', () => {
         it('should return all combinations of the given tiles (1 tile)', () => {
             const expected: Tile[][] = [[DEFAULT_TILE_A]];
             expect(service.combination(SINGLE_TILE_TILE_RACK)).to.deep.equal(expected);
+        });
+
+        it('should return all combinations of the given tiles (blank tile)', () => {
+            const expected: Tile[][] = [[DEFAULT_TILE_BLANK_E]];
+            expect(service.combination([DEFAULT_TILE_WILD])).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (3 tiles)', () => {
