@@ -2,7 +2,7 @@
 
 import { Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
-import { WordPlacement } from '@app/classes/word-finding';
+import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { expect } from 'chai';
 import { WordPlacementUtils } from './word-placement';
 
