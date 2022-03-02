@@ -1,4 +1,4 @@
-export enum CommandErrorMessages {
+export enum CommandExceptionMessages {
     BadSyntax = 'La commande ne respecte pas la syntaxe requise.',
     PlaceBadSyntax = 'La commande placer doit suivre le format _!placer ‹position› ‹lettres›_',
     ExchangeBadSyntax = 'La commande échanger doit suivre le format _!échanger ‹lettres›_',

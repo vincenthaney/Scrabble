@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
-import CommandError from '@app/classes/command-error';
+import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { CommandErrorMessages, PLAYER_NOT_FOUND } from '@app/constants/command-error-messages';
+import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
 import { BOARD_SIZE, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
@@ -36,10 +36,12 @@ export default class InputParserService {
     private parseCommand(input: string, gameId: string, playerId: string): void {
         try {
             this.controller.sendAction(gameId, playerId, this.createActionData(input));
-        } catch (e) {
-            if (e instanceof CommandError) {
+        } catch (exception) {
+            if (exception instanceof CommandException) {
                 const errorMessageContent =
-                    e.message === CommandErrorMessages.NotYourTurn ? e.message : `La commande **${input}** est invalide :<br />${e.message}`;
+                    exception.message === CommandExceptionMessages.NotYourTurn
+                        ? exception.message
+                        : `La commande **${input}** est invalide :<br />${exception.message}`;
 
                 this.controller.sendError(gameId, playerId, {
                     content: errorMessageContent,
@@ -58,7 +60,7 @@ export default class InputParserService {
 
         switch (actionName) {
             case ActionType.PLACE:
-                if (inputWords.length !== ExpectedCommandWordCount.Place) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
+                if (inputWords.length !== ExpectedCommandWordCount.Place) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
                 actionData = {
                     type: ActionType.PLACE,
                     input,
@@ -66,7 +68,7 @@ export default class InputParserService {
                 };
                 break;
             case ActionType.EXCHANGE:
-                if (inputWords.length !== ExpectedCommandWordCount.Exchange) throw new CommandError(CommandErrorMessages.ExchangeBadSyntax);
+                if (inputWords.length !== ExpectedCommandWordCount.Exchange) throw new CommandException(CommandExceptionMessages.ExchangeBadSyntax);
                 actionData = {
                     type: ActionType.EXCHANGE,
                     input,
@@ -74,7 +76,7 @@ export default class InputParserService {
                 };
                 break;
             case ActionType.PASS:
-                if (inputWords.length !== ExpectedCommandWordCount.Pass) throw new CommandError(CommandErrorMessages.PassBadSyntax);
+                if (inputWords.length !== ExpectedCommandWordCount.Pass) throw new CommandException(CommandExceptionMessages.PassBadSyntax);
                 actionData = {
                     type: ActionType.PASS,
                     input,
@@ -82,7 +84,7 @@ export default class InputParserService {
                 };
                 break;
             case ActionType.RESERVE:
-                if (inputWords.length !== ExpectedCommandWordCount.Reserve) throw new CommandError(CommandErrorMessages.BadSyntax);
+                if (inputWords.length !== ExpectedCommandWordCount.Reserve) throw new CommandException(CommandExceptionMessages.BadSyntax);
                 actionData = {
                     type: ActionType.RESERVE,
                     input,
@@ -94,7 +96,7 @@ export default class InputParserService {
             //     // this.controller.sendHintAction();
             //     break;
             case ActionType.HELP:
-                if (inputWords.length !== ExpectedCommandWordCount.Help) throw new CommandError(CommandErrorMessages.BadSyntax);
+                if (inputWords.length !== ExpectedCommandWordCount.Help) throw new CommandException(CommandExceptionMessages.BadSyntax);
                 actionData = {
                     type: ActionType.HELP,
                     input,
@@ -102,7 +104,7 @@ export default class InputParserService {
                 };
                 break;
             default:
-                throw new CommandError(CommandErrorMessages.InvalidEntry);
+                throw new CommandException(CommandExceptionMessages.InvalidEntry);
         }
         return actionData;
     }
@@ -114,12 +116,12 @@ export default class InputParserService {
         let orientation: Orientation;
 
         if (this.isNumber(locationLastChar)) {
-            if (nLettersToPlace !== 1) throw new CommandError(CommandErrorMessages.PlaceBadSyntax);
+            if (nLettersToPlace !== 1) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
             orientation = Orientation.Horizontal;
         } else {
             if (locationLastChar === 'h') orientation = Orientation.Horizontal;
             else if (locationLastChar === 'v') orientation = Orientation.Vertical;
-            else throw new CommandError(CommandErrorMessages.BadSyntax);
+            else throw new CommandException(CommandExceptionMessages.BadSyntax);
         }
 
         return {
@@ -150,7 +152,7 @@ export default class InputParserService {
 
     private parseLettersToTiles(lettersToParse: string, actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {
         if (actionType === ActionType.EXCHANGE) {
-            if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandError(CommandErrorMessages.ExhangeRequireLowercaseLettes);
+            if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandException(CommandExceptionMessages.ExhangeRequireLowercaseLettes);
         }
 
         const player: AbstractPlayer = this.getLocalPlayer();
@@ -173,7 +175,7 @@ export default class InputParserService {
             }
         }
 
-        if (parsedTiles.length !== lettersToParse.length) throw new CommandError(CommandErrorMessages.DontHaveTiles);
+        if (parsedTiles.length !== lettersToParse.length) throw new CommandException(CommandExceptionMessages.DontHaveTiles);
 
         return parsedTiles;
     }
@@ -199,10 +201,10 @@ export default class InputParserService {
     }
 
     private verifyActionValidity(actionName: ActionType) {
-        if (!actionName) throw new CommandError(CommandErrorMessages.InvalidEntry);
-        if (this.gameService.isGameOver) throw new CommandError(CommandErrorMessages.GameOver);
+        if (!actionName) throw new CommandException(CommandExceptionMessages.InvalidEntry);
+        if (this.gameService.isGameOver) throw new CommandException(CommandExceptionMessages.GameOver);
         if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName))
-            throw new CommandError(CommandErrorMessages.NotYourTurn);
+            throw new CommandException(CommandExceptionMessages.NotYourTurn);
     }
 
     private getStartPosition(location: Location): Position {
@@ -211,7 +213,7 @@ export default class InputParserService {
             column: location.col,
         };
 
-        if (!this.isPositionWithinBounds(inputStartPosition)) throw new CommandError(CommandErrorMessages.PositionFormat);
+        if (!this.isPositionWithinBounds(inputStartPosition)) throw new CommandException(CommandExceptionMessages.PositionFormat);
         return inputStartPosition;
     }
 

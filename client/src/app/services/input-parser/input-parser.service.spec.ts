@@ -7,13 +7,13 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
-import CommandError from '@app/classes/command-error';
+import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { CommandErrorMessages, PLAYER_NOT_FOUND } from '@app/constants/command-error-messages';
+import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
@@ -50,7 +50,7 @@ describe('InputParserService', () => {
         new Tile('*' as LetterValue, 0, true),
     ];
     const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME, DEFAULT_TILES);
-    const DEFAULT_COMMAND_ERROR_MESSAGE = CommandErrorMessages.InvalidEntry;
+    const DEFAULT_COMMAND_ERROR_MESSAGE = CommandExceptionMessages.InvalidEntry;
 
     const EXPECTED_PLACE_PAYLOAD_MULTI: ActionPlacePayload = {
         tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
@@ -137,7 +137,7 @@ describe('InputParserService', () => {
         it('should have right error message content if createActionData throws error NotYourTurn', () => {
             spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
             spyOn<any>(service, 'createActionData').and.callFake(() => {
-                throw new CommandError(DEFAULT_COMMAND_ERROR_MESSAGE);
+                throw new CommandException(DEFAULT_COMMAND_ERROR_MESSAGE);
             });
             service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
@@ -149,11 +149,11 @@ describe('InputParserService', () => {
         it('should have right error message content if createActionData throws other commandError', () => {
             spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
             spyOn<any>(service, 'createActionData').and.callFake(() => {
-                throw new CommandError(CommandErrorMessages.NotYourTurn);
+                throw new CommandException(CommandExceptionMessages.NotYourTurn);
             });
             service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
-                content: CommandErrorMessages.NotYourTurn,
+                content: CommandExceptionMessages.NotYourTurn,
                 senderId: SYSTEM_ERROR_ID,
             });
         });
@@ -229,23 +229,23 @@ describe('InputParserService', () => {
         });
 
         it('should throw error if commands have incorrect lengths', () => {
-            const invalidCommands: [command: string, error: CommandErrorMessages][] = [
-                [`${ACTION_COMMAND_INDICATOR}placer abc`, CommandErrorMessages.PlaceBadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}échanger one two three`, CommandErrorMessages.ExchangeBadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}passer thing`, CommandErrorMessages.PassBadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}réserve second word`, CommandErrorMessages.BadSyntax],
+            const invalidCommands: [command: string, error: CommandExceptionMessages][] = [
+                [`${ACTION_COMMAND_INDICATOR}placer abc`, CommandExceptionMessages.PlaceBadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}échanger one two three`, CommandExceptionMessages.ExchangeBadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}passer thing`, CommandExceptionMessages.PassBadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}réserve second word`, CommandExceptionMessages.BadSyntax],
                 // `${ACTION_COMMAND_INDICATOR}indice not length of two`,
-                [`${ACTION_COMMAND_INDICATOR}aide help`, CommandErrorMessages.BadSyntax],
+                [`${ACTION_COMMAND_INDICATOR}aide help`, CommandExceptionMessages.BadSyntax],
             ];
             for (const [command, error] of invalidCommands) {
-                expect(() => service['createActionData'](command)).toThrow(new CommandError(error));
+                expect(() => service['createActionData'](command)).toThrow(new CommandException(error));
             }
         });
 
         it('should throw error if command does not exist', () => {
             expect(() => {
                 service['createActionData']('!trouver un ami');
-            }).toThrow(new CommandError(CommandErrorMessages.InvalidEntry));
+            }).toThrow(new CommandException(CommandExceptionMessages.InvalidEntry));
         });
     });
 
@@ -273,7 +273,7 @@ describe('InputParserService', () => {
         it('should throw if lastChar is a number and trying to place multiple letters', () => {
             expect(() => {
                 service['createLocation'](VALID_LOCATION_INPUT_SINGLE, VALID_LETTERS_INPUT_MULTI.length);
-            }).toThrow(new CommandError(CommandErrorMessages.PlaceBadSyntax));
+            }).toThrow(new CommandException(CommandExceptionMessages.PlaceBadSyntax));
         });
 
         it('should have horizontal orientation if last char is number and trying to place one letter', () => {
@@ -284,7 +284,7 @@ describe('InputParserService', () => {
         it('should throw if last char is not a number and is not h or v', () => {
             expect(() => {
                 service['createLocation']('a1x', VALID_LETTERS_INPUT_MULTI.length);
-            }).toThrow(new CommandError(CommandErrorMessages.BadSyntax));
+            }).toThrow(new CommandException(CommandExceptionMessages.BadSyntax));
         });
 
         it('should have horizontal orientation if last char is h', () => {
@@ -348,19 +348,19 @@ describe('InputParserService', () => {
 
         it('should throw error with invalid input for place actions', () => {
             const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
-            const errorMessages: CommandErrorMessages[] = [
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
+            const errorMessages: CommandExceptionMessages[] = [
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
             ];
 
             for (let i = 0; i < invalidLetters.length; i++) {
                 expect(() => {
                     service['parseLettersToTiles'](invalidLetters[i], ActionType.PLACE);
-                }).toThrow(new CommandError(errorMessages[i]));
+                }).toThrow(new CommandException(errorMessages[i]));
             }
         });
 
@@ -379,18 +379,18 @@ describe('InputParserService', () => {
 
         it('should throw error with invalid input for exchange actions', () => {
             const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
-            const errorMessages: CommandErrorMessages[] = [
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.DontHaveTiles,
-                CommandErrorMessages.ExhangeRequireLowercaseLettes,
-                CommandErrorMessages.DontHaveTiles,
+            const errorMessages: CommandExceptionMessages[] = [
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.DontHaveTiles,
+                CommandExceptionMessages.ExhangeRequireLowercaseLettes,
+                CommandExceptionMessages.DontHaveTiles,
             ];
 
             for (let i = 0; i < invalidLetters.length; i++) {
                 expect(() => {
                     service['parseLettersToTiles'](invalidLetters[i], ActionType.EXCHANGE);
-                }).toThrow(new CommandError(errorMessages[i]));
+                }).toThrow(new CommandException(errorMessages[i]));
             }
         });
     });
@@ -471,14 +471,14 @@ describe('InputParserService', () => {
         it('should throw error if actionType is undefined', () => {
             expect(() => {
                 service['verifyActionValidity'](undefined as unknown as ActionType);
-            }).toThrow(new CommandError(CommandErrorMessages.InvalidEntry));
+            }).toThrow(new CommandException(CommandExceptionMessages.InvalidEntry));
         });
 
         it('should throw error if game is over', () => {
             gameServiceSpy.isGameOver = true;
             expect(() => {
                 service['verifyActionValidity'](ActionType.RESERVE);
-            }).toThrow(new CommandError(CommandErrorMessages.GameOver));
+            }).toThrow(new CommandException(CommandExceptionMessages.GameOver));
         });
 
         it("should throw error if on your turn command and it is not the player's turn", () => {
@@ -486,7 +486,7 @@ describe('InputParserService', () => {
             gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
             expect(() => {
                 service['verifyActionValidity'](ActionType.PASS);
-            }).toThrow(new CommandError(CommandErrorMessages.NotYourTurn));
+            }).toThrow(new CommandException(CommandExceptionMessages.NotYourTurn));
         });
     });
 
@@ -505,7 +505,7 @@ describe('InputParserService', () => {
             spyOn<any>(service, 'isPositionWithinBounds').and.returnValue(false);
             expect(() => {
                 service['getStartPosition'](VALID_LOCATION);
-            }).toThrow(new CommandError(CommandErrorMessages.PositionFormat));
+            }).toThrow(new CommandException(CommandExceptionMessages.PositionFormat));
         });
     });
 
