@@ -1,6 +1,6 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
-import { ActionData, ActionType } from '@app/classes/communication/action-data';
+import { ActionData, ActionExchangePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -15,13 +15,16 @@ export default class ActionExchange extends ActionPlay {
         this.tilesToExchange = tilesToExchange;
     }
 
-    static createPayload(tiles: Tile[]): ActionData {
-        const payload = {
+    static getData(tiles: Tile[]): ActionData {
+        return {
             type: ActionType.EXCHANGE,
-            payload: { tiles },
+            payload: this.createActionExchangePayload(tiles),
             input: '',
         };
-        return payload;
+    }
+
+    static createActionExchangePayload(tiles: Tile[]): ActionExchangePayload {
+        return { tiles };
     }
 
     execute(): GameUpdateData {
