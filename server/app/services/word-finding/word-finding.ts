@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 // import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 
 @Service()
-export default class WordFindingService {
+export class WordFindingService {
     // constructor(
     //     private wordExtraction: WordExtraction,
     //     private wordVerification: WordsVerificationService,

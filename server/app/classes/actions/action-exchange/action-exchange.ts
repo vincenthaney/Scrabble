@@ -16,11 +16,12 @@ export default class ActionExchange extends ActionPlay {
     }
 
     static createPayload(tiles: Tile[]): ActionData {
-        return {
+        const payload = {
             type: ActionType.EXCHANGE,
             payload: { tiles },
             input: '',
         };
+        return payload;
     }
 
     execute(): GameUpdateData {

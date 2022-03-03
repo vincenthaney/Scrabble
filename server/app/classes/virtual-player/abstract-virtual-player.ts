@@ -1,12 +1,13 @@
 import Player from '@app/classes/player/player';
-import { PointRange } from '@app/classes/word-finding';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import { PointRange, WordFindingRequest } from '@app/classes/word-finding';
+import { WordFindingService } from '@app/services/word-finding/word-finding';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Router } from 'express';
-import Tile from '@app/classes/tile/tile';
 // import { ActionData } from '@app/classes/communication/action-data';
 
 export abstract class AbstractVirtualPlayer extends Player {
-    private static wordFindingService: WordFindingService;
+    static wordFindingService: WordFindingService;
+    static activeGameService: ActiveGameService;
 
     gameId: string;
     pointHistoric = new Map<number, number>();
@@ -21,9 +22,16 @@ export abstract class AbstractVirtualPlayer extends Player {
         return AbstractVirtualPlayer.wordFindingService;
     }
 
+    static getActiveGameService(): ActiveGameService {
+        return AbstractVirtualPlayer.activeGameService;
+    }
+
     static injectServices(wordFindingService: WordFindingService): void {
         if (!this.getWordFindingService()) {
             AbstractVirtualPlayer.wordFindingService = wordFindingService;
+        }
+        if (!this.getActiveGameService()) {
+            AbstractVirtualPlayer.activeGameService = this.activeGameService;
         }
     }
 
@@ -35,10 +43,10 @@ export abstract class AbstractVirtualPlayer extends Player {
         // API call
     }
 
-    generateWordFindingRequest() {
+    generateWordFindingRequest(): WordFindingRequest {
         return {
             pointRange: this.findPointRange(),
-            numberOfWordsToFind: '1',
+            numberOfWordsToFind: 1,
             pointHistoric: this.pointHistoric,
         };
     }

@@ -31,12 +31,13 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator = Container.get(WordsVerificationService);
     }
 
-    static createPayload(tiles: Tile[], ): ActionData {
-        return {
-            tiles: [new Tile('A', 0), new Tile('B', 0)],
+    static createPayload(payloadTiles: Tile[]): ActionPayload {
+        const payload = {
+            tiles: payloadTiles,
             orientation: Orientation.Horizontal,
             startPosition: { row: 0, column: 0 },
         };
+        return payload;
     }
 
     execute(): void | GameUpdateData {
