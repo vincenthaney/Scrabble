@@ -70,7 +70,7 @@ export class GamePlayService {
             case ActionType.RESERVE: {
                 return new ActionReserve(player, game);
             }
-            case 'hint': {
+            case ActionType.HINT: {
                 return new ActionHint(player, game);
             }
             default: {
