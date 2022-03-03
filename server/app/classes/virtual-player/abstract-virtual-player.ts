@@ -3,7 +3,6 @@ import { PointRange, WordFindingRequest } from '@app/classes/word-finding';
 import { WordFindingService } from '@app/services/word-finding/word-finding';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Router } from 'express';
-// import { ActionData } from '@app/classes/communication/action-data';
 
 export abstract class AbstractVirtualPlayer extends Player {
     static wordFindingService: WordFindingService;
@@ -26,12 +25,12 @@ export abstract class AbstractVirtualPlayer extends Player {
         return AbstractVirtualPlayer.activeGameService;
     }
 
-    static injectServices(wordFindingService: WordFindingService): void {
+    static injectServices(wordFindingService: WordFindingService, activeGameService: ActiveGameService): void {
         if (!this.getWordFindingService()) {
             AbstractVirtualPlayer.wordFindingService = wordFindingService;
         }
         if (!this.getActiveGameService()) {
-            AbstractVirtualPlayer.activeGameService = this.activeGameService;
+            AbstractVirtualPlayer.activeGameService = activeGameService;
         }
     }
 
@@ -41,6 +40,7 @@ export abstract class AbstractVirtualPlayer extends Player {
 
     sendPayload() {
         // API call
+        throw new Error('Method not implemented.');
     }
 
     generateWordFindingRequest(): WordFindingRequest {
