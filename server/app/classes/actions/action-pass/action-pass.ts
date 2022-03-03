@@ -3,7 +3,7 @@ import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 
 export default class ActionPass extends ActionPlay {
-    static createPayload(): ActionData {
+    static getData(): ActionData {
         return {
             input: '',
             type: ActionType.PASS,
