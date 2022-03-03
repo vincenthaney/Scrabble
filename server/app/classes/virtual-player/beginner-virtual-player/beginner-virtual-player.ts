@@ -1,4 +1,9 @@
-import { EXCHANGE_ACTION_THRESHOLD, PASS_ACTION_THRESHOLD } from '@app/constants/virtual-player-constants';
+import {
+    EXCHANGE_ACTION_THRESHOLD,
+    LOW_SCORE_THRESHOLD,
+    MEDIUM_SCORE_THRESHOLD,
+    PASS_ACTION_THRESHOLD,
+} from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { PointRange } from '@app/classes/word-finding';
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
@@ -8,7 +13,23 @@ import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     findPointRange(): PointRange {
-        throw new Error('Method not implemented.');
+        const randomPointRange = Math.random();
+        if (randomPointRange <= LOW_SCORE_THRESHOLD) {
+            return {
+                minimum: 0,
+                maximum: 6,
+            };
+        } else if (randomPointRange <= MEDIUM_SCORE_THRESHOLD) {
+            return {
+                minimum: 7,
+                maximum: 12,
+            };
+        } else {
+            return {
+                minimum: 13,
+                maximum: 18,
+            };
+        }
     }
 
     findAction(): ActionData {
