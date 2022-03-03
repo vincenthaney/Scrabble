@@ -22,8 +22,6 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./join-waiting-page.component.scss'],
 })
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
-    // canceledGameSubscription: Subscription;
-    // joinerRejectedSubscription: Subscription;
     routingSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     currentLobby: LobbyInfo;
