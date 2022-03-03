@@ -26,7 +26,15 @@ export const HELP_ACTIONS: HelpAction[] = [
     },
 ];
 
+export const HINT_ACTION_NUMBER_OF_WORDS = 3;
+
 export const START_TILES_AMOUNT = 7;
 export const TILE_RESERVE_THRESHOLD = 7;
 export const LETTER_DISTRIBUTION_RELATIVE_PATH = '../../../assets/letter-distribution.json';
 export const END_GAME_HEADER_MESSAGE = 'Fin de partie - lettres restantes';
+
+export const ORIENTATION_HORIZONTAL_LETTER = 'h';
+export const ORIENTATION_VERTICAL_LETTER = 'v';
+
+export const NO_WORDS_FOUND = 'Aucun mot trouvé.';
+export const FOUND_WORDS = '**Mots trouvés**';

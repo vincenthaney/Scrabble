@@ -7,6 +7,7 @@ export enum ActionType {
     PASS = 'passer',
     RESERVE = 'réserve',
     HELP = 'aide',
+    HINT = 'indice',
 }
 
 export interface ActionPlacePayload {
