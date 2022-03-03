@@ -1,6 +1,12 @@
 import {
     EXCHANGE_ACTION_THRESHOLD,
+    HIGH_MAXIMUM_VALUE,
+    HIGH_MINIMUM_VALUE,
+    LOW_MAXIMUM_VALUE,
+    LOW_MINIMUM_VALUE,
     LOW_SCORE_THRESHOLD,
+    MEDIUM_MAXIMUM_VALUE,
+    MEDIUM_MINIMUM_VALUE,
     MEDIUM_SCORE_THRESHOLD,
     PASS_ACTION_THRESHOLD,
 } from '@app/constants/virtual-player-constants';
@@ -16,18 +22,18 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         const randomPointRange = Math.random();
         if (randomPointRange <= LOW_SCORE_THRESHOLD) {
             return {
-                minimum: 0,
-                maximum: 6,
+                minimum: LOW_MINIMUM_VALUE,
+                maximum: LOW_MAXIMUM_VALUE,
             };
         } else if (randomPointRange <= MEDIUM_SCORE_THRESHOLD) {
             return {
-                minimum: 7,
-                maximum: 12,
+                minimum: MEDIUM_MINIMUM_VALUE,
+                maximum: MEDIUM_MAXIMUM_VALUE,
             };
         } else {
             return {
-                minimum: 13,
-                maximum: 18,
+                minimum: HIGH_MINIMUM_VALUE,
+                maximum: HIGH_MAXIMUM_VALUE,
             };
         }
     }
@@ -39,8 +45,6 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         } else if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
             return ActionExchange.getData(this.tiles);
         } else {
-            // appeler la méthode de Raph et store le résultat dans pointHistoric
-            // on a beosin des points pour historic et du mot + position pour le payload
             const evaluatedPlacement = this.createWordFindingPlacement();
             if (evaluatedPlacement) {
                 this.pointHistoric[evaluatedPlacement.score]++;
