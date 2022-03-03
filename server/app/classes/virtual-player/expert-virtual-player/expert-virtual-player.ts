@@ -5,7 +5,7 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     generateWordRequest(): WordFindingRequest {
         throw new Error('Method not implemented.');
     }
-    findRange(): PointRange {
+    findPointRange(): PointRange {
         throw new Error('Method not implemented.');
     }
 
