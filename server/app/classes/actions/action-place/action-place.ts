@@ -13,7 +13,8 @@ import { WordsVerificationService } from '@app/services/words-verification-servi
 import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
-import { ActionPayload } from '@app/classes/communication/action-data';
+import { ActionData, ActionType } from '@app/classes/communication/action-data';
+import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -31,13 +32,20 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator = Container.get(WordsVerificationService);
     }
 
-    static createPayload(payloadTiles: Tile[]): ActionPayload {
-        const payload = {
-            tiles: payloadTiles,
-            orientation: Orientation.Horizontal,
-            startPosition: { row: 0, column: 0 },
+    static getData(evaluatedPlacement: EvaluatedPlacement): ActionData {
+        return {
+            type: ActionType.PLACE,
+            payload: this.createActionPlacePayload(evaluatedPlacement),
+            input: '',
         };
-        return payload;
+    }
+
+    static createActionPlacePayload(evaluatedPlacement: EvaluatedPlacement) {
+        return {
+            tiles: evaluatedPlacement.tilesToPlace,
+            orientation: evaluatedPlacement.orientation,
+            startPosition: evaluatedPlacement.startPosition,
+        };
     }
 
     execute(): void | GameUpdateData {

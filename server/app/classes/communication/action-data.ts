@@ -10,7 +10,7 @@ export enum ActionType {
 }
 
 export interface ActionPayload {
-    tiles: Tile[];
+    tiles?: Tile[];
 }
 export interface ActionPlacePayload extends ActionPayload {
     startPosition: { column: number; row: number };
@@ -20,8 +20,8 @@ export interface ActionPlacePayload extends ActionPayload {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ActionExchangePayload extends ActionPayload {}
 
-export interface ActionData<T extends unknown = unknown> {
+export interface ActionData {
     type: ActionType;
-    payload: T;
+    payload: ActionPayload;
     input: string;
 }
