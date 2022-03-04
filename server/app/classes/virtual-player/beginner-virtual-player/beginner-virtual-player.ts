@@ -47,7 +47,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         } else {
             const evaluatedPlacement = this.createWordFindingPlacement();
             if (evaluatedPlacement) {
-                this.pointHistoric[evaluatedPlacement.score]++;
+                this.updateHistoric(evaluatedPlacement);
                 return ActionPlace.getData(evaluatedPlacement);
             } else {
                 return ActionPass.getData();
@@ -55,13 +55,20 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         }
     }
 
+    updateHistoric(evaluatedPlacement: EvaluatedPlacement) {
+        let scoreCount = this.pointHistoric.get(evaluatedPlacement.score);
+        if (scoreCount) {
+            this.pointHistoric.set(evaluatedPlacement.score, ++scoreCount);
+        } else {
+            this.pointHistoric.set(evaluatedPlacement.score, 1);
+        }
+    }
+
     getGameBoard(gameId: string, playerId: string): Board {
-        return BeginnerVirtualPlayer.activeGameService.getGame(gameId, playerId).board;
+        return this.getActiveGameService().getGame(gameId, playerId).board;
     }
 
     createWordFindingPlacement(): EvaluatedPlacement | undefined {
-        return BeginnerVirtualPlayer.wordFindingService
-            .findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest())
-            .pop();
+        return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
     }
 }
