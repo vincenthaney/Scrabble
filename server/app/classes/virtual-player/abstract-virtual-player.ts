@@ -5,33 +5,23 @@ import { ActiveGameService } from '@app/services/active-game-service/active-game
 import { Router } from 'express';
 
 export abstract class AbstractVirtualPlayer extends Player {
-    static wordFindingService: WordFindingService;
-    static activeGameService: ActiveGameService;
-
     gameId: string;
     pointHistoric = new Map<number, number>();
     router: Router;
 
+    private wordFindingService: WordFindingService;
+    private activeGameService: ActiveGameService;
     constructor(gameId: string, id: string, name: string) {
         super(id, name);
         this.gameId = gameId;
     }
 
-    static getWordFindingService(): WordFindingService {
-        return AbstractVirtualPlayer.wordFindingService;
+    getWordFindingService(): WordFindingService {
+        return this.wordFindingService;
     }
 
-    static getActiveGameService(): ActiveGameService {
-        return AbstractVirtualPlayer.activeGameService;
-    }
-
-    static injectServices(wordFindingService: WordFindingService, activeGameService: ActiveGameService): void {
-        if (!this.getWordFindingService()) {
-            AbstractVirtualPlayer.wordFindingService = wordFindingService;
-        }
-        if (!this.getActiveGameService()) {
-            AbstractVirtualPlayer.activeGameService = activeGameService;
-        }
+    getActiveGameService(): ActiveGameService {
+        return this.activeGameService;
     }
 
     playTurn(): void {
@@ -40,7 +30,7 @@ export abstract class AbstractVirtualPlayer extends Player {
 
     sendPayload() {
         // API call
-        throw new Error('Method not implemented.');
+        return;
     }
 
     generateWordFindingRequest(): WordFindingRequest {
