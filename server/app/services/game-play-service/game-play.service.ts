@@ -76,7 +76,7 @@ export class GamePlayService {
 
     getActionPlacePayload(actionData: ActionData): ActionPlacePayload {
         const payload = actionData.payload as ActionPlacePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
         if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
         if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
         return payload;
@@ -84,7 +84,7 @@ export class GamePlayService {
 
     getActionExchangePayload(actionData: ActionData): ActionExchangePayload {
         const payload = actionData.payload as ActionExchangePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
         return payload;
     }
 
