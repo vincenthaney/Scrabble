@@ -10,7 +10,7 @@ export enum ActionType {
 }
 
 export interface ActionPayload {
-    tiles?: Tile[];
+    tiles: Tile[];
 }
 export interface ActionPlacePayload extends ActionPayload {
     startPosition: { column: number; row: number };

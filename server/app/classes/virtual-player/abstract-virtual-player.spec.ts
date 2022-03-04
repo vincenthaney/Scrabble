@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { TEST_MAXIMUM_VALUE, TEST_MINIMUM_VALUE } from '@app/constants/virtual-player-tests-constants';
@@ -8,7 +9,7 @@ import { expect, spy } from 'chai';
 
 class TestClass extends AbstractVirtualPlayer {
     findAction(): void {
-        throw new Error('This is a test method');
+        return;
     }
 
     findPointRange(): PointRange {
@@ -43,13 +44,13 @@ describe('AbstractVirtualPlayer', () => {
     });
 
     it('should return true when getWordFindingService', () => {
-        const wordFindingServiceTest = AbstractVirtualPlayer.getWordFindingService();
-        expect(AbstractVirtualPlayer.wordFindingService === wordFindingServiceTest);
+        const wordFindingServiceTest = abstractPlayer.getWordFindingService();
+        expect(abstractPlayer['wordFindingService']).to.equal(wordFindingServiceTest);
     });
 
     it('should return true when getActiveGameService', () => {
-        const activeGameServiceTest = AbstractVirtualPlayer.getActiveGameService();
-        expect(AbstractVirtualPlayer.activeGameService === activeGameServiceTest);
+        const activeGameServiceTest = abstractPlayer.getActiveGameService();
+        expect(AbstractVirtualPlayer['activeGameService']).to.equal(activeGameServiceTest);
     });
 
     // // NOT COMPLETE
@@ -64,26 +65,30 @@ describe('AbstractVirtualPlayer', () => {
     // });
 
     it('should call findAction method', () => {
-        const findActionSpy = spy.on(abstractPlayer, 'findAction').and.callFake();
+        const findActionSpy = chai.spy.on(abstractPlayer, 'findAction', () => {
+            return;
+        });
         abstractPlayer.playTurn();
-        expect(findActionSpy).to.have.been.called();
+        expect(findActionSpy).to.be.called();
     });
 
     it('should call findPointRange method', () => {
-        const findPointRangeSpy = spy.on(abstractPlayer, 'findPointRange').and.callFake();
+        const findPointRangeSpy = spy.on(abstractPlayer, 'findPointRange', () => {
+            return;
+        });
         abstractPlayer.generateWordFindingRequest();
         expect(findPointRangeSpy).to.have.been.called();
     });
 
     it('should return WordFindingRequest with correct data', () => {
         const testWordFindingRequest = abstractPlayer.generateWordFindingRequest();
-        expect(testWordFindingRequest.numberOfWordsToFind === 1).to.be.true;
-        expect(testWordFindingRequest.pointHistoric === abstractPlayer.pointHistoric);
-        expect(testWordFindingRequest.pointRange === testPointRange);
+        expect(testWordFindingRequest.numberOfWordsToFind).to.equal(1);
+        expect(testWordFindingRequest.pointHistoric).to.deep.equal(abstractPlayer.pointHistoric);
+        expect(testWordFindingRequest.pointRange).to.deep.equal(testPointRange);
     });
 
     // TO MODIFY WHEN SEND PAYLOAD IMPLEMENTED
-    it('should call findPointRange method', () => {
-        expect(abstractPlayer.sendPayload()).to.throw();
+    it('should throw when sendPayload()', () => {
+        expect(abstractPlayer.sendPayload()).to.be.undefined;
     });
 });
