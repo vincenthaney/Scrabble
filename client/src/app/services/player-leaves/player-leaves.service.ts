@@ -3,16 +3,15 @@ import { PlayerLeavesController } from '@app/controllers/player-leaves-controlle
 import { GameService } from '@app/services/';
 import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerLeavesService implements OnDestroy {
-    joinerLeaveGameEvent: Subject<string> = new Subject();
-    joinerLeaveGameSubscription: Subscription;
-    serviceDestroyed$: Subject<boolean> = new Subject();
+    private joinerLeavesGameEvent: Subject<string> = new Subject();
+    private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
         private readonly playerLeavesController: PlayerLeavesController,
@@ -20,11 +19,10 @@ export class PlayerLeavesService implements OnDestroy {
         private readonly gameService: GameService,
         private readonly roundManagerService: RoundManagerService,
     ) {
-        this.joinerLeaveGameSubscription = this.playerLeavesController.joinerLeaveGameEvent
-            .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe((leaverName: string) => this.handleJoinerLeaveGame(leaverName));
-
-        this.playerLeavesController.resetGameEvent.pipe(takeUntil(this.serviceDestroyed$)).subscribe(() => {
+        this.playerLeavesController.subscribeToJoinerLeavesGameEvent(this.serviceDestroyed$, (leaverName: string) =>
+            this.handleJoinerLeaveGame(leaverName),
+        );
+        this.playerLeavesController.subscribeToResetGameEvent(this.serviceDestroyed$, () => {
             this.gameService.resetServiceData();
             this.gameDispatcherService.resetServiceData();
             this.roundManagerService.resetServiceData();
@@ -36,7 +34,7 @@ export class PlayerLeavesService implements OnDestroy {
     }
 
     handleJoinerLeaveGame(leaverName: string): void {
-        this.joinerLeaveGameEvent.next(leaverName);
+        this.joinerLeavesGameEvent.next(leaverName);
     }
 
     handleLocalPlayerLeavesGame(): void {
@@ -51,5 +49,9 @@ export class PlayerLeavesService implements OnDestroy {
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
+    }
+
+    subscribeToJoinerLeavesGameEvent(componentDestroyed$: Subject<boolean>, callback: (leaverName: string) => void): void {
+        this.joinerLeavesGameEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 }

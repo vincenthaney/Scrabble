@@ -9,14 +9,14 @@ export class FocusableComponentsService {
 
     setActiveKeyboardComponent(component: FocusableComponent<KeyboardEvent>): boolean {
         if (component === this.activeKeyboardComponent) return false;
-        this.activeKeyboardComponent?.looseFocusEvent.emit();
+        this.activeKeyboardComponent?.emitLoseFocusEvent();
         this.activeKeyboardComponent = component;
         return true;
     }
 
-    emitKeyboard(value?: KeyboardEvent): boolean {
+    emitKeyboard(value: KeyboardEvent): boolean {
         if (!this.activeKeyboardComponent) return false;
-        this.activeKeyboardComponent.focusEvent.emit(value);
+        this.activeKeyboardComponent.emitFocusableEvent(value);
         return true;
     }
 }

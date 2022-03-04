@@ -19,6 +19,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameMode } from '@app/classes/game-mode';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -142,7 +143,7 @@ describe('GameCreationPageComponent', () => {
                 gameType: component.gameTypes.Classic,
                 gameMode: component.gameModes.Multiplayer,
                 level: component.virtualPlayerLevels.Beginner,
-                timer: EMPTY_VALUE,
+                timer: DEFAULT_TIMER_VALUE,
                 dictionary: EMPTY_VALUE,
             };
             const defaultNameValue = EMPTY_VALUE;

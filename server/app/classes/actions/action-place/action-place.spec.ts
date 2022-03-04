@@ -49,8 +49,8 @@ const DEFAULT_POSITION: Position = new Position(CENTER, CENTER);
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 3 };
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
-const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
-const DEFAULT_SQUARE_CENTER: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: true };
+const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_CENTER: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: true };
 
 const EXTRACT_RETURN: [Square, Tile][][] = [
     [
@@ -78,10 +78,10 @@ const GET_TILES_RETURN: Tile[] = [
 const BOARD: Square[][] = [
     [
         { ...DEFAULT_SQUARE_1, position: new Position(0, 0) },
-        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
     ],
     [
-        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
         { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];

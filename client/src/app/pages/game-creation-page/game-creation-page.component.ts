@@ -6,6 +6,7 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { NAME_SAME_AS_VIRTUAL_PLAYER } from '@app/constants/name-field';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -21,7 +22,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
-    timerOptions: number[];
     dictionaryOptions: string[];
     virtualPlayerNames: string[] = ['Victoria', 'Vladimir', 'Herménégilde'];
     errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
@@ -33,7 +33,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
-        timer: new FormControl('60', Validators.required),
+        timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
         dictionary: new FormControl('default-dictionary', Validators.required),
     });
 

@@ -27,7 +27,7 @@ const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
 const DEFAULT_PLAYER_SCORE = 5;
 const DEFAULT_INPUT = 'input';
-const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {}, input: DEFAULT_INPUT };
+const DEFAULT_ACTION: ActionData = { type: ActionType.EXCHANGE, payload: {}, input: DEFAULT_INPUT };
 const INVALID_ACTION_TYPE = 'invalid action type';
 const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['A', 1],
@@ -233,7 +233,7 @@ describe('GamePlayService', () => {
         });
 
         it('should return action of type ActionPlace when type is place', () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: ActionPlacePayload = {
                 tiles: [],
                 startPosition: { column: 0, row: 0 },
@@ -244,7 +244,7 @@ describe('GamePlayService', () => {
         });
 
         it('should return action of type ActionExchange when type is exchange', () => {
-            const type = 'exchange';
+            const type = ActionType.EXCHANGE;
             const payload: ActionExchangePayload = {
                 tiles: [],
             };
@@ -253,28 +253,28 @@ describe('GamePlayService', () => {
         });
 
         it('should return action of type ActionPass when type is pass', () => {
-            const type = 'pass';
+            const type = ActionType.PASS;
             const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionPass);
         });
 
         it('should return action of type ActionHelp when type is help', () => {
-            const type = 'help';
+            const type = ActionType.HELP;
             const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionHelp);
         });
 
         it('should return action of type ActionReserve when type is reserve', () => {
-            const type = 'reserve';
+            const type = ActionType.RESERVE;
             const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionReserve);
         });
 
         it("should throw if place payload doesn't have tiles", () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'tiles'> = {
                 startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
@@ -283,7 +283,7 @@ describe('GamePlayService', () => {
         });
 
         it("should throw if place payload doesn't have startPosition", () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'startPosition'> = {
                 tiles: [],
                 orientation: Orientation.Horizontal,
@@ -292,7 +292,7 @@ describe('GamePlayService', () => {
         });
 
         it("should throw if place payload doesn't have orientation", () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'orientation'> = {
                 tiles: [],
                 startPosition: { column: 0, row: 0 },
@@ -301,7 +301,7 @@ describe('GamePlayService', () => {
         });
 
         it("should throw if exchange payload doesn't have tiles", () => {
-            const type = 'exchange';
+            const type = ActionType.EXCHANGE;
             const payload: Omit<ActionExchangePayload, 'tiles'> = {};
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });

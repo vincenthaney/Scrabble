@@ -31,7 +31,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
+    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
 
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
@@ -61,11 +61,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngAfterViewInit(): void {
-        this.messageInputElement.nativeElement.focus();
-        const handleKeyEvent = () => {
-            this.messageInputElement.nativeElement.focus();
-        };
-        this.focusEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(handleKeyEvent);
+        this.subscribeToFocusableEvent(this.componentDestroyed$, this.handleKeyInput.bind(this));
     }
 
     ngOnDestroy(): void {
@@ -116,6 +112,18 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
         this.lettersLeft = tileReserve;
         this.lettersLeftTotal = tileReserveTotal;
+    }
+
+    onContainerClick() {
+        this.focusableComponentsService.setActiveKeyboardComponent(this);
+    }
+
+    private handleKeyInput(event: KeyboardEvent): void {
+        if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private isCtrlC(event: KeyboardEvent): boolean {
+        return event.key === 'c' && (event.ctrlKey || event.metaKey);
     }
 
     private scrollToBottom(): void {
