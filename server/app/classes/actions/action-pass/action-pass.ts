@@ -7,7 +7,9 @@ export default class ActionPass extends ActionPlay {
         return {
             input: '',
             type: ActionType.PASS,
-            payload: {},
+            payload: {
+                tiles: [],
+            },
         };
     }
     // Doesn't have anything to do, but still extends Action
