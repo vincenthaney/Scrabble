@@ -7,7 +7,7 @@
 import { Application } from '@app/app';
 import { Position } from '@app/classes/board';
 import Board from '@app/classes/board/board';
-import { ActionData } from '@app/classes/communication/action-data';
+import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import Game from '@app/classes/game/game';
@@ -40,7 +40,7 @@ chai.use(chaiAsPromised);
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DATA: ActionData = { type: 'exchange', payload: {}, input: '' };
+const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: { tiles: [] }, input: '' };
 const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_FEEDBACK = 'this is a feedback';
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
@@ -215,8 +215,8 @@ describe('GamePlayController', () => {
         it('should call emitToSocket if data.input is not empty', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
-                type: 'pass',
-                payload: {},
+                type: ActionType.PASS,
+                payload: { tiles: [] },
                 input: '!passer',
             });
             expect(emitToSocketSpy).to.have.been.called();
@@ -225,8 +225,8 @@ describe('GamePlayController', () => {
         it('should NOT call emitToSocket if data.input is empty', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
-                type: 'pass',
-                payload: {},
+                type: ActionType.PASS,
+                payload: { tiles: [] },
                 input: '',
             });
             expect(emitToSocketSpy).to.not.have.been.called();
@@ -268,8 +268,8 @@ describe('GamePlayController', () => {
             };
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
             gamePlayController['handlePlayAction']('', '', {
-                type: 'help',
-                payload: {},
+                type: ActionType.HELP,
+                payload: { tiles: [] },
                 input: '',
             });
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -311,9 +311,9 @@ describe('GamePlayController', () => {
             const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
             handlePlayActionStub.callThrough();
 
-            await gamePlayController['handlePlayAction']('', '', { type: 'place', payload: {}, input: '' });
+            await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
-            expect(handlePlayActionStub.calledWith('', '', { type: 'pass', payload: {}, input: '' })).to.be.true;
+            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PASS, payload: { tiles: [] }, input: '' })).to.be.true;
         });
     });
 
