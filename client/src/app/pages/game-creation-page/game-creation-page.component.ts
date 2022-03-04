@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -29,7 +29,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-        dictionary: new FormControl('', Validators.required),
+        dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
@@ -60,8 +60,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     onSubmit(): void {
         if (this.isFormValid()) {
             this.createGame();
-        } else {
-            // this.child.formParameters.markAllAsTouched();
         }
     }
 
