@@ -38,6 +38,13 @@ const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['E', 2],
 ];
 const DEFAULT_ACTION_MESSAGE = 'default action message';
+const DEFAULT_TILES: Tile[] = [
+    {
+        letter: 'A',
+        value: 1,
+        isBlank: false,
+    },
+];
 
 describe('GamePlayService', () => {
     let gamePlayService: GamePlayService;
@@ -291,7 +298,7 @@ describe('GamePlayService', () => {
         it("should throw if place payload doesn't have startPosition", () => {
             const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'startPosition'> = {
-                tiles: [],
+                tiles: DEFAULT_TILES,
                 orientation: Orientation.Horizontal,
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
@@ -300,7 +307,7 @@ describe('GamePlayService', () => {
         it("should throw if place payload doesn't have orientation", () => {
             const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'orientation'> = {
-                tiles: [],
+                tiles: DEFAULT_TILES,
                 startPosition: { column: 0, row: 0 },
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
