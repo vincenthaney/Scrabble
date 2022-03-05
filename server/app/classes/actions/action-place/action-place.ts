@@ -13,7 +13,7 @@ import { WordsVerificationService } from '@app/services/words-verification-servi
 import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
-import { ActionData, ActionType } from '@app/classes/communication/action-data';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 export default class ActionPlace extends ActionPlay {
@@ -40,7 +40,7 @@ export default class ActionPlace extends ActionPlay {
         };
     }
 
-    static createActionPlacePayload(evaluatedPlacement: EvaluatedPlacement) {
+    static createActionPlacePayload(evaluatedPlacement: EvaluatedPlacement): ActionPlacePayload {
         return {
             tiles: evaluatedPlacement.tilesToPlace,
             orientation: evaluatedPlacement.orientation,
