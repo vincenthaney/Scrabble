@@ -47,6 +47,7 @@ describe('ActionExchange', () => {
 
     afterEach(() => {
         getTilesFromPlayerStub.restore();
+        chai.spy.restore();
     });
 
     describe('static calls', () => {
@@ -60,7 +61,7 @@ describe('ActionExchange', () => {
 
         it('should return payload', () => {
             const payload = { tiles: TEST_TILES };
-            expect(ActionExchange.createActionExchangePayload(TEST_TILES)).to.equal(payload);
+            expect(ActionExchange.createActionExchangePayload(TEST_TILES)).to.deep.equal(payload);
         });
     });
 

@@ -124,6 +124,10 @@ describe('ActionPlace', () => {
         game = gameStub as unknown as Game;
     });
 
+    afterEach(() => {
+        chai.spy.restore();
+    });
+
     it('should create', () => {
         const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
         expect(action).to.exist;
@@ -143,10 +147,7 @@ describe('ActionPlace', () => {
             orientation: testEvaluatedPlacement.orientation,
             startPosition: testEvaluatedPlacement.startPosition,
         };
-        const test = ActionPlace.createActionPlacePayload(testEvaluatedPlacement);
-        // eslint-disable-next-line no-console
-        console.log(test);
-        expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.equal(payload);
+        expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.deep.equal(payload);
     });
 
     describe('execute', () => {
