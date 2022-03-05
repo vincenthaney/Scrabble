@@ -12,10 +12,11 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile, TileReserve } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import * as chai from 'chai';
-import { assert } from 'chai';
+import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -85,6 +86,12 @@ const BOARD: Square[][] = [
         { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];
+const testEvaluatedPlacement = {
+    tilesToPlace: [],
+    orientation: TEST_ORIENTATION,
+    startPosition: TEST_START_POSITION,
+    score: TEST_SCORE,
+};
 
 describe('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
@@ -195,9 +202,26 @@ describe('ActionPlace', () => {
                 expect(wordToStringSpy).to.have.been.called();
             });
 
+            it('should call createActionPlacePayload', () => {
+                const amountOfLettersInWordsStub = spy.on(ActionPlace, 'createActionPlacePayload', () => {
+                    return testEvaluatedPlacement;
+                });
+                ActionPlace.getData(testEvaluatedPlacement);
+                expect(amountOfLettersInWordsStub).to.have.been.called();
+            });
+
             it('should call isLegalPlacement', () => {
                 action.execute();
                 assert(isLegalPlacementStub.calledOnce);
+            });
+
+            it('should return payload', () => {
+                const payload = {
+                    tiles: testEvaluatedPlacement.tilesToPlace,
+                    orientation: testEvaluatedPlacement.orientation,
+                    startPosition: testEvaluatedPlacement.startPosition,
+                };
+                expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.deep.equal(payload);
             });
 
             it('should throw if isLegalPlacement returns false', () => {
