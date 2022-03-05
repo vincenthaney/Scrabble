@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
+import { ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -128,6 +129,26 @@ describe('ActionPlace', () => {
         expect(action).to.exist;
     });
 
+    it('should call createActionPlacePayload', () => {
+        const actionPayloadSpy = spy.on(ActionPlace, 'createActionPlacePayload', () => {
+            return testEvaluatedPlacement;
+        });
+        ActionPlace.getData(testEvaluatedPlacement);
+        expect(actionPayloadSpy).to.have.been.called();
+    });
+
+    it('should return payload', () => {
+        const payload: ActionPlacePayload = {
+            tiles: testEvaluatedPlacement.tilesToPlace,
+            orientation: testEvaluatedPlacement.orientation,
+            startPosition: testEvaluatedPlacement.startPosition,
+        };
+        const test = ActionPlace.createActionPlacePayload(testEvaluatedPlacement);
+        // eslint-disable-next-line no-console
+        console.log(test);
+        expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.equal(payload);
+    });
+
     describe('execute', () => {
         describe('valid word', () => {
             let action: ActionPlace;
@@ -202,26 +223,9 @@ describe('ActionPlace', () => {
                 expect(wordToStringSpy).to.have.been.called();
             });
 
-            it('should call createActionPlacePayload', () => {
-                const amountOfLettersInWordsStub = spy.on(ActionPlace, 'createActionPlacePayload', () => {
-                    return testEvaluatedPlacement;
-                });
-                ActionPlace.getData(testEvaluatedPlacement);
-                expect(amountOfLettersInWordsStub).to.have.been.called();
-            });
-
             it('should call isLegalPlacement', () => {
                 action.execute();
                 assert(isLegalPlacementStub.calledOnce);
-            });
-
-            it('should return payload', () => {
-                const payload = {
-                    tiles: testEvaluatedPlacement.tilesToPlace,
-                    orientation: testEvaluatedPlacement.orientation,
-                    startPosition: testEvaluatedPlacement.startPosition,
-                };
-                expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.deep.equal(payload);
             });
 
             it('should throw if isLegalPlacement returns false', () => {
