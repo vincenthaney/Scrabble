@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    serverUrl: 'ec2-3-97-9-51.ca-central-1.compute.amazonaws.com:3000/api',
-    serverUrlWebsocket: 'ec2-3-97-9-51.ca-central-1.compute.amazonaws.com:3000',
+    serverUrl: 'http://ec2-15-222-3-253.ca-central-1.compute.amazonaws.com:3000',
+    serverUrlWebsocket: 'http://ec2-15-222-3-253.ca-central-1.compute.amazonaws.com:3000',
 };
