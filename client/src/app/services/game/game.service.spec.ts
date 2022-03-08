@@ -277,7 +277,7 @@ describe('GameService', () => {
     });
 
     describe('reconnectReinitialize', () => {
-        let defaultGameData: StartMultiplayerGameData;
+        let defaultGameData: StartGameData;
 
         beforeEach(() => {
             service.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);

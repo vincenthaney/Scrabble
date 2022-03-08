@@ -26,6 +26,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     virtualPlayerNames: string[] = ['Victoria', 'Vladimir', 'Herménégilde'];
     errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
 
+    isNameValid = true;
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     gameParameters: FormGroup = new FormGroup({
@@ -58,10 +59,19 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.serviceDestroyed$.complete();
     }
 
-    isFormValid(): boolean {
+    checkIsFormValid(): void {
+        console.log('coucou');
         console.log(this.gameParameters.get('virtualPlayerName')?.value);
         console.log(this.child.formParameters.get('inputName')?.value);
-        return this.gameParameters?.valid && this.child.formParameters?.valid && this.isNameDifferentFromVirtualPlayer();
+        this.isNameValid = this.isFormValid();
+        if (!this.isNameValid) this.child.formParameters.setErrors({ error: true });
+        this.child.formParameters.updateValueAndValidity();
+    }
+
+    isFormValid(): boolean {
+        let validity = this.gameParameters?.valid && this.child.formParameters?.valid;
+        if (this.gameParameters.get('gameMode')?.value === this.gameModes.Solo) validity = validity && this.isNameDifferentFromVirtualPlayer();
+        return validity;
     }
 
     isNameDifferentFromVirtualPlayer(): boolean {

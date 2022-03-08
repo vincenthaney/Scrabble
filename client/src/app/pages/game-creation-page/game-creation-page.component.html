@@ -3,7 +3,7 @@
 
     <section id="game-creation-fields">
         <h1>Créez une partie</h1>
-        <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
+        <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()" (change)="checkIsFormValid()">
             <mat-label>Choisissez un type de partie</mat-label>
             <mat-button-toggle-group formControlName="gameType" ngDefaultControl>
                 <mat-button-toggle id="classic-button" [value]="gameTypes.Classic">{{ gameTypes.Classic }}</mat-button-toggle>
@@ -13,7 +13,7 @@
             </mat-button-toggle-group>
 
             <mat-label>Choisissez un mode de jeu</mat-label>
-            <mat-button-toggle-group formControlName="gameMode" ngDefaultControl>
+            <mat-button-toggle-group formControlName="gameMode" ngDefaultControl (change)="checkIsFormValid()">
                 <mat-button-toggle id="solo-button" [value]="gameModes.Solo">{{ gameModes.Solo }}</mat-button-toggle>
                 <mat-button-toggle id="multi-button" [value]="gameModes.Multiplayer">{{ gameModes.Multiplayer }}</mat-button-toggle>
             </mat-button-toggle-group>
@@ -38,7 +38,7 @@
             <span id="form-fields">
                 <mat-form-field appearance="outline" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
                     <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
-                    <mat-select formControlName="virtualPlayerName">
+                    <mat-select formControlName="virtualPlayerName" (selectionChange)="checkIsFormValid()">
                         <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{virtualPlayer}}">{{virtualPlayer}}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -54,8 +54,8 @@
                     <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
                 </span>
                 
-                <app-name-field (keydown.enter)="$event.preventDefault()" ></app-name-field>
-                <mat-error  class="alert" *ngIf="isFormValid()">
+                <app-name-field (keydown.enter)="$event.preventDefault()" (keyup)="checkIsFormValid()"></app-name-field>
+                <mat-error  class="alert" *ngIf="!isNameValid">
                     {{errorSameNameAsVirtualPlayer}}
                 </mat-error>
                 

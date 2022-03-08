@@ -78,7 +78,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('On start game, configureSocket should emit socket id and game data', async () => {
-            const startGameRequestSpy = spyOn(gameServiceMock, 'initializeMultiplayerGame').and.callFake(async () => {
+            const startGameRequestSpy = spyOn(gameServiceMock, 'initializeGame').and.callFake(async () => {
                 return;
             });
             socketHelper.peerSideEmit('startGame', DEFAULT_GAME_DATA);
