@@ -18,7 +18,7 @@ import { GamePlayController } from '@app/controllers/game-play-controller/game-p
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
 
-describe('InputParserService', () => {
+fdescribe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';
     const VALID_LOCATION_INPUT = 'b12h';
     const VALID_LOCATION_INPUT_SINGLE = 'b12';
@@ -31,7 +31,7 @@ describe('InputParserService', () => {
     const VALID_PASS_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PASS}`;
     const VALID_PASS_ACTION_DATA = { type: ActionType.PASS, payload: {} };
     const VALID_RESERVE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.RESERVE}`;
-    // const VALID_HINT_INPUT = '${ACTION_COMMAND_INDICATOR}indice';
+    const VALID_HINT_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.HINT}`;
     const VALID_HELP_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.HELP}`;
     const VALID_POSITION: Position = { row: 0, column: 0 };
     const VALID_LOCATION: Location = { row: 0, col: 0, orientation: DEFAULT_ORIENTATION };
@@ -221,7 +221,9 @@ describe('InputParserService', () => {
             });
         });
 
-        // it('should call sendHintAction if input is a valid hint command', () => { });
+        it('should return right Actiondata if input is a valid hint command', () => {
+            expect(service['createActionData'](VALID_HINT_INPUT)).toEqual({ type: ActionType.HINT, input: VALID_HINT_INPUT, payload: {} });
+        });
 
         it('should return right Actiondata if input is a valid help command', () => {
             expect(service['createActionData'](VALID_HELP_INPUT)).toEqual({ type: ActionType.HELP, input: VALID_HELP_INPUT, payload: {} });
@@ -233,7 +235,7 @@ describe('InputParserService', () => {
                 [`${ACTION_COMMAND_INDICATOR}échanger one two three`, CommandExceptionMessages.ExchangeBadSyntax],
                 [`${ACTION_COMMAND_INDICATOR}passer thing`, CommandExceptionMessages.PassBadSyntax],
                 [`${ACTION_COMMAND_INDICATOR}réserve second word`, CommandExceptionMessages.BadSyntax],
-                // `${ACTION_COMMAND_INDICATOR}indice not length of two`,
+                [`${ACTION_COMMAND_INDICATOR}indice not length of two`, CommandExceptionMessages.BadSyntax],
                 [`${ACTION_COMMAND_INDICATOR}aide help`, CommandExceptionMessages.BadSyntax],
             ];
             for (const [command, error] of invalidCommands) {
