@@ -18,7 +18,9 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameMode } from '@app/classes/game-mode';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
@@ -30,7 +32,7 @@ import SpyObj = jasmine.SpyObj;
 })
 class TestComponent {}
 
-describe('GameCreationPageComponent', () => {
+fdescribe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
@@ -44,7 +46,7 @@ describe('GameCreationPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent],
+            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent, TimerSelectionComponent, IconComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
@@ -154,28 +156,28 @@ describe('GameCreationPageComponent', () => {
 
         it('form should be valid if all required fields are filled', () => {
             setValidFormValues();
-            expect(component.isFormValid()).toBeTruthy();
+            expect(component.checkIsFormValid()).toBeTruthy();
         });
 
         it('form should be invalid if gameType is empty', async () => {
             setValidFormValues();
             gameParameters.get('gameType')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.checkIsFormValid()).toBeFalsy();
         });
 
         it('form should be invalid if gameMode is empty', async () => {
             setValidFormValues();
             gameParameters.get('gameMode')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.checkIsFormValid()).toBeFalsy();
         });
 
         it('form should be invalid if level is empty while gameMode is solo', async () => {
             setValidFormValues();
             gameParameters.get('level')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.checkIsFormValid()).toBeFalsy();
         });
 
         it('form should be valid if level is empty while gameMode is multiplayer', async () => {
@@ -183,28 +185,28 @@ describe('GameCreationPageComponent', () => {
             gameParameters.get('gameMode')?.setValue(component.gameModes.Multiplayer);
             gameParameters.get('level')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeTruthy();
+            expect(component.checkIsFormValid()).toBeTruthy();
         });
 
         it('form should not be valid if timer is empty', () => {
             setValidFormValues();
             gameParameters.get('timer')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.checkIsFormValid()).toBeFalsy();
         });
 
         it('form should not be valid if dictionary is empty', () => {
             setValidFormValues();
             gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.checkIsFormValid()).toBeFalsy();
         });
 
         it('form should not be valid if name is empty', () => {
             setValidFormValues();
             component.child.formParameters.get('inputName')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.checkIsFormValid()).toBeFalsy();
         });
 
         it('form should call onSubmit when submit button is clicked', async () => {
