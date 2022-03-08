@@ -18,7 +18,7 @@ import { GamePlayController } from '@app/controllers/game-play-controller/game-p
 import { InputParserService } from '@app/services';
 import GameService from '@app/services/game/game.service';
 
-fdescribe('InputParserService', () => {
+describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';
     const VALID_LOCATION_INPUT = 'b12h';
     const VALID_LOCATION_INPUT_SINGLE = 'b12';
