@@ -115,9 +115,10 @@ export default class RoundManagerService implements IResetServiceData {
 
         const actionPass: ActionData = {
             type: ActionType.PASS,
+            input: '',
             payload: {},
         };
         this.endRoundEvent.emit();
-        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass, '');
+        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
     }
 }

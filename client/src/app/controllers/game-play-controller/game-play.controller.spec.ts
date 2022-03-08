@@ -71,15 +71,16 @@ describe('GamePlayController', () => {
 
     describe('HTTP', () => {
         it('sendAction should post action to endpoint', () => {
+            const typedInput = '';
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
             const actionData: ActionData = {
                 type: ActionType.PASS,
+                input: typedInput,
                 payload: {},
             };
-            const typedInput = '';
             const endpoint = `${environment.serverUrl}/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`;
 
-            controller.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData, typedInput);
+            controller.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(httpPostSpy).toHaveBeenCalledWith(endpoint, { type: actionData.type, payload: actionData.payload, input: typedInput });
         });
 
