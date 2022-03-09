@@ -485,11 +485,12 @@ describe('RoundManagerService', () => {
 
                 const actionPass = {
                     type: ActionType.PASS,
+                    input: '',
                     payload: {},
                 };
 
                 service.roundTimeout();
-                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass, '');
+                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
             }));
         });
     });

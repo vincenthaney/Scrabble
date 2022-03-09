@@ -2,13 +2,15 @@ import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
 
+export const ACTION_COMMAND_INDICATOR = '!';
+
 export enum ActionType {
-    PLACE = 'place',
-    EXCHANGE = 'exchange',
-    PASS = 'pass',
-    RESERVE = 'reserve',
-    HELP = 'help',
-    HINT = 'hint',
+    PLACE = 'placer',
+    EXCHANGE = 'échanger',
+    PASS = 'passer',
+    RESERVE = 'réserve',
+    HELP = 'aide',
+    HINT = 'indice',
 }
 
 export interface ActionPlacePayload {
@@ -23,5 +25,6 @@ export interface ActionExchangePayload {
 
 export interface ActionData<T extends unknown = unknown> {
     type: ActionType;
+    input: string;
     payload: T;
 }
