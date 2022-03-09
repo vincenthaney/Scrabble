@@ -5,12 +5,12 @@ import { Random } from './random';
 
 const DEFAULT_ARRAY = ['a', 'b', 'c'];
 describe('random -> getRandomElementsFromArray', () => {
-    it('should an array of the desired length', () => {
+    it('should return an array of the desired length', () => {
         expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY).length).to.equal(1);
         expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, 2).length).to.equal(2);
     });
 
-    it('should the entire array if the desired length is larger than the array.length', () => {
+    it('should return the entire array if the desired length is larger than the array.length', () => {
         const desiredElements = 10;
         expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, desiredElements)).to.deep.equal(DEFAULT_ARRAY);
     });
