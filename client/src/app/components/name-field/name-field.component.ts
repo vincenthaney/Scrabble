@@ -10,6 +10,7 @@ import { NAME_NO_MATCH_REGEX, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constan
 })
 export class NameFieldComponent {
     @Output() isInputNameValid = new EventEmitter<boolean>();
+    @Output() playerNameChange = new EventEmitter<[name: string, valid: boolean]>();
     playerName: string;
     errorNameTooShort: string = NAME_TOO_SHORT;
     errorNameTooLong: string = NAME_TOO_LONG;
@@ -27,5 +28,6 @@ export class NameFieldComponent {
     onNameChange(newName: string): void {
         this.playerName = newName;
         this.isInputNameValid.emit(this.formParameters.get('inputName')?.valid);
+        this.playerNameChange.emit([newName, this.formParameters.get('inputName')?.valid ?? false]);
     }
 }
