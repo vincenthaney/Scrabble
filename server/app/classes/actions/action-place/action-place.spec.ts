@@ -147,7 +147,6 @@ describe('ActionPlace', () => {
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
                 wordToStringSpy = chai.spy.on(StringConversion, 'wordToString', () => []);
             });
 
