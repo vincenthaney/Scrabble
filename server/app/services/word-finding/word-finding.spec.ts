@@ -11,11 +11,10 @@ import * as chai from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { StringConversion } from '@app/utils/string-conversion';
-// import { Random } from '@app/utils/random';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { LONG_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
+import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
-import { EvaluationInfo, SearchState, WordFindingRequest, WordFindingUsage } from '@app/classes/word-finding';
+import { EvaluationInfo, SearchState, SquareProperties, WordFindingRequest, WordFindingUsage } from '@app/classes/word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -29,7 +28,6 @@ const BOARD: LetterValues = [
 ];
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
-// const DEFAULT_TILE_A_2: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };
 const DEFAULT_TILE_C: Tile = { letter: 'C', value: 3 };
 const DEFAULT_TILE_D: Tile = { letter: 'D', value: 4 };
@@ -42,7 +40,6 @@ const EMPTY_TILE_RACK: Tile[] = [];
 const SINGLE_TILE_TILE_RACK = [DEFAULT_TILE_A];
 const SMALL_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C];
 const BIG_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C, DEFAULT_TILE_D, DEFAULT_TILE_E, DEFAULT_TILE_F, DEFAULT_TILE_G];
-// const REPEATING_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_A_2, DEFAULT_TILE_B, DEFAULT_TILE_C];
 
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
@@ -59,7 +56,6 @@ const DEFAULT_SQUARE_PROPERTIES = {
     square: DEFAULT_SQUARE_1,
     horizontal: DEFAULT_HORIZONTAL_PROPERTIES,
     vertical: DEFAULT_VERTICAL_PROPERTIES,
-    isEmpty: true,
 };
 
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -188,7 +184,7 @@ describe('WordFindingservice', () => {
             });
             const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
             const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
-            const spyAttemptMove = chai.spy.on(service, 'attemptMove');
+            const spyAttemptPermutations = chai.spy.on(service, 'attemptPermutations');
             const spyChooseMove = chai.spy.on(service, 'chooseMove');
 
             service.findWords(board, BIG_TILE_RACK, request);
@@ -196,7 +192,7 @@ describe('WordFindingservice', () => {
             expect(spyGetDesiredSquares).to.have.been.called;
             expect(spyGetRandomSquare).to.have.been.called;
             expect(spyFindSquareProperties).to.have.been.called;
-            expect(spyAttemptMove).to.have.been.called;
+            expect(spyAttemptPermutations).to.have.been.called;
             expect(spyChooseMove).to.have.been.called;
         });
 
@@ -211,7 +207,7 @@ describe('WordFindingservice', () => {
             });
             const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
             const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
-            const spyAttemptMove = chai.spy.on(service, 'attemptMove');
+            const spyAttemptPermutations = chai.spy.on(service, 'attemptPermutations');
             const spyEvaluate = chai.spy.on(service, 'evaluate');
 
             service.findWords(board, BIG_TILE_RACK, request);
@@ -219,7 +215,7 @@ describe('WordFindingservice', () => {
             expect(spyGetDesiredSquares).to.have.been.called;
             expect(spyGetRandomSquare).not.to.have.been.called;
             expect(spyFindSquareProperties).not.to.have.been.called;
-            expect(spyAttemptMove).not.to.have.been.called;
+            expect(spyAttemptPermutations).not.to.have.been.called;
             expect(spyEvaluate).to.have.been.called;
 
             clock.restore();
@@ -305,47 +301,6 @@ describe('WordFindingservice', () => {
         });
     });
 
-    // describe('chooseMove', () => {
-    //     let request: WordFindingRequest;
-    //     beforeEach(() => {
-    //         request = { ...DEFAULT_REQUEST };
-    //     });
-
-    //     it('should return all validMoves if the query asks for more than there is', () => {
-    //         request.usage = WordFindingUsage.Hint;
-    //         expect(service.chooseMove(SINGLE_VALID_MOVES, request)).to.deep.equal(SINGLE_VALID_MOVES);
-    //     });
-
-    //     it('should return the best move if maximizeScore', () => {
-    //         request.usage = WordFindingUsage.Expert;
-    //         expect(service.chooseMove(DEFAULT_VALID_MOVES, request)).to.deep.equal([BEST_MOVE]);
-    //     });
-
-    //     it('should call getRandomElementsFromArray if query has  no pointHistoric', () => {
-    //         request.pointHistoric = undefined;
-    //         const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
-    //         service.chooseMove(DEFAULT_VALID_MOVES, request);
-    //         assert(stubGetRandomElementsFromArray.calledOnce);
-    //         stubGetRandomElementsFromArray.restore();
-    //     });
-
-    //     it('should call getRandomElementsFromArray if query has no pointRange ', () => {
-    //         request.pointRange = undefined;
-    //         const stubGetRandomElementsFromArray = stub(Random, 'getRandomElementsFromArray');
-    //         service.chooseMove(DEFAULT_VALID_MOVES, request);
-    //         assert(stubGetRandomElementsFromArray.calledOnce);
-    //         stubGetRandomElementsFromArray.restore();
-    //     });
-
-    //     it('should call getMovesInRange and  selectLowestFrequencyScoreMove if there is a pointRange and a pointHistoric  ', () => {
-    //         const stubGetMovesInRange = stub(service, 'getMovesInRange').returns({} as unknown as Map<number, EvaluatedPlacement[]>);
-    //         const stubSelectLowestFrequencyScoreMove = stub(service, 'selectLowestFrequencyScoreMove');
-    //         service.chooseMove(DEFAULT_VALID_MOVES, request);
-    //         assert(stubGetMovesInRange.calledOnce);
-    //         assert(stubSelectLowestFrequencyScoreMove.calledOnce);
-    //     });
-    // });
-
     describe('evaluate', () => {
         let request: WordFindingRequest;
         beforeEach(() => {
@@ -374,6 +329,15 @@ describe('WordFindingservice', () => {
             const spy = chai.spy.on(service, 'evaluateBeginner', () => {});
             service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
             expect(spy).to.have.been.called;
+        });
+    });
+
+    describe('attemptPermutations', () => {
+        it('should call attemptMove rackPermutations.length times', () => {
+            const spyAttemptMove = stub(service, 'attemptMove');
+
+            service.attemptPermutations([[], [], []], {} as unknown as SquareProperties, []);
+            assert(spyAttemptMove.calledThrice);
         });
     });
 
@@ -654,45 +618,9 @@ describe('WordFindingservice', () => {
                 [7, 1],
                 [8, 0.5],
             ]);
-            /* eslint-enable @typescript-eslint/no-magic-numbers */
             expect(service.distributeChance(request)).to.deep.equal(expected);
         });
     });
-
-    // [2, 2],
-    // [4, 1],
-    // [8, 2],
-    // describe('selectLowestFrequencyScoreMove', () => {
-    //     let request: WordFindingRequest;
-    //     beforeEach(() => {
-    //         request = { ...DEFAULT_REQUEST };
-    //     });
-
-    //     it('should throw if there is no pointHistoric', () => {
-    //         const foundMovesMap = new Map();
-    //         request.pointHistoric = undefined;
-    //         const result = () => service.selectLowestFrequencyScoreMove(foundMovesMap, request);
-    //         expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
-    //     });
-
-    //     it('should return the first move with a score that was never played ', () => {
-    //         const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
-    //             [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
-    //             [DEFAULT_MOVE_3.score, DEFAULT_MOVE_3],
-    //             [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
-    //         ]);
-    //         expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_3);
-    //     });
-
-    //     it('should return the move with the lowest frequency amongst scores that were alreayd played', () => {
-    //         const foundMovesMap: Map<number, EvaluatedPlacement> = new Map([
-    //             [DEFAULT_MOVE_2.score, DEFAULT_MOVE_2],
-    //             [DEFAULT_MOVE_4.score, DEFAULT_MOVE_4],
-    //             [BEST_MOVE.score, BEST_MOVE],
-    //         ]);
-    //         expect(service.selectLowestFrequencyScoreMove(foundMovesMap, request)).to.deep.equal(DEFAULT_MOVE_4);
-    //     });
-    // });
 
     describe('attemptMove', () => {
         it('should call attemptMoveDirection', () => {
@@ -787,7 +715,7 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('findProperties', () => {
+    describe('findMovePossibilities', () => {
         it('should call findMinimumWordLength and findMaximumWordTileLeftLength', () => {
             const spyFindMinimumWordLength = chai.spy.on(service, 'findMinimumWordLength', () => {
                 return 0;
@@ -795,7 +723,7 @@ describe('WordFindingservice', () => {
             const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
                 return 0;
             });
-            service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE);
+            service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE);
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyFindMaximumWordTileLeftLength).to.have.been.called;
         });
@@ -807,7 +735,7 @@ describe('WordFindingservice', () => {
             const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
                 return 0;
             });
-            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
+            expect(service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyFindMaximumWordTileLeftLength).not.to.have.been.called;
         });
@@ -819,7 +747,7 @@ describe('WordFindingservice', () => {
             const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
                 return 0;
             });
-            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
+            expect(service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyFindMaximumWordTileLeftLength).not.to.have.been.called;
         });
@@ -834,22 +762,22 @@ describe('WordFindingservice', () => {
             const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
                 return maxLength;
             });
-            expect(service.findProperties(navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
+            expect(service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
             expect(spyFindMaximumWordTileLeftLength).to.have.been.called.with(navigator, DEFAULT_TILES_LEFT_SIZE - minLength);
         });
     });
 
     describe('findSquareProperties', () => {
-        it('should call findProperties twice', () => {
-            const spy = chai.spy.on(service, 'findProperties');
+        it('should call findMovePossibilities twice', () => {
+            const spy = chai.spy.on(service, 'findMovePossibilities');
             service.findSquareProperties(board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE);
             expect(spy).to.have.been.called.twice;
         });
 
         it('should return the correct SquareProperties  ', () => {
-            const stubFindProperties = stub(service, 'findProperties');
-            stubFindProperties.onCall(0).returns(DEFAULT_HORIZONTAL_PROPERTIES);
-            stubFindProperties.onCall(1).returns(DEFAULT_VERTICAL_PROPERTIES);
+            const stubFindMovePossibilities = stub(service, 'findMovePossibilities');
+            stubFindMovePossibilities.onCall(0).returns(DEFAULT_HORIZONTAL_PROPERTIES);
+            stubFindMovePossibilities.onCall(1).returns(DEFAULT_VERTICAL_PROPERTIES);
 
             chai.spy.on(BoardNavigator, 'isEmpty', () => {
                 return true;
@@ -908,15 +836,18 @@ describe('WordFindingservice', () => {
 
     describe('updateState', () => {
         it('should return SearchState.Over if the time exceeds the limit', () => {
-            expect(service.updateState(LONG_MOVE_TIME + 1)).to.deep.equal(SearchState.Over);
+            const OVER_DATE = new Date(Date.now() - LONG_MOVE_TIME - 100);
+            expect(service.updateState(OVER_DATE)).to.deep.equal(SearchState.Over);
         });
 
         it('should return SearchState.Unselective if the time exceeds the limit short time limit but not the long time limit', () => {
-            expect(service.updateState(LONG_MOVE_TIME - 1)).to.deep.equal(SearchState.Unselective);
+            const UNSELECTIVE_DATE = new Date(Date.now() - QUICK_MOVE_TIME - 100);
+            expect(service.updateState(UNSELECTIVE_DATE)).to.deep.equal(SearchState.Unselective);
         });
 
-        it('should return SearchState.Selective if the time exceeds the limit', () => {
-            expect(service.updateState(1)).to.deep.equal(SearchState.Selective);
+        it('should return SearchState.Selective if the time does not exceed the short time limit', () => {
+            const START_DATE = new Date(Date.now());
+            expect(service.updateState(START_DATE)).to.deep.equal(SearchState.Selective);
         });
     });
 
