@@ -3,7 +3,9 @@ import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/';
 import { GameConfigData } from '@app/classes/communication/game-config';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -67,14 +69,21 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     handleCreateGame(playerName: string, gameParameters: FormGroup): void {
+        const gameMode: GameMode = gameParameters.get('gameMode')?.value as GameMode;
         const gameConfig: GameConfigData = {
             playerName,
             playerId: this.gameDispatcherController.socketService.getId(),
             gameType: gameParameters.get('gameType')?.value as GameType,
+            gameMode,
             maxRoundTime: gameParameters.get('timer')?.value as number,
             dictionary: gameParameters.get('dictionary')?.value as string,
         };
-        this.gameDispatcherController.handleMultiplayerGameCreation(gameConfig);
+        if (gameMode === GameMode.Solo) {
+            gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
+            gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
+        }
+        console.log(gameConfig);
+        this.gameDispatcherController.handleGameCreation(gameConfig);
     }
 
     handleCancelGame(): void {
