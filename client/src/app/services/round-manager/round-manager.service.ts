@@ -113,14 +113,14 @@ export default class RoundManagerService implements IResetServiceData {
     }
 
     roundTimeout(): void {
-        if (this.router.url !== '/game' || !this.isActivePlayerLocalPlayer()) return;
-
-        const actionPass: ActionData = {
-            type: ActionType.PASS,
-            input: '',
-            payload: {},
-        };
-        this.endRoundEvent.emit();
-        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+        if (this.router.url === '/game' && this.isActivePlayerLocalPlayer()) {
+            const actionPass: ActionData = {
+                type: ActionType.PASS,
+                input: '',
+                payload: {},
+            };
+            this.endRoundEvent.emit();
+            this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+        }
     }
 }
