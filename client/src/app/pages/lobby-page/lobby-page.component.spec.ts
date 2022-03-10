@@ -6,6 +6,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -69,6 +70,7 @@ describe('LobbyPageComponent', () => {
                 MatTooltipModule,
                 MatFormFieldModule,
                 MatSelectModule,
+                MatCardModule,
                 BrowserAnimationsModule,
                 FormsModule,
                 ReactiveFormsModule,
@@ -142,6 +144,34 @@ describe('LobbyPageComponent', () => {
             for (let i = 0; i++; i < component.lobbies.length) {
                 expect(component.lobbies[i].canJoin).toEqual(expected[i]);
             }
+        });
+
+        it('should call setFormAvailability', () => {
+            const setFormAvailabilitySpy = spyOn(component, 'setFormAvailability');
+            component.validateName();
+            expect(setFormAvailabilitySpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('setFormAvailability', () => {
+        beforeEach(() => {
+            component.filterFormGroup.get('gameType')?.disable();
+        });
+
+        it('should enable form if name is valid and form is disabled', () => {
+            component.setFormAvailability(true);
+            expect(component.filterFormGroup.get('gameType')?.disabled).toBeFalse();
+        });
+
+        it('should not enable form if name is not valid and form is disabled', () => {
+            component.setFormAvailability(false);
+            expect(component.filterFormGroup.get('gameType')?.disabled).toBeTrue();
+        });
+
+        it('should enable form if name is valid and form is disabled', () => {
+            component.filterFormGroup.get('gameType')?.enable();
+            component.setFormAvailability(false);
+            expect(component.filterFormGroup.get('gameType')?.disabled).toBeTrue();
         });
     });
 
@@ -307,11 +337,8 @@ describe('LobbyPageComponent', () => {
     });
 
     it('ngOnInit should subscribe to gameDispatcherService lobbiesUpdateEvent and lobbyFullEvent', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeLobbyUpdateEvent = spyOn(gameDispatcherServiceMock['lobbiesUpdateEvent'], 'subscribe').and.returnValue(of(true) as any);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeLobbyFullEvent = spyOn(gameDispatcherServiceMock['lobbyFullEvent'], 'subscribe').and.returnValue(of(true) as any);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const spySubscribeLobbyCanceledEvent = spyOn(gameDispatcherServiceMock['canceledGameEvent'], 'subscribe').and.returnValue(of(true) as any);
         component.ngOnInit();
         expect(spySubscribeLobbyUpdateEvent).toHaveBeenCalled();

@@ -29,6 +29,6 @@ export class TileComponent implements OnInit {
 
     getBgPath(): string {
         const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMG) + 1;
-        return `/assets/img/tiles/bg_${index}.svg`;
+        return `assets/img/tiles/bg_${index}.svg`;
     }
 }

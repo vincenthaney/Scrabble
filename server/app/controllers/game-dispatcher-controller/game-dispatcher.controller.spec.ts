@@ -619,16 +619,16 @@ describe('GameDispatcherController', () => {
             });
 
             it('should remove player who leaves from socket room', () => {
-                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
 
                 controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-                expect(removeFromRoomSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, DEFAULT_GAME_ID);
+                expect(removeFromRoomSpy).to.have.been.called();
             });
 
             it('should emit cleanup event to socket', () => {
-                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
                 controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-                expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'cleanup');
+                expect(emitToSocketSpy).to.have.been.called();
             });
 
             it('should remove game from active game service if there is no more player in room', () => {

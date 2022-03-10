@@ -1,7 +1,7 @@
 import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '@app/classes/actions';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Position } from '@app/classes/board';
-import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/communication/action-data';
+import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
@@ -52,25 +52,25 @@ export class GamePlayService {
 
     getAction(player: Player, game: Game, actionData: ActionData): Action {
         switch (actionData.type) {
-            case 'place': {
+            case ActionType.PLACE: {
                 const payload = this.getActionPlacePayload(actionData);
                 const position = new Position(payload.startPosition.row, payload.startPosition.column);
                 return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
             }
-            case 'exchange': {
+            case ActionType.EXCHANGE: {
                 const payload = this.getActionExchangePayload(actionData);
                 return new ActionExchange(player, game, payload.tiles);
             }
-            case 'pass': {
+            case ActionType.PASS: {
                 return new ActionPass(player, game);
             }
-            case 'help': {
+            case ActionType.HELP: {
                 return new ActionHelp(player, game);
             }
-            case 'reserve': {
+            case ActionType.RESERVE: {
                 return new ActionReserve(player, game);
             }
-            case 'hint': {
+            case ActionType.HINT: {
                 return new ActionHint(player, game);
             }
             default: {
