@@ -20,7 +20,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
-import { GameType } from './game.type';
+import { GameType } from './game-type';
 
 const expect = chai.expect;
 
