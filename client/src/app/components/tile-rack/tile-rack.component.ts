@@ -42,12 +42,11 @@ export class TileRackComponent implements OnInit, OnDestroy {
     private updateTileRack(): void {
         this.tiles = [];
         const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
-        if (!localPlayer || !localPlayer.getTiles()) {
-            return;
+        if (localPlayer && localPlayer.getTiles()) {
+            localPlayer.getTiles().forEach((tile: Tile) => {
+                this.tiles.push({ ...tile });
+            });
         }
-        localPlayer.getTiles().forEach((tile: Tile) => {
-            this.tiles.push({ ...tile });
-        });
     }
 
     private handlePlaceTiles(payload: ActionPlacePayload): void {
