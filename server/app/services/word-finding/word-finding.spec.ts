@@ -208,7 +208,7 @@ describe('WordFindingservice', () => {
             const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
             const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
             const spyAttemptPermutations = chai.spy.on(service, 'attemptPermutations');
-            const spyEvaluate = chai.spy.on(service, 'evaluate');
+            const spyEvaluate = chai.spy.on(service, 'chooseMoves');
 
             service.findWords(board, BIG_TILE_RACK, request);
             expect(spyGetRackPermutations).to.have.been.called;
@@ -301,33 +301,33 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('evaluate', () => {
+    describe('chooseMoves', () => {
         let request: WordFindingRequest;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
         });
 
-        it('should call evaluateHint if the request useCase is Hint', () => {
+        it('should call chooseMovesHint if the request useCase is Hint', () => {
             request.useCase = WordFindingUseCase.Hint;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const spy = chai.spy.on(service, 'evaluateHint', () => {});
-            service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            const spy = chai.spy.on(service, 'chooseMovesHint', () => {});
+            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
             expect(spy).to.have.been.called;
         });
 
-        it('should call evaluateExpert if the request useCase is Expert', () => {
+        it('should call chooseMovesExpert if the request useCase is Expert', () => {
             request.useCase = WordFindingUseCase.Expert;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const spy = chai.spy.on(service, 'evaluateExpert', () => {});
-            service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            const spy = chai.spy.on(service, 'chooseMovesExpert', () => {});
+            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
             expect(spy).to.have.been.called;
         });
 
-        it('should call evaluateBeginner if the request useCase is Beginner', () => {
+        it('should call chooseMovesBeginner if the request useCase is Beginner', () => {
             request.useCase = WordFindingUseCase.Beginner;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const spy = chai.spy.on(service, 'evaluateBeginner', () => {});
-            service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            const spy = chai.spy.on(service, 'chooseMovesBeginner', () => {});
+            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
             expect(spy).to.have.been.called;
         });
     });
@@ -341,7 +341,7 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('evaluateHint', () => {
+    describe('chooseMovesHint', () => {
         it('should return 3 moves if there are atleast 3 of them', () => {
             const info = {
                 foundMoves: [],
@@ -349,7 +349,7 @@ describe('WordFindingservice', () => {
                 validMoves: DEFAULT_VALID_MOVES,
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.evaluateHint(info)?.length).to.equal(3);
+            expect(service.chooseMovesHint(info)?.length).to.equal(3);
         });
 
         it('should return undefined if there are less than 3 moves', () => {
@@ -359,7 +359,7 @@ describe('WordFindingservice', () => {
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.evaluateHint(info)).to.be.undefined;
+            expect(service.chooseMovesHint(info)).to.be.undefined;
         });
 
         it('should add foundMoves to validMoves ', () => {
@@ -369,12 +369,12 @@ describe('WordFindingservice', () => {
                 validMoves: DEFAULT_VALID_MOVES,
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            service.evaluateHint(info);
+            service.chooseMovesHint(info);
             expect(info.validMoves.length).to.equal(DEFAULT_VALID_MOVES.length + SINGLE_VALID_MOVES.length);
         });
     });
 
-    describe('evaluateExpert', () => {
+    describe('chooseMovesExpert', () => {
         it('should return 1 move if the searchState is over and there is atleast 1 move', () => {
             const expected = { score: 3 } as unknown as EvaluatedPlacement;
             const info = {
@@ -388,7 +388,7 @@ describe('WordFindingservice', () => {
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.evaluateExpert(SearchState.Over, info)).to.deep.equal([expected]);
+            expect(service.chooseMovesExpert(SearchState.Over, info)).to.deep.equal([expected]);
         });
 
         it('should return undefined if the searchState is not over', () => {
@@ -398,7 +398,7 @@ describe('WordFindingservice', () => {
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.evaluateExpert(SearchState.Selective, info)).to.be.undefined;
+            expect(service.chooseMovesExpert(SearchState.Selective, info)).to.be.undefined;
         });
 
         it('should add foundMoves to validMoves ', () => {
@@ -408,12 +408,12 @@ describe('WordFindingservice', () => {
                 validMoves: [{} as unknown as EvaluatedPlacement],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            service.evaluateExpert(SearchState.Over, info);
+            service.chooseMovesExpert(SearchState.Over, info);
             expect(info.validMoves.length).to.equal(3);
         });
     });
 
-    describe('evaluateBeginner', () => {
+    describe('chooseMovesBeginner', () => {
         let request: WordFindingRequest;
         let scoreMap: Map<number, EvaluatedPlacement[]>;
         let info: EvaluationInfo;
@@ -434,7 +434,7 @@ describe('WordFindingservice', () => {
 
         it('should call getMovesInRange', () => {
             const spy = chai.spy.on(service, 'getMovesInRange');
-            service.evaluateBeginner(SearchState.Over, request, info);
+            service.chooseMovesBeginner(SearchState.Over, request, info);
             expect(spy).to.have.been.called;
         });
 
@@ -445,7 +445,7 @@ describe('WordFindingservice', () => {
             const spyAcceptMove = chai.spy.on(service, 'acceptMove', () => {
                 return true;
             });
-            expect(service.evaluateBeginner(SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
+            expect(service.chooseMovesBeginner(SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
             expect(spyAcceptMove).to.have.been.called;
         });
 
@@ -469,7 +469,7 @@ describe('WordFindingservice', () => {
                 return false;
             });
             info.pointDistributionChance = pointDistributionChance;
-            expect(service.evaluateBeginner(SearchState.Selective, request, info)).to.be.undefined;
+            expect(service.chooseMovesBeginner(SearchState.Selective, request, info)).to.be.undefined;
             expect(info.rejectedValidMoves).to.deep.equal(expected);
         });
 
@@ -488,7 +488,7 @@ describe('WordFindingservice', () => {
             info.pointDistributionChance = pointDistributionChance;
 
             const spy = chai.spy.on(service, 'getHighestAcceptChanceMove');
-            service.evaluateBeginner(SearchState.Unselective, request, info);
+            service.chooseMovesBeginner(SearchState.Unselective, request, info);
             expect(spy).to.have.been.called();
         });
     });

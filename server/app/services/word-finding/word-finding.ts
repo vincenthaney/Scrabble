@@ -51,11 +51,11 @@ export default class WordFindingService {
             const foundMoves: EvaluatedPlacement[] = [];
             this.attemptPermutations(rackPermutations, squareProperties, foundMoves);
             searchState = this.updateSearchState(startTime);
-            chosenMoves = this.evaluate(searchState, request, { foundMoves, validMoves, rejectedValidMoves, pointDistributionChance });
+            chosenMoves = this.chooseMoves(searchState, request, { foundMoves, validMoves, rejectedValidMoves, pointDistributionChance });
             if (chosenMoves) return chosenMoves;
         }
 
-        chosenMoves = this.evaluate(searchState, request, { foundMoves: [], validMoves, rejectedValidMoves, pointDistributionChance });
+        chosenMoves = this.chooseMoves(searchState, request, { foundMoves: [], validMoves, rejectedValidMoves, pointDistributionChance });
         return chosenMoves ? chosenMoves : [];
     }
 
@@ -65,17 +65,17 @@ export default class WordFindingService {
         }
     }
 
-    evaluate(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+    chooseMoves(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
         if (request.useCase === WordFindingUseCase.Beginner) {
-            return this.evaluateBeginner(searchState, request, evaluationInfo);
+            return this.chooseMovesBeginner(searchState, request, evaluationInfo);
         } else if (request.useCase === WordFindingUseCase.Hint) {
-            return this.evaluateHint(evaluationInfo);
+            return this.chooseMovesHint(evaluationInfo);
         } else {
-            return this.evaluateExpert(searchState, evaluationInfo);
+            return this.chooseMovesExpert(searchState, evaluationInfo);
         }
     }
 
-    evaluateBeginner(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+    chooseMovesBeginner(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
         const movesInRange = this.getMovesInRange(evaluationInfo.foundMoves, request);
         for (const movesScore of movesInRange.values()) {
             for (const move of movesScore) {
@@ -92,7 +92,7 @@ export default class WordFindingService {
         return undefined;
     }
 
-    evaluateExpert(searchState: SearchState, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+    chooseMovesExpert(searchState: SearchState, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
         evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
         if (searchState === SearchState.Over) {
             return evaluationInfo.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
@@ -100,7 +100,7 @@ export default class WordFindingService {
         return undefined;
     }
 
-    evaluateHint(evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+    chooseMovesHint(evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
         evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
         if (evaluationInfo.validMoves.length > HINT_AMOUNT_OF_WORDS) {
             return Random.getRandomElementsFromArray(evaluationInfo.validMoves, HINT_AMOUNT_OF_WORDS);
