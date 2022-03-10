@@ -31,7 +31,7 @@ import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
-    constructor(private wordVerification: WordsVerificationService, private scoreCalculator: ScoreCalculatorService) {}
+    constructor(private wordVerificationService: WordsVerificationService, private scoreCalculatorService: ScoreCalculatorService) {}
 
     findWords(board: Board, tiles: Tile[], request: WordFindingRequest): EvaluatedPlacement[] {
         const startTime = new Date();
@@ -225,12 +225,12 @@ export default class WordFindingService {
         if (movePossibilities.isValid && this.isWithin(movePossibilities, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
-                this.wordVerification.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
+                this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
                 return {
                     tilesToPlace: permutation,
                     orientation,
                     startPosition: squareProperties.square.position,
-                    score: this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(permutation),
+                    score: this.scoreCalculatorService.calculatePoints(createdWords) + this.scoreCalculatorService.bonusPoints(permutation),
                 };
                 // eslint-disable-next-line no-empty
             } catch (exception) {}
