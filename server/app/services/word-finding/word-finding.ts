@@ -4,7 +4,7 @@ import Direction from '@app/classes/board/direction';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import {
-    EvaluationInfo,
+    PlacementEvaluationResults,
     MovePossibilities,
     RejectedMove,
     SearchState,
@@ -65,45 +65,45 @@ export default class WordFindingService {
         }
     }
 
-    chooseMoves(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+    chooseMoves(searchState: SearchState, request: WordFindingRequest, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
         if (request.useCase === WordFindingUseCase.Beginner) {
-            return this.chooseMovesBeginner(searchState, request, evaluationInfo);
+            return this.chooseMovesBeginner(searchState, request, placementEvaluationResults);
         } else if (request.useCase === WordFindingUseCase.Hint) {
-            return this.chooseMovesHint(evaluationInfo);
+            return this.chooseMovesHint(placementEvaluationResults);
         } else {
-            return this.chooseMovesExpert(searchState, evaluationInfo);
+            return this.chooseMovesExpert(searchState, placementEvaluationResults);
         }
     }
 
-    chooseMovesBeginner(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
-        const movesInRange = this.getMovesInRange(evaluationInfo.foundMoves, request);
+    chooseMovesBeginner(searchState: SearchState, request: WordFindingRequest, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+        const movesInRange = this.getMovesInRange(placementEvaluationResults.foundMoves, request);
         for (const movesScore of movesInRange.values()) {
             for (const move of movesScore) {
-                if (searchState === SearchState.Selective && this.isMoveAccepted(move.score, evaluationInfo.pointDistributionChance)) {
+                if (searchState === SearchState.Selective && this.isMoveAccepted(move.score, placementEvaluationResults.pointDistributionChance)) {
                     return [move];
                 } else {
-                    const acceptChance = evaluationInfo.pointDistributionChance.get(move.score);
-                    if (acceptChance) evaluationInfo.rejectedValidMoves.push({ acceptChance, move });
+                    const acceptChance = placementEvaluationResults.pointDistributionChance.get(move.score);
+                    if (acceptChance) placementEvaluationResults.rejectedValidMoves.push({ acceptChance, move });
                 }
             }
         }
-        if (searchState !== SearchState.Selective && evaluationInfo.rejectedValidMoves.length > 0)
-            return [this.getHighestAcceptChanceMove(evaluationInfo.rejectedValidMoves)];
+        if (searchState !== SearchState.Selective && placementEvaluationResults.rejectedValidMoves.length > 0)
+            return [this.getHighestAcceptChanceMove(placementEvaluationResults.rejectedValidMoves)];
         return undefined;
     }
 
-    chooseMovesExpert(searchState: SearchState, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
-        evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
+    chooseMovesExpert(searchState: SearchState, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+        placementEvaluationResults.validMoves = placementEvaluationResults.validMoves.concat(placementEvaluationResults.foundMoves);
         if (searchState === SearchState.Over) {
-            return evaluationInfo.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
+            return placementEvaluationResults.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
         }
         return undefined;
     }
 
-    chooseMovesHint(evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
-        evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
-        if (evaluationInfo.validMoves.length > HINT_AMOUNT_OF_WORDS) {
-            return Random.getRandomElementsFromArray(evaluationInfo.validMoves, HINT_AMOUNT_OF_WORDS);
+    chooseMovesHint(placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+        placementEvaluationResults.validMoves = placementEvaluationResults.validMoves.concat(placementEvaluationResults.foundMoves);
+        if (placementEvaluationResults.validMoves.length > HINT_AMOUNT_OF_WORDS) {
+            return Random.getRandomElementsFromArray(placementEvaluationResults.validMoves, HINT_AMOUNT_OF_WORDS);
         }
         return undefined;
     }

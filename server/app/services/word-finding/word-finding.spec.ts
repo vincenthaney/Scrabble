@@ -14,7 +14,7 @@ import { StringConversion } from '@app/utils/string-conversion';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
-import { EvaluationInfo, RejectedMove, SearchState, SquareProperties, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { PlacementEvaluationResults, RejectedMove, SearchState, SquareProperties, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -311,7 +311,7 @@ describe('WordFindingservice', () => {
             request.useCase = WordFindingUseCase.Hint;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'chooseMovesHint', () => {});
-            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
             expect(spy).to.have.been.called;
         });
 
@@ -319,7 +319,7 @@ describe('WordFindingservice', () => {
             request.useCase = WordFindingUseCase.Expert;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'chooseMovesExpert', () => {});
-            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
             expect(spy).to.have.been.called;
         });
 
@@ -327,7 +327,7 @@ describe('WordFindingservice', () => {
             request.useCase = WordFindingUseCase.Beginner;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'chooseMovesBeginner', () => {});
-            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
+            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
             expect(spy).to.have.been.called;
         });
     });
@@ -416,7 +416,7 @@ describe('WordFindingservice', () => {
     describe('chooseMovesBeginner', () => {
         let request: WordFindingRequest;
         let scoreMap: Map<number, EvaluatedPlacement[]>;
-        let info: EvaluationInfo;
+        let info: PlacementEvaluationResults;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
             scoreMap = new Map([

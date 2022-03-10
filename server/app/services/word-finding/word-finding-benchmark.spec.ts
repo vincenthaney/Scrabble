@@ -1,3 +1,4 @@
+// TODO: This will be removed before sprint 2
 // /* eslint-disable @typescript-eslint/no-magic-numbers */
 // /* eslint-disable no-console */
 // /* eslint-disable dot-notation */
