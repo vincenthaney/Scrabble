@@ -130,18 +130,18 @@ describe('BeginnerVirtualPlayer', () => {
             expect(createActionDataPlaceSpy).to.have.been.called();
         });
 
-        it('findAction should call updateHistoric', () => {
+        it('findAction should call updateHistory', () => {
             spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
                 return testEvaluatedPlacements;
             });
             spy.on(ActionPlace, 'createActionData', () => {
                 return;
             });
-            const updateHistoricSpy = spy.on(beginnerVirtualPlayer, 'updateHistoric', () => {
+            const updateHistorySpy = spy.on(beginnerVirtualPlayer, 'updateHistory', () => {
                 return;
             });
             beginnerVirtualPlayer.findAction();
-            expect(updateHistoricSpy).to.have.been.called();
+            expect(updateHistorySpy).to.have.been.called();
         });
     });
 
@@ -158,7 +158,7 @@ describe('BeginnerVirtualPlayer', () => {
         });
     });
 
-    describe('updateHistoric', () => {
+    describe('updateHistory', () => {
         afterEach(() => {
             chai.spy.restore();
         });
@@ -166,13 +166,13 @@ describe('BeginnerVirtualPlayer', () => {
         it('should increment value', () => {
             const testEvaluatedPlacement = { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE };
             beginnerVirtualPlayer.pointHistoric.set(TEST_SCORE, TEST_COUNT_VALUE);
-            beginnerVirtualPlayer.updateHistoric(testEvaluatedPlacement);
+            beginnerVirtualPlayer.updateHistory(testEvaluatedPlacement);
             expect(beginnerVirtualPlayer.pointHistoric.get(TEST_SCORE)).to.deep.equal(TEST_COUNT_VALUE + EXPECTED_INCREMENT_VALUE);
         });
 
         it('should set value to 1', () => {
             const testEvaluatedPlacement = { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE };
-            beginnerVirtualPlayer.updateHistoric(testEvaluatedPlacement);
+            beginnerVirtualPlayer.updateHistory(testEvaluatedPlacement);
             expect(beginnerVirtualPlayer.pointHistoric.get(TEST_SCORE)).to.deep.equal(EXPECTED_INCREMENT_VALUE);
         });
     });
