@@ -16,7 +16,6 @@ describe('GameButtonActionService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
-            // providers: [GameDispatcherController, Game],
         });
         service = TestBed.inject(GameButtonActionService);
     });
