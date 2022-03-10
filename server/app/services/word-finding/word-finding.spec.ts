@@ -438,11 +438,11 @@ describe('WordFindingservice', () => {
             expect(spy).to.have.been.called;
         });
 
-        it('should call acceptMove and return the first accepted move if in Selective state', () => {
+        it('should call isMoveAccepted and return the first accepted move if in Selective state', () => {
             chai.spy.on(service, 'getMovesInRange', () => {
                 return scoreMap;
             });
-            const spyAcceptMove = chai.spy.on(service, 'acceptMove', () => {
+            const spyAcceptMove = chai.spy.on(service, 'isMoveAccepted', () => {
                 return true;
             });
             expect(service.chooseMovesBeginner(SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
@@ -465,7 +465,7 @@ describe('WordFindingservice', () => {
                 { acceptChance: 3, move: DEFAULT_MOVE_4 },
                 { acceptChance: 3, move: DEFAULT_MOVE_4 },
             ];
-            chai.spy.on(service, 'acceptMove', () => {
+            chai.spy.on(service, 'isMoveAccepted', () => {
                 return false;
             });
             info.pointDistributionChance = pointDistributionChance;
@@ -477,7 +477,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'getMovesInRange', () => {
                 return scoreMap;
             });
-            chai.spy.on(service, 'acceptMove', () => {
+            chai.spy.on(service, 'isMoveAccepted', () => {
                 return false;
             });
             const pointDistributionChance: Map<number, number> = new Map([
@@ -845,7 +845,7 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('acceptMove', () => {
+    describe('isMoveAccepted', () => {
         it('should not always return true if the chance is not 100%', () => {
             let result;
             let sameResult = true;
@@ -853,7 +853,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             const map = new Map([[2, 0.5]]);
             for (let i = 0; i < iterations; i++) {
-                const tmp = service.acceptMove({ score: 2 } as unknown as EvaluatedPlacement, map);
+                const tmp = service.isMoveAccepted(2, map);
                 if (tmp !== result && i !== 0) {
                     sameResult = false;
                     break;
@@ -870,7 +870,7 @@ describe('WordFindingservice', () => {
             const iterations = 10;
             const map = new Map([[2, 1]]);
             for (let i = 0; i < iterations; i++) {
-                const tmp = service.acceptMove({ score: 2 } as unknown as EvaluatedPlacement, map);
+                const tmp = service.isMoveAccepted(2, map);
                 if (tmp !== result && i !== 0) {
                     sameResult = false;
                     break;

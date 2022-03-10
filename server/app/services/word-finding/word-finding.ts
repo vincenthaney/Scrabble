@@ -79,7 +79,7 @@ export default class WordFindingService {
         const movesInRange = this.getMovesInRange(evaluationInfo.foundMoves, request);
         for (const movesScore of movesInRange.values()) {
             for (const move of movesScore) {
-                if (searchState === SearchState.Selective && this.acceptMove(move, evaluationInfo.pointDistributionChance)) {
+                if (searchState === SearchState.Selective && this.isMoveAccepted(move.score, evaluationInfo.pointDistributionChance)) {
                     return [move];
                 } else {
                     const acceptChance = evaluationInfo.pointDistributionChance.get(move.score);
@@ -124,9 +124,9 @@ export default class WordFindingService {
         }
     }
 
-    acceptMove(move: EvaluatedPlacement, pointDistributionChance: Map<number, number>): boolean {
-        const chance = pointDistributionChance.get(move.score);
-        return chance ? chance > Math.random() : true;
+    isMoveAccepted(moveScore: number, pointDistributionChance: Map<number, number>): boolean {
+        const acceptProbability = pointDistributionChance.get(moveScore);
+        return acceptProbability ? acceptProbability > Math.random() : true;
     }
 
     distributeChance(request: WordFindingRequest): Map<number, number> {
