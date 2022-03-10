@@ -50,7 +50,7 @@
                             <form [formGroup]="filterFormGroup">
                                 <mat-form-field appearance="standard">
                                     <mat-label>Type de partie</mat-label>
-                                    <mat-select formControlName="gameType" [disabled]="!nameValid">
+                                    <mat-select formControlName="gameType">
                                         <mat-option value="all">Tous</mat-option>
                                         <mat-option value="Classique">Classique</mat-option>
                                         <mat-option value="LOG2990" disabled>LOG2990</mat-option>

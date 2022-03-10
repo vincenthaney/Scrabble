@@ -11,11 +11,10 @@ import {
     DIALOG_CANCELED_CONTENT,
     DIALOG_CANCELED_TITLE,
     DIALOG_FULL_CONTENT,
-    DIALOG_FULL_TITLE,
+    DIALOG_FULL_TITLE
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-lobby-page',
@@ -49,7 +48,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.lobbyFullDialog());
         this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
-        this.filterFormGroup.get('gameType')?.valueChanges.pipe(takeUntil(this.componentDestroyed$)).subscribe(this.validateName.bind(this));
 
         this.validateName();
     }
@@ -63,9 +61,19 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.numberOfLobbiesMeetingFilter = 0;
         this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
 
+        this.setFormAvailability(this.nameValid);
+
         for (const lobby of this.lobbies) {
             this.updateLobbyAttributes(lobby);
             if (lobby.meetFilters) this.numberOfLobbiesMeetingFilter++;
+        }
+    }
+
+    setFormAvailability(isNameValid: boolean): void {
+        if (isNameValid && this.filterFormGroup.get('gameType')?.disabled) {
+            this.filterFormGroup.get('gameType')?.enable();
+        } else if (!this.filterFormGroup.get('gameType')?.disabled) {
+            this.filterFormGroup.get('gameType')?.disable();
         }
     }
 
