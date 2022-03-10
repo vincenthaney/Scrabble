@@ -14,7 +14,7 @@ import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -32,7 +32,7 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator = Container.get(WordsVerificationService);
     }
 
-    static createActionData(evaluatedPlacement: EvaluatedPlacement): ActionData {
+    static createActionData(evaluatedPlacement: ScoredWordPlacement): ActionData {
         return {
             type: ActionType.PLACE,
             payload: this.createActionPlacePayload(evaluatedPlacement),
@@ -40,7 +40,7 @@ export default class ActionPlace extends ActionPlay {
         };
     }
 
-    static createActionPlacePayload(evaluatedPlacement: EvaluatedPlacement): ActionPlacePayload {
+    static createActionPlacePayload(evaluatedPlacement: ScoredWordPlacement): ActionPlacePayload {
         return {
             tiles: evaluatedPlacement.tilesToPlace,
             orientation: evaluatedPlacement.orientation,

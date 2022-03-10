@@ -12,7 +12,7 @@ import { PointRange } from '@app/classes/word-finding';
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Board } from '@app/classes/board';
-import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     findPointRange(): PointRange {
@@ -42,7 +42,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return ActionPass.createActionData();
     }
 
-    updateHistoric(evaluatedPlacement: EvaluatedPlacement): void {
+    updateHistoric(evaluatedPlacement: ScoredWordPlacement): void {
         let scoreCount = this.pointHistoric.get(evaluatedPlacement.score);
         this.pointHistoric.set(evaluatedPlacement.score, scoreCount ? ++scoreCount : 1);
     }
@@ -51,7 +51,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return this.getActiveGameService().getGame(gameId, playerId).board;
     }
 
-    computeWordPlacement(): EvaluatedPlacement | undefined {
+    computeWordPlacement(): ScoredWordPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
     }
 }

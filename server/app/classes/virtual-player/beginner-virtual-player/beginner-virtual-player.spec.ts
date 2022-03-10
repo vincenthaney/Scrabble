@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
-import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { HIGH_SCORE_RANGE, MEDIUM_SCORE_RANGE, LOW_SCORE_RANGE } from '@app/constants/virtual-player-constants';
 import {
     EXPECTED_INCREMENT_VALUE,
@@ -28,7 +28,7 @@ import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
 
-const testEvaluatedPlacements: EvaluatedPlacement[] = [
+const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
 ];
 
