@@ -6,7 +6,7 @@
 
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData } from '@app/classes/game/game-config';
-import { GameType } from '@app/classes/game/game.type';
+import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { TileReserve } from '@app/classes/tile';
