@@ -11,7 +11,7 @@ import {
     DIALOG_CANCELED_CONTENT,
     DIALOG_CANCELED_TITLE,
     DIALOG_FULL_CONTENT,
-    DIALOG_FULL_TITLE
+    DIALOG_FULL_TITLE,
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';

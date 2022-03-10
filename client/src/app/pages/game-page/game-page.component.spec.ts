@@ -26,7 +26,7 @@ import {
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_DEFAULT_FONT_SIZE,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE
+    SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
