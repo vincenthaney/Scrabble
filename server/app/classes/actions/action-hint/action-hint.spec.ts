@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import ActionHint from './action-hint';
 import WordFindingService from '@app/services/word-finding/word-finding';
 import { Orientation, Position } from '@app/classes/board';
-import { PlacementToString  } from '@app/utils/placement-to-string';
+import { PlacementToString } from '@app/utils/placement-to-string';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
@@ -62,7 +62,7 @@ describe('ActionHint', () => {
                 });
             }
 
-            const wordPlacementToCommandStringSpy = spy(PlacementToString , 'wordPlacementToCommandString');
+            const wordPlacementToCommandStringSpy = spy(PlacementToString, 'wordPlacementToCommandString');
 
             action.getMessage();
 
