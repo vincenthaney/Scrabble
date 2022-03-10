@@ -40,7 +40,7 @@ chai.use(chaiAsPromised);
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: {}, input: '' };
+const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: { tiles: [] }, input: '' };
 const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_FEEDBACK = 'this is a feedback';
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
@@ -311,9 +311,9 @@ describe('GamePlayController', () => {
             const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
             handlePlayActionStub.callThrough();
 
-            await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: {}, input: '' });
+            await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
-            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PLACE, payload: {}, input: '' })).to.be.true;
+            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' })).to.be.true;
         });
     });
 

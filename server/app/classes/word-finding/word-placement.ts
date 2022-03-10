@@ -6,3 +6,7 @@ export default interface WordPlacement {
     orientation: Orientation;
     startPosition: Position;
 }
+
+export interface ScoredWordPlacement extends WordPlacement {
+    score: number;
+}
