@@ -89,8 +89,8 @@ export default class Game {
 
     getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
         if (this.isPlayerFromGame(playerId)) {
-            const players: Player[] = [this.player1, this.player2];
-            return isRequestingPlayer ? players.filter((player) => player.id === playerId)[0] : players.filter((player) => player.id !== playerId)[0];
+            if (this.player1.id === playerId && isRequestingPlayer) return this.player1;
+            return this.player2;
         }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
