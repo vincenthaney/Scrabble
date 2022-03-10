@@ -236,7 +236,7 @@ export default class WordFindingService {
 
     attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {
         const moveRequirements = this.getCorrespondingMovePossibility(squareProperties, orientation);
-        if (moveRequirements.isPossible && this.isWithin(moveRequirements, permutation.length)) {
+        if (moveRequirements.isPossible && this.isWithinRequirements(moveRequirements, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
                 this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
@@ -261,13 +261,13 @@ export default class WordFindingService {
         return orientation === Orientation.Horizontal ? squareProperties.horizontal : squareProperties.vertical;
     }
 
-    isWithin(movePossibility: MoveRequirements, target: number): boolean {
+    isWithinRequirements(movePossibility: MoveRequirements, target: number): boolean {
         return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
     }
 
     combination(tiles: Tile[]) {
         const res: Tile[][] = [[]];
-        let temp;
+        let currentCombination;
         for (const tile of tiles) {
             if (tile.isBlank) {
                 tile.letter = 'E';
@@ -278,15 +278,15 @@ export default class WordFindingService {
         // eslint-disable-next-line no-bitwise
         const maxCombinations = 1 << tiles.length;
         for (let i = 0; i < maxCombinations; ++i) {
-            temp = [];
+            currentCombination = [];
             for (let j = 0; j < tiles.length; ++j) {
                 // If the tile has to be included in the current combination
                 // eslint-disable-next-line no-bitwise
                 if (i & (1 << j)) {
-                    temp.push(tiles[j]);
+                    currentCombination.push(tiles[j]);
                 }
             }
-            res.push(temp);
+            res.push(currentCombination);
         }
         return res.filter((l) => l.length > 0);
     }

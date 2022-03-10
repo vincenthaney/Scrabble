@@ -239,7 +239,7 @@ describe('WordFindingservice', () => {
             const spyGetCorrespondingMovePossibility = chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
                 return DEFAULT_SQUARE_PROPERTIES.horizontal;
             });
-            const spyIsWithin = chai.spy.on(service, 'isWithin', () => {
+            const spyIsWithin = chai.spy.on(service, 'isWithinRequirements', () => {
                 return true;
             });
 
@@ -262,7 +262,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
                 return DEFAULT_SQUARE_PROPERTIES.horizontal;
             });
-            chai.spy.on(service, 'isWithin', () => {
+            chai.spy.on(service, 'isWithinRequirements', () => {
                 return true;
             });
             // eslint-disable-next-line dot-notation
@@ -277,7 +277,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
                 return DEFAULT_SQUARE_PROPERTIES.horizontal;
             });
-            chai.spy.on(service, 'isWithin', () => {
+            chai.spy.on(service, 'isWithinRequirements', () => {
                 return false;
             });
             expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
@@ -287,7 +287,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'getCorrespondingMovePossibility', () => {
                 return DEFAULT_SQUARE_PROPERTIES.horizontal;
             });
-            chai.spy.on(service, 'isWithin', () => {
+            chai.spy.on(service, 'isWithinRequirements', () => {
                 return true;
             });
             const stubwordsToString = stub(StringConversion, 'wordsToString').returns(['']);
@@ -825,13 +825,13 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('isWithin', () => {
+    describe('isWithinRequirements', () => {
         it('should return true if the target if within the MoveRequirements range', () => {
-            expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
+            expect(service.isWithinRequirements(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
         });
 
         it('should return false if the target if within the MoveRequirements range', () => {
-            expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
+            expect(service.isWithinRequirements(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
         });
     });
 
