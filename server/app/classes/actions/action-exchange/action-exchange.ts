@@ -39,7 +39,6 @@ export default class ActionExchange extends ActionPlay {
     }
 
     getOpponentMessage(): string {
-        const moreThanOne = this.tilesToExchange.length > 1;
-        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}`;
+        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${this.tilesToExchange.length > 1 ? 's' : ''}`;
     }
 }

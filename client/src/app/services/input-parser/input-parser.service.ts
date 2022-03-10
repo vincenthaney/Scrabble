@@ -92,10 +92,14 @@ export default class InputParserService {
                     payload: {},
                 };
                 break;
-            // case ActionType.HINT:
-            //     if (inputWords.length !== ExpectedCommandWordCount.Hint) throw new CommandError(CommandErrorMessages.BadSyntax);
-            //     // this.controller.sendHintAction();
-            //     break;
+            case ActionType.HINT:
+                if (inputWords.length !== ExpectedCommandWordCount.Hint) throw new CommandException(CommandExceptionMessages.BadSyntax);
+                actionData = {
+                    type: ActionType.HINT,
+                    input,
+                    payload: {},
+                };
+                break;
             case ActionType.HELP:
                 if (inputWords.length !== ExpectedCommandWordCount.Help) throw new CommandException(CommandExceptionMessages.BadSyntax);
                 actionData = {

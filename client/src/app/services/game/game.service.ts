@@ -42,6 +42,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
     noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
+    newActivePlayerEvent: EventEmitter<[PlayerData, boolean]> = new EventEmitter<[PlayerData, boolean]>();
     rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
     updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
     playingTiles: EventEmitter<ActionPlacePayload>;
@@ -128,6 +129,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (gameUpdateData.round) {
             const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
             this.roundManager.updateRound(round);
+            const newActivePlayer: PlayerData = gameUpdateData.round.playerData;
+            this.newActivePlayerEvent.emit([newActivePlayer, this.isLocalPlayerPlaying()]);
         }
         if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
             this.tileReserve = gameUpdateData.tileReserve;
