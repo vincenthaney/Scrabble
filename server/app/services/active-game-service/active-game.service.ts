@@ -40,7 +40,7 @@ export class ActiveGameService {
             const game = this.getGame(id, playerId);
             const index = this.activeGames.indexOf(game);
             this.activeGames.splice(index, 1);
-            // If the game is already deleted, don't do anything
+            // If the game is already deleted, catch error but don't do anything
             // eslint-disable-next-line no-empty
         } catch (exception) {}
     }

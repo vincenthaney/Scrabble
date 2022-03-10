@@ -178,7 +178,7 @@ export class GameDispatcherController {
             try {
                 this.socketService.removeFromRoom(playerId, gameId);
                 this.socketService.emitToSocket(playerId, 'cleanup');
-                // Socket might not exist if client completely closed application
+                // catch errors caused by inexistent socket after client closed application
                 // eslint-disable-next-line no-empty
             } catch (exception) {}
             const playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
