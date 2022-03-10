@@ -240,7 +240,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line dot-notation
             const spyExtract = chai.spy.on(service['wordExtraction'], 'extract');
             // eslint-disable-next-line dot-notation
-            const spyVerifyWords = chai.spy.on(service['wordVerification'], 'verifyWords');
+            const spyVerifyWords = chai.spy.on(service['wordVerificationService'], 'verifyWords');
 
             service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal);
             expect(spyGetCorrespondingMovePossibility).to.have.been.called;
@@ -288,7 +288,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract');
             // eslint-disable-next-line dot-notation
-            chai.spy.on(service['wordVerification'], 'verifyWords');
+            chai.spy.on(service['wordVerificationService'], 'verifyWords');
             const expected = {
                 tilesToPlace: SMALL_TILE_RACK,
                 orientation: Orientation.Horizontal,
