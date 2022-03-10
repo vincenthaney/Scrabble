@@ -59,13 +59,13 @@ export default class WordFindingService {
         return chosenMoves ? chosenMoves : [];
     }
 
-    attemptPermutations(rackPermutations: Tile[][], squareProperties: SquareProperties, foundMoves: EvaluatedPlacement[]): void {
+    private attemptPermutations(rackPermutations: Tile[][], squareProperties: SquareProperties, foundMoves: EvaluatedPlacement[]): void {
         for (const permutation of rackPermutations) {
             this.attemptMove(squareProperties, permutation, foundMoves);
         }
     }
 
-    chooseMoves(
+    private chooseMoves(
         searchState: SearchState,
         request: WordFindingRequest,
         placementEvaluationResults: PlacementEvaluationResults,
@@ -83,7 +83,7 @@ export default class WordFindingService {
         }
     }
 
-    chooseMovesBeginner(
+    private chooseMovesBeginner(
         searchState: SearchState,
         request: WordFindingRequest,
         placementEvaluationResults: PlacementEvaluationResults,
@@ -104,7 +104,7 @@ export default class WordFindingService {
         return undefined;
     }
 
-    chooseMovesExpert(searchState: SearchState, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+    private chooseMovesExpert(searchState: SearchState, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
         placementEvaluationResults.validMoves = placementEvaluationResults.validMoves.concat(placementEvaluationResults.foundMoves);
         if (searchState === SearchState.Over) {
             return placementEvaluationResults.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
@@ -112,7 +112,7 @@ export default class WordFindingService {
         return undefined;
     }
 
-    chooseMovesHint(placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+    private chooseMovesHint(placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
         placementEvaluationResults.validMoves = placementEvaluationResults.validMoves.concat(placementEvaluationResults.foundMoves);
         if (placementEvaluationResults.validMoves.length > HINT_AMOUNT_OF_WORDS) {
             return Random.getRandomElementsFromArray(placementEvaluationResults.validMoves, HINT_AMOUNT_OF_WORDS);
@@ -120,11 +120,11 @@ export default class WordFindingService {
         return undefined;
     }
 
-    getHighestAcceptChanceMove(rejectedValidMoves: RejectedMove[]): EvaluatedPlacement {
+    private getHighestAcceptChanceMove(rejectedValidMoves: RejectedMove[]): EvaluatedPlacement {
         return rejectedValidMoves.sort((previous, current) => current.acceptChance - previous.acceptChance)[0].move;
     }
 
-    assignAcceptanceProbability(request: WordFindingRequest): Map<number, number> {
+    private assignAcceptanceProbability(request: WordFindingRequest): Map<number, number> {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
@@ -143,7 +143,7 @@ export default class WordFindingService {
         return scoreChanceDistribution;
     }
 
-    updateSearchState(startTime: Date): SearchState {
+    private updateSearchState(startTime: Date): SearchState {
         const currentTime = new Date();
         const timeElapsed = currentTime.getTime() - startTime.getTime();
         if (timeElapsed > LONG_MOVE_TIME) {
@@ -155,12 +155,12 @@ export default class WordFindingService {
         }
     }
 
-    isMoveAccepted(moveScore: number, pointDistributionChance: Map<number, number>): boolean {
+    private isMoveAccepted(moveScore: number, pointDistributionChance: Map<number, number>): boolean {
         const acceptProbability = pointDistributionChance.get(moveScore);
         return acceptProbability ? acceptProbability > Math.random() : true;
     }
 
-    getMovesInRange(validMoves: EvaluatedPlacement[], request: WordFindingRequest): Map<number, EvaluatedPlacement[]> {
+    private getMovesInRange(validMoves: EvaluatedPlacement[], request: WordFindingRequest): Map<number, EvaluatedPlacement[]> {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         const foundMoves = new Map<number, EvaluatedPlacement[]>();
         for (const move of validMoves) {
@@ -175,7 +175,7 @@ export default class WordFindingService {
         return foundMoves;
     }
 
-    findMinRangeFrequency(request: WordFindingRequest): number {
+    private findMinRangeFrequency(request: WordFindingRequest): number {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
@@ -190,7 +190,7 @@ export default class WordFindingService {
         return minFrequency;
     }
 
-    findMoveRequirements(navigator: BoardNavigator, tileRackSize: number): MoveRequirements {
+    private findMoveRequirements(navigator: BoardNavigator, tileRackSize: number): MoveRequirements {
         const moveRequirements = {
             isPossible: true,
             minimumLength: this.findMinimumWordLength(navigator),
@@ -206,11 +206,11 @@ export default class WordFindingService {
         return moveRequirements;
     }
 
-    findMinimumWordLength(navigator: BoardNavigator): number {
+    private findMinimumWordLength(navigator: BoardNavigator): number {
         return INITIAL_TILE + navigator.moveUntil(Direction.Forward, () => navigator.verifyAllNeighbors(HAS_TILE) || navigator.square.isCenter);
     }
 
-    findTilesLeftLengthAtExtremity(navigator: BoardNavigator, tilesLeftSize: number): number {
+    private findTilesLeftLengthAtExtremity(navigator: BoardNavigator, tilesLeftSize: number): number {
         navigator.moveUntil(Direction.Forward, () => {
             if (navigator.isEmpty()) tilesLeftSize--;
             return tilesLeftSize === 0;
@@ -218,7 +218,7 @@ export default class WordFindingService {
         return tilesLeftSize;
     }
 
-    findSquareProperties(board: Board, square: Square, tileRackSize: number): SquareProperties {
+    private findSquareProperties(board: Board, square: Square, tileRackSize: number): SquareProperties {
         const navigator: BoardNavigator = new BoardNavigator(board, square.position, Orientation.Horizontal);
         return {
             square,
@@ -227,14 +227,14 @@ export default class WordFindingService {
         };
     }
 
-    attemptMove(squareProperties: SquareProperties, permutation: Tile[], validMoves: EvaluatedPlacement[]): void {
+    private attemptMove(squareProperties: SquareProperties, permutation: Tile[], validMoves: EvaluatedPlacement[]): void {
         let result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Horizontal);
         if (result) validMoves.push(result);
         result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Vertical);
         if (result) validMoves.push(result);
     }
 
-    attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {
+    private attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {
         const moveRequirements = this.getCorrespondingMovePossibility(squareProperties, orientation);
         if (moveRequirements.isPossible && this.isWithinRequirements(moveRequirements, permutation.length)) {
             try {
@@ -253,19 +253,19 @@ export default class WordFindingService {
         return undefined;
     }
 
-    extractRandomSquare(squares: Square[]): Square {
+    private extractRandomSquare(squares: Square[]): Square {
         return squares.splice(Math.floor(Math.random() * squares.length), 1)[0];
     }
 
-    getCorrespondingMovePossibility(squareProperties: SquareProperties, orientation: Orientation): MoveRequirements {
+    private getCorrespondingMovePossibility(squareProperties: SquareProperties, orientation: Orientation): MoveRequirements {
         return orientation === Orientation.Horizontal ? squareProperties.horizontal : squareProperties.vertical;
     }
 
-    isWithinRequirements(movePossibility: MoveRequirements, target: number): boolean {
+    private isWithinRequirements(movePossibility: MoveRequirements, target: number): boolean {
         return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
     }
 
-    combination(tiles: Tile[]) {
+    private combination(tiles: Tile[]) {
         const res: Tile[][] = [[]];
         let currentCombination;
         for (const tile of tiles) {
@@ -291,7 +291,7 @@ export default class WordFindingService {
         return res.filter((l) => l.length > 0);
     }
 
-    permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []): void {
+    private permuteTiles(tiles: Tile[], result: Tile[][], current: Tile[] = []): void {
         if (tiles.length === 0) {
             result.push(current);
             return;
@@ -306,7 +306,7 @@ export default class WordFindingService {
         }
     }
 
-    getRackPermutations(tiles: Tile[]): Tile[][] {
+    private getRackPermutations(tiles: Tile[]): Tile[][] {
         const result: Tile[][] = [];
         const tileRackPermutations: Tile[][] = this.combination(tiles);
         for (const permutation of tileRackPermutations) {
