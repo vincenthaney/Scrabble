@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { TEST_MAXIMUM_VALUE, TEST_MINIMUM_VALUE } from '@app/constants/virtual-player-tests-constants';
+import { TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
 import PointRange from '@app/classes/word-finding/point-range';
 import { AbstractVirtualPlayer } from './abstract-virtual-player';
 import * as chai from 'chai';
@@ -13,20 +13,13 @@ class TestClass extends AbstractVirtualPlayer {
     }
 
     findPointRange(): PointRange {
-        return {
-            minimum: TEST_MINIMUM_VALUE,
-            maximum: TEST_MAXIMUM_VALUE,
-        };
+        return TEST_POINT_RANGE;
     }
 }
 
 const gameId = 'testGameId';
 const playerId = 'testPlayerId';
 const playerName = 'ElScrabblo';
-const testPointRange: PointRange = {
-    minimum: TEST_MINIMUM_VALUE,
-    maximum: TEST_MAXIMUM_VALUE,
-};
 
 describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
@@ -84,7 +77,7 @@ describe('AbstractVirtualPlayer', () => {
         const testWordFindingRequest = abstractPlayer.generateWordFindingRequest();
         expect(testWordFindingRequest.numberOfWordsToFind).to.equal(1);
         expect(testWordFindingRequest.pointHistoric).to.deep.equal(abstractPlayer.pointHistoric);
-        expect(testWordFindingRequest.pointRange).to.deep.equal(testPointRange);
+        expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
     });
 
     // TO MODIFY WHEN SEND PAYLOAD IMPLEMENTED
