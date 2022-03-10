@@ -22,7 +22,13 @@ import { StringConversion } from '@app/utils/string-conversion';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Random } from '@app/utils/random';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { BLANK_TILE_REPLACEMENT_LETTER, HINT_AMOUNT_OF_WORDS, INITIAL_TILE, LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
+import {
+    BLANK_TILE_REPLACEMENT_LETTER,
+    HINT_AMOUNT_OF_WORDS,
+    INITIAL_TILE,
+    LONG_MOVE_TIME,
+    QUICK_MOVE_TIME,
+} from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 // wildcards converted only to 'E'
@@ -36,33 +42,44 @@ export default class WordFindingService {
     findWords(board: Board, tiles: Tile[], request: WordFindingRequest): EvaluatedPlacement[] {
         const startTime = new Date();
         let searchState = SearchState.Selective;
+        const placementEvaluationResults: PlacementEvaluationResults = {
+            foundMoves: [],
+            validMoves: [],
+            rejectedValidMoves: [],
+            pointDistributionChance: new Map(),
+        };
         this.wordExtraction = new WordExtraction(board);
         let chosenMoves: EvaluatedPlacement[] | undefined;
-        const validMoves: EvaluatedPlacement[] = [];
-        const rejectedValidMoves: RejectedMove[] = [];
-        let pointDistributionChance = new Map();
-        if (request.useCase === WordFindingUseCase.Beginner) pointDistributionChance = this.assignAcceptanceProbability(request);
+        // const pointDistributionChance = new Map();
+        // const validMoves: EvaluatedPlacement[] = [];
+        // const rejectedValidMoves: RejectedMove[] = [];
+        if (request.useCase === WordFindingUseCase.Beginner) {
+            placementEvaluationResults.pointDistributionChance = this.assignAcceptanceProbability(request);
+        }
 
         const rackPermutations = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
             const squareProperties = this.findSquareProperties(board, this.extractRandomSquare(emptySquares), tiles.length);
-            const foundMoves: EvaluatedPlacement[] = [];
-            this.attemptPermutations(rackPermutations, squareProperties, foundMoves);
+            // const foundMoves: EvaluatedPlacement[] = [];
+            placementEvaluationResults.foundMoves = this.attemptPermutations(rackPermutations, squareProperties);
+            // this.attemptPermutations(rackPermutations, squareProperties, foundMoves);
             searchState = this.updateSearchState(startTime);
-            chosenMoves = this.chooseMoves(searchState, request, { foundMoves, validMoves, rejectedValidMoves, pointDistributionChance });
+            chosenMoves = this.chooseMoves(searchState, request, placementEvaluationResults);
             if (chosenMoves) return chosenMoves;
         }
 
-        chosenMoves = this.chooseMoves(searchState, request, { foundMoves: [], validMoves, rejectedValidMoves, pointDistributionChance });
+        chosenMoves = this.chooseMoves(searchState, request, placementEvaluationResults);
         return chosenMoves ? chosenMoves : [];
     }
 
-    private attemptPermutations(rackPermutations: Tile[][], squareProperties: SquareProperties, foundMoves: EvaluatedPlacement[]): void {
+    private attemptPermutations(rackPermutations: Tile[][], squareProperties: SquareProperties): EvaluatedPlacement[] {
+        const foundMoves: EvaluatedPlacement[] = [];
         for (const permutation of rackPermutations) {
-            this.attemptMove(squareProperties, permutation, foundMoves);
+            foundMoves.concat(this.attemptMove(squareProperties, permutation));
         }
+        return foundMoves;
     }
 
     private chooseMoves(
@@ -227,11 +244,13 @@ export default class WordFindingService {
         };
     }
 
-    private attemptMove(squareProperties: SquareProperties, permutation: Tile[], validMoves: EvaluatedPlacement[]): void {
+    private attemptMove(squareProperties: SquareProperties, permutation: Tile[]): EvaluatedPlacement[] {
+        const validMoves: EvaluatedPlacement[] = [];
         let result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Horizontal);
         if (result) validMoves.push(result);
         result = this.attemptMoveDirection(squareProperties, permutation, Orientation.Vertical);
         if (result) validMoves.push(result);
+        return validMoves;
     }
 
     private attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {

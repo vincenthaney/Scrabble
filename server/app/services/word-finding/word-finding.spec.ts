@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -15,6 +17,7 @@ import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT
 import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 import {
+    MoveRequirements,
     PlacementEvaluationResults,
     RejectedMove,
     SearchState,
@@ -57,9 +60,9 @@ const DEFAULT_TILES_LEFT_SIZE = 7;
 const DEFAULT_SMALL_TILES_LEFT_SIZE = 3;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
-const DEFAULT_HORIZONTAL_PROPERTIES = { isPossible: true, minimumLength: 1, maximumLength: 2 };
-const DEFAULT_VERTICAL_PROPERTIES = { isPossible: true, minimumLength: 1, maximumLength: 3 };
-const DEFAULT_SQUARE_PROPERTIES = {
+const DEFAULT_HORIZONTAL_PROPERTIES: MoveRequirements = { isPossible: true, minimumLength: 1, maximumLength: 2 };
+const DEFAULT_VERTICAL_PROPERTIES: MoveRequirements = { isPossible: true, minimumLength: 1, maximumLength: 3 };
+const DEFAULT_SQUARE_PROPERTIES: SquareProperties = {
     square: DEFAULT_SQUARE_1,
     horizontal: DEFAULT_HORIZONTAL_PROPERTIES,
     vertical: DEFAULT_VERTICAL_PROPERTIES,
@@ -249,7 +252,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line dot-notation
             const spyVerifyWords = chai.spy.on(service['wordVerificationService'], 'verifyWords');
 
-            service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal);
+            service['attemptMoveDirection'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal);
             expect(spyGetCorrespondingMovePossibility).to.have.been.called;
             expect(spyIsWithin).to.have.been.called;
             assert(stubwordsToString.calledOnce);
@@ -270,7 +273,7 @@ describe('WordFindingservice', () => {
                 throw new Error();
             });
 
-            expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
+            expect(service['attemptMoveDirection'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
         });
 
         it('should return undefined if it isnt within the possible range', () => {
@@ -280,7 +283,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'isWithinRequirements', () => {
                 return false;
             });
-            expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
+            expect(service['attemptMoveDirection'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.be.undefined;
         });
 
         it('should return the current permutation as a WordPlacement if everything succeeds', () => {
@@ -303,7 +306,7 @@ describe('WordFindingservice', () => {
                 score: 13,
             };
 
-            expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.deep.equal(expected);
+            expect(service['attemptMoveDirection'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.deep.equal(expected);
             stubwordsToString.restore();
         });
     });
@@ -318,7 +321,7 @@ describe('WordFindingservice', () => {
             request.useCase = WordFindingUseCase.Hint;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'chooseMovesHint', () => {});
-            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
+            service['chooseMoves']({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
             expect(spy).to.have.been.called;
         });
 
@@ -326,7 +329,7 @@ describe('WordFindingservice', () => {
             request.useCase = WordFindingUseCase.Expert;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'chooseMovesExpert', () => {});
-            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
+            service['chooseMoves']({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
             expect(spy).to.have.been.called;
         });
 
@@ -334,16 +337,16 @@ describe('WordFindingservice', () => {
             request.useCase = WordFindingUseCase.Beginner;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'chooseMovesBeginner', () => {});
-            service.chooseMoves({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
+            service['chooseMoves']({} as unknown as SearchState, request, {} as unknown as PlacementEvaluationResults);
             expect(spy).to.have.been.called;
         });
     });
 
     describe('attemptPermutations', () => {
         it('should call attemptMove rackPermutations.length times', () => {
-            const spyAttemptMove = stub(service, 'attemptMove');
+            const spyAttemptMove = stub(service, <any>'attemptMove');
 
-            service.attemptPermutations([[], [], []], {} as unknown as SquareProperties, []);
+            service['attemptPermutations']([[], [], []], {} as unknown as SquareProperties);
             assert(spyAttemptMove.calledThrice);
         });
     });
@@ -356,7 +359,7 @@ describe('WordFindingservice', () => {
                 validMoves: DEFAULT_VALID_MOVES,
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.chooseMovesHint(info)?.length).to.equal(3);
+            expect(service['chooseMovesHint'](info)?.length).to.equal(3);
         });
 
         it('should return undefined if there are less than 3 moves', () => {
@@ -366,7 +369,7 @@ describe('WordFindingservice', () => {
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.chooseMovesHint(info)).to.be.undefined;
+            expect(service['chooseMovesHint'](info)).to.be.undefined;
         });
 
         it('should add foundMoves to validMoves ', () => {
@@ -376,7 +379,7 @@ describe('WordFindingservice', () => {
                 validMoves: DEFAULT_VALID_MOVES,
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            service.chooseMovesHint(info);
+            service['chooseMovesHint'](info);
             expect(info.validMoves.length).to.equal(DEFAULT_VALID_MOVES.length + SINGLE_VALID_MOVES.length);
         });
     });
@@ -395,7 +398,7 @@ describe('WordFindingservice', () => {
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.chooseMovesExpert(SearchState.Over, info)).to.deep.equal([expected]);
+            expect(service['chooseMovesExpert'](SearchState.Over, info)).to.deep.equal([expected]);
         });
 
         it('should return undefined if the searchState is not over', () => {
@@ -405,7 +408,7 @@ describe('WordFindingservice', () => {
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            expect(service.chooseMovesExpert(SearchState.Selective, info)).to.be.undefined;
+            expect(service['chooseMovesExpert'](SearchState.Selective, info)).to.be.undefined;
         });
 
         it('should add foundMoves to validMoves ', () => {
@@ -415,7 +418,7 @@ describe('WordFindingservice', () => {
                 validMoves: [{} as unknown as EvaluatedPlacement],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
-            service.chooseMovesExpert(SearchState.Over, info);
+            service['chooseMovesExpert'](SearchState.Over, info);
             expect(info.validMoves.length).to.equal(3);
         });
     });
@@ -441,7 +444,7 @@ describe('WordFindingservice', () => {
 
         it('should call getMovesInRange', () => {
             const spy = chai.spy.on(service, 'getMovesInRange');
-            service.chooseMovesBeginner(SearchState.Over, request, info);
+            service['chooseMovesBeginner'](SearchState.Over, request, info);
             expect(spy).to.have.been.called;
         });
 
@@ -452,7 +455,7 @@ describe('WordFindingservice', () => {
             const spyAcceptMove = chai.spy.on(service, 'isMoveAccepted', () => {
                 return true;
             });
-            expect(service.chooseMovesBeginner(SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
+            expect(service['chooseMovesBeginner'](SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
             expect(spyAcceptMove).to.have.been.called;
         });
 
@@ -476,7 +479,7 @@ describe('WordFindingservice', () => {
                 return false;
             });
             info.pointDistributionChance = pointDistributionChance;
-            expect(service.chooseMovesBeginner(SearchState.Selective, request, info)).to.be.undefined;
+            expect(service['chooseMovesBeginner'](SearchState.Selective, request, info)).to.be.undefined;
             expect(info.rejectedValidMoves).to.deep.equal(expected);
         });
 
@@ -495,7 +498,7 @@ describe('WordFindingservice', () => {
             info.pointDistributionChance = pointDistributionChance;
 
             const spy = chai.spy.on(service, 'getHighestAcceptChanceMove');
-            service.chooseMovesBeginner(SearchState.Unselective, request, info);
+            service['chooseMovesBeginner'](SearchState.Unselective, request, info);
             expect(spy).to.have.been.called();
         });
     });
@@ -511,7 +514,7 @@ describe('WordFindingservice', () => {
                 expected,
                 { acceptChance: 3, move: DEFAULT_MOVE_4 },
             ];
-            expect(service.getHighestAcceptChanceMove(rejectedMoves)).to.deep.equal(BEST_MOVE);
+            expect(service['getHighestAcceptChanceMove'](rejectedMoves)).to.deep.equal(BEST_MOVE);
         });
     });
 
@@ -523,7 +526,7 @@ describe('WordFindingservice', () => {
 
         it('should throw if there is no pointRange', () => {
             request.pointRange = undefined;
-            const result = () => service.getMovesInRange(SINGLE_VALID_MOVES, request);
+            const result = () => service['getMovesInRange'](SINGLE_VALID_MOVES, request);
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
@@ -533,7 +536,7 @@ describe('WordFindingservice', () => {
                 [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
                 [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
             ]);
-            expect(service.getMovesInRange(DEFAULT_VALID_MOVES, request)).to.deep.equal(expected);
+            expect(service['getMovesInRange'](DEFAULT_VALID_MOVES, request)).to.deep.equal(expected);
         });
     });
 
@@ -545,20 +548,20 @@ describe('WordFindingservice', () => {
 
         it('should throw if there is no pointRange', () => {
             request.pointRange = undefined;
-            const result = () => service.findMinRangeFrequency(request);
+            const result = () => service['findMinRangeFrequency'](request);
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
         it('should throw if there is no pointHistory', () => {
             request.pointHistory = undefined;
-            const result = () => service.findMinRangeFrequency(request);
+            const result = () => service['findMinRangeFrequency'](request);
             expect(result).to.Throw(NO_REQUEST_POINT_HISTORY);
         });
 
         it('should throw if there is an invalid pointRange', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.minimum = request.pointRange!.maximum + 1;
-            const result = () => service.findMinRangeFrequency(request);
+            const result = () => service['findMinRangeFrequency'](request);
             expect(result).to.Throw(INVALID_REQUEST_POINT_RANGE);
         });
 
@@ -567,7 +570,7 @@ describe('WordFindingservice', () => {
             request.pointRange!.minimum = 2;
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.maximum = 8;
-            expect(service.findMinRangeFrequency(request)).to.deep.equal(1);
+            expect(service['findMinRangeFrequency'](request)).to.deep.equal(1);
         });
 
         it('should return the correct maximum and minimum in the given range ', () => {
@@ -575,7 +578,7 @@ describe('WordFindingservice', () => {
             request.pointRange!.minimum = 0;
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.maximum = 20;
-            expect(service.findMinRangeFrequency(request)).to.deep.equal(1);
+            expect(service['findMinRangeFrequency'](request)).to.deep.equal(1);
         });
     });
 
@@ -587,20 +590,20 @@ describe('WordFindingservice', () => {
 
         it('should throw if there is no pointRange', () => {
             request.pointRange = undefined;
-            const result = () => service.assignAcceptanceProbability(request);
+            const result = () => service['assignAcceptanceProbability'](request);
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
         it('should throw if there is no pointHistory', () => {
             request.pointHistory = undefined;
-            const result = () => service.assignAcceptanceProbability(request);
+            const result = () => service['assignAcceptanceProbability'](request);
             expect(result).to.Throw(NO_REQUEST_POINT_HISTORY);
         });
 
         it('should throw if there is an invalid pointRange', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.minimum = request.pointRange!.maximum + 1;
-            const result = () => service.assignAcceptanceProbability(request);
+            const result = () => service['assignAcceptanceProbability'](request);
             expect(result).to.Throw(INVALID_REQUEST_POINT_RANGE);
         });
 
@@ -619,36 +622,34 @@ describe('WordFindingservice', () => {
                 [7, 1],
                 [8, 0.5],
             ]);
-            expect(service.assignAcceptanceProbability(request)).to.deep.equal(expected);
+            expect(service['assignAcceptanceProbability'](request)).to.deep.equal(expected);
         });
     });
 
     describe('attemptMove', () => {
         it('should call attemptMoveDirection', () => {
-            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection').returns(undefined);
-            const validMoves: EvaluatedPlacement[] = [];
-            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const stubAttemptMoveDirection = stub(service, <any>'attemptMoveDirection').returns(undefined);
+            service['attemptMove'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK);
             assert(stubAttemptMoveDirection.calledTwice);
         });
 
         it('should add the EvaluatedPlacement that are valid (0)', () => {
-            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const stubAttemptMoveDirection = stub(service, <any>'attemptMoveDirection');
             stubAttemptMoveDirection.onCall(0).returns({} as unknown as EvaluatedPlacement);
             stubAttemptMoveDirection.onCall(1).returns(undefined);
-            const validMoves: EvaluatedPlacement[] = [{} as unknown as EvaluatedPlacement];
-            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            expect(service['attemptMove'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK).length).to.equal(1);
             assert(stubAttemptMoveDirection.calledTwice);
-            expect(validMoves.length).to.equal(2);
         });
 
         it('should add the EvaluatedPlacement that are valid (1)', () => {
-            const stubAttemptMoveDirection = stub(service, 'attemptMoveDirection');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const stubAttemptMoveDirection = stub(service, <any>'attemptMoveDirection');
             stubAttemptMoveDirection.onCall(0).returns(undefined);
             stubAttemptMoveDirection.onCall(1).returns({} as unknown as EvaluatedPlacement);
-            const validMoves: EvaluatedPlacement[] = [{} as unknown as EvaluatedPlacement];
-            service.attemptMove(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, validMoves);
+            expect(service['attemptMove'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK).length).to.equal(1);
             assert(stubAttemptMoveDirection.calledTwice);
-            expect(validMoves.length).to.equal(2);
         });
     });
 
@@ -657,30 +658,30 @@ describe('WordFindingservice', () => {
             const spy = chai.spy.on(navigator, 'moveUntil', () => {
                 return true;
             });
-            service.findMinimumWordLength(navigator);
+            service['findMinimumWordLength'](navigator);
             expect(spy).to.have.been.called;
         });
 
         it('should return POSITIVE_INFINITY if there is no neighbor', () => {
             navigator = navigator.switchOrientation();
-            expect(service.findMinimumWordLength(navigator)).to.equal(Number.POSITIVE_INFINITY);
+            expect(service['findMinimumWordLength'](navigator)).to.equal(Number.POSITIVE_INFINITY);
         });
 
         it('should return the correct amount of tiles if there is a neighbor on the side', () => {
             navigator = new BoardNavigator(board, new Position(0, 1), Orientation.Horizontal);
-            expect(service.findMinimumWordLength(navigator)).to.equal(2);
+            expect(service['findMinimumWordLength'](navigator)).to.equal(2);
         });
 
         it('should return the correct amount of tiles if there the center', () => {
             board.grid[2][0].isCenter = true;
             navigator = new BoardNavigator(board, new Position(0, 0), Orientation.Horizontal);
-            expect(service.findMinimumWordLength(navigator)).to.equal(3);
+            expect(service['findMinimumWordLength'](navigator)).to.equal(3);
         });
 
         it('should return the correct amount of tiles if there is a neighbor on the path', () => {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             navigator = new BoardNavigator(board, new Position(1, 4), Orientation.Vertical);
-            expect(service.findMinimumWordLength(navigator)).to.equal(3);
+            expect(service['findMinimumWordLength'](navigator)).to.equal(3);
         });
     });
 
@@ -689,30 +690,30 @@ describe('WordFindingservice', () => {
             const spy = chai.spy.on(navigator, 'moveUntil', () => {
                 return true;
             });
-            service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE);
+            service['findTilesLeftLengthAtExtremity'](navigator, DEFAULT_TILES_LEFT_SIZE);
             expect(spy).to.have.been.called;
         });
 
         it('should return 0 if there are enough empty Squares', () => {
             navigator = new BoardNavigator(board, new Position(0, 0), Orientation.Horizontal);
-            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_SMALL_TILES_LEFT_SIZE)).to.equal(0);
+            expect(service['findTilesLeftLengthAtExtremity'](navigator, DEFAULT_SMALL_TILES_LEFT_SIZE)).to.equal(0);
         });
 
         it('should return the amount of empty Squares in the direction', () => {
             navigator = new BoardNavigator(board, new Position(0, 0), Orientation.Horizontal);
-            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(
+            expect(service['findTilesLeftLengthAtExtremity'](navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(
                 DEFAULT_TILES_LEFT_SIZE - (board.getSize().x - 1),
             );
         });
 
         it('should return the amount of empty Squares in the direction', () => {
             navigator = new BoardNavigator(board, new Position(0, 2), Orientation.Vertical);
-            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
+            expect(service['findTilesLeftLengthAtExtremity'](navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
         });
 
         it('should return the amount of empty Squares in the direction', () => {
             navigator = new BoardNavigator(board, new Position(2, 3), Orientation.Horizontal);
-            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
+            expect(service['findTilesLeftLengthAtExtremity'](navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
         });
     });
 
@@ -724,7 +725,7 @@ describe('WordFindingservice', () => {
             const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return 0;
             });
-            service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE);
+            service['findMoveRequirements'](navigator, DEFAULT_TILES_LEFT_SIZE);
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyfindTilesLeftLengthAtExtremity).to.have.been.called;
         });
@@ -736,7 +737,7 @@ describe('WordFindingservice', () => {
             const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return 0;
             });
-            expect(service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE).isPossible).to.be.false;
+            expect(service['findMoveRequirements'](navigator, DEFAULT_TILES_LEFT_SIZE).isPossible).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyfindTilesLeftLengthAtExtremity).not.to.have.been.called;
         });
@@ -748,7 +749,7 @@ describe('WordFindingservice', () => {
             const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return 0;
             });
-            expect(service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE).isPossible).to.be.false;
+            expect(service['findMoveRequirements'](navigator, DEFAULT_TILES_LEFT_SIZE).isPossible).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
             expect(spyfindTilesLeftLengthAtExtremity).not.to.have.been.called;
         });
@@ -763,7 +764,7 @@ describe('WordFindingservice', () => {
             const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return maxLength;
             });
-            expect(service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
+            expect(service['findMoveRequirements'](navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
             expect(spyfindTilesLeftLengthAtExtremity).to.have.been.called.with(navigator, DEFAULT_TILES_LEFT_SIZE - minLength);
         });
     });
@@ -771,26 +772,27 @@ describe('WordFindingservice', () => {
     describe('findSquareProperties', () => {
         it('should call findMoveRequirements twice', () => {
             const spy = chai.spy.on(service, 'findMoveRequirements');
-            service.findSquareProperties(board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE);
+            service['findSquareProperties'](board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE);
             expect(spy).to.have.been.called.twice;
         });
 
         it('should return the correct SquareProperties  ', () => {
-            const stubfindMoveRequirements = stub(service, 'findMoveRequirements');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const stubfindMoveRequirements = stub(service, <any>'findMoveRequirements');
             stubfindMoveRequirements.onCall(0).returns(DEFAULT_HORIZONTAL_PROPERTIES);
             stubfindMoveRequirements.onCall(1).returns(DEFAULT_VERTICAL_PROPERTIES);
 
             chai.spy.on(BoardNavigator, 'isEmpty', () => {
                 return true;
             });
-            expect(service.findSquareProperties(board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(DEFAULT_SQUARE_PROPERTIES);
+            expect(service['findSquareProperties'](board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(DEFAULT_SQUARE_PROPERTIES);
         });
     });
 
     describe('extractRandomSquare', () => {
         it('should remove 1 element form array and return it', () => {
             const arrayCopy: Square[] = JSON.parse(JSON.stringify(DEFAULT_SQUARE_ARRAY));
-            const removedSquare = service.extractRandomSquare(arrayCopy);
+            const removedSquare = service['extractRandomSquare'](arrayCopy);
             expect(arrayCopy.length).to.equal(DEFAULT_SQUARE_ARRAY.length - 1);
             expect(DEFAULT_SQUARE_ARRAY.some((square) => JSON.stringify(square) === JSON.stringify(removedSquare))).to.be.true;
             expect(arrayCopy.includes(removedSquare)).to.be.false;
@@ -799,13 +801,13 @@ describe('WordFindingservice', () => {
 
     describe('getCorrespondingMovePossibility', () => {
         it('should the horizontal move property if asked', () => {
-            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
+            expect(service['getCorrespondingMovePossibility'](DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
                 DEFAULT_SQUARE_PROPERTIES.horizontal,
             );
         });
 
         it('should the vertical move property if asked', () => {
-            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
+            expect(service['getCorrespondingMovePossibility'](DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
                 DEFAULT_SQUARE_PROPERTIES.vertical,
             );
         });
@@ -813,13 +815,13 @@ describe('WordFindingservice', () => {
 
     describe('getCorrespondingMovePossibility', () => {
         it('should get the horizontal move property if asked', () => {
-            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
+            expect(service['getCorrespondingMovePossibility'](DEFAULT_SQUARE_PROPERTIES, Orientation.Horizontal)).to.deep.equal(
                 DEFAULT_SQUARE_PROPERTIES.horizontal,
             );
         });
 
         it('should get the vertical move property if asked', () => {
-            expect(service.getCorrespondingMovePossibility(DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
+            expect(service['getCorrespondingMovePossibility'](DEFAULT_SQUARE_PROPERTIES, Orientation.Vertical)).to.deep.equal(
                 DEFAULT_SQUARE_PROPERTIES.vertical,
             );
         });
@@ -827,28 +829,28 @@ describe('WordFindingservice', () => {
 
     describe('isWithinRequirements', () => {
         it('should return true if the target if within the MoveRequirements range', () => {
-            expect(service.isWithinRequirements(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
+            expect(service['isWithinRequirements'](DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
         });
 
         it('should return false if the target if within the MoveRequirements range', () => {
-            expect(service.isWithinRequirements(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
+            expect(service['isWithinRequirements'](DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
         });
     });
 
     describe('updateSearchState', () => {
         it('should return SearchState.Over if the time exceeds the limit', () => {
             const OVER_DATE = new Date(Date.now() - LONG_MOVE_TIME - 100);
-            expect(service.updateSearchState(OVER_DATE)).to.deep.equal(SearchState.Over);
+            expect(service['updateSearchState'](OVER_DATE)).to.deep.equal(SearchState.Over);
         });
 
         it('should return SearchState.Unselective if the time exceeds the limit short time limit but not the long time limit', () => {
             const UNSELECTIVE_DATE = new Date(Date.now() - QUICK_MOVE_TIME - 100);
-            expect(service.updateSearchState(UNSELECTIVE_DATE)).to.deep.equal(SearchState.Unselective);
+            expect(service['updateSearchState'](UNSELECTIVE_DATE)).to.deep.equal(SearchState.Unselective);
         });
 
         it('should return SearchState.Selective if the time does not exceed the short time limit', () => {
             const START_DATE = new Date(Date.now());
-            expect(service.updateSearchState(START_DATE)).to.deep.equal(SearchState.Selective);
+            expect(service['updateSearchState'](START_DATE)).to.deep.equal(SearchState.Selective);
         });
     });
 
@@ -860,7 +862,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             const map = new Map([[2, 0.5]]);
             for (let i = 0; i < iterations; i++) {
-                const tmp = service.isMoveAccepted(2, map);
+                const tmp = service['isMoveAccepted'](2, map);
                 if (tmp !== result && i !== 0) {
                     sameResult = false;
                     break;
@@ -877,7 +879,7 @@ describe('WordFindingservice', () => {
             const iterations = 10;
             const map = new Map([[2, 1]]);
             for (let i = 0; i < iterations; i++) {
-                const tmp = service.isMoveAccepted(2, map);
+                const tmp = service['isMoveAccepted'](2, map);
                 if (tmp !== result && i !== 0) {
                     sameResult = false;
                     break;
@@ -892,17 +894,17 @@ describe('WordFindingservice', () => {
     describe('combination', () => {
         it('should return an empty array if the rack is empty (0 tiles)', () => {
             const expected: Tile[][] = [];
-            expect(service.combination(EMPTY_TILE_RACK)).to.deep.equal(expected);
+            expect(service['combination'](EMPTY_TILE_RACK)).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (1 tile)', () => {
             const expected: Tile[][] = [[DEFAULT_TILE_A]];
-            expect(service.combination(SINGLE_TILE_TILE_RACK)).to.deep.equal(expected);
+            expect(service['combination'](SINGLE_TILE_TILE_RACK)).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (blank tile)', () => {
             const expected: Tile[][] = [[DEFAULT_TILE_BLANK_E]];
-            expect(service.combination([DEFAULT_TILE_WILD])).to.deep.equal(expected);
+            expect(service['combination']([DEFAULT_TILE_WILD])).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (3 tiles)', () => {
@@ -915,7 +917,7 @@ describe('WordFindingservice', () => {
                 [DEFAULT_TILE_B, DEFAULT_TILE_C],
                 [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C],
             ];
-            expect(service.combination(SMALL_TILE_RACK)).to.deep.equal(expected);
+            expect(service['combination'](SMALL_TILE_RACK)).to.deep.equal(expected);
         });
     });
 
@@ -923,14 +925,14 @@ describe('WordFindingservice', () => {
         it('should result should be an empty array if the rack is empty (0 tiles)', () => {
             const expected: Tile[][] = [[]];
             const result: Tile[][] = [];
-            service.permuteTiles(EMPTY_TILE_RACK, result);
+            service['permuteTiles'](EMPTY_TILE_RACK, result);
             expect(result).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (1 tile)', () => {
             const expected: Tile[][] = [[DEFAULT_TILE_A]];
             const result: Tile[][] = [];
-            service.permuteTiles(SINGLE_TILE_TILE_RACK, result);
+            service['permuteTiles'](SINGLE_TILE_TILE_RACK, result);
             expect(result).to.deep.equal(expected);
         });
 
@@ -944,7 +946,7 @@ describe('WordFindingservice', () => {
                 [DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_B],
                 [DEFAULT_TILE_C, DEFAULT_TILE_B, DEFAULT_TILE_A],
             ];
-            service.permuteTiles(SMALL_TILE_RACK, result);
+            service['permuteTiles'](SMALL_TILE_RACK, result);
             expect(result).to.deep.equal(expected);
         });
     });
@@ -953,20 +955,20 @@ describe('WordFindingservice', () => {
         it('should call combination and permuteTiles', () => {
             const spyCombination = chai.spy.on(service, 'combination');
             const spyPermuteTiles = chai.spy.on(service, 'permuteTiles');
-            service.getRackPermutations(SINGLE_TILE_TILE_RACK);
+            service['getRackPermutations'](SINGLE_TILE_TILE_RACK);
             expect(spyCombination).to.have.been.called;
             expect(spyPermuteTiles).to.have.been.called;
         });
 
         it('should return an empty array if the tile rack is empty', () => {
             const expected: Tile[][] = [];
-            const result: Tile[][] = service.getRackPermutations(EMPTY_TILE_RACK);
+            const result: Tile[][] = service['getRackPermutations'](EMPTY_TILE_RACK);
             expect(result).to.deep.equal(expected);
         });
 
         it('should return an array containing the only tile in the rack', () => {
             const expected: Tile[][] = [SINGLE_TILE_TILE_RACK];
-            const result: Tile[][] = service.getRackPermutations(SINGLE_TILE_TILE_RACK);
+            const result: Tile[][] = service['getRackPermutations'](SINGLE_TILE_TILE_RACK);
 
             expect(result).to.deep.equal(expected);
         });
@@ -989,7 +991,7 @@ describe('WordFindingservice', () => {
                 [DEFAULT_TILE_C, DEFAULT_TILE_A, DEFAULT_TILE_B],
                 [DEFAULT_TILE_C, DEFAULT_TILE_B, DEFAULT_TILE_A],
             ];
-            const result: Tile[][] = service.getRackPermutations(SMALL_TILE_RACK);
+            const result: Tile[][] = service['getRackPermutations'](SMALL_TILE_RACK);
             expect(result).to.deep.equal(expected);
         });
 
@@ -998,7 +1000,7 @@ describe('WordFindingservice', () => {
             for (let tilesToChoose = BIG_TILE_RACK.length; tilesToChoose > 0; tilesToChoose--) {
                 expectedLength += permutationAmount(BIG_TILE_RACK.length, tilesToChoose);
             }
-            const result: Tile[][] = service.getRackPermutations(BIG_TILE_RACK);
+            const result: Tile[][] = service['getRackPermutations'](BIG_TILE_RACK);
             expect(result.length).to.deep.equal(expectedLength);
         });
     });
