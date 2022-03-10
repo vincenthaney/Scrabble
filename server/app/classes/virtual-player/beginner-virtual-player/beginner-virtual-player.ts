@@ -29,27 +29,22 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     findAction(): ActionData {
         const randomAction = Math.random();
         if (randomAction <= PASS_ACTION_THRESHOLD) {
-            return ActionPass.getData();
-        } else if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
-            return ActionExchange.getData(this.tiles);
-        } else {
-            const evaluatedPlacement = this.createWordFindingPlacement();
-            if (evaluatedPlacement) {
-                this.updateHistoric(evaluatedPlacement);
-                return ActionPlace.getData(evaluatedPlacement);
-            } else {
-                return ActionPass.getData();
-            }
+            return ActionPass.createActionData();
         }
+        if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
+            return ActionExchange.createActionData(this.tiles);
+        }
+        const evaluatedPlacement = this.createWordFindingPlacement();
+        if (evaluatedPlacement) {
+            this.updateHistoric(evaluatedPlacement);
+            return ActionPlace.createActionData(evaluatedPlacement);
+        }
+        return ActionPass.createActionData();
     }
 
     updateHistoric(evaluatedPlacement: EvaluatedPlacement): void {
         let scoreCount = this.pointHistoric.get(evaluatedPlacement.score);
-        if (scoreCount) {
-            this.pointHistoric.set(evaluatedPlacement.score, ++scoreCount);
-        } else {
-            this.pointHistoric.set(evaluatedPlacement.score, 1);
-        }
+        this.pointHistoric.set(evaluatedPlacement.score, scoreCount ? ++scoreCount : 1);
     }
 
     getGameBoard(gameId: string, playerId: string): Board {
