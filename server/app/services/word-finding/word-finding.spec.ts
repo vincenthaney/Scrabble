@@ -541,7 +541,7 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('findMinRangeFrequency', () => {
+    describe('findMinFrequencyInRange', () => {
         let request: WordFindingRequest;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
@@ -549,20 +549,20 @@ describe('WordFindingservice', () => {
 
         it('should throw if there is no pointRange', () => {
             request.pointRange = undefined;
-            const result = () => service['findMinRangeFrequency'](request);
+            const result = () => service['findMinFrequencyInRange'](request);
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
         it('should throw if there is no pointHistory', () => {
             request.pointHistory = undefined;
-            const result = () => service['findMinRangeFrequency'](request);
+            const result = () => service['findMinFrequencyInRange'](request);
             expect(result).to.Throw(NO_REQUEST_POINT_HISTORY);
         });
 
         it('should throw if there is an invalid pointRange', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.minimum = request.pointRange!.maximum + 1;
-            const result = () => service['findMinRangeFrequency'](request);
+            const result = () => service['findMinFrequencyInRange'](request);
             expect(result).to.Throw(INVALID_REQUEST_POINT_RANGE);
         });
 
@@ -571,7 +571,7 @@ describe('WordFindingservice', () => {
             request.pointRange!.minimum = 2;
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.maximum = 8;
-            expect(service['findMinRangeFrequency'](request)).to.deep.equal(1);
+            expect(service['findMinFrequencyInRange'](request)).to.deep.equal(1);
         });
 
         it('should return the correct maximum and minimum in the given range ', () => {
@@ -579,7 +579,7 @@ describe('WordFindingservice', () => {
             request.pointRange!.minimum = 0;
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.maximum = 20;
-            expect(service['findMinRangeFrequency'](request)).to.deep.equal(1);
+            expect(service['findMinFrequencyInRange'](request)).to.deep.equal(1);
         });
     });
 
@@ -892,20 +892,20 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('combination', () => {
+    describe('getTilesCombinations', () => {
         it('should return an empty array if the rack is empty (0 tiles)', () => {
             const expected: Tile[][] = [];
-            expect(service['combination'](EMPTY_TILE_RACK)).to.deep.equal(expected);
+            expect(service['getTilesCombinations'](EMPTY_TILE_RACK)).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (1 tile)', () => {
             const expected: Tile[][] = [[DEFAULT_TILE_A]];
-            expect(service['combination'](SINGLE_TILE_TILE_RACK)).to.deep.equal(expected);
+            expect(service['getTilesCombinations'](SINGLE_TILE_TILE_RACK)).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (blank tile)', () => {
             const expected: Tile[][] = [[DEFAULT_TILE_BLANK_E]];
-            expect(service['combination']([DEFAULT_TILE_WILD])).to.deep.equal(expected);
+            expect(service['getTilesCombinations']([DEFAULT_TILE_WILD])).to.deep.equal(expected);
         });
 
         it('should return all combinations of the given tiles (3 tiles)', () => {
@@ -918,7 +918,7 @@ describe('WordFindingservice', () => {
                 [DEFAULT_TILE_B, DEFAULT_TILE_C],
                 [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C],
             ];
-            expect(service['combination'](SMALL_TILE_RACK)).to.deep.equal(expected);
+            expect(service['getTilesCombinations'](SMALL_TILE_RACK)).to.deep.equal(expected);
         });
     });
 
@@ -953,8 +953,8 @@ describe('WordFindingservice', () => {
     });
 
     describe('getRackPermutations', () => {
-        it('should call combination and permuteTiles', () => {
-            const spyCombination = chai.spy.on(service, 'combination');
+        it('should call getTilesCombinations and permuteTiles', () => {
+            const spyCombination = chai.spy.on(service, 'getTilesCombinations');
             const spyPermuteTiles = chai.spy.on(service, 'permuteTiles');
             service['getRackPermutations'](SINGLE_TILE_TILE_RACK);
             expect(spyCombination).to.have.been.called;

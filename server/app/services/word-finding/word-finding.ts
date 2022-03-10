@@ -142,7 +142,7 @@ export default class WordFindingService {
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
-        const minFrequency = this.findMinRangeFrequency(request);
+        const minFrequency = this.findMinFrequencyInRange(request);
         const scoreChanceDistribution = new Map<number, number>();
 
         for (let score = request.pointRange.minimum; score <= request.pointRange.maximum; score++) {
@@ -188,7 +188,7 @@ export default class WordFindingService {
         return foundMoves;
     }
 
-    private findMinRangeFrequency(request: WordFindingRequest): number {
+    private findMinFrequencyInRange(request: WordFindingRequest): number {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
@@ -261,7 +261,7 @@ export default class WordFindingService {
                     startPosition: squareProperties.square.position,
                     score: this.scoreCalculatorService.calculatePoints(createdWords) + this.scoreCalculatorService.bonusPoints(permutation),
                 };
-                // Try to play the current move, if an error is throw, it is invalid and do nothing
+                // Try to play the current move, if an error is thrown, it is invalid and do nothing
                 // eslint-disable-next-line no-empty
             } catch (exception) {}
         }
@@ -280,7 +280,7 @@ export default class WordFindingService {
         return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
     }
 
-    private combination(tiles: Tile[]) {
+    private getTilesCombinations(tiles: Tile[]) {
         const res: Tile[][] = [[]];
         let currentCombination;
         for (const tile of tiles) {
@@ -322,7 +322,7 @@ export default class WordFindingService {
 
     private getRackPermutations(tiles: Tile[]): Tile[][] {
         const result: Tile[][] = [];
-        const tileRackPermutations: Tile[][] = this.combination(tiles);
+        const tileRackPermutations: Tile[][] = this.getTilesCombinations(tiles);
         for (const permutation of tileRackPermutations) {
             this.permuteTiles(permutation, result);
         }
