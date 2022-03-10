@@ -95,13 +95,11 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     getPlayer1(): AbstractPlayer {
-        if (!this.gameService.player1) return new Player('', 'Player1', []);
-        return this.gameService.player1;
+        return !this.gameService.player1 ? new Player('', 'Player1', []) : this.gameService.player1;
     }
 
     getPlayer2(): AbstractPlayer {
-        if (!this.gameService.player2) return new Player('', 'Player2', []);
-        return this.gameService.player2;
+        return !this.gameService.player2 ? new Player('', 'Player2', []) : this.gameService.player2;
     }
 
     private createTimer(length: number): Observable<number> {
