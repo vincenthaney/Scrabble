@@ -189,7 +189,7 @@ describe('WordFindingservice', () => {
             const spyGetDesiredSquares = chai.spy.on(service, 'getDesiredSquares', () => {
                 return DEFAULT_SQUARE_ARRAY;
             });
-            const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
+            const spyExtractRandomSquare = chai.spy.on(service, 'extractRandomSquare');
             const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
             const spyAttemptPermutations = chai.spy.on(service, 'attemptPermutations');
             const spyChooseMove = chai.spy.on(service, 'chooseMove');
@@ -197,7 +197,7 @@ describe('WordFindingservice', () => {
             service.findWords(board, BIG_TILE_RACK, request);
             expect(spyGetRackPermutations).to.have.been.called;
             expect(spyGetDesiredSquares).to.have.been.called;
-            expect(spyGetRandomSquare).to.have.been.called;
+            expect(spyExtractRandomSquare).to.have.been.called;
             expect(spyFindSquareProperties).to.have.been.called;
             expect(spyAttemptPermutations).to.have.been.called;
             expect(spyChooseMove).to.have.been.called;
@@ -212,7 +212,7 @@ describe('WordFindingservice', () => {
             const spyGetDesiredSquares = chai.spy.on(service, 'getDesiredSquares', () => {
                 return DEFAULT_SQUARE_ARRAY;
             });
-            const spyGetRandomSquare = chai.spy.on(service, 'getRandomSquare');
+            const spyExtractRandomSquare = chai.spy.on(service, 'extractRandomSquare');
             const spyFindSquareProperties = chai.spy.on(service, 'findSquareProperties');
             const spyAttemptPermutations = chai.spy.on(service, 'attemptPermutations');
             const spyEvaluate = chai.spy.on(service, 'chooseMoves');
@@ -220,7 +220,7 @@ describe('WordFindingservice', () => {
             service.findWords(board, BIG_TILE_RACK, request);
             expect(spyGetRackPermutations).to.have.been.called;
             expect(spyGetDesiredSquares).to.have.been.called;
-            expect(spyGetRandomSquare).not.to.have.been.called;
+            expect(spyExtractRandomSquare).not.to.have.been.called;
             expect(spyFindSquareProperties).not.to.have.been.called;
             expect(spyAttemptPermutations).not.to.have.been.called;
             expect(spyEvaluate).to.have.been.called;
@@ -787,10 +787,10 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('getRandomSquare', () => {
+    describe('extractRandomSquare', () => {
         it('should remove 1 element form array and return it', () => {
             const arrayCopy: Square[] = JSON.parse(JSON.stringify(DEFAULT_SQUARE_ARRAY));
-            const removedSquare = service.getRandomSquare(arrayCopy);
+            const removedSquare = service.extractRandomSquare(arrayCopy);
             expect(arrayCopy.length).to.equal(DEFAULT_SQUARE_ARRAY.length - 1);
             expect(DEFAULT_SQUARE_ARRAY.some((square) => JSON.stringify(square) === JSON.stringify(removedSquare))).to.be.true;
             expect(arrayCopy.includes(removedSquare)).to.be.false;

@@ -47,7 +47,7 @@ export default class WordFindingService {
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
-            const squareProperties = this.findSquareProperties(board, this.getRandomSquare(emptySquares), tiles.length);
+            const squareProperties = this.findSquareProperties(board, this.extractRandomSquare(emptySquares), tiles.length);
             const foundMoves: EvaluatedPlacement[] = [];
             this.attemptPermutations(rackPermutations, squareProperties, foundMoves);
             searchState = this.updateSearchState(startTime);
@@ -253,7 +253,7 @@ export default class WordFindingService {
         return undefined;
     }
 
-    getRandomSquare(squares: Square[]): Square {
+    extractRandomSquare(squares: Square[]): Square {
         return squares.splice(Math.floor(Math.random() * squares.length), 1)[0];
     }
 
