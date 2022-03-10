@@ -186,6 +186,32 @@ describe('GamePageComponent', () => {
             expect(component.isLocalPlayerTurn).toBeTrue();
         });
     });
+
+    describe('handlePlayerLeaves', () => {
+        it('should reset gameServiceId', () => {
+            spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
+                return;
+            });
+            gameServiceMock.gameId = 'something';
+            component['handlePlayerLeaves']();
+            expect(gameServiceMock.gameId).toEqual('');
+        });
+
+        it('should call playerLeavesService.handleLocalPlayerLeavesGame', () => {
+            const handleLocalPlayerLeavesGameSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
+                return;
+            });
+            component['handlePlayerLeaves']();
+            expect(handleLocalPlayerLeavesGameSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('changeTileFontSize', () => {
+        beforeEach(() => {
+            component.tileRackComponent = jasmine.createSpyObj('MockTileRackComponent', ['tileFontSize']);
+            component.boardComponent = jasmine.createSpyObj('MockBoardComponent', ['tileFontSize']);
+        });
+
         it('should call changeTileFontSize with smaller when - button is clicked ', () => {
             const spy = spyOn(component, 'changeTileFontSize');
             const minusButton = fixture.debugElement.nativeElement.querySelector('#minus-button');
