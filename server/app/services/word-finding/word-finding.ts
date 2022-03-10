@@ -70,12 +70,16 @@ export default class WordFindingService {
         request: WordFindingRequest,
         placementEvaluationResults: PlacementEvaluationResults,
     ): EvaluatedPlacement[] | undefined {
-        if (request.useCase === WordFindingUseCase.Beginner) {
-            return this.chooseMovesBeginner(searchState, request, placementEvaluationResults);
-        } else if (request.useCase === WordFindingUseCase.Hint) {
-            return this.chooseMovesHint(placementEvaluationResults);
-        } else {
-            return this.chooseMovesExpert(searchState, placementEvaluationResults);
+        switch (request.useCase) {
+            case WordFindingUseCase.Beginner: {
+                return this.chooseMovesBeginner(searchState, request, placementEvaluationResults);
+            }
+            case WordFindingUseCase.Expert: {
+                return this.chooseMovesExpert(searchState, placementEvaluationResults);
+            }
+            case WordFindingUseCase.Hint: {
+                return this.chooseMovesHint(placementEvaluationResults);
+            }
         }
     }
 
