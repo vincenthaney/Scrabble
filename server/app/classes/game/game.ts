@@ -88,7 +88,7 @@ export default class Game {
     }
 
     getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
-        if (this.player1.id === playerId || this.player2.id === playerId) {
+        if (this.isPlayerFromGame(playerId)) {
             const players: Player[] = [this.player1, this.player2];
             return isRequestingPlayer ? players.filter((player) => player.id === playerId)[0] : players.filter((player) => player.id !== playerId)[0];
         }
@@ -178,5 +178,9 @@ export default class Game {
             round: roundData,
         };
         return startMultiplayerGameData;
+    }
+
+    private isPlayerFromGame(playerId: string): boolean {
+        return this.player1.id === playerId || this.player2.id === playerId;
     }
 }
