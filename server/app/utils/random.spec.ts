@@ -11,21 +11,20 @@ describe('random -> getRandomElementsFromArray', () => {
     });
 
     it('should return the entire array if the desired length is larger than the array.length', () => {
-        const desiredElements = 10;
-        expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, desiredElements)).to.deep.equal(DEFAULT_ARRAY);
+        expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, DEFAULT_ARRAY.length + 1)).to.deep.equal(DEFAULT_ARRAY);
     });
 
     it('should not always return the same element', () => {
-        let result;
+        let result: string | undefined;
         let sameResult = true;
         const iterations = 100;
         for (let i = 0; i < iterations; i++) {
-            const tmp = Random.getRandomElementsFromArray(DEFAULT_ARRAY);
-            if (tmp[0] !== result && i !== 0) {
+            const currentRandomSelection = Random.getRandomElementsFromArray(DEFAULT_ARRAY);
+            if (currentRandomSelection[0] !== result && i !== 0) {
                 sameResult = false;
                 break;
             } else {
-                result = tmp[0];
+                result = currentRandomSelection[0];
             }
         }
         expect(sameResult).to.be.false;
