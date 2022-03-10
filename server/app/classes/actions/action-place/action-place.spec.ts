@@ -137,7 +137,7 @@ describe('ActionPlace', () => {
         const actionPayloadSpy = spy.on(ActionPlace, 'createActionPlacePayload', () => {
             return testEvaluatedPlacement;
         });
-        ActionPlace.getData(testEvaluatedPlacement);
+        ActionPlace.createActionData(testEvaluatedPlacement);
         expect(actionPayloadSpy).to.have.been.called();
     });
 

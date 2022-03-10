@@ -15,7 +15,7 @@ export default class ActionExchange extends ActionPlay {
         this.tilesToExchange = tilesToExchange;
     }
 
-    static getData(tiles: Tile[]): ActionData {
+    static createActionData(tiles: Tile[]): ActionData {
         return {
             type: ActionType.EXCHANGE,
             payload: this.createActionExchangePayload(tiles),

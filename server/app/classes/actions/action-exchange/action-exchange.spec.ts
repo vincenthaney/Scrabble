@@ -55,7 +55,7 @@ describe('ActionExchange', () => {
             const actionExchangeSpy = spy.on(ActionExchange, 'createActionExchangePayload', () => {
                 return;
             });
-            ActionExchange.getData(TEST_TILES);
+            ActionExchange.createActionData(TEST_TILES);
             expect(actionExchangeSpy).to.have.been.called();
         });
 

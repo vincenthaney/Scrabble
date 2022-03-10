@@ -32,7 +32,7 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator = Container.get(WordsVerificationService);
     }
 
-    static getData(evaluatedPlacement: EvaluatedPlacement): ActionData {
+    static createActionData(evaluatedPlacement: EvaluatedPlacement): ActionData {
         return {
             type: ActionType.PLACE,
             payload: this.createActionPlacePayload(evaluatedPlacement),

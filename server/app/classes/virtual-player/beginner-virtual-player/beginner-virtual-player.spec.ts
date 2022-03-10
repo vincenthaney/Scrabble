@@ -80,15 +80,15 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     describe('Find Action with RANDOM_VALUE_PASS', () => {
-        it('findAction should call ActionPass.getData() if random is RANDOM_VALUE_PASS', () => {
+        it('findAction should call ActionPass.createActionData() if random is RANDOM_VALUE_PASS', () => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PASS;
             });
-            const getDataPassSpy = spy.on(ActionPass, 'getData', () => {
+            const createActionDataPassSpy = spy.on(ActionPass, 'createActionData', () => {
                 return;
             });
             beginnerVirtualPlayer.findAction();
-            expect(getDataPassSpy).to.have.been.called();
+            expect(createActionDataPassSpy).to.have.been.called();
         });
     });
 
@@ -107,34 +107,34 @@ describe('BeginnerVirtualPlayer', () => {
             expect(createWordSpy).to.have.been.called();
         });
 
-        it('findAction should call ActionPass.getData because not possible placements', () => {
+        it('findAction should call ActionPass.createActionData if no possible placements are found', () => {
             const testEmptyEvaluatedPlacement = undefined;
             spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
                 return testEmptyEvaluatedPlacement;
             });
-            const getDataPassSpy = spy.on(ActionPass, 'getData', () => {
+            const createActionDataPassSpy = spy.on(ActionPass, 'createActionData', () => {
                 return;
             });
             beginnerVirtualPlayer.findAction();
-            expect(getDataPassSpy).to.have.been.called();
+            expect(createActionDataPassSpy).to.have.been.called();
         });
 
-        it('findAction should call ActionPlace.getData because possible placement', () => {
+        it('findAction should call ActionPlace.createActionData because possible placement', () => {
             spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
                 return testEvaluatedPlacements;
             });
-            const getDataPlaceSpy = spy.on(ActionPlace, 'getData', () => {
+            const createActionDataPlaceSpy = spy.on(ActionPlace, 'createActionData', () => {
                 return;
             });
             beginnerVirtualPlayer.findAction();
-            expect(getDataPlaceSpy).to.have.been.called();
+            expect(createActionDataPlaceSpy).to.have.been.called();
         });
 
         it('findAction should call updateHistoric', () => {
             spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
                 return testEvaluatedPlacements;
             });
-            spy.on(ActionPlace, 'getData', () => {
+            spy.on(ActionPlace, 'createActionData', () => {
                 return;
             });
             const updateHistoricSpy = spy.on(beginnerVirtualPlayer, 'updateHistoric', () => {
@@ -146,11 +146,11 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     describe('Find Action with RANDOM_VALUE_EXCHANGE', () => {
-        it('findAction should call ActionExchange.getData()', () => {
+        it('findAction should call ActionExchange.createActionData()', () => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_EXCHANGE;
             });
-            const actionExchangeSpy = spy.on(ActionExchange, 'getData', () => {
+            const actionExchangeSpy = spy.on(ActionExchange, 'createActionData', () => {
                 return;
             });
             beginnerVirtualPlayer.findAction();
