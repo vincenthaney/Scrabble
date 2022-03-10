@@ -50,9 +50,6 @@ export default class WordFindingService {
         };
         this.wordExtraction = new WordExtraction(board);
         let chosenMoves: EvaluatedPlacement[] | undefined;
-        // const pointDistributionChance = new Map();
-        // const validMoves: EvaluatedPlacement[] = [];
-        // const rejectedValidMoves: RejectedMove[] = [];
         if (request.useCase === WordFindingUseCase.Beginner) {
             placementEvaluationResults.pointDistributionChance = this.assignAcceptanceProbability(request);
         }
@@ -62,9 +59,8 @@ export default class WordFindingService {
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
             const squareProperties = this.findSquareProperties(board, this.extractRandomSquare(emptySquares), tiles.length);
-            // const foundMoves: EvaluatedPlacement[] = [];
+
             placementEvaluationResults.foundMoves = this.attemptPermutations(rackPermutations, squareProperties);
-            // this.attemptPermutations(rackPermutations, squareProperties, foundMoves);
             searchState = this.updateSearchState(startTime);
             chosenMoves = this.chooseMoves(searchState, request, placementEvaluationResults);
             if (chosenMoves) return chosenMoves;

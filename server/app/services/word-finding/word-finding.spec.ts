@@ -344,6 +344,7 @@ describe('WordFindingservice', () => {
 
     describe('attemptPermutations', () => {
         it('should call attemptMove rackPermutations.length times', () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const spyAttemptMove = stub(service, <any>'attemptMove');
 
             service['attemptPermutations']([[], [], []], {} as unknown as SquareProperties);
