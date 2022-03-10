@@ -187,6 +187,16 @@ describe('GamePageComponent', () => {
         });
     });
 
+    describe('createpassAction', () => {
+        it('should call gameButtonActionService.createPassAction()', () => {
+            const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
+                return;
+            });
+            component.createPassAction();
+            expect(createPassActionSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('handlePlayerLeaves', () => {
         it('should reset gameServiceId', () => {
             spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
