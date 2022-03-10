@@ -189,11 +189,11 @@ export default class InputParserService {
         return playerLetter === '*' && LETTER_VALUES.includes(placeLetter as LetterValue) && placeLetter === placeLetter.toUpperCase();
     }
 
-    private isPositionWithinBounds(position: Position) {
+    private isPositionWithinBounds(position: Position): boolean {
         return position.row >= 0 && position.column >= 0 && position.row < BOARD_SIZE && position.column < BOARD_SIZE;
     }
 
-    private isAction(input: string) {
+    private isAction(input: string): {} {
         return input[0] === ACTION_COMMAND_INDICATOR;
     }
 
@@ -201,7 +201,7 @@ export default class InputParserService {
         return input.substring(1).split(' ');
     }
 
-    private verifyActionValidity(actionName: ActionType) {
+    private verifyActionValidity(actionName: ActionType): void {
         if (!actionName) throw new CommandException(CommandExceptionMessages.InvalidEntry);
         if (this.gameService.isGameOver) throw new CommandException(CommandExceptionMessages.GameOver);
         if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName))

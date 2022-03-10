@@ -7,7 +7,7 @@ export class HttpException extends Error {
         this.name = 'HttpException';
     }
 
-    static sendError(error: Error, response: Response) {
+    static sendError(error: Error, response: Response): void {
         const message = error.message;
         let status = StatusCodes.INTERNAL_SERVER_ERROR;
 

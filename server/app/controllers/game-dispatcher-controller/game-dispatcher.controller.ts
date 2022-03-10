@@ -10,7 +10,7 @@ import {
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_LEFT_GAME,
-    PLAYER_NAME_REQUIRED,
+    PLAYER_NAME_REQUIRED
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -49,8 +49,8 @@ export class GameDispatcherController {
                 const gameId = this.handleCreateGame({ playerId, ...body });
 
                 res.status(StatusCodes.CREATED).send({ gameId });
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -60,8 +60,8 @@ export class GameDispatcherController {
                 this.handleLobbiesRequest(playerId);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -73,8 +73,8 @@ export class GameDispatcherController {
                 this.handleJoinGame(gameId, playerId, playerName);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -86,8 +86,8 @@ export class GameDispatcherController {
                 this.handleAcceptRequest(gameId, playerId, opponentName);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -99,8 +99,8 @@ export class GameDispatcherController {
                 this.handleRejectRequest(gameId, playerId, opponentName);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -111,8 +111,8 @@ export class GameDispatcherController {
                 this.handleCancelGame(gameId, playerId);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -123,8 +123,8 @@ export class GameDispatcherController {
                 this.handleLeave(gameId, playerId);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -136,8 +136,8 @@ export class GameDispatcherController {
                 this.handleReconnection(gameId, playerId, newPlayerId);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -148,8 +148,8 @@ export class GameDispatcherController {
                 this.handleDisconnection(gameId, playerId);
 
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
     }

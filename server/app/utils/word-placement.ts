@@ -21,11 +21,11 @@ export class WordPlacementUtils {
         return `${this.positionNumberToLetter(position.row)}${position.column + 1}${this.orientationToLetter(orientation)}`;
     }
 
-    static tilesToString(tiles: Tile[]) {
+    static tilesToString(tiles: Tile[]): string {
         return tiles.reduce((str, tile) => str + tile.letter.toLowerCase(), '');
     }
 
-    static wordPlacementToCommandString(placement: WordPlacement) {
+    static wordPlacementToCommandString(placement: WordPlacement): string {
         return `${this.positionAndOrientationToString(placement.startPosition, placement.orientation)} ${this.tilesToString(placement.tilesToPlace)}`;
     }
 }

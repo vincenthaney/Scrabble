@@ -22,6 +22,7 @@ import SpyObj = jasmine.SpyObj;
 class RoundManagerServiceWrapper {
     roundManagerService: RoundManagerService;
     pCurrentRound: Round;
+
     constructor(roundManagerService: RoundManagerService) {
         this.roundManagerService = roundManagerService;
         this.currentRound = roundManagerService.currentRound;
