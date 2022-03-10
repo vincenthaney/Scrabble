@@ -22,7 +22,7 @@ import { StringConversion } from '@app/utils/string-conversion';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Random } from '@app/utils/random';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { HINT_AMOUNT_OF_WORDS, INITIAL_TILE, LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
+import { BLANK_TILE_REPLACEMENT_LETTER, HINT_AMOUNT_OF_WORDS, INITIAL_TILE, LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
 // wildcards converted only to 'E'
@@ -270,8 +270,7 @@ export default class WordFindingService {
         let currentCombination;
         for (const tile of tiles) {
             if (tile.isBlank) {
-                tile.letter = 'E';
-                tile.value = 0;
+                tile.letter = BLANK_TILE_REPLACEMENT_LETTER;
             }
         }
         // Try every combination of either including or excluding each Tile of the array
