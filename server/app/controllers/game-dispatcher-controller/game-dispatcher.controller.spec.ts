@@ -5,7 +5,7 @@ import { Application } from '@app/app';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
-import { GameType } from '@app/classes/game/game.type';
+import { GameType } from '@app/classes/game/game-type';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
@@ -20,8 +20,9 @@ import {
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
-import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -32,7 +33,6 @@ import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
-import { SocketService } from '@app/services/socket-service/socket.service';
 
 const expect = chai.expect;
 

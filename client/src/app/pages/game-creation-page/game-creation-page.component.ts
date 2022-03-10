@@ -60,7 +60,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     checkIsFormValid(): void {
-        console.log('coucou');
+        console.log('--------------------------');
         console.log(this.gameParameters.get('virtualPlayerName')?.value);
         console.log(this.child.formParameters.get('inputName')?.value);
         this.isNameValid = this.isFormValid();

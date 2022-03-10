@@ -47,7 +47,7 @@ export class GameDispatcherController implements OnDestroy {
         this.socketService.on('canceledGame', (opponent: PlayerName) => this.canceledGameEvent.next(opponent.name));
     }
 
-    handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
+    handleGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
         this.http.post<{ gameId: string }>(endpoint, gameConfig).subscribe((response) => {
             this.createGameEvent.next(response.gameId);

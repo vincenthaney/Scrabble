@@ -1,16 +1,20 @@
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
+import { GameMode } from '@app/classes/game/game-mode';
 import { HttpException } from '@app/classes/http.exception';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
     GAME_IS_OVER,
+    GAME_MODE_REQUIRED,
     GAME_TYPE_REQUIRED,
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_LEFT_GAME,
     PLAYER_NAME_REQUIRED,
+    VIRTUAL_PLAYER_LEVEL_REQUIRED,
+    VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -204,12 +208,20 @@ export class GameDispatcherController {
     private handleCreateGame(config: GameConfigData): string {
         if (config.playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameType === undefined) throw new HttpException(GAME_TYPE_REQUIRED, StatusCodes.BAD_REQUEST);
+        if (config.gameMode === undefined) throw new HttpException(GAME_MODE_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.maxRoundTime === undefined) throw new HttpException(MAX_ROUND_TIME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.dictionary === undefined) throw new HttpException(DICTIONARY_REQUIRED, StatusCodes.BAD_REQUEST);
 
         if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
-        const gameId = this.gameDispatcherService.createMultiplayerGame(config);
+        let gameId: string;
+        if (config.gameMode === GameMode.Multiplayer) {
+            gameId = this.gameDispatcherService.createMultiplayerGame(config);
+        } else {
+            if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
+            if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
+            gameId = this.gameDispatcherService.createMultiplayerGame(config);
+        }
 
         this.socketService.addToRoom(config.playerId, gameId);
         this.handleLobbiesUpdate();
