@@ -3,7 +3,7 @@ import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
 
-export class WordPlacementUtils {
+export class PlacementToString {
     static positionNumberToLetter(position: number): string {
         return String.fromCharCode(position + 'a'.charCodeAt(0));
     }

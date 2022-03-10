@@ -4,26 +4,26 @@ import { Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { expect } from 'chai';
-import { WordPlacementUtils } from './word-placement';
+import { PlacementToString  } from './placement-to-string';
 
 describe('WordPlacement utils', () => {
     describe('positionNumberToLetter', () => {
         it('should convert 0 to a', () => {
-            expect(WordPlacementUtils.positionNumberToLetter(0)).to.equal('a');
+            expect(PlacementToString .positionNumberToLetter(0)).to.equal('a');
         });
 
         it('should convert 5 to f', () => {
-            expect(WordPlacementUtils.positionNumberToLetter(5)).to.equal('f');
+            expect(PlacementToString .positionNumberToLetter(5)).to.equal('f');
         });
     });
 
     describe('orientationToLetter', () => {
         it('should convert horizontal to h', () => {
-            expect(WordPlacementUtils.orientationToLetter(Orientation.Horizontal)).to.equal('h');
+            expect(PlacementToString .orientationToLetter(Orientation.Horizontal)).to.equal('h');
         });
 
         it('should convert vertical to v', () => {
-            expect(WordPlacementUtils.orientationToLetter(Orientation.Vertical)).to.equal('v');
+            expect(PlacementToString .orientationToLetter(Orientation.Vertical)).to.equal('v');
         });
     });
 
@@ -34,12 +34,12 @@ describe('WordPlacement utils', () => {
                 { letter: 'B', value: 0 },
                 { letter: 'C', value: 0 },
             ];
-            expect(WordPlacementUtils.tilesToString(tiles)).to.equal('abc');
+            expect(PlacementToString .tilesToString(tiles)).to.equal('abc');
         });
 
         it('should convert', () => {
             const tiles: Tile[] = [];
-            expect(WordPlacementUtils.tilesToString(tiles)).to.equal('');
+            expect(PlacementToString .tilesToString(tiles)).to.equal('');
         });
     });
 
@@ -47,7 +47,7 @@ describe('WordPlacement utils', () => {
         it('should convert', () => {
             const position = new Position(3, 4);
             const orientation = Orientation.Horizontal;
-            expect(WordPlacementUtils.positionAndOrientationToString(position, orientation)).to.equal('d5h');
+            expect(PlacementToString .positionAndOrientationToString(position, orientation)).to.equal('d5h');
         });
     });
 
@@ -67,7 +67,7 @@ describe('WordPlacement utils', () => {
                 orientation,
             };
 
-            expect(WordPlacementUtils.wordPlacementToCommandString(placement)).to.equal('g3v xyz');
+            expect(PlacementToString .wordPlacementToCommandString(placement)).to.equal('g3v xyz');
         });
     });
 });
