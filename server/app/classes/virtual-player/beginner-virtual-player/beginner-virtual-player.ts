@@ -43,7 +43,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         }
     }
 
-    updateHistoric(evaluatedPlacement: EvaluatedPlacement) {
+    updateHistoric(evaluatedPlacement: EvaluatedPlacement): void {
         let scoreCount = this.pointHistoric.get(evaluatedPlacement.score);
         if (scoreCount) {
             this.pointHistoric.set(evaluatedPlacement.score, ++scoreCount);
