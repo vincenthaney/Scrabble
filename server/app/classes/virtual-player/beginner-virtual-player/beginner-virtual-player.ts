@@ -1,12 +1,9 @@
 import {
     EXCHANGE_ACTION_THRESHOLD,
-    HIGH_MAXIMUM_VALUE,
-    HIGH_MINIMUM_VALUE,
-    LOW_MAXIMUM_VALUE,
-    LOW_MINIMUM_VALUE,
+    HIGH_SCORE_RANGE,
+    LOW_SCORE_RANGE,
     LOW_SCORE_THRESHOLD,
-    MEDIUM_MAXIMUM_VALUE,
-    MEDIUM_MINIMUM_VALUE,
+    MEDIUM_SCORE_RANGE,
     MEDIUM_SCORE_THRESHOLD,
     PASS_ACTION_THRESHOLD,
 } from '@app/constants/virtual-player-constants';
@@ -21,20 +18,11 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     findPointRange(): PointRange {
         const randomPointRange = Math.random();
         if (randomPointRange <= LOW_SCORE_THRESHOLD) {
-            return {
-                minimum: LOW_MINIMUM_VALUE,
-                maximum: LOW_MAXIMUM_VALUE,
-            };
+            return LOW_SCORE_RANGE;
         } else if (randomPointRange <= MEDIUM_SCORE_THRESHOLD) {
-            return {
-                minimum: MEDIUM_MINIMUM_VALUE,
-                maximum: MEDIUM_MAXIMUM_VALUE,
-            };
+            return MEDIUM_SCORE_RANGE;
         } else {
-            return {
-                minimum: HIGH_MINIMUM_VALUE,
-                maximum: HIGH_MAXIMUM_VALUE,
-            };
+            return HIGH_SCORE_RANGE;
         }
     }
 
