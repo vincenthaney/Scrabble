@@ -11,10 +11,10 @@ import * as chai from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { StringConversion } from '@app/utils/string-conversion';
-import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
-import { EvaluationInfo, SearchState, SquareProperties, WordFindingRequest, WordFindingUsage } from '@app/classes/word-finding';
+import { EvaluationInfo, RejectedMove, SearchState, SquareProperties, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -70,8 +70,8 @@ const DEFAULT_HISTORIC = new Map<number, number>([
 
 const DEFAULT_REQUEST: WordFindingRequest = {
     pointRange: { minimum: 2, maximum: 8 },
-    usage: WordFindingUsage.Beginner,
-    pointHistoric: DEFAULT_HISTORIC,
+    useCase: WordFindingUseCase.Beginner,
+    pointHistory: DEFAULT_HISTORIC,
 };
 
 const BEST_MOVE = {
@@ -236,7 +236,7 @@ describe('WordFindingservice', () => {
                 return true;
             });
 
-            const stubWordToString = stub(StringConversion, 'wordToString');
+            const stubwordsToString = stub(StringConversion, 'wordsToString');
             // eslint-disable-next-line dot-notation
             const spyExtract = chai.spy.on(service['wordExtraction'], 'extract');
             // eslint-disable-next-line dot-notation
@@ -245,10 +245,10 @@ describe('WordFindingservice', () => {
             service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal);
             expect(spyGetCorrespondingMovePossibility).to.have.been.called;
             expect(spyIsWithin).to.have.been.called;
-            assert(stubWordToString.calledOnce);
+            assert(stubwordsToString.calledOnce);
             expect(spyExtract).to.have.been.called;
             expect(spyVerifyWords).to.have.been.called;
-            stubWordToString.restore();
+            stubwordsToString.restore();
         });
 
         it('should return undefined if an error is thrown', () => {
@@ -283,7 +283,7 @@ describe('WordFindingservice', () => {
             chai.spy.on(service, 'isWithin', () => {
                 return true;
             });
-            const stubWordToString = stub(StringConversion, 'wordToString').returns(['']);
+            const stubwordsToString = stub(StringConversion, 'wordsToString').returns(['']);
 
             // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract');
@@ -297,7 +297,7 @@ describe('WordFindingservice', () => {
             };
 
             expect(service.attemptMoveDirection(DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK, Orientation.Horizontal)).to.deep.equal(expected);
-            stubWordToString.restore();
+            stubwordsToString.restore();
         });
     });
 
@@ -307,24 +307,24 @@ describe('WordFindingservice', () => {
             request = { ...DEFAULT_REQUEST };
         });
 
-        it('should call evaluateHint if the request usage is Hint', () => {
-            request.usage = WordFindingUsage.Hint;
+        it('should call evaluateHint if the request useCase is Hint', () => {
+            request.useCase = WordFindingUseCase.Hint;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'evaluateHint', () => {});
             service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
             expect(spy).to.have.been.called;
         });
 
-        it('should call evaluateExpert if the request usage is Expert', () => {
-            request.usage = WordFindingUsage.Expert;
+        it('should call evaluateExpert if the request useCase is Expert', () => {
+            request.useCase = WordFindingUseCase.Expert;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'evaluateExpert', () => {});
             service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
             expect(spy).to.have.been.called;
         });
 
-        it('should call evaluateBeginner if the request usage is Beginner', () => {
-            request.usage = WordFindingUsage.Beginner;
+        it('should call evaluateBeginner if the request useCase is Beginner', () => {
+            request.useCase = WordFindingUseCase.Beginner;
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(service, 'evaluateBeginner', () => {});
             service.evaluate({} as unknown as SearchState, request, {} as unknown as EvaluationInfo);
@@ -415,50 +415,41 @@ describe('WordFindingservice', () => {
 
     describe('evaluateBeginner', () => {
         let request: WordFindingRequest;
+        let scoreMap: Map<number, EvaluatedPlacement[]>;
+        let info: EvaluationInfo;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
-        });
-
-        it('should call getMovesInRange', () => {
-            const spy = chai.spy.on(service, 'getMovesInRange');
-            const info = {
+            scoreMap = new Map([
+                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
+                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
+                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
+            ]);
+            info = {
                 foundMoves: [],
                 rejectedValidMoves: [],
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
+        });
+
+        it('should call getMovesInRange', () => {
+            const spy = chai.spy.on(service, 'getMovesInRange');
             service.evaluateBeginner(SearchState.Over, request, info);
             expect(spy).to.have.been.called;
         });
 
         it('should call acceptMove and return the first accepted move if in Selective state', () => {
-            const scoreMap: Map<number, EvaluatedPlacement[]> = new Map([
-                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
-                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
-                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
-            ]);
             chai.spy.on(service, 'getMovesInRange', () => {
                 return scoreMap;
             });
             const spyAcceptMove = chai.spy.on(service, 'acceptMove', () => {
                 return true;
             });
-            const info = {
-                foundMoves: [],
-                rejectedValidMoves: [],
-                validMoves: [],
-                pointDistributionChance: {} as unknown as Map<number, number>,
-            };
             expect(service.evaluateBeginner(SearchState.Selective, request, info)).to.deep.equal([DEFAULT_MOVE_2]);
             expect(spyAcceptMove).to.have.been.called;
         });
 
         it('should add the rejected moves to rejectedValidMoves', () => {
-            const scoreMap: Map<number, EvaluatedPlacement[]> = new Map([
-                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
-                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
-                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
-            ]);
             chai.spy.on(service, 'getMovesInRange', () => {
                 return scoreMap;
             });
@@ -467,50 +458,53 @@ describe('WordFindingservice', () => {
                 [DEFAULT_MOVE_3.score, 2],
                 [DEFAULT_MOVE_4.score, 3],
             ]);
-            const expected: [number, EvaluatedPlacement][] = [
-                [1, DEFAULT_MOVE_2],
-                [1, DEFAULT_MOVE_2],
-                [2, DEFAULT_MOVE_3],
-                [3, DEFAULT_MOVE_4],
-                [3, DEFAULT_MOVE_4],
+            const expected: RejectedMove[] = [
+                { acceptChance: 1, move: DEFAULT_MOVE_2 },
+                { acceptChance: 1, move: DEFAULT_MOVE_2 },
+                { acceptChance: 2, move: DEFAULT_MOVE_3 },
+                { acceptChance: 3, move: DEFAULT_MOVE_4 },
+                { acceptChance: 3, move: DEFAULT_MOVE_4 },
             ];
             chai.spy.on(service, 'acceptMove', () => {
                 return false;
             });
-            const info = {
-                foundMoves: [],
-                rejectedValidMoves: [],
-                validMoves: [],
-                pointDistributionChance,
-            };
+            info.pointDistributionChance = pointDistributionChance;
             expect(service.evaluateBeginner(SearchState.Selective, request, info)).to.be.undefined;
             expect(info.rejectedValidMoves).to.deep.equal(expected);
         });
 
-        it('should return the highest chance rejected move if not in Selective mode', () => {
-            const scoreMap: Map<number, EvaluatedPlacement[]> = new Map([
-                [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
-                [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
-                [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
-            ]);
+        it('should call getHighestAcceptChanceMove if not in Selective mode', () => {
             chai.spy.on(service, 'getMovesInRange', () => {
                 return scoreMap;
+            });
+            chai.spy.on(service, 'acceptMove', () => {
+                return false;
             });
             const pointDistributionChance: Map<number, number> = new Map([
                 [DEFAULT_MOVE_2.score, 1],
                 [DEFAULT_MOVE_3.score, 2],
                 [DEFAULT_MOVE_4.score, 3],
             ]);
-            chai.spy.on(service, 'acceptMove', () => {
-                return false;
-            });
-            const info = {
-                foundMoves: [],
-                rejectedValidMoves: [],
-                validMoves: [],
-                pointDistributionChance,
-            };
-            expect(service.evaluateBeginner(SearchState.Unselective, request, info)).to.deep.equal([DEFAULT_MOVE_4]);
+            info.pointDistributionChance = pointDistributionChance;
+
+            const spy = chai.spy.on(service, 'getHighestAcceptChanceMove');
+            service.evaluateBeginner(SearchState.Unselective, request, info);
+            expect(spy).to.have.been.called();
+        });
+    });
+
+    describe('getHighestAcceptChanceMove', () => {
+        it('should return the highest chance move', () => {
+            const expected: RejectedMove = { acceptChance: 4, move: BEST_MOVE };
+            const rejectedMoves: RejectedMove[] = [
+                { acceptChance: 1, move: DEFAULT_MOVE_2 },
+                { acceptChance: 1, move: DEFAULT_MOVE_2 },
+                { acceptChance: 2, move: DEFAULT_MOVE_3 },
+                { acceptChance: 3, move: DEFAULT_MOVE_4 },
+                expected,
+                { acceptChance: 3, move: DEFAULT_MOVE_4 },
+            ];
+            expect(service.getHighestAcceptChanceMove(rejectedMoves)).to.deep.equal(BEST_MOVE);
         });
     });
 
@@ -548,10 +542,10 @@ describe('WordFindingservice', () => {
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
-        it('should throw if there is no pointHistoric', () => {
-            request.pointHistoric = undefined;
+        it('should throw if there is no pointHistory', () => {
+            request.pointHistory = undefined;
             const result = () => service.findMinRangeFrequency(request);
-            expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
+            expect(result).to.Throw(NO_REQUEST_POINT_HISTORY);
         });
 
         it('should throw if there is an invalid pointRange', () => {
@@ -590,10 +584,10 @@ describe('WordFindingservice', () => {
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
-        it('should throw if there is no pointHistoric', () => {
-            request.pointHistoric = undefined;
+        it('should throw if there is no pointHistory', () => {
+            request.pointHistory = undefined;
             const result = () => service.distributeChance(request);
-            expect(result).to.Throw(NO_REQUEST_POINT_HISTORIC);
+            expect(result).to.Throw(NO_REQUEST_POINT_HISTORY);
         });
 
         it('should throw if there is an invalid pointRange', () => {

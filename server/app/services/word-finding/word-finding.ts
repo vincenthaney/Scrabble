@@ -3,7 +3,15 @@ import BoardNavigator from '@app/classes/board/board-navigator';
 import Direction from '@app/classes/board/direction';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
-import { EvaluationInfo, MovePossibilities, SearchState, SquareProperties, WordFindingRequest, WordFindingUsage } from '@app/classes/word-finding';
+import {
+    EvaluationInfo,
+    MovePossibilities,
+    RejectedMove,
+    SearchState,
+    SquareProperties,
+    WordFindingRequest,
+    WordFindingUseCase,
+} from '@app/classes/word-finding';
 import { Service } from 'typedi';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 
@@ -13,7 +21,7 @@ import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verific
 import { StringConversion } from '@app/utils/string-conversion';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Random } from '@app/utils/random';
-import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORIC, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { HINT_AMOUNT_OF_WORDS, INITIAL_TILE, LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
 
@@ -31,9 +39,9 @@ export default class WordFindingService {
         this.wordExtraction = new WordExtraction(board);
         let chosenMoves: EvaluatedPlacement[] | undefined;
         const validMoves: EvaluatedPlacement[] = [];
-        const rejectedValidMoves: [number, EvaluatedPlacement][] = [];
+        const rejectedValidMoves: RejectedMove[] = [];
         let pointDistributionChance = new Map();
-        if (request.usage === WordFindingUsage.Beginner) pointDistributionChance = this.distributeChance(request);
+        if (request.useCase === WordFindingUseCase.Beginner) pointDistributionChance = this.distributeChance(request);
 
         const rackPermutations = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
@@ -59,9 +67,9 @@ export default class WordFindingService {
     }
 
     evaluate(searchState: SearchState, request: WordFindingRequest, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
-        if (request.usage === WordFindingUsage.Beginner) {
+        if (request.useCase === WordFindingUseCase.Beginner) {
             return this.evaluateBeginner(searchState, request, evaluationInfo);
-        } else if (request.usage === WordFindingUsage.Hint) {
+        } else if (request.useCase === WordFindingUseCase.Hint) {
             return this.evaluateHint(evaluationInfo);
         } else {
             return this.evaluateExpert(searchState, evaluationInfo);
@@ -76,12 +84,20 @@ export default class WordFindingService {
                     return [move];
                 } else {
                     const acceptChance = evaluationInfo.pointDistributionChance.get(move.score);
-                    if (acceptChance) evaluationInfo.rejectedValidMoves.push([acceptChance, move]);
+                    if (acceptChance) evaluationInfo.rejectedValidMoves.push({ acceptChance, move });
                 }
             }
         }
         if (searchState !== SearchState.Selective && evaluationInfo.rejectedValidMoves.length > 0)
-            return [evaluationInfo.rejectedValidMoves.sort((previous, current) => current[0] - previous[0]).slice(0, 1)[0][1]];
+            return [this.getHighestAcceptChanceMove(evaluationInfo.rejectedValidMoves)];
+        return undefined;
+    }
+
+    evaluateExpert(searchState: SearchState, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
+        evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
+        if (searchState === SearchState.Over) {
+            return evaluationInfo.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
+        }
         return undefined;
     }
 
@@ -93,12 +109,8 @@ export default class WordFindingService {
         return undefined;
     }
 
-    evaluateExpert(searchState: SearchState, evaluationInfo: EvaluationInfo): EvaluatedPlacement[] | undefined {
-        evaluationInfo.validMoves = evaluationInfo.validMoves.concat(evaluationInfo.foundMoves);
-        if (searchState === SearchState.Over) {
-            return evaluationInfo.validMoves.sort((previous, current) => current.score - previous.score).slice(0, 1);
-        }
-        return undefined;
+    getHighestAcceptChanceMove(rejectedValidMoves: RejectedMove[]): EvaluatedPlacement {
+        return rejectedValidMoves.sort((previous, current) => current.acceptChance - previous.acceptChance)[0].move;
     }
 
     updateState(startTime: Date): SearchState {
@@ -120,14 +132,14 @@ export default class WordFindingService {
 
     distributeChance(request: WordFindingRequest): Map<number, number> {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
-        if (!request.pointHistoric) throw new Error(NO_REQUEST_POINT_HISTORIC);
+        if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
         const minFrequency = this.findMinRangeFrequency(request);
         const scoreChanceDistribution = new Map<number, number>();
 
         for (let score = request.pointRange.minimum; score <= request.pointRange.maximum; score++) {
-            const scoreFrequency = request.pointHistoric.get(score);
+            const scoreFrequency = request.pointHistory.get(score);
             if (scoreFrequency) {
                 scoreChanceDistribution.set(score, 1 / (scoreFrequency - minFrequency + 1));
             } else {
@@ -139,12 +151,12 @@ export default class WordFindingService {
 
     findMinRangeFrequency(request: WordFindingRequest): number {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
-        if (!request.pointHistoric) throw new Error(NO_REQUEST_POINT_HISTORIC);
+        if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
         let minFrequency = Number.MAX_VALUE;
         for (let score = request.pointRange.minimum; score < request.pointRange.maximum + 1; score++) {
-            const scoreFrequency = request.pointHistoric.get(score);
+            const scoreFrequency = request.pointHistory.get(score);
             if (scoreFrequency && scoreFrequency < minFrequency) {
                 minFrequency = scoreFrequency;
             }
@@ -213,7 +225,7 @@ export default class WordFindingService {
         if (movePossibilities.isValid && this.isWithin(movePossibilities, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
-                this.wordVerification.verifyWords(StringConversion.wordToString(createdWords), DICTIONARY_NAME);
+                this.wordVerification.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
                 return {
                     tilesToPlace: permutation,
                     orientation,
