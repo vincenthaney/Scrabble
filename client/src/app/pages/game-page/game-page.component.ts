@@ -15,7 +15,7 @@ import {
     DIALOG_QUIT_BUTTON_CONFIRM,
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
-    DIALOG_QUIT_TITLE,
+    DIALOG_QUIT_TITLE
 } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -23,7 +23,7 @@ import {
     RACK_TILE_MIN_FONT_SIZE,
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE,
+    SQUARE_TILE_MIN_FONT_SIZE
 } from '@app/constants/tile-font-size';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
@@ -40,6 +40,7 @@ import { takeUntil } from 'rxjs/operators';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
+    isLocalPlayerTurn;
     noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
 
@@ -50,7 +51,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private gameDispatcher: GameDispatcherController,
         public surrenderDialog: MatDialog,
         private readonly playerLeavesService: PlayerLeavesService,
-    ) {}
+    ) {
+        this.isLocalPlayerTurn = gameService.isLocalPlayerPlaying();
+    }
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
@@ -80,6 +83,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe(() => this.noActiveGameDialog());
+        this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([newPlayerData, isLocalPlayerTurn]) => {
+            this.isLocalPlayerTurn = isLocalPlayerTurn;
+        });
+
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
         }
