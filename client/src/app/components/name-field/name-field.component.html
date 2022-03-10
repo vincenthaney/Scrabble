@@ -1,6 +1,6 @@
 <div class="form-group">
-    <mat-form-field appearance="outline" [formGroup]="formParameters" matTooltip="Votre nom doit être entre 2 et 20 caractères sans caractères spéciaux" matTooltipPosition="above">
-        <mat-label><app-icon icon="user"></app-icon> Choisissez votre nom de joueur</mat-label>
+    <mat-form-field appearance="outline" [formGroup]="formParameters">
+        <mat-label >Choisissez votre nom de joueur</mat-label>
         <input matInput id="playerNameValidator" type="text" formControlName="inputName" autocomplete="off" (ngModelChange)="onNameChange($event)">
     </mat-form-field>
     <span class="alert-group" *ngIf="formParameters.get('inputName')?.invalid &&

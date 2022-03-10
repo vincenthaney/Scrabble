@@ -1,11 +1,11 @@
 @import '../../style/utils.scss';
-@import '../../style/variables.scss';
-
+$primary: #1b5e20;
 $disabled: gray;
 $line: rgb(202, 202, 202);
+$max-width: 1200px;
 
 ::ng-deep body {
-    background: $page-background;
+    background: #f3f3f3;
 }
 
 .steps {
@@ -95,8 +95,59 @@ $line: rgb(202, 202, 202);
 }
 
 .page {
+    .header {
+        position: fixed;
+        width: 100%;
+        z-index: 1;
+        box-sizing: border-box;
+
+        .content {
+            display: flex;
+            max-width: $max-width;
+            margin: 0 auto;
+            justify-content: space-between;
+
+            .back-btn {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+
+                app-icon {
+                    color: $primary;
+                    margin-right: 6px;
+                    font-size: 1.1em;
+                }
+
+                img {
+                    height: 22px;
+                    width: auto;
+                }
+            }
+
+            .title {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 1.5em;
+            }
+
+            .link {
+                text-decoration: none;
+                font-size: 1.2em;
+                color: $primary;
+                transition: ease-in opacity 0.05s;
+
+                &:hover {
+                    opacity: 0.55;
+                    transition: ease-in opacity 0.1s;
+                }
+            }
+        }
+    }
+
     .container {
-        max-width: $page-max-width;
+        max-width: $max-width;
         margin: 0 auto;
         padding-top: 54px;
 

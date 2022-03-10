@@ -25,7 +25,6 @@ import { TimerSelectionComponent } from './components/timer-selection/timer-sele
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { SocketService } from './services';
-import { PageHeaderComponent } from './components/page-header/page-header.component';
 // import { ReconnectionService } from './services/reconnection/reconnection.service';
 
 /**
@@ -54,7 +53,6 @@ import { PageHeaderComponent } from './components/page-header/page-header.compon
         IconComponent,
         NameFieldComponent,
         TimerSelectionComponent,
-        PageHeaderComponent,
     ],
     imports: [
         AppMaterialModule,
