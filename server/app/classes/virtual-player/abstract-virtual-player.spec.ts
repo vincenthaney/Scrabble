@@ -57,7 +57,7 @@ describe('AbstractVirtualPlayer', () => {
     //     expect(false).to.be.true;
     // });
 
-    it('should call findAction method', () => {
+    it('playTurn should call findAction method', () => {
         const findActionSpy = chai.spy.on(abstractPlayer, 'findAction', () => {
             return;
         });
@@ -65,7 +65,7 @@ describe('AbstractVirtualPlayer', () => {
         expect(findActionSpy).to.be.called();
     });
 
-    it('should call findPointRange method', () => {
+    it('generateWordFindingRequest should call findPointRange method', () => {
         const findPointRangeSpy = spy.on(abstractPlayer, 'findPointRange', () => {
             return;
         });
@@ -73,14 +73,14 @@ describe('AbstractVirtualPlayer', () => {
         expect(findPointRangeSpy).to.have.been.called();
     });
 
-    it('should return WordFindingRequest with correct data', () => {
+    it('generateWordFindingRequest should return WordFindingRequest with correct data', () => {
         const testWordFindingRequest = abstractPlayer.generateWordFindingRequest();
         expect(testWordFindingRequest.numberOfWordsToFind).to.equal(1);
         expect(testWordFindingRequest.pointHistoric).to.deep.equal(abstractPlayer.pointHistoric);
         expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
     });
 
-    // TO MODIFY WHEN SEND PAYLOAD IMPLEMENTED
+    // TODO: MODIFY WHEN SEND PAYLOAD IMPLEMENTED
     it('should throw when sendPayload()', () => {
         expect(abstractPlayer.sendPayload()).to.be.undefined;
     });
