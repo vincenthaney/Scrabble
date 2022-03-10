@@ -5,7 +5,7 @@ import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import {
     PlacementEvaluationResults,
-    MovePossibilities,
+    MovePossibilitiesParams,
     RejectedMove,
     SearchState,
     SquareProperties,
@@ -65,7 +65,11 @@ export default class WordFindingService {
         }
     }
 
-    chooseMoves(searchState: SearchState, request: WordFindingRequest, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+    chooseMoves(
+        searchState: SearchState,
+        request: WordFindingRequest,
+        placementEvaluationResults: PlacementEvaluationResults,
+    ): EvaluatedPlacement[] | undefined {
         if (request.useCase === WordFindingUseCase.Beginner) {
             return this.chooseMovesBeginner(searchState, request, placementEvaluationResults);
         } else if (request.useCase === WordFindingUseCase.Hint) {
@@ -75,7 +79,11 @@ export default class WordFindingService {
         }
     }
 
-    chooseMovesBeginner(searchState: SearchState, request: WordFindingRequest, placementEvaluationResults: PlacementEvaluationResults): EvaluatedPlacement[] | undefined {
+    chooseMovesBeginner(
+        searchState: SearchState,
+        request: WordFindingRequest,
+        placementEvaluationResults: PlacementEvaluationResults,
+    ): EvaluatedPlacement[] | undefined {
         const movesInRange = this.getMovesInRange(placementEvaluationResults.foundMoves, request);
         for (const movesScore of movesInRange.values()) {
             for (const move of movesScore) {
@@ -178,17 +186,21 @@ export default class WordFindingService {
         return foundMoves;
     }
 
-    findMovePossibilities(navigator: BoardNavigator, tileRackSize: number): MovePossibilities {
-        const movePossibilities = { isValid: true, minimumLength: this.findMinimumWordLength(navigator), maximumLength: Number.POSITIVE_INFINITY };
+    findMovePossibilities(navigator: BoardNavigator, tileRackSize: number): MovePossibilitiesParams {
+        const movePossibilitiesParams = {
+            isValid: true,
+            minimumLength: this.findMinimumWordLength(navigator),
+            maximumLength: Number.POSITIVE_INFINITY,
+        };
 
-        if (movePossibilities.minimumLength > tileRackSize) {
-            movePossibilities.isValid = false;
-            return movePossibilities;
+        if (movePossibilitiesParams.minimumLength > tileRackSize) {
+            movePossibilitiesParams.isValid = false;
+            return movePossibilitiesParams;
         }
-        movePossibilities.maximumLength =
-            tileRackSize - this.findMaximumWordTileLeftLength(navigator, tileRackSize - movePossibilities.minimumLength);
+        movePossibilitiesParams.maximumLength =
+            tileRackSize - this.findMaximumWordTileLeftLength(navigator, tileRackSize - movePossibilitiesParams.minimumLength);
 
-        return movePossibilities;
+        return movePossibilitiesParams;
     }
 
     findMinimumWordLength(navigator: BoardNavigator): number {
@@ -220,8 +232,8 @@ export default class WordFindingService {
     }
 
     attemptMoveDirection(squareProperties: SquareProperties, permutation: Tile[], orientation: Orientation): EvaluatedPlacement | undefined {
-        const movePossibilities = this.getCorrespondingMovePossibility(squareProperties, orientation);
-        if (movePossibilities.isValid && this.isWithin(movePossibilities, permutation.length)) {
+        const movePossibilitiesParams = this.getCorrespondingMovePossibility(squareProperties, orientation);
+        if (movePossibilitiesParams.isValid && this.isWithin(movePossibilitiesParams, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
                 this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
@@ -241,11 +253,11 @@ export default class WordFindingService {
         return squares.splice(Math.floor(Math.random() * squares.length), 1)[0];
     }
 
-    getCorrespondingMovePossibility(squareProperties: SquareProperties, orientation: Orientation): MovePossibilities {
+    getCorrespondingMovePossibility(squareProperties: SquareProperties, orientation: Orientation): MovePossibilitiesParams {
         return orientation === Orientation.Horizontal ? squareProperties.horizontal : squareProperties.vertical;
     }
 
-    isWithin(movePossibility: MovePossibilities, target: number): boolean {
+    isWithin(movePossibility: MovePossibilitiesParams, target: number): boolean {
         return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
     }
 

@@ -14,7 +14,14 @@ import { StringConversion } from '@app/utils/string-conversion';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
-import { PlacementEvaluationResults, RejectedMove, SearchState, SquareProperties, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import {
+    PlacementEvaluationResults,
+    RejectedMove,
+    SearchState,
+    SquareProperties,
+    WordFindingRequest,
+    WordFindingUseCase,
+} from '@app/classes/word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -819,11 +826,11 @@ describe('WordFindingservice', () => {
     });
 
     describe('isWithin', () => {
-        it('should return true if the target if within the movePossibilities range', () => {
+        it('should return true if the target if within the MovePossibilitiesParams range', () => {
             expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
         });
 
-        it('should return false if the target if within the movePossibilities range', () => {
+        it('should return false if the target if within the MovePossibilitiesParams range', () => {
             expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
         });
     });
