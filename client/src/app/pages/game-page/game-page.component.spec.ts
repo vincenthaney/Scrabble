@@ -16,6 +16,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { BACKSPACE, ESCAPE } from '@app/constants/components-constants';
+import { DEFAULT_PLAYER } from '@app/constants/game';
 import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -25,12 +26,12 @@ import {
     SQUARE_FONT_SIZE_INCREMENT,
     SQUARE_TILE_DEFAULT_FONT_SIZE,
     SQUARE_TILE_MAX_FONT_SIZE,
-    SQUARE_TILE_MIN_FONT_SIZE,
+    SQUARE_TILE_MIN_FONT_SIZE
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
+import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
-// import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -68,6 +69,12 @@ export class MatDialogMock {
     }
 }
 
+export class RoundManagerServiceMock {
+    getActivePlayer() {
+        return DEFAULT_PLAYER;
+    }
+}
+
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
@@ -101,10 +108,10 @@ describe('GamePageComponent', () => {
                     provide: MatDialog,
                     useClass: MatDialogMock,
                 },
-                // {
-                //     provide: GameService,
-                //     useValue: gameServiceSpy,
-                // },
+                {
+                    provide: RoundManagerService,
+                    useClass: RoundManagerServiceMock,
+                },
             ],
         }).compileComponents();
     });
@@ -172,24 +179,25 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledWith(event);
     });
 
-    it('should call changeTileFontSize with smaller when - button is clicked ', () => {
-        const spy = spyOn(component, 'changeTileFontSize');
-        const minusButton = fixture.debugElement.nativeElement.querySelector('#minus-button');
-        minusButton.click();
-        expect(spy).toHaveBeenCalledWith('smaller');
+    describe('ngOnInit', () => {
+        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent', () => {
+            component.isLocalPlayerTurn = false;
+            gameServiceMock.newActivePlayerEvent.emit([DEFAULT_PLAYER, true]);
+            expect(component.isLocalPlayerTurn).toBeTrue();
+        });
     });
+        it('should call changeTileFontSize with smaller when - button is clicked ', () => {
+            const spy = spyOn(component, 'changeTileFontSize');
+            const minusButton = fixture.debugElement.nativeElement.querySelector('#minus-button');
+            minusButton.click();
+            expect(spy).toHaveBeenCalledWith('smaller');
+        });
 
-    it('should call changeTileFontSize with larger when + button is clicked ', () => {
-        const spy = spyOn(component, 'changeTileFontSize');
-        const minusButton = fixture.debugElement.nativeElement.querySelector('#plus-button');
-        minusButton.click();
-        expect(spy).toHaveBeenCalledWith('larger');
-    });
-
-    describe('changeTileFontSize', () => {
-        beforeEach(() => {
-            component.tileRackComponent = jasmine.createSpyObj('MockTileRackComponent', ['tileFontSize']);
-            component.boardComponent = jasmine.createSpyObj('MockBoardComponent', ['tileFontSize']);
+        it('should call changeTileFontSize with larger when + button is clicked ', () => {
+            const spy = spyOn(component, 'changeTileFontSize');
+            const minusButton = fixture.debugElement.nativeElement.querySelector('#plus-button');
+            minusButton.click();
+            expect(spy).toHaveBeenCalledWith('larger');
         });
 
         it('should increment tileFontSize of tilerack and board components if max size not reached', () => {
