@@ -193,7 +193,7 @@ export default class InputParserService {
         return position.row >= 0 && position.column >= 0 && position.row < BOARD_SIZE && position.column < BOARD_SIZE;
     }
 
-    private isAction(input: string): {} {
+    private isAction(input: string): boolean {
         return input[0] === ACTION_COMMAND_INDICATOR;
     }
 

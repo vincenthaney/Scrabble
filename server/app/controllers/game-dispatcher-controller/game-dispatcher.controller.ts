@@ -10,7 +10,7 @@ import {
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_LEFT_GAME,
-    PLAYER_NAME_REQUIRED
+    PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
