@@ -29,7 +29,7 @@ import { CreateWaitingPageComponent } from './create-waiting-page.component';
 class TestComponent {}
 
 export class MatDialogMock {
-    open(): void {
+    open() {
         return {
             afterClosed: () => of({}),
         };
