@@ -13,6 +13,7 @@ import {
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
+import { NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -170,10 +171,19 @@ export class GameDispatcherController {
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
             this.handleLobbiesUpdate();
         } else {
-            this.socketService.removeFromRoom(playerId, gameId);
-            this.socketService.emitToSocket(playerId, 'cleanup');
-
-            const playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
+            let playerName;
+            try {
+                this.socketService.removeFromRoom(playerId, gameId);
+                this.socketService.emitToSocket(playerId, 'cleanup');
+                // Socket might not exist if client completed closed application
+                // eslint-disable-next-line no-empty
+            } catch (exception) {}
+            try {
+                playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
+            } catch (exception) {
+                // game was already deleted
+                if (exception.message === NO_GAME_FOUND_WITH_ID) return;
+            }
             this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
 
             // Check if there is no player left --> cleanup server and client
@@ -181,6 +191,7 @@ export class GameDispatcherController {
                 this.activeGameService.removeGame(gameId, playerId);
                 return;
             }
+
             if (this.activeGameService.isGameOver(gameId, playerId)) return;
 
             this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
