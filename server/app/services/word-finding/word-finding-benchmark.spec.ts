@@ -13,7 +13,7 @@
 // // import * as chai from 'chai';
 // // import { stub, useFakeTimers } from 'sinon';
 // // import { assert } from 'console';
-// import { WordFindingRequest, WordFindingUsage } from '@app/classes/word-finding';
+// import { WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 // import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 // import { StringConversion } from '@app/utils/string-conversion';
 // import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
@@ -97,28 +97,28 @@
 
 // const LOW_SCORE_REQUEST: WordFindingRequest = {
 //     pointRange: { minimum: 2, maximum: 6 },
-//     usage: WordFindingUsage.Beginner,
-//     pointHistoric: DEFAULT_HISTORIC,
+//     useCase: WordFindingUseCase.Beginner,
+//     pointHistory: DEFAULT_HISTORIC,
 // };
 
 // const MEDIUM_SCORE_REQUEST: WordFindingRequest = {
 //     pointRange: { minimum: 7, maximum: 12 },
-//     usage: WordFindingUsage.Beginner,
-//     pointHistoric: DEFAULT_HISTORIC,
+//     useCase: WordFindingUseCase.Beginner,
+//     pointHistory: DEFAULT_HISTORIC,
 // };
 
 // const HIGH_SCORE_REQUEST: WordFindingRequest = {
 //     pointRange: { minimum: 13, maximum: 18 },
-//     usage: WordFindingUsage.Beginner,
-//     pointHistoric: DEFAULT_HISTORIC,
+//     useCase: WordFindingUseCase.Beginner,
+//     pointHistory: DEFAULT_HISTORIC,
 // };
 
 // const BEST_MOVE_REQUEST: WordFindingRequest = {
-//     usage: WordFindingUsage.Expert,
+//     useCase: WordFindingUseCase.Expert,
 // };
 
 // const HINT_REQUEST: WordFindingRequest = {
-//     usage: WordFindingUsage.Hint,
+//     useCase: WordFindingUseCase.Hint,
 // };
 
 // const boardFromLetterValues = (letterValues: LetterValues) => {
@@ -232,7 +232,7 @@
 //             startTime = currentTime;
 
 //             for (let i = 0; i < ITERATIONS; i++) {
-//                 service['wordVerification'].verifyWords(StringConversion.wordToString(extractResult), DICTIONARY_NAME);
+//                 service['wordVerification'].verifyWords(StringConversion.wordsToString(extractResult), DICTIONARY_NAME);
 //             }
 //             currentTime = new Date();
 //             console.log(`VERIFY Total time : ${currentTime.getTime() - startTime.getTime()} `);

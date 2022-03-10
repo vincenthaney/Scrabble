@@ -5,5 +5,4 @@ export default interface SquareProperties {
     square: Square;
     horizontal: MovePossibilities;
     vertical: MovePossibilities;
-    isEmpty: boolean;
 }

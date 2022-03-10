@@ -28,6 +28,6 @@ export const NO_GAME_FOUND_WITH_ID = 'No game could be found with id';
 export const INVALID_PLAYER_ID_FOR_GAME = 'Invalid player id for game';
 export const COMMAND_IS_INVALID = (command: string) => `La commande **${command}** est invalide :<br>`;
 export const OPPONENT_PLAYED_INVALID_WORD = "Votre adversaire a joué un mot qui n'est pas dans le dictionnaire. Il perd son tour.";
-export const NO_REQUEST_POINT_RANGE = 'The request needs to have a pointRange for this function';
+export const NO_REQUEST_POINT_RANGE = 'The request needs to have a pointRange';
 export const INVALID_REQUEST_POINT_RANGE = 'The request needs to have a pointRange minimum lower than maximum';
-export const NO_REQUEST_POINT_HISTORIC = 'The request needs to have a pointHistoric for this function';
+export const NO_REQUEST_POINT_HISTORY = 'The request needs to have a pointHistory';
