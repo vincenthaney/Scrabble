@@ -41,7 +41,7 @@ export default class WordFindingService {
         const validMoves: EvaluatedPlacement[] = [];
         const rejectedValidMoves: RejectedMove[] = [];
         let pointDistributionChance = new Map();
-        if (request.useCase === WordFindingUseCase.Beginner) pointDistributionChance = this.distributeChance(request);
+        if (request.useCase === WordFindingUseCase.Beginner) pointDistributionChance = this.assignAcceptanceProbability(request);
 
         const rackPermutations = this.getRackPermutations(tiles);
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
@@ -129,7 +129,7 @@ export default class WordFindingService {
         return acceptProbability ? acceptProbability > Math.random() : true;
     }
 
-    distributeChance(request: WordFindingRequest): Map<number, number> {
+    assignAcceptanceProbability(request: WordFindingRequest): Map<number, number> {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
         if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);

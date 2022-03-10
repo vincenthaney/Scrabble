@@ -572,7 +572,7 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('distributeChance', () => {
+    describe('assignAcceptanceProbability', () => {
         let request: WordFindingRequest;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
@@ -580,20 +580,20 @@ describe('WordFindingservice', () => {
 
         it('should throw if there is no pointRange', () => {
             request.pointRange = undefined;
-            const result = () => service.distributeChance(request);
+            const result = () => service.assignAcceptanceProbability(request);
             expect(result).to.Throw(NO_REQUEST_POINT_RANGE);
         });
 
         it('should throw if there is no pointHistory', () => {
             request.pointHistory = undefined;
-            const result = () => service.distributeChance(request);
+            const result = () => service.assignAcceptanceProbability(request);
             expect(result).to.Throw(NO_REQUEST_POINT_HISTORY);
         });
 
         it('should throw if there is an invalid pointRange', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             request.pointRange!.minimum = request.pointRange!.maximum + 1;
-            const result = () => service.distributeChance(request);
+            const result = () => service.assignAcceptanceProbability(request);
             expect(result).to.Throw(INVALID_REQUEST_POINT_RANGE);
         });
 
@@ -612,7 +612,7 @@ describe('WordFindingservice', () => {
                 [7, 1],
                 [8, 0.5],
             ]);
-            expect(service.distributeChance(request)).to.deep.equal(expected);
+            expect(service.assignAcceptanceProbability(request)).to.deep.equal(expected);
         });
     });
 
