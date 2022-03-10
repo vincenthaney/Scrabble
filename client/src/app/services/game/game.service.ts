@@ -111,7 +111,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     handleTileReserveUpdate(tileReserve: TileReserveData[]): void {
-        this.tileReserve = tileReserve;
+        this.tileReserve = [...tileReserve];
     }
 
     handleNewMessage(newMessage: Message): void {

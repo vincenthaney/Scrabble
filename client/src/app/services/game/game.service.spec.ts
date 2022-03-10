@@ -250,6 +250,58 @@ describe('GameService', () => {
         });
     });
 
+    describe('handleUpdatePlayerData', () => {
+        let emitSpy: unknown;
+
+        beforeEach(() => {
+            emitSpy = spyOn(service['gameViewEventManagerService'], 'emitGameViewEvent').and.callFake(() => {
+                return;
+            });
+        });
+        it('should call playerContainer.updatePlayersData if it is defined', () => {
+            service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
+            const updatedData: PlayerData = { id: 'id', name: 'new-name' };
+            // eslint-disable-next-line no-unused-vars
+            const spy = spyOn(service['playerContainer'], 'updatePlayersData').and.callFake((...playerDatas: PlayerData[]) => {
+                return service['playerContainer']!;
+            });
+
+            service.handleUpdatePlayerData(updatedData);
+            expect(spy).toHaveBeenCalledWith(updatedData);
+        });
+
+        it('should NOT call playerContainer.updatePlayersData if playerContainer is NOT defined', () => {
+            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            const updatedData: PlayerData = { id: 'id', name: 'new-name' };
+            // eslint-disable-next-line no-unused-vars
+            const spy = spyOn(service['playerContainer'], 'updatePlayersData').and.callFake((...playerDatas: PlayerData[]) => {
+                return service['playerContainer']!;
+            });
+
+            service.handleUpdatePlayerData(updatedData);
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should call emitGameViewEvent with tileRackUpdate', () => {
+            service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
+            const updatedData: PlayerData = { id: 'id', name: 'new-name' };
+
+            service.handleUpdatePlayerData(updatedData);
+            expect(emitSpy).toHaveBeenCalledWith('tileRackUpdate');
+        });
+    });
+
+    it('handleTileReserveUpdate should assign new tileReserve to the service', () => {
+        const oldTileReserve: TileReserveData[] = [{ letter: 'A', amount: 1 }];
+        const newTileReserve: TileReserveData[] = [{ letter: 'B', amount: 1 }];
+
+        service['tileReserve'] = oldTileReserve;
+        service.handleTileReserveUpdate(newTileReserve);
+
+        expect(service['tileReserve']).toEqual(newTileReserve);
+        expect(service['tileReserve'] === newTileReserve).toBeFalse();
+    });
+
     describe('reconnectReinitialize', () => {
         let defaultGameData: StartMultiplayerGameData;
 
@@ -464,6 +516,12 @@ describe('GameService', () => {
             const result = service.isLocalPlayerPlaying();
             expect(result).toBeFalse();
         });
+
+        it('should return false there is no player container', () => {
+            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            const result = service.isLocalPlayerPlaying();
+            expect(result).toBeFalse();
+        });
     });
 
     describe('getGameId', () => {
@@ -471,6 +529,23 @@ describe('GameService', () => {
             const expected = 'expected-id';
             service['gameId'] = expected;
             expect(service.getGameId()).toEqual(expected);
+        });
+    });
+
+    describe('getPlayerByNumber', () => {
+        it('should return call playerContainer.getPlayer if it is defined', () => {
+            service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
+            const spy = spyOn<any>(service['playerContainer'], 'getPlayer').and.callFake(() => {
+                return;
+            });
+            const playerNumber = 1;
+            service.getPlayerByNumber(playerNumber);
+            expect(spy).toHaveBeenCalledWith(playerNumber);
+        });
+
+        it('should return undefined if player container is undefined', () => {
+            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            expect(service.getPlayerByNumber(1)).toBeUndefined();
         });
     });
 
@@ -522,6 +597,12 @@ describe('GameService', () => {
             expect(result).not.toBeDefined();
         });
 
+        it('should return undefined there is no player container', () => {
+            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            const result = service.getLocalPlayer();
+            expect(result).toBeUndefined();
+        });
+
         it('should return player 1 id if is local', () => {
             service['playerContainer'] = new PlayerContainer(player1.id);
             service['playerContainer']['players'].add(player1);
@@ -547,6 +628,45 @@ describe('GameService', () => {
 
             const result = service.getLocalPlayerId();
             expect(result).not.toBeDefined();
+        });
+
+        it('should return undefined there is no player container', () => {
+            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            const result = service.getLocalPlayerId();
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('getTotalNumberOfTilesLeft', () => {
+        const tilesLeftTestCase: Map<TileReserveData[], number> = new Map([
+            [[], 0],
+            [[{ letter: 'A', amount: 1 }], 1],
+            [
+                [
+                    { letter: 'A', amount: 1 },
+                    { letter: 'B', amount: 1 },
+                ],
+                2,
+            ],
+            [
+                [
+                    { letter: 'A', amount: 1 },
+                    { letter: 'B', amount: 1 },
+                    { letter: 'C', amount: 1 },
+                ],
+                3,
+            ],
+        ]);
+        tilesLeftTestCase.forEach((amount: number, tileReserve: TileReserveData[]) => {
+            it(`should return ${amount} if there are ${amount} in the tile reserve`, () => {
+                service['tileReserve'] = tileReserve;
+                expect(service.getTotalNumberOfTilesLeft()).toEqual(amount);
+            });
+        });
+
+        it('should return 0 if the tile reserve is undefined', () => {
+            service['tileReserve'] = undefined as unknown as TileReserveData[];
+            expect(service.getTotalNumberOfTilesLeft()).toEqual(0);
         });
     });
 
