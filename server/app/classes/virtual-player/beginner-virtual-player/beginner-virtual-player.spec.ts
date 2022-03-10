@@ -32,7 +32,7 @@ const testEvaluatedPlacements: EvaluatedPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
 ];
 
-describe.only('BeginnerVirtualPlayer', () => {
+describe('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
 
     beforeEach(async () => {
