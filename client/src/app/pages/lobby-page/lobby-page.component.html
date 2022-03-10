@@ -35,7 +35,7 @@
                     <mat-card>
                         <p *ngIf="numberOfLobbiesMeetingFilter > 0">Choisissez une partie<span *ngIf="numberOfLobbiesMeetingFilter > 1"> ou rejoignez une partie aléatoire</span>.</p>
                         <p *ngIf="numberOfLobbiesMeetingFilter === 0">Aucune partie disponible.</p>
-                        <button mat-flat-button color="primary" *ngIf="numberOfLobbiesMeetingFilter > 0" [disabled]="numberOfLobbiesMeetingFilter <= 2 || !nameValid" (click)="joinRandomLobby()"><app-icon icon="random"></app-icon> Partie aléatoire</button>
+                        <button mat-flat-button color="primary" *ngIf="numberOfLobbiesMeetingFilter > 0" [disabled]="numberOfLobbiesMeetingFilter <= 1 || !nameValid" (click)="joinRandomLobby()"><app-icon icon="random"></app-icon> Partie aléatoire</button>
                     </mat-card>
 
                     <br>
@@ -43,7 +43,9 @@
                     <mat-card class="form-container">
                         <div class="info">
                             <p class="title">Filtre</p>
-                            <p class="lobby-amount">{{ numberOfLobbiesMeetingFilter }} parties trouvées</p>
+                            <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter > 1">{{ numberOfLobbiesMeetingFilter }} parties trouvées</p>
+                            <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter === 1">{{ numberOfLobbiesMeetingFilter }} partie trouvée</p>
+                            <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter === 0"> Aucune partie trouvée</p>
                         </div>
 
                         <div class="forms">
