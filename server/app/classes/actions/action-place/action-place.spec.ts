@@ -130,7 +130,7 @@ describe('ActionPlace', () => {
             let updateBoardSpy: unknown;
 
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
-            let wordToStringSpy: unknown;
+            let wordsToStringSpy: unknown;
 
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
@@ -147,7 +147,7 @@ describe('ActionPlace', () => {
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                wordToStringSpy = chai.spy.on(StringConversion, 'wordToString', () => []);
+                wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
             });
 
             afterEach(() => {
@@ -190,9 +190,9 @@ describe('ActionPlace', () => {
                 assert(scoreCalculatorServiceStub.bonusPoints.calledOnce);
             });
 
-            it('should call wordToString', () => {
+            it('should call wordsToString', () => {
                 action.execute();
-                expect(wordToStringSpy).to.have.been.called();
+                expect(wordsToStringSpy).to.have.been.called();
             });
 
             it('should call isLegalPlacement', () => {
