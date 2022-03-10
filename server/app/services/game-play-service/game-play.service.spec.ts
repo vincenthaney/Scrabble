@@ -55,7 +55,7 @@ describe('GamePlayService', () => {
         tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
-        gameStub.getRequestingPlayer.returns(gameStub.player1);
+        gameStub.getPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
 

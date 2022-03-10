@@ -6,6 +6,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
+import { IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
@@ -21,7 +22,7 @@ export class GamePlayService {
 
     playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, FeedbackMessages | void] {
         const game = this.activeGameService.getGame(gameId, playerId);
-        const player = game.getRequestingPlayer(playerId);
+        const player = game.getPlayer(playerId, IS_REQUESTING);
 
         if (player.id !== playerId) throw Error(NOT_PLAYER_TURN);
 

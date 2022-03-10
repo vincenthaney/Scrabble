@@ -87,15 +87,11 @@ export default class Game {
         return this.tileReserve.init();
     }
 
-    getRequestingPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player1;
-        if (this.player2.id === playerId) return this.player2;
-        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
-    }
-
-    getOpponentPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player2;
-        if (this.player2.id === playerId) return this.player1;
+    getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
+        if (this.player1.id === playerId || this.player2.id === playerId) {
+            const players: Player[] = [this.player1, this.player2];
+            return isRequestingPlayer ? players.filter((player) => player.id === playerId)[0] : players.filter((player) => player.id !== playerId)[0];
+        }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
