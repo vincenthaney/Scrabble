@@ -30,4 +30,4 @@ export const COMMAND_IS_INVALID = (command: string) => `La commande **${command}
 export const OPPONENT_PLAYED_INVALID_WORD = "Votre adversaire a joué un mot qui n'est pas dans le dictionnaire. Il perd son tour.";
 export const NO_REQUEST_POINT_RANGE = 'The request needs to have a pointRange for this function';
 export const INVALID_REQUEST_POINT_RANGE = 'The request needs to have a pointRange minimum lower than maximum';
-export const NO_REQUEST_POINT_HISTORIC = 'The request needs to have a pointHistoric for this function';
+export const NO_REQUEST_POINT_HISTORY = 'The request needs to have a pointHistory for this function';
