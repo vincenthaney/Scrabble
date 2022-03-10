@@ -47,11 +47,10 @@ export default class WordFindingService {
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
-            const emptySquare = this.getRandomSquare(emptySquares);
-            const squareProperties = this.findSquareProperties(board, emptySquare, tiles.length);
+            const squareProperties = this.findSquareProperties(board, this.getRandomSquare(emptySquares), tiles.length);
             const foundMoves: EvaluatedPlacement[] = [];
             this.attemptPermutations(rackPermutations, squareProperties, foundMoves);
-            searchState = this.updateState(startTime);
+            searchState = this.updateSearchState(startTime);
             chosenMoves = this.evaluate(searchState, request, { foundMoves, validMoves, rejectedValidMoves, pointDistributionChance });
             if (chosenMoves) return chosenMoves;
         }
@@ -113,7 +112,7 @@ export default class WordFindingService {
         return rejectedValidMoves.sort((previous, current) => current.acceptChance - previous.acceptChance)[0].move;
     }
 
-    updateState(startTime: Date): SearchState {
+    updateSearchState(startTime: Date): SearchState {
         const currentTime = new Date();
         const timeElapsed = currentTime.getTime() - startTime.getTime();
         if (timeElapsed > LONG_MOVE_TIME) {

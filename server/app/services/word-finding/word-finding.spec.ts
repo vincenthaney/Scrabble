@@ -828,20 +828,20 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('updateState', () => {
+    describe('updateSearchState', () => {
         it('should return SearchState.Over if the time exceeds the limit', () => {
             const OVER_DATE = new Date(Date.now() - LONG_MOVE_TIME - 100);
-            expect(service.updateState(OVER_DATE)).to.deep.equal(SearchState.Over);
+            expect(service.updateSearchState(OVER_DATE)).to.deep.equal(SearchState.Over);
         });
 
         it('should return SearchState.Unselective if the time exceeds the limit short time limit but not the long time limit', () => {
             const UNSELECTIVE_DATE = new Date(Date.now() - QUICK_MOVE_TIME - 100);
-            expect(service.updateState(UNSELECTIVE_DATE)).to.deep.equal(SearchState.Unselective);
+            expect(service.updateSearchState(UNSELECTIVE_DATE)).to.deep.equal(SearchState.Unselective);
         });
 
         it('should return SearchState.Selective if the time does not exceed the short time limit', () => {
             const START_DATE = new Date(Date.now());
-            expect(service.updateState(START_DATE)).to.deep.equal(SearchState.Selective);
+            expect(service.updateSearchState(START_DATE)).to.deep.equal(SearchState.Selective);
         });
     });
 
