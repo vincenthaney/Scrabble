@@ -352,6 +352,7 @@ describe('GameService', () => {
         let gameUpdateData: GameUpdateData;
         let updateTileRackEventEmitSpy: jasmine.Spy;
         let updateTileReserveEventEmitSpy: jasmine.Spy;
+        let newActivePlayerEventEmitSpy: jasmine.Spy;
 
         beforeEach(() => {
             gameUpdateData = {};
@@ -363,6 +364,8 @@ describe('GameService', () => {
             updateTileRackEventEmitSpy = spyOn(service.updateTileRackEvent, 'emit');
             service.updateTileReserveEvent = new EventEmitter();
             updateTileReserveEventEmitSpy = spyOn(service.updateTileReserveEvent, 'emit');
+            service.newActivePlayerEvent = new EventEmitter();
+            newActivePlayerEventEmitSpy = spyOn(service.newActivePlayerEvent, 'emit');
         });
 
         it('should call updatePlayerDate and emit with player1 if defined', () => {
@@ -409,6 +412,8 @@ describe('GameService', () => {
         it('should call convertRoundDataToRound and updateRound if round is defined', () => {
             const round: Round = { player: service.player1, startTime: new Date(), limitTime: new Date(), completedTime: null };
             roundManagerSpy.convertRoundDataToRound.and.returnValue(round);
+            spyOn(service, 'isLocalPlayerPlaying').and.returnValue(true);
+
             gameUpdateData.round = { playerData: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date(), completedTime: null };
             service.handleGameUpdate(gameUpdateData);
             expect(roundManagerSpy.convertRoundDataToRound).toHaveBeenCalled();
@@ -421,6 +426,19 @@ describe('GameService', () => {
             service.handleGameUpdate(gameUpdateData);
             expect(roundManagerSpy.convertRoundDataToRound).not.toHaveBeenCalled();
             expect(roundManagerSpy.updateRound).not.toHaveBeenCalledWith(round);
+        });
+
+        it('should emit newActivePlayer if round is defined', () => {
+            const expectedIsLocalPlayerPlaying = true;
+            spyOn(service, 'isLocalPlayerPlaying').and.returnValue(expectedIsLocalPlayerPlaying);
+            gameUpdateData.round = { playerData: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date(), completedTime: null };
+            service.handleGameUpdate(gameUpdateData);
+            expect(newActivePlayerEventEmitSpy).toHaveBeenCalledWith([DEFAULT_PLAYER_1, expectedIsLocalPlayerPlaying]);
+        });
+
+        it('should NOT emit newActivePlayer if round is undefined', () => {
+            service.handleGameUpdate(gameUpdateData);
+            expect(newActivePlayerEventEmitSpy).not.toHaveBeenCalled();
         });
 
         it('should update tileReserve, tileReserveTotal and emit if tileReserve and tilReserveTotal are defined', () => {

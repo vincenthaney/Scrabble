@@ -170,17 +170,21 @@ export class GameDispatcherController {
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
             this.handleLobbiesUpdate();
         } else {
-            this.socketService.removeFromRoom(playerId, gameId);
-            this.socketService.emitToSocket(playerId, 'cleanup');
-
-            const playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
-            this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
-
             // Check if there is no player left --> cleanup server and client
             if (!this.socketService.doesRoomExist(gameId)) {
                 this.activeGameService.removeGame(gameId, playerId);
                 return;
             }
+            try {
+                this.socketService.removeFromRoom(playerId, gameId);
+                this.socketService.emitToSocket(playerId, 'cleanup');
+                // catch errors caused by inexistent socket after client closed application
+                // eslint-disable-next-line no-empty
+            } catch (exception) {}
+            const playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
+
+            this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
+
             if (this.activeGameService.isGameOver(gameId, playerId)) return;
 
             this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
