@@ -43,19 +43,8 @@ describe('AbstractVirtualPlayer', () => {
 
     it('should return true when getActiveGameService', () => {
         const activeGameServiceTest = abstractPlayer.getActiveGameService();
-        expect(AbstractVirtualPlayer['activeGameService']).to.equal(activeGameServiceTest);
+        expect(abstractPlayer['activeGameService']).to.equal(activeGameServiceTest);
     });
-
-    // // NOT COMPLETE
-    // it('should inject class with WordFindingService', () => {
-    //     const activeGameServiceTest = AbstractVirtualPlayer.getActiveGameService();
-    //     expect(false).to.be.true;
-    // });
-    // // NOT COMPLETE
-    // it('should inject class with ActiveGameService', () => {
-    //     const activeGameServiceTest = AbstractVirtualPlayer.getActiveGameService();
-    //     expect(false).to.be.true;
-    // });
 
     it('playTurn should call findAction method', () => {
         const findActionSpy = chai.spy.on(abstractPlayer, 'findAction', () => {

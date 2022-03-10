@@ -313,7 +313,7 @@ describe('GamePlayController', () => {
 
             await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
-            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PASS, payload: { tiles: [] }, input: '' })).to.be.true;
+            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' })).to.be.true;
         });
     });
 

@@ -2,6 +2,7 @@ import Player from '@app/classes/player/player';
 import { PointRange, WordFindingRequest } from '@app/classes/word-finding';
 import { WordFindingService } from '@app/services/word-finding/word-finding';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { Container } from 'typedi';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
@@ -12,6 +13,8 @@ export abstract class AbstractVirtualPlayer extends Player {
     constructor(gameId: string, id: string, name: string) {
         super(id, name);
         this.gameId = gameId;
+        this.wordFindingService = Container.get(WordFindingService);
+        this.activeGameService = Container.get(ActiveGameService);
     }
 
     getWordFindingService(): WordFindingService {

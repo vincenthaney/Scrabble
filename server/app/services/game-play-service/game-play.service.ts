@@ -55,11 +55,11 @@ export class GamePlayService {
             case ActionType.PLACE: {
                 const payload = this.getActionPlacePayload(actionData);
                 const position = new Position(payload.startPosition.row, payload.startPosition.column);
-                return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
+                return new ActionPlace(player, game, payload.tiles ?? [], position, payload.orientation);
             }
             case ActionType.EXCHANGE: {
                 const payload = this.getActionExchangePayload(actionData);
-                return new ActionExchange(player, game, payload.tiles);
+                return new ActionExchange(player, game, payload.tiles ?? []);
             }
             case ActionType.PASS: {
                 return new ActionPass(player, game);
