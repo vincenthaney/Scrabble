@@ -4,14 +4,7 @@
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
 import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
-import {
-    HIGH_MAXIMUM_VALUE,
-    HIGH_MINIMUM_VALUE,
-    LOW_MAXIMUM_VALUE,
-    LOW_MINIMUM_VALUE,
-    MEDIUM_MAXIMUM_VALUE,
-    MEDIUM_MINIMUM_VALUE,
-} from '@app/constants/virtual-player-constants';
+import { HIGH_SCORE_RANGE, MEDIUM_SCORE_RANGE, LOW_SCORE_RANGE } from '@app/constants/virtual-player-constants';
 import {
     EXPECTED_INCREMENT_VALUE,
     GAME_ID,
@@ -33,14 +26,13 @@ import { WordFindingService } from '@app/services/word-finding/word-finding';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-// import Sinon = require('sinon');
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
 
 const testEvaluatedPlacements: EvaluatedPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
 ];
 
-describe('BeginnerVirtualPlayer', () => {
+describe.only('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
 
     beforeEach(async () => {
@@ -55,114 +47,115 @@ describe('BeginnerVirtualPlayer', () => {
         expect(beginnerVirtualPlayer).to.exist;
     });
 
-    it('findPointRange should return low range values', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_LOW;
+    describe('findPointRange', () => {
+        it('findPointRange should return low range values', () => {
+            spy.on(Math, 'random', () => {
+                return RANDOM_VALUE_LOW;
+            });
+
+            const testPointRange = beginnerVirtualPlayer.findPointRange();
+            expect(testPointRange.minimum).to.equal(LOW_SCORE_RANGE.minimum);
+            expect(testPointRange.maximum).to.equal(LOW_SCORE_RANGE.maximum);
         });
 
-        const testPointRange = beginnerVirtualPlayer.findPointRange();
-        expect(testPointRange.minimum).to.equal(LOW_MINIMUM_VALUE);
-        expect(testPointRange.maximum).to.equal(LOW_MAXIMUM_VALUE);
+        it('findPointRange should return medium range values', () => {
+            spy.on(Math, 'random', () => {
+                return RANDOM_VALUE_MEDIUM;
+            });
+
+            const testPointRange = beginnerVirtualPlayer.findPointRange();
+            expect(testPointRange.minimum).to.equal(MEDIUM_SCORE_RANGE.minimum);
+            expect(testPointRange.maximum).to.equal(MEDIUM_SCORE_RANGE.maximum);
+        });
+
+        it('findPointRange should return high range values', () => {
+            spy.on(Math, 'random', () => {
+                return RANDOM_VALUE_HIGH;
+            });
+
+            const testPointRange = beginnerVirtualPlayer.findPointRange();
+            expect(testPointRange.minimum).to.equal(HIGH_SCORE_RANGE.minimum);
+            expect(testPointRange.maximum).to.equal(HIGH_SCORE_RANGE.maximum);
+        });
     });
 
-    it('findPointRange should return medium range values', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_MEDIUM;
+    describe('Find Action with RANDOM_VALUE_PASS', () => {
+        it('findAction should call ActionPass.getData() if random is RANDOM_VALUE_PASS', () => {
+            spy.on(Math, 'random', () => {
+                return RANDOM_VALUE_PASS;
+            });
+            const getDataPassSpy = spy.on(ActionPass, 'getData', () => {
+                return;
+            });
+            beginnerVirtualPlayer.findAction();
+            expect(getDataPassSpy).to.have.been.called();
         });
-
-        const testPointRange = beginnerVirtualPlayer.findPointRange();
-        expect(testPointRange.minimum).to.equal(MEDIUM_MINIMUM_VALUE);
-        expect(testPointRange.maximum).to.equal(MEDIUM_MAXIMUM_VALUE);
     });
 
-    it('findPointRange should return high range values', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_HIGH;
+    describe('Find Action with RANDOM_VALUE_PLACE', () => {
+        beforeEach(async () => {
+            spy.on(Math, 'random', () => {
+                return RANDOM_VALUE_PLACE;
+            });
         });
 
-        const testPointRange = beginnerVirtualPlayer.findPointRange();
-        expect(testPointRange.minimum).to.equal(HIGH_MINIMUM_VALUE);
-        expect(testPointRange.maximum).to.equal(HIGH_MAXIMUM_VALUE);
+        it('findAction should call createWordFindingPlacement if random is RANDOM_VALUE_PLACE', () => {
+            const createWordSpy = spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+                return;
+            });
+            beginnerVirtualPlayer.findAction();
+            expect(createWordSpy).to.have.been.called();
+        });
+
+        it('findAction should call ActionPass.getData because not possible placements', () => {
+            const testEmptyEvaluatedPlacement = undefined;
+            spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+                return testEmptyEvaluatedPlacement;
+            });
+            const getDataPassSpy = spy.on(ActionPass, 'getData', () => {
+                return;
+            });
+            beginnerVirtualPlayer.findAction();
+            expect(getDataPassSpy).to.have.been.called();
+        });
+
+        it('findAction should call ActionPlace.getData because possible placement', () => {
+            spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+                return testEvaluatedPlacements;
+            });
+            const getDataPlaceSpy = spy.on(ActionPlace, 'getData', () => {
+                return;
+            });
+            beginnerVirtualPlayer.findAction();
+            expect(getDataPlaceSpy).to.have.been.called();
+        });
+
+        it('findAction should call updateHistoric', () => {
+            spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+                return testEvaluatedPlacements;
+            });
+            spy.on(ActionPlace, 'getData', () => {
+                return;
+            });
+            const updateHistoricSpy = spy.on(beginnerVirtualPlayer, 'updateHistoric', () => {
+                return;
+            });
+            beginnerVirtualPlayer.findAction();
+            expect(updateHistoricSpy).to.have.been.called();
+        });
     });
 
-    it('findAction should call ActionPass.getData()', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_PASS;
+    describe('Find Action with RANDOM_VALUE_EXCHANGE', () => {
+        it('findAction should call ActionExchange.getData()', () => {
+            spy.on(Math, 'random', () => {
+                return RANDOM_VALUE_EXCHANGE;
+            });
+            const actionExchangeSpy = spy.on(ActionExchange, 'getData', () => {
+                return;
+            });
+            beginnerVirtualPlayer.findAction();
+            expect(actionExchangeSpy).to.have.been.called();
         });
-        const getDataPassSpy = spy.on(ActionPass, 'getData', () => {
-            return;
-        });
-        beginnerVirtualPlayer.findAction();
-        expect(getDataPassSpy).to.have.been.called();
-    });
-
-    it('findAction should call createWordFindingPlacement', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_PLACE;
-        });
-        const createWordSpy = spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
-            return;
-        });
-        beginnerVirtualPlayer.findAction();
-        expect(createWordSpy).to.have.been.called();
-    });
-
-    it('findAction should call ActionPass.getData because not possible placements', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_PLACE;
-        });
-        const testEmptyEvaluatedPlacement = undefined;
-        spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
-            return testEmptyEvaluatedPlacement;
-        });
-        const getDataPassSpy = spy.on(ActionPass, 'getData', () => {
-            return;
-        });
-        beginnerVirtualPlayer.findAction();
-        expect(getDataPassSpy).to.have.been.called();
-    });
-
-    it('findAction should call ActionPlace.getData because possible placement', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_PLACE;
-        });
-
-        spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
-            return testEvaluatedPlacements;
-        });
-        const getDataPassSpy = spy.on(ActionPlace, 'getData', () => {
-            return;
-        });
-        beginnerVirtualPlayer.findAction();
-        expect(getDataPassSpy).to.have.been.called();
-    });
-
-    it('findAction should call updateHistoric', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_PLACE;
-        });
-        spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
-            return testEvaluatedPlacements;
-        });
-        spy.on(ActionPlace, 'getData', () => {
-            return;
-        });
-        const updateHistoricSpy = spy.on(beginnerVirtualPlayer, 'updateHistoric', () => {
-            return;
-        });
-        beginnerVirtualPlayer.findAction();
-        expect(updateHistoricSpy).to.have.been.called();
-    });
-
-    it('findAction should call ActionExchange.getData()', () => {
-        spy.on(Math, 'random', () => {
-            return RANDOM_VALUE_EXCHANGE;
-        });
-        const actionExchangeSpy = spy.on(ActionExchange, 'getData', () => {
-            return;
-        });
-        beginnerVirtualPlayer.findAction();
-        expect(actionExchangeSpy).to.have.been.called();
     });
 
     describe('updateHistoric', () => {
