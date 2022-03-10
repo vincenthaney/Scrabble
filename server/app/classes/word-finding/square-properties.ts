@@ -1,8 +1,8 @@
 import { Square } from '@app/classes/square';
-import { MovePossibilitiesParams } from '.';
+import { MoveRequirements } from '.';
 
 export default interface SquareProperties {
     square: Square;
-    horizontal: MovePossibilitiesParams;
-    vertical: MovePossibilitiesParams;
+    horizontal: MoveRequirements;
+    vertical: MoveRequirements;
 }

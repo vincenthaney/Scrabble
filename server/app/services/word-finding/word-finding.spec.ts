@@ -57,8 +57,8 @@ const DEFAULT_TILES_LEFT_SIZE = 7;
 const DEFAULT_SMALL_TILES_LEFT_SIZE = 3;
 const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
-const DEFAULT_HORIZONTAL_PROPERTIES = { isValid: true, minimumLength: 1, maximumLength: 2 };
-const DEFAULT_VERTICAL_PROPERTIES = { isValid: true, minimumLength: 1, maximumLength: 3 };
+const DEFAULT_HORIZONTAL_PROPERTIES = { isPossible: true, minimumLength: 1, maximumLength: 2 };
+const DEFAULT_VERTICAL_PROPERTIES = { isPossible: true, minimumLength: 1, maximumLength: 3 };
 const DEFAULT_SQUARE_PROPERTIES = {
     square: DEFAULT_SQUARE_1,
     horizontal: DEFAULT_HORIZONTAL_PROPERTIES,
@@ -684,101 +684,101 @@ describe('WordFindingservice', () => {
         });
     });
 
-    describe('findMaximumWordTileLeftLength', () => {
+    describe('findTilesLeftLengthAtExtremity', () => {
         it('should call navigator.moveUntil', () => {
             const spy = chai.spy.on(navigator, 'moveUntil', () => {
                 return true;
             });
-            service.findMaximumWordTileLeftLength(navigator, DEFAULT_TILES_LEFT_SIZE);
+            service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE);
             expect(spy).to.have.been.called;
         });
 
         it('should return 0 if there are enough empty Squares', () => {
             navigator = new BoardNavigator(board, new Position(0, 0), Orientation.Horizontal);
-            expect(service.findMaximumWordTileLeftLength(navigator, DEFAULT_SMALL_TILES_LEFT_SIZE)).to.equal(0);
+            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_SMALL_TILES_LEFT_SIZE)).to.equal(0);
         });
 
         it('should return the amount of empty Squares in the direction', () => {
             navigator = new BoardNavigator(board, new Position(0, 0), Orientation.Horizontal);
-            expect(service.findMaximumWordTileLeftLength(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(
+            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(
                 DEFAULT_TILES_LEFT_SIZE - (board.getSize().x - 1),
             );
         });
 
         it('should return the amount of empty Squares in the direction', () => {
             navigator = new BoardNavigator(board, new Position(0, 2), Orientation.Vertical);
-            expect(service.findMaximumWordTileLeftLength(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
+            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
         });
 
         it('should return the amount of empty Squares in the direction', () => {
             navigator = new BoardNavigator(board, new Position(2, 3), Orientation.Horizontal);
-            expect(service.findMaximumWordTileLeftLength(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
+            expect(service.findTilesLeftLengthAtExtremity(navigator, DEFAULT_TILES_LEFT_SIZE)).to.equal(DEFAULT_TILES_LEFT_SIZE - 3);
         });
     });
 
-    describe('findMovePossibilities', () => {
-        it('should call findMinimumWordLength and findMaximumWordTileLeftLength', () => {
+    describe('findMoveRequirements', () => {
+        it('should call findMinimumWordLength and findTilesLeftLengthAtExtremity', () => {
             const spyFindMinimumWordLength = chai.spy.on(service, 'findMinimumWordLength', () => {
                 return 0;
             });
-            const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
+            const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return 0;
             });
-            service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE);
+            service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE);
             expect(spyFindMinimumWordLength).to.have.been.called;
-            expect(spyFindMaximumWordTileLeftLength).to.have.been.called;
+            expect(spyfindTilesLeftLengthAtExtremity).to.have.been.called;
         });
 
-        it('should return isValid = false if findMinimumWordLength is POSITIVE_INFINITY ', () => {
+        it('should return isPossible = false if findMinimumWordLength is POSITIVE_INFINITY ', () => {
             const spyFindMinimumWordLength = chai.spy.on(service, 'findMinimumWordLength', () => {
                 return Number.POSITIVE_INFINITY;
             });
-            const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
+            const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return 0;
             });
-            expect(service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
+            expect(service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE).isPossible).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
-            expect(spyFindMaximumWordTileLeftLength).not.to.have.been.called;
+            expect(spyfindTilesLeftLengthAtExtremity).not.to.have.been.called;
         });
 
-        it('should return isValid = false if findMinimumWordLength is too big ', () => {
+        it('should return isPossible = false if findMinimumWordLength is too big ', () => {
             const spyFindMinimumWordLength = chai.spy.on(service, 'findMinimumWordLength', () => {
                 return DEFAULT_TILES_LEFT_SIZE + 1;
             });
-            const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
+            const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return 0;
             });
-            expect(service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE).isValid).to.be.false;
+            expect(service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE).isPossible).to.be.false;
             expect(spyFindMinimumWordLength).to.have.been.called;
-            expect(spyFindMaximumWordTileLeftLength).not.to.have.been.called;
+            expect(spyfindTilesLeftLengthAtExtremity).not.to.have.been.called;
         });
 
         it('should return the correct moveProperties ', () => {
             const minLength = 1;
             const maxLength = 4;
-            const expected = { isValid: true, minimumLength: minLength, maximumLength: DEFAULT_TILES_LEFT_SIZE - maxLength };
+            const expected = { isPossible: true, minimumLength: minLength, maximumLength: DEFAULT_TILES_LEFT_SIZE - maxLength };
             chai.spy.on(service, 'findMinimumWordLength', () => {
                 return minLength;
             });
-            const spyFindMaximumWordTileLeftLength = chai.spy.on(service, 'findMaximumWordTileLeftLength', () => {
+            const spyfindTilesLeftLengthAtExtremity = chai.spy.on(service, 'findTilesLeftLengthAtExtremity', () => {
                 return maxLength;
             });
-            expect(service.findMovePossibilities(navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
-            expect(spyFindMaximumWordTileLeftLength).to.have.been.called.with(navigator, DEFAULT_TILES_LEFT_SIZE - minLength);
+            expect(service.findMoveRequirements(navigator, DEFAULT_TILES_LEFT_SIZE)).to.deep.equal(expected);
+            expect(spyfindTilesLeftLengthAtExtremity).to.have.been.called.with(navigator, DEFAULT_TILES_LEFT_SIZE - minLength);
         });
     });
 
     describe('findSquareProperties', () => {
-        it('should call findMovePossibilities twice', () => {
-            const spy = chai.spy.on(service, 'findMovePossibilities');
+        it('should call findMoveRequirements twice', () => {
+            const spy = chai.spy.on(service, 'findMoveRequirements');
             service.findSquareProperties(board, DEFAULT_SQUARE_1, DEFAULT_TILES_LEFT_SIZE);
             expect(spy).to.have.been.called.twice;
         });
 
         it('should return the correct SquareProperties  ', () => {
-            const stubFindMovePossibilities = stub(service, 'findMovePossibilities');
-            stubFindMovePossibilities.onCall(0).returns(DEFAULT_HORIZONTAL_PROPERTIES);
-            stubFindMovePossibilities.onCall(1).returns(DEFAULT_VERTICAL_PROPERTIES);
+            const stubfindMoveRequirements = stub(service, 'findMoveRequirements');
+            stubfindMoveRequirements.onCall(0).returns(DEFAULT_HORIZONTAL_PROPERTIES);
+            stubfindMoveRequirements.onCall(1).returns(DEFAULT_VERTICAL_PROPERTIES);
 
             chai.spy.on(BoardNavigator, 'isEmpty', () => {
                 return true;
@@ -826,11 +826,11 @@ describe('WordFindingservice', () => {
     });
 
     describe('isWithin', () => {
-        it('should return true if the target if within the MovePossibilitiesParams range', () => {
+        it('should return true if the target if within the MoveRequirements range', () => {
             expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.minimumLength)).to.be.true;
         });
 
-        it('should return false if the target if within the MovePossibilitiesParams range', () => {
+        it('should return false if the target if within the MoveRequirements range', () => {
             expect(service.isWithin(DEFAULT_HORIZONTAL_PROPERTIES, DEFAULT_HORIZONTAL_PROPERTIES.maximumLength + 1)).to.be.false;
         });
     });
