@@ -1,5 +1,5 @@
 <div id="timer-selection-container">
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" matTooltip="Utilisez les boutons +/- pour changer le temps par tour" matTooltipPosition="above">
         <mat-label><app-icon icon="hourglass-half"></app-icon> Choisissez le temps par tour</mat-label>
         <input matInput id="time-input" type="text" autocomplete="off" readonly="true" [value]="timerValue * 1000 | date: 'm:ss'" />
     </mat-form-field>
