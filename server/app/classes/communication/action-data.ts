@@ -9,20 +9,18 @@ export enum ActionType {
     HELP = 'aide',
     HINT = 'indice',
 }
-
-export interface ActionPayload {
-    tiles: Tile[];
-}
-export interface ActionPlacePayload extends ActionPayload {
+export interface ActionPlacePayload {
     startPosition: { column: number; row: number };
     orientation: Orientation;
+    tiles: Tile[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ActionExchangePayload extends ActionPayload {}
-
-export interface ActionData {
+export interface ActionExchangePayload {
+    tiles: Tile[];
+}
+export interface ActionData<T extends unknown = unknown> {
     type: ActionType;
-    payload: ActionPayload;
     input: string;
+    payload: T;
 }
