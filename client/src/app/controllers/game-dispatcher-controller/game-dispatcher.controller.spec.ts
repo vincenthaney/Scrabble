@@ -6,6 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import PlayerName from '@app/classes/communication/player-name';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
@@ -22,6 +23,7 @@ const DEFAULT_GAME_DATA: GameConfigData = {
     playerName: DEFAULT_PLAYER_NAME,
     playerId: 'tessId',
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 0,
     dictionary: '',
 };
@@ -107,7 +109,7 @@ describe('GameDispatcherController', () => {
     describe('handleMultiplayerGameCreation', () => {
         it('handleMultiplayerGameCreation should  make an HTTP post request', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
-            controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+            controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(httpPostSpy).toHaveBeenCalled();
         });
 
@@ -115,7 +117,7 @@ describe('GameDispatcherController', () => {
             const fakeObservable = of<string>('fakeResponse');
             spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
             const createGameSpy = spyOn(controller['createGameEvent'], 'next').and.callThrough();
-            controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+            controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(createGameSpy).toHaveBeenCalled();
         });
     });
@@ -133,7 +135,7 @@ describe('GameDispatcherController', () => {
             spyOn(controller['http'], 'post').and.returnValue(observable);
             const spy = spyOn(observable, 'subscribe');
 
-            controller.handleMultiplayerGameCreation({} as unknown as GameConfigData);
+            controller.handleGameCreation({} as unknown as GameConfigData);
             expect(spy).toHaveBeenCalled();
         });
     });
