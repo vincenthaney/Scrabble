@@ -1,3 +1,5 @@
+@import '../../style/variables.scss';
+
 #timer-selection-container {
     display: grid;
     grid-template-columns: 1fr minmax(auto, 30%);
@@ -13,6 +15,7 @@
         button {
             font-size: 1.2em;
             border: solid 1px rgb(224, 224, 224);
+            background-color: rgba($primary, 0.15);
 
             &:hover {
                 border: solid 2px black;
