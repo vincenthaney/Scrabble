@@ -34,7 +34,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
             return ActionExchange.createActionData(this.tiles);
         }
-        const evaluatedPlacement = this.createWordFindingPlacement();
+        const evaluatedPlacement = this.computeWordPlacement();
         if (evaluatedPlacement) {
             this.updateHistoric(evaluatedPlacement);
             return ActionPlace.createActionData(evaluatedPlacement);
@@ -51,7 +51,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return this.getActiveGameService().getGame(gameId, playerId).board;
     }
 
-    createWordFindingPlacement(): EvaluatedPlacement | undefined {
+    computeWordPlacement(): EvaluatedPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
     }
 }

@@ -100,7 +100,7 @@ describe('BeginnerVirtualPlayer', () => {
         });
 
         it('findAction should call createWordFindingPlacement if random is RANDOM_VALUE_PLACE', () => {
-            const createWordSpy = spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+            const createWordSpy = spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
                 return;
             });
             beginnerVirtualPlayer.findAction();
@@ -109,7 +109,7 @@ describe('BeginnerVirtualPlayer', () => {
 
         it('findAction should call ActionPass.createActionData if no possible placements are found', () => {
             const testEmptyEvaluatedPlacement = undefined;
-            spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
                 return testEmptyEvaluatedPlacement;
             });
             const createActionDataPassSpy = spy.on(ActionPass, 'createActionData', () => {
@@ -120,7 +120,7 @@ describe('BeginnerVirtualPlayer', () => {
         });
 
         it('findAction should call ActionPlace.createActionData because possible placement', () => {
-            spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
                 return testEvaluatedPlacements;
             });
             const createActionDataPlaceSpy = spy.on(ActionPlace, 'createActionData', () => {
@@ -131,7 +131,7 @@ describe('BeginnerVirtualPlayer', () => {
         });
 
         it('findAction should call updateHistoric', () => {
-            spy.on(beginnerVirtualPlayer, 'createWordFindingPlacement', () => {
+            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
                 return testEvaluatedPlacements;
             });
             spy.on(ActionPlace, 'createActionData', () => {
@@ -212,7 +212,7 @@ describe('BeginnerVirtualPlayer', () => {
             spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
             });
-            beginnerVirtualPlayer.createWordFindingPlacement();
+            beginnerVirtualPlayer.computeWordPlacement();
             expect(findWordsSpy).to.have.been.called();
         });
 
@@ -226,7 +226,7 @@ describe('BeginnerVirtualPlayer', () => {
             const generateWordSpy = spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
             });
-            beginnerVirtualPlayer.createWordFindingPlacement();
+            beginnerVirtualPlayer.computeWordPlacement();
             expect(getGameBoardSpy).to.have.been.called();
             expect(generateWordSpy).to.have.been.called();
         });
