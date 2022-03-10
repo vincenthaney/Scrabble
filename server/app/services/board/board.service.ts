@@ -13,15 +13,15 @@ export default class BoardService {
 
     initializeBoard(): Board {
         const grid: Square[][] = [];
-        const center: Position = new Position(Math.floor(BoardService.size.y / 2), Math.floor(BoardService.size.x / 2));
+        const center: Position = new Position(Math.floor(BoardService.size.x / 2), Math.floor(BoardService.size.y / 2));
         for (let i = 0; i < BoardService.size.y; i++) {
             grid[i] = [];
             for (let j = 0; j < BoardService.size.x; j++) {
                 const isCenter = j === center.row && i === center.column;
                 const square: Square = {
                     tile: null,
-                    position: new Position(j, i),
-                    scoreMultiplier: this.readScoreMultiplierConfig(new Position(j, i)),
+                    position: new Position(i, j),
+                    scoreMultiplier: this.readScoreMultiplierConfig(new Position(i, j)),
                     wasMultiplierUsed: false,
                     isCenter,
                 };

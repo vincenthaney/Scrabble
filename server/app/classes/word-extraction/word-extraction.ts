@@ -9,13 +9,13 @@ export class WordExtraction {
     constructor(private board: Board) {}
 
     extract(tilesToPlace: Tile[], startPosition: Position, orientation: Orientation): [Square, Tile][][] {
-        const navigator = this.board.navigate(startPosition);
+        const navigator = this.board.navigate(startPosition, orientation);
 
         if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         if (
             !navigator
                 .clone()
-                .forward(orientation, tilesToPlace.length - 1)
+                .forward(tilesToPlace.length - 1)
                 .isWithinBounds()
         )
             throw new Error(POSITION_OUT_OF_BOARD);
@@ -43,9 +43,9 @@ export class WordExtraction {
                 i++;
             }
 
-            navigator.forward(orientation);
+            navigator.forward();
         }
-        navigator.backward(orientation);
+        navigator.backward();
 
         const beforeWord = this.extractWordInDirection(orientation, Direction.Backward, startPosition);
         const afterWord = this.extractWordInDirection(orientation, Direction.Forward, navigator.position);
@@ -67,11 +67,11 @@ export class WordExtraction {
     }
 
     private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position) {
-        const navigator = this.board.navigate(position);
+        const navigator = this.board.navigate(position, orientation);
         if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const word: [Square, Tile][] = [];
 
-        while (navigator.move(orientation, direction).verify(HAS_TILE)) {
+        while (navigator.move(direction).verify(HAS_TILE)) {
             // We know that square has a tile because it was checked in the while condition
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             word.push([navigator.square, navigator.square.tile!]);

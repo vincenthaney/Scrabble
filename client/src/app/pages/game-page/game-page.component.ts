@@ -28,6 +28,7 @@ import {
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -40,6 +41,7 @@ import { takeUntil } from 'rxjs/operators';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
+    isLocalPlayerTurn;
     noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
 
@@ -50,10 +52,21 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private gameDispatcher: GameDispatcherController,
         public surrenderDialog: MatDialog,
         private readonly playerLeavesService: PlayerLeavesService,
-    ) {}
+        private gameButtonActionService: GameButtonActionService,
+    ) {
+        this.isLocalPlayerTurn = gameService.isLocalPlayerPlaying();
+    }
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.escape', ['$event'])
+    handleKeyboardEventEsc(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.backspace', ['$event'])
+    handleKeyboardEventBackspace(event: KeyboardEvent): void {
         this.focusableComponentService.emitKeyboard(event);
     }
 
@@ -72,9 +85,17 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe(() => this.noActiveGameDialog());
+        this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([, isLocalPlayerTurn]) => {
+            this.isLocalPlayerTurn = isLocalPlayerTurn;
+        });
+
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
         }
+    }
+
+    createPassAction(): void {
+        this.gameButtonActionService.createPassAction();
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]): void {
@@ -90,7 +111,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         // We haven't been able to test that the right function is called because this
                         // arrow function creates a new instance of the function. We cannot spy on it.
                         // It totally works tho, try it!
-                        action: () => this.handlePlayerLeave(),
+                        action: () => this.handlePlayerLeaves(),
                     },
                     {
                         content: buttonsContent[1],
@@ -147,7 +168,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    private handlePlayerLeave(): void {
+    private handlePlayerLeaves(): void {
         this.gameService.gameId = '';
         this.playerLeavesService.handleLocalPlayerLeavesGame();
     }

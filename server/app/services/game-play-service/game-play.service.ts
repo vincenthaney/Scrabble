@@ -1,4 +1,5 @@
 import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '@app/classes/actions';
+import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -25,11 +26,12 @@ export class GamePlayService {
         if (player.id !== playerId) throw Error(NOT_PLAYER_TURN);
 
         const action: Action = this.getAction(player, game, actionData);
+
+        let updatedData: void | GameUpdateData = action.execute();
+
         const localPlayerFeedback = action.getMessage();
         const opponentFeedback = action.getOpponentMessage();
         let endGameFeedback: string[] | undefined;
-
-        let updatedData: void | GameUpdateData = action.execute();
 
         if (updatedData) {
             updatedData.tileReserve = Array.from(game.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
@@ -52,7 +54,7 @@ export class GamePlayService {
         switch (actionData.type) {
             case ActionType.PLACE: {
                 const payload = this.getActionPlacePayload(actionData);
-                const position = new Position(payload.startPosition.column, payload.startPosition.row);
+                const position = new Position(payload.startPosition.row, payload.startPosition.column);
                 return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
             }
             case ActionType.EXCHANGE: {
@@ -67,6 +69,9 @@ export class GamePlayService {
             }
             case ActionType.RESERVE: {
                 return new ActionReserve(player, game);
+            }
+            case ActionType.HINT: {
+                return new ActionHint(player, game);
             }
             default: {
                 throw Error(INVALID_COMMAND);

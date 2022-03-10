@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,7 +19,10 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameMode } from '@app/classes/game-mode';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -43,7 +47,7 @@ describe('GameCreationPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent],
+            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent, TimerSelectionComponent, IconComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
@@ -55,6 +59,7 @@ describe('GameCreationPageComponent', () => {
                 MatButtonModule,
                 MatFormFieldModule,
                 MatSelectModule,
+                MatCardModule,
                 MatInputModule,
                 RouterTestingModule.withRoutes([
                     { path: 'waiting-room', component: TestComponent },
@@ -142,7 +147,7 @@ describe('GameCreationPageComponent', () => {
                 gameType: component.gameTypes.Classic,
                 gameMode: component.gameModes.Multiplayer,
                 level: component.virtualPlayerLevels.Beginner,
-                timer: EMPTY_VALUE,
+                timer: DEFAULT_TIMER_VALUE,
                 dictionary: EMPTY_VALUE,
             };
             const defaultNameValue = EMPTY_VALUE;

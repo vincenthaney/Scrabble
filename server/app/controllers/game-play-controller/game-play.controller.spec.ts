@@ -49,10 +49,10 @@ const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), sco
 const DEFAULT_BOARD: Square[][] = [
     [
         { ...DEFAULT_SQUARE_1, position: new Position(0, 0) },
-        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
     ],
     [
-        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
         { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];
@@ -216,7 +216,7 @@ describe('GamePlayController', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 type: ActionType.PASS,
-                payload: { tiles: [] },
+                payload: {},
                 input: '!passer',
             });
             expect(emitToSocketSpy).to.have.been.called();
@@ -226,7 +226,7 @@ describe('GamePlayController', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined, undefined]);
             gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 type: ActionType.PASS,
-                payload: { tiles: [] },
+                payload: {},
                 input: '',
             });
             expect(emitToSocketSpy).to.not.have.been.called();
@@ -269,7 +269,7 @@ describe('GamePlayController', () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
             gamePlayController['handlePlayAction']('', '', {
                 type: ActionType.HELP,
-                payload: { tiles: [] },
+                payload: {},
                 input: '',
             });
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

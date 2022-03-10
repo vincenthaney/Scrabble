@@ -266,21 +266,21 @@ describe('GamePlayService', () => {
 
         it('should return action of type ActionPass when type is pass', () => {
             const type = ActionType.PASS;
-            const payload = { tiles: [] };
+            const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionPass);
         });
 
         it('should return action of type ActionHelp when type is help', () => {
             const type = ActionType.HELP;
-            const payload = { tiles: [] };
+            const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionHelp);
         });
 
         it('should return action of type ActionReserve when type is reserve', () => {
             const type = ActionType.RESERVE;
-            const payload = { tiles: [] };
+            const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionReserve);
         });

@@ -1,8 +1,11 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { NO_LOBBY_CAN_BE_JOINED } from '@app/constants/component-errors';
 import {
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCELED_CONTENT,
@@ -12,7 +15,6 @@ import {
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-lobby-page',
@@ -22,24 +24,32 @@ import { takeUntil } from 'rxjs/operators';
 export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
 
+    nameValid: boolean;
     lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
     lobbyCanceledSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
     lobbies: LobbyInfo[];
-    constructor(private ref: ChangeDetectorRef, public gameDispatcherService: GameDispatcherService, public dialog: MatDialog) {}
+
+    filterFormGroup: FormGroup = new FormGroup({
+        gameType: new FormControl('all'),
+    });
+    numberOfLobbiesMeetingFilter: number = 0;
+
+    constructor(
+        private ref: ChangeDetectorRef,
+        public gameDispatcherService: GameDispatcherService,
+        public dialog: MatDialog,
+        private snackBar: MatSnackBar,
+    ) {}
 
     ngOnInit(): void {
-        this.lobbiesUpdateSubscription = this.gameDispatcherService.lobbiesUpdateEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((lobbies) => this.updateLobbies(lobbies));
-        this.lobbyFullSubscription = this.gameDispatcherService.lobbyFullEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.lobbyFullDialog());
-        this.lobbyCanceledSubscription = this.gameDispatcherService.canceledGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.lobbyCanceledDialog());
+        this.gameDispatcherService.subscribeToLobbiesUpdateEvent(this.componentDestroyed$, (lobbies) => this.updateLobbies(lobbies));
+        this.gameDispatcherService.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.lobbyFullDialog());
+        this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
+
+        this.validateName();
     }
 
     ngOnDestroy(): void {
@@ -48,10 +58,22 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     validateName(): void {
+        this.numberOfLobbiesMeetingFilter = 0;
+        this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
+
+        this.setFormAvailability(this.nameValid);
+
         for (const lobby of this.lobbies) {
-            lobby.canJoin =
-                (this.nameField.formParameters.get('inputName')?.valid as boolean) &&
-                this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
+            this.updateLobbyAttributes(lobby);
+            if (lobby.meetFilters) this.numberOfLobbiesMeetingFilter++;
+        }
+    }
+
+    setFormAvailability(isNameValid: boolean): void {
+        if (isNameValid && this.filterFormGroup.get('gameType')?.disabled) {
+            this.filterFormGroup.get('gameType')?.enable();
+        } else if (!this.filterFormGroup.get('gameType')?.disabled) {
+            this.filterFormGroup.get('gameType')?.disable();
         }
     }
 
@@ -100,5 +122,28 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
                 ],
             },
         });
+    }
+
+    joinRandomLobby() {
+        try {
+            const lobby = this.getRandomLobby();
+            return this.joinLobby(lobby.lobbyId);
+        } catch (e) {
+            this.snackBar.open((e as Error).toString(), 'Ok', {
+                duration: 3000,
+            });
+        }
+    }
+
+    getRandomLobby() {
+        const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters !== false);
+        if (filteredLobbies.length === 0) throw new Error(NO_LOBBY_CAN_BE_JOINED);
+        return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
+    }
+
+    updateLobbyAttributes(lobby: LobbyInfo) {
+        const gameType = this.filterFormGroup.get('gameType')?.value;
+        lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
+        lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
     }
 }

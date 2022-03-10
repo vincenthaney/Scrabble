@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-classes-per-file */
@@ -98,8 +99,10 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
-        const spySubscribeJoinRequestEvent = spyOn(gameDispatcherServiceMock.joinRequestEvent, 'subscribe').and.returnValue(of(true) as any);
-        const spySubscribeJoinerLeaveGameEvent = spyOn(playerLeavesServiceMock.joinerLeaveGameEvent, 'subscribe').and.returnValue(of(true) as any);
+        const spySubscribeJoinRequestEvent = spyOn<any>(gameDispatcherServiceMock['joinRequestEvent'], 'subscribe').and.returnValue(of(true) as any);
+        const spySubscribeJoinerLeaveGameEvent = spyOn<any>(playerLeavesServiceMock['joinerLeavesGameEvent'], 'subscribe').and.returnValue(
+            of(true) as any,
+        );
 
         component.ngOnInit();
         expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
@@ -107,15 +110,6 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     describe('ngOnDestroy', () => {
-        it('ngOnDestroy should unsubscribe from all subscriptions', () => {
-            const spyUnsubscribeJoinRequestEvent = spyOn(component.joinRequestSubscription, 'unsubscribe').and.returnValue(of(true) as any);
-            const spyUnsubscribeJoinerLeaveGameEvent = spyOn(component.joinerLeaveGameSubscription, 'unsubscribe').and.returnValue(of(true) as any);
-
-            component.ngOnDestroy();
-            expect(spyUnsubscribeJoinRequestEvent).toHaveBeenCalled();
-            expect(spyUnsubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
-        });
-
         it('ngOnDestroy should call handleCancelGame if the isStartingGame is false', () => {
             component.isStartingGame = false;
             const spyCancelGame = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {
@@ -143,7 +137,7 @@ describe('CreateWaitingPageComponent', () => {
             const spySetOpponent = spyOn(component, 'setOpponent').and.callFake(() => {
                 return;
             });
-            gameDispatcherServiceMock.joinRequestEvent.emit(emitName);
+            gameDispatcherServiceMock['joinRequestEvent'].next(emitName);
             expect(spySetOpponent).toHaveBeenCalledWith(emitName);
         });
 
@@ -219,7 +213,7 @@ describe('CreateWaitingPageComponent', () => {
             const spyOpponentLeft = spyOn(component, 'opponentLeft').and.callFake(() => {
                 return;
             });
-            playerLeavesServiceMock.joinerLeaveGameEvent.next(emitName);
+            playerLeavesServiceMock['joinerLeavesGameEvent'].next(emitName);
             expect(spyOpponentLeft).toHaveBeenCalledWith(emitName);
         });
     });
