@@ -87,15 +87,11 @@ export default class Game {
         return this.tileReserve.init();
     }
 
-    getRequestingPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player1;
-        if (this.player2.id === playerId) return this.player2;
-        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
-    }
-
-    getOpponentPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player2;
-        if (this.player2.id === playerId) return this.player1;
+    getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
+        if (this.isPlayerFromGame(playerId)) {
+            if (this.player1.id === playerId) return isRequestingPlayer ? this.player1 : this.player2;
+            if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
+        }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
@@ -182,5 +178,9 @@ export default class Game {
             round: roundData,
         };
         return startMultiplayerGameData;
+    }
+
+    private isPlayerFromGame(playerId: string): boolean {
+        return this.player1.id === playerId || this.player2.id === playerId;
     }
 }

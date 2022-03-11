@@ -268,7 +268,7 @@ describe('GameDispatcherController', () => {
             gameStub.createStartGameData.callsFake(() => undefined as unknown as StartMultiplayerGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
-            gameStub.getRequestingPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             gameStub.isGameOver.returns(false);
@@ -292,9 +292,9 @@ describe('GameDispatcherController', () => {
             expect(result).to.throw(GAME_IS_OVER);
         });
 
-        it('should call getRequestingPlayer', () => {
+        it('should call getPlayer', () => {
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            chai.assert(gameStub.getRequestingPlayer.calledOnce);
+            chai.assert(gameStub.getPlayer.calledOnce);
         });
 
         it('should call addToRoom', () => {
@@ -567,7 +567,7 @@ describe('GameDispatcherController', () => {
             (controller['activeGameService'] as unknown) = activeGameServiceStub;
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
             activeGameServiceStub.playerLeftEvent = new EventEmitter();
-            gameStub.getRequestingPlayer.returns(player);
+            gameStub.getPlayer.returns(player);
         });
 
         describe('Player leave before game', () => {
@@ -708,7 +708,7 @@ describe('GameDispatcherController', () => {
             gameStub = createStubInstance(Game);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             playerStub = createStubInstance(Player);
-            gameStub.getRequestingPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub);
             handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
         });
 
