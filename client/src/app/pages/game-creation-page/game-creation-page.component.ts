@@ -8,6 +8,7 @@ import { NameFieldComponent } from '@app/components/name-field/name-field.compon
 import { NAME_SAME_AS_VIRTUAL_PLAYER } from '@app/constants/name-field';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
+import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -23,7 +24,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
     dictionaryOptions: string[];
-    virtualPlayerNames: string[] = ['Victoria', 'Vladimir', 'Herménégilde'];
+    virtualPlayerNames: string[] = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
     errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
 
     isNameValid = true;

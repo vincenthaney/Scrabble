@@ -39,7 +39,7 @@
                 <mat-form-field appearance="outline" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
                     <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
                     <mat-select formControlName="virtualPlayerName" (selectionChange)="checkIsFormValid()">
-                        <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{virtualPlayer}}">{{virtualPlayer}}</mat-option>
+                        <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
                     </mat-select>
                 </mat-form-field>
 
@@ -53,12 +53,11 @@
                 <span id="timer-selection">
                     <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
                 </span>
-                
+
                 <app-name-field (keydown.enter)="$event.preventDefault()" (keyup)="checkIsFormValid()"></app-name-field>
-                <mat-error  class="alert" *ngIf="!isNameValid">
-                    {{errorSameNameAsVirtualPlayer}}
+                <mat-error class="alert" *ngIf="!isNameValid">
+                    {{ errorSameNameAsVirtualPlayer }}
                 </mat-error>
-                
             </span>
 
             <span id="bottom-buttons">
