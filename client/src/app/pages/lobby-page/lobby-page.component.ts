@@ -58,7 +58,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     validateName(): void {
         this.numberOfLobbiesMeetingFilter = 0;
         this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
-
+        console.log(this.nameValid);
         this.setFormAvailability(this.nameValid);
 
         for (const lobby of this.lobbies) {
@@ -68,9 +68,9 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     setFormAvailability(isNameValid: boolean): void {
-        if (isNameValid && this.filterFormGroup.get('gameType')?.disabled) {
+        if (isNameValid) {
             this.filterFormGroup.get('gameType')?.enable();
-        } else if (!this.filterFormGroup.get('gameType')?.disabled) {
+        } else {
             this.filterFormGroup.get('gameType')?.disable();
         }
     }
