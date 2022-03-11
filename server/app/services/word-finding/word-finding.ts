@@ -71,9 +71,9 @@ export default class WordFindingService {
     }
 
     private attemptPermutations(rackPermutations: Tile[][], squareProperties: SquareProperties): ScoredWordPlacement[] {
-        const foundMoves: ScoredWordPlacement[] = [];
+        let foundMoves: ScoredWordPlacement[] = [];
         for (const permutation of rackPermutations) {
-            foundMoves.concat(this.attemptMove(squareProperties, permutation));
+            foundMoves = foundMoves.concat(this.attemptMove(squareProperties, permutation));
         }
         return foundMoves;
     }

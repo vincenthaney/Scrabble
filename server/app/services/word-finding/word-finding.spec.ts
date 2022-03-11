@@ -345,9 +345,11 @@ describe('WordFindingservice', () => {
     describe('attemptPermutations', () => {
         it('should call attemptMove rackPermutations.length times', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const spyAttemptMove = stub(service, <any>'attemptMove');
+            const spyAttemptMove = stub(service, <any>'attemptMove').callsFake(() => {
+                return [{ score: 1 } as unknown as ScoredWordPlacement];
+            });
 
-            service['attemptPermutations']([[], [], []], {} as unknown as SquareProperties);
+            expect(service['attemptPermutations']([[], [], []], {} as unknown as SquareProperties).length).to.equal(3);
             assert(spyAttemptMove.calledThrice);
         });
     });
