@@ -154,11 +154,7 @@ export default class Game {
     }
 
     isPlayer1(arg: string | Player): boolean {
-        if (arg instanceof Player) {
-            return this.player1.id === arg.id;
-        } else {
-            return this.player1.id === arg;
-        }
+        return arg instanceof Player ? this.player1.id === arg.id : this.player1.id === arg;
     }
 
     createStartGameData(): StartMultiplayerGameData {
