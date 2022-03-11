@@ -174,7 +174,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
-        if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
+        if (this.hasBoardBeenUpdated(squaresToUpdate)) return false;
         this.clearNotAppliedSquare();
 
         /* 
@@ -196,6 +196,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         });
         this.selectedSquare = undefined;
         return true;
+    }
+
+    private hasBoardBeenUpdated(squaresToUpdate: Square[]): boolean {
+        return !squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y;
     }
 
     private isInBounds(position: Position): boolean {
