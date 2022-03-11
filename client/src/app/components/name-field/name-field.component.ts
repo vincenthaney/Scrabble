@@ -40,7 +40,7 @@ export class NameFieldComponent implements OnChanges {
         this.playerNameChange.emit([this.formParameters.get('inputName')?.value, nameValid]);
     }
 
-    nameDifferentFomVirtualPlayer(): ValidatorFn {
+    private nameDifferentFomVirtualPlayer(): ValidatorFn {
         return (inputName: AbstractControl): ValidationErrors | null => {
             if (!this.mustVerifyVirtualPlayerName) return null;
             if (inputName.value !== this.virtualPlayerName) return null;

@@ -69,7 +69,7 @@
 
                 <mat-form-field appearance="outline" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
                     <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
-                    <mat-select formControlName="virtualPlayerName" (selectionChange)="checkIsFormValid()">
+                    <mat-select formControlName="virtualPlayerName">
                         <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -87,7 +87,6 @@
                     [virtualPlayerName]="gameParameters.get('virtualPlayerName')?.value"
                     [mustVerifyVirtualPlayerName]="gameParameters.get('gameMode')?.value === gameModes.Solo"
                     (keydown.enter)="$event.preventDefault()"
-                    (keyup)="checkIsFormValid()"
                     (playerNameChange)="onPlayerNameChanges($event)"
                 ></app-name-field>
 
