@@ -7,6 +7,6 @@ export interface WordPlacement {
     startPosition: Position;
 }
 
-export interface EvaluatedPlacement extends WordPlacement {
+export interface ScoredWordPlacement extends WordPlacement {
     score: number;
 }

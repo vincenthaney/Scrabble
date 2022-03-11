@@ -41,3 +41,5 @@ export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
 
 export const WINNER_MESSAGE = (winnerName: string) => `Félicitations à ${winnerName} pour votre victoire!`;
+export const IS_REQUESTING = true;
+export const IS_OPPONENT = false;

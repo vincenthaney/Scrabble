@@ -11,6 +11,7 @@ import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { assert } from 'console';
 import ActionExchange from './action-exchange';
+import { spy } from 'chai';
 
 const expect = chai.expect;
 
@@ -26,6 +27,7 @@ const PLAYER_TILES: Tile[] = [
 ];
 const TILES_TO_EXCHANGE = [PLAYER_TILES[1]];
 const TILES_NOT_TO_EXCHANGE = [PLAYER_TILES[0], PLAYER_TILES[2]];
+const TEST_TILES: Tile[] = [];
 
 describe('ActionExchange', () => {
     let gameStub: SinonStubbedInstance<Game>;
@@ -45,6 +47,22 @@ describe('ActionExchange', () => {
 
     afterEach(() => {
         getTilesFromPlayerStub.restore();
+        chai.spy.restore();
+    });
+
+    describe('static calls', () => {
+        it('should call createActionPlacePayload', () => {
+            const actionExchangeSpy = spy.on(ActionExchange, 'createActionExchangePayload', () => {
+                return;
+            });
+            ActionExchange.createActionData(TEST_TILES);
+            expect(actionExchangeSpy).to.have.been.called();
+        });
+
+        it('should return payload', () => {
+            const payload = { tiles: TEST_TILES };
+            expect(ActionExchange.createActionExchangePayload(TEST_TILES)).to.deep.equal(payload);
+        });
     });
 
     describe('execute', () => {

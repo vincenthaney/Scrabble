@@ -15,7 +15,7 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { StringConversion } from '@app/utils/string-conversion';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
-import { EvaluatedPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import {
     MoveRequirements,
     PlacementEvaluationResults,
@@ -119,9 +119,9 @@ const DEFAULT_MOVE_5 = {
     score: 5,
 };
 
-const SINGLE_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_5];
+const SINGLE_VALID_MOVES: ScoredWordPlacement[] = [DEFAULT_MOVE_5];
 
-const DEFAULT_VALID_MOVES: EvaluatedPlacement[] = [DEFAULT_MOVE_2, BEST_MOVE, DEFAULT_MOVE_3, DEFAULT_MOVE_4, DEFAULT_MOVE_4, DEFAULT_MOVE_2];
+const DEFAULT_VALID_MOVES: ScoredWordPlacement[] = [DEFAULT_MOVE_2, BEST_MOVE, DEFAULT_MOVE_3, DEFAULT_MOVE_4, DEFAULT_MOVE_4, DEFAULT_MOVE_2];
 
 const permutationAmount = (total: number, wanted: number) => {
     return factorial(total) / factorial(total - wanted);
@@ -365,7 +365,7 @@ describe('WordFindingservice', () => {
 
         it('should return undefined if there are less than 3 moves', () => {
             const info = {
-                foundMoves: [{} as unknown as EvaluatedPlacement, {} as unknown as EvaluatedPlacement],
+                foundMoves: [{} as unknown as ScoredWordPlacement, {} as unknown as ScoredWordPlacement],
                 rejectedValidMoves: [],
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
@@ -387,13 +387,13 @@ describe('WordFindingservice', () => {
 
     describe('chooseMovesExpert', () => {
         it('should return 1 move if the searchState is over and there is atleast 1 move', () => {
-            const expected = { score: 3 } as unknown as EvaluatedPlacement;
+            const expected = { score: 3 } as unknown as ScoredWordPlacement;
             const info = {
                 foundMoves: [
-                    { score: 1 } as unknown as EvaluatedPlacement,
-                    { score: 2 } as unknown as EvaluatedPlacement,
+                    { score: 1 } as unknown as ScoredWordPlacement,
+                    { score: 2 } as unknown as ScoredWordPlacement,
                     expected,
-                    { score: 1 } as unknown as EvaluatedPlacement,
+                    { score: 1 } as unknown as ScoredWordPlacement,
                 ],
                 rejectedValidMoves: [],
                 validMoves: [],
@@ -404,7 +404,7 @@ describe('WordFindingservice', () => {
 
         it('should return undefined if the searchState is not over', () => {
             const info = {
-                foundMoves: [{} as unknown as EvaluatedPlacement, {} as unknown as EvaluatedPlacement],
+                foundMoves: [{} as unknown as ScoredWordPlacement, {} as unknown as ScoredWordPlacement],
                 rejectedValidMoves: [],
                 validMoves: [],
                 pointDistributionChance: {} as unknown as Map<number, number>,
@@ -414,9 +414,9 @@ describe('WordFindingservice', () => {
 
         it('should add foundMoves to validMoves ', () => {
             const info = {
-                foundMoves: [{} as unknown as EvaluatedPlacement, {} as unknown as EvaluatedPlacement],
+                foundMoves: [{} as unknown as ScoredWordPlacement, {} as unknown as ScoredWordPlacement],
                 rejectedValidMoves: [],
-                validMoves: [{} as unknown as EvaluatedPlacement],
+                validMoves: [{} as unknown as ScoredWordPlacement],
                 pointDistributionChance: {} as unknown as Map<number, number>,
             };
             service['chooseMovesExpert'](SearchState.Over, info);
@@ -426,7 +426,7 @@ describe('WordFindingservice', () => {
 
     describe('chooseMovesBeginner', () => {
         let request: WordFindingRequest;
-        let scoreMap: Map<number, EvaluatedPlacement[]>;
+        let scoreMap: Map<number, ScoredWordPlacement[]>;
         let info: PlacementEvaluationResults;
         beforeEach(() => {
             request = { ...DEFAULT_REQUEST };
@@ -532,7 +532,7 @@ describe('WordFindingservice', () => {
         });
 
         it('should return a map containing an array of each score ', () => {
-            const expected: Map<number, EvaluatedPlacement[]> = new Map([
+            const expected: Map<number, ScoredWordPlacement[]> = new Map([
                 [DEFAULT_MOVE_2.score, [DEFAULT_MOVE_2, DEFAULT_MOVE_2]],
                 [DEFAULT_MOVE_3.score, [DEFAULT_MOVE_3]],
                 [DEFAULT_MOVE_4.score, [DEFAULT_MOVE_4, DEFAULT_MOVE_4]],
@@ -635,20 +635,20 @@ describe('WordFindingservice', () => {
             assert(stubAttemptMoveDirection.calledTwice);
         });
 
-        it('should add the EvaluatedPlacement that are valid (0)', () => {
+        it('should add the ScoredWordPlacement that are valid (0)', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const stubAttemptMoveDirection = stub(service, <any>'attemptMoveDirection');
-            stubAttemptMoveDirection.onCall(0).returns({} as unknown as EvaluatedPlacement);
+            stubAttemptMoveDirection.onCall(0).returns({} as unknown as ScoredWordPlacement);
             stubAttemptMoveDirection.onCall(1).returns(undefined);
             expect(service['attemptMove'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK).length).to.equal(1);
             assert(stubAttemptMoveDirection.calledTwice);
         });
 
-        it('should add the EvaluatedPlacement that are valid (1)', () => {
+        it('should add the ScoredWordPlacement that are valid (1)', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const stubAttemptMoveDirection = stub(service, <any>'attemptMoveDirection');
             stubAttemptMoveDirection.onCall(0).returns(undefined);
-            stubAttemptMoveDirection.onCall(1).returns({} as unknown as EvaluatedPlacement);
+            stubAttemptMoveDirection.onCall(1).returns({} as unknown as ScoredWordPlacement);
             expect(service['attemptMove'](DEFAULT_SQUARE_PROPERTIES, SMALL_TILE_RACK).length).to.equal(1);
             assert(stubAttemptMoveDirection.calledTwice);
         });

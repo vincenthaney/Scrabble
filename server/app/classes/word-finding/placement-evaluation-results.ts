@@ -1,9 +1,9 @@
 import { RejectedMove } from '.';
-import { EvaluatedPlacement } from './word-placement';
+import { ScoredWordPlacement } from './word-placement';
 
 export default interface PlacementEvaluationResults {
-    foundMoves: EvaluatedPlacement[];
+    foundMoves: ScoredWordPlacement[];
     rejectedValidMoves: RejectedMove[];
-    validMoves: EvaluatedPlacement[];
+    validMoves: ScoredWordPlacement[];
     pointDistributionChance: Map<number, number>;
 }

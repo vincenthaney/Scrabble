@@ -12,7 +12,7 @@ import {
     PLAYER_LEFT_GAME,
     PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
-import { SYSTEM_ID } from '@app/constants/game';
+import { IS_REQUESTING, SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -181,7 +181,7 @@ export class GameDispatcherController {
                 // catch errors caused by inexistent socket after client closed application
                 // eslint-disable-next-line no-empty
             } catch (exception) {}
-            const playerName = this.activeGameService.getGame(gameId, playerId).getRequestingPlayer(playerId).name;
+            const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
 
             this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
 
@@ -262,7 +262,7 @@ export class GameDispatcherController {
         if (game.isGameOver()) {
             throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
         }
-        const player = game.getRequestingPlayer(playerId);
+        const player = game.getPlayer(playerId, IS_REQUESTING);
         player.id = newPlayerId;
         player.isConnected = true;
         this.socketService.addToRoom(newPlayerId, gameId);
@@ -276,7 +276,7 @@ export class GameDispatcherController {
         // TODO: Add condition once we have singleplayer games
         // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
         if (!game.isGameOver()) {
-            const disconnectedPlayer = game.getRequestingPlayer(playerId);
+            const disconnectedPlayer = game.getPlayer(playerId, IS_REQUESTING);
             disconnectedPlayer.isConnected = false;
             setTimeout(() => {
                 if (!disconnectedPlayer.isConnected) {

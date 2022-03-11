@@ -6,6 +6,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
+import { IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
@@ -21,7 +22,7 @@ export class GamePlayService {
 
     playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, FeedbackMessages | void] {
         const game = this.activeGameService.getGame(gameId, playerId);
-        const player = game.getRequestingPlayer(playerId);
+        const player = game.getPlayer(playerId, IS_REQUESTING);
 
         if (player.id !== playerId) throw Error(NOT_PLAYER_TURN);
 
@@ -55,11 +56,11 @@ export class GamePlayService {
             case ActionType.PLACE: {
                 const payload = this.getActionPlacePayload(actionData);
                 const position = new Position(payload.startPosition.row, payload.startPosition.column);
-                return new ActionPlace(player, game, payload.tiles, position, payload.orientation);
+                return new ActionPlace(player, game, payload.tiles ?? [], position, payload.orientation);
             }
             case ActionType.EXCHANGE: {
                 const payload = this.getActionExchangePayload(actionData);
-                return new ActionExchange(player, game, payload.tiles);
+                return new ActionExchange(player, game, payload.tiles ?? []);
             }
             case ActionType.PASS: {
                 return new ActionPass(player, game);
@@ -81,7 +82,7 @@ export class GamePlayService {
 
     getActionPlacePayload(actionData: ActionData): ActionPlacePayload {
         const payload = actionData.payload as ActionPlacePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
         if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
         if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
         return payload;
@@ -89,7 +90,7 @@ export class GamePlayService {
 
     getActionExchangePayload(actionData: ActionData): ActionExchangePayload {
         const payload = actionData.payload as ActionExchangePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles)) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
         return payload;
     }
 

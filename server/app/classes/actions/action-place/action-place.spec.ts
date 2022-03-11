@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
+import { ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -12,11 +13,12 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile, TileReserve } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { StringConversion } from '@app/utils/string-conversion';
 import * as chai from 'chai';
-import { assert } from 'chai';
+import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -86,6 +88,12 @@ const BOARD: Square[][] = [
         { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];
+const testEvaluatedPlacement = {
+    tilesToPlace: [],
+    orientation: TEST_ORIENTATION,
+    startPosition: TEST_START_POSITION,
+    score: TEST_SCORE,
+};
 
 describe('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
@@ -117,9 +125,30 @@ describe('ActionPlace', () => {
         game = gameStub as unknown as Game;
     });
 
+    afterEach(() => {
+        chai.spy.restore();
+    });
+
     it('should create', () => {
         const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
         expect(action).to.exist;
+    });
+
+    it('should call createActionPlacePayload', () => {
+        const actionPayloadSpy = spy.on(ActionPlace, 'createActionPlacePayload', () => {
+            return testEvaluatedPlacement;
+        });
+        ActionPlace.createActionData(testEvaluatedPlacement);
+        expect(actionPayloadSpy).to.have.been.called();
+    });
+
+    it('should return payload', () => {
+        const payload: ActionPlacePayload = {
+            tiles: testEvaluatedPlacement.tilesToPlace,
+            orientation: testEvaluatedPlacement.orientation,
+            startPosition: testEvaluatedPlacement.startPosition,
+        };
+        expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.deep.equal(payload);
     });
 
     describe('execute', () => {

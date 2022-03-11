@@ -6,10 +6,10 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { expect } from 'chai';
 import ActionHint from './action-hint';
-import WordFindingService from '@app/services/word-finding/word-finding';
 import { Orientation, Position } from '@app/classes/board';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
+import WordFindingService from '@app/services/word-finding/word-finding';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
