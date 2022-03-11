@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -32,7 +33,7 @@ describe('TimerSelectionComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [TimerSelectionComponent, TimerSelectionWrapperComponent, IconComponent],
-            imports: [MatInputModule, MatFormFieldModule, MatCardModule],
+            imports: [MatInputModule, MatFormFieldModule, MatCardModule, BrowserAnimationsModule],
         }).compileComponents();
     });
 

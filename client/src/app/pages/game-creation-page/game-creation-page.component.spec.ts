@@ -22,7 +22,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
-import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -94,7 +94,8 @@ describe('GameCreationPageComponent', () => {
             dictionary: 'français',
         };
         gameParametersForm.setValue(formValues);
-        component.child.formParameters.get('inputName')?.setValue('valid name');
+        component.playerName = 'valid name';
+        component.playerNameValid = true;
     };
 
     it('should create', () => {
@@ -148,12 +149,12 @@ describe('GameCreationPageComponent', () => {
                 gameMode: component.gameModes.Multiplayer,
                 level: component.virtualPlayerLevels.Beginner,
                 timer: DEFAULT_TIMER_VALUE,
-                dictionary: EMPTY_VALUE,
+                dictionary: DEFAULT_DICTIONARY_VALUE,
             };
             const defaultNameValue = EMPTY_VALUE;
 
             expect(gameParameters.value).toEqual(defaultFormValues);
-            expect(component.child.formParameters.get('inputName')?.value).toEqual(defaultNameValue);
+            expect(component.playerName).toEqual(defaultNameValue);
         });
 
         it('form should be valid if all required fields are filled', () => {
@@ -206,13 +207,18 @@ describe('GameCreationPageComponent', () => {
 
         it('form should not be valid if name is empty', () => {
             setValidFormValues();
-            component.child.formParameters.get('inputName')?.setValue(EMPTY_VALUE);
+
+            component.playerName = EMPTY_VALUE;
+            component.playerNameValid = false;
 
             expect(component.isFormValid()).toBeFalsy();
         });
 
         it('form should call onSubmit when submit button is clicked', async () => {
+            setValidFormValues();
             const spy = spyOn(component, 'onSubmit');
+
+            fixture.autoDetectChanges();
             const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
             submitButton.click();
 
@@ -225,6 +231,7 @@ describe('GameCreationPageComponent', () => {
             const spy = spyOn(component, 'createGame');
             setValidFormValues();
 
+            fixture.autoDetectChanges();
             component.onSubmit();
             expect(spy).toHaveBeenCalled();
         });
@@ -238,24 +245,6 @@ describe('GameCreationPageComponent', () => {
             component.onSubmit();
             expect(spy).not.toHaveBeenCalled();
         });
-
-        it('should mark child form as touched if form is invalid', async () => {
-            const spy = spyOn(component.child.formParameters, 'markAllAsTouched');
-
-            const gameParametersForm = component.gameParameters;
-            gameParametersForm.setErrors({ error: true });
-
-            component.onSubmit();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should NOT mark child form as touched if form is valid', async () => {
-            const spy = spyOn(component.child.formParameters, 'markAllAsTouched');
-            setValidFormValues();
-
-            component.onSubmit();
-            expect(spy).not.toHaveBeenCalled();
-        });
     });
 
     describe('createGame', () => {
@@ -263,6 +252,7 @@ describe('GameCreationPageComponent', () => {
             const location: Location = TestBed.inject(Location);
             setValidFormValues();
 
+            fixture.autoDetectChanges();
             const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
             createButton.click();
 
@@ -274,10 +264,26 @@ describe('GameCreationPageComponent', () => {
         it('createGame button should send game to GameDispatcher service if valid', async () => {
             setValidFormValues();
 
+            fixture.autoDetectChanges();
             const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
             createButton.click();
 
             expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
+        });
+    });
+
+    describe('onPlayerNameChanges', () => {
+        it('should set playerName and playerNameCalid', () => {
+            component.playerName = EMPTY_VALUE;
+            (component.playerNameValid as unknown) = EMPTY_VALUE;
+
+            const expectedName = 'player name';
+            const expectedValid = true;
+
+            component.onPlayerNameChanges([expectedName, expectedValid]);
+
+            expect(component.playerName).toEqual(expectedName);
+            expect(component.playerNameValid).toEqual(expectedValid);
         });
     });
 
@@ -361,16 +367,5 @@ describe('GameCreationPageComponent', () => {
 
         expect(levelLabel).toBeFalsy();
         expect(levelButtons).toBeFalsy();
-    });
-
-    it('back button should reroute to home page', async () => {
-        const location: Location = TestBed.inject(Location);
-
-        const backButton = fixture.debugElement.nativeElement.querySelector('#back-button');
-        backButton.click();
-
-        return fixture.whenStable().then(() => {
-            expect(location.path()).toBe('/home');
-        });
     });
 });
