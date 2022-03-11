@@ -43,36 +43,36 @@
                     </mat-button-toggle>
                 </mat-button-toggle-group>
 
-                <mat-label class="button-toggle-label" id="level-label" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo"
-                    >Choisissez le niveau de votre adversaire virtuel</mat-label
-                >
-                <mat-button-toggle-group id="level-buttons" formControlName="level" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
-                    <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">
-                        <mat-card class="content">
-                            <app-icon icon="turtle" styling="solid"></app-icon>
-                            <p class="text">{{ virtualPlayerLevels.Beginner }}</p>
-                        </mat-card>
-                    </mat-button-toggle>
-
-                    <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
-                        <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert" [disabled]="true">
+                <ng-container *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
+                    <mat-label class="button-toggle-label" id="level-label">Choisissez le niveau de votre adversaire virtuel</mat-label>
+                    <mat-button-toggle-group id="level-buttons" formControlName="level">
+                        <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">
                             <mat-card class="content">
-                                <app-icon icon="rabbit" styling="solid"></app-icon>
-                                <p class="text">{{ virtualPlayerLevels.Expert }}</p>
+                                <app-icon icon="turtle" styling="solid"></app-icon>
+                                <p class="text">{{ virtualPlayerLevels.Beginner }}</p>
                             </mat-card>
                         </mat-button-toggle>
-                    </div>
-                </mat-button-toggle-group>
+    
+                        <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                            <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert" [disabled]="true">
+                                <mat-card class="content">
+                                    <app-icon icon="rabbit" styling="solid"></app-icon>
+                                    <p class="text">{{ virtualPlayerLevels.Expert }}</p>
+                                </mat-card>
+                            </mat-button-toggle>
+                        </div>
+                    </mat-button-toggle-group>
+    
+                    <mat-form-field appearance="outline">
+                        <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
+                        <mat-select formControlName="virtualPlayerName" (selectionChange)="checkIsFormValid()">
+                            <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </ng-container>
 
                 <mat-divider></mat-divider>
                 <br />
-
-                <mat-form-field appearance="outline" *ngIf="gameParameters.get('gameMode')?.value === gameModes.Solo">
-                    <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
-                    <mat-select formControlName="virtualPlayerName" (selectionChange)="checkIsFormValid()">
-                        <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label floatLabel="always"><app-icon icon="book"></app-icon> Choisissez le dictionnaire à utiliser</mat-label>
