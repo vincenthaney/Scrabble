@@ -10,6 +10,13 @@ import { EventTypes } from './event-types';
     providedIn: 'root',
 })
 export class GameViewEventManagerService {
+    /*
+     * We need an any here because the payload type of the different subjects
+     * could be anything. However, since we add the subjects to the map at its
+     * creation, and we assign the subject a payload type, we know that on
+     * use, the payload of the subject cannot actually be any, as it has to be the
+     * right type to fit the event name.
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private eventMap: Map<keyof EventTypes, Subject<any>> = new Map();
 
