@@ -48,8 +48,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.lobbyFullDialog());
         this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
-
-        this.validateName();
     }
 
     ngOnDestroy(): void {

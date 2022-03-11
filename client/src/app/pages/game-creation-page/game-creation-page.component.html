@@ -84,13 +84,12 @@
                 <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
 
                 <app-name-field
+                    [virtualPlayerName]="gameParameters.get('virtualPlayerName')?.value"
+                    [mustVerifyVirtualPlayerName]="gameParameters.get('gameMode')?.value === gameModes.Solo"
                     (keydown.enter)="$event.preventDefault()"
                     (keyup)="checkIsFormValid()"
                     (playerNameChange)="onPlayerNameChanges($event)"
                 ></app-name-field>
-                <mat-error class="alert" *ngIf="!isNameValid">
-                    {{ errorSameNameAsVirtualPlayer }}
-                </mat-error>
 
                 <div class="buttons">
                     <div

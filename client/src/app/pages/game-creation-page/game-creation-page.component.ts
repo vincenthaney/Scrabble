@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { NAME_SAME_AS_VIRTUAL_PLAYER } from '@app/constants/name-field';
 import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
@@ -23,7 +22,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
     dictionaryOptions: string[];
     virtualPlayerNames: string[] = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
-    errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
     isNameValid = true;
     playerName: string = '';
     playerNameValid: boolean = false;
@@ -61,18 +59,18 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     checkIsFormValid(): void {
-        console.log('--------------------------');
-        console.log(this.gameParameters.get('virtualPlayerName')?.value);
-        console.log(this.playerName);
+        // console.log('--------------------------');
+        // console.log(this.gameParameters.get('virtualPlayerName')?.value);
+        // console.log(this.playerName);
         this.isNameValid = this.isFormValid();
         // if (!this.isNameValid) this.child.formParameters.setErrors({ error: true });
         // this.child.formParameters.updateValueAndValidity();
     }
 
     isFormValid(): boolean {
-        let validity = this.gameParameters?.valid && this.playerNameValid;
-        if (this.gameParameters.get('gameMode')?.value === this.gameModes.Solo) validity = validity && this.isNameDifferentFromVirtualPlayer();
-        return validity;
+        // let validity = this.gameParameters?.valid && this.playerNameValid;
+        // if (this.gameParameters.get('gameMode')?.value === this.gameModes.Solo) validity = validity && this.isNameDifferentFromVirtualPlayer();
+        return this.gameParameters?.valid && this.playerNameValid;
     }
 
     isNameDifferentFromVirtualPlayer(): boolean {
