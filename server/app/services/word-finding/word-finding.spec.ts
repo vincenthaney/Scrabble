@@ -7,7 +7,7 @@ import { Tile } from '@app/classes/tile';
 import { WordFindingRequest } from '@app/classes/word-finding';
 import { expect } from 'chai';
 import { Container } from 'typedi';
-import WordFindingService from './word-finding';
+import { WordFindingService } from './word-finding';
 
 describe('WordFindingservice', () => {
     let service: WordFindingService;

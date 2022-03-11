@@ -13,6 +13,8 @@ import { WordsVerificationService } from '@app/services/words-verification-servi
 import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -28,6 +30,22 @@ export default class ActionPlace extends ActionPlay {
 
         this.scoreCalculator = Container.get(ScoreCalculatorService);
         this.wordValidator = Container.get(WordsVerificationService);
+    }
+
+    static createActionData(evaluatedPlacement: ScoredWordPlacement): ActionData {
+        return {
+            type: ActionType.PLACE,
+            payload: this.createActionPlacePayload(evaluatedPlacement),
+            input: '',
+        };
+    }
+
+    static createActionPlacePayload(evaluatedPlacement: ScoredWordPlacement): ActionPlacePayload {
+        return {
+            tiles: evaluatedPlacement.tilesToPlace,
+            orientation: evaluatedPlacement.orientation,
+            startPosition: evaluatedPlacement.startPosition,
+        };
     }
 
     execute(): void | GameUpdateData {

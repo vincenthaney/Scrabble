@@ -6,7 +6,7 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { expect } from 'chai';
 import ActionHint from './action-hint';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import { WordFindingService } from '@app/services/word-finding/word-finding';
 import { Orientation, Position } from '@app/classes/board';
 import { WordPlacementUtils } from '@app/utils/word-placement';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';

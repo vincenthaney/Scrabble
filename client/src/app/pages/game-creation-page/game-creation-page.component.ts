@@ -1,12 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { NAME_SAME_AS_VIRTUAL_PLAYER } from '@app/constants/name-field';
-import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
@@ -18,7 +17,6 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit, OnDestroy {
-    @ViewChild(NameFieldComponent) child: NameFieldComponent;
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
@@ -26,8 +24,10 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     dictionaryOptions: string[];
     virtualPlayerNames: string[] = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
     errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
-
     isNameValid = true;
+    playerName: string = '';
+    playerNameValid: boolean = false;
+
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     gameParameters: FormGroup = new FormGroup({
@@ -36,7 +36,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
         virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
         timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-        dictionary: new FormControl('default-dictionary', Validators.required),
+        dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
@@ -63,27 +63,25 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     checkIsFormValid(): void {
         console.log('--------------------------');
         console.log(this.gameParameters.get('virtualPlayerName')?.value);
-        console.log(this.child.formParameters.get('inputName')?.value);
+        console.log(this.playerName);
         this.isNameValid = this.isFormValid();
-        if (!this.isNameValid) this.child.formParameters.setErrors({ error: true });
-        this.child.formParameters.updateValueAndValidity();
+        // if (!this.isNameValid) this.child.formParameters.setErrors({ error: true });
+        // this.child.formParameters.updateValueAndValidity();
     }
 
     isFormValid(): boolean {
-        let validity = this.gameParameters?.valid && this.child.formParameters?.valid;
+        let validity = this.gameParameters?.valid && this.playerNameValid;
         if (this.gameParameters.get('gameMode')?.value === this.gameModes.Solo) validity = validity && this.isNameDifferentFromVirtualPlayer();
         return validity;
     }
 
     isNameDifferentFromVirtualPlayer(): boolean {
-        return this.gameParameters.get('virtualPlayerName')?.value !== this.child.formParameters.get('inputName')?.value;
+        return this.gameParameters.get('virtualPlayerName')?.value !== this.playerName;
     }
 
     onSubmit(): void {
         if (this.isFormValid()) {
             this.createGame();
-        } else {
-            this.child.formParameters.markAllAsTouched();
         }
     }
 
@@ -93,6 +91,11 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         } else {
             this.router.navigateByUrl('game');
         }
-        this.gameDispatcherService.handleCreateGame(this.child.playerName, this.gameParameters);
+        this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
+    }
+
+    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
+        this.playerName = playerName;
+        this.playerNameValid = valid;
     }
 }
