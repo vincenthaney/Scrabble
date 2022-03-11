@@ -16,6 +16,7 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { StringConversion } from '@app/utils/string-conversion';
 import * as chai from 'chai';
 import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -158,7 +159,7 @@ describe('ActionPlace', () => {
             let updateBoardSpy: unknown;
 
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
-            let wordToStringSpy: unknown;
+            let wordsToStringSpy: unknown;
 
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
@@ -175,8 +176,7 @@ describe('ActionPlace', () => {
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
-                wordToStringSpy = chai.spy.on(ActionPlace.prototype, 'wordToString', () => []);
+                wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
             });
 
             afterEach(() => {
@@ -219,9 +219,9 @@ describe('ActionPlace', () => {
                 assert(scoreCalculatorServiceStub.bonusPoints.calledOnce);
             });
 
-            it('should call wordToString', () => {
+            it('should call wordsToString', () => {
                 action.execute();
-                expect(wordToStringSpy).to.have.been.called();
+                expect(wordsToStringSpy).to.have.been.called();
             });
 
             it('should call isLegalPlacement', () => {
@@ -357,28 +357,6 @@ describe('ActionPlace', () => {
 
         it('should return the correct number of tiles', () => {
             expect(action.amountOfLettersInWords(EXTRACT_RETURN)).to.equal(EXTRACT_RETURN_LETTERS);
-        });
-    });
-
-    describe('wordToString', () => {
-        let action: ActionPlace;
-
-        beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
-        });
-
-        it('should return the word', () => {
-            expect(action.wordToString(EXTRACT_RETURN)).to.deep.equal(['AB']);
-        });
-
-        it('should return word when tile has playedLetter', () => {
-            const tiles: [Square, Tile][][] = [
-                [
-                    [{} as unknown as Square, { letter: 'A', value: 0 }],
-                    [{} as unknown as Square, { letter: '*', value: 0, playedLetter: 'B' }],
-                ],
-            ];
-            expect(action.wordToString(tiles)).to.deep.equal(['AB']);
         });
     });
 

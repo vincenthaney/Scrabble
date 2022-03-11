@@ -1,12 +1,12 @@
 import Player from '@app/classes/player/player';
-import { PointRange, WordFindingRequest } from '@app/classes/word-finding';
-import { WordFindingService } from '@app/services/word-finding/word-finding';
+import { PointRange, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import WordFindingService from '@app/services/word-finding/word-finding';
 import { Container } from 'typedi';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
-    pointHistoric = new Map<number, number>();
+    pointHistory = new Map<number, number>();
 
     private wordFindingService: WordFindingService;
     private activeGameService: ActiveGameService;
@@ -37,8 +37,8 @@ export abstract class AbstractVirtualPlayer extends Player {
     generateWordFindingRequest(): WordFindingRequest {
         return {
             pointRange: this.findPointRange(),
-            numberOfWordsToFind: 1,
-            pointHistoric: this.pointHistoric,
+            useCase: WordFindingUseCase.Beginner,
+            pointHistory: this.pointHistory,
         };
     }
 
