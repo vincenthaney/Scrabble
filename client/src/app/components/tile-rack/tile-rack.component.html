@@ -17,7 +17,7 @@
                     <app-icon icon="exchange"></app-icon> Échanger
                 </button>
             </div>
-            <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
+            <div matTooltip="Aucune tuiles sélectionnées" matTooltipPosition="above" matTooltipDisabled="selectedTiles.length === 0">
                 <button mat-raised-button class="btn-rack" color="primary" [disabled]="selectedTiles.length === 0" (click)="unselectAll()">
                     <app-icon icon="undo"></app-icon> Annuler
                 </button>

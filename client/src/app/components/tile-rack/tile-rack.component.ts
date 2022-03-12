@@ -16,7 +16,7 @@ export type RackTile = Tile & { played: boolean; selected: boolean };
 @Component({
     selector: 'app-tile-rack',
     templateUrl: './tile-rack.component.html',
-    styleUrls: ['./tile-rack.component.scss'],
+    styleUrls: ['./tile-rack.component.scss', './tile-rack.component.2.scss'],
 })
 export class TileRackComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
     tiles: RackTile[];
