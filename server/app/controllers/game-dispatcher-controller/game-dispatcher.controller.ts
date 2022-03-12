@@ -220,7 +220,8 @@ export class GameDispatcherController {
         } else {
             if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
             if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
-            gameId = this.gameDispatcherService.createMultiplayerGame(config);
+            // TODO : gameId = this.gameDispatcherService.createSoloGame(config);
+            gameId = ''; // CHANGE THIS ONCE SOLO GAME CREATION METHOD EXISTS
         }
 
         this.socketService.addToRoom(config.playerId, gameId);

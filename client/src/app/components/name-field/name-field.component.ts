@@ -24,7 +24,7 @@ export class NameFieldComponent implements OnChanges {
             Validators.pattern(NAME_VALIDATION.rule),
             Validators.minLength(NAME_VALIDATION.minLength),
             Validators.maxLength(NAME_VALIDATION.maxLength),
-            this.nameDifferentFomVirtualPlayer(),
+            this.nameDifferentFromVirtualPlayer(),
         ]),
     });
 
@@ -35,12 +35,12 @@ export class NameFieldComponent implements OnChanges {
     onChange() {
         if (this.formParameters.controls.inputName?.dirty) this.formParameters.controls.inputName?.markAsTouched();
         this.formParameters.controls.inputName?.updateValueAndValidity();
-        const nameValid: boolean = this.formParameters.get('inputName')?.valid ?? false;
-        this.isInputNameValid.emit(nameValid);
-        this.playerNameChange.emit([this.formParameters.get('inputName')?.value, nameValid]);
+        const isNameValid: boolean = this.formParameters.get('inputName')?.valid ?? false;
+        this.isInputNameValid.emit(isNameValid);
+        this.playerNameChange.emit([this.formParameters.get('inputName')?.value, isNameValid]);
     }
 
-    private nameDifferentFomVirtualPlayer(): ValidatorFn {
+    private nameDifferentFromVirtualPlayer(): ValidatorFn {
         return (inputName: AbstractControl): ValidationErrors | null => {
             if (!this.mustVerifyVirtualPlayerName) return null;
             if (inputName.value !== this.virtualPlayerName) return null;
