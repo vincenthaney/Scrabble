@@ -25,7 +25,17 @@ export default class Board {
         return this.grid[position.row][position.column];
     }
 
-    navigate(position: Position, orientation: Orientation): BoardNavigator {
+    getDesiredSquares(predicate: (square: Square) => boolean): Square[] {
+        const desiredSquares: Square[] = [];
+        for (const row of this.grid) {
+            for (const square of row) {
+                if (predicate(square)) desiredSquares.push(square);
+            }
+        }
+        return desiredSquares;
+    }
+
+    navigate(position: Position, orientation: Orientation) {
         return new BoardNavigator(this, position, orientation);
     }
 

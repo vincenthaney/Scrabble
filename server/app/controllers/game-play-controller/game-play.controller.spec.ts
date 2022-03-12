@@ -40,7 +40,7 @@ chai.use(chaiAsPromised);
 
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: {}, input: '' };
+const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: { tiles: [] }, input: '' };
 const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_FEEDBACK = 'this is a feedback';
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
@@ -194,7 +194,7 @@ describe('GamePlayController', () => {
             gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
             gameStub.board = boardStub as unknown as Board;
             gameStub['id'] = DEFAULT_GAME_ID;
-            gameStub.getOpponentPlayer.returns(gameStub.player2);
+            gameStub.getPlayer.returns(gameStub.player2);
 
             emitToSocketSpy = chai.spy.on(gamePlayController['socketService'], 'emitToSocket', () => {});
             emitToRoomSpy = chai.spy.on(gamePlayController['socketService'], 'emitToRoom', () => {});
@@ -311,9 +311,9 @@ describe('GamePlayController', () => {
             const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
             handlePlayActionStub.callThrough();
 
-            await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: {}, input: '' });
+            await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
-            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PLACE, payload: {}, input: '' })).to.be.true;
+            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' })).to.be.true;
         });
     });
 
@@ -412,7 +412,7 @@ describe('GamePlayController', () => {
             (gamePlayController['socketService'] as unknown) = socketServiceStub;
 
             gameStub = createStubInstance(Game);
-            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name));
+            gameStub.getPlayer.returns(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name));
 
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);

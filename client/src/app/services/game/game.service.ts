@@ -2,7 +2,7 @@ import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
-import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
@@ -74,7 +74,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.serviceDestroyed$.complete();
     }
 
-    async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData): Promise<void> {
+    async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -99,7 +99,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
     }
 
-    reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
+    reconnectReinitialize(startGameData: StartGameData): void {
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
         this.rerenderEvent.emit();

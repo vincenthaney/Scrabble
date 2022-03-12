@@ -13,6 +13,9 @@ import { WordsVerificationService } from '@app/services/words-verification-servi
 import { Container } from 'typedi';
 import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
+import { StringConversion } from '@app/utils/string-conversion';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -30,13 +33,29 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator = Container.get(WordsVerificationService);
     }
 
+    static createActionData(scoredWordPlacement: ScoredWordPlacement): ActionData {
+        return {
+            type: ActionType.PLACE,
+            payload: this.createActionPlacePayload(scoredWordPlacement),
+            input: '',
+        };
+    }
+
+    static createActionPlacePayload(scoredWordPlacement: ScoredWordPlacement): ActionPlacePayload {
+        return {
+            tiles: scoredWordPlacement.tilesToPlace,
+            orientation: scoredWordPlacement.orientation,
+            startPosition: scoredWordPlacement.startPosition,
+        };
+    }
+
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        this.wordValidator.verifyWords(this.wordToString(createdWords), DICTIONARY_NAME);
+        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
@@ -53,12 +72,6 @@ export default class ActionPlace extends ActionPlay {
         else response.player2 = playerData;
 
         return response;
-    }
-
-    wordToString(words: [Square, Tile][][]): string[] {
-        return words.map((word) =>
-            word.reduce((previous, [, tile]) => (tile.playedLetter ? (previous += tile.playedLetter) : (previous += tile.letter)), ''),
-        );
     }
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {

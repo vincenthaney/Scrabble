@@ -28,6 +28,7 @@ const TEST_LOBBIES = [TEST_LOBBY_INFO];
 const TEST_GAME_PARAMETERS = {
     gameType: GameType.LOG2990,
     gameMode: GameMode.Solo,
+    virtualPlayerName: 'Victoria',
     level: VirtualPlayerLevel.Beginner,
     timer: '60',
     dictionary: 'français',
@@ -35,6 +36,7 @@ const TEST_GAME_PARAMETERS = {
 const TEST_FORM_CONTENT = {
     gameType: new FormControl(GameType.Classic, Validators.required),
     gameMode: new FormControl(GameMode.Solo, Validators.required),
+    virtualPlayerName: new FormControl('', Validators.required),
     level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
     timer: new FormControl('', Validators.required),
     dictionary: new FormControl('', Validators.required),
@@ -168,7 +170,7 @@ describe('GameDispatcherService', () => {
 
     it('handleCreateGame should call gameDispatcherController.handleMultiplayerGameCreation \
     with the correct parameters', () => {
-        const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleMultiplayerGameCreation').and.callFake(() => {
+        const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -178,6 +180,9 @@ describe('GameDispatcherService', () => {
             playerName: TEST_PLAYER_NAME,
             playerId: TEST_PLAYER_ID,
             gameType: TEST_GAME_PARAMETERS.gameType,
+            gameMode: TEST_GAME_PARAMETERS.gameMode,
+            virtualPlayerName: TEST_GAME_PARAMETERS.virtualPlayerName,
+            virtualPlayerLevel: TEST_GAME_PARAMETERS.level,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
             dictionary: TEST_GAME_PARAMETERS.dictionary,
         };
