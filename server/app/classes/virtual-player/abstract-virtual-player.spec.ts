@@ -16,6 +16,10 @@ class TestClass extends AbstractVirtualPlayer {
     findPointRange(): PointRange {
         return TEST_POINT_RANGE;
     }
+
+    sendPayload(): void {
+        return;
+    }
 }
 
 const gameId = 'testGameId';
