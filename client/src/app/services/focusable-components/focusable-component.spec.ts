@@ -78,7 +78,7 @@ describe('FocusableComponent', () => {
         });
 
         it('should call onFocusableEvent when subscribed', () => {
-            component.onFocusableEvent = () => {};
+            component['onFocusableEvent'] = () => {};
             const spy = spyOn<any>(component, 'onFocusableEvent');
             component['subscribe']();
             const expected = 'expected';
@@ -87,7 +87,7 @@ describe('FocusableComponent', () => {
         });
 
         it('should call onFocusableEvent when subscribed', () => {
-            component.onLoseFocusEvent = () => {};
+            component['onLoseFocusEvent'] = () => {};
             const spy = spyOn<any>(component, 'onLoseFocusEvent');
             component['subscribe']();
             component.emitLoseFocusEvent();
