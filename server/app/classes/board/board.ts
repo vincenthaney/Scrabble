@@ -12,7 +12,6 @@ export default class Board {
     constructor(grid: Square[][]) {
         this.grid = grid;
     }
-
     // Verifies if the position is valid and if the square at the given position in the board has a tile or not
     verifySquare(position: Position, shouldBeFilled: boolean): boolean {
         if (position.isWithinBounds({ x: this.grid[0].length, y: this.grid.length })) {
@@ -61,7 +60,7 @@ export default class Board {
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
         while (i < tiles.length) {
-            if (this.isPositionOutOfBoard(startPosition)) return false;
+            if (this.isWithinBounds(actualPosition)) return false;
             const targetSquare = this.grid[actualPosition.row][actualPosition.column];
             if (isVertical) actualPosition.row++;
             else actualPosition.column++;
@@ -82,7 +81,12 @@ export default class Board {
         return { x: this.grid[0].length, y: this.grid.length };
     }
 
-    private isPositionOutOfBoard(position: Position): boolean {
-        return position.row < 0 || position.row >= this.grid.length || position.column < 0 || position.column >= this.grid[0].length;
+    private isWithinBounds(actualPosition: { row: number; column: number }) {
+        return (
+            actualPosition.row < 0 ||
+            actualPosition.row >= this.grid.length ||
+            actualPosition.column < 0 ||
+            actualPosition.column >= this.grid[0].length
+        );
     }
 }
