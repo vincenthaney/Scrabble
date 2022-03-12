@@ -199,7 +199,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private hasBoardBeenUpdated(squaresToUpdate: Square[]): boolean {
-        return squaresToUpdate.length > 0 && squaresToUpdate.length < this.gridSize.x * this.gridSize.y;
+        return !squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y;
     }
 
     private isInBounds(position: Position): boolean {
