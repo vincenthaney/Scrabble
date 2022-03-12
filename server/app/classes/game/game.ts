@@ -79,11 +79,11 @@ export default class Game {
         return this.tileReserve.getTilesLeftPerLetter();
     }
 
-    getId() {
+    getId(): string {
         return this.id;
     }
 
-    async initTileReserve() {
+    async initTileReserve(): Promise<void> {
         return this.tileReserve.init();
     }
 

@@ -92,16 +92,16 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         };
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onFocusableEvent = (e: KeyboardEvent): void => {
-            switch (e.key) {
+        this.onFocusableEvent = (exception: KeyboardEvent): void => {
+            switch (exception.key) {
                 case BACKSPACE:
-                    if (e.type === KEYDOWN) handleBackspace();
+                    if (exception.type === KEYDOWN) handleBackspace();
                     break;
                 case ESCAPE:
-                    if (e.type === KEYDOWN) clearCursor();
+                    if (exception.type === KEYDOWN) clearCursor();
                     break;
                 default:
-                    handlePlaceLetter(e.key, this.selectedSquare);
+                    handlePlaceLetter(exception.key, this.selectedSquare);
             }
         };
 
@@ -145,7 +145,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         );
     }
 
-    private clearNotAppliedSquare() {
+    private clearNotAppliedSquare(): void {
         this.notAppliedSquares.forEach((s) => (s.square.tile = null));
         this.notAppliedSquares = [];
     }
