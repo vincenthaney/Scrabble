@@ -93,8 +93,6 @@ export default class RoundManager {
             // Randomly get a player
             return Math.round(Math.random()) === 0 ? this.player1 : this.player2;
         }
-
-        if (this.currentRound.player === this.player1) return this.player2;
-        else return this.player1;
+        return this.currentRound.player === this.player1 ? this.player2 : this.player1;
     }
 }

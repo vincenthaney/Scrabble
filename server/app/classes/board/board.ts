@@ -14,7 +14,7 @@ export default class Board {
     }
     // Verifies if the position is valid and if the square at the given position in the board has a tile or not
     verifySquare(position: Position, shouldBeFilled: boolean): boolean {
-        if (position.isWithinBounds({ x: this.grid[0].length, y: this.grid.length })) {
+        if (this.isWithinBounds(position)) {
             return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
         } else {
             throw new Error(POSITION_OUT_OF_BOARD);
@@ -64,19 +64,13 @@ export default class Board {
     }
 
     placeWord(tiles: Tile[], startPosition: Position, orientation: Orientation): boolean {
-        const actualPosition = { ...startPosition };
+        const actualPosition = new Position(startPosition.row, startPosition.column);
         if (tiles.length === 0 || !this.verifySquare(startPosition, SHOULD_HAVE_NO_TILE)) return false;
         const isVertical = orientation === Orientation.Vertical;
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
         while (i < tiles.length) {
-            if (
-                actualPosition.row < 0 ||
-                actualPosition.row >= this.grid.length ||
-                actualPosition.column < 0 ||
-                actualPosition.column >= this.grid[0].length
-            )
-                return false;
+            if (!this.isWithinBounds(actualPosition)) return false;
             const targetSquare = this.grid[actualPosition.row][actualPosition.column];
             if (isVertical) actualPosition.row++;
             else actualPosition.column++;
@@ -95,5 +89,9 @@ export default class Board {
 
     getSize(): Vec2 {
         return { x: this.grid[0].length, y: this.grid.length };
+    }
+
+    private isWithinBounds(position: Position): boolean {
+        return position.isWithinBounds(this.getSize());
     }
 }

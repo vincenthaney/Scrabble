@@ -110,8 +110,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
-        if (!playerData.id || !playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
-        return new Player(playerData.id, playerData.name, playerData.tiles);
+        if (playerData.id && playerData.name && playerData.tiles) return new Player(playerData.id, playerData.name, playerData.tiles);
+        throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
