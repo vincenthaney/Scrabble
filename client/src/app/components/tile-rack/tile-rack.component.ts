@@ -49,14 +49,14 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.serviceDestroyed$.complete();
     }
 
-    selectTile(type: TileRackSelectType, tile: RackTile): boolean {
-        if (this.selectionType === type && tile.isSelected) {
+    selectTile(selectType: TileRackSelectType, tile: RackTile): boolean {
+        if (this.selectionType === selectType && tile.isSelected) {
             this.unselectTile(tile);
             return false;
         }
 
-        if (this.selectionType !== type || type === TileRackSelectType.Move) {
-            this.selectionType = type;
+        if (this.selectionType !== selectType || selectType === TileRackSelectType.Move) {
+            this.selectionType = selectType;
             this.unselectAll();
         }
 
