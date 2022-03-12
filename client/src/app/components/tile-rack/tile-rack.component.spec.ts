@@ -19,6 +19,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { ESCAPE } from '@app/constants/components-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { BehaviorSubject } from 'rxjs';
@@ -159,7 +160,7 @@ describe('TileRackComponent', () => {
     describe('selectTile', () => {
         it('should set tile.selected to true', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
-            const tile: RackTile = { selected: false } as unknown as RackTile;
+            const tile: RackTile = { isSelected: false } as unknown as RackTile;
 
             component.selectTile(type, tile);
 
@@ -179,7 +180,7 @@ describe('TileRackComponent', () => {
 
         it('should call unselectTile if same tile and tile is selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
-            const tile: RackTile = { selected: true } as unknown as RackTile;
+            const tile: RackTile = { isSelected: true } as unknown as RackTile;
             const spy = spyOn(component, 'unselectTile');
 
             component['selectionType'] = type;
@@ -190,7 +191,7 @@ describe('TileRackComponent', () => {
 
         it('should return false', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
-            const tile: RackTile = { selected: false } as unknown as RackTile;
+            const tile: RackTile = { isSelected: false } as unknown as RackTile;
 
             const result = component.selectTile(type, tile);
 
@@ -220,7 +221,7 @@ describe('TileRackComponent', () => {
 
         it('should return false if tile already selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
-            const tile: RackTile = { selected: true } as unknown as RackTile;
+            const tile: RackTile = { isSelected: true } as unknown as RackTile;
             spyOn(component, 'unselectTile');
 
             component['selectionType'] = type;
@@ -230,9 +231,31 @@ describe('TileRackComponent', () => {
         });
     });
 
+    describe('selectTileExchange', () => {
+        it('should call selectType with type exchange', () => {
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'selectTile');
+
+            component.selectTileExchange(tile);
+
+            expect(spy).toHaveBeenCalledOnceWith(TileRackSelectType.Exchange, tile);
+        });
+    });
+
+    describe('selectTileMove', () => {
+        it('should call selectType with type move', () => {
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'selectTile');
+
+            component.selectTileMove(tile);
+
+            expect(spy).toHaveBeenCalledOnceWith(TileRackSelectType.Move, tile);
+        });
+    });
+
     describe('unselectTile', () => {
         it('should set tile.selected to false', () => {
-            const tile: RackTile = { selected: true } as unknown as RackTile;
+            const tile: RackTile = { isSelected: true } as unknown as RackTile;
 
             component.unselectTile(tile);
 
@@ -240,7 +263,7 @@ describe('TileRackComponent', () => {
         });
 
         it('should remove tile from selectedTiles', () => {
-            const tile: RackTile = { selected: true } as unknown as RackTile;
+            const tile: RackTile = { isSelected: true } as unknown as RackTile;
 
             component.selectedTiles = [tile];
             component.unselectTile(tile);
@@ -286,6 +309,17 @@ describe('TileRackComponent', () => {
             const spy = spyOn(component, 'unselectAll');
 
             component['onLoseFocusEvent']();
+
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onFocusableEvent', () => {
+        it('should call unselectAll on ESC', () => {
+            const event = { key: ESCAPE } as KeyboardEvent;
+            const spy = spyOn(component, 'unselectAll');
+
+            component['onFocusableEvent'](event);
 
             expect(spy).toHaveBeenCalled();
         });
