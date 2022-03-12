@@ -16,7 +16,7 @@ import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     sendPayload(): void {
-        this.getVirtualPlayerService.sendAction(this.gameId, this.id, this.findAction());
+        this.getVirtualPlayerService().sendAction(this.gameId, this.id, this.findAction());
     }
 
     findPointRange(): PointRange {
