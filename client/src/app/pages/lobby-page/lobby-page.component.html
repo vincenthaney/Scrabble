@@ -1,5 +1,16 @@
 <div class="page">
-    <app-page-header title="Rejoindre une partie" button="Créer une partie" buttonRoute="/game-creation"></app-page-header>
+    <mat-card class="header">
+        <div class="content">
+            <div class="back-btn" [routerLink]="'/'">
+                <app-icon icon="arrow-left" styling="solid"></app-icon>
+                <img src="https://bit.ly/3m206ss" />
+            </div>
+        
+            <div class="title">Sélection de partie</div>
+
+            <a routerLink="/game-creation" class="link">Créer une partie</a>
+        </div>
+    </mat-card>
 
     <div class="container">
         <div class="steps">
@@ -15,26 +26,36 @@
                     <mat-divider class="step-divider"></mat-divider>
                 </div>
             </div>
-    
+
             <div class="step" [ngClass]="{ disabled: !nameValid }">
                 <div class="step-indicator">
                     <p class="indicator"><span>2</span></p>
                 </div>
                 <div class="step-content" id="lobby-container">
                     <mat-card>
-                        <p *ngIf="numberOfLobbiesMeetingFilter > 0">Choisissez une partie<span *ngIf="numberOfLobbiesMeetingFilter > 1"> ou rejoignez une partie aléatoire</span>.</p>
+                        <p *ngIf="numberOfLobbiesMeetingFilter > 0">
+                            Choisissez une partie<span *ngIf="numberOfLobbiesMeetingFilter > 1"> ou rejoignez une partie aléatoire</span>.
+                        </p>
                         <p *ngIf="numberOfLobbiesMeetingFilter === 0">Aucune partie disponible.</p>
-                        <button mat-flat-button color="primary" *ngIf="numberOfLobbiesMeetingFilter > 0" [disabled]="numberOfLobbiesMeetingFilter <= 1 || !nameValid" (click)="joinRandomLobby()"><app-icon icon="random"></app-icon> Partie aléatoire</button>
+                        <button
+                            mat-flat-button
+                            color="primary"
+                            *ngIf="numberOfLobbiesMeetingFilter > 0"
+                            [disabled]="numberOfLobbiesMeetingFilter <= 1 || !nameValid"
+                            (click)="joinRandomLobby()"
+                        >
+                            <app-icon icon="random"></app-icon> Partie aléatoire
+                        </button>
                     </mat-card>
 
-                    <br>
+                    <br />
 
                     <mat-card class="form-container">
                         <div class="info">
                             <p class="title">Filtre</p>
                             <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter > 1">{{ numberOfLobbiesMeetingFilter }} parties trouvées</p>
                             <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter === 1">{{ numberOfLobbiesMeetingFilter }} partie trouvée</p>
-                            <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter === 0"> Aucune partie trouvée</p>
+                            <p class="lobby-amount" *ngIf="numberOfLobbiesMeetingFilter === 0">Aucune partie trouvée</p>
                         </div>
 
                         <div class="forms">
@@ -50,10 +71,10 @@
                             </form>
                         </div>
                     </mat-card>
-                    
+
                     <div class="grid">
                         <ng-container *ngFor="let lobby of lobbies">
-                            <app-lobby-info [lobby]="lobby" *ngIf="lobby.meetFilters !== false" (joinLobbyId)="joinLobby($event)"></app-lobby-info> 
+                            <app-lobby-info [lobby]="lobby" *ngIf="lobby.meetFilters !== false" (joinLobbyId)="joinLobby($event)"></app-lobby-info>
                         </ng-container>
                     </div>
                 </div>

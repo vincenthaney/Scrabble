@@ -7,22 +7,22 @@ export abstract class FocusableComponent<T> {
     private loseFocusEvent: Subject<void> = new Subject();
     private focusableComponentDestroyed$: Subject<boolean> = new Subject();
 
-    emitFocusableEvent(value: T) {
+    emitFocusableEvent(value: T): void {
         this.focusableEvent.next(value);
     }
 
-    emitLoseFocusEvent() {
+    emitLoseFocusEvent(): void {
         this.loseFocusEvent.next();
     }
 
     protected onLoseFocusEvent?(): void;
     protected onFocusableEvent?(value: T): void;
 
-    protected subscribeToFocusableEvent(destroy$: Subject<boolean>, next: (value: T) => void) {
+    protected subscribeToFocusableEvent(destroy$: Subject<boolean>, next: (value: T) => void): void {
         this.focusableEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
-    protected subscribeToLoseFocusEvent(destroy$: Subject<boolean>, next: () => void) {
+    protected subscribeToLoseFocusEvent(destroy$: Subject<boolean>, next: () => void): void {
         this.loseFocusEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 

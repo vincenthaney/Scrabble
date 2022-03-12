@@ -1,8 +1,8 @@
-import { Board, Orientation, Position } from '@app/classes/board';
-import { Square } from '@app/classes/square';
+import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
-import { Tile } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
+import { Square } from '@app/classes/square';
+import { Tile } from '@app/classes/tile';
 import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 export class WordExtraction {
@@ -12,13 +12,7 @@ export class WordExtraction {
         const navigator = this.board.navigate(startPosition, orientation);
 
         if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
-        if (
-            !navigator
-                .clone()
-                .forward(tilesToPlace.length - 1)
-                .isWithinBounds()
-        )
-            throw new Error(POSITION_OUT_OF_BOARD);
+        if (this.isWordWithinBounds(navigator, tilesToPlace)) throw new Error(POSITION_OUT_OF_BOARD);
 
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
@@ -58,7 +52,7 @@ export class WordExtraction {
         return wordsCreated;
     }
 
-    private extractWordAroundTile(orientation: Orientation, position: Position, tile: Tile) {
+    private extractWordAroundTile(orientation: Orientation, position: Position, tile: Tile): [Square, Tile][] {
         const previous = this.extractWordInDirection(orientation, Direction.Backward, position);
         const next = this.extractWordInDirection(orientation, Direction.Forward, position);
         const current = [[this.board.getSquare(position), tile]] as [Square, Tile][];
@@ -66,7 +60,7 @@ export class WordExtraction {
         return [...previous, ...current, ...next];
     }
 
-    private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position) {
+    private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position): [Square, Tile][] {
         const navigator = this.board.navigate(position, orientation);
         if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
         const word: [Square, Tile][] = [];
@@ -80,5 +74,12 @@ export class WordExtraction {
         if (direction === Direction.Backward) word.reverse();
 
         return word;
+    }
+
+    private isWordWithinBounds(navigator: BoardNavigator, tilesToPlace: Tile[]): boolean {
+        return !navigator
+            .clone()
+            .forward(tilesToPlace.length - 1)
+            .isWithinBounds();
     }
 }

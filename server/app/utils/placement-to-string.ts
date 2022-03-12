@@ -1,9 +1,9 @@
 import { Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
-import { WordPlacement } from '@app/classes/word-finding';
+import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
 
-export class WordPlacementUtils {
+export class PlacementToString {
     static positionNumberToLetter(position: number): string {
         return String.fromCharCode(position + 'a'.charCodeAt(0));
     }
@@ -21,11 +21,11 @@ export class WordPlacementUtils {
         return `${this.positionNumberToLetter(position.row)}${position.column + 1}${this.orientationToLetter(orientation)}`;
     }
 
-    static tilesToString(tiles: Tile[]) {
+    static tilesToString(tiles: Tile[]): string {
         return tiles.reduce((str, tile) => str + tile.letter.toLowerCase(), '');
     }
 
-    static wordPlacementToCommandString(placement: WordPlacement) {
+    static wordPlacementToCommandString(placement: WordPlacement): string {
         return `${this.positionAndOrientationToString(placement.startPosition, placement.orientation)} ${this.tilesToString(placement.tilesToPlace)}`;
     }
 }

@@ -30,9 +30,8 @@ export class ActiveGameService {
         if (filteredGames.length === 0) throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.NOT_FOUND);
 
         const game = filteredGames[0];
-        if (game.player1.id !== playerId && game.player2.id !== playerId) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
-
-        return game;
+        if (game.player1.id === playerId || game.player2.id === playerId) return game;
+        throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
     }
 
     removeGame(id: string, playerId: string): void {

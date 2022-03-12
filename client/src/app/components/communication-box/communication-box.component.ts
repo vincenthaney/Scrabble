@@ -106,7 +106,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         if (!this.isOpponent(newMessage.senderId)) this.loading = false;
     }
 
-    isOpponent(id: string) {
+    isOpponent(id: string): boolean {
         return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
@@ -115,7 +115,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeftTotal = tileReserveTotal;
     }
 
-    onContainerClick() {
+    onContainerClick(): void {
         this.focusableComponentsService.setActiveKeyboardComponent(this);
     }
 

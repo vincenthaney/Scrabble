@@ -6,6 +6,7 @@ import PointRange from '@app/classes/word-finding/point-range';
 import { AbstractVirtualPlayer } from './abstract-virtual-player';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
+import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
 
 class TestClass extends AbstractVirtualPlayer {
     findAction(): void {
@@ -64,8 +65,8 @@ describe('AbstractVirtualPlayer', () => {
 
     it('generateWordFindingRequest should return WordFindingRequest with correct data', () => {
         const testWordFindingRequest = abstractPlayer.generateWordFindingRequest();
-        expect(testWordFindingRequest.numberOfWordsToFind).to.equal(1);
-        expect(testWordFindingRequest.pointHistoric).to.deep.equal(abstractPlayer.pointHistoric);
+        expect(testWordFindingRequest.useCase).to.equal(WordFindingUseCase.Beginner);
+        expect(testWordFindingRequest.pointHistory).to.deep.equal(abstractPlayer.pointHistory);
         expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
     });
 
