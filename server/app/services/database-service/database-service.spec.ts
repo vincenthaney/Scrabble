@@ -13,10 +13,8 @@ import { Container } from 'typedi';
 import DatabaseService from './database-service';
 chai.use(chaiAsPromised);
 
-const TEST_DOCUMENT: Document = { score: 1 };
-const TEST_DOCUMENT_2: Document = { name: 'pablito' };
-const TEST_DOCUMENT_SMALL_ARRAY: Document[] = [TEST_DOCUMENT_2, TEST_DOCUMENT_2];
-const TEST_DOCUMENT_BIG_ARRAY: Document[] = [TEST_DOCUMENT, TEST_DOCUMENT, TEST_DOCUMENT, TEST_DOCUMENT];
+const TEST_DOCUMENT_SMALL_ARRAY: Document[] = [{ name: 'pablito' }, { name: 'pablito' }];
+const TEST_DOCUMENT_BIG_ARRAY: Document[] = [{ score: 1 }, { score: 1 }, { score: 1 }, { score: 1 }];
 
 describe('Database service', () => {
     let databaseService: DatabaseService;
@@ -56,7 +54,6 @@ describe('Database service', () => {
 
     it('should populate the database with a helper function', async () => {
         const mongoUri = await mongoServer.getUri();
-
         const client = await MongoClient.connect(mongoUri);
         databaseService['db'] = client.db(MONGO_DATABASE_NAME);
 
