@@ -1,9 +1,9 @@
-export interface DbHighScore {
+export interface HighScore {
     gameType: string;
     score: number;
     names: string[];
 }
 
 export interface DbHighScoresData {
-    highScores: DbHighScore[];
+    highScores: HighScore[];
 }
