@@ -22,7 +22,7 @@ export class TileComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.isWorthessTile()) {
+        if (this.isWorthlessTile()) {
             this.hideValue = true;
         }
     }
@@ -32,7 +32,7 @@ export class TileComponent implements OnInit {
         return `assets/img/tiles/bg_${index}.svg`;
     }
 
-    private isWorthessTile(): boolean {
+    private isWorthlessTile(): boolean {
         return this.tile.isBlank || (this.tile.letter === '*' && this.tile.value === 0);
     }
 }
