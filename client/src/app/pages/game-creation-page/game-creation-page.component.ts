@@ -31,6 +31,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
+        // we must disable to use the first name from the randomized virtual player names array created in this class as the default value.
+        // eslint-disable-next-line no-invalid-this
         virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
         timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
         dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
