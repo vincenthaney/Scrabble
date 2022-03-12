@@ -2,11 +2,6 @@
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-export interface FocusableComponent<T> {
-    onLoseFocusEvent?(): void;
-    onFocusableEvent?(value: T): void;
-}
-
 export abstract class FocusableComponent<T> {
     private focusableEvent: Subject<T> = new Subject();
     private loseFocusEvent: Subject<void> = new Subject();
@@ -19,6 +14,9 @@ export abstract class FocusableComponent<T> {
     emitLoseFocusEvent() {
         this.loseFocusEvent.next();
     }
+
+    protected onLoseFocusEvent?(): void;
+    protected onFocusableEvent?(value: T): void;
 
     protected subscribeToFocusableEvent(destroy$: Subject<boolean>, next: (value: T) => void) {
         this.focusableEvent.pipe(takeUntil(destroy$)).subscribe(next);
