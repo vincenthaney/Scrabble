@@ -11,7 +11,7 @@ import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
-import { GameType } from './game.type';
+import { GameType } from './game-type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
@@ -87,15 +87,11 @@ export default class Game {
         return this.tileReserve.init();
     }
 
-    getRequestingPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player1;
-        if (this.player2.id === playerId) return this.player2;
-        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
-    }
-
-    getOpponentPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player2;
-        if (this.player2.id === playerId) return this.player1;
+    getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
+        if (this.isPlayerFromGame(playerId)) {
+            if (this.player1.id === playerId) return isRequestingPlayer ? this.player1 : this.player2;
+            if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
+        }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
@@ -178,5 +174,9 @@ export default class Game {
             round: roundData,
         };
         return startMultiplayerGameData;
+    }
+
+    private isPlayerFromGame(playerId: string): boolean {
+        return this.player1.id === playerId || this.player2.id === playerId;
     }
 }

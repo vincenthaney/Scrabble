@@ -1,12 +1,12 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { NameFieldComponent } from '@app/components/name-field/name-field.component';
-import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
+import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -16,20 +16,26 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit, OnDestroy {
-    @ViewChild(NameFieldComponent) child: NameFieldComponent;
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
     // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
     dictionaryOptions: string[];
+    virtualPlayerNames: string[] = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
+    playerName: string = '';
+    playerNameValid: boolean = false;
+
     serviceDestroyed$: Subject<boolean> = new Subject();
 
     gameParameters: FormGroup = new FormGroup({
         gameType: new FormControl(GameType.Classic, Validators.required),
         gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
         level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
+        // we must disable to use the first name from the randomized virtual player names array created in this class as the default value.
+        // eslint-disable-next-line no-invalid-this
+        virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
         timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-        dictionary: new FormControl('', Validators.required),
+        dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
     });
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
@@ -54,19 +60,26 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     isFormValid(): boolean {
-        return this.gameParameters?.valid && this.child.formParameters?.valid;
+        return this.gameParameters?.valid && this.playerNameValid;
     }
 
     onSubmit(): void {
         if (this.isFormValid()) {
             this.createGame();
-        } else {
-            this.child.formParameters.markAllAsTouched();
         }
     }
 
     createGame(): void {
-        this.router.navigateByUrl('waiting-room');
-        this.gameDispatcherService.handleCreateGame(this.child.playerName, this.gameParameters);
+        if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
+            this.router.navigateByUrl('waiting-room');
+        } else {
+            this.router.navigateByUrl('game');
+        }
+        this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
+    }
+
+    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
+        this.playerName = playerName;
+        this.playerNameValid = valid;
     }
 }

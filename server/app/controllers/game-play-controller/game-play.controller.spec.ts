@@ -194,7 +194,7 @@ describe('GamePlayController', () => {
             gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
             gameStub.board = boardStub as unknown as Board;
             gameStub['id'] = DEFAULT_GAME_ID;
-            gameStub.getOpponentPlayer.returns(gameStub.player2);
+            gameStub.getPlayer.returns(gameStub.player2);
 
             emitToSocketSpy = chai.spy.on(gamePlayController['socketService'], 'emitToSocket', () => {});
             emitToRoomSpy = chai.spy.on(gamePlayController['socketService'], 'emitToRoom', () => {});
@@ -412,7 +412,7 @@ describe('GamePlayController', () => {
             (gamePlayController['socketService'] as unknown) = socketServiceStub;
 
             gameStub = createStubInstance(Game);
-            gameStub.getOpponentPlayer.returns(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name));
+            gameStub.getPlayer.returns(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name));
 
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);

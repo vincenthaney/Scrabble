@@ -264,26 +264,28 @@ describe('InformationBoxComponent', () => {
     });
 
     describe('updateActivePlayerBorder', () => {
+        const PLAYER1 = new Player('1', 'Player1', []);
+        const PLAYER2 = new Player('2', 'Player2', []);
+
+        beforeEach(() => {
+            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(PLAYER1);
+            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(PLAYER2);
+        });
+
+        it('updateActivePlayerBorder should not set any border if there is no active player', () => {
+            component.updateActivePlayerBorder(undefined);
+            expect(component.isPlayer1Active).toBeFalse();
+            expect(component.isPlayer2Active).toBeFalse();
+        });
+
         it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
-            const player1 = new Player('1', 'Player1', []);
-            const player2 = new Player('2', 'Player2', []);
-            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
-            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
-
-            component.updateActivePlayerBorder(player1);
-
+            component.updateActivePlayerBorder(PLAYER1);
             expect(component.isPlayer1Active).toBeTrue();
             expect(component.isPlayer2Active).toBeFalse();
         });
 
         it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
-            const player1 = new Player('1', 'Player1', []);
-            const player2 = new Player('2', 'Player2', []);
-            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
-            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
-
-            component.updateActivePlayerBorder(player2);
-
+            component.updateActivePlayerBorder(PLAYER2);
             expect(component.isPlayer2Active).toBeTrue();
             expect(component.isPlayer1Active).toBeFalse();
         });

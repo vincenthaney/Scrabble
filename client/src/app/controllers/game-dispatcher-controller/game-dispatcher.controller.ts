@@ -1,7 +1,7 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { LobbyInfo, PlayerName } from '@app/classes/communication/';
-import { GameConfig, GameConfigData, StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { GameConfig, GameConfigData, StartGameData } from '@app/classes/communication/game-config';
 import GameService from '@app/services/game/game.service';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
@@ -35,8 +35,8 @@ export class GameDispatcherController implements OnDestroy {
         this.socketService.on('joinRequest', (opponent: PlayerName) => {
             this.joinRequestEvent.next(opponent.name);
         });
-        this.socketService.on('startGame', (startGameData: StartMultiplayerGameData) => {
-            this.gameService.initializeMultiplayerGame(this.socketService.getId(), startGameData);
+        this.socketService.on('startGame', (startGameData: StartGameData) => {
+            this.gameService.initializeGame(this.socketService.getId(), startGameData);
         });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
             this.lobbiesUpdateEvent.next(lobbies);
@@ -47,7 +47,7 @@ export class GameDispatcherController implements OnDestroy {
         this.socketService.on('canceledGame', (opponent: PlayerName) => this.canceledGameEvent.next(opponent.name));
     }
 
-    handleMultiplayerGameCreation(gameConfig: GameConfigData): void {
+    handleGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
         this.http.post<{ gameId: string }>(endpoint, gameConfig).subscribe((response) => {
             this.createGameEvent.next(response.gameId);
@@ -86,6 +86,7 @@ export class GameDispatcherController implements OnDestroy {
         );
     }
 
+    // error has any type so we must disable no explicit any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleJoinError(error: any): void {
         if (error.status === HttpStatusCode.Unauthorized) {

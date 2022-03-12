@@ -181,6 +181,36 @@ describe('Board', () => {
         });
     });
 
+    describe('getSize', () => {
+        it('should return correctSize', () => {
+            expect(board.getSize()).to.deep.equal(BOARD_SIZE);
+        });
+    });
+
+    describe('getDesiredSquares', () => {
+        it('should return all squares if predicate is always true', () => {
+            expect(board.getDesiredSquares(() => true)).to.deep.equal(grid.flat());
+        });
+        it('should return no squares if predicate is always false', () => {
+            expect(board.getDesiredSquares(() => false)).to.deep.equal([]);
+        });
+        it('should return squares with tiles', () => {
+            grid[1][1].tile = DEFAULT_TILE_A;
+            grid[2][2].tile = DEFAULT_TILE_B;
+            grid[3][1].tile = DEFAULT_TILE_C;
+            grid[4][1].tile = DEFAULT_TILE_D;
+
+            expect(board.getDesiredSquares((square: Square) => square.tile !== null).length).to.equal(4);
+        });
+    });
+
+    describe('navigate', () => {
+        it('should return a BoardNavigator', () => {
+            const position = new Position(2, 4);
+            expect(board.navigate(position, Orientation.Horizontal)).to.be.instanceOf(BoardNavigator);
+        });
+    });
+
     describe('getSquare', () => {
         it('should return square from grid', () => {
             const position = new Position(2, 4);

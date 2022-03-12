@@ -9,7 +9,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { WINNER_MESSAGE } from '@app/constants/game';
+import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import * as chai from 'chai';
@@ -21,7 +21,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
-import { GameType } from './game.type';
+import { GameType } from './game-type';
 
 const expect = chai.expect;
 
@@ -154,35 +154,35 @@ describe('Game', () => {
 
         describe('getActivePlayer', () => {
             it('should return player with same id (player 1)', () => {
-                const player = game.getRequestingPlayer(DEFAULT_PLAYER_1.id);
+                const player = game.getPlayer(DEFAULT_PLAYER_1.id, IS_REQUESTING);
                 expect(player).to.equal(DEFAULT_PLAYER_1);
             });
 
             it('should return player with same id (player 2)', () => {
-                const player = game.getRequestingPlayer(DEFAULT_PLAYER_2.id);
+                const player = game.getPlayer(DEFAULT_PLAYER_2.id, IS_REQUESTING);
                 expect(player).to.equal(DEFAULT_PLAYER_2);
             });
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getRequestingPlayer(invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getPlayer(invalidId, IS_REQUESTING)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
 
         describe('getOpponentPlayer', () => {
             it('should return player with other id (player 1)', () => {
-                const player = game.getOpponentPlayer(DEFAULT_PLAYER_1.id);
+                const player = game.getPlayer(DEFAULT_PLAYER_1.id, IS_OPPONENT);
                 expect(player).to.equal(DEFAULT_PLAYER_2);
             });
 
             it('should return player with other id (player 2)', () => {
-                const player = game.getOpponentPlayer(DEFAULT_PLAYER_2.id);
+                const player = game.getPlayer(DEFAULT_PLAYER_2.id, IS_OPPONENT);
                 expect(player).to.equal(DEFAULT_PLAYER_1);
             });
 
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
-                expect(() => game.getOpponentPlayer(invalidId)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+                expect(() => game.getPlayer(invalidId, IS_OPPONENT)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
     });
