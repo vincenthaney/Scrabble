@@ -82,7 +82,6 @@ export default class GameDispatcherService implements OnDestroy {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
             gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
         }
-        console.log(gameConfig);
         this.gameDispatcherController.handleGameCreation(gameConfig);
     }
 
