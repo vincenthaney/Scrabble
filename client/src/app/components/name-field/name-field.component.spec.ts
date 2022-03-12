@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NAME_NO_MATCH_REGEX, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
+import { IconComponent } from '../icon/icon.component';
 import { NameFieldComponent } from './name-field.component';
 
 const fakeNameChange = () => {
@@ -19,7 +20,7 @@ describe('NameFieldComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [NameFieldComponent],
+            declarations: [NameFieldComponent, IconComponent],
             imports: [BrowserAnimationsModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
         }).compileComponents();
     });
@@ -45,29 +46,10 @@ describe('NameFieldComponent', () => {
     });
 
     describe('onChange', () => {
-        let inputControlSpy: jasmine.SpyObj<AbstractControl>;
         let nameValidEmitSpy: jasmine.Spy;
 
         beforeEach(() => {
-            inputControlSpy = jasmine.createSpyObj(component.formParameters.controls.inputName, ['markAsTouched', 'updateValueAndValidity']);
             nameValidEmitSpy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
-        });
-
-        it('should mark as touched if field dirty', () => {
-            component.formParameters.controls.inputName.markAsDirty();
-            fixture.detectChanges();
-            component.onChange();
-            expect(inputControlSpy.markAsTouched).toHaveBeenCalled();
-        });
-
-        it('should NOT mark as touched if field is not dirty', () => {
-            component.onChange();
-            expect(inputControlSpy.markAsTouched).not.toHaveBeenCalled();
-        });
-
-        it('should update value and validity', () => {
-            component.onChange();
-            expect(inputControlSpy.updateValueAndValidity).toHaveBeenCalled();
         });
 
         it('onNameChange should emit isInputNameValid true with a valid name', () => {
@@ -78,7 +60,6 @@ describe('NameFieldComponent', () => {
 
         it('onNameChange should emit isInputNameValid false with an invalid name', () => {
             component.formParameters.patchValue({ inputName: INVALID_NAME });
-            // fixture.detectChanges();
             component.onChange();
             expect(nameValidEmitSpy).toHaveBeenCalledWith(false);
         });

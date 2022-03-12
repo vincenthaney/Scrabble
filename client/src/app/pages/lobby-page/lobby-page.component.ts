@@ -58,7 +58,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     validateName(): void {
         this.numberOfLobbiesMeetingFilter = 0;
         this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
-        console.log(this.nameValid);
         this.setFormAvailability(this.nameValid);
 
         for (const lobby of this.lobbies) {
