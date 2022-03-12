@@ -38,9 +38,8 @@ export default class RoundManagerService implements IResetServiceData {
 
     convertRoundDataToRound(roundData: RoundData): Round {
         if (roundData.playerData.id && roundData.playerData.name && roundData.playerData.tiles) {
-            const player = new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles);
             return {
-                player,
+                player: new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles),
                 startTime: roundData.startTime,
                 limitTime: roundData.limitTime,
                 completedTime: roundData.completedTime,
