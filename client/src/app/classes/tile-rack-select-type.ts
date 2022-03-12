@@ -1,1 +1,4 @@
-export type TileRackSelectType = 'exchange' | 'move';
+export enum TileRackSelectType {
+    Exchange = 'exchange',
+    Move = 'move',
+}

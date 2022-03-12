@@ -111,7 +111,7 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with tiles should return the player tiles', () => {
-        const tiles: RackTile[] = [{ letter: 'A', value: 10, played: false, selected: false }];
+        const tiles: RackTile[] = [{ letter: 'A', value: 10, isPlayed: false, isSelected: false }];
         const localPlayer: AbstractPlayer = new Player('', 'Test', []);
 
         spyOn(mockGameService, 'getLocalPlayer').and.returnValue(localPlayer);
@@ -129,31 +129,31 @@ describe('TileRackComponent', () => {
 
     it('should mark tiles as played but only those in playedTiles', () => {
         const tiles: RackTile[] = [
-            { letter: 'A', value: 0, played: false, selected: false },
-            { letter: 'B', value: 0, played: false, selected: false },
+            { letter: 'A', value: 0, isPlayed: false, isSelected: false },
+            { letter: 'B', value: 0, isPlayed: false, isSelected: false },
         ];
-        const playedTiles: RackTile[] = [{ ...tiles[0] }, { letter: 'Z', value: 0, played: false, selected: false }];
+        const playedTiles: RackTile[] = [{ ...tiles[0] }, { letter: 'Z', value: 0, isPlayed: false, isSelected: false }];
         component.tiles = tiles;
         const payload = { tiles: playedTiles, orientation: Orientation.Horizontal, startPosition: { row: 0, column: 9 } };
 
         handlePlaceTileSpy.and.callThrough();
         component['handlePlaceTiles'](payload);
 
-        expect(tiles[0].played).toBeTrue();
-        expect(tiles[1].played).toBeFalsy();
+        expect(tiles[0].isPlayed).toBeTrue();
+        expect(tiles[1].isPlayed).toBeFalsy();
     });
 
     it('should set all tiles to not played when call handleNewMessage', () => {
         const tiles: RackTile[] = [
-            { letter: 'A', value: 0, played: true, selected: false },
-            { letter: 'B', value: 0, played: false, selected: false },
+            { letter: 'A', value: 0, isPlayed: true, isSelected: false },
+            { letter: 'B', value: 0, isPlayed: false, isSelected: false },
         ];
         component.tiles = tiles;
 
         handleNewMessageSpy.and.callThrough();
         component['handleNewMessage']({ senderId: 'system-error' } as Message);
 
-        for (const tile of tiles) expect(tile.played).toBeFalse();
+        for (const tile of tiles) expect(tile.isPlayed).toBeFalse();
     });
 
     describe('selectTile', () => {
@@ -163,7 +163,7 @@ describe('TileRackComponent', () => {
 
             component.selectTile(type, tile);
 
-            expect(tile.selected).toBeTrue();
+            expect(tile.isSelected).toBeTrue();
         });
 
         it('should add tile to selectedTiles', () => {
@@ -198,7 +198,7 @@ describe('TileRackComponent', () => {
         });
 
         it('should call unselectAll if type is move', () => {
-            const type: TileRackSelectType = 'move';
+            const type: TileRackSelectType = TileRackSelectType.Move;
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'unselectAll');
 
@@ -236,7 +236,7 @@ describe('TileRackComponent', () => {
 
             component.unselectTile(tile);
 
-            expect(tile.selected).toBeFalse();
+            expect(tile.isSelected).toBeFalse();
         });
 
         it('should remove tile from selectedTiles', () => {
@@ -252,17 +252,17 @@ describe('TileRackComponent', () => {
     describe('unselectAll', () => {
         it('should set tile.selected to false for all tiles', () => {
             const tiles: RackTile[] = [];
-            for (let i = 0; i < 3; ++i) tiles.push({ selected: true } as RackTile);
+            for (let i = 0; i < 3; ++i) tiles.push({ isSelected: true } as RackTile);
 
             component.selectedTiles = tiles;
             component.unselectAll();
 
-            tiles.forEach((tile) => expect(tile.selected).toBeFalse());
+            tiles.forEach((tile) => expect(tile.isSelected).toBeFalse());
         });
 
         it('should remove all tiles from selectedTiles', () => {
             const tiles: RackTile[] = [];
-            for (let i = 0; i < 3; ++i) tiles.push({ selected: true } as RackTile);
+            for (let i = 0; i < 3; ++i) tiles.push({ isSelected: true } as RackTile);
 
             component.selectedTiles = tiles;
             component.unselectAll();

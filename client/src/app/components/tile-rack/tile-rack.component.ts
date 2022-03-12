@@ -12,7 +12,7 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-export type RackTile = Tile & { played: boolean; selected: boolean };
+export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
 
 @Component({
     selector: 'app-tile-rack',
@@ -22,7 +22,7 @@ export type RackTile = Tile & { played: boolean; selected: boolean };
 export class TileRackComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
     tiles: RackTile[];
     selectedTiles: RackTile[] = [];
-    selectionType: TileRackSelectType = 'exchange';
+    selectionType: TileRackSelectType = TileRackSelectType.Exchange;
     tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
     updateTileRackSubscription: Subscription;
     serviceDestroyed$: Subject<boolean> = new Subject();
@@ -50,24 +50,32 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     selectTile(type: TileRackSelectType, tile: RackTile): boolean {
-        if (this.selectionType === type && tile.selected) {
+        if (this.selectionType === type && tile.isSelected) {
             this.unselectTile(tile);
             return false;
         }
 
-        if (this.selectionType !== type || type === 'move') {
+        if (this.selectionType !== type || type === TileRackSelectType.Move) {
             this.selectionType = type;
             this.unselectAll();
         }
 
-        tile.selected = true;
+        tile.isSelected = true;
         this.selectedTiles.push(tile);
 
         return false; // return false so the browser doesn't show the context menu
     }
 
+    selectTileExchange(tile: RackTile): boolean {
+        return this.selectTile(TileRackSelectType.Exchange, tile);
+    }
+
+    selectTileMove(tile: RackTile): boolean {
+        return this.selectTile(TileRackSelectType.Move, tile);
+    }
+
     unselectTile(tile: RackTile): void {
-        tile.selected = false;
+        tile.isSelected = false;
         const index = this.selectedTiles.indexOf(tile);
         if (index >= 0) {
             this.selectedTiles.splice(index, 1);
@@ -75,7 +83,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     unselectAll(): void {
-        this.selectedTiles.forEach((t) => (t.selected = false));
+        this.selectedTiles.forEach((t) => (t.isSelected = false));
         this.selectedTiles = [];
     }
 
@@ -102,21 +110,21 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
             return;
         }
         localPlayer.getTiles().forEach((tile: Tile) => {
-            this.tiles.push({ ...tile, played: false, selected: false });
+            this.tiles.push({ ...tile, isPlayed: false, isSelected: false });
         });
     }
 
     private handlePlaceTiles(payload: ActionPlacePayload): void {
         for (const tile of payload.tiles) {
-            const filtered = this.tiles.filter((t) => t.value === tile.value && t.letter === tile.letter && !t.played);
-            if (filtered.length > 0) filtered[0].played = true;
+            const filtered = this.tiles.filter((t) => t.value === tile.value && t.letter === tile.letter && !t.isPlayed);
+            if (filtered.length > 0) filtered[0].isPlayed = true;
         }
     }
 
     private handleNewMessage(message: Message): void {
         if (message.senderId === 'system-error') {
             for (const tile of this.tiles) {
-                tile.played = false;
+                tile.isPlayed = false;
             }
         }
     }
