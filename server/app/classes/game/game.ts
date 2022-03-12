@@ -149,8 +149,8 @@ export default class Game {
         return WINNER_MESSAGE(winner);
     }
 
-    isPlayer1(arg: string | Player): boolean {
-        return arg instanceof Player ? this.player1.id === arg.id : this.player1.id === arg;
+    isPlayer1(player: string | Player): boolean {
+        return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
     }
 
     createStartGameData(): StartMultiplayerGameData {

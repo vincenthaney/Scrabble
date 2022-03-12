@@ -17,7 +17,6 @@ import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
-// import Sinon = require('sinon');
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
