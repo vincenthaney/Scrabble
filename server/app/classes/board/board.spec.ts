@@ -63,7 +63,7 @@ describe('Board', () => {
         });
     });
 
-    describe('placeWord', () => {
+    describe.only('placeWord', () => {
         it('placeWord should place a single letter word and return true', () => {
             const startingSquare = new Position(5, 3);
             expect(board.placeWord([DEFAULT_TILE_A], startingSquare, Orientation.Horizontal)).to.be.true;
