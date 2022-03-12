@@ -27,7 +27,6 @@ import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
@@ -159,9 +158,13 @@ describe('BeginnerVirtualPlayer', () => {
         });
     });
 
-    describe('sendPayload should', () => {
+    describe('sendPayload', () => {
         it('should call getVirtualPlayerService', () => {
-            const sendGetSpy = spy.on(beginnerVirtualPlayer, 'getVirtualPlayerService', () => {
+            const sendGetSpy = spy.on(beginnerVirtualPlayer, 'getVirtualPlayerService');
+            spy.on(beginnerVirtualPlayer['virtualPlayerService'], 'sendAction', () => {
+                return;
+            });
+            spy.on(beginnerVirtualPlayer, 'findAction', () => {
                 return;
             });
             beginnerVirtualPlayer.sendPayload();
@@ -169,7 +172,10 @@ describe('BeginnerVirtualPlayer', () => {
         });
 
         it('should call virtualPlayerService.sendAction', () => {
-            const sendActionSpy = spy.on(VirtualPlayerService, 'sendAction', () => {
+            const sendActionSpy = spy.on(beginnerVirtualPlayer['virtualPlayerService'], 'sendAction', () => {
+                return;
+            });
+            spy.on(beginnerVirtualPlayer, 'findAction', () => {
                 return;
             });
             beginnerVirtualPlayer.sendPayload();
@@ -180,9 +186,6 @@ describe('BeginnerVirtualPlayer', () => {
             const FAKE_ACTION_PAYLOAD = {};
             const findActionSpy = spy.on(beginnerVirtualPlayer, 'findAction', () => {
                 return FAKE_ACTION_PAYLOAD;
-            });
-            spy.on(VirtualPlayerService, 'sendAction', () => {
-                return;
             });
             beginnerVirtualPlayer.sendPayload();
             expect(findActionSpy).to.have.been.called();
