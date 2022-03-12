@@ -1,3 +1,5 @@
+@import '../../style/icon.scss';
+
 $tile-size: 50px;
 
 #rack-grid mat-card {
@@ -15,24 +17,95 @@ $tile-size: 50px;
         border-radius: 8px;
         padding: 6px;
 
-        app-tile {
-            display: block;
-            height: $tile-size;
-            width: $tile-size;
-            transition: ease-in transform 0.1s;
+        .rack-tile-container {
+            position: relative;
+            transition: ease-in-out transform 0.1s;
+
+            app-tile {
+                display: block;
+                height: $tile-size;
+                width: $tile-size;
+                position: relative;
+            }
 
             &:not(:last-child) {
                 margin-right: 12px;
             }
 
             &:hover {
+                z-index: 1;
                 transform: translateY(-15%) scale(1.05);
-                transition: ease-in transform 0.15s;
+                transition: ease-in-out transform 0.1s;
             }
 
             &.hidden {
                 display: none !important;
                 visibility: hidden !important;
+            }
+
+        }
+
+        &.selection-exchange .rack-tile-container.selected app-tile {
+            $rotation: 3deg;
+            $animation-duration: 0.25s;
+            
+            @keyframes wiggle {
+                0% { transform: rotate(0); }
+                25% { transform: rotate($rotation * -1); }
+                75% { transform: rotate($rotation); }
+                100% { transform: rotate(0); }
+            }
+
+            animation: wiggle $animation-duration infinite;
+            filter: hue-rotate(50deg);
+        }
+
+        &.selection-move .rack-tile-container.selected {
+            z-index: 2;
+
+            app-tile {
+                @keyframes orbit {
+                    from { transform: rotate(0deg) translateX(3px) rotate(0deg); }
+                    to   { transform: rotate(360deg) translateX(3px) rotate(-360deg); }
+                }
+    
+                transform: translateY(-20%);
+                filter: hue-rotate(175deg);
+                animation: orbit linear 1s infinite;
+                z-index: 2;
+    
+                &:hover {
+                    z-index: 2;
+                }
+    
+                &:after, &:before {
+                    @include font-awesome-solid;
+                    content: '';
+                    position: absolute;
+                    font-style: normal;
+                    font-variant: normal;
+                    text-rendering: auto;
+                    -webkit-font-smoothing: antialiased;
+                    font-size: 1.6em;
+                    color: rgb(218, 183, 126);
+                    text-shadow: 0px 1px 6px rgba(0, 0, 0, 0.15);
+                    top: 50%;
+                    z-index: 3;
+                }
+
+                &:before {
+                    content: "\f0d9";
+                    left: 0;
+                    transform: translate(-100%, -50%);
+                    margin-left: -6px;
+                }
+
+                &:after {
+                    content: "\f0da";
+                    right: 0;
+                    transform: translate(100%, -50%);
+                    margin-right: -6px;
+                }
             }
         }
     }
