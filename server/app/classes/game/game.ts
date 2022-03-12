@@ -11,7 +11,7 @@ import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
-import { GameType } from './game.type';
+import { GameType } from './game-type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;

@@ -1,8 +1,9 @@
+/* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -21,8 +22,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GameMode } from '@app/classes/game-mode';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
-import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DEFAULT_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
@@ -47,7 +49,7 @@ describe('GameCreationPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent, TimerSelectionComponent, IconComponent],
+            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent, TimerSelectionComponent, IconComponent, PageHeaderComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
@@ -89,6 +91,7 @@ describe('GameCreationPageComponent', () => {
         const formValues = {
             gameType: component.gameTypes.LOG2990,
             gameMode: component.gameModes.Solo,
+            virtualPlayerName: DEFAULT_PLAYER.name,
             level: component.virtualPlayerLevels.Beginner,
             timer: '60',
             dictionary: 'français',
@@ -142,45 +145,31 @@ describe('GameCreationPageComponent', () => {
         });
     });
 
-    describe('form', () => {
-        it('form should have the right default values', async () => {
-            const defaultFormValues = {
-                gameType: component.gameTypes.Classic,
-                gameMode: component.gameModes.Multiplayer,
-                level: component.virtualPlayerLevels.Beginner,
-                timer: DEFAULT_TIMER_VALUE,
-                dictionary: DEFAULT_DICTIONARY_VALUE,
-            };
-            const defaultNameValue = EMPTY_VALUE;
-
-            expect(gameParameters.value).toEqual(defaultFormValues);
-            expect(component.playerName).toEqual(defaultNameValue);
-        });
-
+    describe('isFormValid', () => {
         it('form should be valid if all required fields are filled', () => {
             setValidFormValues();
-            expect(component.isFormValid()).toBeTruthy();
+            expect(component.isFormValid()).toBeTrue();
         });
 
         it('form should be invalid if gameType is empty', async () => {
             setValidFormValues();
             gameParameters.get('gameType')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.isFormValid()).toBeFalse();
         });
 
         it('form should be invalid if gameMode is empty', async () => {
             setValidFormValues();
             gameParameters.get('gameMode')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.isFormValid()).toBeFalse();
         });
 
         it('form should be invalid if level is empty while gameMode is solo', async () => {
             setValidFormValues();
             gameParameters.get('level')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.isFormValid()).toBeFalse();
         });
 
         it('form should be valid if level is empty while gameMode is multiplayer', async () => {
@@ -188,21 +177,21 @@ describe('GameCreationPageComponent', () => {
             gameParameters.get('gameMode')?.setValue(component.gameModes.Multiplayer);
             gameParameters.get('level')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeTruthy();
+            expect(component.isFormValid()).toBeTrue();
         });
 
         it('form should not be valid if timer is empty', () => {
             setValidFormValues();
             gameParameters.get('timer')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.isFormValid()).toBeFalse();
         });
 
         it('form should not be valid if dictionary is empty', () => {
             setValidFormValues();
             gameParameters.get('dictionary')?.setValue(EMPTY_VALUE);
 
-            expect(component.isFormValid()).toBeFalsy();
+            expect(component.isFormValid()).toBeFalse();
         });
 
         it('form should not be valid if name is empty', () => {
@@ -211,36 +200,34 @@ describe('GameCreationPageComponent', () => {
             component.playerName = EMPTY_VALUE;
             component.playerNameValid = false;
 
-            expect(component.isFormValid()).toBeFalsy();
-        });
-
-        it('form should call onSubmit when submit button is clicked', async () => {
-            setValidFormValues();
-            const spy = spyOn(component, 'onSubmit');
-
-            fixture.autoDetectChanges();
-            const submitButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-            submitButton.click();
-
-            expect(spy).toHaveBeenCalled();
+            expect(component.isFormValid()).toBeFalse();
         });
     });
 
     describe('onSubmit', () => {
+        it('clicking createGame button should call onSubmit', async () => {
+            spyOn(component, 'isFormValid').and.returnValue(true);
+            fixture.detectChanges();
+            const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
+            const spy = spyOn(component, 'onSubmit').and.callFake(() => {
+                return;
+            });
+            createButton.click();
+
+            expect(spy).toHaveBeenCalled();
+        });
+
         it('form should call createGame on submit if form is valid', async () => {
             const spy = spyOn(component, 'createGame');
-            setValidFormValues();
+            spyOn(component, 'isFormValid').and.returnValue(true);
 
-            fixture.autoDetectChanges();
             component.onSubmit();
             expect(spy).toHaveBeenCalled();
         });
 
         it('should NOT call createGame on submit if form is invalid', async () => {
             const spy = spyOn(component, 'createGame');
-
-            const gameParametersForm = component.gameParameters;
-            gameParametersForm.setErrors({ error: true });
+            spyOn(component, 'isFormValid').and.returnValue(false);
 
             component.onSubmit();
             expect(spy).not.toHaveBeenCalled();
@@ -248,26 +235,24 @@ describe('GameCreationPageComponent', () => {
     });
 
     describe('createGame', () => {
-        it('createGame button should reroute to waiting-room page if form is valid', async () => {
-            const location: Location = TestBed.inject(Location);
-            setValidFormValues();
+        it('createGame should reroute to waiting-room if multiplayer game', () => {
+            const spy = spyOn<any>(component['router'], 'navigateByUrl');
+            component.gameParameters.patchValue({ gameMode: component.gameModes.Multiplayer });
 
-            fixture.autoDetectChanges();
-            const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-            createButton.click();
-
-            return fixture.whenStable().then(() => {
-                expect(location.path()).toBe('/waiting-room');
-            });
+            component.createGame();
+            expect(spy).toHaveBeenCalledWith('waiting-room');
         });
 
-        it('createGame button should send game to GameDispatcher service if valid', async () => {
-            setValidFormValues();
+        it('createGame should reroute to game if solo game', () => {
+            const spy = spyOn<any>(component['router'], 'navigateByUrl');
+            component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
 
-            fixture.autoDetectChanges();
-            const createButton = fixture.debugElement.nativeElement.querySelector('#create-game-button');
-            createButton.click();
+            component.createGame();
+            expect(spy).toHaveBeenCalledWith('game');
+        });
 
+        it('createGame button should always call gameDispatcher.handleCreateGame', () => {
+            component.createGame();
             expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
         });
     });
@@ -316,21 +301,20 @@ describe('GameCreationPageComponent', () => {
     //     expect(gameTypeField?.value).toEqual(component.gameTypes.LOG2990);
     // });
 
-    // NOT YET IMPLEMENTED
-    // it('clicking on Solo button should set gameMode attribute to Solo', async () => {
-    //     const gameModeField = component.gameParameters.get('gameMode');
-    //     gameModeField?.setValue(component.gameModes.Multiplayer);
+    it('clicking on Solo button should set gameMode attribute to Solo', async () => {
+        const gameModeField = component.gameParameters.get('gameMode');
+        gameModeField?.setValue(component.gameModes.Multiplayer);
 
-    //     const soloButton = await loader.getHarness(
-    //         MatButtonToggleHarness.with({
-    //             selector: '#solo-button',
-    //         }),
-    //     );
+        const soloButton = await loader.getHarness(
+            MatButtonToggleHarness.with({
+                selector: '#solo-button',
+            }),
+        );
 
-    //     if (await soloButton.isDisabled()) return;
-    //     await soloButton.toggle();
-    //     expect(gameModeField?.value).toEqual(component.gameModes.Solo);
-    // });
+        if (await soloButton.isDisabled()) return;
+        await soloButton.toggle();
+        expect(gameModeField?.value).toEqual(component.gameModes.Solo);
+    });
 
     it('clicking on Multiplayer button should set gameMode attribute to Multiplayer', async () => {
         const gameModeField = component.gameParameters.get('gameMode');
