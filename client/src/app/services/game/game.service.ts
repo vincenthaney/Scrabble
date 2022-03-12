@@ -14,7 +14,7 @@ import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ID, TIME_TO_RECONNECT } from '
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
-import { CookieService } from '@app/services/reconnexion-data/cookie.service';
+import { CookieService } from '@app/services/cookie/cookie.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -97,9 +97,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
         } else {
             this.reconnectReinitialize(startGameData);
         }
+        this.newActivePlayerEvent.emit([startGameData.round.playerData, this.isLocalPlayerPlaying()]);
     }
 
     reconnectReinitialize(startGameData: StartGameData): void {
+        console.log('reconnect reinitialize');
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
         this.rerenderEvent.emit();
@@ -178,6 +180,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     reconnectGame(): void {
+        console.log('reconnect');
         const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
         const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
 

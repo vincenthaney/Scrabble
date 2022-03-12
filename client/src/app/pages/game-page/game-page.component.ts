@@ -41,7 +41,7 @@ import { takeUntil } from 'rxjs/operators';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
-    isLocalPlayerTurn;
+    isLocalPlayerTurn: boolean;
     noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
 
@@ -53,9 +53,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public surrenderDialog: MatDialog,
         private readonly playerLeavesService: PlayerLeavesService,
         private gameButtonActionService: GameButtonActionService,
-    ) {
-        this.isLocalPlayerTurn = gameService.isLocalPlayerPlaying();
-    }
+    ) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
@@ -82,16 +80,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
+        if (!this.gameService.getGameId()) {
+            this.gameService.reconnectGame();
+        }
+
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
             .subscribe(() => this.noActiveGameDialog());
         this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([, isLocalPlayerTurn]) => {
             this.isLocalPlayerTurn = isLocalPlayerTurn;
         });
-
-        if (!this.gameService.getGameId()) {
-            this.gameService.reconnectGame();
-        }
     }
 
     createPassAction(): void {
