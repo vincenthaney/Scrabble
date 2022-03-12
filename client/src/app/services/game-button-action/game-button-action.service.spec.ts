@@ -45,7 +45,7 @@ describe('GameButtonActionService', () => {
             const sendActionSpy = spyOn(service['gamePlayController'], 'sendAction').and.callFake(() => {
                 return;
             });
-            service['gameService'].gameId = DEFAULT_GAME_ID;
+            service['gameService']['gameId'] = DEFAULT_GAME_ID;
             const expectedActionData: ActionData = {
                 type: ActionType.PASS,
                 input: '',

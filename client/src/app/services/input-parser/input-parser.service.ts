@@ -9,8 +9,8 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
 import { BOARD_SIZE, DEFAULT_ORIENTATION, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;

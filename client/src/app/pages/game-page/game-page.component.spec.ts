@@ -179,14 +179,6 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledWith(event);
     });
 
-    describe('ngOnInit', () => {
-        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent', () => {
-            component.isLocalPlayerTurn = false;
-            gameServiceMock.newActivePlayerEvent.emit([DEFAULT_PLAYER, true]);
-            expect(component.isLocalPlayerTurn).toBeTrue();
-        });
-    });
-
     describe('createpassAction', () => {
         it('should call gameButtonActionService.createPassAction()', () => {
             const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
@@ -194,25 +186,6 @@ describe('GamePageComponent', () => {
             });
             component.createPassAction();
             expect(createPassActionSpy).toHaveBeenCalled();
-        });
-    });
-
-    describe('handlePlayerLeaves', () => {
-        it('should reset gameServiceId', () => {
-            spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            gameServiceMock.gameId = 'something';
-            component['handlePlayerLeaves']();
-            expect(gameServiceMock.gameId).toEqual('');
-        });
-
-        it('should call playerLeavesService.handleLocalPlayerLeavesGame', () => {
-            const handleLocalPlayerLeavesGameSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            component['handlePlayerLeaves']();
-            expect(handleLocalPlayerLeavesGameSpy).toHaveBeenCalled();
         });
     });
 

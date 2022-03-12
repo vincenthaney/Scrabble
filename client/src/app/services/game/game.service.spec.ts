@@ -165,12 +165,12 @@ describe('GameService', () => {
         });
 
         it('should set player 1', async () => {
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service['playerContainer']!.getPlayer(1)).toBeDefined();
         });
 
         it('should set player 2', async () => {
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service['playerContainer']!.getPlayer(2)).toBeDefined();
         });
 
@@ -187,7 +187,7 @@ describe('GameService', () => {
         });
 
         it('should initialize roundManager', async () => {
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(roundManagerSpy.initialize).toHaveBeenCalled();
         });
 
@@ -448,19 +448,6 @@ describe('GameService', () => {
             service.handleGameUpdate(gameUpdateData);
             expect(roundManagerSpy.convertRoundDataToRound).not.toHaveBeenCalled();
             expect(roundManagerSpy.updateRound).not.toHaveBeenCalledWith(round);
-        });
-
-        it('should emit newActivePlayer if round is defined', () => {
-            const expectedIsLocalPlayerPlaying = true;
-            spyOn(service, 'isLocalPlayerPlaying').and.returnValue(expectedIsLocalPlayerPlaying);
-            gameUpdateData.round = { playerData: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date(), completedTime: null };
-            service.handleGameUpdate(gameUpdateData);
-            expect(newActivePlayerEventEmitSpy).toHaveBeenCalledWith([DEFAULT_PLAYER_1, expectedIsLocalPlayerPlaying]);
-        });
-
-        it('should NOT emit newActivePlayer if round is undefined', () => {
-            service.handleGameUpdate(gameUpdateData);
-            expect(newActivePlayerEventEmitSpy).not.toHaveBeenCalled();
         });
 
         it('should update tileReserve, tileReserveTotal and emit if tileReserve and tilReserveTotal are defined', () => {

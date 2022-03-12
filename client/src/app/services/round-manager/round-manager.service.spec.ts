@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionType } from '@app/classes/actions/action-data';
 import { PlayerData } from '@app/classes/communication';
-import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameType } from '@app/classes/game-type';
 import { Player } from '@app/classes/player';
@@ -111,7 +111,7 @@ describe('RoundManagerService', () => {
         const gameId = 'gameId';
         const player2Data = DEFAULT_PLAYER_DATA;
         player2Data.id = 'notLocal';
-        const startGameData: StartMultiplayerGameData = {
+        const startGameData: StartGameData = {
             player1: DEFAULT_PLAYER_DATA,
             player2: player2Data,
             gameType: GameType.Classic,

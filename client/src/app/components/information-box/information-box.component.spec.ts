@@ -299,14 +299,6 @@ describe('InformationBoxComponent', () => {
         it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
             component.updateActivePlayerBorder(player1);
 
-        it('updateActivePlayerBorder should not set any border if there is no active player', () => {
-            component.updateActivePlayerBorder(undefined);
-            expect(component.isPlayer1Active).toBeFalse();
-            expect(component.isPlayer2Active).toBeFalse();
-        });
-
-        it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
-            component.updateActivePlayerBorder(PLAYER1);
             expect(component.isPlayer1Active).toBeTrue();
             expect(component.isPlayer2Active).toBeFalse();
         });

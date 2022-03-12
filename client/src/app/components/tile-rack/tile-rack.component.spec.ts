@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonModule } from '@angular/common';
@@ -29,7 +30,7 @@ import { RackTile, TileRackComponent } from './tile-rack.component';
 import SpyObj = jasmine.SpyObj;
 
 describe('TileRackComponent', () => {
-    const EMPTY_TILE_RACK: Tile[] = [];
+    const EMPTY_TILE_RACK: RackTile[] = [];
     let gameServiceSpy: SpyObj<GameService>;
     let gameViewEventManagerSpy: SpyObj<GameViewEventManagerService>;
     let component: TileRackComponent;
@@ -190,15 +191,15 @@ describe('TileRackComponent', () => {
 
     it('should not reset tiles if message is not from system', () => {
         const tiles: RackTile[] = [
-            { letter: 'A', value: 0, played: true },
-            { letter: 'B', value: 0, played: true },
+            { letter: 'A', value: 0, isPlayed: true, isSelected: false },
+            { letter: 'B', value: 0, isPlayed: true, isSelected: false },
         ];
         component.tiles = tiles;
 
         handleNewMessageSpy.and.callThrough();
         component['handleNewMessage']({ senderId: 'not-system-error' } as Message);
 
-        for (const tile of tiles) expect(tile.played).toEqual(tile.played);
+        for (const tile of tiles) expect(tile.isPlayed).toEqual(tile.isPlayed);
     });
 
     describe('selectTile', () => {
