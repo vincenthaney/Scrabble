@@ -91,7 +91,7 @@ export default class Board {
         return { x: this.grid[0].length, y: this.grid.length };
     }
 
-    private isPossiblePlacement(position: Position) {
+    private isPossiblePlacement(position: Position): boolean {
         return position.row < 0 || position.row >= this.grid.length || position.column < 0 || position.column >= this.grid[0].length;
     }
 }
