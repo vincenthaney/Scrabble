@@ -22,7 +22,7 @@ import {
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { WordFindingService } from '@app/services/word-finding/word-finding';
+import WordFindingService from '@app/services/word-finding/word-finding';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -165,15 +165,15 @@ describe('BeginnerVirtualPlayer', () => {
 
         it('should increment value', () => {
             const testEvaluatedPlacement = { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE };
-            beginnerVirtualPlayer.pointHistoric.set(TEST_SCORE, TEST_COUNT_VALUE);
+            beginnerVirtualPlayer.pointHistory.set(TEST_SCORE, TEST_COUNT_VALUE);
             beginnerVirtualPlayer.updateHistory(testEvaluatedPlacement);
-            expect(beginnerVirtualPlayer.pointHistoric.get(TEST_SCORE)).to.deep.equal(TEST_COUNT_VALUE + EXPECTED_INCREMENT_VALUE);
+            expect(beginnerVirtualPlayer.pointHistory.get(TEST_SCORE)).to.deep.equal(TEST_COUNT_VALUE + EXPECTED_INCREMENT_VALUE);
         });
 
         it('should set value to 1', () => {
             const testEvaluatedPlacement = { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE };
             beginnerVirtualPlayer.updateHistory(testEvaluatedPlacement);
-            expect(beginnerVirtualPlayer.pointHistoric.get(TEST_SCORE)).to.deep.equal(EXPECTED_INCREMENT_VALUE);
+            expect(beginnerVirtualPlayer.pointHistory.get(TEST_SCORE)).to.deep.equal(EXPECTED_INCREMENT_VALUE);
         });
     });
 
