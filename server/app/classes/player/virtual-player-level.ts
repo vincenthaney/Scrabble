@@ -1,4 +1,4 @@
-export enum VirtualPlayerLevel {
-    Beginner = 'Débutant',
-    Expert = 'Expert',
-}
+// export enum VirtualPlayerLevel {
+//     Beginner = 'Débutant',
+//     Expert = 'Expert',
+// }
