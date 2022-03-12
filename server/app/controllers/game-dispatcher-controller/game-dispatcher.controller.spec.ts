@@ -11,6 +11,7 @@ import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
@@ -19,6 +20,8 @@ import {
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
+    VIRTUAL_PLAYER_LEVEL_REQUIRED,
+    VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -50,6 +53,8 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     playerId: DEFAULT_PLAYER_ID,
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
+    virtualPlayerLevel: VirtualPlayerLevel.Beginner,
+    virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: 1,
     dictionary: 'french',
 };
@@ -346,7 +351,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('should throw if config.playerName is undefined', () => {
-            const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined };
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined, virtualPlayerLevel: VirtualPlayerLevel.Expert };
             expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
         });
 
@@ -369,6 +374,16 @@ describe('GameDispatcherController', () => {
             const playerName = '     ';
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
             expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
+        });
+
+        it('should throw if config.virtualPlayerName is undefined with solo game', () => {
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: GameMode.Solo, virtualPlayerName: undefined };
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_NAME_REQUIRED);
+        });
+
+        it('should throw if config.virtualPlayerLevel is undefined with solo game', () => {
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: GameMode.Solo, virtualPlayerLevel: undefined };
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_LEVEL_REQUIRED);
         });
     });
 
