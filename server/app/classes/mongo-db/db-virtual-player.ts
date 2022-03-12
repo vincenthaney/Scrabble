@@ -1,9 +1,9 @@
-export interface DbVirtualPlayer {
+export interface VirtualPlayerConfig {
     level: string;
     name: string;
     isDefault: boolean;
 }
 
-export interface DbVirtualPlayerData {
-    players: DbVirtualPlayer[];
+export interface VirtualPlayersConfigData {
+    virtualPlayers: VirtualPlayerConfig[];
 }
