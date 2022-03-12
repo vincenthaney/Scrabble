@@ -8,6 +8,7 @@ import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { SessionStorageService } from '@app/services/session-storage/session-storage.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -43,9 +44,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         private gameService: GameService,
         private focusableComponentsService: FocusableComponentsService,
         private changeDetectorRef: ChangeDetectorRef,
+        private sessionStorageService: SessionStorageService,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
+        this.messages = this.sessionStorageService.getMessages().map((message) => this.createVisualMessage(message));
     }
 
     ngOnInit(): void {
@@ -67,6 +70,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
+        this.sessionStorageService.resetData();
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
@@ -103,6 +107,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
         if (!this.isOpponent(newMessage.senderId)) this.loading = false;
+        this.sessionStorageService.saveMessage(newMessage);
     }
 
     isOpponent(id: string) {
