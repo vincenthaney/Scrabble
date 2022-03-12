@@ -108,13 +108,10 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
         const localPlayerTiles = localPlayer?.getTiles();
         if (localPlayer && localPlayerTiles) {
-            localPlayerTiles.forEach((tile: Tile) => {
-                this.tiles.push({ ...tile });
+            localPlayer.getTiles().forEach((tile: Tile) => {
+                this.tiles.push({ ...tile, isPlayed: false, isSelected: false });
             });
         }
-        localPlayer.getTiles().forEach((tile: Tile) => {
-            this.tiles.push({ ...tile, isPlayed: false, isSelected: false });
-        });
     }
 
     private handlePlaceTiles(payload: ActionPlacePayload): void {
