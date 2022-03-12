@@ -65,7 +65,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         return false; // return false so the browser doesn't show the context menu
     }
 
-    unselectTile(tile: RackTile) {
+    unselectTile(tile: RackTile): void {
         tile.selected = false;
         const index = this.selectedTiles.indexOf(tile);
         if (index >= 0) {
@@ -73,16 +73,16 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         }
     }
 
-    unselectAll() {
+    unselectAll(): void {
         this.selectedTiles.forEach((t) => (t.selected = false));
         this.selectedTiles = [];
     }
 
-    focus() {
+    focus(): void {
         this.focusableComponentService.setActiveKeyboardComponent(this);
     }
 
-    protected onLoseFocusEvent() {
+    protected onLoseFocusEvent(): void {
         this.unselectAll();
     }
 
