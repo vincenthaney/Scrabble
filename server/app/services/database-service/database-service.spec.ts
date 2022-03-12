@@ -13,7 +13,7 @@ import { Container } from 'typedi';
 import DatabaseService from './database-service';
 chai.use(chaiAsPromised);
 
-describe.only('Database service', () => {
+describe('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
 
