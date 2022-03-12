@@ -11,7 +11,7 @@ import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
-import { GameType } from './game.type';
+import { GameType } from './game-type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
@@ -79,11 +79,11 @@ export default class Game {
         return this.tileReserve.getTilesLeftPerLetter();
     }
 
-    getId() {
+    getId(): string {
         return this.id;
     }
 
-    async initTileReserve() {
+    async initTileReserve(): Promise<void> {
         return this.tileReserve.init();
     }
 
@@ -149,12 +149,8 @@ export default class Game {
         return WINNER_MESSAGE(winner);
     }
 
-    isPlayer1(arg: string | Player): boolean {
-        if (arg instanceof Player) {
-            return this.player1.id === arg.id;
-        } else {
-            return this.player1.id === arg;
-        }
+    isPlayer1(player: string | Player): boolean {
+        return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
     }
 
     createStartGameData(): StartMultiplayerGameData {

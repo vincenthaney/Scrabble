@@ -369,7 +369,7 @@ describe('InputParserService', () => {
         });
 
         it('should throw error with invalid input for place actions', () => {
-            const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
+            const invalidLetters = ['a&c"exception', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
             const errorMessages: CommandExceptionMessages[] = [
                 CommandExceptionMessages.DontHaveTiles,
                 CommandExceptionMessages.DontHaveTiles,
@@ -400,7 +400,7 @@ describe('InputParserService', () => {
         });
 
         it('should throw error with invalid input for exchange actions', () => {
-            const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
+            const invalidLetters = ['a&c"exception', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
             const errorMessages: CommandExceptionMessages[] = [
                 CommandExceptionMessages.DontHaveTiles,
                 CommandExceptionMessages.DontHaveTiles,

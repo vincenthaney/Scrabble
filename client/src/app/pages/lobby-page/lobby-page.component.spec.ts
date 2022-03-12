@@ -21,6 +21,7 @@ import { GameType } from '@app/classes/game-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { NO_LOBBY_CAN_BE_JOINED } from '@app/constants/component-errors';
 import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
@@ -36,10 +37,10 @@ const DEFAULT_FILTER_VALUES = {
 export class TestComponent {}
 
 export class GameDispatcherServiceSpy extends GameDispatcherService {
-    handleLobbyListRequest() {
+    handleLobbyListRequest(): void {
         return;
     }
-    handleJoinLobby() {
+    handleJoinLobby(): void {
         return;
     }
 }
@@ -60,7 +61,7 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [LobbyPageComponent, NameFieldComponent, LobbyInfoComponent, IconComponent],
+            declarations: [LobbyPageComponent, NameFieldComponent, LobbyInfoComponent, IconComponent, PageHeaderComponent],
             imports: [
                 MatInputModule,
                 MatFormFieldModule,

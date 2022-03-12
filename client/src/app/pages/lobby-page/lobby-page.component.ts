@@ -48,8 +48,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService.subscribeToLobbyFullEvent(this.componentDestroyed$, () => this.lobbyFullDialog());
         this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
-
-        this.validateName();
     }
 
     ngOnDestroy(): void {
@@ -60,7 +58,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     validateName(): void {
         this.numberOfLobbiesMeetingFilter = 0;
         this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
-
         this.setFormAvailability(this.nameValid);
 
         for (const lobby of this.lobbies) {
@@ -70,9 +67,9 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     setFormAvailability(isNameValid: boolean): void {
-        if (isNameValid && this.filterFormGroup.get('gameType')?.disabled) {
+        if (isNameValid) {
             this.filterFormGroup.get('gameType')?.enable();
-        } else if (!this.filterFormGroup.get('gameType')?.disabled) {
+        } else {
             this.filterFormGroup.get('gameType')?.disable();
         }
     }
@@ -124,24 +121,24 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    joinRandomLobby() {
+    joinRandomLobby(): void {
         try {
             const lobby = this.getRandomLobby();
-            return this.joinLobby(lobby.lobbyId);
-        } catch (e) {
-            this.snackBar.open((e as Error).toString(), 'Ok', {
+            this.joinLobby(lobby.lobbyId);
+        } catch (exception) {
+            this.snackBar.open((exception as Error).toString(), 'Ok', {
                 duration: 3000,
             });
         }
     }
 
-    getRandomLobby() {
+    getRandomLobby(): LobbyInfo {
         const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters !== false);
         if (filteredLobbies.length === 0) throw new Error(NO_LOBBY_CAN_BE_JOINED);
         return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
     }
 
-    updateLobbyAttributes(lobby: LobbyInfo) {
+    updateLobbyAttributes(lobby: LobbyInfo): void {
         const gameType = this.filterFormGroup.get('gameType')?.value;
         lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
         lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;

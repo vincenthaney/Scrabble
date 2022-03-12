@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Game from '@app/classes/game/game';
 import { MultiplayerGameConfig } from '@app/classes/game/game-config';
-import { GameType } from '@app/classes/game/game.type';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
