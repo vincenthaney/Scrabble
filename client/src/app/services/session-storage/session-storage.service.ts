@@ -16,18 +16,15 @@ export class SessionStorageService {
     //     const localData:
     // }
 
-    getMessages(): Message[] | null {
-        const localMessagesString: string | null = sessionStorage.getItem(MESSAGE_STORAGE_KEY);
-        return localMessagesString ? JSON.parse(localMessagesString) : null;
+    getMessages(): Message[] {
+        return JSON.parse(sessionStorage.getItem(MESSAGE_STORAGE_KEY) || '{}');
     }
 
     saveMessage(newMessage: Message): void {
-        const localMessages: Message[] | null = this.getMessages();
-        if (localMessages) {
-            localMessages.push(newMessage);
-            sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(localMessages));
-            console.log('new message saved : ' + newMessage.content);
-        } else console.log('new messages could not be saved ERROR');
+        const localMessages: Message[] = this.getMessages();
+        localMessages.push(newMessage);
+        sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(localMessages));
+        console.log('new message saved : ' + newMessage.content);
     }
 
     resetData() {
