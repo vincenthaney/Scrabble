@@ -118,10 +118,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     onSquareClick(squareView: SquareView): boolean {
+        this.focusableComponentService.setActiveKeyboardComponent(this);
+
         if (squareView.square.tile !== null) return false;
         if (!this.gameService.isLocalPlayerPlaying()) return false;
-
-        this.focusableComponentService.setActiveKeyboardComponent(this);
 
         if (this.selectedSquare === squareView && this.notAppliedSquares.length === 0) {
             this.navigator.switchOrientation();
