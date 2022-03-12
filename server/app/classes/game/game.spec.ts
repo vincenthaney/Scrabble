@@ -17,6 +17,7 @@ import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+// import Sinon = require('sinon');
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
@@ -439,99 +440,96 @@ describe('Game', () => {
             expect(game.isPlayer1(DEFAULT_PLAYER_2_ID)).to.be.false;
         });
     });
-});
+    describe('Game Type', () => {
+        it('should contain Classic', () => {
+            expect(GameType.Classic).to.equal('Classique');
+        });
 
-describe('Game Type', () => {
-    it('should contain Classic', () => {
-        expect(GameType.Classic).to.equal('Classique');
+        it('should contain LOG2990', () => {
+            expect(GameType.LOG2990).to.equal('LOG2990');
+        });
     });
 
-    it('should contain LOG2990', () => {
-        expect(GameType.LOG2990).to.equal('LOG2990');
+    describe('Game Service Injection', () => {
+        it('injectServices should set static Game BoardService', () => {
+            chai.spy.on(Game, 'getBoardService', () => null);
+            const boardService = Container.get(BoardService);
+
+            expect(Game['getBoardService']()).to.not.exist;
+            Game.injectServices(boardService);
+            chai.spy.restore();
+            expect(Game['getBoardService']()).to.equal(boardService);
+        });
+
+        it('injectServices should call getBoardService()', () => {
+            const boardService = Container.get(BoardService);
+            chai.spy.on(Game, 'getBoardService', () => boardService);
+            Game.injectServices(boardService);
+            expect(Game['getBoardService']).to.have.been.called;
+        });
     });
-});
+    describe('createStartGameData', () => {
+        const PLAYER_1_ID = 'player1Id';
+        const PLAYER_2_ID = 'player2Id';
+        const PLAYER_1_NAME = 'player1Name';
+        const PLAYER_2_NAME = 'player2Name';
+        const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
+        const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
+        const DEFAULT_TIME = 60;
+        const DEFAULT_DICTIONARY = 'dict';
+        DEFAULT_MAP = new Map<LetterValue, number>([
+            ['A', 1],
+            ['B', 2],
+            ['C', 2],
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            ['F', 8],
+        ]);
+        const TILE_RESERVE_DATA: TileReserveData[] = [
+            { letter: 'A', amount: 1 },
+            { letter: 'B', amount: 2 },
+            { letter: 'C', amount: 2 },
+            { letter: 'F', amount: 8 },
+        ];
+        const TILE_RESERVE_TOTAL = 13;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let board: Board;
+        let round: Round;
+        let game: Game;
 
-describe('Game Service Injection', () => {
-    it('injectServices should set static Game BoardService', () => {
-        chai.spy.on(Game, 'getBoardService', () => null);
-        const boardService = Container.get(BoardService);
+        beforeEach(() => {
+            game = new Game();
+            board = new Board([[]]);
+            roundManagerStub = createStubInstance(RoundManager);
+            roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
+            game.player1 = PLAYER_1;
+            game.player2 = PLAYER_2;
+            chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
+            game.gameType = GameType.Classic;
+            game.dictionnaryName = DEFAULT_DICTIONARY;
+            chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
+            game.board = board;
+            chai.spy.on(game.board, ['isWithinBounds'], () => true);
+            game.roundManager = roundManagerStub as unknown as RoundManager;
 
-        expect(Game['getBoardService']()).to.not.exist;
-        Game.injectServices(boardService);
-        chai.spy.restore();
-        expect(Game['getBoardService']()).to.equal(boardService);
-    });
+            round = { player: game.player1, startTime: new Date(), limitTime: new Date() };
+            roundManagerStub.getCurrentRound.returns(round);
+        });
 
-    it('injectServices should call getBoardService()', () => {
-        const boardService = Container.get(BoardService);
-        chai.spy.on(Game, 'getBoardService', () => boardService);
-        Game.injectServices(boardService);
-        expect(Game['getBoardService']).to.have.been.called;
-    });
-});
-
-describe('createStartGameData', () => {
-    const PLAYER_1_ID = 'player1Id';
-    const PLAYER_2_ID = 'player2Id';
-    const PLAYER_1_NAME = 'player1Name';
-    const PLAYER_2_NAME = 'player2Name';
-    const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
-    const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
-    const DEFAULT_TIME = 60;
-    const DEFAULT_DICTIONARY = 'dict';
-    DEFAULT_MAP = new Map<LetterValue, number>([
-        ['A', 1],
-        ['B', 2],
-        ['C', 2],
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        ['F', 8],
-    ]);
-    const TILE_RESERVE_DATA: TileReserveData[] = [
-        { letter: 'A', amount: 1 },
-        { letter: 'B', amount: 2 },
-        { letter: 'C', amount: 2 },
-        { letter: 'F', amount: 8 },
-    ];
-    const TILE_RESERVE_TOTAL = 13;
-    let roundManagerStub: SinonStubbedInstance<RoundManager>;
-    let round: Round;
-    let boardStub: SinonStubbedInstance<Board>;
-    let game: Game;
-
-    beforeEach(() => {
-        game = new Game();
-        roundManagerStub = createStubInstance(RoundManager);
-        boardStub = createStubInstance(Board);
-
-        roundManagerStub.getMaxRoundTime.returns(DEFAULT_TIME);
-        game.player1 = PLAYER_1;
-        game.player2 = PLAYER_2;
-        chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
-        game.gameType = GameType.Classic;
-        game.dictionnaryName = DEFAULT_DICTIONARY;
-        chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
-        game.board = boardStub;
-        game.board.grid = [[]];
-        game.roundManager = roundManagerStub as unknown as RoundManager;
-
-        round = { player: game.player1, startTime: new Date(), limitTime: new Date() };
-        roundManagerStub.getCurrentRound.returns(round);
-    });
-
-    it('should return the expected StartMultiplayerGameData', () => {
-        const result = game['createStartGameData']();
-        const expectedMultiplayerGameData: StartMultiplayerGameData = {
-            player1: game.player1,
-            player2: game.player2,
-            gameType: game.gameType,
-            maxRoundTime: DEFAULT_TIME,
-            dictionary: DEFAULT_DICTIONARY,
-            gameId: DEFAULT_GAME_ID,
-            board: game.board.grid,
-            tileReserve: TILE_RESERVE_DATA,
-            tileReserveTotal: TILE_RESERVE_TOTAL,
-            round: roundManagerStub.convertRoundToRoundData(round),
-        };
-        expect(result).to.deep.equal(expectedMultiplayerGameData);
+        it('should return the expected StartMultiplayerGameData', () => {
+            const result = game['createStartGameData']();
+            const expectedMultiplayerGameData: StartMultiplayerGameData = {
+                player1: game.player1,
+                player2: game.player2,
+                gameType: game.gameType,
+                maxRoundTime: DEFAULT_TIME,
+                dictionary: DEFAULT_DICTIONARY,
+                gameId: DEFAULT_GAME_ID,
+                board: game.board.grid,
+                tileReserve: TILE_RESERVE_DATA,
+                tileReserveTotal: TILE_RESERVE_TOTAL,
+                round: roundManagerStub.convertRoundToRoundData(round),
+            };
+            expect(result).to.deep.equal(expectedMultiplayerGameData);
+        });
     });
 });
