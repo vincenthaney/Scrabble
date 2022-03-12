@@ -54,15 +54,13 @@ export default class Board {
     }
 
     placeWord(tiles: Tile[], startPosition: Position, orientation: Orientation): boolean {
-        // eslint-disable-next-line no-console
-        console.log('1');
         const actualPosition = new Position(startPosition.row, startPosition.column);
         if (tiles.length === 0 || !this.verifySquare(startPosition, SHOULD_HAVE_NO_TILE)) return false;
         const isVertical = orientation === Orientation.Vertical;
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
         while (i < tiles.length) {
-            if (this.isWithinBounds(actualPosition)) return false;
+            if (actualPosition.isWithinBounds({ x: this.grid[0].length, y: this.grid.length })) return false;
             const targetSquare = this.grid[actualPosition.row][actualPosition.column];
             if (isVertical) actualPosition.row++;
             else actualPosition.column++;
@@ -81,9 +79,5 @@ export default class Board {
 
     getSize(): Vec2 {
         return { x: this.grid[0].length, y: this.grid.length };
-    }
-
-    private isWithinBounds(position: Position) {
-        return position.row < 0 || position.row >= this.grid.length || position.column < 0 || position.column >= this.grid[0].length;
     }
 }
