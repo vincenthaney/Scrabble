@@ -27,7 +27,7 @@ export class SessionStorageService {
         console.log('new message saved : ' + newMessage.content);
     }
 
-    resetData() {
+    resetMessages() {
         sessionStorage.clear();
     }
 }

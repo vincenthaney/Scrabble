@@ -70,7 +70,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
-        this.sessionStorageService.resetData();
+        this.sessionStorageService.resetMessages();
     }
 
     createVisualMessage(newMessage: Message): VisualMessage {
