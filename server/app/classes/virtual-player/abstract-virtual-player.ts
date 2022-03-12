@@ -36,11 +36,6 @@ export abstract class AbstractVirtualPlayer extends Player {
         this.findAction();
     }
 
-    sendPayload() {
-        // API call
-        return;
-    }
-
     generateWordFindingRequest(): WordFindingRequest {
         return {
             pointRange: this.findPointRange(),
@@ -48,6 +43,8 @@ export abstract class AbstractVirtualPlayer extends Player {
             pointHistory: this.pointHistory,
         };
     }
+
+    abstract sendPayload(): void;
 
     abstract findPointRange(): PointRange;
 
