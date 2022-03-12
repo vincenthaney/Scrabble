@@ -1,5 +1,5 @@
 import { MONGO_DATABASE_NAME, MONGO_DB_URL } from '@app/constants/services-constants/mongo-db.const';
-import { Db, MongoClient, Document } from 'mongodb';
+import { Db, MongoClient, Document, Collection } from 'mongodb';
 import { Service } from 'typedi';
 
 @Service()
@@ -9,9 +9,13 @@ export default class DatabaseService {
 
     async populateDb(collectionName: string, data: Document[]): Promise<void> {
         const collection = await this.db.collection(collectionName);
-        if ((await collection.find({}).toArray()).length === 0) {
+        if (await this.isCollectionEmpty(collection)) {
             await collection.insertMany(data);
         }
+    }
+
+    async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
+        return (await collection.find({}).toArray()).length === 0;
     }
 
     async connectToServer(databaseUrl: string = MONGO_DB_URL): Promise<MongoClient | null> {
