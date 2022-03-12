@@ -4,6 +4,7 @@ import { Message } from '@app/classes/communication/message';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
+import { ESCAPE } from '@app/constants/components-constants';
 import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
@@ -84,6 +85,14 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     protected onLoseFocusEvent(): void {
         this.unselectAll();
+    }
+
+    protected onFocusableEvent(e: KeyboardEvent): void {
+        switch (e.key) {
+            case ESCAPE:
+                this.unselectAll();
+                break;
+        }
     }
 
     private updateTileRack(): void {
