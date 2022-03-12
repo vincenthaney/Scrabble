@@ -32,7 +32,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     ngOnInit(): void {
-        this.subscribe();
+        this.subscribeToFocusableEvents();
         this.updateTileRack();
         this.updateTileRackSubscription = this.gameService.updateTileRackEvent
             .pipe(takeUntil(this.serviceDestroyed$))
@@ -44,7 +44,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     ngOnDestroy(): void {
-        this.destroy();
+        this.unsubscribeToFocusableEvents();
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
     }

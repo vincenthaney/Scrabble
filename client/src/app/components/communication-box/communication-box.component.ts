@@ -61,11 +61,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngAfterViewInit(): void {
-        this.subscribe();
+        this.subscribeToFocusableEvents();
     }
 
     ngOnDestroy(): void {
-        this.destroy();
+        this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }

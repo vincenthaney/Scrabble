@@ -143,7 +143,7 @@ describe('CommunicationBoxComponent', () => {
 
     describe('ngAfterViewInit', () => {
         it('should subscribe to focusable event', () => {
-            const spy = spyOn<any>(component, 'subscribe');
+            const spy = spyOn<any>(component, 'subscribeToFocusableEvents');
             component.ngAfterViewInit();
             expect(spy).toHaveBeenCalled();
         });

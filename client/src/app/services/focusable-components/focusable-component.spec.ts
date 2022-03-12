@@ -64,7 +64,7 @@ describe('FocusableComponent', () => {
             (component as any)[event] = subject;
             const spy = spyOn(subject, 'subscribe');
 
-            component['subscribe']();
+            component['subscribeToFocusableEvents']();
 
             expect(spy).toHaveBeenCalled();
         };
@@ -80,7 +80,7 @@ describe('FocusableComponent', () => {
         it('should call onFocusableEvent when subscribed', () => {
             component['onFocusableEvent'] = () => {};
             const spy = spyOn<any>(component, 'onFocusableEvent');
-            component['subscribe']();
+            component['subscribeToFocusableEvents']();
             const expected = 'expected';
             component.emitFocusableEvent(expected);
             expect(spy).toHaveBeenCalledWith(expected);
@@ -89,7 +89,7 @@ describe('FocusableComponent', () => {
         it('should call onFocusableEvent when subscribed', () => {
             component['onLoseFocusEvent'] = () => {};
             const spy = spyOn<any>(component, 'onLoseFocusEvent');
-            component['subscribe']();
+            component['subscribeToFocusableEvents']();
             component.emitLoseFocusEvent();
             expect(spy).toHaveBeenCalled();
         });
@@ -98,13 +98,13 @@ describe('FocusableComponent', () => {
     describe('destroy', () => {
         it('should call focusableComponentDestroyed next', () => {
             const spy = spyOn(component['focusableComponentDestroyed$'], 'next');
-            component['destroy']();
+            component['unsubscribeToFocusableEvents']();
             expect(spy).toHaveBeenCalledWith(true);
         });
 
         it('should call focusableComponentDestroyed next', () => {
             const spy = spyOn(component['focusableComponentDestroyed$'], 'complete');
-            component['destroy']();
+            component['unsubscribeToFocusableEvents']();
             expect(spy).toHaveBeenCalled();
         });
     });
