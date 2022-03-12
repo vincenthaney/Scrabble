@@ -39,7 +39,7 @@ class MockBoardService {
     boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
     boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
 
-    createGrid() {
+    createGrid(): void {
         this.grid = [];
         for (let i = 0; i < this.getGridSize().y; i++) {
             this.grid.push([]);
@@ -59,6 +59,7 @@ class MockBoardService {
     get grid(): Square[][] {
         return this.pGrid;
     }
+
     set grid(grid: Square[][]) {
         this.pGrid = grid;
     }
@@ -442,7 +443,7 @@ describe('BoardComponent', () => {
 
             component.navigator = new BoardNavigator(component.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
-            event = new KeyboardEvent('e');
+            event = new KeyboardEvent('exception');
             component.ngOnInit();
 
             nextEmptySpy = spyOn(component.navigator, 'nextEmpty').and.returnValue(undefined);

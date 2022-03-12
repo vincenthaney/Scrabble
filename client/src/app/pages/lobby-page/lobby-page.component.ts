@@ -121,24 +121,24 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    joinRandomLobby() {
+    joinRandomLobby(): void {
         try {
             const lobby = this.getRandomLobby();
-            return this.joinLobby(lobby.lobbyId);
-        } catch (e) {
-            this.snackBar.open((e as Error).toString(), 'Ok', {
+            this.joinLobby(lobby.lobbyId);
+        } catch (exception) {
+            this.snackBar.open((exception as Error).toString(), 'Ok', {
                 duration: 3000,
             });
         }
     }
 
-    getRandomLobby() {
+    getRandomLobby(): LobbyInfo {
         const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters !== false);
         if (filteredLobbies.length === 0) throw new Error(NO_LOBBY_CAN_BE_JOINED);
         return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
     }
 
-    updateLobbyAttributes(lobby: LobbyInfo) {
+    updateLobbyAttributes(lobby: LobbyInfo): void {
         const gameType = this.filterFormGroup.get('gameType')?.value;
         lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
         lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;

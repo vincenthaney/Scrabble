@@ -115,11 +115,12 @@ export class SquareTestWrapper {
     pSquareView: SquareView;
     squareComponent: SquareComponent;
 
-    createComponent() {
+    createComponent(): void {
         this.squareView = new SquareView(UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE);
         this.squareComponent = new SquareComponent();
         this.squareComponent.squareView = this.squareView;
     }
+    
     get squareView(): SquareView {
         return this.pSquareView;
     }

@@ -37,10 +37,10 @@ const DEFAULT_FILTER_VALUES = {
 export class TestComponent {}
 
 export class GameDispatcherServiceSpy extends GameDispatcherService {
-    handleLobbyListRequest() {
+    handleLobbyListRequest(): void {
         return;
     }
-    handleJoinLobby() {
+    handleJoinLobby(): void {
         return;
     }
 }

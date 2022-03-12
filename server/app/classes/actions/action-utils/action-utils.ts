@@ -1,5 +1,5 @@
-import { Tile } from '@app/classes/tile';
 import Player from '@app/classes/player/player';
+import { Tile } from '@app/classes/tile';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 
 export class ActionUtils {
@@ -34,7 +34,7 @@ export class ActionUtils {
         return index;
     };
 
-    static isBlankTile(tile: Tile) {
+    static isBlankTile(tile: Tile): boolean {
         return tile.isBlank || tile.letter === '*';
     }
 }

@@ -1,8 +1,8 @@
-import { Orientation, Position, BoardNavigator } from './';
-import { Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
-import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import { Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import { BoardNavigator, Orientation, Position } from './';
 
 export const SHOULD_HAVE_A_TILE = true;
 export const SHOULD_HAVE_NO_TILE = false;
@@ -21,7 +21,7 @@ export default class Board {
         }
     }
 
-    getSquare(position: Position) {
+    getSquare(position: Position): Square {
         return this.grid[position.row][position.column];
     }
 
@@ -45,12 +45,12 @@ export default class Board {
 
         try {
             backward = this.verifySquare(position.copy().backward(orientation), shouldBeFilled);
-        } catch (e) {
+        } catch (exception) {
             backward = !shouldBeFilled;
         }
         try {
             forward = this.verifySquare(position.copy().forward(orientation), shouldBeFilled);
-        } catch (e) {
+        } catch (exception) {
             forward = !shouldBeFilled;
         }
 
