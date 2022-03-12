@@ -4,6 +4,6 @@ export interface DbVirtualPlayer {
     isDefault: boolean;
 }
 
-export interface DbVirtualPlayers {
+export interface DbVirtualPlayerData {
     players: DbVirtualPlayer[];
 }

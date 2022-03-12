@@ -4,6 +4,6 @@ export interface DbHighScore {
     names: string[];
 }
 
-export interface DbHighScores {
+export interface DbHighScoresData {
     highScores: DbHighScore[];
 }
