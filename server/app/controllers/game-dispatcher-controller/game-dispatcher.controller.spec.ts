@@ -5,6 +5,7 @@ import { Application } from '@app/app';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
@@ -48,6 +49,7 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     playerName: DEFAULT_PLAYER_NAME,
     playerId: DEFAULT_PLAYER_ID,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: 'french',
 };
