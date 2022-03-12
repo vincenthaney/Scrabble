@@ -26,7 +26,11 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
     componentDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(public gameService: GameService, private readonly focusableComponentService: FocusableComponentsService, private gameViewEventManagerService: GameViewEventManagerService) {
+    constructor(
+        public gameService: GameService,
+        private readonly focusableComponentService: FocusableComponentsService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {
         super();
     }
 
@@ -44,8 +48,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     ngOnDestroy(): void {
         this.unsubscribeToFocusableEvents();
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     selectTile(selectType: TileRackSelectType, tile: RackTile): boolean {

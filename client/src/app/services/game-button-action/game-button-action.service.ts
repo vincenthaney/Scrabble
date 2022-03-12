@@ -18,6 +18,6 @@ export class GameButtonActionService {
         };
         const localPlayerId = this.gameService.getLocalPlayerId();
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
-        this.gamePlayController.sendAction(this.gameService.gameId, localPlayerId, actionPass);
+        this.gamePlayController.sendAction(this.gameService.getGameId(), localPlayerId, actionPass);
     }
 }
