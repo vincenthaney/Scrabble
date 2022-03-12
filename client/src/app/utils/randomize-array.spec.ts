@@ -10,10 +10,13 @@ describe('randomizeArray', () => {
     it('should not always return the same array', () => {
         let sameResult = true;
         const iterations = 100;
+        const initialArray = { ...TEST_ARRAY };
 
         for (let i = 0; i < iterations; i++) {
-            if (randomizeArray(TEST_ARRAY) !== TEST_ARRAY) sameResult = false;
-            else break;
+            if (randomizeArray(TEST_ARRAY) !== initialArray) {
+                sameResult = false;
+                break;
+            }
         }
         expect(sameResult).toBeFalse();
     });
