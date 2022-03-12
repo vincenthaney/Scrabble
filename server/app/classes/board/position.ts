@@ -26,7 +26,7 @@ export default class Position {
         return new Position(this.row, this.column);
     }
 
-    isWithinBounds(size: Vec2) {
+    isWithinBounds(size: Vec2): boolean {
         return this.column >= 0 && this.column < size.x && this.row >= 0 && this.row < size.y;
     }
 }
