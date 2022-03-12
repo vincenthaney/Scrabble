@@ -6,12 +6,13 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import PlayerName from '@app/classes/communication/player-name';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import SocketService from '@app/services/socket/socket.service';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { Socket } from 'socket.io-client';
 
 const DEFAULT_SOCKET_ID = 'testSocketID';
@@ -22,6 +23,7 @@ const DEFAULT_GAME_DATA: GameConfigData = {
     playerName: DEFAULT_PLAYER_NAME,
     playerId: 'tessId',
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 0,
     dictionary: '',
 };
@@ -56,15 +58,15 @@ describe('GameDispatcherController', () => {
 
     describe('ngOnDestroy', () => {
         it('should call next', () => {
-            const spy = spyOn(controller.serviceDestroyed$, 'next');
-            spyOn(controller.serviceDestroyed$, 'complete');
+            const spy = spyOn(controller['serviceDestroyed$'], 'next');
+            spyOn(controller['serviceDestroyed$'], 'complete');
             controller.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
 
         it('should call complete', () => {
-            spyOn(controller.serviceDestroyed$, 'next');
-            const spy = spyOn(controller.serviceDestroyed$, 'complete');
+            spyOn(controller['serviceDestroyed$'], 'next');
+            const spy = spyOn(controller['serviceDestroyed$'], 'complete');
             controller.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
@@ -72,13 +74,13 @@ describe('GameDispatcherController', () => {
 
     describe('configureSocket', () => {
         it('On join request, configureSocket should emit opponent name', () => {
-            const joinRequestSpy = spyOn(controller.joinRequestEvent, 'emit').and.callThrough();
+            const joinRequestSpy = spyOn(controller['joinRequestEvent'], 'next').and.callThrough();
             socketHelper.peerSideEmit('joinRequest', DEFAULT_OPPONENT_NAME);
             expect(joinRequestSpy).toHaveBeenCalled();
         });
 
         it('On start game, configureSocket should emit socket id and game data', async () => {
-            const startGameRequestSpy = spyOn(gameServiceMock, 'initializeMultiplayerGame').and.callFake(async () => {
+            const startGameRequestSpy = spyOn(gameServiceMock, 'initializeGame').and.callFake(async () => {
                 return;
             });
             socketHelper.peerSideEmit('startGame', DEFAULT_GAME_DATA);
@@ -86,19 +88,19 @@ describe('GameDispatcherController', () => {
         });
 
         it('On lobbies update, configureSocket should emit hostName', () => {
-            const lobbiesUpdateSpy = spyOn(controller.lobbiesUpdateEvent, 'emit').and.callThrough();
+            const lobbiesUpdateSpy = spyOn(controller['lobbiesUpdateEvent'], 'next').and.callThrough();
             socketHelper.peerSideEmit('lobbiesUpdate', DEFAULT_OPPONENT_NAME);
             expect(lobbiesUpdateSpy).toHaveBeenCalled();
         });
 
         it('On rejected, configureSocket should emit lobbies', () => {
-            const rejectedSpy = spyOn(controller.joinerRejectedEvent, 'emit').and.callThrough();
+            const rejectedSpy = spyOn(controller['joinerRejectedEvent'], 'next').and.callThrough();
             socketHelper.peerSideEmit('rejected', DEFAULT_OPPONENT_NAME);
             expect(rejectedSpy).toHaveBeenCalled();
         });
 
         it('On cancel game, configureSocket should emit opponent name', () => {
-            const cancelGameSpy = spyOn(controller.canceledGameEvent, 'emit').and.callThrough();
+            const cancelGameSpy = spyOn(controller['canceledGameEvent'], 'next').and.callThrough();
             socketHelper.peerSideEmit('canceledGame', DEFAULT_OPPONENT_NAME);
             expect(cancelGameSpy).toHaveBeenCalled();
         });
@@ -107,15 +109,15 @@ describe('GameDispatcherController', () => {
     describe('handleMultiplayerGameCreation', () => {
         it('handleMultiplayerGameCreation should  make an HTTP post request', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
-            controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+            controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(httpPostSpy).toHaveBeenCalled();
         });
 
         it('handleMultiplayerGameCreation should emit to createGameEvent', () => {
             const fakeObservable = of<string>('fakeResponse');
             spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
-            const createGameSpy = spyOn(controller.createGameEvent, 'emit').and.callThrough();
-            controller.handleMultiplayerGameCreation(DEFAULT_GAME_DATA);
+            const createGameSpy = spyOn(controller['createGameEvent'], 'next').and.callThrough();
+            controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(createGameSpy).toHaveBeenCalled();
         });
     });
@@ -133,7 +135,7 @@ describe('GameDispatcherController', () => {
             spyOn(controller['http'], 'post').and.returnValue(observable);
             const spy = spyOn(observable, 'subscribe');
 
-            controller.handleMultiplayerGameCreation({} as unknown as GameConfigData);
+            controller.handleGameCreation({} as unknown as GameConfigData);
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -219,7 +221,7 @@ describe('GameDispatcherController', () => {
         it('handleLobbyJoinRequest should emit when HTTP post request on success', () => {
             const fakeObservable = of<string>('fakeResponse');
             spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
-            const successSpy = spyOn(controller.lobbyRequestValidEvent, 'emit');
+            const successSpy = spyOn(controller['lobbyRequestValidEvent'], 'next');
             controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
             expect(successSpy).toHaveBeenCalled();
         });
@@ -238,10 +240,10 @@ describe('GameDispatcherController', () => {
 
     describe('handleJoinError', () => {
         it('handleJoinError should emit lobyFullEvent if error status is Unauthorized', () => {
-            const lobbyFullEmitSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callFake(() => {
+            const lobbyFullNextSpy = spyOn(controller['lobbyFullEvent'], 'next').and.callFake(() => {
                 return;
             });
-            const canceledGameEmitSpy = spyOn(controller.canceledGameEvent, 'emit').and.callFake(() => {
+            const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
             controller.handleJoinError(
@@ -249,15 +251,15 @@ describe('GameDispatcherController', () => {
                     status: HttpStatusCode.Unauthorized,
                 }),
             );
-            expect(lobbyFullEmitSpy).toHaveBeenCalled();
-            expect(canceledGameEmitSpy).not.toHaveBeenCalled();
+            expect(lobbyFullNextSpy).toHaveBeenCalled();
+            expect(canceledGameNextSpy).not.toHaveBeenCalled();
         });
 
         it('handleJoinError should emit canceledGameEvent if error status is Gone', () => {
-            const lobbyFullEmitSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callFake(() => {
+            const lobbyFullNextSpy = spyOn(controller['lobbyFullEvent'], 'next').and.callFake(() => {
                 return;
             });
-            const canceledGameEmitSpy = spyOn(controller.canceledGameEvent, 'emit').and.callFake(() => {
+            const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
             controller.handleJoinError(
@@ -265,15 +267,15 @@ describe('GameDispatcherController', () => {
                     status: HttpStatusCode.Gone,
                 }),
             );
-            expect(lobbyFullEmitSpy).not.toHaveBeenCalled();
-            expect(canceledGameEmitSpy).toHaveBeenCalled();
+            expect(lobbyFullNextSpy).not.toHaveBeenCalled();
+            expect(canceledGameNextSpy).toHaveBeenCalled();
         });
 
         it('handleJoinError should emit nothing if error status is not Unauthorized or Gone', () => {
-            const lobbyFullEmitSpy = spyOn(controller.lobbyFullEvent, 'emit').and.callFake(() => {
+            const lobbyFullNextSpy = spyOn(controller['lobbyFullEvent'], 'next').and.callFake(() => {
                 return;
             });
-            const canceledGameEmitSpy = spyOn(controller.canceledGameEvent, 'emit').and.callFake(() => {
+            const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
             controller.handleJoinError(
@@ -281,8 +283,62 @@ describe('GameDispatcherController', () => {
                     status: HttpStatusCode.BadGateway,
                 }),
             );
-            expect(lobbyFullEmitSpy).not.toHaveBeenCalled();
-            expect(canceledGameEmitSpy).not.toHaveBeenCalled();
+            expect(lobbyFullNextSpy).not.toHaveBeenCalled();
+            expect(canceledGameNextSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('subcription methods', () => {
+        let serviceDestroyed$: Subject<boolean>;
+        let callback: () => void;
+
+        beforeEach(() => {
+            serviceDestroyed$ = new Subject();
+            callback = () => {
+                return;
+            };
+        });
+
+        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+            const subscriptionSpy = spyOn(controller['createGameEvent'], 'subscribe');
+            controller.subscribeToCreateGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToJoinRequestEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(controller['joinRequestEvent'], 'subscribe');
+            controller.subscribeToJoinRequestEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToCanceledGameEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(controller['canceledGameEvent'], 'subscribe');
+            controller.subscribeToCanceledGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbyFullEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(controller['lobbyFullEvent'], 'subscribe');
+            controller.subscribeToLobbyFullEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbyRequestValidEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(controller['lobbyRequestValidEvent'], 'subscribe');
+            controller.subscribeToLobbyRequestValidEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbiesUpdateEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(controller['lobbiesUpdateEvent'], 'subscribe');
+            controller.subscribeToLobbiesUpdateEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToJoinerRejectedEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(controller['joinerRejectedEvent'], 'subscribe');
+            controller.subscribeToJoinerRejectedEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
         });
     });
 });

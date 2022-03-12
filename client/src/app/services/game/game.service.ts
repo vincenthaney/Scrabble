@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
-import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
@@ -55,7 +55,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.serviceDestroyed$.complete();
     }
 
-    async initializeMultiplayerGame(localPlayerId: string, startGameData: StartMultiplayerGameData): Promise<void> {
+    async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
         this.gameId = startGameData.gameId;
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
@@ -71,7 +71,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         await this.handleReRouteOrReconnect(startGameData);
     }
 
-    async handleReRouteOrReconnect(startGameData: StartMultiplayerGameData): Promise<void> {
+    async handleReRouteOrReconnect(startGameData: StartGameData): Promise<void> {
         if (this.router.url !== '/game') {
             this.roundManager.initializeEvents();
             this.roundManager.startRound();
@@ -165,7 +165,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.playerContainer = undefined;
     }
 
-    reconnectReinitialize(startGameData: StartMultiplayerGameData): void {
+    reconnectReinitialize(startGameData: StartGameData): void {
         if (this.playerContainer) {
             this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
         }

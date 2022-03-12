@@ -28,6 +28,7 @@ import {
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject } from 'rxjs';
@@ -40,6 +41,7 @@ import { Subject } from 'rxjs';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
+
     componentDestroyed$: Subject<boolean> = new Subject();
     playerLeftWithQuitButton: boolean = false;
 
@@ -51,10 +53,19 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public surrenderDialog: MatDialog,
         private playerLeavesService: PlayerLeavesService,
         private gameViewEventManagerService: GameViewEventManagerService,
+        private gameButtonActionService: GameButtonActionService,
     ) {}
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.escape', ['$event'])
+    handleKeyboardEventEsc(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.backspace', ['$event'])
+    handleKeyboardEventBackspace(event: KeyboardEvent): void {
         this.focusableComponentService.emitKeyboard(event);
     }
 
@@ -74,6 +85,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
         }
+    }
+
+    createPassAction(): void {
+        this.gameButtonActionService.createPassAction();
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]): void {
@@ -144,6 +159,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
             if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
             if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
         }
+    }
+
+    isLocalPlayerTurn(): boolean {
+        return this.gameService.isLocalPlayerPlaying();
     }
 
     private handlePlayerLeave(): void {

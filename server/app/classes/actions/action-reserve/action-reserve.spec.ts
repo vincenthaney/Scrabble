@@ -39,7 +39,7 @@ describe('ActionReserve', () => {
         });
 
         it('should be correct format', () => {
-            const expected = 'A: 0, B: 0\nTotal: 0';
+            const expected = '**<span>A</span>**: 0, **<span>B</span>**: 0<br>**Total**: 0';
 
             expect(action.getMessage()).to.equal(expected);
         });

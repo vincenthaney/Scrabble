@@ -11,7 +11,6 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-communication-box',
@@ -30,10 +29,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif 3', 'Objectif 4'];
-
-    // lettersLeftTotal: number = 0;
-    // lettersLeft: TileReserveData[] = [];
+    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
 
     loading: boolean = false;
 
@@ -55,14 +51,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngAfterViewInit(): void {
-        this.messageInputElement.nativeElement.focus();
-        const handleKeyEvent = () => {
-            this.messageInputElement.nativeElement.focus();
-        };
-        this.focusEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(handleKeyEvent);
+        this.subscribeToFocusableEvents();
     }
 
     ngOnDestroy(): void {
+        this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
@@ -103,7 +96,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         if (!this.isOpponent(newMessage.senderId)) this.loading = false;
     }
 
-    isOpponent(id: string) {
+    isOpponent(id: string): boolean {
         return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
@@ -113,6 +106,18 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     getNumberOfTilesLeft(): number {
         return this.gameService.getTotalNumberOfTilesLeft();
+    }
+
+    onContainerClick(): void {
+        this.focusableComponentsService.setActiveKeyboardComponent(this);
+    }
+
+    protected onFocusableEvent(event: KeyboardEvent): void {
+        if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private isCtrlC(event: KeyboardEvent): boolean {
+        return event.key === 'c' && (event.ctrlKey || event.metaKey);
     }
 
     private scrollToBottom(): void {

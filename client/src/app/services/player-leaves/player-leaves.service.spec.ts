@@ -6,6 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DEFAULT_GAME_ID, DEFAULT_LEAVER } from '@app/constants/controller-constants';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
+import { Subject } from 'rxjs';
 import { SocketService } from '..';
 import { PlayerLeavesService } from './player-leaves.service';
 
@@ -26,12 +27,12 @@ describe('PlayerLeavesService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should call handleJoinerLeaveGame when playerLeavesController.joinerLeaveGameEvent emits', () => {
+    it('should call handleJoinerLeaveGame when playerLeavesController.joinerLeavesGameEvent emits', () => {
         const createGameSpy = spyOn(service, 'handleJoinerLeaveGame').and.callFake(() => {
             return;
         });
         // eslint-disable-next-line dot-notation
-        playerLeavesController.joinerLeaveGameEvent.emit('testName');
+        playerLeavesController['joinerLeavesGameEvent'].emit('testName');
         expect(createGameSpy).toHaveBeenCalledWith('testName');
     });
 
@@ -40,25 +41,26 @@ describe('PlayerLeavesService', () => {
             return;
         });
         // eslint-disable-next-line dot-notation
-        playerLeavesController.resetGameEvent.emit();
+        playerLeavesController['resetGameEvent'].emit();
         expect(gameServiceResetSpy).toHaveBeenCalled();
     });
     it('should reset gameDispatcherService data when playerLeavesController.resetGameEvent emits', () => {
         const spy = spyOn<any>(service['gameDispatcherService'], 'resetServiceData').and.callFake(() => {});
         // eslint-disable-next-line dot-notation
-        playerLeavesController.resetGameEvent.emit();
+        playerLeavesController['resetGameEvent'].emit();
         expect(spy).toHaveBeenCalled();
     });
     it('should reset roundManagerService data when playerLeavesController.resetGameEvent emits', () => {
         const spy = spyOn(service['roundManagerService'], 'resetServiceData').and.callFake(() => {
             return;
         });
-        playerLeavesController.resetGameEvent.emit();
+        // eslint-disable-next-line dot-notation
+        playerLeavesController['resetGameEvent'].emit();
         expect(spy).toHaveBeenCalled();
     });
 
-    it('handleJoinerLeaveGame should call joinerLeaveGameEvent.next', () => {
-        const joinerLeaveGameEventSpy = spyOn(service.joinerLeaveGameEvent, 'next').and.callFake(() => {
+    it('handleJoinerLeaveGame should call joinerLeavesGameEvent.next', () => {
+        const joinerLeaveGameEventSpy = spyOn(service['joinerLeavesGameEvent'], 'next').and.callFake(() => {
             return;
         });
         service.handleJoinerLeaveGame(DEFAULT_LEAVER);
@@ -91,7 +93,7 @@ describe('PlayerLeavesService', () => {
     });
 
     it('ngOnDestroy should call serviceDestroyed$.next', () => {
-        const nextSpy = spyOn(service.serviceDestroyed$, 'next').and.callFake(() => {
+        const nextSpy = spyOn(service['serviceDestroyed$'], 'next').and.callFake(() => {
             return;
         });
         service.ngOnDestroy();
@@ -99,10 +101,28 @@ describe('PlayerLeavesService', () => {
     });
 
     it('ngOnDestroy should call serviceDestroyed$.complete', () => {
-        const completeSpy = spyOn(service.serviceDestroyed$, 'complete').and.callFake(() => {
+        const completeSpy = spyOn(service['serviceDestroyed$'], 'complete').and.callFake(() => {
             return;
         });
         service.ngOnDestroy();
         expect(completeSpy).toHaveBeenCalled();
+    });
+
+    describe('subcription methods', () => {
+        let serviceDestroyed$: Subject<boolean>;
+        let callback: () => void;
+
+        beforeEach(() => {
+            serviceDestroyed$ = new Subject();
+            callback = () => {
+                return;
+            };
+        });
+
+        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+            const subscriptionSpy = spyOn(service['joinerLeavesGameEvent'], 'subscribe');
+            service.subscribeToJoinerLeavesGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
     });
 });

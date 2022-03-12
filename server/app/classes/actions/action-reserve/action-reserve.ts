@@ -6,8 +6,8 @@ export default class ActionReserve extends ActionInfo {
         const map = this.game.getTilesLeftPerLetter();
         const arr: [letter: LetterValue, amount: number][] = Array.from(map, ([v, k]) => [v, k]);
         const total = arr.reduce((prev, [, amount]) => (prev += amount), 0);
-        let message = arr.map(([letter, amount]) => `${letter}: ${amount}`).join(', ');
-        message += `\nTotal: ${total}`;
+        let message = arr.map(([letter, amount]) => `**<span>${letter}</span>**: ${amount}`).join(', ');
+        message += `<br>**Total**: ${total}`;
         return message;
     }
 

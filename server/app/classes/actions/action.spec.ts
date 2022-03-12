@@ -4,7 +4,23 @@
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { expect } from 'chai';
-import { ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
+import { Action, ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+
+const DEFAULT_MESSAGE = 'message';
+
+class MockAction extends Action {
+    willEndTurn(): boolean {
+        return true;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    execute(): void | GameUpdateData {}
+
+    getMessage(): string | undefined {
+        return DEFAULT_MESSAGE;
+    }
+}
 
 describe('Action', () => {
     describe('ActionPlay', () => {
@@ -28,6 +44,18 @@ describe('Action', () => {
 
         it('should not end round', () => {
             expect(action.willEndTurn()).to.be.false;
+        });
+    });
+
+    describe('getOpponentMessage', () => {
+        let action: Action;
+
+        beforeEach(() => {
+            action = new MockAction(null as unknown as Player, null as unknown as Game);
+        });
+
+        it('should return getMessage if method not overloaded', () => {
+            expect(action.getOpponentMessage()).to.equal(action.getMessage());
         });
     });
 });

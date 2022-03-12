@@ -18,6 +18,7 @@ import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
+import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { marked } from 'marked';
 import { CommunicationBoxComponent } from './communication-box.component';
 
@@ -85,6 +86,7 @@ describe('CommunicationBoxComponent', () => {
                 { provide: InputParserService, useValue: inputParserSpy },
                 { provide: CdkVirtualScrollViewport, useValue: virtualScrollSpy },
                 GameService,
+                FocusableComponentsService,
             ],
         }).compileComponents();
 
@@ -126,9 +128,9 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('ngAfterViewInit', () => {
-        it('should call focus on handleKeyEvent', () => {
-            const spy = spyOn(component.messageInputElement.nativeElement, 'focus');
-            component.focusEvent.emit(new KeyboardEvent('keypress'));
+        it('should subscribe to focusable event', () => {
+            const spy = spyOn<any>(component, 'subscribeToFocusableEvents');
+            component.ngAfterViewInit();
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -244,6 +246,39 @@ describe('CommunicationBoxComponent', () => {
 
         it('should return true if id is other', () => {
             expect(component.isOpponent('other id')).toBeTrue();
+        });
+    });
+
+    describe('onContainerClick', () => {
+        it('should call setActiveKeyboardComponent', () => {
+            const spy = spyOn(component['focusableComponentsService'], 'setActiveKeyboardComponent');
+            component.onContainerClick();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onFocusableEvent', () => {
+        let focusSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            focusSpy = spyOn(component.messageInputElement.nativeElement, 'focus');
+        });
+
+        it('should call focus', () => {
+            const event = new KeyboardEvent('keypress');
+            component['onFocusableEvent'](event);
+            expect(focusSpy).toHaveBeenCalled();
+        });
+
+        it('should not call focus with CTR+C or CMD+C', () => {
+            const keys = ['ctrlKey', 'metaKey'];
+
+            for (const key of keys) {
+                const event: any = { key: 'c' };
+                event[key] = true;
+                component['onFocusableEvent'](event as KeyboardEvent);
+                expect(focusSpy).not.toHaveBeenCalled();
+            }
         });
     });
 

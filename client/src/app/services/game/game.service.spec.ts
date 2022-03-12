@@ -8,7 +8,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
-import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
@@ -135,7 +135,7 @@ describe('GameService', () => {
     });
 
     describe('initializeMultiplayerGame', () => {
-        let defaultGameData: StartMultiplayerGameData;
+        let defaultGameData: StartGameData;
 
         beforeEach(() => {
             defaultGameData = {
@@ -160,7 +160,7 @@ describe('GameService', () => {
 
         it('should set gameId', async () => {
             expect(service.getGameId()).not.toBeDefined();
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service.getGameId()).toEqual(defaultGameData.gameId);
         });
 
@@ -176,13 +176,13 @@ describe('GameService', () => {
 
         it('should set gameType', async () => {
             expect(service.gameType).not.toBeDefined();
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service.gameType).toEqual(defaultGameData.gameType);
         });
 
         it('should set dictionnaryName', async () => {
             expect(service.dictionnaryName).not.toBeDefined();
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service.dictionnaryName).toEqual(defaultGameData.dictionary);
         });
 
@@ -193,12 +193,12 @@ describe('GameService', () => {
 
         it('should set tileReserve', async () => {
             expect(service.tileReserve).not.toBeDefined();
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service.tileReserve).toEqual(defaultGameData.tileReserve);
         });
 
         it('should call initializeBoard', async () => {
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(boardServiceSpy.initializeBoard).toHaveBeenCalledWith(defaultGameData.board);
         });
 
@@ -206,7 +206,7 @@ describe('GameService', () => {
             const router: Router = TestBed.inject(Router);
             router.navigateByUrl('other');
             tick();
-            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(roundManagerSpy.startRound).toHaveBeenCalled();
         }));
 
@@ -214,7 +214,7 @@ describe('GameService', () => {
             const router: Router = TestBed.inject(Router);
             router.navigateByUrl('other');
             tick();
-            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(roundManagerSpy.startRound).toHaveBeenCalled();
         }));
 
@@ -223,7 +223,7 @@ describe('GameService', () => {
             router.navigateByUrl('other');
             tick();
             const spy = spyOn(service['router'], 'navigateByUrl');
-            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(spy).toHaveBeenCalledWith('game');
         }));
 
@@ -234,18 +234,18 @@ describe('GameService', () => {
             const spy = spyOn(service, 'reconnectReinitialize').and.callFake(() => {
                 return;
             });
-            service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(spy).toHaveBeenCalled();
         }));
 
         it('should call startRound', async () => {
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(roundManagerSpy.startRound).toHaveBeenCalled();
         });
 
         it('should call navigateByUrl', async () => {
             const spy = spyOn(service['router'], 'navigateByUrl');
-            await service.initializeMultiplayerGame(DEFAULT_PLAYER_ID, defaultGameData);
+            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(spy).toHaveBeenCalledWith('game');
         });
     });
@@ -303,7 +303,7 @@ describe('GameService', () => {
     });
 
     describe('reconnectReinitialize', () => {
-        let defaultGameData: StartMultiplayerGameData;
+        let defaultGameData: StartGameData;
 
         beforeEach(() => {
             service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
@@ -434,6 +434,8 @@ describe('GameService', () => {
         it('should call convertRoundDataToRound and updateRound if round is defined', () => {
             const round: Round = { player: player1, startTime: new Date(), limitTime: new Date(), completedTime: null };
             roundManagerSpy.convertRoundDataToRound.and.returnValue(round);
+            spyOn(service, 'isLocalPlayerPlaying').and.returnValue(true);
+
             gameUpdateData.round = { playerData: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date(), completedTime: null };
             service.handleGameUpdate(gameUpdateData);
             expect(roundManagerSpy.convertRoundDataToRound).toHaveBeenCalled();
@@ -446,6 +448,19 @@ describe('GameService', () => {
             service.handleGameUpdate(gameUpdateData);
             expect(roundManagerSpy.convertRoundDataToRound).not.toHaveBeenCalled();
             expect(roundManagerSpy.updateRound).not.toHaveBeenCalledWith(round);
+        });
+
+        it('should emit newActivePlayer if round is defined', () => {
+            const expectedIsLocalPlayerPlaying = true;
+            spyOn(service, 'isLocalPlayerPlaying').and.returnValue(expectedIsLocalPlayerPlaying);
+            gameUpdateData.round = { playerData: DEFAULT_PLAYER_1, startTime: new Date(), limitTime: new Date(), completedTime: null };
+            service.handleGameUpdate(gameUpdateData);
+            expect(newActivePlayerEventEmitSpy).toHaveBeenCalledWith([DEFAULT_PLAYER_1, expectedIsLocalPlayerPlaying]);
+        });
+
+        it('should NOT emit newActivePlayer if round is undefined', () => {
+            service.handleGameUpdate(gameUpdateData);
+            expect(newActivePlayerEventEmitSpy).not.toHaveBeenCalled();
         });
 
         it('should update tileReserve, tileReserveTotal and emit if tileReserve and tilReserveTotal are defined', () => {

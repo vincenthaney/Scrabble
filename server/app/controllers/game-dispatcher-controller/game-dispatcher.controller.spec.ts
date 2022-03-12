@@ -5,11 +5,13 @@ import { Application } from '@app/app';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
-import { GameType } from '@app/classes/game/game.type';
+import { GameMode } from '@app/classes/game/game-mode';
+import { GameType } from '@app/classes/game/game-type';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
@@ -18,10 +20,13 @@ import {
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
     PLAYER_NAME_REQUIRED,
+    VIRTUAL_PLAYER_LEVEL_REQUIRED,
+    VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
-import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -32,7 +37,6 @@ import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
-import { SocketService } from '@app/services/socket-service/socket.service';
 
 const expect = chai.expect;
 
@@ -48,6 +52,9 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     playerName: DEFAULT_PLAYER_NAME,
     playerId: DEFAULT_PLAYER_ID,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
+    virtualPlayerLevel: VirtualPlayerLevel.Beginner,
+    virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: 1,
     dictionary: 'french',
 };
@@ -268,7 +275,7 @@ describe('GameDispatcherController', () => {
             gameStub.createStartGameData.callsFake(() => undefined as unknown as StartMultiplayerGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
-            gameStub.getRequestingPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             gameStub.isGameOver.returns(false);
@@ -292,9 +299,9 @@ describe('GameDispatcherController', () => {
             expect(result).to.throw(GAME_IS_OVER);
         });
 
-        it('should call getRequestingPlayer', () => {
+        it('should call getPlayer', () => {
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            chai.assert(gameStub.getRequestingPlayer.calledOnce);
+            chai.assert(gameStub.getPlayer.calledOnce);
         });
 
         it('should call addToRoom', () => {
@@ -344,7 +351,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('should throw if config.playerName is undefined', () => {
-            const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined };
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined, virtualPlayerLevel: VirtualPlayerLevel.Expert };
             expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
         });
 
@@ -367,6 +374,16 @@ describe('GameDispatcherController', () => {
             const playerName = '     ';
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
             expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
+        });
+
+        it('should throw if config.virtualPlayerName is undefined with solo game', () => {
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: GameMode.Solo, virtualPlayerName: undefined };
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_NAME_REQUIRED);
+        });
+
+        it('should throw if config.virtualPlayerLevel is undefined with solo game', () => {
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: GameMode.Solo, virtualPlayerLevel: undefined };
+            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_LEVEL_REQUIRED);
         });
     });
 
@@ -567,7 +584,7 @@ describe('GameDispatcherController', () => {
             (controller['activeGameService'] as unknown) = activeGameServiceStub;
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
             activeGameServiceStub.playerLeftEvent = new EventEmitter();
-            gameStub.getRequestingPlayer.returns(player);
+            gameStub.getPlayer.returns(player);
         });
 
         describe('Player leave before game', () => {
@@ -619,16 +636,16 @@ describe('GameDispatcherController', () => {
             });
 
             it('should remove player who leaves from socket room', () => {
-                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
 
                 controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-                expect(removeFromRoomSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, DEFAULT_GAME_ID);
+                expect(removeFromRoomSpy).to.have.been.called();
             });
 
             it('should emit cleanup event to socket', () => {
-                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => false);
+                doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
                 controller['handleLeave'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-                expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'cleanup');
+                expect(emitToSocketSpy).to.have.been.called();
             });
 
             it('should remove game from active game service if there is no more player in room', () => {
@@ -708,7 +725,7 @@ describe('GameDispatcherController', () => {
             gameStub = createStubInstance(Game);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             playerStub = createStubInstance(Player);
-            gameStub.getRequestingPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub);
             handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
         });
 

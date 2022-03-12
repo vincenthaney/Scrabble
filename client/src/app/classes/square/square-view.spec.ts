@@ -22,7 +22,7 @@ class SquareViewWrapper {
     squareView: SquareView;
     private pSquare: Square;
 
-    createSquareView() {
+    createSquareView(): void {
         this.squareView = new SquareView(this.square, SQUARE_SIZE);
     }
     get square(): Square {

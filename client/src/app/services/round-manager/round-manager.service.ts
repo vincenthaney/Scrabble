@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionData, ActionType } from '@app/classes/actions/action-data';
-import { StartMultiplayerGameData } from '@app/classes/communication/game-config';
+import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
@@ -30,7 +30,7 @@ export default class RoundManagerService implements IResetServiceData {
         this.initializeEvents();
     }
 
-    initialize(localPlayerId: string, startGameData: StartMultiplayerGameData): void {
+    initialize(localPlayerId: string, startGameData: StartGameData): void {
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.maxRoundTime = startGameData.maxRoundTime;
@@ -45,14 +45,15 @@ export default class RoundManagerService implements IResetServiceData {
     }
 
     convertRoundDataToRound(roundData: RoundData): Round {
-        if (!roundData.playerData.name || !roundData.playerData.tiles) throw Error(INVALID_ROUND_DATA_PLAYER);
-        const player = new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles);
-        return {
-            player,
-            startTime: roundData.startTime,
-            limitTime: roundData.limitTime,
-            completedTime: roundData.completedTime,
-        };
+        if (roundData.playerData.id && roundData.playerData.name && roundData.playerData.tiles) {
+            return {
+                player: new Player(roundData.playerData.id, roundData.playerData.name, roundData.playerData.tiles),
+                startTime: roundData.startTime,
+                limitTime: roundData.limitTime,
+                completedTime: roundData.completedTime,
+            };
+        }
+        throw Error(INVALID_ROUND_DATA_PLAYER);
     }
 
     resetServiceData(): void {
@@ -120,13 +121,14 @@ export default class RoundManagerService implements IResetServiceData {
     }
 
     roundTimeout(): void {
-        if (this.router.url !== '/game' || !this.isActivePlayerLocalPlayer()) return;
-
-        const actionPass: ActionData = {
-            type: ActionType.PASS,
-            payload: {},
-        };
-        this.endRoundEvent.emit();
-        this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass, '');
+        if (this.router.url === '/game' && this.isActivePlayerLocalPlayer()) {
+            const actionPass: ActionData = {
+                type: ActionType.PASS,
+                input: '',
+                payload: {},
+            };
+            this.endRoundEvent.emit();
+            this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+        }
     }
 }

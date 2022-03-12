@@ -22,13 +22,17 @@ export class TileComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.tile.isBlank || (this.tile.letter === '*' && this.tile.value === 0)) {
+        if (this.isWorthlessTile()) {
             this.hideValue = true;
         }
     }
 
     getBgPath(): string {
         const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMG) + 1;
-        return `/assets/img/tiles/bg_${index}.svg`;
+        return `assets/img/tiles/bg_${index}.svg`;
+    }
+
+    private isWorthlessTile(): boolean {
+        return this.tile.isBlank || (this.tile.letter === '*' && this.tile.value === 0);
     }
 }

@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
+import { ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -12,10 +13,12 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile, TileReserve } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { StringConversion } from '@app/utils/string-conversion';
 import * as chai from 'chai';
-import { assert } from 'chai';
+import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -49,8 +52,8 @@ const DEFAULT_POSITION: Position = new Position(CENTER, CENTER);
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 3 };
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
-const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
-const DEFAULT_SQUARE_CENTER: Square = { tile: null, position: new Position(1, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: true };
+const DEFAULT_SQUARE_2: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
+const DEFAULT_SQUARE_CENTER: Square = { tile: null, position: new Position(0, 1), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: true };
 
 const EXTRACT_RETURN: [Square, Tile][][] = [
     [
@@ -78,13 +81,19 @@ const GET_TILES_RETURN: Tile[] = [
 const BOARD: Square[][] = [
     [
         { ...DEFAULT_SQUARE_1, position: new Position(0, 0) },
-        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
+        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
     ],
     [
-        { ...DEFAULT_SQUARE_1, position: new Position(0, 1) },
+        { ...DEFAULT_SQUARE_1, position: new Position(1, 0) },
         { ...DEFAULT_SQUARE_1, position: new Position(1, 1) },
     ],
 ];
+const testEvaluatedPlacement = {
+    tilesToPlace: [],
+    orientation: TEST_ORIENTATION,
+    startPosition: TEST_START_POSITION,
+    score: TEST_SCORE,
+};
 
 describe('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
@@ -116,9 +125,30 @@ describe('ActionPlace', () => {
         game = gameStub as unknown as Game;
     });
 
+    afterEach(() => {
+        chai.spy.restore();
+    });
+
     it('should create', () => {
         const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
         expect(action).to.exist;
+    });
+
+    it('should call createActionPlacePayload', () => {
+        const actionPayloadSpy = spy.on(ActionPlace, 'createActionPlacePayload', () => {
+            return testEvaluatedPlacement;
+        });
+        ActionPlace.createActionData(testEvaluatedPlacement);
+        expect(actionPayloadSpy).to.have.been.called();
+    });
+
+    it('should return payload', () => {
+        const payload: ActionPlacePayload = {
+            tiles: testEvaluatedPlacement.tilesToPlace,
+            orientation: testEvaluatedPlacement.orientation,
+            startPosition: testEvaluatedPlacement.startPosition,
+        };
+        expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.deep.equal(payload);
     });
 
     describe('execute', () => {
@@ -129,7 +159,7 @@ describe('ActionPlace', () => {
             let updateBoardSpy: unknown;
 
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
-            let wordToStringSpy: unknown;
+            let wordsToStringSpy: unknown;
 
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
@@ -146,8 +176,7 @@ describe('ActionPlace', () => {
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
-                // isABingoSpy = chai.spy.on(ActionPlace.prototype, 'isABingo', () => false);
-                wordToStringSpy = chai.spy.on(ActionPlace.prototype, 'wordToString', () => []);
+                wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
             });
 
             afterEach(() => {
@@ -190,9 +219,9 @@ describe('ActionPlace', () => {
                 assert(scoreCalculatorServiceStub.bonusPoints.calledOnce);
             });
 
-            it('should call wordToString', () => {
+            it('should call wordsToString', () => {
                 action.execute();
-                expect(wordToStringSpy).to.have.been.called();
+                expect(wordsToStringSpy).to.have.been.called();
             });
 
             it('should call isLegalPlacement', () => {
@@ -328,28 +357,6 @@ describe('ActionPlace', () => {
 
         it('should return the correct number of tiles', () => {
             expect(action.amountOfLettersInWords(EXTRACT_RETURN)).to.equal(EXTRACT_RETURN_LETTERS);
-        });
-    });
-
-    describe('wordToString', () => {
-        let action: ActionPlace;
-
-        beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
-        });
-
-        it('should return the word', () => {
-            expect(action.wordToString(EXTRACT_RETURN)).to.deep.equal(['AB']);
-        });
-
-        it('should return word when tile has playedLetter', () => {
-            const tiles: [Square, Tile][][] = [
-                [
-                    [{} as unknown as Square, { letter: 'A', value: 0 }],
-                    [{} as unknown as Square, { letter: '*', value: 0, playedLetter: 'B' }],
-                ],
-            ];
-            expect(action.wordToString(tiles)).to.deep.equal(['AB']);
         });
     });
 

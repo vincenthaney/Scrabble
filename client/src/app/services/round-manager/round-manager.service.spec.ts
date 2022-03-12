@@ -26,6 +26,7 @@ import SpyObj = jasmine.SpyObj;
 class RoundManagerServiceWrapper {
     roundManagerService: RoundManagerService;
     pCurrentRound: Round;
+
     constructor(roundManagerService: RoundManagerService) {
         this.roundManagerService = roundManagerService;
         this.currentRound = roundManagerService.currentRound;
@@ -517,11 +518,12 @@ describe('RoundManagerService', () => {
 
                 const actionPass = {
                     type: ActionType.PASS,
+                    input: '',
                     payload: {},
                 };
 
                 service.roundTimeout();
-                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass, '');
+                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
             }));
         });
     });

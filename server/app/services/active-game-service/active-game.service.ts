@@ -30,16 +30,18 @@ export class ActiveGameService {
         if (filteredGames.length === 0) throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.NOT_FOUND);
 
         const game = filteredGames[0];
-        if (game.player1.id !== playerId && game.player2.id !== playerId) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
-
-        return game;
+        if (game.player1.id === playerId || game.player2.id === playerId) return game;
+        throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
     }
 
-    removeGame(id: string, playerId: string): Game {
-        const game = this.getGame(id, playerId);
-        const index = this.activeGames.indexOf(game);
-        this.activeGames.splice(index, 1);
-        return game;
+    removeGame(id: string, playerId: string): void {
+        try {
+            const game = this.getGame(id, playerId);
+            const index = this.activeGames.indexOf(game);
+            this.activeGames.splice(index, 1);
+            // If the game is already deleted, catch error but don't do anything
+            // eslint-disable-next-line no-empty
+        } catch (exception) {}
     }
 
     isGameOver(gameId: string, playerId: string): boolean {

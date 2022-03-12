@@ -129,14 +129,13 @@
             }
         }
     }
-    &:after {
+    #background {
         content: '';
         position: absolute;
         height: 100%;
         width: 100%;
-        background: url('/assets/img/board_background.svg');
-        background-position: center;
-        background-size: cover;
+        background-position: center !important;
+        background-size: cover !important;
         opacity: 0.3;
         z-index: -2;
     }

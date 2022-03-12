@@ -13,7 +13,7 @@ export const PLAYER_ALREADY_TRYING_TO_JOIN = 'A player is already trying to join
 export const NO_OPPONENT_IN_WAITING_GAME = 'No opponent is waiting for the game';
 export const OPPONENT_NAME_DOES_NOT_MATCH = 'Opponent name does not match. Cannot accept game';
 export const CANNOT_HAVE_SAME_NAME = 'Cannot join a game with a player with the same name';
-export const INVALID_COMMAND = 'The command is not one of the recognised commands. type !help for a list of possible commands';
+export const INVALID_COMMAND = 'Cette commande ne fait pas partie des commandes reconnues. Entrez !aide pour connaitre les commandes pertinentes.';
 export const INVALID_PAYLOAD = 'Invalid payload for command type';
 export const NOT_PLAYER_TURN = 'It is not the turn of requesting player';
 export const SOCKET_SERVICE_NOT_INITIALIZED = 'SocketService not initialized';
@@ -28,3 +28,6 @@ export const NO_GAME_FOUND_WITH_ID = 'No game could be found with id';
 export const INVALID_PLAYER_ID_FOR_GAME = 'Invalid player id for game';
 export const COMMAND_IS_INVALID = (command: string) => `La commande **${command}** est invalide :<br>`;
 export const OPPONENT_PLAYED_INVALID_WORD = "Votre adversaire a joué un mot qui n'est pas dans le dictionnaire. Il perd son tour.";
+export const NO_REQUEST_POINT_RANGE = 'The request needs to have a pointRange';
+export const INVALID_REQUEST_POINT_RANGE = 'The request needs to have a pointRange minimum lower than maximum';
+export const NO_REQUEST_POINT_HISTORY = 'The request needs to have a pointHistory';
