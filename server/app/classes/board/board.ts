@@ -70,7 +70,7 @@ export default class Board {
         const validatedTiles = new Map<Square, Tile>();
         let i = 0;
         while (i < tiles.length) {
-            if (actualPosition.isWithinBounds({ x: this.grid[0].length, y: this.grid.length })) return false;
+            if (this.isWithinBounds(actualPosition)) return false;
             const targetSquare = this.grid[actualPosition.row][actualPosition.column];
             if (isVertical) actualPosition.row++;
             else actualPosition.column++;
@@ -89,5 +89,9 @@ export default class Board {
 
     getSize(): Vec2 {
         return { x: this.grid[0].length, y: this.grid.length };
+    }
+
+    private isWithinBounds(position: Position) {
+        return position.row < 0 || position.row >= this.grid.length || position.column < 0 || position.column >= this.grid[0].length;
     }
 }
