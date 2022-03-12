@@ -254,9 +254,7 @@ describe('GameService', () => {
         let emitSpy: unknown;
 
         beforeEach(() => {
-            emitSpy = spyOn(service['gameViewEventManagerService'], 'emitGameViewEvent').and.callFake(() => {
-                return;
-            });
+            emitSpy = gameViewEventManagerSpy.emitGameViewEvent;
         });
         it('should call playerContainer.updatePlayersData if it is defined', () => {
             service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
@@ -271,12 +269,14 @@ describe('GameService', () => {
         });
 
         it('should NOT call playerContainer.updatePlayersData if playerContainer is NOT defined', () => {
-            service['playerContainer'] = undefined as unknown as PlayerContainer;
-            const updatedData: PlayerData = { id: 'id', name: 'new-name' };
+            service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
             // eslint-disable-next-line no-unused-vars
-            const spy = spyOn(service['playerContainer'], 'updatePlayersData').and.callFake((...playerDatas: PlayerData[]) => {
+            const spy = spyOn<any>(service['playerContainer'], 'updatePlayersData').and.callFake((...playerDatas: PlayerData[]) => {
                 return service['playerContainer']!;
             });
+
+            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            const updatedData: PlayerData = { id: 'id', name: 'new-name' };
 
             service.handleUpdatePlayerData(updatedData);
             expect(spy).not.toHaveBeenCalled();
