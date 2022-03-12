@@ -168,7 +168,7 @@ describe('GameDispatcherService', () => {
 
     it('handleCreateGame should call gameDispatcherController.handleMultiplayerGameCreation \
     with the correct parameters', () => {
-        const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleMultiplayerGameCreation').and.callFake(() => {
+        const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -178,6 +178,7 @@ describe('GameDispatcherService', () => {
             playerName: TEST_PLAYER_NAME,
             playerId: TEST_PLAYER_ID,
             gameType: TEST_GAME_PARAMETERS.gameType,
+            gameMode: TEST_GAME_PARAMETERS.gameMode,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
             dictionary: TEST_GAME_PARAMETERS.dictionary,
         };
