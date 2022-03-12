@@ -16,7 +16,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer, Player } from '@app/classes/player';
-import { Tile } from '@app/classes/tile';
+import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { AppMaterialModule } from '@app/modules/material.module';
@@ -39,7 +39,7 @@ class MockGameService {
 }
 
 describe('TileRackComponent', () => {
-    const EMPTY_TILE_RACK: Tile[] = [];
+    const EMPTY_TILE_RACK: RackTile[] = [];
     const mockGameService = new MockGameService();
     let component: TileRackComponent;
     let fixture: ComponentFixture<TileRackComponent>;
@@ -111,7 +111,7 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with tiles should return the player tiles', () => {
-        const tiles: Tile[] = [{ letter: 'A', value: 10 }];
+        const tiles: RackTile[] = [{ letter: 'A', value: 10, played: false, selected: false }];
         const localPlayer: AbstractPlayer = new Player('', 'Test', []);
 
         spyOn(mockGameService, 'getLocalPlayer').and.returnValue(localPlayer);
@@ -129,10 +129,10 @@ describe('TileRackComponent', () => {
 
     it('should mark tiles as played but only those in playedTiles', () => {
         const tiles: RackTile[] = [
-            { letter: 'A', value: 0 },
-            { letter: 'B', value: 0 },
+            { letter: 'A', value: 0, played: false, selected: false },
+            { letter: 'B', value: 0, played: false, selected: false },
         ];
-        const playedTiles: Tile[] = [{ ...tiles[0] }, { letter: 'Z', value: 0 }];
+        const playedTiles: RackTile[] = [{ ...tiles[0] }, { letter: 'Z', value: 0, played: false, selected: false }];
         component.tiles = tiles;
         const payload = { tiles: playedTiles, orientation: Orientation.Horizontal, startPosition: { row: 0, column: 9 } };
 
@@ -145,8 +145,8 @@ describe('TileRackComponent', () => {
 
     it('should set all tiles to not played when call handleNewMessage', () => {
         const tiles: RackTile[] = [
-            { letter: 'A', value: 0, played: true },
-            { letter: 'B', value: 0 },
+            { letter: 'A', value: 0, played: true, selected: false },
+            { letter: 'B', value: 0, played: false, selected: false },
         ];
         component.tiles = tiles;
 
@@ -154,5 +154,140 @@ describe('TileRackComponent', () => {
         component['handleNewMessage']({ senderId: 'system-error' } as Message);
 
         for (const tile of tiles) expect(tile.played).toBeFalse();
+    });
+
+    describe('selectTile', () => {
+        it('should set tile.selected to true', () => {
+            const type: TileRackSelectType = 'type' as TileRackSelectType;
+            const tile: RackTile = { selected: false } as unknown as RackTile;
+
+            component.selectTile(type, tile);
+
+            expect(tile.selected).toBeTrue();
+        });
+
+        it('should add tile to selectedTiles', () => {
+            const type: TileRackSelectType = 'type' as TileRackSelectType;
+            const tile: RackTile = {} as unknown as RackTile;
+
+            component.selectedTiles = [];
+            component.selectTile(type, tile);
+
+            expect(component.selectedTiles).toHaveSize(1);
+            expect(component.selectedTiles).toContain(tile);
+        });
+
+        it('should call unselectTile if same tile and tile is selected', () => {
+            const type: TileRackSelectType = 'type' as TileRackSelectType;
+            const tile: RackTile = { selected: true } as unknown as RackTile;
+            const spy = spyOn(component, 'unselectTile');
+
+            component['selectionType'] = type;
+            component.selectTile(type, tile);
+
+            expect(spy).toHaveBeenCalledOnceWith(tile);
+        });
+
+        it('should return false', () => {
+            const type: TileRackSelectType = 'type' as TileRackSelectType;
+            const tile: RackTile = { selected: false } as unknown as RackTile;
+
+            const result = component.selectTile(type, tile);
+
+            expect(result).toBeFalse();
+        });
+
+        it('should call unselectAll if type is move', () => {
+            const type: TileRackSelectType = 'move';
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'unselectAll');
+
+            component.selectTile(type, tile);
+
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call unselectAll if type changes', () => {
+            const type: TileRackSelectType = 'other-type' as TileRackSelectType;
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'unselectAll');
+
+            component['selectionType'] = 'type' as TileRackSelectType;
+            component.selectTile(type, tile);
+
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should return false if tile already selected', () => {
+            const type: TileRackSelectType = 'type' as TileRackSelectType;
+            const tile: RackTile = { selected: true } as unknown as RackTile;
+            spyOn(component, 'unselectTile');
+
+            component['selectionType'] = type;
+            const result = component.selectTile(type, tile);
+
+            expect(result).toBeFalse();
+        });
+    });
+
+    describe('unselectTile', () => {
+        it('should set tile.selected to false', () => {
+            const tile: RackTile = { selected: true } as unknown as RackTile;
+
+            component.unselectTile(tile);
+
+            expect(tile.selected).toBeFalse();
+        });
+
+        it('should remove tile from selectedTiles', () => {
+            const tile: RackTile = { selected: true } as unknown as RackTile;
+
+            component.selectedTiles = [tile];
+            component.unselectTile(tile);
+
+            expect(component.selectedTiles).not.toContain(tile);
+        });
+    });
+
+    describe('unselectAll', () => {
+        it('should set tile.selected to false for all tiles', () => {
+            const tiles: RackTile[] = [];
+            for (let i = 0; i < 3; ++i) tiles.push({ selected: true } as RackTile);
+
+            component.selectedTiles = tiles;
+            component.unselectAll();
+
+            tiles.forEach((tile) => expect(tile.selected).toBeFalse());
+        });
+
+        it('should remove all tiles from selectedTiles', () => {
+            const tiles: RackTile[] = [];
+            for (let i = 0; i < 3; ++i) tiles.push({ selected: true } as RackTile);
+
+            component.selectedTiles = tiles;
+            component.unselectAll();
+
+            expect(component.selectedTiles).toHaveSize(0);
+        });
+    });
+
+    describe('focus', () => {
+        it('should call setActiveKeyboardComponent', () => {
+            const spy = spyOn(component['focusableComponentService'], 'setActiveKeyboardComponent');
+
+            component.focus();
+
+            expect(spy).toHaveBeenCalledOnceWith(component);
+        });
+    });
+
+    describe('onLoseFocusEvent', () => {
+        it('should call unselectAll', () => {
+            const spy = spyOn(component, 'unselectAll');
+
+            component['onLoseFocusEvent']();
+
+            expect(spy).toHaveBeenCalled();
+        });
     });
 });
