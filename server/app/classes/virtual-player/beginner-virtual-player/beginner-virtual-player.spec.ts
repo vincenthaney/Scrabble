@@ -158,6 +158,12 @@ describe('BeginnerVirtualPlayer', () => {
         });
     });
 
+    describe('sendAction should', () => {
+        it('should make an API call with the correct content', () => {
+            
+        })
+    })
+
     describe('updateHistory', () => {
         afterEach(() => {
             chai.spy.restore();
