@@ -15,6 +15,10 @@ import { Board } from '@app/classes/board';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
+    sendPayload(): void {
+        this.getVirtualPlayerService.sendAction(this.gameId, this.id, this.findAction());
+    }
+
     findPointRange(): PointRange {
         const randomPointRange = Math.random();
         if (randomPointRange <= LOW_SCORE_THRESHOLD) {
