@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NAME_NO_MATCH_REGEX, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
-import { IconComponent } from '../icon/icon.component';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { NAME_NO_MATCH_REGEX, NAME_SAME_AS_VIRTUAL_PLAYER, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
 import { NameFieldComponent } from './name-field.component';
 
 const fakeNameChange = () => {
@@ -59,13 +60,13 @@ describe('NameFieldComponent', () => {
         });
 
         it('onNameChange should emit isInputNameValid false with an invalid name', () => {
+            component.formParameters.controls.inputName.markAsDirty();
             component.formParameters.patchValue({ inputName: INVALID_NAME });
             component.onChange();
             expect(nameValidEmitSpy).toHaveBeenCalledWith(false);
         });
     });
 
-    // Html add a space on each side as it is the only text in the <mat-error> tag
     const MESSAGE_NAME_TOO_SHORT = ' ' + NAME_TOO_SHORT + ' ';
     const MESSAGE_NAME_TOO_LONG = ' ' + NAME_TOO_LONG + ' ';
     const MESSAGE_NAME_NO_MATCH_REGEX = ' ' + NAME_NO_MATCH_REGEX + ' ';
@@ -108,5 +109,16 @@ describe('NameFieldComponent', () => {
             const errorMessage = fixture.debugElement.query(By.css('.alert'));
             expect(errorMessage).toBeFalsy();
         });
+    });
+
+    it('name should not be valid if mustVerifyVirtualPlayer and is same as virtualPlayer', () => {
+        component.mustVerifyVirtualPlayerName = true;
+        component.virtualPlayerName = VALID_NAME;
+        component.formParameters.setValue({ inputName: VALID_NAME });
+        fixture.detectChanges();
+
+        const errorMessage = fixture.debugElement.query(By.css('.alert'));
+        expect(errorMessage).toBeTruthy();
+        expect(errorMessage.nativeElement.innerHTML).toBe(' ' + NAME_SAME_AS_VIRTUAL_PLAYER + ' ');
     });
 });
