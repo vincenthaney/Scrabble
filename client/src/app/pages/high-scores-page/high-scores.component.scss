@@ -1,0 +1,33 @@
+
+.center {
+    // align-self: center;
+    // justify-content: center;
+
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    
+}
+
+#high-score-container {
+    width: 480px;
+    border: solid 4px rgb(34, 34, 34);
+    border-radius: 4px;
+}
+
+.high-score {
+    display: flex;
+    align-self: center;
+    justify-content: center;
+    width: 480px;
+    align-items: center;
+}
+
+.high-score:nth-child(2n) {
+    background-color: rgb(190, 190, 190);
+}
+
+.high-score:nth-child(2n+1) {
+    background-color: lightgray;
+}

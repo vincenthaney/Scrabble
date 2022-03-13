@@ -1,0 +1,9 @@
+<h1>Meilleurs scores</h1>
+<div class="center">
+    <div id="high-score-container">
+        <div class="high-score" *ngFor="let highScore of separateHighScores()">
+            <app-high-score-box [highScore]="highScore"></app-high-score-box>
+        </div>
+    </div>
+</div>
+
