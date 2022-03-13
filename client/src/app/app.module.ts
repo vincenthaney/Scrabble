@@ -26,6 +26,8 @@ import { TimerSelectionComponent } from './components/timer-selection/timer-sele
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { SocketService } from './services';
+import { HighScoresComponent } from './pages/high-scores-page/high-scores.component';
+import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 
 /**
  * Main module that is used in main.ts.
@@ -54,6 +56,8 @@ import { SocketService } from './services';
         NameFieldComponent,
         TimerSelectionComponent,
         PageHeaderComponent,
+        HighScoresComponent,
+        HighScoreBoxComponent,
     ],
     imports: [
         AppMaterialModule,
