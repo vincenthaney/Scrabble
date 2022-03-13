@@ -1,10 +1,18 @@
-import { StorableModel } from '@app/classes/admin';
+import { GameType } from '@app/classes/game-type';
 
-export default class HighScore extends StorableModel {
+export default interface HighScore {
     score: number;
-    playerNames: string[];
+    names: string[];
+    gameType: GameType;
     // constructor(score: number, playerNames: string[]) {
     //     super();
     //     throw new Error('Method not implemented.');
     // }
+}
+
+export interface SingleHighScore {
+    rank?: number;
+    score: number;
+    name: string;
+    gameType: GameType;
 }
