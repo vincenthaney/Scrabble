@@ -33,24 +33,21 @@ export default class GameService implements OnDestroy, IResetServiceData {
     player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
-    gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>({
-        content: 'Début de la partie',
-        senderId: SYSTEM_ID,
-    });
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
-    updateTileRackEvent: EventEmitter<void>;
-    noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
-    newActivePlayerEvent: EventEmitter<[PlayerData, boolean]> = new EventEmitter<[PlayerData, boolean]>();
-    rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
-    updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
-    playingTiles: EventEmitter<ActionPlacePayload>;
-    leaveGameSubject: Subject<string>;
-    serviceDestroyed$: Subject<boolean> = new Subject();
     gameIsSetUp: boolean;
     isGameOver: boolean;
     gameId: string;
+    updateTileRackEvent: EventEmitter<void>;
+    noActiveGameEvent: EventEmitter<void>;
+    newActivePlayerEvent: EventEmitter<[PlayerData, boolean]>;
+    rerenderEvent: EventEmitter<void>;
+    updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
+    playingTiles: EventEmitter<ActionPlacePayload>;
+    leaveGameSubject: Subject<string>;
+    serviceDestroyed$: Subject<boolean>;
+    gameUpdateValue: BehaviorSubject<GameUpdateData>;
+    newMessageValue: BehaviorSubject<Message>;
     private localPlayerId: string;
 
     constructor(
@@ -61,12 +58,22 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private socketService: SocketService,
         private cookieService: CookieService,
     ) {
+        this.noActiveGameEvent = new EventEmitter<void>();
+        this.newActivePlayerEvent = new EventEmitter<[PlayerData, boolean]>();
+        this.rerenderEvent = new EventEmitter<void>();
         this.updateTileRackEvent = new EventEmitter();
         this.updateTileReserveEvent = new EventEmitter();
+        this.playingTiles = new EventEmitter();
+        this.gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
+        this.newMessageValue = new BehaviorSubject<Message>({
+            content: 'Début de la partie',
+            senderId: SYSTEM_ID,
+        });
+        this.leaveGameSubject = new Subject<string>();
+        this.serviceDestroyed$ = new Subject<boolean>();
+
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
-        this.leaveGameSubject = new Subject<string>();
-        this.playingTiles = new EventEmitter();
     }
 
     ngOnDestroy(): void {
