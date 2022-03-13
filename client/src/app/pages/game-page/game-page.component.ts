@@ -80,9 +80,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
-        if (!this.gameService.getGameId()) {
-            this.gameService.reconnectGame();
-        }
+        if (!this.gameService.getGameId()) this.gameService.reconnectGame();
+        if (this.gameService.gameIsSetUp) this.isLocalPlayerTurn = this.gameService.isLocalPlayerPlaying();
 
         this.noActiveGameSubscription = this.gameService.noActiveGameEvent
             .pipe(takeUntil(this.componentDestroyed$))
@@ -167,7 +166,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     private handlePlayerLeaves(): void {
-        this.gameService.gameId = '';
         this.playerLeavesService.handleLocalPlayerLeavesGame();
+        this.gameService.gameId = '';
     }
 }

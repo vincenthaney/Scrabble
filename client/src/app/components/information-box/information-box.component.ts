@@ -82,6 +82,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
+        console.log('updateactiveplayerb0rder');
         if (!activePlayer) {
             this.isPlayer1Active = false;
             this.isPlayer2Active = false;
