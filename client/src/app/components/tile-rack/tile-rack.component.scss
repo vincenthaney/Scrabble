@@ -1,56 +1,88 @@
+@import '../../style/animations.scss';
+@import '../../style/icon.scss';
 $tile-size: 50px;
 
-#rack-grid mat-card {
-    display: grid;
-    grid-template-columns: 1fr 120px;
-    gap: 18px;
-    align-self: center;
-    padding: 12px 16px;
+#rack-grid mat-card #rack-card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: solid 2px rgb(207, 207, 207);
+    border-radius: 8px;
+    padding: 6px;
 
-    #rack-card-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: solid 2px rgb(207, 207, 207);
-        border-radius: 8px;
-        padding: 6px;
+    .rack-tile-container {
+        position: relative;
+        transition: ease-in-out transform 0.1s;
 
         app-tile {
             display: block;
             height: $tile-size;
             width: $tile-size;
-            transition: ease-in transform 0.1s;
+            position: relative;
+        }
 
-            &:not(:last-child) {
-                margin-right: 12px;
-            }
+        &:not(:last-child) {
+            margin-right: 12px;
+        }
 
-            &:hover {
-                transform: translateY(-15%) scale(1.05);
-                transition: ease-in transform 0.15s;
-            }
+        &:hover {
+            z-index: 1;
+            transform: translateY(-15%) scale(1.05);
+            transition: ease-in-out transform 0.1s;
+        }
 
-            &.hidden {
-                display: none !important;
-                visibility: hidden !important;
-            }
+        &.hidden {
+            display: none !important;
+            visibility: hidden !important;
         }
     }
 
-    #rack-button-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
+    &.selection-exchange .rack-tile-container.selected app-tile {
+        animation: wiggle 0.25s infinite;
+        filter: hue-rotate(50deg);
+    }
 
-        & > button, & > div {
-            font-size: 0.95em;
-            
-            &:not(:last-child) {
-                margin-bottom: 6px;
+    &.selection-move .rack-tile-container.selected {
+        z-index: 2;
+
+        app-tile {
+            transform: translateY(-20%);
+            filter: hue-rotate(175deg);
+            animation: orbit linear 1s infinite;
+            z-index: 2;
+
+            &:hover {
+                z-index: 2;
             }
 
-            & > button {
-                width: 100%;
+            &:after,
+            &:before {
+                @include font-awesome-solid;
+                content: '';
+                position: absolute;
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+                font-size: 1.6em;
+                color: rgb(218, 183, 126);
+                text-shadow: 0px 1px 6px rgba(0, 0, 0, 0.15);
+                top: 50%;
+                z-index: 3;
+            }
+
+            &:before {
+                content: "\f0d9";
+                left: 0;
+                transform: translate(-100%, -50%);
+                margin-left: -6px;
+            }
+
+            &:after {
+                content: "\f0da";
+                right: 0;
+                transform: translate(100%, -50%);
+                margin-right: -6px;
             }
         }
     }

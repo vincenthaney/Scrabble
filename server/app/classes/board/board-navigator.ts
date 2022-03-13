@@ -1,3 +1,4 @@
+import { Square } from '@app/classes/square';
 import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
@@ -11,7 +12,7 @@ export default class BoardNavigator {
         this.orientation = orientation;
     }
 
-    get square() {
+    get square(): Square {
         return this.board.getSquare(this.position);
     }
 
@@ -31,11 +32,11 @@ export default class BoardNavigator {
         }
     }
 
-    verifyNeighbors(orientation: Orientation, shouldBeFilled: boolean) {
+    verifyNeighbors(orientation: Orientation, shouldBeFilled: boolean): boolean {
         return this.board.verifyNeighbors(this.position, orientation, shouldBeFilled);
     }
 
-    verifyAllNeighbors(shouldBeFilled: boolean) {
+    verifyAllNeighbors(shouldBeFilled: boolean): boolean {
         return (
             this.board.verifyNeighbors(this.position, Orientation.Horizontal, shouldBeFilled) ||
             this.board.verifyNeighbors(this.position, Orientation.Vertical, shouldBeFilled)

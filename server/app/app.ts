@@ -57,7 +57,7 @@ export class Application {
         this.app.use(cors());
     }
 
-    private setPublicDirectory() {
+    private setPublicDirectory(): void {
         const path = join(__dirname, '../public');
         this.app.use('/public', express.static(path));
     }

@@ -12,7 +12,7 @@ export default class WaitingRoom extends Room {
         this.joinedPlayer = undefined;
     }
 
-    getConfig() {
+    getConfig(): GameConfig {
         return this.config;
     }
 }
