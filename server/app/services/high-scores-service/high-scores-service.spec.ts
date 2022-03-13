@@ -91,10 +91,18 @@ describe('HighScoresService', () => {
     });
 
     describe('getHighScores', () => {
-        it('should get all courses from DB', async () => {
+        it('should get all courses from DB of given gameType', async () => {
             const highScores = await highScoresService.getHighScores(GameType.Classic);
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES_CLASSIC.length);
             expect(INITIAL_HIGH_SCORES_CLASSIC).to.deep.equals(highScores);
+        });
+    });
+
+    describe('getAllHighScores', () => {
+        it('should get all courses from DB', async () => {
+            const highScores = await highScoresService.getAllHighScores();
+            expect(highScores.length).to.equal(INITIAL_HIGH_SCORES.length);
+            expect(INITIAL_HIGH_SCORES).to.deep.equals(highScores);
         });
     });
 

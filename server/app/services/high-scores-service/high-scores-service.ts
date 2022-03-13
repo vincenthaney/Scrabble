@@ -22,6 +22,10 @@ export default class HighScoresService {
         return this.collection.find({ gameType }).toArray();
     }
 
+    async getAllHighScores(): Promise<HighScore[]> {
+        return this.collection.find({}).toArray();
+    }
+
     async addHighScore(name: string, score: number, gameType: GameType): Promise<boolean> {
         const sortedHighScores = await this.getSortedHighScores(gameType);
         if (sortedHighScores[0].score > score) return false;
