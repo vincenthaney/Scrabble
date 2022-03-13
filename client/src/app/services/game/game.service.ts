@@ -74,7 +74,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
-        // console.log(startGameData);
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);

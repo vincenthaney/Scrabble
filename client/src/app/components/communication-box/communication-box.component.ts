@@ -52,7 +52,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     ngOnInit(): void {
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
-        console.log('dans le ngOnInit');
 
         this.gameService.updateTileReserveEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
@@ -71,7 +70,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnDestroy(): void {
-        console.log('ngOnDestroy');
         this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
