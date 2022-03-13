@@ -32,8 +32,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
-
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
 
@@ -59,6 +57,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     ngOnInit(): void {
         this.lettersLeft = this.gameService.tileReserve;
         this.lettersLeftTotal = this.gameService.tileReserveTotal;
+        console.log('dans le ngOnInit');
 
         this.gameService.updateTileReserveEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
             this.onTileReserveUpdate(tileReserve, tileReserveTotal);
@@ -73,6 +72,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnDestroy(): void {
+        console.log('ngOnDestroy');
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
         this.sessionStorageService.resetMessages();
@@ -109,10 +109,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.scrollToBottom();
         if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
         this.sessionStorageService.saveMessage(newMessage);
-    }
-
-    isOpponent(id: string) {
-        return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
     onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
