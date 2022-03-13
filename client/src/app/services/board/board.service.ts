@@ -5,7 +5,7 @@ import { Square } from '@app/classes/square';
     providedIn: 'root',
 })
 export default class BoardService {
-    initialBoard: Square[][];
+    initialBoard: Square[][] = [];
     boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
     boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
 
