@@ -180,10 +180,30 @@ describe('GamePageComponent', () => {
     });
 
     describe('ngOnInit', () => {
-        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent', () => {
+        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent ', () => {
             component.isLocalPlayerTurn = false;
             gameServiceMock.newActivePlayerEvent.emit([DEFAULT_PLAYER, true]);
             expect(component.isLocalPlayerTurn).toBeTrue();
+        });
+
+        it('should call gamedispatcher.configuresocket', () => {
+            const spy = spyOn(component['gameDispatcher'], 'configureSocket');
+            component.ngOnInit();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call gameservice.reconnectGame if game id is undefined', () => {
+            const spy = spyOn(component['gameService'], 'reconnectGame');
+            spyOn(component['gameService'], 'getGameId').and.returnValue(undefined as unknown as string);
+            component.ngOnInit();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call isLocalPlayerPLaying if gameservice.gameIsSetup is defined', () => {
+            const spy = spyOn<any>(component['gameService'], 'isLocalPlayerPlaying');
+            component['gameService'].gameIsSetUp = true;
+            component.ngOnInit();
+            expect(spy).toHaveBeenCalled();
         });
     });
 

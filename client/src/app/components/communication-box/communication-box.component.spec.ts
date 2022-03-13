@@ -11,10 +11,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Message } from '@app/classes/communication/message';
-import { Player } from '@app/classes/player';
+import { AbstractPlayer, Player } from '@app/classes/player';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { marked } from 'marked';
@@ -52,7 +52,6 @@ describe('CommunicationBoxComponent', () => {
     const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
         ...DEFAULT_SYSTEM_ERROR_MESSAGE,
         content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
-        class: 'system-error',
     };
 
     beforeEach(async () => {
@@ -166,26 +165,26 @@ describe('CommunicationBoxComponent', () => {
 
     describe('createVisualMessage', () => {
         it('should create visualMessage from Message by player1', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_PLAYER1_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_PLAYER1_MESSAGE, class: 'me' };
+            const returnValue: Message = component.createVisualMessage(DEFAULT_PLAYER1_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_PLAYER1_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by player2', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_PLAYER2_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_PLAYER2_MESSAGE, class: 'opponent' };
+            const returnValue: Message = component.createVisualMessage(DEFAULT_PLAYER2_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_PLAYER2_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by system', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_SYSTEM_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_SYSTEM_MESSAGE, class: 'system' };
+            const returnValue: Message = component.createVisualMessage(DEFAULT_SYSTEM_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_SYSTEM_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by system-error', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_SYSTEM_ERROR_MESSAGE, class: 'system-error' };
+            const returnValue: Message = component.createVisualMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_SYSTEM_ERROR_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
     });
@@ -207,13 +206,17 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('onReceiveMessage', () => {
+        beforeEach(() => {
+            spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as AbstractPlayer);
+        });
+
         it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
             const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
             gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
             expect(onReceiveSpy).toHaveBeenCalled();
         });
 
-        it('onReceiveNewMessage should call appropriate functions and receive new message', () => {
+        it('onReceiveNewMessage should call appropriate functions and receive new message with defined message', () => {
             const messagesLengthBefore: number = component.messages.length;
             gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
             const messagesLengthAfter: number = component.messages.length;
@@ -230,35 +233,14 @@ describe('CommunicationBoxComponent', () => {
 
         it('should set loading to false if new message is NOT from opponent', () => {
             component.loading = true;
-            spyOn(component, 'isOpponent').and.returnValue(false);
-            component.onReceiveNewMessage(DEFAULT_PLAYER2_MESSAGE);
+            component.onReceiveNewMessage(DEFAULT_SYSTEM_MESSAGE);
             expect(component.loading).toBeFalse();
         });
 
         it('should NOT set loading to true if new message is from opponent', () => {
             component.loading = true;
-            spyOn(component, 'isOpponent').and.returnValue(true);
-            component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            component.onReceiveNewMessage(DEFAULT_PLAYER2_MESSAGE);
             expect(component.loading).toBeTrue();
-        });
-    });
-
-    describe('isOpponent', () => {
-        it('should return false if id = system', () => {
-            expect(component.isOpponent('system')).toBeFalse();
-        });
-
-        it('should return false if id = system-error ', () => {
-            expect(component.isOpponent('system-error')).toBeFalse();
-        });
-
-        it('should return false if id = local player id', () => {
-            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue(DEFAULT_PLAYER.id);
-            expect(component.isOpponent(DEFAULT_PLAYER.id)).toBeFalse();
-        });
-
-        it('should return true if id is other', () => {
-            expect(component.isOpponent('other id')).toBeTrue();
         });
     });
 
