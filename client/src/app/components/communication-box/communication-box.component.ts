@@ -27,7 +27,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
     componentDestroyed$: Subject<boolean> = new Subject();
 
-    messages: VisualMessage[] = [];
+    messages: Message[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
@@ -73,8 +73,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.sessionStorageService.resetMessages();
     }
 
-    createVisualMessage(newMessage: Message): VisualMessage {
-        let messageClass: VisualMessageClass;
+    createVisualMessage(newMessage: Message): Message {
         switch (newMessage.senderId) {
             case this.gameService.getLocalPlayerId():
                 messageClass = 'me';
@@ -90,7 +89,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
                 break;
         }
 
-        return { ...newMessage, content: marked.parseInline(newMessage.content), class: messageClass };
+        return { ...newMessage, content: marked.parseInline(newMessage.content) };
     }
 
     onSendMessage(): void {

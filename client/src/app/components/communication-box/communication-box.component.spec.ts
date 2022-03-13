@@ -50,7 +50,7 @@ describe('CommunicationBoxComponent', () => {
         content: 'content of test message',
         senderId: SYSTEM_ERROR_ID,
     };
-    const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: VisualMessage = {
+    const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
         ...DEFAULT_SYSTEM_ERROR_MESSAGE,
         content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
         class: 'system-error',
