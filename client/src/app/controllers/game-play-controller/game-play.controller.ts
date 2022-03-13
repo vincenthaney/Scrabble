@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
-import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { HTTP_ABORT_ERROR } from '@app/constants/controllers-errors';
 import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject } from 'rxjs';

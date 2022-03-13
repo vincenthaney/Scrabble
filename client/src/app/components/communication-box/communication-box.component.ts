@@ -3,6 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
@@ -47,7 +48,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
-        this.messages = this.sessionStorageService.getMessages().map((message) => this.createVisualMessage(message));
+        this.sessionStorageService.initializeMessages();
+
+        const sessionStorageMessages = this.sessionStorageService.getMessages();
+        console.log(sessionStorageMessages);
+        if (sessionStorageMessages) this.messages = this.messages.concat(sessionStorageMessages);
+        else this.onReceiveNewMessage(INITIAL_MESSAGE);
     }
 
     ngOnInit(): void {
