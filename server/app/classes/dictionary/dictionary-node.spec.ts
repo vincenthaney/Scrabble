@@ -6,7 +6,7 @@ import DictionaryNode from './dictionary-node';
 
 const WORDS = ['abc', 'abcd', 'abcde', 'xyz', 'wxyz', 'ablmnop'];
 
-describe.only('DictionaryNode', () => {
+describe('DictionaryNode', () => {
     let node: DictionaryNode;
 
     beforeEach(() => {
