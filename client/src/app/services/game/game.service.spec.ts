@@ -8,7 +8,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
-import { StartGameData } from '@app/classes/communication/game-config';
+import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
@@ -20,7 +20,7 @@ import { GameDispatcherController } from '@app/controllers/game-dispatcher-contr
 import { BoardService, GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import SpyObj = jasmine.SpyObj;
 
@@ -54,7 +54,13 @@ describe('GameService', () => {
             'continueRound',
             'initializeEvents',
         ]);
-        gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['']);
+        gameDispatcherControllerSpy = jasmine.createSpyObj('GameDispatcherController', ['subscribeToInitializeGame']);
+        gameDispatcherControllerSpy['initializeGame$'] = new BehaviorSubject<InitializeGameData | undefined>(undefined);
+        gameDispatcherControllerSpy.subscribeToInitializeGame.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (value: InitializeGameData | undefined) => void) => {
+                gameDispatcherControllerSpy['initializeGame$'].pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+            },
+        );
 
         const tileRackUpdate$ = new Subject();
         const message$ = new Subject();
@@ -115,6 +121,12 @@ describe('GameService', () => {
         expect(service).toBeTruthy();
     });
 
+    describe('Constructor', () => {
+        it('should subscribe to initialize game event from GameDispatcher', () => {
+            expect(gameDispatcherControllerSpy.subscribeToInitializeGame).toHaveBeenCalled();
+        });
+    });
+
     describe('ngOnDestroy', () => {
         let serviceDestroyed$py: SpyObj<Subject<boolean>>;
 
@@ -134,7 +146,7 @@ describe('GameService', () => {
         });
     });
 
-    describe('initializeMultiplayerGame', () => {
+    describe('initializeGame', () => {
         let defaultGameData: StartGameData;
 
         beforeEach(() => {
@@ -156,6 +168,27 @@ describe('GameService', () => {
                     completedTime: null,
                 },
             };
+        });
+
+        it('InitializeGame event of GameDispatcher should call initializeGame if payload is present', () => {
+            const initializeGameSpy = spyOn(service, 'initializeGame').and.callFake(async () => {
+                return new Promise(() => {
+                    return;
+                });
+            });
+            const initializeData: InitializeGameData = { localPlayerId: 'id', startGameData: defaultGameData };
+            gameDispatcherControllerSpy['initializeGame$'].next(initializeData);
+            expect(initializeGameSpy).toHaveBeenCalledWith(initializeData.localPlayerId, initializeData.startGameData);
+        });
+
+        it('InitializeGame event of GameDispatcher should NOT call initializeGame if payload is NOT present', () => {
+            const initializeGameSpy = spyOn(service, 'initializeGame').and.callFake(async () => {
+                return new Promise(() => {
+                    return;
+                });
+            });
+            gameDispatcherControllerSpy['initializeGame$'].next(undefined);
+            expect(initializeGameSpy).not.toHaveBeenCalled();
         });
 
         it('should set gameId', async () => {

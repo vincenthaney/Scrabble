@@ -31,3 +31,8 @@ export interface StartGameData extends GameConfig {
     tileReserve: TileReserveData[];
     round: RoundData;
 }
+
+export interface InitializeGameData {
+    localPlayerId: string;
+    startGameData: StartGameData;
+}

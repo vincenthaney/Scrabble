@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
-import { StartGameData } from '@app/classes/communication/game-config';
+import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
@@ -12,6 +12,7 @@ import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
 import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import { CookieService } from '@app/services/cookie/cookie.service';
@@ -40,12 +41,16 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
+        private gameDispatcherController: GameDispatcherController,
         private gameController: GamePlayController,
         private socketService: SocketService,
         private cookieService: CookieService,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         this.serviceDestroyed$ = new Subject();
+        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
+            this.handleInitializeGame(initializeValue),
+        );
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
     }
@@ -53,6 +58,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
+    }
+
+    async handleInitializeGame(initializeGameData: InitializeGameData | undefined): Promise<void> {
+        if (!initializeGameData) return;
+        return await this.initializeGame(initializeGameData.localPlayerId, initializeGameData.startGameData);
     }
 
     async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
