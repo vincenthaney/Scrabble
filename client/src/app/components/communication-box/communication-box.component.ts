@@ -3,8 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { LetterValue } from '@app/classes/tile';
-import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
-import { MAX_INPUT_LENGTH } from '@app/constants/game';
+import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
@@ -76,16 +75,13 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     createVisualMessage(newMessage: Message): Message {
         switch (newMessage.senderId) {
             case this.gameService.getLocalPlayerId():
-                messageClass = 'me';
+                newMessage.senderId = LOCAL_PLAYER_ID;
                 break;
-            case 'system':
-                messageClass = 'system';
-                break;
-            case 'system-error':
-                messageClass = 'system-error';
+            case SYSTEM_ID:
+            case SYSTEM_ERROR_ID:
                 break;
             default:
-                messageClass = 'opponent';
+                newMessage.senderId = OPPONENT_ID;
                 break;
         }
 
@@ -105,7 +101,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
-        if (!this.isOpponent(newMessage.senderId)) this.loading = false;
+        if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
         this.sessionStorageService.saveMessage(newMessage);
     }
 

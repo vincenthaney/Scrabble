@@ -12,7 +12,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Message } from '@app/classes/communication/message';
 import { Player } from '@app/classes/player';
-import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
