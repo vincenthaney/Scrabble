@@ -11,14 +11,11 @@ import { takeUntil } from 'rxjs/operators';
 export default class HighScoresService {
     private serviceDestroyed$: Subject<boolean> = new Subject();
     private highScoresListEvent: Subject<HighScore[]> = new Subject();
-    private highScores: HighScore[] = [];
     private highScoresMap: Map<GameType, SingleHighScore[]> = new Map();
-    private listHasChanged: boolean = true;
 
     constructor(private highScoresController: HighScoresController) {
         this.highScoresController.subscribeToHighScoresListEvent(this.serviceDestroyed$, (highScores: HighScore[]) => {
-            this.highScores = highScores;
-            this.listHasChanged = true;
+            this.updateHighScores(highScores);
         });
     }
 
@@ -31,23 +28,21 @@ export default class HighScoresService {
     }
 
     getHighScores(gameType: GameType): SingleHighScore[] {
-        if (this.listHasChanged) this.updateHighScores();
         const highScores = this.highScoresMap.get(gameType);
         return highScores ? highScores : [];
     }
 
-    updateHighScores(): void {
-        const [classicHighScores, log2990HighScores] = this.separateHighScoresType();
+    updateHighScores(highScores: HighScore[]): void {
+        const [classicHighScores, log2990HighScores] = this.separateHighScoresType(highScores);
         this.highScoresMap.set(GameType.Classic, this.separateHighScores(classicHighScores));
         this.highScoresMap.set(GameType.LOG2990, this.separateHighScores(log2990HighScores));
-        this.listHasChanged = false;
     }
 
-    separateHighScoresType(): [HighScore[], HighScore[]] {
+    separateHighScoresType(highScores: HighScore[]): [HighScore[], HighScore[]] {
         const classicHighScores: HighScore[] = [];
         const log2990HighScores: HighScore[] = [];
 
-        this.highScores.forEach((highScore) => {
+        highScores.forEach((highScore) => {
             if (highScore.gameType === GameType.Classic) classicHighScores.push(highScore);
             else log2990HighScores.push(highScore);
         });
