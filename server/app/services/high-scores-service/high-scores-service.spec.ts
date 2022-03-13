@@ -11,7 +11,7 @@ import { HighScore, HighScoresData } from '@app/classes/database/high-score';
 import { GameType } from '@app/classes/game/game-type';
 import HighScoresService from './high-scores-service';
 import Container from 'typedi';
-import { DatabaseServiceMock } from '@app/services/database-service/database-service.mock';
+import { DatabaseServiceMock } from '@app/services/database-service/database-service.mock.spec';
 import DatabaseService from '@app/services/database-service/database-service';
 import { stub } from 'sinon';
 import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
