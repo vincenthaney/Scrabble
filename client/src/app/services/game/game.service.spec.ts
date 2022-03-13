@@ -15,6 +15,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE } from '@app/constants/services-errors';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { BoardService, GameService } from '@app/services';
@@ -25,7 +26,18 @@ import SpyObj = jasmine.SpyObj;
 const DEFAULT_PLAYER_ID = 'cov-id';
 const DEFAULT_SQUARE: Omit<Square, 'position'> = { tile: null, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_GRID_SIZE = 8;
-const DEFAULT_PLAYER_1 = { name: 'phineas', id: 'id-1', score: 0, tiles: [] };
+const DEFAULT_PLAYER_1 = {
+    name: 'phineas',
+    id: 'id-1',
+    score: 0,
+    tiles: [],
+    getTiles: () => {
+        return [];
+    },
+    updatePlayerData: () => {
+        return;
+    },
+};
 const DEFAULT_PLAYER_2 = { name: 'ferb', id: 'id-2', score: 0, tiles: [] };
 
 @Component({
@@ -69,6 +81,10 @@ describe('GameService', () => {
             ],
         });
         service = TestBed.inject(GameService);
+    });
+
+    beforeEach(() => {
+        // spyOn(service['roundManager'], 'getActivePlayer').and.returnValue(DEFAULT_PLAYER_1);
     });
 
     it('should be created', () => {
@@ -117,6 +133,8 @@ describe('GameService', () => {
                     completedTime: null,
                 },
             };
+
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: DEFAULT_PLAYER_ID } as AbstractPlayer);
         });
 
         it('should set gameId', async () => {
@@ -494,10 +512,24 @@ describe('GameService', () => {
 
     describe('handleNewMessage', () => {
         it('should call newMessageValue next', () => {
-            service.newMessageValue = new BehaviorSubject({} as Message);
+            service.newMessageValue = new BehaviorSubject<Message | null>({} as Message);
             const spy = spyOn(service.newMessageValue, 'next');
             service.handleNewMessage({} as Message);
             expect(spy).toHaveBeenCalled();
+        });
+
+        it('should not get called when new message is null', () => {
+            service.newMessageValue = new BehaviorSubject<Message | null>(null);
+            const spy = spyOn(service, 'handleNewMessage');
+            service['gameController'].newMessageValue.next(null);
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should get called when new message is not null', () => {
+            service.newMessageValue = new BehaviorSubject<Message | null>(null);
+            const spy = spyOn(service, 'handleNewMessage');
+            service['gameController'].newMessageValue.next(INITIAL_MESSAGE);
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 
