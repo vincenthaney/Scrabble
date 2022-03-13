@@ -21,7 +21,7 @@ export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
     styleUrls: ['./tile-rack.component.scss', './tile-rack.component.2.scss'],
 })
 export class TileRackComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
-    tiles: RackTile[];
+    tiles: RackTile[] = [];
     selectedTiles: RackTile[] = [];
     selectionType: TileRackSelectType = TileRackSelectType.Exchange;
     tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
