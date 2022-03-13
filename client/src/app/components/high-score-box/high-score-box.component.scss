@@ -1,0 +1,24 @@
+#root {
+    display: grid;
+    grid-template-columns: 75px 300px 75px;
+    justify-self: center;
+    width: 100%;
+    max-width: 600px;
+    vertical-align: middle;
+    padding: 5px;
+    // padding-bottom: 5px;
+}
+
+.rank, .score {
+    display: flex;
+    align-items: center;
+    font-size: larger;
+    text-align: right;
+    justify-items: right;
+}
+
+.score {
+    margin-left: auto;
+    text-align: right;
+}
+
