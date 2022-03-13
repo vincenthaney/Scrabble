@@ -142,7 +142,7 @@ describe('CommunicationBoxComponent', () => {
 
     describe('ngAfterViewInit', () => {
         it('should subscribe to focusable event', () => {
-            const spy = spyOn<any>(component, 'subscribeToFocusableEvent');
+            const spy = spyOn<any>(component, 'subscribeToFocusableEvents');
             component.ngAfterViewInit();
             expect(spy).toHaveBeenCalled();
         });
@@ -287,7 +287,7 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    describe('handleKeyInput', () => {
+    describe('onFocusableEvent', () => {
         let focusSpy: jasmine.Spy;
 
         beforeEach(() => {
@@ -296,7 +296,7 @@ describe('CommunicationBoxComponent', () => {
 
         it('should call focus', () => {
             const event = new KeyboardEvent('keypress');
-            component['handleKeyInput'](event);
+            component['onFocusableEvent'](event);
             expect(focusSpy).toHaveBeenCalled();
         });
 
@@ -306,7 +306,7 @@ describe('CommunicationBoxComponent', () => {
             for (const key of keys) {
                 const event: any = { key: 'c' };
                 event[key] = true;
-                component['handleKeyInput'](event as KeyboardEvent);
+                component['onFocusableEvent'](event as KeyboardEvent);
                 expect(focusSpy).not.toHaveBeenCalled();
             }
         });

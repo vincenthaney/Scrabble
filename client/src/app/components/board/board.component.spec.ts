@@ -39,7 +39,7 @@ class MockBoardService {
     boardInitializationEvent: EventEmitter<Square[][]> = new EventEmitter();
     boardUpdateEvent: EventEmitter<Square[]> = new EventEmitter();
 
-    createGrid() {
+    createGrid(): void {
         this.grid = [];
         for (let i = 0; i < this.getGridSize().y; i++) {
             this.grid.push([]);
@@ -59,6 +59,7 @@ class MockBoardService {
     get grid(): Square[][] {
         return this.pGrid;
     }
+
     set grid(grid: Square[][]) {
         this.pGrid = grid;
     }
@@ -442,14 +443,14 @@ describe('BoardComponent', () => {
 
             component.navigator = new BoardNavigator(component.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
-            event = new KeyboardEvent('e');
+            event = new KeyboardEvent('exception');
             component.ngOnInit();
 
             nextEmptySpy = spyOn(component.navigator, 'nextEmpty').and.returnValue(undefined);
         });
 
         it('should set tile on selectedSquare', () => {
-            component.onFocusableEvent!(event);
+            component['onFocusableEvent']!(event);
 
             expect(selectedSquare.square.tile).not.toBeNull();
             expect(selectedSquare.applied).toBeFalse();
@@ -457,13 +458,13 @@ describe('BoardComponent', () => {
 
         it('should add selectedSquare to notAppliedSquares', () => {
             component.notAppliedSquares = [];
-            component.onFocusableEvent!(event);
+            component['onFocusableEvent']!(event);
 
             expect(component.notAppliedSquares.includes(selectedSquare)).toBeTrue();
         });
 
         it('should call nextEmptySpy', () => {
-            component.onFocusableEvent!(event);
+            component['onFocusableEvent']!(event);
             expect(nextEmptySpy).toHaveBeenCalled();
         });
 
@@ -471,7 +472,7 @@ describe('BoardComponent', () => {
             component.selectedSquare = undefined;
             component.notAppliedSquares = [];
 
-            component.onFocusableEvent!(event);
+            component['onFocusableEvent']!(event);
 
             expect(nextEmptySpy).not.toHaveBeenCalled();
             expect(component.notAppliedSquares.length).toEqual(0);
@@ -483,7 +484,7 @@ describe('BoardComponent', () => {
             });
 
             it('should call nextEmpty with Backward if backspace', () => {
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
                 expect(nextEmptySpy).toHaveBeenCalledOnceWith(Direction.Backward, true);
             });
 
@@ -492,7 +493,7 @@ describe('BoardComponent', () => {
                 nextEmptySpy.and.returnValue(selectedSquare);
                 component.notAppliedSquares = [selectedSquare];
 
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
 
                 expect(component.notAppliedSquares.length).toEqual(0);
                 expect(selectedSquare.square.tile).toBeNull();
@@ -502,7 +503,7 @@ describe('BoardComponent', () => {
                 (selectedSquare.square.tile as unknown) = 'not null';
                 nextEmptySpy.and.returnValue(selectedSquare);
 
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
 
                 expect(selectedSquare.square.tile).toBeNull();
             });
@@ -510,7 +511,7 @@ describe('BoardComponent', () => {
             it('should do nothing if not keydown', () => {
                 event = { key: BACKSPACE } as unknown as KeyboardEvent;
                 (selectedSquare.square.tile as unknown) = 'not null';
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
                 expect(nextEmptySpy).not.toHaveBeenCalled();
             });
         });
@@ -522,20 +523,20 @@ describe('BoardComponent', () => {
 
             it('should clear selectedSquare', () => {
                 (component.selectedSquare as unknown) = 'not-undefined';
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
                 expect(component.selectedSquare).toBeUndefined();
             });
 
             it('should call clearNotAppliedSquare', () => {
                 const spy = spyOn<any>(component, 'clearNotAppliedSquare');
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
                 expect(spy).toHaveBeenCalled();
             });
 
             it('should do nothing if not keydown', () => {
                 event = { key: ESCAPE } as unknown as KeyboardEvent;
                 (component.selectedSquare as unknown) = 'not-undefined';
-                component.onFocusableEvent!(event);
+                component['onFocusableEvent']!(event);
                 expect(component.selectedSquare).toBeDefined();
             });
         });
@@ -549,7 +550,7 @@ describe('BoardComponent', () => {
         it('should reset attributes', () => {
             (component.selectedSquare as unknown) = 'not-empty';
 
-            component.onLoseFocusEvent!();
+            component['onLoseFocusEvent']!();
 
             expect(component.selectedSquare).toBeUndefined();
         });
@@ -557,7 +558,7 @@ describe('BoardComponent', () => {
         it('should call clearNotAppliedSquare', () => {
             const spy = spyOn<any>(component, 'clearNotAppliedSquare');
 
-            component.onLoseFocusEvent!();
+            component['onLoseFocusEvent']!();
 
             expect(spy).toHaveBeenCalled();
         });

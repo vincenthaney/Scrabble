@@ -1,7 +1,7 @@
-import { Orientation } from '.';
 import { Vec2 } from '@app/classes/vec2';
-import Direction from './direction';
 import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
+import { Orientation } from '.';
+import Direction from './direction';
 
 export default class Position {
     constructor(public row: number, public column: number) {}
@@ -26,7 +26,7 @@ export default class Position {
         return new Position(this.row, this.column);
     }
 
-    isWithinBounds(size: Vec2) {
+    isWithinBounds(size: Vec2): boolean {
         return this.column >= 0 && this.column < size.x && this.row >= 0 && this.row < size.y;
     }
 }

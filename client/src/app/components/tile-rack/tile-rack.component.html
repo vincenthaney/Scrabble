@@ -1,16 +1,24 @@
-<div id="rack-grid">
+<div id="rack-grid" (click)="focus()">
     <mat-card>
-        <div id="rack-card-container">
-            <app-tile *ngFor="let tile of tiles" [tile]="tile" [ngStyle]="{'fontSize': tileFontSize+'em'}" class="rack-tile" [ngClass]="{hidden: tile.played}">{{ tile.letter }}</app-tile>
+        <div id="rack-card-container" [class]="'selection-' + selectionType">
+            <div class="rack-tile-container" 
+                *ngFor="let tile of tiles" [ngClass]="{ selected: tile.isSelected, hidden: tile.isPlayed }"
+                (click)="selectTileExchange(tile)"
+                (contextmenu)="selectTileMove(tile)"
+            >
+                <app-tile [tile]="tile" [ngStyle]="{'fontSize': tileFontSize+'em'}" class="rack-tile">
+                    {{ tile.letter }}
+                </app-tile>
+            </div>
         </div>
         <div id="rack-button-container" class="rack-card">
-            <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
-                <button mat-raised-button class="btn-rack" color="primary" [disabled]="true">
+            <div matTooltip="Assurez vous d'avoir des tuiles sélectionnées et que ce soit votre tour" matTooltipPosition="above" [matTooltipDisabled]="canExchangeTiles()">
+                <button mat-raised-button class="btn-rack" color="primary" [disabled]="!canExchangeTiles()" (click)="exchangeTiles()">
                     <app-icon icon="exchange"></app-icon> Échanger
                 </button>
             </div>
-            <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
-                <button mat-raised-button class="btn-rack" color="primary" [disabled]="true">
+            <div matTooltip="Aucune tuile sélectionnée" matTooltipPosition="above" matTooltipDisabled="selectedTiles.length === 0">
+                <button mat-raised-button class="btn-rack" color="primary" [disabled]="selectedTiles.length === 0" (click)="unselectAll()">
                     <app-icon icon="undo"></app-icon> Annuler
                 </button>
             </div>

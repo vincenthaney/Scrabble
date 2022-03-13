@@ -30,10 +30,7 @@ export class SquareComponent implements OnInit {
     }
 
     getSquareSize(): Vec2 {
-        if (!this.squareView) {
-            return UNDEFINED_SQUARE_SIZE;
-        }
-        return this.squareView.squareSize;
+        return this.squareView ? this.squareView.squareSize : UNDEFINED_SQUARE_SIZE;
     }
 
     setText(): void {

@@ -144,7 +144,7 @@ describe('WordsVerificationService', () => {
         try {
             wordsVerificationService.verifyWords(words, DICTIONARY_NAME);
             // eslint-disable-next-line no-empty
-        } catch (e) {}
+        } catch (exception) {}
         expect(removeAccentsSpy).to.have.been.called();
     });
 

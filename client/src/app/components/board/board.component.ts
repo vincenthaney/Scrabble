@@ -94,16 +94,16 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         };
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onFocusableEvent = (e: KeyboardEvent): void => {
-            switch (e.key) {
+        this.onFocusableEvent = (exception: KeyboardEvent): void => {
+            switch (exception.key) {
                 case BACKSPACE:
-                    if (e.type === KEYDOWN) handleBackspace();
+                    if (exception.type === KEYDOWN) handleBackspace();
                     break;
                 case ESCAPE:
-                    if (e.type === KEYDOWN) clearCursor();
+                    if (exception.type === KEYDOWN) clearCursor();
                     break;
                 default:
-                    handlePlaceLetter(e.key, this.selectedSquare);
+                    handlePlaceLetter(exception.key, this.selectedSquare);
             }
         };
 
@@ -120,10 +120,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     onSquareClick(squareView: SquareView): boolean {
+        this.focusableComponentService.setActiveKeyboardComponent(this);
+
         if (squareView.square.tile !== null) return false;
         if (!this.gameService.isLocalPlayerPlaying()) return false;
-
-        this.focusableComponentService.setActiveKeyboardComponent(this);
 
         if (this.selectedSquare === squareView && this.notAppliedSquares.length === 0) {
             this.navigator.switchOrientation();
@@ -147,7 +147,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         );
     }
 
-    private clearNotAppliedSquare() {
+    private clearNotAppliedSquare(): void {
         this.notAppliedSquares.forEach((s) => (s.square.tile = null));
         this.notAppliedSquares = [];
     }
@@ -176,7 +176,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
-        if (!squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y) return false;
+        if (this.hasBoardBeenUpdated(squaresToUpdate)) return false;
         this.clearNotAppliedSquare();
 
         /* 
@@ -198,6 +198,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         });
         this.selectedSquare = undefined;
         return true;
+    }
+
+    private hasBoardBeenUpdated(squaresToUpdate: Square[]): boolean {
+        return !squaresToUpdate || squaresToUpdate.length <= 0 || squaresToUpdate.length > this.gridSize.x * this.gridSize.y;
     }
 
     private isInBounds(position: Position): boolean {

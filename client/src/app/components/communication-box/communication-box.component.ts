@@ -68,11 +68,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngAfterViewInit(): void {
-        this.subscribeToFocusableEvent(this.componentDestroyed$, this.handleKeyInput.bind(this));
+        this.subscribeToFocusableEvents();
     }
 
     ngOnDestroy(): void {
         console.log('ngOnDestroy');
+        this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
         this.sessionStorageService.resetMessages();
@@ -116,11 +117,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.lettersLeftTotal = tileReserveTotal;
     }
 
-    onContainerClick() {
+    onContainerClick(): void {
         this.focusableComponentsService.setActiveKeyboardComponent(this);
     }
 
-    private handleKeyInput(event: KeyboardEvent): void {
+    protected onFocusableEvent(event: KeyboardEvent): void {
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
     }
 
