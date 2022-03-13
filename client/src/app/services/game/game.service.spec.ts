@@ -529,7 +529,7 @@ describe('GameService', () => {
             service.newMessageValue = new BehaviorSubject<Message | null>(null);
             const spy = spyOn(service, 'handleNewMessage');
             service['gameController'].newMessageValue.next(INITIAL_MESSAGE);
-            expect(spy).not.toHaveBeenCalled();
+            expect(spy).toHaveBeenCalled();
         });
     });
 
