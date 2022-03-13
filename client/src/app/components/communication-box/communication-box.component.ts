@@ -47,11 +47,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
         this.sessionStorageService.initializeMessages();
-
-        const sessionStorageMessages = this.sessionStorageService.getMessages();
-        console.log(sessionStorageMessages);
-        if (sessionStorageMessages) this.messages = this.messages.concat(sessionStorageMessages);
-        else this.onReceiveNewMessage(INITIAL_MESSAGE);
     }
 
     ngOnInit(): void {
@@ -65,6 +60,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((newMessage: Message | null) => {
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
+
+        const sessionStorageMessages = this.sessionStorageService.getMessages();
+        console.log(sessionStorageMessages);
+        if (sessionStorageMessages.length > 0) this.messages = this.messages.concat(sessionStorageMessages);
+        else this.onReceiveNewMessage(INITIAL_MESSAGE);
     }
 
     ngAfterViewInit(): void {
