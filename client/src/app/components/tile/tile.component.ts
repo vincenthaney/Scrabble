@@ -10,14 +10,19 @@ const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
     styleUrls: ['./tile.component.scss'],
 })
 export class TileComponent implements OnInit {
-    @Input() tile: Tile | { letter: '?'; value: number; isBlank?: boolean; playedLetter?: LetterValue } = UNDEFINED_TILE;
-    @Input() fontSize: string = '1em';
-    @Input() hideValue: boolean = false;
-    @Input() applied: boolean = true;
-    isPlayed: boolean = false;
+    @Input() tile: Tile | { letter: '?'; value: number; isBlank?: boolean; playedLetter?: LetterValue };
+    @Input() fontSize: string;
+    @Input() hideValue: boolean;
+    @Input() applied: boolean;
+    isPlayed: boolean;
     bgPath: string;
 
     constructor() {
+        this.tile = UNDEFINED_TILE;
+        this.fontSize = '1em';
+        this.hideValue = false;
+        this.applied = true;
+        this.isPlayed = false;
         this.bgPath = this.getBgPath();
     }
 
