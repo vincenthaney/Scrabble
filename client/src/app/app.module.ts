@@ -26,7 +26,7 @@ import { TimerSelectionComponent } from './components/timer-selection/timer-sele
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { SocketService } from './services';
-import { HighScoresComponent } from './pages/high-scores-page/high-scores.component';
+import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-page.component';
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 
 /**
@@ -56,7 +56,7 @@ import { HighScoreBoxComponent } from './components/high-score-box/high-score-bo
         NameFieldComponent,
         TimerSelectionComponent,
         PageHeaderComponent,
-        HighScoresComponent,
+        HighScoresPageComponent,
         HighScoreBoxComponent,
     ],
     imports: [

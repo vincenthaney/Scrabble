@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CreateWaitingPageComponent } from '@app/pages/create-waiting-page/create-waiting-page.component';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { HighScoresComponent } from '@app/pages/high-scores-page/high-scores.component';
+import { HighScoresPageComponent } from '@app/pages/high-scores-page/high-scores-page.component';
 import { HomePageComponent } from '@app/pages/home-page/home-page.component';
 import { JoinWaitingPageComponent } from '@app/pages/join-waiting-page/join-waiting-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
@@ -16,7 +16,7 @@ const routes: Routes = [
     { path: 'lobby', component: LobbyPageComponent },
     { path: 'waiting-room', component: CreateWaitingPageComponent },
     { path: 'join-waiting-room', component: JoinWaitingPageComponent },
-    { path: 'high-scores', component: HighScoresComponent },
+    { path: 'high-scores', component: HighScoresPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
