@@ -11,15 +11,15 @@ import { takeUntil } from 'rxjs/operators';
 export default class HighScoresService {
     private serviceDestroyed$: Subject<boolean> = new Subject();
     private highScoresListEvent: Subject<HighScore[]> = new Subject();
+    private highScores: HighScore[] = [];
+    private highScoresMap: Map<GameType, SingleHighScore[]> = new Map();
+    private listHasChanged: boolean = true;
 
     constructor(private highScoresController: HighScoresController) {
         this.highScoresController.subscribeToHighScoresListEvent(this.serviceDestroyed$, (highScores: HighScore[]) => {
-            this.handleHighScoresList(highScores);
+            this.highScores = highScores;
+            this.listHasChanged = true;
         });
-    }
-
-    handleHighScoresList(highScores: HighScore[]): void {
-        this.highScoresListEvent.next(highScores);
     }
 
     handleHighScoresRequest(): void {
@@ -30,11 +30,37 @@ export default class HighScoresService {
         this.highScoresListEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 
-    separateHighScores(highScores: HighScore[], gameType: GameType): SingleHighScore[] {
+    getHighScores(gameType: GameType): SingleHighScore[] {
+        if (this.listHasChanged) this.updateHighScores();
+        const highScores = this.highScoresMap.get(gameType);
+        return highScores ? highScores : [];
+    }
+
+    updateHighScores(): void {
+        const [classicHighScores, log2990HighScores] = this.separateHighScoresType();
+        this.highScoresMap.set(GameType.Classic, this.separateHighScores(classicHighScores));
+        this.highScoresMap.set(GameType.LOG2990, this.separateHighScores(log2990HighScores));
+        this.listHasChanged = false;
+    }
+
+    separateHighScoresType(): [HighScore[], HighScore[]] {
+        const classicHighScores: HighScore[] = [];
+        const log2990HighScores: HighScore[] = [];
+
+        this.highScores.forEach((highScore) => {
+            if (highScore.gameType === GameType.Classic) classicHighScores.push(highScore);
+            else log2990HighScores.push(highScore);
+        });
+
+        return [classicHighScores, log2990HighScores];
+    }
+
+    separateHighScores(highScores: HighScore[]): SingleHighScore[] {
         const singleHighScores: SingleHighScore[] = [];
         let rank = 1;
-        highScores.forEach((highScore) => {
-            if (highScore.gameType === gameType) {
+        highScores
+            .sort((previous, current) => current.score - previous.score)
+            .forEach((highScore) => {
                 let isFirst = true;
                 for (const name of highScore.names) {
                     if (isFirst) {
@@ -44,8 +70,7 @@ export default class HighScoresService {
                         singleHighScores.push({ ...highScore, name });
                     }
                 }
-            }
-        });
+            });
         return singleHighScores;
     }
 }
