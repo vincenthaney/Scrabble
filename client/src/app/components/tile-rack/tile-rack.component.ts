@@ -56,6 +56,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     selectTile(selectType: TileRackSelectType, tile: RackTile): boolean {
+        this.focus();
+
         if (this.selectionType === selectType && tile.isSelected) {
             this.unselectTile(tile);
             return false;
