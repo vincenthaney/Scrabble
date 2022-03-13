@@ -6,28 +6,28 @@ import { MESSAGE_STORAGE_KEY } from '@app/constants/session-storage-constants';
     providedIn: 'root',
 })
 export class SessionStorageService {
-    constructor() {}
+    constructor() {
+        console.log('constru');
+        this.initializeMessages();
+    }
 
-    // getData(dataKeyName: string): T[] {
-    //     return JSON.parse(sessionStorage.getItem(dataKeyName) as string);
-    // }
-
-    // addData(datakeyName: string, newData: T) {
-    //     const localData:
-    // }
+    initializeMessages(): void {
+        if (!window.sessionStorage.getItem(MESSAGE_STORAGE_KEY)) window.sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify([]));
+    }
 
     getMessages(): Message[] {
-        return JSON.parse(sessionStorage.getItem(MESSAGE_STORAGE_KEY) || '{}');
+        const localMessages = window.sessionStorage.getItem(MESSAGE_STORAGE_KEY);
+        return localMessages ? JSON.parse(localMessages) : [];
     }
 
     saveMessage(newMessage: Message): void {
         const localMessages: Message[] = this.getMessages();
         localMessages.push(newMessage);
-        sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(localMessages));
+        window.sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(localMessages));
         console.log('new message saved : ' + newMessage.content);
     }
 
     resetMessages() {
-        sessionStorage.clear();
+        window.sessionStorage.clear();
     }
 }
