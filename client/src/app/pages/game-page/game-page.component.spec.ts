@@ -15,7 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { BACKSPACE, ESCAPE } from '@app/constants/components-constants';
+import { ARROW_LEFT, ARROW_RIGHT, BACKSPACE, ESCAPE } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
@@ -149,34 +149,31 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should call emitKeyboard on keyboardEvent', () => {
-        const event: KeyboardEvent = new KeyboardEvent('keypress', {
-            key: '.',
-            cancelable: true,
-        });
-        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
-        component.handleKeyboardEvent(event);
-        expect(spy).toHaveBeenCalledWith(event);
-    });
+    describe('keypress/keydown', () => {
+        const tests: [method: keyof GamePageComponent, key: string][] = [
+            ['handleKeyboardEvent', 'a'],
+            ['handleKeyboardEventEsc', ESCAPE],
+            ['handleKeyboardEventBackspace', BACKSPACE],
+            ['handleKeyboardEventArrowLeft', ARROW_LEFT],
+            ['handleKeyboardEventArrowRight', ARROW_RIGHT],
+        ];
+        let emitKeyboardSpy: jasmine.Spy;
 
-    it('should call emitKeyboard on keydown.escape', () => {
-        const event: KeyboardEvent = new KeyboardEvent('keypress', {
-            key: ESCAPE,
-            cancelable: true,
+        beforeEach(() => {
+            emitKeyboardSpy = spyOn(component['focusableComponentService'], 'emitKeyboard');
         });
-        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
-        component.handleKeyboardEventEsc(event);
-        expect(spy).toHaveBeenCalledWith(event);
-    });
 
-    it('should call emitKeyboard on keydown.escape', () => {
-        const event: KeyboardEvent = new KeyboardEvent('keypress', {
-            key: BACKSPACE,
-            cancelable: true,
-        });
-        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
-        component.handleKeyboardEventBackspace(event);
-        expect(spy).toHaveBeenCalledWith(event);
+        for (const [method, key] of tests) {
+            it(`should call emitKeyboard on ${method}`, () => {
+                const event: KeyboardEvent = new KeyboardEvent('keypress', {
+                    key,
+                    cancelable: true,
+                });
+
+                (component[method] as (e: unknown) => void)(event);
+                expect(emitKeyboardSpy).toHaveBeenCalledWith(event);
+            });
+        }
     });
 
     describe('ngOnInit', () => {
