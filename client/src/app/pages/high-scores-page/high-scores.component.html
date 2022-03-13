@@ -34,7 +34,7 @@
                 </div>
 
             </div>
-            <div class="high-score" *ngFor="let highScore of separateHighScores()">
+            <div class="high-score" *ngFor="let highScore of getHighScores()">
                 <app-high-score-box [highScore]="highScore"></app-high-score-box>
             </div>
         </div>
