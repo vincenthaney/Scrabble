@@ -1,15 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
-import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
-import { ESCAPE } from '@app/constants/components-constants';
+import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
 import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
+import { preserveArrayOrder } from '@app/utils/preserve-array-order';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -117,6 +118,14 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
             case ESCAPE:
                 this.unselectAll();
                 break;
+            case ARROW_LEFT:
+                this.moveSelectedTile(Direction.Backward);
+                break;
+            case ARROW_RIGHT:
+                this.moveSelectedTile(Direction.Forward);
+                break;
+            default:
+                this.selectTileFromKey(e);
         }
     }
 
@@ -129,6 +138,21 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         const indexToSelect = (selectedIndex + 1) % tiles.length;
         this.selectTileMove(tiles[indexToSelect]);
     }
+
+    private moveSelectedTile(direction: Direction): void {
+        if (this.selectionType !== TileRackSelectType.Move) return;
+        if (this.selectedTiles.length === 0) return;
+
+        const tile = this.selectedTiles[0];
+        const index = this.tiles.indexOf(tile);
+
+        let newIndex = (index + direction) % this.tiles.length;
+        if (newIndex < 0) newIndex += this.tiles.length;
+
+        this.tiles.splice(index, 1);
+        this.tiles.splice(newIndex, 0, tile);
+    }
+
     private updateTileRack(): void {
         const player = this.gameService.getLocalPlayer();
         if (!player) return;
