@@ -11,8 +11,16 @@ describe('PlayerContainer', () => {
     let playerContainer: PlayerContainer;
 
     const DEFAULT_LOCAL_PLAYER_ID = '1';
+    const DEFAULT_PLAYER_NUMBER = 1;
     const testPlayers: AbstractPlayer[] = [new Player('1', 'player1', []), new Player('2', 'player2', [])];
 
+    const initializeMap = (players: AbstractPlayer[]): Map<number, AbstractPlayer> => {
+        const map = new Map();
+        players.forEach((value: AbstractPlayer, index: number) => {
+            map.set(index + 1, value);
+        });
+        return map;
+    };
     beforeEach(() => {
         playerContainer = new PlayerContainer(DEFAULT_LOCAL_PLAYER_ID);
     });
@@ -32,14 +40,14 @@ describe('PlayerContainer', () => {
 
     it('getLocalPlayer should return player from container with same id as localPlayerId', () => {
         const localPlayer = new Player(DEFAULT_LOCAL_PLAYER_ID, 'test', []);
-        playerContainer['players'].add(localPlayer);
+        playerContainer['players'].set(DEFAULT_PLAYER_NUMBER, localPlayer);
 
         expect(playerContainer.getLocalPlayer()).toEqual(localPlayer);
     });
 
     it('getLocalPlayer should return undefined if there is no player which id matchers localPlayerId', () => {
         const notLocalPlayer = new Player('not-local-player', 'test', []);
-        playerContainer['players'].add(notLocalPlayer);
+        playerContainer['players'].set(DEFAULT_PLAYER_NUMBER, notLocalPlayer);
 
         expect(playerContainer.getLocalPlayer()).toBeUndefined();
     });
@@ -50,11 +58,11 @@ describe('PlayerContainer', () => {
             name: 'test',
             tiles: [],
         };
-        const spy = spyOn(playerContainer, 'addPlayer').and.callFake(() => {
+        const spy = spyOn(playerContainer, 'setPlayer').and.callFake(() => {
             return playerContainer;
         });
 
-        playerContainer.initializePlayer(playerData);
+        playerContainer.initializePlayer(DEFAULT_PLAYER_NUMBER, playerData);
         expect(spy).toHaveBeenCalled();
     });
 
@@ -64,7 +72,7 @@ describe('PlayerContainer', () => {
             tiles: [],
         };
 
-        expect(() => playerContainer.initializePlayer(playerData)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
+        expect(() => playerContainer.initializePlayer(DEFAULT_PLAYER_NUMBER, playerData)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
     });
 
     it('initializePlayer should throw error if tiles are missing', () => {
@@ -73,7 +81,7 @@ describe('PlayerContainer', () => {
             name: 'test',
         };
 
-        expect(() => playerContainer.initializePlayer(playerData)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
+        expect(() => playerContainer.initializePlayer(DEFAULT_PLAYER_NUMBER, playerData)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
     });
 
     it('initializePlayers should call addPlayer if playerData is valid', () => {
@@ -94,38 +102,43 @@ describe('PlayerContainer', () => {
         });
 
         playerContainer.initializePlayers(...playerDatas);
-        playerDatas.forEach((data: PlayerData) => {
-            expect(spy).toHaveBeenCalledWith(data);
+
+        const expectedData: [number, PlayerData][] = [
+            [DEFAULT_PLAYER_NUMBER, playerDatas[0]],
+            [DEFAULT_PLAYER_NUMBER + 1, playerDatas[1]],
+        ];
+        expectedData.forEach((data: [number, PlayerData]) => {
+            expect(spy).toHaveBeenCalledWith(data[0], data[1]);
         });
     });
 
     it('getPlayer 1 should return the first player in the set', () => {
-        playerContainer['players'] = new Set(testPlayers);
+        playerContainer['players'] = initializeMap(testPlayers);
 
-        expect(playerContainer.getPlayer(1)).toEqual(testPlayers[0]);
+        expect(playerContainer.getPlayer(DEFAULT_PLAYER_NUMBER)).toEqual(testPlayers[0]);
     });
 
     it('getPlayer for player number not in set should throw error', () => {
-        playerContainer['players'] = new Set(testPlayers);
+        playerContainer['players'] = initializeMap(testPlayers);
         const outOfBoundNumber = playerContainer['players'].size + 1;
 
         expect(() => playerContainer.getPlayer(outOfBoundNumber)).toThrowError(PLAYER_NUMBER_INVALID(outOfBoundNumber));
     });
 
     it('addPlayer should add provided player to set', () => {
-        const spy = spyOn(playerContainer['players'], 'add').and.callThrough();
+        const spy = spyOn(playerContainer['players'], 'set').and.callThrough();
 
-        playerContainer.addPlayer(DEFAULT_PLAYER);
-        expect(spy).toHaveBeenCalledWith(DEFAULT_PLAYER);
+        playerContainer.setPlayer(1, DEFAULT_PLAYER);
+        expect(spy).toHaveBeenCalledWith(1, DEFAULT_PLAYER);
     });
 
     it('removePlayer should delete provided player to set', () => {
         const spy = spyOn(playerContainer['players'], 'delete').and.callThrough();
 
-        playerContainer.addPlayer(DEFAULT_PLAYER);
-        playerContainer.removePlayer(DEFAULT_PLAYER);
+        playerContainer.setPlayer(DEFAULT_PLAYER_NUMBER, DEFAULT_PLAYER);
+        playerContainer.removePlayer(DEFAULT_PLAYER_NUMBER);
 
-        expect(spy).toHaveBeenCalledWith(DEFAULT_PLAYER);
+        expect(spy).toHaveBeenCalledWith(DEFAULT_PLAYER_NUMBER);
     });
 
     it('resetPlayers should clear the set', () => {
@@ -153,7 +166,8 @@ describe('PlayerContainer', () => {
             },
         ];
 
-        playerContainer['players'] = new Set(testPlayers);
+        playerContainer['players'] = initializeMap(testPlayers);
+
         playerContainer.updatePlayersData(...playerDatas);
         expect(player1UpdateSpy).toHaveBeenCalledWith(playerDatas[0]);
         expect(player2UpdateSpy).toHaveBeenCalledWith(playerDatas[1]);

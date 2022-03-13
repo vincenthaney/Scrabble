@@ -340,8 +340,8 @@ describe('GameService', () => {
 
         beforeEach(() => {
             service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
-            service['playerContainer']['players'].add(new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles));
-            service['playerContainer']['players'].add(new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name, DEFAULT_PLAYER_2.tiles));
+            service['playerContainer']['players'].set(1, new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles));
+            service['playerContainer']['players'].set(2, new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name, DEFAULT_PLAYER_2.tiles));
             defaultGameData = {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
@@ -416,8 +416,8 @@ describe('GameService', () => {
             service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
             player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name, DEFAULT_PLAYER_1.tiles);
             player2 = new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name, DEFAULT_PLAYER_2.tiles);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             updateTileRackEventEmitSpy = gameViewEventManagerSpy.emitGameViewEvent;
         });
@@ -607,8 +607,8 @@ describe('GameService', () => {
 
         it('should return player 1 if is local', () => {
             service['playerContainer'] = new PlayerContainer(player1.id);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             const result = service.getLocalPlayer();
             expect(result).toEqual(player1);
@@ -616,8 +616,8 @@ describe('GameService', () => {
 
         it('should return player 2 if is local', () => {
             service['playerContainer'] = new PlayerContainer(player2.id);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             const result = service.getLocalPlayer();
             expect(result).toEqual(player2);
@@ -625,8 +625,8 @@ describe('GameService', () => {
 
         it('should return undefined if no player', () => {
             service['playerContainer'] = new PlayerContainer(undefined as unknown as string);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             const result = service.getLocalPlayer();
             expect(result).not.toBeDefined();
@@ -640,8 +640,8 @@ describe('GameService', () => {
 
         it('should return player 1 id if is local', () => {
             service['playerContainer'] = new PlayerContainer(player1.id);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             const result = service.getLocalPlayerId();
             expect(result).toEqual(player1.id);
@@ -649,8 +649,8 @@ describe('GameService', () => {
 
         it('should return player 2 id if is local', () => {
             service['playerContainer'] = new PlayerContainer(player2.id);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             const result = service.getLocalPlayerId();
             expect(result).toEqual(player2.id);
@@ -658,8 +658,8 @@ describe('GameService', () => {
 
         it('should return undefined if no player', () => {
             service['playerContainer'] = new PlayerContainer(undefined as unknown as string);
-            service['playerContainer']['players'].add(player1);
-            service['playerContainer']['players'].add(player2);
+            service['playerContainer']['players'].set(1, player1);
+            service['playerContainer']['players'].set(2, player2);
 
             const result = service.getLocalPlayerId();
             expect(result).not.toBeDefined();
@@ -711,8 +711,8 @@ describe('GameService', () => {
         let gameControllerSpy: jasmine.Spy;
         beforeEach(() => {
             service['playerContainer'] = new PlayerContainer('p1');
-            service['playerContainer']['players'].add(new Player('p1', 'jean', []));
-            service['playerContainer']['players'].add(new Player('p2', 'paul', []));
+            service['playerContainer']['players'].set(1, new Player('p1', 'jean', []));
+            service['playerContainer']['players'].set(2, new Player('p2', 'paul', []));
             localPlayerSpy = spyOn(service, 'getLocalPlayerId').and.callThrough();
 
             cookieGameSpy = spyOn(service['cookieService'], 'setCookie').and.callFake(() => {

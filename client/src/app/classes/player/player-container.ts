@@ -4,11 +4,11 @@ import AbstractPlayer from './abstract-player';
 import Player from './player';
 
 export class PlayerContainer {
-    private players: Set<AbstractPlayer>;
+    private players: Map<number, AbstractPlayer>;
     private readonly localPlayerId: string;
 
     constructor(localPlayerId: string) {
-        this.players = new Set();
+        this.players = new Map();
         this.localPlayerId = localPlayerId;
     }
 
@@ -18,34 +18,36 @@ export class PlayerContainer {
 
     getLocalPlayer(): AbstractPlayer | undefined {
         if (!this.getLocalPlayerId()) return undefined;
-        const filteredPlayers = [...this.players].filter((p) => p.id === this.getLocalPlayerId());
+        const filteredPlayers = [...this.players.values()].filter((p) => p.id === this.getLocalPlayerId());
 
         return filteredPlayers[0] ? filteredPlayers[0] : undefined;
     }
 
-    initializePlayer(playerData: PlayerData): this {
-        if (!playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
-        this.addPlayer(new Player(playerData.id, playerData.name, playerData.tiles));
+    initializePlayers(...playerDatas: PlayerData[]): this {
+        this.resetPlayers();
+        playerDatas.forEach((playerData: PlayerData, index: number) => this.initializePlayer(index + 1, playerData));
         return this;
     }
 
-    initializePlayers(...playerDatas: PlayerData[]): this {
-        playerDatas.forEach((playerData: PlayerData) => this.initializePlayer(playerData));
+    initializePlayer(playerNumber: number, playerData: PlayerData): this {
+        if (!playerData.name || !playerData.tiles) throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
+        this.setPlayer(playerNumber, new Player(playerData.id, playerData.name, playerData.tiles));
         return this;
     }
 
     getPlayer(playerNumber: number): AbstractPlayer {
-        if (playerNumber > this.players.size) throw new Error(PLAYER_NUMBER_INVALID(playerNumber));
-        return [...this.players][playerNumber - 1];
+        const player: AbstractPlayer | undefined = this.players.get(playerNumber);
+        if (!player) throw new Error(PLAYER_NUMBER_INVALID(playerNumber));
+        return player;
     }
 
-    addPlayer(player: AbstractPlayer): this {
-        this.players.add(player);
+    setPlayer(playerNumber: number, player: AbstractPlayer): this {
+        this.players.set(playerNumber, player);
         return this;
     }
 
-    removePlayer(player: AbstractPlayer): this {
-        this.players.delete(player);
+    removePlayer(playerNumber: number): this {
+        this.players.delete(playerNumber);
         return this;
     }
 
@@ -56,7 +58,9 @@ export class PlayerContainer {
 
     updatePlayersData(...playerDatas: PlayerData[]): this {
         playerDatas.forEach((playerData: PlayerData) => {
-            [...this.players].filter((p: AbstractPlayer) => p.id === playerData.id).map((p: AbstractPlayer) => p.updatePlayerData(playerData));
+            [...this.players.values()]
+                .filter((p: AbstractPlayer) => p.id === playerData.id)
+                .map((p: AbstractPlayer) => p.updatePlayerData(playerData));
         });
         return this;
     }
