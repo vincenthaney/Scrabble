@@ -82,7 +82,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
-        console.log('updateactiveplayerb0rder');
+        // console.log('updateactiveplayerb0rder');
         if (!activePlayer) {
             this.isPlayer1Active = false;
             this.isPlayer2Active = false;
@@ -112,6 +112,8 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private getLocalPlayerIcon(): IconName {
-        return LOCAL_PLAYER_ICON[Math.floor(Math.random() * LOCAL_PLAYER_ICON.length)];
+        const truc = LOCAL_PLAYER_ICON[Math.floor(Math.random() * LOCAL_PLAYER_ICON.length)];
+        console.log('USER ICON : ' + truc);
+        return truc;
     }
 }

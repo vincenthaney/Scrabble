@@ -22,6 +22,7 @@ export class IconComponent implements OnInit {
         const prefix: IconPrefix = this.getPrefix(this.styling);
 
         this.className = `${prefix} fa-${this.icon}`;
+        console.log(this.className + '------' + this.icon);
 
         if (this.animation) this.className += ` fa-${this.animation}`;
         if (this.size) this.className += ` fa-${this.size}`;

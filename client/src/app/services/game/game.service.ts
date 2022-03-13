@@ -74,7 +74,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
-        console.log(startGameData);
+        // console.log(startGameData);
         this.gameId = startGameData.gameId;
         this.localPlayerId = localPlayerId;
         this.player1 = this.initializePlayer(startGameData.player1);
@@ -101,7 +101,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     reconnectReinitialize(startGameData: StartGameData): void {
-        console.log('reconnect reinitialize');
         this.player1.updatePlayerData(startGameData.player1);
         this.player2.updatePlayerData(startGameData.player2);
         this.rerenderEvent.emit();
@@ -109,7 +108,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
         this.roundManager.continueRound(this.roundManager.currentRound);
-        console.log(this.gameId);
     }
 
     initializePlayer(playerData: PlayerData): AbstractPlayer {
@@ -181,7 +179,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     reconnectGame(): void {
-        console.log('reconnect');
         const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
         const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
 

@@ -7,7 +7,6 @@ import { MESSAGE_STORAGE_KEY } from '@app/constants/session-storage-constants';
 })
 export class SessionStorageService {
     constructor() {
-        console.log('constru');
         this.initializeMessages();
     }
 
@@ -24,7 +23,6 @@ export class SessionStorageService {
         const localMessages: Message[] = this.getMessages();
         localMessages.push(newMessage);
         window.sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(localMessages));
-        console.log('new message saved : ' + newMessage.content);
     }
 
     resetMessages() {
