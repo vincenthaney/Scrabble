@@ -1,6 +1,6 @@
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
-import { Square } from '@app/classes/square';
+import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { COLORS } from '@app/constants/colors';
@@ -49,6 +49,7 @@ export const UNDEFINED_SQUARE: Square = {
     wasMultiplierUsed: false,
     isCenter: false,
 };
+export const DEFAULT_SQUAREVIEW = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
 
 export const VALID_MULTIPLIERS: number[] = [2, 3];
 
