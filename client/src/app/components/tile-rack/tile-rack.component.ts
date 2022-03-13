@@ -120,6 +120,15 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         }
     }
 
+    private selectTileFromKey(e: KeyboardEvent): void {
+        const tiles = this.tiles.filter((t) => t.letter.toLowerCase() === e.key.toLowerCase());
+
+        if (tiles.length === 0) return;
+
+        const selectedIndex = tiles.findIndex((t) => t.isSelected);
+        const indexToSelect = (selectedIndex + 1) % tiles.length;
+        this.selectTileMove(tiles[indexToSelect]);
+    }
     private updateTileRack(): void {
         const player = this.gameService.getLocalPlayer();
         if (!player) return;
