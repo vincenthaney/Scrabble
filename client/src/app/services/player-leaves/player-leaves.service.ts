@@ -30,7 +30,7 @@ export class PlayerLeavesService implements OnDestroy {
     }
 
     getGameId(): string {
-        return this.gameDispatcherService.gameId;
+        return this.gameService.gameId;
     }
 
     handleJoinerLeaveGame(leaverName: string): void {
