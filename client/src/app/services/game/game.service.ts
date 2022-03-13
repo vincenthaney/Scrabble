@@ -48,10 +48,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         this.serviceDestroyed$ = new Subject();
-        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, (initializeValue: InitializeGameData | undefined) => {
-            if (!initializeValue) return;
-            this.initializeGame(initializeValue.localPlayerId, initializeValue.startGameData);
-        });
+        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
+            this.handleInitializeGame(initializeValue),
+        );
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
     }
@@ -59,6 +58,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
+    }
+
+    async handleInitializeGame(initializeGameData: InitializeGameData | undefined): Promise<void> {
+        if (!initializeGameData) return;
+        return await this.initializeGame(initializeGameData.localPlayerId, initializeGameData.startGameData);
     }
 
     async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
