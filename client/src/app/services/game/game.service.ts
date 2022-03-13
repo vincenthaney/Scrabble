@@ -34,10 +34,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     gameType: GameType;
     dictionnaryName: string;
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>({
-        content: 'Début de la partie',
-        senderId: SYSTEM_ID,
-    });
+    newMessageValue = new BehaviorSubject<Message | null>(null);
     tileReserve: TileReserveData[];
     tileReserveTotal: number;
     updateTileRackEvent: EventEmitter<void>;
@@ -63,7 +60,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
     ) {
         this.updateTileRackEvent = new EventEmitter();
         this.updateTileReserveEvent = new EventEmitter();
-        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage: Message | null) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
         this.leaveGameSubject = new Subject<string>();
         this.playingTiles = new EventEmitter();

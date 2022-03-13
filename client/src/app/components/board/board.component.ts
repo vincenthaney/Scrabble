@@ -69,7 +69,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.gameService.playingTiles
             .pipe(takeUntil(this.boardDestroyed$))
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
-        this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message | null) => {
+            if (message) this.handleNewMessage(message);
+        });
         this.roundManagerService.endRoundEvent.pipe(takeUntil(this.boardDestroyed$)).subscribe(() => clearCursor());
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined

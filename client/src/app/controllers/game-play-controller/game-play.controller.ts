@@ -14,7 +14,7 @@ import { environment } from 'src/environments/environment';
 })
 export class GamePlayController {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>(INITIAL_MESSAGE);
+    newMessageValue = new BehaviorSubject<Message | null>(null);
 
     constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();

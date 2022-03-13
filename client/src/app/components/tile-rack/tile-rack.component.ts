@@ -31,7 +31,9 @@ export class TileRackComponent implements OnInit, OnDestroy {
         this.gameService.playingTiles
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
-        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((message: Message | null) => {
+            if (message) this.handleNewMessage(message);
+        });
     }
 
     ngOnDestroy(): void {
