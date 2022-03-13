@@ -24,18 +24,19 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
-    boardDestroyed$: Subject<boolean> = new Subject();
+    readonly marginColumnSize: number = MARGIN_COLUMN_SIZE;
+    gridSize: Vec2 = { x: 0, y: 0 };
     marginLetters: LetterValue[];
-    readonly marginColumnSize: number;
-    gridSize: Vec2;
     squareGrid: SquareView[][];
-    boardUpdateSubscription: Subscription;
-    boardInitializationSubscription: Subscription;
-    notAppliedSquares: SquareView[];
+    notAppliedSquares: SquareView[] = [];
     tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
+    selectedSquare: SquareView | undefined;
 
     navigator: BoardNavigator;
-    selectedSquare: SquareView | undefined;
+    boardUpdateSubscription: Subscription;
+    boardInitializationSubscription: Subscription;
+
+    boardDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
         private boardService: BoardService,
@@ -44,10 +45,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         private focusableComponentService: FocusableComponentsService,
     ) {
         super();
-        this.gridSize = { x: 0, y: 0 };
-        this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
-        this.notAppliedSquares = [];
     }
 
     ngOnInit(): void {
