@@ -63,7 +63,7 @@ const mockInitialHighScores: HighScoresData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, DEFAULT_HIGH_SCORES_RELATIVE_PATH)] = JSON.stringify(mockInitialHighScores);
 
-describe.only('HighScoresService', () => {
+describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
     let client: MongoClient;
