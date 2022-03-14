@@ -36,8 +36,8 @@ export class GamePlayService {
         let endGameFeedback: string[] | undefined;
 
         if (updatedData) {
+            updatedData = this.addMissingPlayerId(gameId, playerId, updatedData);
             updatedData.tileReserve = Array.from(game.getTilesLeftPerLetter(), ([letter, amount]) => ({ letter, amount }));
-            updatedData.tileReserveTotal = updatedData.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
         }
 
         if (action.willEndTurn()) {
@@ -107,9 +107,9 @@ export class GamePlayService {
         }
 
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
-        else updatedData.player1 = { score: updatedScorePlayer1 };
+        else updatedData.player1 = { id: game.player1.id, score: updatedScorePlayer1 };
         if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
-        else updatedData.player2 = { score: updatedScorePlayer2 };
+        else updatedData.player2 = { id: game.player2.id, score: updatedScorePlayer2 };
 
         updatedData.isGameOver = true;
         return game.endGameMessage(winnerName);
@@ -119,8 +119,21 @@ export class GamePlayService {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.getPlayer(playerWhoLeftId, IS_OPPONENT);
         game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
-        const updatedData: GameUpdateData = {};
+        let updatedData: GameUpdateData = {};
         const endOfGameMessages = await this.handleGameOver(playerStillInGame.name, game, updatedData);
+        updatedData = this.addMissingPlayerId(gameId, playerStillInGame.id, updatedData);
         this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
+    }
+
+    private addMissingPlayerId(gameId: string, playerId: string, gameUpdateData: GameUpdateData): GameUpdateData {
+        const game: Game = this.activeGameService.getGame(gameId, playerId);
+        const newgameUpdateData: GameUpdateData = { ...gameUpdateData };
+        if (newgameUpdateData.player1) {
+            newgameUpdateData.player1.id = game.player1.id;
+        }
+        if (newgameUpdateData.player2) {
+            newgameUpdateData.player2.id = game.player2.id;
+        }
+        return newgameUpdateData;
     }
 }

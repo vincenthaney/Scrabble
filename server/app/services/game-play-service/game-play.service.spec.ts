@@ -64,6 +64,8 @@ describe('GamePlayService', () => {
         tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+        gameStub.player2 = new Player(INVALID_PLAYER_ID, 'JCol');
+
         gameStub.getPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
@@ -210,15 +212,7 @@ describe('GamePlayService', () => {
             }
         });
 
-        it('should return tileReserveTotal if updatedData exists', async () => {
-            actionStub.execute.returns({});
-            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(result).to.exist;
-            expect(result[0]!.tileReserveTotal).to.exist;
-            expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));
-        });
-
-        it('should call getMessage from action', async () => {
+        it('should call getMessage from action', () => {
             await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.calledOnce).to.be.true;
         });

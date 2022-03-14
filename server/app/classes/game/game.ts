@@ -16,7 +16,7 @@ import { GameType } from './game-type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
-export const LOOSE = -1;
+export const LOSE = -1;
 
 export default class Game {
     private static boardService: BoardService;
@@ -112,8 +112,8 @@ export default class Game {
     endOfGame(winnerName: string | undefined): [number, number] {
         if (winnerName) {
             if (winnerName === this.player1.name)
-                return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-            else return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+                return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+            else return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         } else {
             return this.getEndOfGameScores();
         }
@@ -121,11 +121,11 @@ export default class Game {
 
     getEndOfGameScores(): [number, number] {
         if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
-            return this.computeEndOfGameScore(LOOSE, LOOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
+            return this.computeEndOfGameScore(LOSE, LOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
         } else if (!this.player1.hasTilesLeft()) {
-            return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+            return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
         } else {
-            return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         }
     }
 
@@ -168,7 +168,6 @@ export default class Game {
         this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
             tileReserve.push({ letter, amount });
         });
-        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
         const round: Round = this.roundManager.getCurrentRound();
         const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
         const startMultiplayerGameData: StartMultiplayerGameData = {
@@ -180,7 +179,6 @@ export default class Game {
             gameId: this.getId(),
             board: this.board.grid,
             tileReserve,
-            tileReserveTotal,
             round: roundData,
         };
         return startMultiplayerGameData;
