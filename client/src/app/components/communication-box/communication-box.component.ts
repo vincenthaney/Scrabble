@@ -8,7 +8,7 @@ import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { SessionStorageService } from '@app/services/session-storage/session-storage.service';
+import { MessageStorageService } from '@app/services/message-storage/message-storage.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -42,11 +42,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         private gameService: GameService,
         private focusableComponentsService: FocusableComponentsService,
         private changeDetectorRef: ChangeDetectorRef,
-        private sessionStorageService: SessionStorageService,
+        private messageStorageService: MessageStorageService,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
-        this.sessionStorageService.initializeMessages();
+        this.messageStorageService.initializeMessages();
     }
 
     ngOnInit(): void {
@@ -60,7 +60,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
 
-        const sessionStorageMessages = this.sessionStorageService.getMessages();
+        const sessionStorageMessages = this.messageStorageService.getMessages();
         if (sessionStorageMessages.length > 0) this.messages = this.messages.concat(sessionStorageMessages);
         else this.onReceiveNewMessage(INITIAL_MESSAGE);
     }
@@ -73,7 +73,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
-        this.sessionStorageService.resetMessages();
+        this.messageStorageService.resetMessages();
     }
 
     createVisualMessage(newMessage: Message): Message {
@@ -106,7 +106,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
         if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
-        this.sessionStorageService.saveMessage(newMessage);
+        this.messageStorageService.saveMessage(newMessage);
     }
 
     onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {

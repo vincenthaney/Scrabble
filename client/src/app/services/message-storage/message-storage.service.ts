@@ -5,7 +5,7 @@ import { MESSAGE_STORAGE_KEY } from '@app/constants/session-storage-constants';
 @Injectable({
     providedIn: 'root',
 })
-export class SessionStorageService {
+export class MessageStorageService {
     constructor() {
         this.initializeMessages();
     }

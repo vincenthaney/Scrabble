@@ -2,12 +2,12 @@
 import { TestBed } from '@angular/core/testing';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { MESSAGE_STORAGE_KEY } from '@app/constants/session-storage-constants';
-import { SessionStorageService } from './session-storage.service';
+import { MessageStorageService } from './message-storage.service';
 
 const TEST_MESSAGES = [INITIAL_MESSAGE, INITIAL_MESSAGE, INITIAL_MESSAGE];
 
 describe('SessionStorageService', () => {
-    let service: SessionStorageService;
+    let service: MessageStorageService;
     let getSpy: jasmine.Spy;
     let setSpy: jasmine.Spy;
     let clearSpy: jasmine.Spy;
@@ -15,7 +15,7 @@ describe('SessionStorageService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(SessionStorageService);
+        service = TestBed.inject(MessageStorageService);
     });
 
     beforeEach(() => {

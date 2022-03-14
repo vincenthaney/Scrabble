@@ -26,7 +26,6 @@ describe('CommunicationBoxComponent', () => {
 
     let inputParserSpy: jasmine.SpyObj<InputParserService>;
     let virtualScrollSpy: jasmine.SpyObj<CdkVirtualScrollViewport>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let scrollToBottomSpy: jasmine.Spy<any>;
     let gameServiceMock: GameService;
     let formSpy: jasmine.Spy<any>;
@@ -98,7 +97,6 @@ describe('CommunicationBoxComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom').and.callThrough();
         formSpy = spyOn(component.messageForm, 'reset');
     });
