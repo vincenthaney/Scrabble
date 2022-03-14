@@ -87,16 +87,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         if (!activePlayer) {
             this.isPlayer1Active = false;
             this.isPlayer2Active = false;
-        } else if (player1 && activePlayer.id === player1.id) {
-            this.isPlayer1Active = true;
-            this.isPlayer2Active = false;
-        } else if (player2 && activePlayer.id === player2.id) {
-            this.isPlayer2Active = true;
-            this.isPlayer1Active = false;
-        } else {
-            this.isPlayer1Active = false;
-            this.isPlayer2Active = false;
+            return;
         }
+        this.isPlayer1Active = player1 && activePlayer.id === player1.id;
+        this.isPlayer2Active = player2 && activePlayer.id === player2.id;
     }
 
     getPlayer1(): AbstractPlayer {
