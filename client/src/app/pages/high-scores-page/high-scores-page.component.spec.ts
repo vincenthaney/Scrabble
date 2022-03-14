@@ -96,6 +96,12 @@ describe('HighScoresPageComponent', () => {
         expect(spyHighScoresListInitializedEvent).toHaveBeenCalled();
     });
 
+    it('subscribeToInitializedHighScoresListEvent change the isInitialized to true', () => {
+        expect(component.isInitialized).toBeFalse();
+        highScoresServiceMock['highScoresListInitializedEvent'].next();
+        expect(component.isInitialized).toBeTrue();
+    });
+
     describe('ngOndestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
             const ngUnsubscribeNextSpy = spyOn<any>(component.componentDestroyed$, 'next');
