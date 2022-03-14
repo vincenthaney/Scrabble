@@ -17,7 +17,7 @@ export class HighScoresController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/highScores/:playerId', async (req: HighScoresRequest, res: Response)  =>  {
+        this.router.get('/highScores/:playerId', async (req: HighScoresRequest, res: Response) => {
             const { playerId } = req.params;
             try {
                 await this.handleHighScoresRequest(playerId);

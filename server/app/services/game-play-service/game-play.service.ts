@@ -6,21 +6,22 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { IS_REQUESTING } from '@app/constants/game';
+import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
+import HighScoresService from '@app/services/high-scores-service/high-scores-service';
 import { FeedbackMessages } from './feedback-messages';
 
 @Service()
 export class GamePlayService {
-    constructor(private readonly activeGameService: ActiveGameService) {
+    constructor(private readonly activeGameService: ActiveGameService, private readonly highScoresService: HighScoresService) {
         this.activeGameService.playerLeftEvent.on('playerLeft', (gameId, playerWhoLeftId) => {
             this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
         });
     }
 
-    playAction(gameId: string, playerId: string, actionData: ActionData): [GameUpdateData | void, FeedbackMessages | void] {
+    async playAction(gameId: string, playerId: string, actionData: ActionData): Promise<[void | GameUpdateData, void | FeedbackMessages]> {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getPlayer(playerId, IS_REQUESTING);
 
@@ -45,7 +46,7 @@ export class GamePlayService {
             if (updatedData) updatedData.round = nextRoundData;
             else updatedData = { round: nextRoundData };
             if (game.isGameOver()) {
-                endGameFeedback = this.handleGameOver(undefined, game, updatedData);
+                endGameFeedback = await this.handleGameOver(undefined, game, updatedData);
             }
         }
         return [updatedData, { localPlayerFeedback, opponentFeedback, endGameFeedback }];
@@ -94,8 +95,17 @@ export class GamePlayService {
         return payload;
     }
 
-    handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): string[] {
+    async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
+
+        if (!game.isAddedToDatabase) {
+            const connectedRealPlayers = game.getConnectedRealPlayers();
+            for (const player of connectedRealPlayers) {
+                await this.highScoresService.addHighScore(player.name, player.score, game.gameType);
+            }
+            game.isAddedToDatabase = true;
+        }
+
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
         else updatedData.player1 = { score: updatedScorePlayer1 };
         if (updatedData.player2) updatedData.player2.score = updatedScorePlayer2;
@@ -107,7 +117,8 @@ export class GamePlayService {
 
     handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): void {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
-        const playerStillInGame = game.player1.id === playerWhoLeftId ? game.player2 : game.player1;
+        const playerStillInGame = game.getPlayer(playerWhoLeftId, IS_OPPONENT);
+        game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
         const updatedData: GameUpdateData = {};
         const endOfGameMessages = this.handleGameOver(playerStillInGame.name, game, updatedData);
         this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
