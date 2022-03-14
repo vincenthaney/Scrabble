@@ -30,7 +30,7 @@ import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -42,7 +42,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
     isLocalPlayerTurn: boolean;
-    noActiveGameSubscription: Subscription;
     componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
@@ -83,9 +82,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         if (!this.gameService.getGameId()) this.gameService.reconnectGame();
         if (this.gameService.gameIsSetUp) this.isLocalPlayerTurn = this.gameService.isLocalPlayerPlaying();
 
-        this.noActiveGameSubscription = this.gameService.noActiveGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.noActiveGameDialog());
+        this.gameService.noActiveGameEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.noActiveGameDialog());
         this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([, isLocalPlayerTurn]) => {
             this.isLocalPlayerTurn = isLocalPlayerTurn;
         });
