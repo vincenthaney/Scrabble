@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { SingleHighScore } from '@app/classes/admin/high-score';
+import { GameType } from '@app/classes/game-type';
 
 @Component({
     selector: 'app-high-score-box',
@@ -7,9 +8,5 @@ import { SingleHighScore } from '@app/classes/admin/high-score';
     styleUrls: ['./high-score-box.component.scss'],
 })
 export class HighScoreBoxComponent {
-    @Input() highScore: SingleHighScore;
-
-    // constructor() {}
-
-    // ngOnInit(): void {}
+    @Input() highScore: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0};
 }
