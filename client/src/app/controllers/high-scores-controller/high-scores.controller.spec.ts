@@ -45,22 +45,6 @@ describe('HighScoresController', () => {
         expect(controller).toBeTruthy();
     });
 
-    describe('ngOnDestroy', () => {
-        it('should call next', () => {
-            const spy = spyOn(controller['serviceDestroyed$'], 'next');
-            spyOn(controller['serviceDestroyed$'], 'complete');
-            controller.ngOnDestroy();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should call complete', () => {
-            spyOn(controller['serviceDestroyed$'], 'next');
-            const spy = spyOn(controller['serviceDestroyed$'], 'complete');
-            controller.ngOnDestroy();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('Configure Socket', () => {
         it('On join request, configureSocket should emit opponent name', () => {
             const spyHighScoresListEvent = spyOn(controller['highScoresListEvent'], 'next').and.callThrough();

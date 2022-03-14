@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HighScore } from '@app/classes/admin';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
@@ -9,17 +9,11 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class HighScoresController implements OnDestroy {
-    private highScoresListEvent: Subject<HighScore[]> = new Subject();
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+export class HighScoresController {
+    private highScoresListEvent: Subject<HighScore[]> = new Subject<HighScore[]>();
 
     constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();
-    }
-
-    ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
     }
 
     configureSocket(): void {
