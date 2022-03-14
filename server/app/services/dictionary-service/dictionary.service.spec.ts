@@ -18,7 +18,7 @@ const TEST_DICTIONARY = {
     words: ['abc', 'abcd', 'abcde'],
 };
 
-describe.only('DictionaryService', () => {
+describe('DictionaryService', () => {
     let service: DictionaryService;
 
     beforeEach(() => {
