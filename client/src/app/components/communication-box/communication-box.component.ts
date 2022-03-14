@@ -24,19 +24,15 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('messageInput') messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
-    componentDestroyed$: Subject<boolean> = new Subject();
 
     messages: VisualMessage[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
-
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
-
     lettersLeftTotal: number = 0;
     lettersLeft: LetterMapItem[] = [];
-
     loading: boolean = false;
+    componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
         private inputParser: InputParserService,
