@@ -186,17 +186,17 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     reconnectGame(): void {
-        const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
-        const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
+        const gameIdCookie: string = this.cookieService.getCookie(GAME_ID_COOKIE);
+        const socketIdCookie: string = this.cookieService.getCookie(SOCKET_ID_COOKIE);
 
-        if (gameIdCookie !== '' && gameIdCookie.length > 0) {
-            this.cookieService.eraseCookie(GAME_ID_COOKIE);
-            this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
-
-            this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
-        } else {
+        if (this.isGameIdCookieAbsent(gameIdCookie)) {
             this.gameViewEventManagerService.emitGameViewEvent('noActiveGame');
+            return;
         }
+        this.cookieService.eraseCookie(GAME_ID_COOKIE);
+        this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
+
+        this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
     }
 
     disconnectGame(): void {
@@ -208,5 +208,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
         this.gameController.handleDisconnection(gameId, localPlayerId);
+    }
+
+    private isGameIdCookieAbsent(gameIdCookie: string): boolean {
+        return gameIdCookie === '' && gameIdCookie.length <= 0;
     }
 }
