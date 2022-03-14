@@ -17,10 +17,10 @@ export class HighScoresController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/highScores/:playerId', (req: HighScoresRequest, res: Response) => {
+        this.router.get('/highScores/:playerId', async (req: HighScoresRequest, res: Response)  =>  {
             const { playerId } = req.params;
             try {
-                this.handleHighScoresRequest(playerId);
+                await this.handleHighScoresRequest(playerId);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
