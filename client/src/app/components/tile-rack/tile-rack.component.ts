@@ -13,6 +13,7 @@ import { GameButtonActionService } from '@app/services/game-button-action/game-b
 import { preserveArrayOrder } from '@app/utils/preserve-array-order';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Subject } from 'rxjs';
+import { MAX_TILE_PER_PLAYER } from '@app/constants/game';
 
 export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
 
@@ -105,7 +106,12 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     canExchangeTiles(): boolean {
-        return this.selectionType === TileRackSelectType.Exchange && this.selectedTiles.length > 0 && this.gameService.isLocalPlayerPlaying();
+        return (
+            this.selectionType === TileRackSelectType.Exchange &&
+            this.selectedTiles.length > 0 &&
+            this.gameService.isLocalPlayerPlaying() &&
+            this.gameService.getTotalNumberOfTilesLeft() >= MAX_TILE_PER_PLAYER
+        );
     }
 
     exchangeTiles(): void {
