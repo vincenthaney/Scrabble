@@ -582,4 +582,15 @@ describe('TileRackComponent', () => {
             expect(sendExchangeActionSpy).not.toHaveBeenCalled();
         });
     });
+
+    describe('onScroll', () => {
+        it('should call moveSelectedTile', () => {
+            const value = 1;
+            const spy = spyOn<any>(component, 'moveSelectedTile');
+
+            component.onScroll({ deltaY: value } as WheelEvent);
+
+            expect(spy).toHaveBeenCalledOnceWith(value);
+        });
+    });
 });
