@@ -93,9 +93,9 @@ describe('HighScoresService', () => {
             };
         });
 
-        it('subscribeToHighScoresListEvent should call subscribe method on highScoresListEvent', () => {
-            const subscriptionSpy = spyOn(service['highScoresListEvent'], 'subscribe');
-            service.subscribeToHighScoresListEvent(serviceDestroyed$, callback);
+        it('subscribeToInitializedHighScoresListEvent should call subscribe method on highScoresListEvent', () => {
+            const subscriptionSpy = spyOn(service['highScoresListInitializedEvent'], 'subscribe');
+            service.subscribeToInitializedHighScoresListEvent(serviceDestroyed$, callback);
             expect(subscriptionSpy).toHaveBeenCalled();
         });
     });
@@ -165,7 +165,6 @@ describe('HighScoresService', () => {
             service['highScoresMap'] = new Map();
             let isOrdered = true;
             let lastScore = Number.MAX_VALUE;
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             const result = service['rankHighScores'](CLASSIC_HIGH_SCORES);
             for (const highScore of result) {
                 isOrdered = highScore.score <= lastScore;
@@ -177,7 +176,6 @@ describe('HighScoresService', () => {
         it('should only include rank for first of score', () => {
             service['highScoresMap'] = new Map();
             let lastScore = Number.MAX_VALUE;
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             const result = service['rankHighScores'](CLASSIC_HIGH_SCORES);
             for (const highScore of result) {
                 if (highScore.score !== lastScore) expect(highScore.rank).toBeTruthy();

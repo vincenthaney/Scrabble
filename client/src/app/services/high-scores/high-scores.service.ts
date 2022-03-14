@@ -10,12 +10,13 @@ import { takeUntil } from 'rxjs/operators';
 })
 export default class HighScoresService {
     private serviceDestroyed$: Subject<boolean> = new Subject();
-    private highScoresListEvent: Subject<HighScore[]> = new Subject();
+    private highScoresListInitializedEvent: Subject<void> = new Subject();
     private highScoresMap: Map<GameType, SingleHighScore[]> = new Map();
 
     constructor(private highScoresController: HighScoresController) {
         this.highScoresController.subscribeToHighScoresListEvent(this.serviceDestroyed$, (highScores: HighScore[]) => {
             this.updateHighScores(highScores);
+            this.highScoresListInitializedEvent.next();
         });
     }
 
@@ -23,8 +24,8 @@ export default class HighScoresService {
         this.highScoresController.handleGetHighScores();
     }
 
-    subscribeToHighScoresListEvent(componentDestroyed$: Subject<boolean>, callback: (highScores: HighScore[]) => void): void {
-        this.highScoresListEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    subscribeToInitializedHighScoresListEvent(componentDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.highScoresListInitializedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 
     getHighScores(gameType: GameType): SingleHighScore[] {

@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -19,6 +20,7 @@ import { HighScoreBoxComponent } from '@app/components/high-score-box/high-score
 import { IconComponent } from '@app/components/icon/icon.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import HighScoresService from '@app/services/high-scores/high-scores.service';
+import { of } from 'rxjs';
 import { HighScoresPageComponent } from './high-scores-page.component';
 
 const DEFAULT_MAP: Map<GameType, SingleHighScore[]> = new Map([
@@ -61,6 +63,7 @@ describe('HighScoresPageComponent', () => {
                 MatButtonToggleModule,
                 RouterModule,
                 RouterTestingModule,
+                MatProgressSpinnerModule,
             ],
             providers: [{ provide: HighScoresService, useClass: HighScoresServiceSpy }],
         }).compileComponents();
@@ -83,6 +86,14 @@ describe('HighScoresPageComponent', () => {
         const spyHandleHighScoresRequest = spyOn(highScoresServiceMock, 'handleHighScoresRequest').and.callFake(() => {});
         component.ngOnInit();
         expect(spyHandleHighScoresRequest).toHaveBeenCalled();
+    });
+
+    it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
+        const spyHighScoresListInitializedEvent = spyOn<any>(highScoresServiceMock['highScoresListInitializedEvent'], 'subscribe').and.returnValue(
+            of() as any,
+        );
+        component.ngOnInit();
+        expect(spyHighScoresListInitializedEvent).toHaveBeenCalled();
     });
 
     describe('ngOndestroy', () => {

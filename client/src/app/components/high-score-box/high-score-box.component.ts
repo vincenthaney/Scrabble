@@ -8,5 +8,5 @@ import { GameType } from '@app/classes/game-type';
     styleUrls: ['./high-score-box.component.scss'],
 })
 export class HighScoreBoxComponent {
-    @Input() highScore: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0};
+    @Input() highScore: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0 };
 }

@@ -15,12 +15,16 @@ export class HighScoresPageComponent implements OnInit, OnDestroy {
         gameType: new FormControl(GameType.Classic, Validators.required),
     });
     gameTypes = GameType;
+    isInitialized: boolean = false;
     componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private highScoresService: HighScoresService) {}
 
     ngOnInit(): void {
         this.highScoresService.handleHighScoresRequest();
+        this.highScoresService.subscribeToInitializedHighScoresListEvent(this.componentDestroyed$, () => {
+            this.isInitialized = true;
+        });
     }
 
     ngOnDestroy(): void {
