@@ -1,5 +1,5 @@
 import { PlayerData } from '@app/classes/communication';
-import { PLAYER_1_NUMBER } from '@app/constants/game';
+import { PLAYER_1_INDEX } from '@app/constants/game';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
 import AbstractPlayer from './abstract-player';
 import Player from './player';
@@ -24,9 +24,9 @@ export class PlayerContainer {
         return filteredPlayers[0] ? filteredPlayers[0] : undefined;
     }
 
-    initializePlayers(...playerDatas: PlayerData[]): this {
+    initializePlayers(...playersData: PlayerData[]): this {
         this.resetPlayers();
-        playerDatas.forEach((playerData: PlayerData, index: number) => this.initializePlayer(PLAYER_1_NUMBER + index, playerData));
+        playersData.forEach((playerData: PlayerData, index: number) => this.initializePlayer(PLAYER_1_INDEX + index, playerData));
         return this;
     }
 
@@ -57,10 +57,10 @@ export class PlayerContainer {
         return this;
     }
 
-    updatePlayersData(...playerDatas: PlayerData[]): this {
-        playerDatas.forEach((playerData: PlayerData) => {
+    updatePlayersData(...playersData: PlayerData[]): this {
+        playersData.forEach((playerData: PlayerData) => {
             [...this.players.values()]
-                .filter((p: AbstractPlayer) => p.id === playerData.id)
+                .filter((player: AbstractPlayer) => player.id === playerData.id)
                 .map((p: AbstractPlayer) => p.updatePlayerData(playerData));
         });
         return this;

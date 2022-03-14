@@ -89,5 +89,5 @@ export enum ExpectedCommandWordCount {
     Reserve = 1,
 }
 
-export const PLAYER_1_NUMBER = 1;
-export const PLAYER_2_NUMBER = 2;
+export const PLAYER_1_INDEX = 1;
+export const PLAYER_2_INDEX = 2;

@@ -3,7 +3,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
-import { MAX_TILE_PER_PLAYER, PLAYER_1_NUMBER, PLAYER_2_NUMBER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { MAX_TILE_PER_PLAYER, PLAYER_1_INDEX, PLAYER_2_INDEX, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -97,12 +97,12 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     getPlayer1(): AbstractPlayer {
-        const player1 = this.gameService.getPlayerByNumber(PLAYER_1_NUMBER);
+        const player1 = this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
         return player1 ? player1 : new Player('', 'Player1', []);
     }
 
     getPlayer2(): AbstractPlayer {
-        const player2 = this.gameService.getPlayerByNumber(PLAYER_2_NUMBER);
+        const player2 = this.gameService.getPlayerByNumber(PLAYER_2_INDEX);
         return player2 ? player2 : new Player('', 'Player2', []);
     }
 
@@ -111,7 +111,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private checkIfIsPlayer1(): boolean {
-        return this.gameService.getLocalPlayer() === this.gameService.getPlayerByNumber(PLAYER_1_NUMBER);
+        return this.gameService.getLocalPlayer() === this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
     }
 
     private getLocalPlayerIcon(): IconName {
