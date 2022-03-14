@@ -111,6 +111,10 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.unselectAll();
     }
 
+    onScroll(event: WheelEvent): void {
+        this.moveSelectedTile(event.deltaY);
+    }
+
     protected onLoseFocusEvent(): void {
         this.unselectAll();
     }
@@ -141,7 +145,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.selectTileToMove(tiles[indexToSelect]);
     }
 
-    private moveSelectedTile(direction: Direction): void {
+    private moveSelectedTile(direction: Direction | number): void {
         if (this.selectionType !== TileRackSelectType.Move) return;
         if (this.selectedTiles.length === 0) return;
 
