@@ -15,7 +15,7 @@ export class TileComponent implements OnInit {
     @Input() hideValue: boolean;
     @Input() applied: boolean;
     isPlayed: boolean;
-    bgPath: string;
+    backgroundPath: string;
 
     constructor() {
         this.tile = UNDEFINED_TILE;
@@ -23,7 +23,7 @@ export class TileComponent implements OnInit {
         this.hideValue = false;
         this.applied = true;
         this.isPlayed = false;
-        this.bgPath = this.getBgPath();
+        this.backgroundPath = this.getBgPath();
     }
 
     ngOnInit(): void {
