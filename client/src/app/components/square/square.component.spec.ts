@@ -44,10 +44,13 @@ describe('SquareComponent', () => {
         }).compileComponents();
     });
 
-    it('should create', () => {
+    beforeEach(() => {
         fixture = TestBed.createComponent(CenterSquareWrapperComponent);
         component = fixture.debugElement.children[0].componentInstance;
         fixture.detectChanges();
+    });
+
+    it('should create', () => {
         expect(component).toBeTruthy();
     });
 
@@ -84,18 +87,6 @@ describe('SquareComponent', () => {
 
         expect(squareWrapper.squareComponent.getSquareSize()).toEqual(squareWrapper.squareView.squareSize);
     });
-
-    // it('initializeStyle should set background-color', () => {
-    //     const squareWrapper = new SquareTestWrapper();
-    //     squareWrapper.createComponent();
-    //     const expectedColor = COLORS.Blue;
-
-    //     spyOn(squareWrapper.squareComponent.squareView, 'getColor').and.returnValue(expectedColor);
-    //     squareWrapper.squareComponent['initializeStyle']();
-
-    //     const actualColor = squareWrapper.squareComponent.style['background-color'];
-    //     expect(actualColor).toEqual(expectedColor);
-    // });
 });
 
 export class SquareTestWrapper {
