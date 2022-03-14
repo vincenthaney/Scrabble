@@ -21,7 +21,14 @@
             </mat-button-toggle-group>
         </form>
 
-        <div id="high-scores-container">
+        <div class="center"  *ngIf="!isInitialized">
+            <p>En attente de la base de données</p>
+            <div  class="center">
+                <mat-progress-spinner class="spinner" mode="indeterminate" [diameter]="55"></mat-progress-spinner>
+            </div>
+        </div>
+
+        <div id="high-scores-container" *ngIf="isInitialized" >
             <div id="high-scores-header">
                 <div class="rank">
                     Classement
