@@ -22,17 +22,19 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./join-waiting-page.component.scss'],
 })
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
-    routingSubscription: Subscription;
-    componentDestroyed$: Subject<boolean> = new Subject();
     currentLobby: LobbyInfo;
     currentName: string;
+    routingSubscription: Subscription;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
         public gameDispatcherService: GameDispatcherService,
         private readonly playerLeavesService: PlayerLeavesService,
         public router: Router,
-    ) {}
+    ) {
+        this.componentDestroyed$ = new Subject();
+    }
 
     @HostListener('window:beforeunload')
     onBeforeUnload(): void {
