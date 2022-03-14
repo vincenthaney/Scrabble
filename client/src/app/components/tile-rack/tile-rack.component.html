@@ -3,8 +3,8 @@
         <div id="rack-card-container" [class]="'selection-' + selectionType">
             <div class="rack-tile-container" 
                 *ngFor="let tile of tiles" [ngClass]="{ selected: tile.isSelected, hidden: tile.isPlayed }"
-                (click)="selectTileToExchange(tile)"
-                (contextmenu)="selectTileToMove(tile)"
+                (click)="selectTileToMove(tile)"
+                (contextmenu)="selectTileToExchange(tile)"
             >
                 <app-tile [tile]="tile" [ngStyle]="{'fontSize': tileFontSize+'em'}" class="rack-tile">
                     {{ tile.letter }}
