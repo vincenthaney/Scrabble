@@ -19,11 +19,11 @@ export default class HighScoresService {
         return defaultHighScores.highScores;
     }
     async getHighScores(gameType: GameType): Promise<HighScore[]> {
-        return this.collection.find({ gameType }).toArray();
+        return await this.collection.find({ gameType }).toArray();
     }
 
     async getAllHighScores(): Promise<HighScore[]> {
-        return this.collection.find({}).toArray();
+        return await this.collection.find({}).toArray();
     }
 
     async addHighScore(name: string, score: number, gameType: GameType): Promise<boolean> {
@@ -33,9 +33,9 @@ export default class HighScoresService {
         if (lowestHighScore.score > score) return false;
 
         const presentHighScore = sortedHighScores.find((highScore) => highScore.score === score);
-        if (presentHighScore) return this.updateHighScore(name, presentHighScore);
+        if (presentHighScore) return await this.updateHighScore(name, presentHighScore);
 
-        return this.replaceHighScore(name, score, sortedHighScores[0]);
+        return await this.replaceHighScore(name, score, sortedHighScores[0]);
     }
 
     async updateHighScore(name: string, highScore: HighScore): Promise<boolean> {
@@ -54,7 +54,7 @@ export default class HighScoresService {
 
     async resetHighScores(): Promise<void> {
         await this.collection.deleteMany({});
-        this.populateDb();
+        await this.populateDb();
     }
 
     private get collection(): Collection<HighScore> {
