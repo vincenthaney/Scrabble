@@ -3,7 +3,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
-import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { MAX_TILE_PER_PLAYER, PLAYER_1_NUMBER, PLAYER_2_NUMBER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -82,8 +82,8 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
-        const player1 = this.gameService.getPlayerByNumber(1);
-        const player2 = this.gameService.getPlayerByNumber(2);
+        const player1 = this.getPlayer1();
+        const player2 = this.getPlayer2();
         if (!activePlayer) {
             this.isPlayer1Active = false;
             this.isPlayer2Active = false;
@@ -93,17 +93,20 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         } else if (player2 && activePlayer.id === player2.id) {
             this.isPlayer2Active = true;
             this.isPlayer1Active = false;
+        } else {
+            this.isPlayer1Active = false;
+            this.isPlayer2Active = false;
         }
     }
 
     getPlayer1(): AbstractPlayer {
-        const player1 = this.gameService.getPlayerByNumber(1);
+        const player1 = this.gameService.getPlayerByNumber(PLAYER_1_NUMBER);
         if (!player1) return new Player('', 'Player1', []);
         return player1;
     }
 
     getPlayer2(): AbstractPlayer {
-        const player2 = this.gameService.getPlayerByNumber(2);
+        const player2 = this.gameService.getPlayerByNumber(PLAYER_2_NUMBER);
         if (!player2) return new Player('', 'Player2', []);
         return player2;
     }
@@ -113,7 +116,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private checkIfIsPlayer1(): boolean {
-        return this.gameService.getLocalPlayer() === this.gameService.getPlayerByNumber(1);
+        return this.gameService.getLocalPlayer() === this.gameService.getPlayerByNumber(PLAYER_1_NUMBER);
     }
 
     private getLocalPlayerIcon(): IconName {
