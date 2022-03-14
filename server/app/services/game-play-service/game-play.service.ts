@@ -16,8 +16,8 @@ import { FeedbackMessages } from './feedback-messages';
 @Service()
 export class GamePlayService {
     constructor(private readonly activeGameService: ActiveGameService, private readonly highScoresService: HighScoresService) {
-        this.activeGameService.playerLeftEvent.on('playerLeft', (gameId, playerWhoLeftId) => {
-            this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
+        this.activeGameService.playerLeftEvent.on('playerLeft', async (gameId, playerWhoLeftId) => {
+            await this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
         });
     }
 
@@ -115,12 +115,12 @@ export class GamePlayService {
         return game.endGameMessage(winnerName);
     }
 
-    handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): void {
+    async handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): Promise<void> {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.getPlayer(playerWhoLeftId, IS_OPPONENT);
         game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
         const updatedData: GameUpdateData = {};
-        const endOfGameMessages = this.handleGameOver(playerStillInGame.name, game, updatedData);
+        const endOfGameMessages = await this.handleGameOver(playerStillInGame.name, game, updatedData);
         this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
     }
 }
