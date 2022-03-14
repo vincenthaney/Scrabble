@@ -331,8 +331,8 @@ describe('TileRackComponent', () => {
 
         it('should call moveSelectedTile on arrow', () => {
             const tests: [arrow: string, direction: Direction][] = [
-                [ARROW_LEFT, Direction.Backward],
-                [ARROW_RIGHT, Direction.Forward],
+                [ARROW_LEFT, Direction.Left],
+                [ARROW_RIGHT, Direction.Right],
             ];
 
             const spy = spyOn<any>(component, 'moveSelectedTile');
@@ -415,10 +415,10 @@ describe('TileRackComponent', () => {
 
     describe('moveSelectedTile', () => {
         const tests: [selected: number, direction: Direction, expected: LetterValue[]][] = [
-            [1, Direction.Backward, ['B', 'A', 'C', 'D']],
-            [1, Direction.Forward, ['A', 'C', 'B', 'D']],
-            [0, Direction.Backward, ['B', 'C', 'D', 'A']],
-            [3, Direction.Forward, ['D', 'A', 'B', 'C']],
+            [1, Direction.Left, ['B', 'A', 'C', 'D']],
+            [1, Direction.Right, ['A', 'C', 'B', 'D']],
+            [0, Direction.Left, ['B', 'C', 'D', 'A']],
+            [3, Direction.Right, ['D', 'A', 'B', 'C']],
         ];
         let tiles: RackTile[];
 
@@ -450,7 +450,7 @@ describe('TileRackComponent', () => {
             component.selectTileMove(tiles[0]);
             component.selectionType = TileRackSelectType.Exchange;
 
-            component['moveSelectedTile'](Direction.Forward);
+            component['moveSelectedTile'](Direction.Right);
 
             expect(component.tiles.map((t) => t.letter)).toEqual(expected.map((t) => t.letter));
         });
@@ -461,7 +461,7 @@ describe('TileRackComponent', () => {
             component.selectTileMove(tiles[0]);
             component.selectedTiles = [];
 
-            component['moveSelectedTile'](Direction.Forward);
+            component['moveSelectedTile'](Direction.Right);
 
             expect(component.tiles.map((t) => t.letter)).toEqual(expected.map((t) => t.letter));
         });

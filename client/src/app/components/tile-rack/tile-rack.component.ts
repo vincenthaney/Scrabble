@@ -121,10 +121,10 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
                 this.unselectAll();
                 break;
             case ARROW_LEFT:
-                this.moveSelectedTile(Direction.Backward);
+                this.moveSelectedTile(Direction.Left);
                 break;
             case ARROW_RIGHT:
-                this.moveSelectedTile(Direction.Forward);
+                this.moveSelectedTile(Direction.Right);
                 break;
             default:
                 this.selectTileFromKey(e);
