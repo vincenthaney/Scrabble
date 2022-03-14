@@ -60,8 +60,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
 
-        const sessionStorageMessages = this.messageStorageService.getMessages();
-        if (sessionStorageMessages.length > 0) this.messages = this.messages.concat(sessionStorageMessages);
+        const storedMessages = this.messageStorageService.getMessages();
+        if (storedMessages.length > 0) this.messages = this.messages.concat(storedMessages);
         else this.onReceiveNewMessage(INITIAL_MESSAGE);
     }
 

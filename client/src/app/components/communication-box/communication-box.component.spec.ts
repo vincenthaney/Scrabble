@@ -20,6 +20,29 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { marked } from 'marked';
 import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
 
+const CURRENT_PLAYER_ID = 'idOfPlayer1';
+const OPPONENT_PLAYER_ID = 'idOfPlayer2';
+const DEFAULT_PLAYER1_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: CURRENT_PLAYER_ID,
+};
+const DEFAULT_PLAYER2_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: OPPONENT_PLAYER_ID,
+};
+const DEFAULT_SYSTEM_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: SYSTEM_ID,
+};
+const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: SYSTEM_ERROR_ID,
+};
+const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
+    ...DEFAULT_SYSTEM_ERROR_MESSAGE,
+    content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
+};
+
 describe('CommunicationBoxComponent', () => {
     let component: CommunicationBoxComponent;
     let fixture: ComponentFixture<CommunicationBoxComponent>;
@@ -29,29 +52,7 @@ describe('CommunicationBoxComponent', () => {
     let scrollToBottomSpy: jasmine.Spy<any>;
     let gameServiceMock: GameService;
     let formSpy: jasmine.Spy<any>;
-
-    const CURRENT_PLAYER_ID = 'idOfPlayer1';
-    const OPPONENT_PLAYER_ID = 'idOfPlayer2';
-    const DEFAULT_PLAYER1_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: CURRENT_PLAYER_ID,
-    };
-    const DEFAULT_PLAYER2_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: OPPONENT_PLAYER_ID,
-    };
-    const DEFAULT_SYSTEM_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: SYSTEM_ID,
-    };
-    const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: SYSTEM_ERROR_ID,
-    };
-    const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
-        ...DEFAULT_SYSTEM_ERROR_MESSAGE,
-        content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
-    };
+    let initializeMessagesSpy: jasmine.Spy;
 
     beforeEach(async () => {
         inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput']);
@@ -99,10 +100,15 @@ describe('CommunicationBoxComponent', () => {
 
         scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom').and.callThrough();
         formSpy = spyOn(component.messageForm, 'reset');
+        initializeMessagesSpy = spyOn(component['messageStorageService'], 'initializeMessages');
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should call initializeMessage', () => {
+        expect(initializeMessagesSpy).toBeTruthy();
     });
 
     describe('ngOnInit', () => {
@@ -156,6 +162,12 @@ describe('CommunicationBoxComponent', () => {
         it('should call complete', () => {
             spyOn(component.componentDestroyed$, 'next');
             const spy = spyOn(component.componentDestroyed$, 'complete');
+            component.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call messageStorageService.resetMessages', () => {
+            const spy = spyOn(component['messageStorageService'], 'resetMessages');
             component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
@@ -215,11 +227,15 @@ describe('CommunicationBoxComponent', () => {
         });
 
         it('onReceiveNewMessage should call appropriate functions and receive new message with defined message', () => {
+            const saveMessageSpy = spyOn(component['messageStorageService'], 'saveMessage');
             const messagesLengthBefore: number = component.messages.length;
+
             gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
+
             const messagesLengthAfter: number = component.messages.length;
             expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
             expect(scrollToBottomSpy).toHaveBeenCalled();
+            expect(saveMessageSpy).toHaveBeenCalled();
         });
 
         it('should add new visualmessage to messages', () => {
