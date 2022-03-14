@@ -1,4 +1,5 @@
 import { PlayerData } from '@app/classes/communication';
+import { PLAYER_1_NUMBER } from '@app/constants/game';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
 import AbstractPlayer from './abstract-player';
 import Player from './player';
@@ -25,7 +26,7 @@ export class PlayerContainer {
 
     initializePlayers(...playerDatas: PlayerData[]): this {
         this.resetPlayers();
-        playerDatas.forEach((playerData: PlayerData, index: number) => this.initializePlayer(index + 1, playerData));
+        playerDatas.forEach((playerData: PlayerData, index: number) => this.initializePlayer(PLAYER_1_NUMBER + index, playerData));
         return this;
     }
 
