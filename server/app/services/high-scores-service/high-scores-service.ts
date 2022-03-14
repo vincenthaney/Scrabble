@@ -28,7 +28,9 @@ export default class HighScoresService {
 
     async addHighScore(name: string, score: number, gameType: GameType): Promise<boolean> {
         const sortedHighScores = await this.getSortedHighScores(gameType);
-        if (sortedHighScores[0].score > score) return false;
+
+        const lowestHighScore = sortedHighScores[0];
+        if (lowestHighScore.score > score) return false;
 
         const presentHighScore = sortedHighScores.find((highScore) => highScore.score === score);
         if (presentHighScore) return this.updateHighScore(name, presentHighScore);

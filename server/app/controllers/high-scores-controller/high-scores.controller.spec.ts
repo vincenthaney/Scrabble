@@ -68,11 +68,11 @@ describe('HighScoresController', () => {
     });
 
     describe('handleHighScoresRequest', () => {
-        it('should call socketService.emitToSocket', () => {
+        it('should call socketService.emitToSocket', async () => {
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spyEmitToSocket = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             const spyGetAllHighScores = chai.spy.on(controller['highScoresService'], 'getAllHighScores', () => []);
-            controller['handleHighScoresRequest'](DEFAULT_PLAYER_ID);
+            await controller['handleHighScoresRequest'](DEFAULT_PLAYER_ID);
             expect(spyEmitToSocket).to.have.been.called();
             expect(spyGetAllHighScores).to.have.been.called();
         });
