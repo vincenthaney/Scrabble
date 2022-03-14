@@ -9,6 +9,7 @@ import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Subject } from 'rxjs';
 
@@ -29,7 +30,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     constructor(
         public gameService: GameService,
         private readonly focusableComponentService: FocusableComponentsService,
-        private gameViewEventManagerService: GameViewEventManagerService,
+        private readonly gameViewEventManagerService: GameViewEventManagerService,
+        private readonly gameButtonActionService: GameButtonActionService,
     ) {
         super();
     }
@@ -92,6 +94,18 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     focus(): void {
         this.focusableComponentService.setActiveKeyboardComponent(this);
+    }
+
+    canExchangeTiles(): boolean {
+        return this.selectionType === TileRackSelectType.Exchange && this.selectedTiles.length > 0 && this.gameService.isLocalPlayerPlaying();
+    }
+
+    exchangeTiles(): void {
+        if (!this.canExchangeTiles()) return;
+
+        this.gameButtonActionService.sendExchangeAction(this.selectedTiles);
+        this.selectedTiles.forEach((tile) => (tile.isPlayed = true));
+        this.unselectAll();
     }
 
     protected onLoseFocusEvent(): void {

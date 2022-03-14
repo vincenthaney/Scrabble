@@ -2,6 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonModule } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -93,6 +94,7 @@ describe('TileRackComponent', () => {
                 MatFormFieldModule,
                 FormsModule,
                 MatDialogModule,
+                HttpClientTestingModule,
             ],
             declarations: [TileRackComponent, IconComponent, TileComponent],
             providers: [
@@ -367,6 +369,70 @@ describe('TileRackComponent', () => {
             component['onFocusableEvent'](event);
 
             expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('canExchangeTiles', () => {
+        let isLocalPlayerPlayingSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            component.selectionType = TileRackSelectType.Exchange;
+            component.selectedTiles = [{}, {}] as RackTile[];
+            isLocalPlayerPlayingSpy = gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+        });
+
+        it('should be true if can exchange', () => {
+            expect(component.canExchangeTiles()).toBeTrue();
+        });
+
+        it('should be false if selectionType is not exchange', () => {
+            component.selectionType = TileRackSelectType.Move;
+            expect(component.canExchangeTiles()).toBeFalse();
+        });
+
+        it('should be false if selectedTiles is empty', () => {
+            component.selectedTiles = [];
+            expect(component.canExchangeTiles()).toBeFalse();
+        });
+
+        it('should be false if is not local player playing', () => {
+            isLocalPlayerPlayingSpy.and.returnValue(false);
+            expect(component.canExchangeTiles()).toBeFalse();
+        });
+    });
+
+    describe('exchangeTiles', () => {
+        let sendExchangeActionSpy: jasmine.Spy;
+        let unselectAllSpy: jasmine.Spy;
+        let canExchangeTile: jasmine.Spy;
+
+        beforeEach(() => {
+            sendExchangeActionSpy = spyOn(component['gameButtonActionService'], 'sendExchangeAction');
+            unselectAllSpy = spyOn(component, 'unselectAll');
+            canExchangeTile = spyOn(component, 'canExchangeTiles').and.returnValue(true);
+            component.selectedTiles = [{ isPlayed: false }, { isPlayed: false }] as RackTile[];
+        });
+
+        it('should send exchange action', () => {
+            component.exchangeTiles();
+            expect(sendExchangeActionSpy).toHaveBeenCalledOnceWith(component.selectedTiles);
+        });
+
+        it('should set all selectedTiles as played', () => {
+            const tiles = [...component.selectedTiles];
+            component.exchangeTiles();
+            expect(tiles.every((tile) => tile.isPlayed)).toBeTrue();
+        });
+
+        it('should call unselectAll', () => {
+            component.exchangeTiles();
+            expect(unselectAllSpy).toHaveBeenCalled();
+        });
+
+        it('should not send action if cannot exchange', () => {
+            canExchangeTile.and.returnValue(false);
+            component.exchangeTiles();
+            expect(sendExchangeActionSpy).not.toHaveBeenCalled();
         });
     });
 });

@@ -12,8 +12,8 @@
             </div>
         </div>
         <div id="rack-button-container" class="rack-card">
-            <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
-                <button mat-raised-button class="btn-rack" color="primary" [disabled]="true">
+            <div matTooltip="Assurez vous d'avoir des tuiles sélectionnées et que ce soit votre tour" matTooltipPosition="above" [matTooltipDisabled]="canExchangeTiles()">
+                <button mat-raised-button class="btn-rack" color="primary" [disabled]="!canExchangeTiles()" (click)="exchangeTiles()">
                     <app-icon icon="exchange"></app-icon> Échanger
                 </button>
             </div>
