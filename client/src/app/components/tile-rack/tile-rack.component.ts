@@ -115,8 +115,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.unselectAll();
     }
 
-    protected onFocusableEvent(e: KeyboardEvent): void {
-        switch (e.key) {
+    protected onFocusableEvent(event: KeyboardEvent): void {
+        switch (event.key) {
             case ESCAPE:
                 this.unselectAll();
                 break;
@@ -127,12 +127,12 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
                 this.moveSelectedTile(Direction.Right);
                 break;
             default:
-                this.selectTileFromKey(e);
+                this.selectTileFromKey(event);
         }
     }
 
-    private selectTileFromKey(e: KeyboardEvent): void {
-        const tiles = this.tiles.filter((t) => t.letter.toLowerCase() === e.key.toLowerCase());
+    private selectTileFromKey(event: KeyboardEvent): void {
+        const tiles = this.tiles.filter((tile) => tile.letter.toLowerCase() === event.key.toLowerCase());
 
         if (tiles.length === 0) return;
 
