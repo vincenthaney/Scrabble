@@ -83,10 +83,6 @@ describe('GameService', () => {
         service = TestBed.inject(GameService);
     });
 
-    beforeEach(() => {
-        // spyOn(service['roundManager'], 'getActivePlayer').and.returnValue(DEFAULT_PLAYER_1);
-    });
-
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
