@@ -18,6 +18,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game-type';
@@ -33,6 +34,8 @@ const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
 const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
+const DEFAULT_VIRTUAL_PLAYER = new BeginnerVirtualPlayer('game', 'virtualplayerid', 'virtualplayername');
+
 const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
@@ -182,6 +185,26 @@ describe('Game', () => {
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
                 expect(() => game.getPlayer(invalidId, IS_OPPONENT)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+            });
+        });
+        describe('getConnectedRealPlayers', () => {
+            it('should return both players if they are both real and connected', () => {
+                game.player1.isConnected = true;
+                game.player2.isConnected = true;
+                expect(game.getConnectedRealPlayers()).to.deep.equal([DEFAULT_PLAYER_1, DEFAULT_PLAYER_2]);
+            });
+
+            it('should return the player that is still connected (Player 1)', () => {
+                game.player1.isConnected = true;
+                game.player2.isConnected = false;
+                expect(game.getConnectedRealPlayers()).to.deep.equal([DEFAULT_PLAYER_1]);
+            });
+
+            it('should return the player that a real player ', () => {
+                game.player1 = DEFAULT_VIRTUAL_PLAYER;
+                game.player1.isConnected = true;
+                game.player2.isConnected = true;
+                expect(game.getConnectedRealPlayers()).to.deep.equal([DEFAULT_PLAYER_2]);
             });
         });
     });

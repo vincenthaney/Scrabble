@@ -21,6 +21,7 @@ import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import HighScoresService from '@app/services/high-scores-service/high-scores-service';
+import { assert } from 'chai';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -74,6 +75,8 @@ describe('GamePlayService', () => {
         roundManagerStub.nextRound.returns(round);
 
         gameStub.endOfGame.returns([DEFAULT_PLAYER_SCORE, DEFAULT_PLAYER_SCORE]);
+        gameStub.endGameMessage.returns([]);
+        gameStub.getConnectedRealPlayers.returns([gameStub.player1]);
         gameStub['getTilesLeftPerLetter'].returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
         player = gameStub.player1;
@@ -212,7 +215,7 @@ describe('GamePlayService', () => {
             }
         });
 
-        it('should call getMessage from action', () => {
+        it('should call getMessage from action', async () => {
             await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.calledOnce).to.be.true;
         });
@@ -354,6 +357,41 @@ describe('GamePlayService', () => {
             gamePlayService.handlePlayerLeftEvent(DEFAULT_GAME_ID, playerWhoLeftId);
             expect(handleGameOverSpy).to.have.been.called.with(playerStillInGame.name, gameStub, updatedData);
             expect(emitSpy).to.have.been.called.with('playerLeftFeedback', DEFAULT_GAME_ID, endOfGameMessages, updatedData);
+        });
+    });
+
+    describe('handleGameOver', () => {
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+
+        beforeEach(() => {
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            highScoresServiceStub = createStubInstance(HighScoresService);
+            highScoresServiceStub.addHighScore.resolves(true);
+            gamePlayService = new GamePlayService(
+                activeGameServiceStub as unknown as ActiveGameService,
+                highScoresServiceStub as unknown as HighScoresService,
+            );
+        });
+
+        it('should call end of game and endgame message', async () => {
+            gameStub.isAddedToDatabase = true;
+            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            assert(gameStub.endOfGame.calledOnce);
+            assert(gameStub.endGameMessage.calledOnce);
+        });
+
+        it('should change isAddedtoDatabase', async () => {
+            gameStub.isAddedToDatabase = false;
+            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            expect(gameStub.isAddedToDatabase).to.be.true;
+        });
+
+        it('should call getConnectedRealPlayers', async () => {
+            gameStub.isAddedToDatabase = false;
+            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            assert(gameStub.getConnectedRealPlayers.calledOnce);
+            assert(highScoresServiceStub.addHighScore.calledOnce);
         });
     });
 });
