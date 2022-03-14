@@ -14,6 +14,7 @@ import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,7 +25,6 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
-    boardDestroyed$: Subject<boolean> = new Subject();
     marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
@@ -37,13 +37,16 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     navigator: BoardNavigator;
     selectedSquare: SquareView | undefined;
 
+    private componentDestroyed$: Subject<boolean> = new Subject();
     constructor(
         private boardService: BoardService,
         private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
         private roundManagerService: RoundManagerService,
         private focusableComponentService: FocusableComponentsService,
     ) {
         super();
+
         this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
@@ -51,7 +54,19 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     ngOnInit(): void {
-        this.initializeBoard(this.boardService.initialBoard);
+        this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
+        this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
+        this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
+            this.handlePlaceTiles(payload),
+        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (message: Message) =>
+            this.handleNewMessage(message),
+        );
+        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => clearCursor());
+
+        if (!this.boardService.readInitialBoard()) return;
+        this.initializeBoard(this.boardService.readInitialBoard());
+
         this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
@@ -59,18 +74,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.selectedSquare = undefined;
             this.clearNotAppliedSquare();
         };
-
-        this.boardUpdateSubscription = this.boardService.boardUpdateEvent
-            .pipe(takeUntil(this.boardDestroyed$))
-            .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
-        this.boardInitializationSubscription = this.boardService.boardInitializationEvent
-            .pipe(takeUntil(this.boardDestroyed$))
-            .subscribe((board: Square[][]) => this.initializeBoard(board));
-        this.gameService.playingTiles
-            .pipe(takeUntil(this.boardDestroyed$))
-            .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
-        this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
-        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.boardDestroyed$)).subscribe(() => clearCursor());
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handleBackspace = (): void => {
@@ -82,6 +85,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 this.selectedSquare.square.tile = null;
             }
         };
+
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handlePlaceLetter = (letter: string, squareView: SquareView | undefined): void => {
             if (!squareView) return;
@@ -108,13 +112,13 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         this.onLoseFocusEvent = (): void => clearCursor();
 
-        this.subscribeToFocusableEvent(this.boardDestroyed$, this.onFocusableEvent);
-        this.subscribeToLoseFocusEvent(this.boardDestroyed$, this.onLoseFocusEvent);
+        this.subscribeToFocusableEvent(this.componentDestroyed$, this.onFocusableEvent);
+        this.subscribeToLoseFocusEvent(this.componentDestroyed$, this.onLoseFocusEvent);
     }
 
     ngOnDestroy(): void {
-        this.boardDestroyed$.next(true);
-        this.boardDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     onSquareClick(squareView: SquareView): boolean {

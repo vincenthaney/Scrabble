@@ -23,7 +23,7 @@ export class GameButtonActionService {
 
         if (this.gameService.isLocalPlayerPlaying()) return player;
 
-        this.sendError(CommandExceptionMessages.NotYourTurn, this.gameService.gameId, player.id);
+        this.sendError(CommandExceptionMessages.NotYourTurn, this.gameService.getGameId(), player.id);
         return undefined;
     }
 
@@ -35,14 +35,14 @@ export class GameButtonActionService {
         };
         const localPlayerId = this.gameService.getLocalPlayerId();
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
-        this.gamePlayController.sendAction(this.gameService.gameId, localPlayerId, actionPass);
+        this.gamePlayController.sendAction(this.gameService.getGameId(), localPlayerId, actionPass);
     }
 
     sendExchangeAction(tiles: Tile[]): void {
         const player = this.getPlayerIfTurn();
         if (!player) return;
 
-        const gameId = this.gameService.gameId;
+        const gameId = this.gameService.getGameId();
 
         if (!this.checkIfPlayerHasTiles(tiles, player)) {
             return this.sendError(CommandExceptionMessages.DontHaveTiles, gameId, player.id);

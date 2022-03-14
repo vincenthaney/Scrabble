@@ -12,6 +12,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Message } from '@app/classes/communication/message';
 import { Player } from '@app/classes/player';
+import { PlayerContainer } from '@app/classes/player/player-container';
 import { VisualMessage } from '@app/components/communication-box/visual-message';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -19,7 +20,7 @@ import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game'
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { marked } from 'marked';
-import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
+import { CommunicationBoxComponent } from './communication-box.component';
 
 describe('CommunicationBoxComponent', () => {
     let component: CommunicationBoxComponent;
@@ -90,9 +91,9 @@ describe('CommunicationBoxComponent', () => {
         }).compileComponents();
 
         gameServiceMock = TestBed.inject(GameService);
-        gameServiceMock.player1 = new Player(CURRENT_PLAYER_ID, 'player1', []);
-        gameServiceMock.player2 = new Player(OPPONENT_PLAYER_ID, 'player2', []);
-        gameServiceMock['localPlayerId'] = CURRENT_PLAYER_ID;
+        gameServiceMock['playerContainer'] = new PlayerContainer(CURRENT_PLAYER_ID);
+        gameServiceMock['playerContainer']['players'].set(1, new Player(CURRENT_PLAYER_ID, 'player1', []));
+        gameServiceMock['playerContainer']['players'].set(2, new Player(OPPONENT_PLAYER_ID, 'player2', []));
     });
 
     beforeEach(() => {
@@ -110,32 +111,17 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('ngOnInit', () => {
-        let spyTile: jasmine.Spy;
         let spyMessage: jasmine.Spy;
 
         beforeEach(() => {
-            spyTile = spyOn(component['gameService'].updateTileReserveEvent, 'subscribe');
-            spyMessage = spyOn(component['gameService'].newMessageValue, 'subscribe');
+            spyMessage = spyOn(component['gameViewEventManagerService'], 'subscribeToGameViewEvent').and.callThrough();
         });
 
         afterEach(() => {
-            spyTile.and.callThrough();
             spyMessage.and.callThrough();
         });
 
-        it('should subscribe to updateTileReserveEvent', () => {
-            component.ngOnInit();
-            expect(spyTile).toHaveBeenCalled();
-        });
-
-        it('should call onTileReserveUpdate on updateTileReserveEvent', () => {
-            const spy = spyOn(component, 'onTileReserveUpdate');
-            component.ngOnInit();
-            component['gameService'].updateTileReserveEvent.emit({ tileReserve: [], tileReserveTotal: 0 });
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should subscribe to updateTileReserveEvent', () => {
+        it('should subscribe to newMessage', () => {
             component.ngOnInit();
             expect(spyMessage).toHaveBeenCalled();
         });
@@ -260,23 +246,6 @@ describe('CommunicationBoxComponent', () => {
 
         it('should return true if id is other', () => {
             expect(component.isOpponent('other id')).toBeTrue();
-        });
-    });
-
-    describe('onTileReserveUpdate', () => {
-        it('should set lettersLeft and tileReserveTotal', () => {
-            component.lettersLeft = [];
-            component.lettersLeftTotal = 0;
-            const expectedLettersLeft: LetterMapItem[] = [{ letter: 'A', amount: 0 }];
-            const expectedLettersLeftTotal = 1;
-
-            expect(component.lettersLeft).not.toEqual(expectedLettersLeft);
-            expect(component.lettersLeftTotal).not.toEqual(expectedLettersLeftTotal);
-
-            component.onTileReserveUpdate(expectedLettersLeft, expectedLettersLeftTotal);
-
-            expect(component.lettersLeft).toEqual(expectedLettersLeft);
-            expect(component.lettersLeftTotal).toEqual(expectedLettersLeftTotal);
         });
     });
 

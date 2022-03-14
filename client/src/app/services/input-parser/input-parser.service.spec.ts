@@ -2,7 +2,6 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
@@ -89,7 +88,6 @@ describe('InputParserService', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(DEFAULT_PLAYER);
         gameServiceSpy.getGameId.and.returnValue(DEFAULT_GAME_ID);
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
-        gameServiceSpy.playingTiles = new EventEmitter();
 
         TestBed.configureTestingModule({
             providers: [
@@ -330,7 +328,9 @@ describe('InputParserService', () => {
         });
 
         it('should emit playingTiles', () => {
-            const emitSpy = spyOn<any>(service['gameService']['playingTiles'], 'emit');
+            const emitSpy = spyOn<any>(service['gameViewEventManagerService'], 'emitGameViewEvent').and.callFake(() => {
+                return;
+            });
             service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
             expect(emitSpy).toHaveBeenCalled();
         });
