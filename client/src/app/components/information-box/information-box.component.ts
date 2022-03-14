@@ -111,7 +111,6 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private getLocalPlayerIcon(): IconName {
-        const truc = LOCAL_PLAYER_ICON[Math.floor(Math.random() * LOCAL_PLAYER_ICON.length)];
-        return truc;
+        return LOCAL_PLAYER_ICON[Math.floor(Math.random() * LOCAL_PLAYER_ICON.length)];
     }
 }
