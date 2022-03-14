@@ -34,8 +34,8 @@ export default class HighScoresService {
 
     private updateHighScores(highScores: HighScore[]): void {
         const [classicHighScores, log2990HighScores] = this.separateHighScoresType(highScores);
-        this.highScoresMap.set(GameType.Classic, this.separateHighScores(classicHighScores));
-        this.highScoresMap.set(GameType.LOG2990, this.separateHighScores(log2990HighScores));
+        this.highScoresMap.set(GameType.Classic, this.rankHighScores(classicHighScores));
+        this.highScoresMap.set(GameType.LOG2990, this.rankHighScores(log2990HighScores));
     }
 
     private separateHighScoresType(highScores: HighScore[]): [HighScore[], HighScore[]] {
@@ -50,7 +50,7 @@ export default class HighScoresService {
         return [classicHighScores, log2990HighScores];
     }
 
-    private separateHighScores(highScores: HighScore[]): SingleHighScore[] {
+    private rankHighScores(highScores: HighScore[]): SingleHighScore[] {
         const singleHighScores: SingleHighScore[] = [];
         let rank = 1;
         highScores
@@ -69,10 +69,3 @@ export default class HighScoresService {
         return singleHighScores;
     }
 }
-
-// resetHighScores(gameType: GameType): void {
-//     throw new Error('Method not implemented.');
-// }
-// addHighScore(highscore: HighScore, gameType: GameType): void {
-//     throw new Error('Method not implemented.');
-// }

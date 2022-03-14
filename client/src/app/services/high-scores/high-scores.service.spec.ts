@@ -105,7 +105,7 @@ describe('HighScoresService', () => {
             service['highScoresMap'] = new Map();
             expect(service.getHighScores(GameType.Classic)).toEqual([]);
         });
-        it('should return a empty array if the map has is not initialized', () => {
+        it('should return the correct array if initialized', () => {
             service['highScoresMap'] = DEFAULT_HIGH_SCORES_MAP;
             expect(service.getHighScores(GameType.Classic)).toEqual(DEFAULT_CLASSIC_HIGH_SCORES);
         });
@@ -116,7 +116,7 @@ describe('HighScoresService', () => {
             const spySeparateHighScoresType = spyOn<any>(service, 'separateHighScoresType').and.callFake(() => {
                 return [DEFAULT_CLASSIC_HIGH_SCORES, DEFAULT_LOG2990_HIGH_SCORES];
             });
-            const spySeparateHighScores = spyOn<any>(service, 'separateHighScores').and.callFake(() => {
+            const spySeparateHighScores = spyOn<any>(service, 'rankHighScores').and.callFake(() => {
                 return [];
             });
             service['highScoresMap'] = new Map();
@@ -128,7 +128,7 @@ describe('HighScoresService', () => {
             spyOn<any>(service, 'separateHighScoresType').and.callFake(() => {
                 return [DEFAULT_CLASSIC_HIGH_SCORES, DEFAULT_LOG2990_HIGH_SCORES];
             });
-            spyOn<any>(service, 'separateHighScores').and.callFake(() => {
+            spyOn<any>(service, 'rankHighScores').and.callFake(() => {
                 return DEFAULT_CLASSIC_HIGH_SCORES;
             });
             const expected = new Map();
@@ -150,11 +150,15 @@ describe('HighScoresService', () => {
         });
     });
 
-    describe('separateHighScores', () => {
+    describe('rankHighScores', () => {
         it('should return the correct amount of elements ', () => {
             service['highScoresMap'] = new Map();
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            expect(service['separateHighScores'](CLASSIC_HIGH_SCORES).length).toEqual(6);
+            let expected = 0;
+            CLASSIC_HIGH_SCORES.forEach((highScore) => {
+                expected += highScore.names.length;
+                return;
+            });
+            expect(service['rankHighScores'](CLASSIC_HIGH_SCORES).length).toEqual(expected);
         });
 
         it('should sort by score ', () => {
@@ -162,7 +166,7 @@ describe('HighScoresService', () => {
             let isOrdered = true;
             let lastScore = Number.MAX_VALUE;
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            const result = service['separateHighScores'](CLASSIC_HIGH_SCORES);
+            const result = service['rankHighScores'](CLASSIC_HIGH_SCORES);
             for (const highScore of result) {
                 isOrdered = highScore.score <= lastScore;
                 lastScore = highScore.score;
@@ -174,7 +178,7 @@ describe('HighScoresService', () => {
             service['highScoresMap'] = new Map();
             let lastScore = Number.MAX_VALUE;
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            const result = service['separateHighScores'](CLASSIC_HIGH_SCORES);
+            const result = service['rankHighScores'](CLASSIC_HIGH_SCORES);
             for (const highScore of result) {
                 if (highScore.score !== lastScore) expect(highScore.rank).toBeTruthy();
                 else expect(highScore.rank).toBeUndefined();
