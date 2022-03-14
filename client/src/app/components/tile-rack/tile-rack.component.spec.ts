@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -23,6 +24,7 @@ import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
+import { MAX_TILE_PER_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
@@ -44,11 +46,12 @@ describe('TileRackComponent', () => {
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj(
             'GameService',
-            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent'],
+            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent', 'getTotalNumberOfTilesLeft'],
             ['playingTiles'],
         );
         gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+        gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(100);
 
         const tileRackUpdate$ = new Subject();
         const tilesPlayed$ = new Subject();
@@ -428,7 +431,7 @@ describe('TileRackComponent', () => {
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
 
-        it('should call selectTileMove is next tile with same letter if multiple', () => {
+        it('should call selectTileMove with next tile with same letter', () => {
             tiles[1].isSelected = true;
             const index = 3;
             const key = tiles[index].letter;
@@ -438,7 +441,7 @@ describe('TileRackComponent', () => {
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
 
-        it('should call selectTileMove is next tile with same letter if multiple (2)', () => {
+        it('should call selectTileMove with next tile with same letter (2)', () => {
             tiles[3].isSelected = true;
             const index = 5;
             const key = tiles[index].letter;
@@ -536,6 +539,11 @@ describe('TileRackComponent', () => {
 
         it('should be false if is not local player playing', () => {
             isLocalPlayerPlayingSpy.and.returnValue(false);
+            expect(component.canExchangeTiles()).toBeFalse();
+        });
+
+        it('should be false if is less than 7 tiles', () => {
+            gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(MAX_TILE_PER_PLAYER - 1);
             expect(component.canExchangeTiles()).toBeFalse();
         });
     });
