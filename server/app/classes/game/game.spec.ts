@@ -18,7 +18,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
+import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game-type';
 
@@ -312,7 +312,7 @@ describe('Game', () => {
             });
             game.endOfGame(game.player1.name);
 
-            expect(player1WinSpy).to.have.been.called.with(WIN, LOOSE);
+            expect(player1WinSpy).to.have.been.called.with(WIN, LOSE);
         });
 
         it('should call computeEndOfGameScore with player2Win if winnerName is player2.name', () => {
@@ -322,7 +322,7 @@ describe('Game', () => {
             });
             game.endOfGame(game.player2.name);
 
-            expect(player2WinSpy).to.have.been.called.with(LOOSE, WIN);
+            expect(player2WinSpy).to.have.been.called.with(LOSE, WIN);
         });
     });
 
