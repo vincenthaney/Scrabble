@@ -39,6 +39,7 @@ export class PlayerLeavesService implements OnDestroy {
 
     handleLocalPlayerLeavesGame(): void {
         this.playerLeavesController.handleLeaveGame(this.getGameId());
+        this.gameService.gameId = '';
     }
 
     handleLeaveLobby(): void {

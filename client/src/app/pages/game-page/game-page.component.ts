@@ -165,6 +165,5 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private handlePlayerLeaves(): void {
         this.playerLeavesService.handleLocalPlayerLeavesGame();
-        this.gameService.gameId = '';
     }
 }
