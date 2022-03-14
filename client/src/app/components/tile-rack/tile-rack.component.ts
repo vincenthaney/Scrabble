@@ -11,8 +11,8 @@ import { FocusableComponent } from '@app/services/focusable-components/focusable
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { preserveArrayOrder } from '@app/utils/preserve-array-order';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { Subject } from 'rxjs';
 
 export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
 
@@ -22,37 +22,41 @@ export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
     styleUrls: ['./tile-rack.component.scss', './tile-rack.component.2.scss'],
 })
 export class TileRackComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
-    tiles: RackTile[] = [];
-    selectedTiles: RackTile[] = [];
-    selectionType: TileRackSelectType = TileRackSelectType.Exchange;
-    tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
-    updateTileRackSubscription: Subscription;
-    serviceDestroyed$: Subject<boolean> = new Subject();
+    tiles: RackTile[];
+    selectedTiles: RackTile[];
+    selectionType: TileRackSelectType;
+    tileFontSize: number;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public gameService: GameService,
         private readonly focusableComponentService: FocusableComponentsService,
+        private readonly gameViewEventManagerService: GameViewEventManagerService,
         private readonly gameButtonActionService: GameButtonActionService,
     ) {
         super();
+        this.selectedTiles = [];
+        this.selectionType = TileRackSelectType.Exchange;
+        this.tileFontSize = RACK_TILE_DEFAULT_FONT_SIZE;
+        this.componentDestroyed$ = new Subject();
     }
 
     ngOnInit(): void {
         this.subscribeToFocusableEvents();
         this.updateTileRack();
-        this.updateTileRackSubscription = this.gameService.updateTileRackEvent
-            .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe(() => this.updateTileRack());
-        this.gameService.playingTiles
-            .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
-        this.gameService.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
+        this.gameViewEventManagerService.subscribeToGameViewEvent('tileRackUpdate', this.componentDestroyed$, () => this.updateTileRack());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
+            this.handlePlaceTiles(payload),
+        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (message: Message) =>
+            this.handleNewMessage(message),
+        );
     }
 
     ngOnDestroy(): void {
         this.unsubscribeToFocusableEvents();
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     selectTile(selectType: TileRackSelectType, tile: RackTile): boolean {

@@ -19,6 +19,7 @@ describe('AbstractPlayer', () => {
             tiles: [{ letter: 'Z', value: 10 }],
         },
         {
+            id: 'test',
             name: 'testName2',
             score: 10,
             tiles: [{ letter: 'Z', value: 10 }],

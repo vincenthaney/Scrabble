@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { DEFAULT_PLAYER } from '@app/constants/game';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
@@ -20,12 +21,12 @@ import { Subject } from 'rxjs';
     styleUrls: ['./create-waiting-page.component.scss'],
 })
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
-    @Input() opponentName: string | undefined;
+    @Input() opponentName: string | undefined = undefined;
     isStartingGame: boolean = false;
-    componentDestroyed$: Subject<boolean> = new Subject();
-    host: AbstractPlayer;
+    isOpponentFound: boolean = false;
+    host: AbstractPlayer = DEFAULT_PLAYER;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
-    isOpponentFound: boolean;
+    componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
         public dialog: MatDialog,

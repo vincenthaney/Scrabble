@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonModule } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,30 +25,60 @@ import { TileComponent } from '@app/components/tile/tile.component';
 import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
-import { BehaviorSubject } from 'rxjs';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+// import { BehaviorSubject } from 'rxjs';
 import { RackTile, TileRackComponent } from './tile-rack.component';
-
-class MockGameService {
-    updateTileRackEvent: EventEmitter<void> = new EventEmitter();
-    newMessageValue = new BehaviorSubject<unknown>({});
-    playingTiles: EventEmitter<unknown> = new EventEmitter();
-
-    getLocalPlayer(): AbstractPlayer | undefined {
-        return new Player('id', 'name', []);
-    }
-
-    isLocalPlayerPlaying(): boolean {
-        return true;
-    }
-}
+import SpyObj = jasmine.SpyObj;
 
 describe('TileRackComponent', () => {
     const EMPTY_TILE_RACK: RackTile[] = [];
-    const mockGameService = new MockGameService();
+    let gameServiceSpy: SpyObj<GameService>;
+    let gameViewEventManagerSpy: SpyObj<GameViewEventManagerService>;
     let component: TileRackComponent;
     let fixture: ComponentFixture<TileRackComponent>;
     let handlePlaceTileSpy: jasmine.Spy;
     let handleNewMessageSpy: jasmine.Spy;
+
+    beforeEach(() => {
+        gameServiceSpy = jasmine.createSpyObj(
+            'GameService',
+            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent'],
+            ['playingTiles'],
+        );
+        gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
+        gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+
+        const tileRackUpdate$ = new Subject();
+        const tilesPlayed$ = new Subject();
+        const message$ = new Subject();
+        gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
+        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
+            switch (eventType) {
+                case 'tileRackUpdate':
+                    tileRackUpdate$.next();
+                    break;
+                case 'tilesPlayed':
+                    tilesPlayed$.next();
+                    break;
+                case 'newMessage':
+                    message$.next();
+            }
+        });
+
+        gameViewEventManagerSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any): Subscription => {
+            switch (eventType) {
+                case 'tileRackUpdate':
+                    return tileRackUpdate$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'tilesPlayed':
+                    return tilesPlayed$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'newMessage':
+                    return message$.pipe(takeUntil(destroy$)).subscribe(next);
+            }
+            return new Subscription();
+        });
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -70,7 +99,10 @@ describe('TileRackComponent', () => {
                 HttpClientTestingModule,
             ],
             declarations: [TileRackComponent, IconComponent, TileComponent],
-            providers: [{ provide: GameService, useValue: mockGameService }],
+            providers: [
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: GameViewEventManagerService, useValue: gameViewEventManagerSpy },
+            ],
         }).compileComponents();
     });
 
@@ -87,20 +119,19 @@ describe('TileRackComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call initializeTileRack when startGameEvent is received', () => {
+    it('should call updateTileRack when tileRackUpdate is received', () => {
         const spy = spyOn<any>(component, 'updateTileRack');
-        mockGameService.updateTileRackEvent.emit();
+        gameViewEventManagerSpy.emitGameViewEvent('tileRackUpdate');
         expect(spy).toHaveBeenCalled();
     });
 
-    it('ngOnDestroy should unsubscribe from startGameEvent', () => {
-        const spy = spyOn<any>(component.updateTileRackSubscription, 'unsubscribe');
-        component.ngOnDestroy();
-        expect(spy).toHaveBeenCalled();
+    it('should call handleNewMessage when newMessage is received', () => {
+        gameViewEventManagerSpy.emitGameViewEvent('newMessage');
+        expect(handleNewMessageSpy).toHaveBeenCalled();
     });
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
-        spyOn(mockGameService, 'getLocalPlayer').and.returnValue(undefined);
+        gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
         component['updateTileRack']();
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
@@ -108,7 +139,7 @@ describe('TileRackComponent', () => {
     it('Initializing TileRack with player with no tiles should return empty TileRack', () => {
         const localPlayer: AbstractPlayer = new Player('', 'Test', []);
 
-        spyOn(mockGameService, 'getLocalPlayer').and.returnValue(localPlayer);
+        gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
 
         component['updateTileRack']();
@@ -120,7 +151,7 @@ describe('TileRackComponent', () => {
         const tiles: RackTile[] = [{ letter: 'A', value: 10, isPlayed: false, isSelected: false }];
         const localPlayer: AbstractPlayer = new Player('', 'Test', []);
 
-        spyOn(mockGameService, 'getLocalPlayer').and.returnValue(localPlayer);
+        gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue(tiles);
 
         component['updateTileRack']();
@@ -129,7 +160,7 @@ describe('TileRackComponent', () => {
     });
 
     it('should call handlePlaceTiles on playTiles event', () => {
-        component['gameService'].playingTiles.emit();
+        gameViewEventManagerSpy.emitGameViewEvent('tilesPlayed');
         expect(handlePlaceTileSpy).toHaveBeenCalled();
     });
 
@@ -160,6 +191,19 @@ describe('TileRackComponent', () => {
         component['handleNewMessage']({ senderId: 'system-error' } as Message);
 
         for (const tile of tiles) expect(tile.isPlayed).toBeFalse();
+    });
+
+    it('should not reset tiles if message is not from system', () => {
+        const tiles: RackTile[] = [
+            { letter: 'A', value: 0, isPlayed: true, isSelected: false },
+            { letter: 'B', value: 0, isPlayed: true, isSelected: false },
+        ];
+        component.tiles = tiles;
+
+        handleNewMessageSpy.and.callThrough();
+        component['handleNewMessage']({ senderId: 'not-system-error' } as Message);
+
+        for (const tile of tiles) expect(tile.isPlayed).toEqual(tile.isPlayed);
     });
 
     describe('selectTile', () => {
@@ -473,7 +517,7 @@ describe('TileRackComponent', () => {
         beforeEach(() => {
             component.selectionType = TileRackSelectType.Exchange;
             component.selectedTiles = [{}, {}] as RackTile[];
-            isLocalPlayerPlayingSpy = spyOn(component.gameService, 'isLocalPlayerPlaying').and.returnValue(true);
+            isLocalPlayerPlayingSpy = gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
         });
 
         it('should be true if can exchange', () => {
