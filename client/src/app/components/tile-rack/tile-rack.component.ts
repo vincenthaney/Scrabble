@@ -35,6 +35,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         private readonly gameButtonActionService: GameButtonActionService,
     ) {
         super();
+        this.tiles = [];
         this.selectedTiles = [];
         this.selectionType = TileRackSelectType.Exchange;
         this.tileFontSize = RACK_TILE_DEFAULT_FONT_SIZE;
