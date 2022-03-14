@@ -89,3 +89,6 @@ export enum ExpectedCommandWordCount {
     Help = 1,
     Reserve = 1,
 }
+
+export const PLAYER_1_INDEX = 1;
+export const PLAYER_2_INDEX = 2;

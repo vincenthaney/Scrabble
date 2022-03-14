@@ -489,7 +489,6 @@ describe('Game', () => {
             { letter: 'C', amount: 2 },
             { letter: 'F', amount: 8 },
         ];
-        const TILE_RESERVE_TOTAL = 13;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
         let board: Board;
         let round: Round;
@@ -525,7 +524,6 @@ describe('Game', () => {
                 gameId: DEFAULT_GAME_ID,
                 board: game.board.grid,
                 tileReserve: TILE_RESERVE_DATA,
-                tileReserveTotal: TILE_RESERVE_TOTAL,
                 round: roundManagerStub.convertRoundToRoundData(round),
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);

@@ -33,7 +33,7 @@ export default class ActionExchange extends ActionPlay {
         const newTiles = this.game.swapTilesFromReserve(tilesToExchange);
         this.player.tiles = unusedTiles.concat(newTiles);
 
-        const playerUpdate: PlayerData = { tiles: this.player.tiles };
+        const playerUpdate: PlayerData = { id: this.player.id, tiles: this.player.tiles };
 
         const response: GameUpdateData = {};
 

@@ -18,7 +18,9 @@
                             <span *ngIf="!gameService.isGameOver"> Abandonner</span>
                             <span *ngIf="gameService.isGameOver"> Quitter</span>
                         </button>
-                        <button mat-flat-button color="primary" [disabled]="!isLocalPlayerTurn" (click)="createPassAction()"><app-icon icon="redo"></app-icon> Passer</button>
+                        <button mat-flat-button color="primary" [disabled]="!isLocalPlayerTurn()" (click)="createPassAction()">
+                            <app-icon icon="redo"></app-icon> Passer
+                        </button>
                         <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
                             <button mat-flat-button color="primary" [disabled]="true">
                                 <app-icon icon="square" styling="solid"></app-icon> Placer
@@ -36,11 +38,15 @@
                     <div class="text-button-container">
                         <mat-card>
                             <span><app-icon icon="text-size"></app-icon> Taille de la police</span>
-                            <div class="text-buttons">     
-                                <button mat-flat-button id="minus-button" color="primary" (click)="changeTileFontSize('smaller')"><app-icon icon="minus"></app-icon></button>
-                                <button mat-flat-button id="plus-button" color="primary" (click)="changeTileFontSize('larger')"><app-icon icon="plus"></app-icon></button>
+                            <div class="text-buttons">
+                                <button mat-flat-button id="minus-button" color="primary" (click)="changeTileFontSize('smaller')">
+                                    <app-icon icon="minus"></app-icon>
+                                </button>
+                                <button mat-flat-button id="plus-button" color="primary" (click)="changeTileFontSize('larger')">
+                                    <app-icon icon="plus"></app-icon>
+                                </button>
                             </div>
-                        </mat-card>                        
+                        </mat-card>
                     </div>
                 </div>
             </div>
