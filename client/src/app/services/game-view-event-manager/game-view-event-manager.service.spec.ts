@@ -41,7 +41,7 @@ describe('GameViewEventManagerService', () => {
             expect(eventMapSpy).toHaveBeenCalledWith(event);
         });
 
-        it('should call next with payload if payload is provided', () => {
+        it('should call next with payload', () => {
             const event = 'tilesPlayed';
             const payload: ActionPlacePayload = {
                 tiles: [],
@@ -50,14 +50,6 @@ describe('GameViewEventManagerService', () => {
             };
             service.emitGameViewEvent(event, payload);
             expect(subjectSpy).toHaveBeenCalledWith(payload);
-        });
-
-        it('should call next with NO payload if NO payload is provided', () => {
-            const event = 'tileRackUpdate';
-            const payload = undefined;
-            service.emitGameViewEvent(event, payload);
-            expect(subjectSpy).toHaveBeenCalled();
-            expect(subjectSpy).not.toHaveBeenCalledWith(payload);
         });
     });
 

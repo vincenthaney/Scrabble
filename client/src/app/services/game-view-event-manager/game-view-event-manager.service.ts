@@ -28,14 +28,9 @@ export class GameViewEventManagerService {
         this.eventMap.set('newMessage', new BehaviorSubject<Message>(INITIAL_MESSAGE));
     }
 
-    emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S) {
+    emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S): void {
         const subject: Subject<S> = this.getSubjectFromMap(eventType);
-
-        if (payload) {
-            subject.next(payload);
-        } else {
-            subject.next();
-        }
+        subject.next(payload);
     }
 
     subscribeToGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(
