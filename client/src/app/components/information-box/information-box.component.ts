@@ -15,21 +15,22 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./information-box.component.scss'],
 })
 export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit {
+    readonly maxTilesPerPlayer;
     isPlayer1Active: boolean;
     isPlayer2Active: boolean;
     isPlayer1: boolean;
     localPlayerIcon: IconName;
-
-    readonly maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
-
     timer: Timer;
+
     timerSource: Observable<number>;
     timerSubscription: Subscription;
     endRoundSubscription: Subscription;
     rerenderSubscription: Subscription;
     private ngUnsubscribe: Subject<void>;
 
-    constructor(private roundManager: RoundManagerService, private gameService: GameService) {}
+    constructor(private roundManager: RoundManagerService, private gameService: GameService) {
+        this.maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
+    }
 
     ngOnInit(): void {
         this.timer = new Timer(0, 0);
