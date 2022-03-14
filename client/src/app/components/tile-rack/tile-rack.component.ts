@@ -134,7 +134,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     private selectTileFromKey(event: KeyboardEvent): void {
         const tiles = this.tiles.filter((tile) => tile.letter.toLowerCase() === event.key.toLowerCase());
 
-        if (tiles.length === 0) return;
+        if (tiles.length === 0) return this.unselectAll();
 
         const selectedIndex = tiles.findIndex((tile) => tile.isSelected);
         const indexToSelect = (selectedIndex + 1) % tiles.length;
