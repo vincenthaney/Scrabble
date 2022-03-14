@@ -43,20 +43,8 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
             this.ngAfterViewInit();
         });
 
-        if (this.gameService.isGameSetUp) {
-            if (this.roundManager.timer) {
-                this.roundManager.timer.pipe(takeUntil(this.componentDestroyed$)).subscribe(([timer, activePlayer]) => {
-                    this.startTimer(timer);
-                    this.updateActivePlayerBorder(activePlayer);
-                });
-            }
-
-            if (this.roundManager.endRoundEvent) {
-                this.roundManager.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.endRound());
-            }
-            this.isPlayer1 = this.checkIfIsPlayer1();
-            this.localPlayerIcon = this.getLocalPlayerIcon();
-        }
+        if (!this.gameService.isGameSetUp) return;
+        this.setupGame();
     }
 
     ngAfterViewInit(): void {
@@ -66,6 +54,21 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
+    }
+
+    setupGame(): void {
+        if (this.roundManager.timer) {
+            this.roundManager.timer.pipe(takeUntil(this.componentDestroyed$)).subscribe(([timer, activePlayer]) => {
+                this.startTimer(timer);
+                this.updateActivePlayerBorder(activePlayer);
+            });
+        }
+
+        if (this.roundManager.endRoundEvent) {
+            this.roundManager.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.endRound());
+        }
+        this.isPlayer1 = this.checkIfIsPlayer1();
+        this.localPlayerIcon = this.getLocalPlayerIcon();
     }
 
     startTimer(timer: Timer): void {
@@ -100,7 +103,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
     getPlayer2(): AbstractPlayer {
         const player2 = this.gameService.getPlayerByNumber(PLAYER_2_NUMBER);
-        return player2 ? player2 : new Player('', 'Player1', []);
+        return player2 ? player2 : new Player('', 'Player2', []);
     }
 
     private createTimer(length: number): Observable<number> {
