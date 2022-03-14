@@ -20,6 +20,7 @@ import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import HighScoresService from '@app/services/high-scores-service/high-scores-service';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -99,55 +100,55 @@ describe('GamePlayService', () => {
             restore();
         });
 
-        it('should call getGame', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getGame', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(getGameStub.called).to.be.true;
         });
 
-        it('should call getMessage', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getMessage', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.called).to.be.true;
         });
 
-        it('should call getOpponentMessage', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getOpponentMessage', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getOpponentMessage.called).to.be.true;
         });
 
-        it('should call getAction', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getAction', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(getActionStub.called).to.be.true;
         });
 
-        it('should call execute', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call execute', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.execute.called).to.be.true;
         });
 
-        it('should call isGameOver', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call isGameOver', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(gameStub.isGameOver.called).to.be.true;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists #1)', () => {
+        it('should set isGameOver to true if gameOver (updatedData exists #1)', async () => {
             gameStub.isGameOver.returns(true);
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.isGameOver).to.be.true;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists #2)', () => {
+        it('should set isGameOver to true if gameOver (updatedData exists #2)', async () => {
             gameStub.isGameOver.returns(true);
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ player1: { score: DEFAULT_PLAYER_SCORE }, player2: { score: DEFAULT_PLAYER_SCORE } } as GameUpdateData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.isGameOver).to.be.true;
         });
 
-        it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
+        it("should set isGameOver to true if gameOver (updatedData doesn't exists)", async () => {
             gameStub.isGameOver.returns(true);
             // actionStub.execute.returns(undefined);
             // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
@@ -157,50 +158,50 @@ describe('GamePlayService', () => {
                 return;
             });
 
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.isGameOver).to.be.true;
         });
 
-        it('should call next round when action ends turn', () => {
+        it('should call next round when action ends turn', async () => {
             actionStub.willEndTurn.returns(true);
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(roundManagerStub.nextRound.called).to.be.true;
         });
 
-        it('should set round action end turn (updatedData exists)', () => {
+        it('should set round action end turn (updatedData exists)', async () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({});
             // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
         });
 
-        it("should set round action end turn (updatedData doesn't exists)", () => {
+        it("should set round action end turn (updatedData doesn't exists)", async () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns(undefined);
             // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
         });
 
-        it('should not call next round when action does not ends turn', () => {
+        it('should not call next round when action does not ends turn', async () => {
             actionStub.willEndTurn.returns(false);
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(roundManagerStub.nextRound.called).to.not.be.true;
         });
 
         it('should throw when playerId is invalid', () => {
-            expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
+            expect(async () => await gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
         });
 
-        it('should return tileReserve if updatedData exists', () => {
+        it('should return tileReserve if updatedData exists', async () => {
             actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.tileReserve).to.exist;
 
@@ -209,26 +210,26 @@ describe('GamePlayService', () => {
             }
         });
 
-        it('should return tileReserveTotal if updatedData exists', () => {
+        it('should return tileReserveTotal if updatedData exists', async () => {
             actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.tileReserveTotal).to.exist;
             expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));
         });
 
-        it('should call getMessage from action', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getMessage from action', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.calledOnce).to.be.true;
         });
 
-        it('should call getOpponentMessage from action', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getOpponentMessage from action', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getOpponentMessage.calledOnce).to.be.true;
         });
 
-        it('should return opponentFeedback equal to getOppnentMessage from action', () => {
-            const [, feedback] = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should return opponentFeedback equal to getOppnentMessage from action', async () => {
+            const [, feedback] = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(feedback!.opponentFeedback).to.equal(DEFAULT_ACTION_MESSAGE);
         });
     });
@@ -323,13 +324,17 @@ describe('GamePlayService', () => {
     describe('PlayerLeftEvent', () => {
         const playerWhoLeftId = 'playerWhoLeftId';
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.playerLeftEvent = new EventEmitter();
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
 
-            gamePlayService = new GamePlayService(activeGameServiceStub as unknown as ActiveGameService);
+            gamePlayService = new GamePlayService(
+                activeGameServiceStub as unknown as ActiveGameService,
+                highScoresServiceStub as unknown as HighScoresService,
+            );
         });
 
         it('On receive player left event, should call handlePlayerLeftEvent', () => {
