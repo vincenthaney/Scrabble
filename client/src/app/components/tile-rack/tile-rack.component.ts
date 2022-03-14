@@ -136,7 +136,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
         if (tiles.length === 0) return;
 
-        const selectedIndex = tiles.findIndex((t) => t.isSelected);
+        const selectedIndex = tiles.findIndex((tile) => tile.isSelected);
         const indexToSelect = (selectedIndex + 1) % tiles.length;
         this.selectTileMove(tiles[indexToSelect]);
     }
