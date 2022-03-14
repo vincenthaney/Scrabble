@@ -43,7 +43,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
     isLocalPlayerTurn;
     noActiveGameSubscription: Subscription;
-    componentDestroyed$: Subject<boolean> = new Subject();
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
@@ -55,6 +55,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private gameButtonActionService: GameButtonActionService,
     ) {
         this.isLocalPlayerTurn = gameService.isLocalPlayerPlaying();
+        this.componentDestroyed$ = new Subject();
     }
 
     @HostListener('document:keypress', ['$event'])
