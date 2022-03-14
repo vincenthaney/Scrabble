@@ -42,8 +42,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
-    componentDestroyed$: Subject<boolean> = new Subject();
-    playerLeftWithQuitButton: boolean = false;
+    componentDestroyed$: Subject<boolean>;
+    playerLeftWithQuitButton: boolean;
 
     constructor(
         public dialog: MatDialog,
@@ -54,7 +54,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private playerLeavesService: PlayerLeavesService,
         private gameViewEventManagerService: GameViewEventManagerService,
         private gameButtonActionService: GameButtonActionService,
-    ) {}
+    ) {
+        this.playerLeftWithQuitButton = false;
+        this.componentDestroyed$ = new Subject();
+    }
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {

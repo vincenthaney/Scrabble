@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class BoardService {
-    private initialBoard: Square[][];
+    private initialBoard: Square[][] = [];
     private boardInitialization$: Subject<Square[][]> = new Subject();
     private boardUpdateEvent$: Subject<Square[]> = new Subject();
 

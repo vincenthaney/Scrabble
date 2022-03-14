@@ -22,10 +22,10 @@ export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
 })
 export class TileRackComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
     tiles: RackTile[];
-    selectedTiles: RackTile[] = [];
-    selectionType: TileRackSelectType = TileRackSelectType.Exchange;
-    tileFontSize: number = RACK_TILE_DEFAULT_FONT_SIZE;
-    componentDestroyed$: Subject<boolean> = new Subject();
+    selectedTiles: RackTile[];
+    selectionType: TileRackSelectType;
+    tileFontSize: number;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public gameService: GameService,
@@ -34,6 +34,10 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         private readonly gameButtonActionService: GameButtonActionService,
     ) {
         super();
+        this.selectedTiles = [];
+        this.selectionType = TileRackSelectType.Exchange;
+        this.tileFontSize = RACK_TILE_DEFAULT_FONT_SIZE;
+        this.componentDestroyed$ = new Subject();
     }
 
     ngOnInit(): void {
