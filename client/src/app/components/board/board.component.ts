@@ -36,10 +36,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     navigator: BoardNavigator;
     boardUpdateSubscription: Subscription;
     boardInitializationSubscription: Subscription;
+    private componentDestroyed$: Subject<boolean>;
 
-    boardDestroyed$: Subject<boolean>;
-
-    private componentDestroyed$: Subject<boolean> = new Subject();
     constructor(
         private boardService: BoardService,
         private gameService: GameService,
@@ -55,7 +53,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.notAppliedSquares = [];
         this.tileFontSize = SQUARE_TILE_DEFAULT_FONT_SIZE;
         this.selectedSquare = undefined;
-        this.boardDestroyed$ = new Subject<boolean>();
+        this.componentDestroyed$ = new Subject<boolean>();
     }
 
     ngOnInit(): void {

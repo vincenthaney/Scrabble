@@ -29,6 +29,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     gameType: GameType;
     dictionnaryName: string;
     tileReserve: TileReserveData[];
+
     isGameSetUp: boolean;
     isGameOver: boolean;
 
