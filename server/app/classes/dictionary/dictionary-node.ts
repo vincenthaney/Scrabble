@@ -27,6 +27,7 @@ export default class DictionaryNode {
 
     getNode(word: string): DictionaryNode | undefined {
         const [key, rest] = this.separateWord(word);
+        console.log('get node', key, rest);
         const node = this.nodes.get(key);
 
         if (!node) return undefined;

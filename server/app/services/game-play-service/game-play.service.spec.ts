@@ -20,6 +20,8 @@ import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { dictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -57,6 +59,8 @@ describe('GamePlayService', () => {
     let game: Game;
 
     beforeEach(() => {
+        Container.set(DictionaryService, dictionaryTestService);
+
         gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);

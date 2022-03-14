@@ -11,11 +11,11 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { Container } from 'typedi';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ActionErrorsMessages } from './action-errors';
 import { StringConversion } from '@app/utils/string-conversion';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { DEFAULT_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -55,7 +55,7 @@ export default class ActionPlace extends ActionPlay {
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
+        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), DEFAULT_DICTIONARY_NAME);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 

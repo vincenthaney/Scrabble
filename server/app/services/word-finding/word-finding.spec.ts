@@ -25,6 +25,8 @@ import {
     WordFindingRequest,
     WordFindingUseCase,
 } from '@app/classes/word-finding';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { dictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -169,6 +171,8 @@ describe('WordFindingservice', () => {
     beforeEach(() => {
         board = boardFromLetterValues(BOARD);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
+
+        Container.set(DictionaryService, dictionaryTestService);
         service = Container.get(WordFindingService);
     });
 
@@ -346,6 +350,7 @@ describe('WordFindingservice', () => {
         it('should call attemptMove rackPermutations.length times', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const spyAttemptMove = stub(service, <any>'attemptMove').callsFake(() => {
+                console.log('called fake');
                 return [{ score: 1 } as unknown as ScoredWordPlacement];
             });
 
@@ -1003,7 +1008,7 @@ describe('WordFindingservice', () => {
             for (let tilesToChoose = BIG_TILE_RACK.length; tilesToChoose > 0; tilesToChoose--) {
                 expectedLength += permutationAmount(BIG_TILE_RACK.length, tilesToChoose);
             }
-            const result: Tile[][] = service['getRackPermutations'](BIG_TILE_RACK);
+            const result: Tile[][] = service['getRack Permutations'](BIG_TILE_RACK);
             expect(result.length).to.deep.equal(expectedLength);
         });
     });

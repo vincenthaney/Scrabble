@@ -17,7 +17,6 @@ import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { StringConversion } from '@app/utils/string-conversion';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Random } from '@app/utils/random';
@@ -30,6 +29,7 @@ import {
     QUICK_MOVE_TIME,
 } from '@app/constants/services-constants/word-finding.const';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { DEFAULT_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 
 // wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
@@ -254,7 +254,7 @@ export default class WordFindingService {
         if (moveRequirements.isPossible && this.isWithinRequirements(moveRequirements, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
-                this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
+                this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DEFAULT_DICTIONARY_NAME);
                 return {
                     tilesToPlace: permutation,
                     orientation,

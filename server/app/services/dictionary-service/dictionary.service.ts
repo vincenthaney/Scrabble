@@ -18,15 +18,15 @@ export default class DictionaryService {
         throw new Error(INVALID_DICTIONARY_NAME);
     }
 
+    protected fetchDictionaryWords(path: string): Dictionary {
+        const buffer = readFileSync(join(__dirname, path));
+        const data: DictionaryData = JSON.parse(buffer.toString());
+        return new Dictionary(data.words);
+    }
+
     private addAllDictionaries(): void {
         for (const [path, name] of DICTIONARIES) {
             this.dictionaries.set(name, this.fetchDictionaryWords(path));
         }
-    }
-
-    private fetchDictionaryWords(path: string): Dictionary {
-        const buffer = readFileSync(join(__dirname, path));
-        const data: DictionaryData = JSON.parse(buffer.toString());
-        return new Dictionary(data.words);
     }
 }

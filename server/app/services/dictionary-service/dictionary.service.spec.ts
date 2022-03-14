@@ -20,9 +20,20 @@ const TEST_DICTIONARY = {
 
 describe('DictionaryService', () => {
     let service: DictionaryService;
+    // mockPaths must be of type any because keys must be dynamic
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let mockPaths: any;
+    let path: string;
 
     beforeEach(() => {
+        path = DICTIONARIES[0][0];
+        mockPaths[join(__dirname, path)] = TEST_DICTIONARY;
+
         service = Container.get(DictionaryService);
+    });
+
+    afterEach(() => {
+        mock.restore();
     });
 
     describe('getDictionary', () => {
@@ -65,20 +76,6 @@ describe('DictionaryService', () => {
     });
 
     describe('fetchDictionaryWords', () => {
-        // mockPaths must be of type any because keys must be dynamic
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let mockPaths: any;
-        let path: string;
-
-        beforeEach(() => {
-            path = DICTIONARIES[0][0];
-            mockPaths[join(__dirname, path)] = TEST_DICTIONARY;
-        });
-
-        afterEach(() => {
-            mock.restore();
-        });
-
         it('should return dictionary', () => {
             const result = service['fetchDictionaryWords'](path);
 
