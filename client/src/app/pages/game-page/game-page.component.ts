@@ -41,8 +41,9 @@ import { takeUntil } from 'rxjs/operators';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
-    isLocalPlayerTurn: boolean;
-    componentDestroyed$: Subject<boolean> = new Subject();
+
+    isLocalPlayerTurn: boolean = false;
+    componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
         public dialog: MatDialog,
