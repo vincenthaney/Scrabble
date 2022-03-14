@@ -74,11 +74,11 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         return false; // return false so the browser doesn't show the context menu
     }
 
-    selectTileExchange(tile: RackTile): boolean {
+    selectTileToExchange(tile: RackTile): boolean {
         return this.selectTile(TileRackSelectType.Exchange, tile);
     }
 
-    selectTileMove(tile: RackTile): boolean {
+    selectTileToMove(tile: RackTile): boolean {
         return this.selectTile(TileRackSelectType.Move, tile);
     }
 
@@ -138,7 +138,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
         const selectedIndex = tiles.findIndex((tile) => tile.isSelected);
         const indexToSelect = (selectedIndex + 1) % tiles.length;
-        this.selectTileMove(tiles[indexToSelect]);
+        this.selectTileToMove(tiles[indexToSelect]);
     }
 
     private moveSelectedTile(direction: Direction): void {

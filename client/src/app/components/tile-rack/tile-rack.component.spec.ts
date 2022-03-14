@@ -241,7 +241,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'selectTile');
 
-            component.selectTileExchange(tile);
+            component.selectTileToExchange(tile);
 
             expect(spy).toHaveBeenCalledOnceWith(TileRackSelectType.Exchange, tile);
         });
@@ -252,7 +252,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'selectTile');
 
-            component.selectTileMove(tile);
+            component.selectTileToMove(tile);
 
             expect(spy).toHaveBeenCalledOnceWith(TileRackSelectType.Move, tile);
         });
@@ -372,7 +372,7 @@ describe('TileRackComponent', () => {
                 { letter: 'B', isSelected: false },
             ] as RackTile[];
             component.tiles = tiles;
-            selectTileMoveSpy = spyOn(component, 'selectTileMove');
+            selectTileMoveSpy = spyOn(component, 'selectTileToMove');
         });
 
         it('should call selectTileMove', () => {
@@ -436,7 +436,7 @@ describe('TileRackComponent', () => {
             it(`should move selected tile (${i + 1})`, () => {
                 const [selected, direction, expected] = tests[i];
 
-                component.selectTileMove(tiles[selected]);
+                component.selectTileToMove(tiles[selected]);
 
                 component['moveSelectedTile'](direction);
 
@@ -447,7 +447,7 @@ describe('TileRackComponent', () => {
         it('should not change tiles if selection type is not move', () => {
             const expected = [...tiles];
 
-            component.selectTileMove(tiles[0]);
+            component.selectTileToMove(tiles[0]);
             component.selectionType = TileRackSelectType.Exchange;
 
             component['moveSelectedTile'](Direction.Right);
@@ -458,7 +458,7 @@ describe('TileRackComponent', () => {
         it('should not change tiles if selectedTiles is empty', () => {
             const expected = [...tiles];
 
-            component.selectTileMove(tiles[0]);
+            component.selectTileToMove(tiles[0]);
             component.selectedTiles = [];
 
             component['moveSelectedTile'](Direction.Right);
