@@ -124,7 +124,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         const localPlayerTiles = localPlayer?.getTiles();
         if (localPlayer && localPlayerTiles) {
             localPlayer.getTiles().forEach((tile: Tile) => {
-                this.tiles.push({ ...tile, isUsed: false, isSelected: false });
+                this.tiles.push({ ...tile, playedLetter: undefined, isUsed: false, isSelected: false });
             });
         }
     }
