@@ -272,6 +272,17 @@ describe('TileRackComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
+        it('should NOT call unselectAll if type is not select and does not change', () => {
+            const type: TileRackSelectType = 'exchange' as TileRackSelectType;
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'unselectAll');
+
+            component['selectionType'] = 'exchange' as TileRackSelectType;
+            component.selectTile(type, tile);
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
         it('should return false if tile already selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
