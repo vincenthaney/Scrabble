@@ -524,6 +524,24 @@ describe('GameService', () => {
             service.handleNewMessage(message);
             expect(spy).toHaveBeenCalledWith('newMessage', message);
         });
+
+        it('should call emitGameViewEvent if sender id is system-error', () => {
+            const spy = gameViewEventManagerSpy.emitGameViewEvent;
+
+            const message: Message = { senderId: 'system-error' } as Message;
+            service.handleNewMessage(message);
+
+            expect(spy).toHaveBeenCalledWith('usedTiles', undefined);
+        });
+
+        it('should not call emitGameViewEvent if sender id is not system-error', () => {
+            const spy = gameViewEventManagerSpy.emitGameViewEvent;
+
+            const message: Message = {} as Message;
+            service.handleNewMessage(message);
+
+            expect(spy).not.toHaveBeenCalledWith('usedTiles', undefined);
+        });
     });
 
     describe('getPlayingPlayerId', () => {
