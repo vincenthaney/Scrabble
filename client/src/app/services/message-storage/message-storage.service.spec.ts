@@ -11,7 +11,7 @@ describe('SessionStorageService', () => {
     let getSpy: jasmine.Spy;
     let setSpy: jasmine.Spy;
     let clearSpy: jasmine.Spy;
-    let store: any = {};
+    let storage: any = {};
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
@@ -20,20 +20,20 @@ describe('SessionStorageService', () => {
 
     beforeEach(() => {
         // Mock sessionStorage
-        store = {};
+        storage = {};
         getSpy = spyOn(window.sessionStorage, 'getItem').and.callFake((key: string): string => {
-            return store[key] || null;
+            return storage[key] || null;
         });
         setSpy = spyOn(window.sessionStorage, 'setItem').and.callFake((key: string, value: string): string => {
-            return (store[key] = value);
+            return (storage[key] = value);
         });
         clearSpy = spyOn(window.sessionStorage, 'clear').and.callFake(() => {
-            store = {};
+            storage = {};
         });
     });
 
     afterEach(() => {
-        store = {};
+        storage = {};
     });
 
     it('should be created', () => {
@@ -42,7 +42,7 @@ describe('SessionStorageService', () => {
 
     describe('initialize', () => {
         it('should not call setItem if key exists', () => {
-            store[MESSAGE_STORAGE_KEY] = [];
+            storage[MESSAGE_STORAGE_KEY] = [];
             service.initializeMessages();
             expect(setSpy).not.toHaveBeenCalled();
         });
@@ -65,7 +65,7 @@ describe('SessionStorageService', () => {
         });
 
         it('should return local messages if getItem returns value', () => {
-            store[MESSAGE_STORAGE_KEY] = JSON.stringify(TEST_MESSAGES);
+            storage[MESSAGE_STORAGE_KEY] = JSON.stringify(TEST_MESSAGES);
             expect(service.getMessages()).toEqual(TEST_MESSAGES);
         });
     });
@@ -79,12 +79,12 @@ describe('SessionStorageService', () => {
         });
 
         it('should add new message to storage', () => {
-            store[MESSAGE_STORAGE_KEY] = JSON.stringify(TEST_MESSAGES);
+            storage[MESSAGE_STORAGE_KEY] = JSON.stringify(TEST_MESSAGES);
             spyOn(service, 'getMessages').and.returnValue(TEST_MESSAGES);
             const lengthBefore = TEST_MESSAGES.length;
 
             service.saveMessage(INITIAL_MESSAGE);
-            const lengthAfter = JSON.parse(store[MESSAGE_STORAGE_KEY]).length;
+            const lengthAfter = JSON.parse(storage[MESSAGE_STORAGE_KEY]).length;
             expect(lengthAfter).toEqual(lengthBefore + 1);
         });
     });
