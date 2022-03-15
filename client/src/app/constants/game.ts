@@ -81,6 +81,8 @@ export const DEFAULT_PLAYER = new Player('id', 'name', []);
 
 export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
+export const LOCAL_PLAYER_ID = 'me';
+export const OPPONENT_ID = 'opponent';
 
 export const ON_YOUR_TURN_ACTIONS = [ActionType.PLACE, ActionType.EXCHANGE, ActionType.PASS, ActionType.HINT];
 

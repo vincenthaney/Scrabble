@@ -1,5 +1,5 @@
 import { MONGO_DATABASE_NAME, MONGO_DB_URL } from '@app/constants/services-constants/mongo-db.const';
-import { Db, MongoClient, Document, Collection } from 'mongodb';
+import { Collection, Db, Document, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
 @Service()
