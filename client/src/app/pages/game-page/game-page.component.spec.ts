@@ -121,6 +121,7 @@ describe('GamePageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameServiceMock = TestBed.inject(GameService);
+        component['mustDisconnectGameOnLeave'] = false;
     });
 
     it('should create', () => {
@@ -139,6 +140,7 @@ describe('GamePageComponent', () => {
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).toHaveBeenCalled();
+        component.mustDisconnectGameOnLeave = false;
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
@@ -254,10 +256,10 @@ describe('GamePageComponent', () => {
     });
 
     it('handlePlayerLeave should tell the playerLeavesService', () => {
+        component['mustDisconnectGameOnLeave'] = true;
         const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
             return;
         });
-        expect(component.mustDisconnectGameOnLeave).toBeTrue();
         component['handlePlayerLeaves']();
         expect(component.mustDisconnectGameOnLeave).toBeFalse();
         expect(leaveSpy).toHaveBeenCalled();
