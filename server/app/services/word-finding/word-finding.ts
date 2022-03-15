@@ -1,27 +1,21 @@
 import { Board, Orientation } from '@app/classes/board';
+import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import BoardNavigator from '@app/classes/board/board-navigator';
 import Direction from '@app/classes/board/direction';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import {
-    PlacementEvaluationResults,
     MoveRequirements,
+    PlacementEvaluationResults,
     RejectedMove,
     SearchState,
     SquareProperties,
     WordFindingRequest,
     WordFindingUseCase,
 } from '@app/classes/word-finding';
-import { Service } from 'typedi';
-import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
-
-import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
-import { StringConversion } from '@app/utils/string-conversion';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { Random } from '@app/utils/random';
-import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import {
     BLANK_TILE_REPLACEMENT_LETTER,
     HINT_AMOUNT_OF_WORDS,
@@ -29,7 +23,13 @@ import {
     LONG_MOVE_TIME,
     QUICK_MOVE_TIME,
 } from '@app/constants/services-constants/word-finding.const';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { Random } from '@app/utils/random';
+import { StringConversion } from '@app/utils/string-conversion';
+import { Service } from 'typedi';
 
 // wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
@@ -67,6 +67,7 @@ export default class WordFindingService {
         }
 
         chosenMoves = this.chooseMoves(searchState, request, placementEvaluationResults);
+        this.replaceBlankTile(tiles, false);
         return chosenMoves ? chosenMoves : [];
     }
 
@@ -283,11 +284,8 @@ export default class WordFindingService {
     private getTilesCombinations(tiles: Tile[]) {
         const res: Tile[][] = [[]];
         let currentCombination;
-        for (const tile of tiles) {
-            if (tile.isBlank) {
-                tile.letter = BLANK_TILE_REPLACEMENT_LETTER;
-            }
-        }
+        this.replaceBlankTile(tiles, true);
+
         // Try every combination of either including or excluding each Tile of the array
         // eslint-disable-next-line no-bitwise
         const maxCombinations = 1 << tiles.length;
@@ -327,5 +325,13 @@ export default class WordFindingService {
             this.permuteTiles(permutation, result);
         }
         return result;
+    }
+
+    private replaceBlankTile(tiles: Tile[], shouldReplaceWithReplacement: boolean): void {
+        for (const tile of tiles) {
+            if (tile.isBlank) {
+                tile.letter = shouldReplaceWithReplacement ? BLANK_TILE_REPLACEMENT_LETTER : BLANK_TILE_LETTER_VALUE;
+            }
+        }
     }
 }
