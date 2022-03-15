@@ -2,17 +2,15 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
-import { LetterValue } from '@app/classes/tile';
+import { TileReserveData } from '@app/classes/tile/tile.types';
 import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
 import { MAX_INPUT_LENGTH } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-
-export type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
     selector: 'app-communication-box',
@@ -24,38 +22,28 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('messageInput') messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
-    componentDestroyed$: Subject<boolean> = new Subject();
 
     messages: VisualMessage[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
-
-    lettersLeftTotal: number = 0;
-    lettersLeft: LetterMapItem[] = [];
-
     loading: boolean = false;
+    componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
         private inputParser: InputParserService,
         private gameService: GameService,
         private focusableComponentsService: FocusableComponentsService,
         private changeDetectorRef: ChangeDetectorRef,
+        private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
     }
 
     ngOnInit(): void {
-        this.lettersLeft = this.gameService.tileReserve;
-        this.lettersLeftTotal = this.gameService.tileReserveTotal;
-
-        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
-            this.onTileReserveUpdate(tileReserve, tileReserveTotal);
-        });
-        this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((newMessage) => {
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage) => {
             this.onReceiveNewMessage(newMessage);
         });
     }
@@ -110,9 +98,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
-    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
-        this.lettersLeft = tileReserve;
-        this.lettersLeftTotal = tileReserveTotal;
+    getLettersLeft(): TileReserveData[] {
+        return this.gameService.tileReserve;
+    }
+
+    getNumberOfTilesLeft(): number {
+        return this.gameService.getTotalNumberOfTilesLeft();
     }
 
     onContainerClick(): void {

@@ -10,6 +10,7 @@ import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/comma
 import { BOARD_SIZE, DEFAULT_ORIENTATION, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
@@ -18,7 +19,11 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
     providedIn: 'root',
 })
 export default class InputParserService {
-    constructor(private controller: GamePlayController, private gameService: GameService) {}
+    constructor(
+        private controller: GamePlayController,
+        private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {}
 
     parseInput(input: string): void {
         const playerId = this.getLocalPlayer().id;
@@ -145,7 +150,8 @@ export default class InputParserService {
             orientation: location.orientation,
         };
 
-        this.gameService.playingTiles.emit(placeActionPayload);
+        this.gameViewEventManagerService.emitGameViewEvent('tilesPlayed', placeActionPayload);
+
         return placeActionPayload;
     }
 

@@ -127,15 +127,15 @@ describe('GamePageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call disconnectGame if there is a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => 'id');
+    it('should call disconnectGame if player left abnormally', () => {
+        component.playerLeftWithQuitButton = false;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).toHaveBeenCalled();
     });
 
-    it('should not call disconnectGame if there no a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => null as unknown as string);
+    it('should not call disconnectGame if player left normally', () => {
+        component.playerLeftWithQuitButton = true;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
@@ -179,14 +179,6 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledWith(event);
     });
 
-    describe('ngOnInit', () => {
-        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent', () => {
-            component.isLocalPlayerTurn = false;
-            gameServiceMock.newActivePlayerEvent.emit([DEFAULT_PLAYER, true]);
-            expect(component.isLocalPlayerTurn).toBeTrue();
-        });
-    });
-
     describe('createpassAction', () => {
         it('should call gameButtonActionService.createPassAction()', () => {
             const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
@@ -194,25 +186,6 @@ describe('GamePageComponent', () => {
             });
             component.createPassAction();
             expect(createPassActionSpy).toHaveBeenCalled();
-        });
-    });
-
-    describe('handlePlayerLeaves', () => {
-        it('should reset gameServiceId', () => {
-            spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            gameServiceMock.gameId = 'something';
-            component['handlePlayerLeaves']();
-            expect(gameServiceMock.gameId).toEqual('');
-        });
-
-        it('should call playerLeavesService.handleLocalPlayerLeavesGame', () => {
-            const handleLocalPlayerLeavesGameSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            component['handlePlayerLeaves']();
-            expect(handleLocalPlayerLeavesGameSpy).toHaveBeenCalled();
         });
     });
 
@@ -278,5 +251,15 @@ describe('GamePageComponent', () => {
 
         component.quitButtonClicked();
         expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
+    });
+
+    it('handlePlayerLeave should tell the playerLeavesService', () => {
+        const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
+            return;
+        });
+        expect(component.playerLeftWithQuitButton).toBeFalse();
+        component['handlePlayerLeave']();
+        expect(component.playerLeftWithQuitButton).toBeTrue();
+        expect(leaveSpy).toHaveBeenCalled();
     });
 });

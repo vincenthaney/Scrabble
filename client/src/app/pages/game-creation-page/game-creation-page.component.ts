@@ -19,8 +19,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameTypes = GameType;
     gameModes = GameMode;
     virtualPlayerLevels = VirtualPlayerLevel;
-    // TODO : when dictionnaries and timers options are implemented, create mat-options with ngFor on the available lists
-    dictionaryOptions: string[];
+    dictionaryOptions: string[] = [];
     virtualPlayerNames: string[] = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
     playerName: string = '';
     playerNameValid: boolean = false;
