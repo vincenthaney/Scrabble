@@ -20,6 +20,15 @@ $border-radius: 6px;
 ::ng-deep .mat-tooltip {
     font-size: small;
 }
+#db-problem {
+    margin-top: 100px;
+    display: inline-block;
+    align-items: center;
+    .center {
+        padding-bottom: 15px;
+        font-size: x-large;
+    }
+}
 
 .center {
     display: grid;

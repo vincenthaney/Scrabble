@@ -212,7 +212,7 @@ describe('GamePlayService', () => {
             }
         });
 
-        it('should call getMessage from action', () => {
+        it('should call getMessage from action', async () => {
             await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.calledOnce).to.be.true;
         });

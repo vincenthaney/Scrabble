@@ -3,7 +3,15 @@
 
     <br />
 
-    <div class="container">
+    <div class="center" id="db-problem" *ngIf="!isInitialized">
+        <div  class="center">
+            <app-icon icon="exclamation-triangle" styling="solid" size="10x"></app-icon>
+        </div>
+        <p class="center">Incapable d'accéder à la base de données</p>
+        <p class="center">Veuillez réessayer plus tard!</p>
+    </div>
+
+    <div class="container" *ngIf="isInitialized">
             <form [formGroup]="highScoresParameters">
             <mat-button-toggle-group formControlName="gameType" ngDefaultControl>
                 <mat-button-toggle id="classic-button" [value]="gameTypes.Classic">
@@ -21,14 +29,9 @@
             </mat-button-toggle-group>
         </form>
 
-        <div class="center"  *ngIf="!isInitialized">
-            <p>En attente de la base de données</p>
-            <div  class="center">
-                <mat-progress-spinner class="spinner" mode="indeterminate" [diameter]="55"></mat-progress-spinner>
-            </div>
-        </div>
 
-        <div id="high-scores-container" *ngIf="isInitialized" >
+
+        <div id="high-scores-container" >
             <div id="high-scores-header">
                 <div class="rank">
                     Classement
