@@ -168,7 +168,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
-                const square: Square = this.getBoardServiceSquare(board, i, j);
+                const square: Square = this.getSquare(board, i, j);
                 const squareView: SquareView = new SquareView(square, SQUARE_SIZE);
                 this.squareGrid[i][j] = squareView;
             }
@@ -176,7 +176,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
-    private getBoardServiceSquare(board: Square[][], row: number, column: number): Square {
+    private getSquare(board: Square[][], row: number, column: number): Square {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 

@@ -57,8 +57,8 @@ describe('CommunicationBoxComponent', () => {
     let initializeMessagesSpy: jasmine.Spy;
 
     beforeEach(async () => {
-        inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput']);
-        inputParserSpy.parseInput.and.callFake(() => {
+        inputParserSpy = jasmine.createSpyObj('InputParserService', ['handleInput']);
+        inputParserSpy.handleInput.and.callFake(() => {
             return;
         });
 
@@ -196,14 +196,14 @@ describe('CommunicationBoxComponent', () => {
         it('onSendMessage should call appropriate functions if message is not empty', () => {
             component.messageForm.get('content')?.setValue('new input');
             component.onSendMessage();
-            expect(inputParserSpy.parseInput).toHaveBeenCalled();
+            expect(inputParserSpy.handleInput).toHaveBeenCalled();
             expect(formSpy).toHaveBeenCalled();
         });
 
         it('onSendMessage should NOT call appropriate functions if message is empty', () => {
             component.messageForm.setValue({ content: '' });
             component.onSendMessage();
-            expect(inputParserSpy.parseInput).not.toHaveBeenCalled();
+            expect(inputParserSpy.handleInput).not.toHaveBeenCalled();
             expect(formSpy).not.toHaveBeenCalled();
         });
     });

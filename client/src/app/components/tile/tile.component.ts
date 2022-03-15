@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { UNDEFINED_TILE } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, UNDEFINED_TILE } from '@app/constants/game';
 
 const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
 
@@ -23,7 +23,7 @@ export class TileComponent implements OnInit {
         this.hideValue = false;
         this.applied = true;
         this.isPlayed = false;
-        this.backgroundPath = this.getBgPath();
+        this.backgroundPath = this.getBackgroundPath();
     }
 
     ngOnInit(): void {
@@ -32,12 +32,12 @@ export class TileComponent implements OnInit {
         }
     }
 
-    getBgPath(): string {
+    getBackgroundPath(): string {
         const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMG) + 1;
         return `assets/img/tiles/bg_${index}.svg`;
     }
 
     private isWorthlessTile(): boolean {
-        return this.tile.isBlank || (this.tile.letter === '*' && this.tile.value === 0);
+        return this.tile.isBlank || (this.tile.letter === BLANK_TILE_LETTER_VALUE && this.tile.value === 0);
     }
 }
