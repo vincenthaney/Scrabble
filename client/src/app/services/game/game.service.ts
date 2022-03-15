@@ -210,7 +210,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         const localPlayerId = this.getLocalPlayerId();
         this.resetServiceData();
 
-        console.log(localPlayerId);
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);

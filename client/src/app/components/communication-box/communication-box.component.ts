@@ -94,7 +94,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     onReceiveNewMessage(newMessage: Message): void {
-        console.log(newMessage);
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();

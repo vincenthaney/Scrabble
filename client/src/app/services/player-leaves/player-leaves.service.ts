@@ -38,7 +38,7 @@ export class PlayerLeavesService implements OnDestroy {
     handleLocalPlayerLeavesGame(): void {
         this.playerLeavesController.handleLeaveGame(this.gameService.getGameId());
         this.gameService.resetGameId();
-        this.gameViewEventManager.emitGameViewEvent('newMessage', undefined);
+        this.gameViewEventManager.emitGameViewEvent('newMessage', null);
     }
 
     handleLeaveLobby(): void {
