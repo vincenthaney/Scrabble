@@ -181,7 +181,7 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledWith(event);
     });
 
-    describe('createpassAction', () => {
+    describe('createPassAction', () => {
         it('should call gameButtonActionService.createPassAction()', () => {
             const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
                 return;
