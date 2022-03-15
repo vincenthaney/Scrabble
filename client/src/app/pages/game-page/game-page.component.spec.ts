@@ -128,14 +128,14 @@ describe('GamePageComponent', () => {
     });
 
     it('should call disconnectGame if player left abnormally', () => {
-        component.playerLeftWithQuitButton = false;
+        component.mustDisconnectGameOnLeave = false;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).toHaveBeenCalled();
     });
 
     it('should not call disconnectGame if player left normally', () => {
-        component.playerLeftWithQuitButton = true;
+        component.mustDisconnectGameOnLeave = true;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
@@ -257,9 +257,9 @@ describe('GamePageComponent', () => {
         const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
             return;
         });
-        expect(component.playerLeftWithQuitButton).toBeFalse();
+        expect(component.mustDisconnectGameOnLeave).toBeFalse();
         component['handlePlayerLeaves']();
-        expect(component.playerLeftWithQuitButton).toBeTrue();
+        expect(component.mustDisconnectGameOnLeave).toBeTrue();
         expect(leaveSpy).toHaveBeenCalled();
     });
 });

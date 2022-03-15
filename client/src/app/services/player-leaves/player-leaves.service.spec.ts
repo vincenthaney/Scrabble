@@ -76,7 +76,7 @@ describe('PlayerLeavesService', () => {
     });
 
     it('handleLeaveLobby should call playerLeavesController.handleLeaveGame if this.gameId true', () => {
-        spyOn(service, 'getGameId').and.callFake(() => {
+        spyOn(service['gameService'], 'getGameId').and.callFake(() => {
             return DEFAULT_GAME_ID;
         });
         const handleLeaveGameSpy = spyOn(service['playerLeavesController'], 'handleLeaveGame').and.callFake(() => {

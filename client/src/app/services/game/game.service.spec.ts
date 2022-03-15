@@ -16,6 +16,7 @@ import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { BoardService, GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
@@ -135,6 +136,18 @@ describe('GameService', () => {
     describe('Constructor', () => {
         it('should subscribe to initialize game event from GameDispatcher', () => {
             expect(gameDispatcherControllerSpy.subscribeToInitializeGame).toHaveBeenCalled();
+        });
+
+        it('should call handleNewMessage if new message from gameController is Message', () => {
+            const spy = spyOn(service, 'handleNewMessage');
+            service['gameController'].newMessageValue.next(INITIAL_MESSAGE);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT call handleNewMessage if new message from gameController is null', () => {
+            const spy = spyOn(service, 'handleNewMessage');
+            service['gameController'].newMessageValue.next(null);
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 
@@ -388,9 +401,27 @@ describe('GameService', () => {
             expect(boardServiceSpy.updateBoard).toHaveBeenCalled();
             expect(roundManagerSpy.continueRound).toHaveBeenCalled();
         });
+
+        it('should update player if playerContainer is defined', () => {
+            service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_ID);
+            const spy = spyOn<any>(service['playerContainer'], 'updatePlayersData');
+
+            service.reconnectReinitialize(defaultGameData);
+
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should not update player if playerContainer is undefined', () => {
+            service['playerContainer'] = undefined;
+            const spy = spyOn<any>(PlayerContainer.prototype, 'updatePlayersData');
+
+            service.reconnectReinitialize(defaultGameData);
+
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
-    describe('reconnectReinitialize', () => {
+    describe('reconnectGame', () => {
         it('reconnect if there is a cookie', () => {
             const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('cookie');
             const eraseCookieSpy = spyOn(service['cookieService'], 'eraseCookie');
@@ -530,7 +561,7 @@ describe('GameService', () => {
     });
 
     describe('handleNewMessage', () => {
-        it('should call newMessageValue next', () => {
+        it('should call emit newMessaget', () => {
             const spy = gameViewEventManagerSpy.emitGameViewEvent;
 
             const message: Message = {} as Message;
@@ -577,6 +608,15 @@ describe('GameService', () => {
             const expected = 'expected-id';
             service['gameId'] = expected;
             expect(service.getGameId()).toEqual(expected);
+        });
+    });
+
+    describe('resetGameId', () => {
+        it('should reset gameId', () => {
+            const expected = '';
+            service['gameId'] = 'something';
+            service.resetGameId();
+            expect(service['gameId']).toEqual(expected);
         });
     });
 
