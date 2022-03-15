@@ -21,7 +21,7 @@
                         <button
                             mat-flat-button
                             color="primary"
-                            [disabled]="!isLocalPlayerTurn || gameService.isGameOver"
+                            [disabled]="!isLocalPlayerTurn() || gameService.isGameOver"
                             (click)="createPassAction()"
                         >
                             <app-icon icon="redo"></app-icon> Passer
