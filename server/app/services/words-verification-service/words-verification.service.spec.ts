@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/services-errors';
 import * as chai from 'chai';
-import { expect, spy } from 'chai';
+import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { WordsVerificationService } from './words-verification.service';
@@ -73,58 +73,6 @@ describe('WordsVerificationService', () => {
             const testWord = 'ufdwihfewa';
             const result = () => service.verifyWords([testWord], 'truc');
             expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
-        });
-
-        it('should NOT throw error when word is in the dictionary(one word)', () => {
-            const wordsCount = 1;
-            const words: string[] = [];
-            const dictionary = service['activeDictionaries'].get(dictionaryTitle);
-
-            if (dictionary) {
-                const dictionaryIterator = dictionary[Symbol.iterator]();
-                let i = 0;
-                while (i < wordsCount) {
-                    words.push(dictionaryIterator.next().value);
-                    i++;
-                }
-            }
-            expect(() => service.verifyWords(words, dictionaryTitle)).to.not.throw();
-        });
-
-        it('should NOT throw error when word is in the dictionary (multiple words)', () => {
-            const wordsCount = 4;
-            const words: string[] = [];
-            const dictionary = service['activeDictionaries'].get(dictionaryTitle);
-
-            if (dictionary) {
-                const dictionaryIterator = dictionary[Symbol.iterator]();
-                let i = 0;
-                while (i < wordsCount) {
-                    words.push(dictionaryIterator.next().value);
-                    i++;
-                }
-            }
-            expect(() => service.verifyWords(words, dictionaryTitle)).to.not.throw();
-        });
-
-        it('should call removeAccents if a word', () => {
-            const words: string[] = ['dummy', 'dictionary'];
-            const removeAccentsSpy = spy.on(service, 'removeAccents');
-            spy.on(service['activeDictionaries'], 'get', () => undefined);
-            try {
-                service.verifyWords(words, dictionaryTitle);
-                // eslint-disable-next-line no-empty
-            } catch (exception) {}
-            expect(removeAccentsSpy).to.have.been.called();
-        });
-
-        it('should NOT call removeAccents if a word', () => {
-            const words: string[] = [''];
-            const removeAccentsSpy = spy.on(service, 'removeAccents', () => {
-                return;
-            });
-            service.verifyWords(words, dictionaryTitle);
-            expect(removeAccentsSpy).to.not.have.been.called();
         });
     });
 });

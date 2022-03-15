@@ -172,7 +172,7 @@ describe('WordFindingservice', () => {
         board = boardFromLetterValues(BOARD);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
 
-        Container.set(DictionaryService, getDictionaryTestService);
+        Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
     });
 
