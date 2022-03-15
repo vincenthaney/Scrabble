@@ -15,6 +15,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
@@ -126,6 +127,12 @@ describe('CommunicationBoxComponent', () => {
         it('should subscribe to newMessage', () => {
             component.ngOnInit();
             expect(spyMessage).toHaveBeenCalled();
+        });
+
+        it('should call initializeMessages', () => {
+            const spy = spyOn<any>(component, 'initializeMessages');
+            component.ngOnInit();
+            expect(spy).toHaveBeenCalled();
         });
     });
 
@@ -274,6 +281,24 @@ describe('CommunicationBoxComponent', () => {
                 component['onFocusableEvent'](event as KeyboardEvent);
                 expect(focusSpy).not.toHaveBeenCalled();
             }
+        });
+    });
+
+    describe('initializeMessages', () => {
+        it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
+            const storedMessages = [INITIAL_MESSAGE, INITIAL_MESSAGE];
+            spyOn(component['messageStorageService'], 'getMessages').and.returnValue(storedMessages);
+            component['messages'] = [];
+            component['initializeMessages']();
+            expect(component.messages.length).toEqual(storedMessages.length);
+        });
+
+        it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
+            spyOn(component['messageStorageService'], 'getMessages').and.returnValue([]);
+            const spy = spyOn<any>(component, 'onReceiveNewMessage');
+
+            component['initializeMessages']();
+            expect(spy).toHaveBeenCalledWith(INITIAL_MESSAGE);
         });
     });
 

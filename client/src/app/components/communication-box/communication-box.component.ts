@@ -50,11 +50,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
 
-        const storedMessages = this.messageStorageService.getMessages();
-        if (storedMessages.length > 0) {
-            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
-            this.messages = this.messages.concat(storedMessages);
-        } else this.onReceiveNewMessage(INITIAL_MESSAGE);
+        this.initializeMessages();
     }
 
     ngAfterViewInit(): void {
@@ -68,22 +64,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.messageStorageService.resetMessages();
     }
 
-    createVisualMessage(newMessage: Message): Message {
-        switch (newMessage.senderId) {
-            case this.gameService.getLocalPlayerId():
-                newMessage.senderId = LOCAL_PLAYER_ID;
-                break;
-            case SYSTEM_ID:
-            case SYSTEM_ERROR_ID:
-                break;
-            default:
-                newMessage.senderId = OPPONENT_ID;
-                break;
-        }
-
-        return { ...newMessage, content: marked.parseInline(newMessage.content) };
-    }
-
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0 && !this.loading) {
@@ -91,14 +71,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             this.messageForm.reset({ content: '' });
             this.loading = true;
         }
-    }
-
-    onReceiveNewMessage(newMessage: Message): void {
-        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
-        this.changeDetectorRef.detectChanges();
-        this.scrollToBottom();
-        if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
-        this.messageStorageService.saveMessage(newMessage);
     }
 
     getLettersLeft(): TileReserveData[] {
@@ -115,6 +87,38 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     protected onFocusableEvent(event: KeyboardEvent): void {
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private initializeMessages(): void {
+        const storedMessages = this.messageStorageService.getMessages();
+        if (storedMessages.length > 0) {
+            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+            this.messages = this.messages.concat(storedMessages);
+        } else this.onReceiveNewMessage(INITIAL_MESSAGE);
+    }
+
+    private createVisualMessage(newMessage: Message): Message {
+        switch (newMessage.senderId) {
+            case this.gameService.getLocalPlayerId():
+                newMessage.senderId = LOCAL_PLAYER_ID;
+                break;
+            case SYSTEM_ID:
+            case SYSTEM_ERROR_ID:
+                break;
+            default:
+                newMessage.senderId = OPPONENT_ID;
+                break;
+        }
+
+        return { ...newMessage, content: marked.parseInline(newMessage.content) };
+    }
+
+    private onReceiveNewMessage(newMessage: Message): void {
+        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
+        this.changeDetectorRef.detectChanges();
+        this.scrollToBottom();
+        if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
+        this.messageStorageService.saveMessage(newMessage);
     }
 
     private isCtrlC(event: KeyboardEvent): boolean {
