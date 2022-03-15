@@ -10,6 +10,8 @@ import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from './controllers/game-play-controller/game-play.controller';
+import { HighScoresController } from './controllers/high-scores-controller/high-scores.controller';
+import DatabaseService from './services/database-service/database-service';
 
 @Service()
 export class Application {
@@ -17,7 +19,12 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly gamePlayController: GamePlayController, private readonly gameDispatcherController: GameDispatcherController) {
+    constructor(
+        private readonly gamePlayController: GamePlayController,
+        private readonly gameDispatcherController: GameDispatcherController,
+        private readonly highScoreController: HighScoresController,
+        private readonly databaseService: DatabaseService,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -36,16 +43,24 @@ export class Application {
         this.setPublicDirectory();
 
         this.bindRoutes();
+
+        this.connectDatabase();
     }
 
     bindRoutes(): void {
         this.app.use('/api', this.gamePlayController.router);
         this.app.use('/api', this.gameDispatcherController.router);
+        this.app.use('/api', this.highScoreController.router);
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
         this.errorHandling();
+    }
+
+    private connectDatabase(): void {
+        // Middlewares configuration
+        this.databaseService.connectToServer();
     }
 
     private config(): void {

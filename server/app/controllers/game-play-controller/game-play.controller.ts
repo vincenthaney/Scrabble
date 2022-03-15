@@ -33,11 +33,11 @@ export class GamePlayController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.post('/games/:gameId/players/:playerId/action', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
             try {
-                this.handlePlayAction(gameId, playerId, data);
+                await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
@@ -74,7 +74,7 @@ export class GamePlayController {
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         try {
-            const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
+            const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
@@ -111,7 +111,7 @@ export class GamePlayController {
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
-                this.handlePlayAction(gameId, playerId, { type: ActionType.PLACE, payload: {}, input: '' });
+                await this.handlePlayAction(gameId, playerId, { type: ActionType.PLACE, payload: {}, input: '' });
             }
         }
     }

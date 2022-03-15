@@ -29,9 +29,10 @@ import { GameDispatcherController } from '@app/controllers/game-dispatcher-contr
 import { GameService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+// import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-game-page',
@@ -42,8 +43,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
-    isLocalPlayerTurn: boolean = false;
-    componentDestroyed$: Subject<boolean> = new Subject<boolean>();
+    playerLeftWithQuitButton: boolean;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
@@ -51,9 +52,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private focusableComponentService: FocusableComponentsService,
         private gameDispatcher: GameDispatcherController,
         public surrenderDialog: MatDialog,
-        private readonly playerLeavesService: PlayerLeavesService,
+        private playerLeavesService: PlayerLeavesService,
+        private gameViewEventManagerService: GameViewEventManagerService,
         private gameButtonActionService: GameButtonActionService,
-    ) {}
+    ) {
+        this.playerLeftWithQuitButton = false;
+        this.componentDestroyed$ = new Subject();
+    }
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
@@ -70,7 +75,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
-        if (this.gameService.getGameId()) {
+        if (!this.playerLeftWithQuitButton) {
             this.gameService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
@@ -80,13 +85,17 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
-        if (!this.gameService.getGameId()) this.gameService.reconnectGame();
-        if (this.gameService.gameIsSetUp) this.isLocalPlayerTurn = this.gameService.isLocalPlayerPlaying();
+        // if (!this.gameService.getGameId()) this.gameService.reconnectGame();
+        // if (this.gameService.gameIsSetUp) this.isLocalPlayerTurn = this.gameService.isLocalPlayerPlaying();
 
-        this.gameService.noActiveGameEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.noActiveGameDialog());
-        this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([, isLocalPlayerTurn]) => {
-            this.isLocalPlayerTurn = isLocalPlayerTurn;
-        });
+        // this.gameService.noActiveGameEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.noActiveGameDialog());
+        // this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([, isLocalPlayerTurn]) => {
+        //     this.isLocalPlayerTurn = isLocalPlayerTurn;
+        // });
+        this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
+        if (!this.gameService.getGameId()) {
+            this.gameService.reconnectGame();
+        }
     }
 
     createPassAction(): void {
@@ -163,7 +172,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
+    isLocalPlayerTurn(): boolean {
+        return this.gameService.isLocalPlayerPlaying();
+    }
+
     private handlePlayerLeaves(): void {
+        this.playerLeftWithQuitButton = true;
         this.playerLeavesService.handleLocalPlayerLeavesGame();
     }
 }

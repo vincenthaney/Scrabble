@@ -5,10 +5,10 @@
                 <mat-expansion-panel-header>Objectifs</mat-expansion-panel-header>
                 <div *ngFor="let obj of objectives">{{obj}}</div>
             </mat-expansion-panel> -->
-            <mat-expansion-panel id="tile-map" [expanded]="false" [disabled]="lettersLeftTotal === 0">
-                <mat-expansion-panel-header>Tuiles restantes : {{ lettersLeftTotal }}</mat-expansion-panel-header>
+            <mat-expansion-panel id="tile-map" [expanded]="false" [disabled]="getNumberOfTilesLeft() === 0">
+                <mat-expansion-panel-header>Tuiles restantes : {{ getNumberOfTilesLeft() }}</mat-expansion-panel-header>
                 <div class="tile-map-content">
-                    <p *ngFor="let letter of lettersLeft">
+                    <p *ngFor="let letter of getLettersLeft()">
                         <app-tile [tile]="{ letter: letter.letter, value: 0 }" [hideValue]="true"></app-tile>
                         <span class="separator">:</span>
                         <span class="amount">{{ letter.amount }}</span>
