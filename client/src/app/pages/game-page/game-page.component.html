@@ -18,7 +18,12 @@
                             <span *ngIf="!gameService.isGameOver"> Abandonner</span>
                             <span *ngIf="gameService.isGameOver"> Quitter</span>
                         </button>
-                        <button mat-flat-button color="primary" [disabled]="!isLocalPlayerTurn()" (click)="createPassAction()">
+                        <button
+                            mat-flat-button
+                            color="primary"
+                            [disabled]="!isLocalPlayerTurn() || gameService.isGameOver"
+                            (click)="createPassAction()"
+                        >
                             <app-icon icon="redo"></app-icon> Passer
                         </button>
                         <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
