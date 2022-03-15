@@ -6,7 +6,7 @@ export interface EventTypes {
     tileRackUpdate: void;
     noActiveGame: void;
     reRender: void;
-    newMessage: Message;
+    newMessage: Message | null;
     usedTiles: ActionPlacePayload | undefined;
 }
 
@@ -15,6 +15,6 @@ type GenericEventClass<T> = {
 };
 
 export interface EventClass extends GenericEventClass<EventTypes> {
-    newMessage: BehaviorSubject<Message>;
+    newMessage: BehaviorSubject<Message | null>;
     usedTiles: BehaviorSubject<ActionPlacePayload | undefined>;
 }
