@@ -121,24 +121,26 @@ describe('GamePageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameServiceMock = TestBed.inject(GameService);
+        component['mustDisconnectGameOnLeave'] = false;
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call disconnectGame if player left abnormally', () => {
-        component.playerLeftWithQuitButton = false;
-        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
-        component.ngOnDestroy();
-        expect(spyDiconnect).toHaveBeenCalled();
-    });
-
-    it('should not call disconnectGame if player left normally', () => {
-        component.playerLeftWithQuitButton = true;
+    it('should call disconnectGame if player left with quit button or no active game dialog)', () => {
+        component.mustDisconnectGameOnLeave = false;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
+    });
+
+    it('should not call disconnectGame if player left abnormally during game', () => {
+        component.mustDisconnectGameOnLeave = true;
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).toHaveBeenCalled();
+        component.mustDisconnectGameOnLeave = false;
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
@@ -254,12 +256,12 @@ describe('GamePageComponent', () => {
     });
 
     it('handlePlayerLeave should tell the playerLeavesService', () => {
+        component['mustDisconnectGameOnLeave'] = true;
         const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
             return;
         });
-        expect(component.playerLeftWithQuitButton).toBeFalse();
-        component['handlePlayerLeave']();
-        expect(component.playerLeftWithQuitButton).toBeTrue();
+        component['handlePlayerLeaves']();
+        expect(component.mustDisconnectGameOnLeave).toBeFalse();
         expect(leaveSpy).toHaveBeenCalled();
     });
 });

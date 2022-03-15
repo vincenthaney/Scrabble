@@ -21,6 +21,7 @@ import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { ESCAPE } from '@app/constants/components-constants';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
@@ -49,9 +50,9 @@ describe('TileRackComponent', () => {
 
         const tileRackUpdate$ = new Subject();
         const tilesPlayed$ = new Subject();
-        const message$ = new Subject();
+        const message$ = new Subject<Message | null>();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
-        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
+        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
             switch (eventType) {
                 case 'tileRackUpdate':
                     tileRackUpdate$.next();
@@ -60,7 +61,7 @@ describe('TileRackComponent', () => {
                     tilesPlayed$.next();
                     break;
                 case 'newMessage':
-                    message$.next();
+                    message$.next(payload);
             }
         });
 
@@ -122,9 +123,14 @@ describe('TileRackComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should call handleNewMessage when newMessage is received', () => {
-        gameViewEventManagerSpy.emitGameViewEvent('newMessage');
+    it('should call handleNewMessage when defined newMessage is received', () => {
+        gameViewEventManagerSpy.emitGameViewEvent('newMessage', INITIAL_MESSAGE);
         expect(handleNewMessageSpy).toHaveBeenCalled();
+    });
+
+    it('should not call handleNewMessage when undefined newMessage is received', () => {
+        gameViewEventManagerSpy.emitGameViewEvent('newMessage', null);
+        expect(handleNewMessageSpy).not.toHaveBeenCalled();
     });
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
@@ -263,6 +269,17 @@ describe('TileRackComponent', () => {
             component.selectTile(type, tile);
 
             expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT call unselectAll if type is not select and does not change', () => {
+            const type: TileRackSelectType = 'exchange' as TileRackSelectType;
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'unselectAll');
+
+            component['selectionType'] = 'exchange' as TileRackSelectType;
+            component.selectTile(type, tile);
+
+            expect(spy).not.toHaveBeenCalled();
         });
 
         it('should return false if tile already selected', () => {

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { Message } from '@app/classes/communication/message';
-import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import * as SERVICE_ERRORS from '@app/constants/services-errors';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -25,7 +24,7 @@ export class GameViewEventManagerService {
         this.eventMap.set('tilesPlayed', new Subject<ActionPlacePayload>());
         this.eventMap.set('noActiveGame', new Subject<void>());
         this.eventMap.set('reRender', new Subject<void>());
-        this.eventMap.set('newMessage', new BehaviorSubject<Message>(INITIAL_MESSAGE));
+        this.eventMap.set('newMessage', new BehaviorSubject<Message | null>(null));
     }
 
     emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S): void {

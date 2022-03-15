@@ -24,8 +24,10 @@ import { Orientation } from '@app/classes/orientation';
 import { Square, SquareView } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { SquareComponent } from '@app/components/square/square.component';
 import { BACKSPACE, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
-import { UNDEFINED_SQUARE } from '@app/constants/game';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
 import { Observable, Subject } from 'rxjs';
@@ -119,7 +121,7 @@ describe('BoardComponent', () => {
                 RouterTestingModule,
                 HttpClientTestingModule,
             ],
-            declarations: [BoardComponent],
+            declarations: [BoardComponent, SquareComponent],
             providers: [{ provide: BoardService, useValue: boardServiceSpy }],
         }).compileComponents();
     });
@@ -138,6 +140,20 @@ describe('BoardComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    describe('newMessage subscription', () => {
+        it('should call handleNewMessage if gameViewEvent new message is defined', () => {
+            const spy = spyOn<any>(component, 'handleNewMessage');
+            component['gameViewEventManagerService'].emitGameViewEvent('newMessage', INITIAL_MESSAGE);
+            expect(spy).toHaveBeenCalledWith(INITIAL_MESSAGE);
+        });
+
+        it('should NOT call handleNewMessage if gameViewEvent new message is undefined', () => {
+            const spy = spyOn<any>(component, 'handleNewMessage');
+            component['gameViewEventManagerService'].emitGameViewEvent('newMessage', null);
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
     it('Component should call initializeBoard on init if service has a board', () => {
@@ -431,6 +447,11 @@ describe('BoardComponent', () => {
             component['handleNewMessage']({ senderId: 'system-error' } as Message);
             expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeTrue();
         });
+
+        it('should do nothing if sender is not system-error', () => {
+            component['handleNewMessage']({ senderId: 'system' } as Message);
+            expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeFalse();
+        });
     });
 
     describe('onFocusableEvent', () => {
@@ -525,6 +546,12 @@ describe('BoardComponent', () => {
             it('should do nothing if not keydown', () => {
                 event = { key: BACKSPACE } as unknown as KeyboardEvent;
                 (selectedSquare.square.tile as unknown) = 'not null';
+                component['onFocusableEvent']!(event);
+                expect(nextEmptySpy).not.toHaveBeenCalled();
+            });
+
+            it('should do nothing if selectedSquare is undefined', () => {
+                component['selectedSquare'] = undefined;
                 component['onFocusableEvent']!(event);
                 expect(nextEmptySpy).not.toHaveBeenCalled();
             });
@@ -706,6 +733,30 @@ describe('BoardComponent', () => {
 
         it('should return true if same position', () => {
             expect(component.isSamePosition(s1, s2)).toBeTrue();
+        });
+    });
+
+    describe('clearBitAppliedSquare', () => {
+        it('should set all square tiles to null', () => {
+            const baseSquareView = new SquareView(
+                {
+                    tile: {
+                        letter: 'A',
+                        value: 1,
+                    },
+                    position: { row: 1, column: 1 },
+                    scoreMultiplier: null,
+                    wasMultiplierUsed: false,
+                    isCenter: false,
+                },
+                SQUARE_SIZE,
+            );
+            component['notAppliedSquares'] = [baseSquareView, baseSquareView, baseSquareView];
+
+            component['clearNotAppliedSquare']();
+
+            component['notAppliedSquares'].forEach((squareView) => expect(squareView.square.tile).toBeNull());
+            expect(component['notAppliedSquares']).toEqual([]);
         });
     });
 });

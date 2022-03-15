@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { EXPIRED_COOKIE_AGE } from '@app/constants/services-errors';
-// import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { CookieService } from './cookie.service';
 
 const USERNAME = 'perry';
