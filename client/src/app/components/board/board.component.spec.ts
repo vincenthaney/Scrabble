@@ -433,7 +433,7 @@ describe('BoardComponent', () => {
 
             const player = new Player('http://endless.horse', 'HORSE', []);
             getTilesSpy = spyOn(player, 'getTiles').and.returnValue(
-                tiles.map<Tile>((letter) => (letter === '*' ? { letter, isBlank: true } : { letter }) as Tile)
+                tiles.map<Tile>((letter) => (letter === '*' ? { letter, isBlank: true } : { letter }) as Tile),
             );
             getLocalPlayerSpy = spyOn(component['gameService'], 'getLocalPlayer').and.returnValue(player);
 
