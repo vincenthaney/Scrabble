@@ -297,7 +297,7 @@ describe('GamePlayController', () => {
             });
         });
 
-        it.only('should call PASS when playAction throw word not in dictionary', async () => {
+        it('should call PASS when playAction throw word not in dictionary', async () => {
             const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
             (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
             gamePlayServiceStub.playAction.throws('error');
