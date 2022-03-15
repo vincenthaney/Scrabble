@@ -14,8 +14,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer, Player } from '@app/classes/player';
+import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -399,6 +401,70 @@ describe('TileRackComponent', () => {
             canExchangeTile.and.returnValue(false);
             component.exchangeTiles();
             expect(sendExchangeActionSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleUsedTiles', () => {
+        let payload: ActionPlacePayload;
+
+        beforeEach(() => {
+            payload = {} as ActionPlacePayload;
+            handleUsedTileSpy.and.callThrough();
+        });
+
+        it('should make tiles as used', () => {
+            component.tiles = [
+                { letter: 'A', isUsed: false },
+                { letter: 'B', isUsed: false },
+                { letter: 'C', isUsed: false },
+            ] as RackTile[];
+
+            payload.tiles = [{ letter: 'A' }, { letter: 'B' }] as Tile[];
+
+            component['handleUsedTiles'](payload);
+
+            for (const tile of payload.tiles) {
+                expect(component.tiles.find((t) => t.letter === tile.letter)?.isUsed).toBeTrue();
+            }
+        });
+
+        it('should mark tile as unused if not in payload', () => {
+            component.tiles = [{ letter: 'A', isUsed: true }] as RackTile[];
+            payload.tiles = [];
+
+            component['handleUsedTiles'](payload);
+
+            for (const tile of component.tiles) {
+                expect(tile.isUsed).toBeFalse();
+            }
+        });
+
+        it('should mark all tiles as unused it payload is undefined', () => {
+            component.tiles = [
+                { letter: 'A', isUsed: true },
+                { letter: 'B', isUsed: true },
+                { letter: 'C', isUsed: true },
+            ] as RackTile[];
+
+            component['handleUsedTiles'](undefined);
+
+            for (const tile of component.tiles) {
+                expect(tile.isUsed).toBeFalse();
+            }
+        });
+
+        it('should only mark one tile as used if two with same letter', () => {
+            component.tiles = [
+                { letter: 'A', isUsed: false },
+                { letter: 'A', isUsed: true },
+            ] as RackTile[];
+
+            payload.tiles = [{ letter: 'A' }] as Tile[];
+
+            component['handleUsedTiles'](payload);
+
+            expect(component.tiles[0].isUsed).toBeTrue();
+            expect(component.tiles[1].isUsed).toBeFalse();
         });
     });
 });
