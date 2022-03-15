@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Position } from '@app/classes/board';
 
 export const NO_MULTIPLIER_MAPPED_TO_INPUT = (data: string): string => {

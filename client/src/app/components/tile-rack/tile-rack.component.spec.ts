@@ -27,7 +27,6 @@ import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-// import { BehaviorSubject } from 'rxjs';
 import { RackTile, TileRackComponent } from './tile-rack.component';
 import SpyObj = jasmine.SpyObj;
 
