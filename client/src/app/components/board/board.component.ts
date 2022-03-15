@@ -106,7 +106,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         );
     }
 
-    protected onFocusableEvent(event: KeyboardEvent) {
+    protected onFocusableEvent(event: KeyboardEvent): void {
         switch (event.key) {
             case BACKSPACE:
                 if (event.type === KEYDOWN) this.handleBackspace();
@@ -122,7 +122,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    protected onLoseFocusEvent() {
+    protected onLoseFocusEvent(): void {
         this.removeUsedTiles();
     }
 
@@ -134,21 +134,21 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (!(LETTER_VALUES as string[]).includes(letter)) return;
         if (letter === WILDCARD) return;
 
-        const availableTile = [...(this.gameService.getLocalPlayer()?.getTiles() ?? [])];
+        const availableTiles = [...(this.gameService.getLocalPlayer()?.getTiles() ?? [])];
         const usedTiles = [...(this.gameViewEventManagerService.getGameViewEventValue('usedTiles')?.tiles ?? [])];
 
         for (const usedTile of usedTiles) {
-            const index = availableTile.findIndex((t) => t.letter === usedTile.letter);
-            if (index >= 0) availableTile.splice(index, 1);
+            const index = availableTiles.findIndex((t) => t.letter === usedTile.letter);
+            if (index >= 0) availableTiles.splice(index, 1);
         }
 
         let tile: Tile | undefined;
 
         if (isUppercase) {
-            tile = availableTile.find((t) => t.isBlank);
+            tile = availableTiles.find((t) => t.isBlank);
             if (tile) (tile.playedLetter as string) = letter;
         } else {
-            tile = availableTile.find((t) => t.letter === letter);
+            tile = availableTiles.find((t) => t.letter === letter);
         }
 
         if (!tile) return;
@@ -157,7 +157,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
     }
 
-    private handleBackspace() {
+    private handleBackspace(): void {
         if (!this.selectedSquare) return;
         this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
         if (this.selectedSquare) {
@@ -168,7 +168,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private handleEnter() {
+    private handleEnter(): void {
         const placePayload = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
         if (placePayload) this.gameButtonActionService.sendPlaceAction(placePayload);
     }
@@ -266,7 +266,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private useTile(tile: Tile) {
+    private useTile(tile: Tile): void {
         const previousUsedTiles = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
 
         if (previousUsedTiles) {
@@ -283,7 +283,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private removeUsedTile(tile: Tile) {
+    private removeUsedTile(tile: Tile): void {
         const previousUsedTiles = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
 
         if (!previousUsedTiles) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
