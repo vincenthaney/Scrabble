@@ -144,6 +144,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.gameId;
     }
 
+    resetGameId(): void {
+        this.gameId = '';
+    }
+
     getPlayerByNumber(playerNumber: number): AbstractPlayer | undefined {
         if (!this.playerContainer) return undefined;
         return this.playerContainer.getPlayer(playerNumber);
@@ -207,6 +211,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         const localPlayerId = this.getLocalPlayerId();
         this.resetServiceData();
 
+        console.log(localPlayerId);
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
