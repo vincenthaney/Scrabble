@@ -488,11 +488,19 @@ describe('InputParserService', () => {
             }).toThrow(new CommandException(CommandExceptionMessages.GameOver));
         });
 
-        it("should throw error if on your turn command and it is not the player's turn", () => {
+        it("should throw error if trying to pass and it is not the player's turn", () => {
             gameServiceSpy.isGameOver = false;
             gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
             expect(() => {
                 service['verifyActionValidity'](ActionType.PASS);
+            }).toThrow(new CommandException(CommandExceptionMessages.NotYourTurn));
+        });
+
+        it("should throw error if trying to get hint and it is not the player's turn", () => {
+            gameServiceSpy.isGameOver = false;
+            gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
+            expect(() => {
+                service['verifyActionValidity'](ActionType.HINT);
             }).toThrow(new CommandException(CommandExceptionMessages.NotYourTurn));
         });
     });
