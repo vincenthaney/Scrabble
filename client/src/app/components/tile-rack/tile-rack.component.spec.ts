@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -51,6 +50,7 @@ describe('TileRackComponent', () => {
         );
         gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(100);
 
         const tileRackUpdate$ = new Subject();
