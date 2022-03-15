@@ -29,21 +29,18 @@ export class PlayerLeavesService implements OnDestroy {
         });
     }
 
-    getGameId(): string {
-        return this.gameService.gameId;
-    }
-
     handleJoinerLeaveGame(leaverName: string): void {
         this.joinerLeavesGameEvent.next(leaverName);
     }
 
     handleLocalPlayerLeavesGame(): void {
-        this.playerLeavesController.handleLeaveGame(this.getGameId());
-        this.gameService.gameId = '';
+        this.playerLeavesController.handleLeaveGame(this.gameService.getGameId());
+        // this.gameService.gameId = '';
     }
 
     handleLeaveLobby(): void {
-        if (this.getGameId()) this.playerLeavesController.handleLeaveGame(this.getGameId());
+        const gameId = this.gameService.getGameId();
+        if (gameId) this.playerLeavesController.handleLeaveGame(gameId);
         this.gameDispatcherService.resetServiceData();
     }
 
