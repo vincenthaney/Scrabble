@@ -75,7 +75,7 @@ export const MIN_LOCATION_COMMAND_LENGTH = 2;
 export const MAX_INPUT_LENGTH = 512;
 export const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
-export const MAX_TILE_PER_PLAYER = 7;
+export const MAX_TILES_PER_PLAYER = 7;
 
 export const DEFAULT_PLAYER = new Player('id', 'name', []);
 

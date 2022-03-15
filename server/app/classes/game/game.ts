@@ -111,9 +111,11 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         if (winnerName) {
-            if (winnerName === this.player1.name)
+            if (winnerName === this.player1.name) {
                 return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-            else return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            } else {
+                return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            }
         } else {
             return this.getEndOfGameScores();
         }

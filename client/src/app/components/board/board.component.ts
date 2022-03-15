@@ -143,12 +143,12 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         return true;
     }
 
-    isSamePosition(s1: SquareView | undefined, s2: SquareView | undefined): boolean {
+    isSamePosition(square1: SquareView | undefined, square2: SquareView | undefined): boolean {
         return (
-            s1 !== undefined &&
-            s2 !== undefined &&
-            s1.square.position.row === s2.square.position.row &&
-            s1.square.position.column === s2.square.position.column
+            square1 !== undefined &&
+            square2 !== undefined &&
+            square1.square.position.row === square2.square.position.row &&
+            square1.square.position.column === square2.square.position.column
         );
     }
 
@@ -187,7 +187,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
             Then, we check for each SquareView if it's square property's position 
-            matches one of the square in "squareToUpate".
+            matches one of the square in "squareToUpdate".
             If so, we change the board's square to be the updated square
         */
         ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {
