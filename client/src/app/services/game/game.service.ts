@@ -91,7 +91,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         } else {
             this.reconnectReinitialize(startGameData);
         }
-        // this.newActivePlayerEvent.emit([startGameData.round.playerData, this.isLocalPlayerPlaying()]);
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
