@@ -58,7 +58,7 @@ describe('CommunicationBoxComponent', () => {
 
     beforeEach(async () => {
         inputParserSpy = jasmine.createSpyObj('InputParserService', ['handleInput']);
-        inputParserSpy.handleInput.and.callFake(() => {
+        inputParserSpy['handleInput'].and.callFake(() => {
             return;
         });
 
@@ -160,7 +160,7 @@ describe('CommunicationBoxComponent', () => {
         });
 
         it('should call messageStorageService.resetMessages', () => {
-            const spy = spyOn(component['messageStorageService'], 'resetMessages');
+            const spy = spyOn<any>(component['messageStorageService'], 'resetMessages');
             component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
@@ -168,25 +168,25 @@ describe('CommunicationBoxComponent', () => {
 
     describe('createVisualMessage', () => {
         it('should create visualMessage from Message by player1', () => {
-            const returnValue: Message = component.createVisualMessage(DEFAULT_PLAYER1_MESSAGE);
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_PLAYER1_MESSAGE);
             const expectedValue: Message = { ...DEFAULT_PLAYER1_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by player2', () => {
-            const returnValue: Message = component.createVisualMessage(DEFAULT_PLAYER2_MESSAGE);
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_PLAYER2_MESSAGE);
             const expectedValue: Message = { ...DEFAULT_PLAYER2_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by system', () => {
-            const returnValue: Message = component.createVisualMessage(DEFAULT_SYSTEM_MESSAGE);
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_SYSTEM_MESSAGE);
             const expectedValue: Message = { ...DEFAULT_SYSTEM_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by system-error', () => {
-            const returnValue: Message = component.createVisualMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_SYSTEM_ERROR_MESSAGE);
             const expectedValue: Message = { ...DEFAULT_SYSTEM_ERROR_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
@@ -214,7 +214,7 @@ describe('CommunicationBoxComponent', () => {
         });
 
         it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
-            const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
+            const onReceiveSpy = spyOn<any>(component, 'onReceiveNewMessage');
             gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
             expect(onReceiveSpy).toHaveBeenCalled();
         });
@@ -233,20 +233,20 @@ describe('CommunicationBoxComponent', () => {
 
         it('should add new visualmessage to messages', () => {
             component.messages = [];
-            spyOn(component, 'createVisualMessage').and.returnValue(DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE);
-            component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            spyOn<any>(component, 'createVisualMessage').and.returnValue(DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE);
+            component['onReceiveNewMessage'](DEFAULT_SYSTEM_ERROR_MESSAGE);
             expect(component.messages).toEqual([DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE]);
         });
 
         it('should set loading to false if new message is NOT from opponent', () => {
             component.loading = true;
-            component.onReceiveNewMessage(DEFAULT_SYSTEM_MESSAGE);
+            component['onReceiveNewMessage'](DEFAULT_SYSTEM_MESSAGE);
             expect(component.loading).toBeFalse();
         });
 
         it('should NOT set loading to true if new message is from opponent', () => {
             component.loading = true;
-            component.onReceiveNewMessage(DEFAULT_PLAYER2_MESSAGE);
+            component['onReceiveNewMessage'](DEFAULT_PLAYER2_MESSAGE);
             expect(component.loading).toBeTrue();
         });
     });
