@@ -17,13 +17,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
-import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
+import { Player } from '@app/classes/player';
 import { Square, SquareView } from '@app/classes/square';
-import { Tile } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { BACKSPACE, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
+import { CANNOT_REMOVE_UNUSED_TILE } from '@app/constants/component-errors';
+import { BACKSPACE, ENTER, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
 import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
@@ -416,126 +417,253 @@ describe('BoardComponent', () => {
         });
     });
 
-    describe('onFocusableEvent', () => {
-        let selectedSquare: SquareView;
-        let event: KeyboardEvent;
+    describe('handlePlaceLetter', () => {
+        let tiles: LetterValue[];
+        let usedTiles: LetterValue[] = [];
         let nextEmptySpy: jasmine.Spy;
+        let useTileSpy: jasmine.Spy;
+        let getLocalPlayerSpy: jasmine.Spy;
+        let getGameViewEventValueSpy: jasmine.Spy;
+        let getTilesSpy: jasmine.Spy;
+        let squareView: SquareView;
 
         beforeEach(() => {
-            selectedSquare = new SquareView(
-                {
-                    tile: null,
-                    position: { row: 0, column: 0 },
-                    scoreMultiplier: null,
-                    wasMultiplierUsed: false,
-                    isCenter: false,
-                },
-                {
-                    x: 1,
-                    y: 1,
-                },
+            tiles = ['A', 'B', 'C', '*'];
+            usedTiles = ['C', 'D'];
+
+            const player = new Player('http://endless.horse', 'HORSE', []);
+            getTilesSpy = spyOn(player, 'getTiles').and.returnValue(
+                tiles.map<Tile>((letter) => (letter === '*' ? { letter, isBlank: true } : { letter }) as Tile)
             );
+            getLocalPlayerSpy = spyOn(component['gameService'], 'getLocalPlayer').and.returnValue(player);
 
-            component.selectedSquare = selectedSquare;
+            getGameViewEventValueSpy = spyOn<any>(component['gameViewEventManagerService'], 'getGameViewEventValue').and.returnValue({
+                tiles: usedTiles.map<Tile>((letter) => ({ letter } as Tile)),
+            });
 
-            component.navigator = new BoardNavigator(component.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
+            nextEmptySpy = spyOn(component['navigator'], 'nextEmpty').and.returnValue(undefined);
 
-            event = new KeyboardEvent('exception');
-            component.ngOnInit();
+            useTileSpy = spyOn<any>(component, 'useTile');
 
-            nextEmptySpy = spyOn(component.navigator, 'nextEmpty').and.returnValue(undefined);
+            squareView = {} as SquareView;
         });
 
-        it('should set tile on selectedSquare', () => {
-            component['onFocusableEvent']!(event);
+        const tests: [letter: string, isUppercase: boolean, calls: boolean][] = [
+            ['A', false, true],
+            ['a', false, true],
+            ['B', false, true],
+            ['C', false, false],
+            ['Z', false, false],
+            ['C', true, true],
+            ['Z', true, true],
+            ['*', true, false],
+            ['!', true, false],
+        ];
 
-            expect(selectedSquare.square.tile).not.toBeNull();
-            expect(selectedSquare.applied).toBeFalse();
+        for (const [letter, isUppercase, calls] of tests) {
+            it(`it should ${calls ? '' : 'not'} call useTile \
+                and nextEmpty with letter ${letter} as ${isUppercase ? 'uppercase' : 'lowecase'}`, () => {
+                component['handlePlaceLetter'](letter, isUppercase, squareView);
+
+                const spies = [useTileSpy, nextEmptySpy];
+
+                for (const spy of spies) {
+                    if (calls) expect(spy).toHaveBeenCalled();
+                    else expect(spy).not.toHaveBeenCalled();
+                }
+            });
+        }
+
+        it('should not call useTile if no localPlayer', () => {
+            getLocalPlayerSpy.and.returnValue(undefined);
+            component['handlePlaceLetter'](tiles[0], false, squareView);
+
+            expect(useTileSpy).not.toHaveBeenCalled();
         });
 
-        it('should add selectedSquare to notAppliedSquares', () => {
-            component.notAppliedSquares = [];
-            component['onFocusableEvent']!(event);
+        it('should work even if not value for usedTile', () => {
+            getGameViewEventValueSpy.and.returnValue(undefined);
+            component['handlePlaceLetter'](tiles[0], false, squareView);
 
-            expect(component.notAppliedSquares.includes(selectedSquare)).toBeTrue();
+            expect(useTileSpy).toHaveBeenCalled();
         });
 
-        it('should call nextEmptySpy', () => {
-            component['onFocusableEvent']!(event);
-            expect(nextEmptySpy).toHaveBeenCalled();
+        it('should not call useTile if squareView is undefined', () => {
+            component['handlePlaceLetter'](tiles[0], false, undefined);
+
+            expect(useTileSpy).not.toHaveBeenCalled();
         });
 
-        it('should do nothing if selectedSquare is undefined', () => {
+        it('should not call useTile if try using blank letter but has none', () => {
+            getTilesSpy.and.returnValue([{ letter: 'A', isBlank: false }]);
+            component['handlePlaceLetter']('C', true, squareView);
+
+            expect(useTileSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleBackspace', () => {
+        let selectedSquare: SquareView;
+        let previousSquare: SquareView;
+        let nextEmptySpy: jasmine.Spy;
+        let removeUsedTileSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            selectedSquare = { square: { tile: {} } } as SquareView;
+            previousSquare = { square: { tile: {} } } as SquareView;
+
+            component['selectedSquare'] = selectedSquare;
+            component.notAppliedSquares = [previousSquare];
+
+            nextEmptySpy = spyOn(component['navigator'], 'nextEmpty').and.returnValue(previousSquare);
+            removeUsedTileSpy = spyOn<any>(component, 'removeUsedTile');
+        });
+
+        it('should call nextEmpty with backward direction', () => {
+            component['handleBackspace']();
+
+            expect(nextEmptySpy).toHaveBeenCalledOnceWith(Direction.Backward, true);
+        });
+
+        it('should set selectedSquare to nextSquare', () => {
+            component['handleBackspace']();
+
+            expect(component['selectedSquare']).toEqual(previousSquare);
+        });
+
+        it('should remove previousSquare from notAppliedSquares', () => {
+            component['handleBackspace']();
+
+            expect(component.notAppliedSquares).not.toContain(previousSquare);
+        });
+
+        it('should not change notAppliedSquare if previousSquare not in it', () => {
+            component.notAppliedSquares = [{}, {}] as SquareView[];
+            const expected = component.notAppliedSquares.length;
+
+            component['handleBackspace']();
+
+            expect(component.notAppliedSquares).toHaveSize(expected);
+        });
+
+        it('should call removeUsedTile', () => {
+            const tile = previousSquare.square.tile;
+            component['handleBackspace']();
+
+            expect(removeUsedTileSpy).toHaveBeenCalledOnceWith(tile);
+        });
+
+        it('should not call removeUsedTile if previousSquare does not have a tile', () => {
+            previousSquare.square.tile = null;
+
+            expect(removeUsedTileSpy).not.toHaveBeenCalled();
+        });
+
+        it("should set previousSquare's tile to null", () => {
+            component['handleBackspace']();
+
+            expect(previousSquare.square.tile).toBeNull();
+        });
+
+        it('should not change notAppliedSquares if no previousSquare', () => {
+            nextEmptySpy.and.returnValue(undefined);
+            const expected = component.notAppliedSquares.length;
+
+            component['handleBackspace']();
+
+            expect(component.notAppliedSquares).toHaveSize(expected);
+        });
+
+        it('should not call nextEmpty if no selectedSquare', () => {
             component.selectedSquare = undefined;
-            component.notAppliedSquares = [];
 
-            component['onFocusableEvent']!(event);
+            component['handleBackspace']();
 
             expect(nextEmptySpy).not.toHaveBeenCalled();
-            expect(component.notAppliedSquares.length).toEqual(0);
+        });
+    });
+
+    describe('handleEnter', () => {
+        let getPayloadSpy: jasmine.Spy;
+        let sendPlaceActionPayload: jasmine.Spy;
+
+        beforeEach(() => {
+            getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
+            sendPlaceActionPayload = spyOn(component['gameButtonActionService'], 'sendPlaceAction');
         });
 
-        describe('Backspace', () => {
-            beforeEach(() => {
-                event = { key: BACKSPACE, type: KEYDOWN } as unknown as KeyboardEvent;
-            });
+        it('should call sendPlaceAction', () => {
+            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+            getPayloadSpy.and.returnValue(payload);
 
-            it('should call nextEmpty with Backward if backspace', () => {
-                component['onFocusableEvent']!(event);
-                expect(nextEmptySpy).toHaveBeenCalledOnceWith(Direction.Backward, true);
-            });
+            component['handleEnter']();
 
-            it('should go back and remove tile (with notAppliedSquares)', () => {
-                (selectedSquare.square.tile as unknown) = 'not null';
-                nextEmptySpy.and.returnValue(selectedSquare);
-                component.notAppliedSquares = [selectedSquare];
-
-                component['onFocusableEvent']!(event);
-
-                expect(component.notAppliedSquares.length).toEqual(0);
-                expect(selectedSquare.square.tile).toBeNull();
-            });
-
-            it('should go back and remove tile', () => {
-                (selectedSquare.square.tile as unknown) = 'not null';
-                nextEmptySpy.and.returnValue(selectedSquare);
-
-                component['onFocusableEvent']!(event);
-
-                expect(selectedSquare.square.tile).toBeNull();
-            });
-
-            it('should do nothing if not keydown', () => {
-                event = { key: BACKSPACE } as unknown as KeyboardEvent;
-                (selectedSquare.square.tile as unknown) = 'not null';
-                component['onFocusableEvent']!(event);
-                expect(nextEmptySpy).not.toHaveBeenCalled();
-            });
+            expect(sendPlaceActionPayload).toHaveBeenCalledOnceWith(payload);
         });
 
-        describe('Escape', () => {
-            beforeEach(() => {
-                event = { key: ESCAPE, type: KEYDOWN } as unknown as KeyboardEvent;
-            });
+        it('should not call sendPlaceAction if no payload', () => {
+            getPayloadSpy.and.returnValue(undefined);
 
-            it('should clear selectedSquare', () => {
-                (component.selectedSquare as unknown) = 'not-undefined';
-                component['onFocusableEvent']!(event);
-                expect(component.selectedSquare).toBeUndefined();
-            });
+            component['handleEnter']();
 
-            it('should call clearNotAppliedSquare', () => {
-                const spy = spyOn<any>(component, 'clearNotAppliedSquare');
-                component['onFocusableEvent']!(event);
-                expect(spy).toHaveBeenCalled();
-            });
+            expect(sendPlaceActionPayload).not.toHaveBeenCalled();
+        });
+    });
 
-            it('should do nothing if not keydown', () => {
-                event = { key: ESCAPE } as unknown as KeyboardEvent;
-                (component.selectedSquare as unknown) = 'not-undefined';
-                component['onFocusableEvent']!(event);
-                expect(component.selectedSquare).toBeDefined();
+    describe('clearCursor', () => {
+        let removeUsedTilesSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            removeUsedTilesSpy = spyOn<any>(component, 'removeUsedTiles');
+            component.selectedSquare = {} as SquareView;
+        });
+
+        it('should set selectedSquare to undefined', () => {
+            component['clearCursor']();
+
+            expect(component.selectedSquare).toBeUndefined();
+        });
+
+        it('should call removeUsedTiles', () => {
+            component['clearCursor']();
+
+            expect(removeUsedTilesSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('onFocusableEvent', () => {
+        const tests: [key: string, type: string, method: string, called: boolean][] = [
+            [BACKSPACE, KEYDOWN, 'handleBackspace', true],
+            [BACKSPACE, 'any', 'handleBackspace', false],
+            [ESCAPE, KEYDOWN, 'clearCursor', true],
+            [ESCAPE, 'any', 'clearCursor', false],
+            [ENTER, 'any', 'handleEnter', true],
+            ['A', 'any', 'handlePlaceLetter', true],
+            ['M', 'any', 'handlePlaceLetter', true],
+            ['Z', 'any', 'handlePlaceLetter', true],
+        ];
+
+        for (const [key, type, method, called] of tests) {
+            it(`should ${called ? 'not' : ''} call ${method} on ${key} when type=${type}`, () => {
+                const event: KeyboardEvent = { key, type } as KeyboardEvent;
+                const spy = spyOn<any>(component, method);
+
+                component['onFocusableEvent'](event);
+
+                if (called) expect(spy).toHaveBeenCalled();
+                else expect(spy).not.toHaveBeenCalled();
             });
+        }
+
+        it('should call handlePlaceLetter with key, shift and selected square by default', () => {
+            const event: KeyboardEvent = { key: 'A', shiftKey: true } as KeyboardEvent;
+            const spy = spyOn<any>(component, 'handlePlaceLetter');
+            const selectedSquare: SquareView = {} as SquareView;
+            component.selectedSquare = selectedSquare;
+
+            component['onFocusableEvent'](event);
+
+            expect(spy).toHaveBeenCalledOnceWith(event.key, event.shiftKey, selectedSquare);
         });
     });
 
@@ -544,16 +672,8 @@ describe('BoardComponent', () => {
             component.ngOnInit();
         });
 
-        it('should reset attributes', () => {
-            (component.selectedSquare as unknown) = 'not-empty';
-
-            component['onLoseFocusEvent']!();
-
-            expect(component.selectedSquare).toBeUndefined();
-        });
-
         it('should call clearNotAppliedSquare', () => {
-            const spy = spyOn<any>(component, 'clearNotAppliedSquare');
+            const spy = spyOn<any>(component, 'removeUsedTiles');
 
             component['onLoseFocusEvent']!();
 
@@ -592,8 +712,8 @@ describe('BoardComponent', () => {
             expect(spy).toHaveBeenCalledOnceWith(component);
         });
 
-        it('should clear not applied square', () => {
-            const spy = spyOn<any>(component, 'clearNotAppliedSquare');
+        it('should call removeUsedTiles', () => {
+            const spy = spyOn<any>(component, 'removeUsedTiles');
 
             component.onSquareClick(squareView);
 
@@ -689,6 +809,112 @@ describe('BoardComponent', () => {
 
         it('should return true if same position', () => {
             expect(component.isSamePosition(s1, s2)).toBeTrue();
+        });
+    });
+
+    describe('useTile', () => {
+        let emitGameViewEventSpy: jasmine.Spy;
+        let getGameViewEventValueSpy: jasmine.Spy;
+        let tile: Tile;
+
+        beforeEach(() => {
+            getGameViewEventValueSpy = spyOn<any>(component['gameViewEventManagerService'], 'getGameViewEventValue');
+            emitGameViewEventSpy = spyOn(component['gameViewEventManagerService'], 'emitGameViewEvent');
+            tile = {} as Tile;
+        });
+
+        it('should call emitToGameViewEvent if has usedTiles', () => {
+            const previousPayload: ActionPlacePayload = {
+                orientation: Orientation.Horizontal,
+                startPosition: { row: 0, column: 0 },
+                tiles: [],
+            };
+            getGameViewEventValueSpy.and.returnValue(previousPayload);
+
+            const expectedPayload = {
+                ...previousPayload,
+                tiles: [...previousPayload.tiles, tile],
+            };
+
+            component['useTile'](tile);
+
+            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', expectedPayload);
+        });
+
+        it('should call emitToGameViewEvent if doesnt have usedTiles', () => {
+            getGameViewEventValueSpy.and.returnValue(undefined);
+
+            component.navigator.orientation = Orientation.Vertical;
+            component.navigator.setPosition(1, 2);
+
+            const expectedPayload: ActionPlacePayload = {
+                orientation: component.navigator.orientation,
+                startPosition: { row: component.navigator.row, column: component.navigator.column },
+                tiles: [tile],
+            };
+
+            component['useTile'](tile);
+
+            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', expectedPayload);
+        });
+    });
+
+    describe('removeUsedTile', () => {
+        let emitGameViewEventSpy: jasmine.Spy;
+        let getGameViewEventValueSpy: jasmine.Spy;
+        let tile: Tile;
+
+        beforeEach(() => {
+            getGameViewEventValueSpy = spyOn<any>(component['gameViewEventManagerService'], 'getGameViewEventValue');
+            emitGameViewEventSpy = spyOn(component['gameViewEventManagerService'], 'emitGameViewEvent');
+            tile = {} as Tile;
+        });
+
+        it('should throw if previousUsedTiles is undefined', () => {
+            getGameViewEventValueSpy.and.returnValue(undefined);
+
+            expect(() => component['removeUsedTile'](tile)).toThrowError(CANNOT_REMOVE_UNUSED_TILE);
+        });
+
+        it('should throw if tile is not in previousTiles', () => {
+            getGameViewEventValueSpy.and.returnValue({ tiles: [] });
+
+            expect(() => component['removeUsedTile'](tile)).toThrowError(CANNOT_REMOVE_UNUSED_TILE);
+        });
+
+        it('should remove tile from previousUsedTiles', () => {
+            const previousUsedTiles = { tiles: [{ letter: 'A' }, { letter: 'B' }] as Tile[] };
+            const tileToRemove = previousUsedTiles.tiles[0];
+            const size = previousUsedTiles.tiles.length;
+
+            getGameViewEventValueSpy.and.returnValue(previousUsedTiles);
+
+            component['removeUsedTile'](tileToRemove);
+
+            expect(previousUsedTiles).toHaveSize(size - 1);
+            expect(previousUsedTiles).not.toContain(tileToRemove);
+        });
+
+        it('should emit same payload with modified tiles', () => {
+            const previousUsedTiles = { tiles: [{ letter: 'A' }, { letter: 'B' }] as Tile[] };
+            const tileToRemove = previousUsedTiles.tiles[0];
+
+            getGameViewEventValueSpy.and.returnValue(previousUsedTiles);
+
+            component['removeUsedTile'](tileToRemove);
+
+            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', previousUsedTiles);
+        });
+
+        it('should emit with undefined if no longer have tiles', () => {
+            const previousUsedTiles = { tiles: [{ letter: 'A' }] as Tile[] };
+            const tileToRemove = previousUsedTiles.tiles[0];
+
+            getGameViewEventValueSpy.and.returnValue(previousUsedTiles);
+
+            component['removeUsedTile'](tileToRemove);
+
+            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', undefined);
         });
     });
 });
