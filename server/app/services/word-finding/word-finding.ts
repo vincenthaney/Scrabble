@@ -15,7 +15,6 @@ import {
     WordFindingUseCase,
 } from '@app/classes/word-finding';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
-import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import {
     BLANK_TILE_REPLACEMENT_LETTER,
     HINT_AMOUNT_OF_WORDS,
@@ -27,6 +26,7 @@ import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verific
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { arrayDeepCopy } from '@app/utils/deep-copy';
 import { Random } from '@app/utils/random';
 import { StringConversion } from '@app/utils/string-conversion';
 import { Service } from 'typedi';
@@ -54,7 +54,7 @@ export default class WordFindingService {
             placementEvaluationResults.pointDistributionChance = this.assignAcceptanceProbability(request);
         }
 
-        const rackPermutations = this.getRackPermutations(tiles);
+        const rackPermutations = this.getRackPermutations(arrayDeepCopy(tiles));
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
@@ -67,7 +67,6 @@ export default class WordFindingService {
         }
 
         chosenMoves = this.chooseMoves(searchState, request, placementEvaluationResults);
-        this.replaceBlankTile(tiles, false);
         return chosenMoves ? chosenMoves : [];
     }
 
@@ -284,7 +283,11 @@ export default class WordFindingService {
     private getTilesCombinations(tiles: Tile[]) {
         const res: Tile[][] = [[]];
         let currentCombination;
-        this.replaceBlankTile(tiles, true);
+        for (const tile of tiles) {
+            if (tile.isBlank) {
+                tile.letter = BLANK_TILE_REPLACEMENT_LETTER;
+            }
+        }
 
         // Try every combination of either including or excluding each Tile of the array
         // eslint-disable-next-line no-bitwise
@@ -325,13 +328,5 @@ export default class WordFindingService {
             this.permuteTiles(permutation, result);
         }
         return result;
-    }
-
-    private replaceBlankTile(tiles: Tile[], shouldReplaceWithReplacement: boolean): void {
-        for (const tile of tiles) {
-            if (tile.isBlank) {
-                tile.letter = shouldReplaceWithReplacement ? BLANK_TILE_REPLACEMENT_LETTER : BLANK_TILE_LETTER_VALUE;
-            }
-        }
     }
 }
