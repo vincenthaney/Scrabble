@@ -1,4 +1,3 @@
-/* eslint-disable dot-notation */
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -57,6 +56,7 @@ describe('TileComponent', () => {
 
     it('Should return tile when tile is defined', () => {
         const expectedTile: Tile = { letter: 'A', value: 5 };
+        // eslint-disable-next-line dot-notation
         component['tile'] = expectedTile;
         expect(component.tile).toEqual(expectedTile);
     });

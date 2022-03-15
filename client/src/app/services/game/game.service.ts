@@ -51,7 +51,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
             this.handleInitializeGame(initializeValue),
         );
-        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
     }
 
@@ -139,6 +141,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     getGameId(): string {
         return this.gameId;
+    }
+
+    resetGameId(): void {
+        this.gameId = '';
     }
 
     getPlayerByNumber(playerNumber: number): AbstractPlayer | undefined {

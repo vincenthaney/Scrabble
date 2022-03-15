@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable max-classes-per-file */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';

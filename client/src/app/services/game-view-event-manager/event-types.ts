@@ -6,5 +6,5 @@ export interface EventTypes {
     tilesPlayed: ActionPlacePayload;
     noActiveGame: void;
     reRender: void;
-    newMessage: Message;
+    newMessage: Message | null;
 }

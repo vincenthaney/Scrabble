@@ -3,12 +3,13 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
-import { MAX_INPUT_LENGTH } from '@app/constants/game';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { MessageStorageService } from '@app/services/message-storage/message-storage.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
 
@@ -23,7 +24,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
-    messages: VisualMessage[] = [];
+    messages: Message[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
@@ -36,16 +37,20 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         private gameService: GameService,
         private focusableComponentsService: FocusableComponentsService,
         private changeDetectorRef: ChangeDetectorRef,
+        private messageStorageService: MessageStorageService,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
+        this.messageStorageService.initializeMessages();
     }
 
     ngOnInit(): void {
-        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage) => {
-            this.onReceiveNewMessage(newMessage);
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
+            if (newMessage) this.onReceiveNewMessage(newMessage);
         });
+
+        this.initializeMessages();
     }
 
     ngAfterViewInit(): void {
@@ -56,46 +61,16 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
-    }
-
-    createVisualMessage(newMessage: Message): VisualMessage {
-        let messageClass: VisualMessageClass;
-        switch (newMessage.senderId) {
-            case this.gameService.getLocalPlayerId():
-                messageClass = 'me';
-                break;
-            case 'system':
-                messageClass = 'system';
-                break;
-            case 'system-error':
-                messageClass = 'system-error';
-                break;
-            default:
-                messageClass = 'opponent';
-                break;
-        }
-
-        return { ...newMessage, content: marked.parseInline(newMessage.content), class: messageClass };
+        this.messageStorageService.resetMessages();
     }
 
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0 && !this.loading) {
-            this.inputParser.parseInput(message);
+            this.inputParser.handleInput(message);
             this.messageForm.reset({ content: '' });
             this.loading = true;
         }
-    }
-
-    onReceiveNewMessage(newMessage: Message): void {
-        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
-        this.changeDetectorRef.detectChanges();
-        this.scrollToBottom();
-        if (!this.isOpponent(newMessage.senderId)) this.loading = false;
-    }
-
-    isOpponent(id: string): boolean {
-        return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
     }
 
     getLettersLeft(): TileReserveData[] {
@@ -112,6 +87,38 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     protected onFocusableEvent(event: KeyboardEvent): void {
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private initializeMessages(): void {
+        const storedMessages = this.messageStorageService.getMessages();
+        if (storedMessages.length > 0) {
+            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+            this.messages = this.messages.concat(storedMessages);
+        } else this.onReceiveNewMessage(INITIAL_MESSAGE);
+    }
+
+    private createVisualMessage(newMessage: Message): Message {
+        switch (newMessage.senderId) {
+            case this.gameService.getLocalPlayerId():
+                newMessage.senderId = LOCAL_PLAYER_ID;
+                break;
+            case SYSTEM_ID:
+            case SYSTEM_ERROR_ID:
+                break;
+            default:
+                newMessage.senderId = OPPONENT_ID;
+                break;
+        }
+
+        return { ...newMessage, content: marked.parseInline(newMessage.content) };
+    }
+
+    private onReceiveNewMessage(newMessage: Message): void {
+        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
+        this.changeDetectorRef.detectChanges();
+        this.scrollToBottom();
+        if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
+        this.messageStorageService.saveMessage(newMessage);
     }
 
     private isCtrlC(event: KeyboardEvent): boolean {

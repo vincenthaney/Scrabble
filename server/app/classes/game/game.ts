@@ -10,6 +10,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game-type';
 
@@ -27,6 +28,7 @@ export default class Game {
     dictionnaryName: string;
     player1: Player;
     player2: Player;
+    isAddedToDatabase: boolean;
     private tileReserve: TileReserve;
     private id: string;
 
@@ -52,6 +54,7 @@ export default class Game {
         game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
+        game.isAddedToDatabase = false;
 
         await game.tileReserve.init();
 
@@ -83,6 +86,13 @@ export default class Game {
         return this.id;
     }
 
+    getConnectedRealPlayers(): Player[] {
+        const connectedRealPlayers: Player[] = [];
+        if (this.player1.isConnected && !(this.player1 instanceof AbstractVirtualPlayer)) connectedRealPlayers.push(this.player1);
+        if (this.player2.isConnected && !(this.player2 instanceof AbstractVirtualPlayer)) connectedRealPlayers.push(this.player2);
+        return connectedRealPlayers;
+    }
+
     async initTileReserve(): Promise<void> {
         return this.tileReserve.init();
     }
@@ -101,9 +111,11 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         if (winnerName) {
-            if (winnerName === this.player1.name)
+            if (winnerName === this.player1.name) {
                 return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-            else return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            } else {
+                return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            }
         } else {
             return this.getEndOfGameScores();
         }

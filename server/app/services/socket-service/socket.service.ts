@@ -11,14 +11,14 @@ import {
     CanceledGameEmitArgs,
     CleanupEmitArgs,
     GameUpdateEmitArgs,
+    HighScoresEmitArgs,
     JoinerLeaveGameEmitArgs,
     JoinRequestEmitArgs,
     LobbiesUpdateEmitArgs,
     NewMessageEmitArgs,
     RejectEmitArgs,
     SocketEmitEvents,
-    // eslint-disable-next-line prettier/prettier
-    StartGameEmitArgs
+    StartGameEmitArgs,
 } from './socket-types';
 
 @Service()
@@ -101,6 +101,7 @@ export class SocketService {
     emitToSocket(id: string, ev: 'rejected', ...args: RejectEmitArgs[]): void;
     emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToSocket(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
+    emitToSocket(id: string, ev: 'highScoresList', ...args: HighScoresEmitArgs[]): void;
     emitToSocket(id: string, ev: 'cleanup', ...args: CleanupEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {

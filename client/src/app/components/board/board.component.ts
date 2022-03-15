@@ -59,9 +59,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
             this.handlePlaceTiles(payload),
         );
-        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (message: Message) =>
-            this.handleNewMessage(message),
-        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
         this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => clearCursor());
 
         if (!this.boardService.readInitialBoard()) return;
@@ -96,16 +96,16 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         };
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onFocusableEvent = (exception: KeyboardEvent): void => {
-            switch (exception.key) {
+        this.onFocusableEvent = (event: KeyboardEvent): void => {
+            switch (event.key) {
                 case BACKSPACE:
-                    if (exception.type === KEYDOWN) handleBackspace();
+                    if (event.type === KEYDOWN) handleBackspace();
                     break;
                 case ESCAPE:
-                    if (exception.type === KEYDOWN) clearCursor();
+                    if (event.type === KEYDOWN) clearCursor();
                     break;
                 default:
-                    handlePlaceLetter(exception.key, this.selectedSquare);
+                    handlePlaceLetter(event.key, this.selectedSquare);
             }
         };
 
@@ -140,17 +140,17 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         return true;
     }
 
-    isSamePosition(s1: SquareView | undefined, s2: SquareView | undefined): boolean {
+    isSamePosition(square1: SquareView | undefined, square2: SquareView | undefined): boolean {
         return (
-            s1 !== undefined &&
-            s2 !== undefined &&
-            s1.square.position.row === s2.square.position.row &&
-            s1.square.position.column === s2.square.position.column
+            square1 !== undefined &&
+            square2 !== undefined &&
+            square1.square.position.row === square2.square.position.row &&
+            square1.square.position.column === square2.square.position.column
         );
     }
 
     private clearNotAppliedSquare(): void {
-        this.notAppliedSquares.forEach((s) => (s.square.tile = null));
+        this.notAppliedSquares.forEach((squareView) => (squareView.square.tile = null));
         this.notAppliedSquares = [];
     }
 
@@ -165,7 +165,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
-                const square: Square = this.getBoardServiceSquare(board, i, j);
+                const square: Square = this.getSquare(board, i, j);
                 const squareView: SquareView = new SquareView(square, SQUARE_SIZE);
                 this.squareGrid[i][j] = squareView;
             }
@@ -173,7 +173,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
-    private getBoardServiceSquare(board: Square[][], row: number, column: number): Square {
+    private getSquare(board: Square[][], row: number, column: number): Square {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 
@@ -184,7 +184,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
             Then, we check for each SquareView if it's square property's position 
-            matches one of the square in "squareToUpate".
+            matches one of the square in "squareToUpdate".
             If so, we change the board's square to be the updated square
         */
         ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {
