@@ -207,7 +207,7 @@ describe('WordFindingservice', () => {
             expect(spyChooseMove).to.have.been.called;
         });
 
-        it.only('should not have changed the tiles values', () => {
+        it('should not have changed the tiles values', () => {
             BIG_TILE_RACK.push(DEFAULT_TILE_WILD);
             service.findWords(board, BIG_TILE_RACK, request);
 
