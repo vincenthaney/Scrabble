@@ -22,10 +22,16 @@ export class PlacementToString {
     }
 
     static tilesToString(tiles: Tile[]): string {
-        return tiles.reduce((str, tile) => str + tile.letter.toLowerCase(), '');
+        return tiles.reduce((str, tile) => {
+            return str + this.tileToLetterConversion(tile);
+        }, '');
     }
 
     static wordPlacementToCommandString(placement: WordPlacement): string {
         return `${this.positionAndOrientationToString(placement.startPosition, placement.orientation)} ${this.tilesToString(placement.tilesToPlace)}`;
+    }
+
+    private static tileToLetterConversion(tile: Tile): string {
+        return tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
     }
 }
