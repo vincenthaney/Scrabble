@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { BLANK_TILE_LETTER_VALUE, UNDEFINED_TILE } from '@app/constants/game';
 
-const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
+const AMOUNT_OF_TILE_BACKGROUND_IMAGES = 4;
 
 @Component({
     selector: 'app-tile',
@@ -33,7 +33,7 @@ export class TileComponent implements OnInit {
     }
 
     getBackgroundPath(): string {
-        const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMG) + 1;
+        const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMAGES) + 1;
         return `assets/img/tiles/bg_${index}.svg`;
     }
 

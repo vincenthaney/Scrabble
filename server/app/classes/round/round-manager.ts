@@ -38,15 +38,13 @@ export default class RoundManager {
     }
 
     getStartGameTime(): Date {
-        if (this.completedRounds.length === 0) {
-            if (this.currentRound) {
-                return this.currentRound.startTime;
-            } else {
-                throw new Error(ERROR_GAME_NOT_STARTED);
-            }
-        } else {
+        if (this.completedRounds.length !== 0) {
             return this.completedRounds[0].startTime;
         }
+        if (this.currentRound) {
+            return this.currentRound.startTime;
+        }
+        throw new Error(ERROR_GAME_NOT_STARTED);
     }
 
     nextRound(actionPlayed: Action): Round {

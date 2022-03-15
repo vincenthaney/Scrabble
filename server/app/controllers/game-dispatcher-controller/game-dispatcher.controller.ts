@@ -173,26 +173,26 @@ export class GameDispatcherController {
             const result = this.gameDispatcherService.leaveLobbyRequest(gameId, playerId);
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
             this.handleLobbiesUpdate();
-        } else {
-            // Check if there is no player left --> cleanup server and client
-            if (!this.socketService.doesRoomExist(gameId)) {
-                this.activeGameService.removeGame(gameId, playerId);
-                return;
-            }
-            try {
-                this.socketService.removeFromRoom(playerId, gameId);
-                this.socketService.emitToSocket(playerId, 'cleanup');
-                // catch errors caused by inexistent sockets if client closed the application
-                // eslint-disable-next-line no-empty
-            } catch (exception) {}
-            const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
-
-            this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
-
-            if (this.activeGameService.isGameOver(gameId, playerId)) return;
-
-            this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
+            return;
         }
+        // Check if there is no player left --> cleanup server and client
+        if (!this.socketService.doesRoomExist(gameId)) {
+            this.activeGameService.removeGame(gameId, playerId);
+            return;
+        }
+        try {
+            this.socketService.removeFromRoom(playerId, gameId);
+            this.socketService.emitToSocket(playerId, 'cleanup');
+            // catch errors caused by inexistent socket after client closed application
+            // eslint-disable-next-line no-empty
+        } catch (exception) {}
+        const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
+
+        this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
+
+        if (this.activeGameService.isGameOver(gameId, playerId)) return;
+
+        this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
     }
 
     private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData): void {
