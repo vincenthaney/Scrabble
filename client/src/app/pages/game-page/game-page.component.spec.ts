@@ -121,24 +121,26 @@ describe('GamePageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameServiceMock = TestBed.inject(GameService);
+        component['mustDisconnectGameOnLeave'] = false;
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call disconnectGame if there is a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => 'id');
-        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
-        component.ngOnDestroy();
-        expect(spyDiconnect).toHaveBeenCalled();
-    });
-
-    it('should not call disconnectGame if there no a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => null as unknown as string);
+    it('should call disconnectGame if player left with quit button or no active game dialog)', () => {
+        component.mustDisconnectGameOnLeave = false;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
+    });
+
+    it('should not call disconnectGame if player left abnormally during game', () => {
+        component.mustDisconnectGameOnLeave = true;
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).toHaveBeenCalled();
+        component.mustDisconnectGameOnLeave = false;
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
@@ -179,14 +181,6 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledWith(event);
     });
 
-    describe('ngOnInit', () => {
-        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent', () => {
-            component.isLocalPlayerTurn = false;
-            gameServiceMock.newActivePlayerEvent.emit([DEFAULT_PLAYER, true]);
-            expect(component.isLocalPlayerTurn).toBeTrue();
-        });
-    });
-
     describe('createpassAction', () => {
         it('should call gameButtonActionService.createPassAction()', () => {
             const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
@@ -194,25 +188,6 @@ describe('GamePageComponent', () => {
             });
             component.createPassAction();
             expect(createPassActionSpy).toHaveBeenCalled();
-        });
-    });
-
-    describe('handlePlayerLeaves', () => {
-        it('should reset gameServiceId', () => {
-            spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            gameServiceMock.gameId = 'something';
-            component['handlePlayerLeaves']();
-            expect(gameServiceMock.gameId).toEqual('');
-        });
-
-        it('should call playerLeavesService.handleLocalPlayerLeavesGame', () => {
-            const handleLocalPlayerLeavesGameSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            component['handlePlayerLeaves']();
-            expect(handleLocalPlayerLeavesGameSpy).toHaveBeenCalled();
         });
     });
 
@@ -278,5 +253,15 @@ describe('GamePageComponent', () => {
 
         component.quitButtonClicked();
         expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
+    });
+
+    it('handlePlayerLeave should tell the playerLeavesService', () => {
+        component['mustDisconnectGameOnLeave'] = true;
+        const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
+            return;
+        });
+        component['handlePlayerLeaves']();
+        expect(component.mustDisconnectGameOnLeave).toBeFalse();
+        expect(leaveSpy).toHaveBeenCalled();
     });
 });

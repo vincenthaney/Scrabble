@@ -12,8 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Orientation } from '@app/classes/orientation';
 import { SquareView } from '@app/classes/square';
-import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { IconComponent } from '../icon/icon.component';
@@ -45,41 +45,17 @@ describe('SquareComponent', () => {
         }).compileComponents();
     });
 
-    it('should create', () => {
+    beforeEach(() => {
         fixture = TestBed.createComponent(CenterSquareWrapperComponent);
         component = fixture.debugElement.children[0].componentInstance;
         fixture.detectChanges();
+    });
+
+    it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('ngOnInit should call initializeStyle()', () => {
-        const squareWrapper = new SquareTestWrapper();
-        squareWrapper.createComponent();
-
-        spyOn<any>(squareWrapper.squareComponent, 'initializeStyle').and.callFake(() => {
-            return;
-        });
-
-        squareWrapper.squareComponent.ngOnInit();
-        expect(squareWrapper.squareComponent['initializeStyle']).toHaveBeenCalled();
-    });
-
-    it('getSquareSize should return UNDEFINED_SQUARE_SIZE if no SquareView is attached', () => {
-        const squareWrapper = new SquareTestWrapper();
-        spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
-        squareWrapper.createComponent();
-
-        expect(squareWrapper.squareComponent.getSquareSize()).toEqual(UNDEFINED_SQUARE_SIZE);
-    });
-
-    it('getSquareSize should return square_size if SquareView is attached', () => {
-        const squareWrapper = new SquareTestWrapper();
-        squareWrapper.createComponent();
-
-        expect(squareWrapper.squareComponent.getSquareSize()).toEqual(squareWrapper.squareView.squareSize);
-    });
-
-    it('setText should leave attributes undefined if no SquareView is attached', () => {
+    it('ngOnOnInit should leave attributes undefined if no SquareView is attached', () => {
         const squareWrapper = new SquareTestWrapper();
         spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(undefined);
         squareWrapper.createComponent();
@@ -88,26 +64,43 @@ describe('SquareComponent', () => {
         expect(squareWrapper.squareComponent.multiplierValue).toBeUndefined();
     });
 
-    it('constructor should call setText', () => {
+    it('ngOnInit should call setText', () => {
         const squareWrapper = new SquareTestWrapper();
         squareWrapper.createComponent();
         const getTextSpy = spyOn(squareWrapper.squareView, 'getText').and.returnValue([undefined, undefined]);
 
-        squareWrapper.squareComponent.setText();
+        squareWrapper.squareComponent.ngOnInit();
 
         expect(getTextSpy).toHaveBeenCalled();
     });
 
-    it('initializeStyle should set background-color', () => {
-        const squareWrapper = new SquareTestWrapper();
-        squareWrapper.createComponent();
-        const expectedColor = COLORS.Blue;
+    describe('getSquareSize', () => {
+        it('getSquareSize should return UNDEFINED_SQUARE_SIZE if no SquareView is attached', () => {
+            const squareWrapper = new SquareTestWrapper();
+            spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
+            squareWrapper.createComponent();
 
-        spyOn(squareWrapper.squareComponent.squareView, 'getColor').and.returnValue(expectedColor);
-        squareWrapper.squareComponent['initializeStyle']();
+            expect(squareWrapper.squareComponent.getSquareSize()).toEqual(UNDEFINED_SQUARE_SIZE);
+        });
 
-        const actualColor = squareWrapper.squareComponent.style['background-color'];
-        expect(actualColor).toEqual(expectedColor);
+        it('getSquareSize should return square_size if SquareView is attached', () => {
+            const squareWrapper = new SquareTestWrapper();
+            squareWrapper.createComponent();
+
+            expect(squareWrapper.squareComponent.getSquareSize()).toEqual(squareWrapper.squareView.squareSize);
+        });
+    });
+
+    describe('getOrientationClass', () => {
+        it('should return right message for horizontal cursor orientation', () => {
+            component['cursorOrientation'] = Orientation.Horizontal;
+            expect(component.getOrientationClass()).toEqual('cursor-horizontal');
+        });
+
+        it('should return right message for vertical cursor orientation', () => {
+            component['cursorOrientation'] = Orientation.Vertical;
+            expect(component.getOrientationClass()).toEqual('cursor-vertical');
+        });
     });
 });
 
@@ -120,7 +113,7 @@ export class SquareTestWrapper {
         this.squareComponent = new SquareComponent();
         this.squareComponent.squareView = this.squareView;
     }
-    
+
     get squareView(): SquareView {
         return this.pSquareView;
     }

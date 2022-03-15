@@ -340,5 +340,11 @@ describe('GameDispatcherController', () => {
             controller.subscribeToJoinerRejectedEvent(serviceDestroyed$, callback);
             expect(subscriptionSpy).toHaveBeenCalled();
         });
+
+        it('subscribeToInitializeGame should call subscribe method on initializeGame$', () => {
+            const subscriptionSpy = spyOn(controller['initializeGame$'], 'subscribe');
+            controller.subscribeToInitializeGame(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
     });
 });

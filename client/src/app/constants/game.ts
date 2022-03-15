@@ -1,6 +1,7 @@
+import { ActionType } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
-import { Square } from '@app/classes/square';
+import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { COLORS } from '@app/constants/colors';
@@ -35,6 +36,8 @@ export const LETTER_VALUES: LetterValue[] = [
     '*',
 ];
 
+export const BLANK_TILE_LETTER_VALUE: LetterValue = '*';
+
 export const SQUARE_SIZE: Vec2 = { x: 1, y: 1 };
 export const MARGIN_COLUMN_SIZE = 1;
 
@@ -49,6 +52,7 @@ export const UNDEFINED_SQUARE: Square = {
     wasMultiplierUsed: false,
     isCenter: false,
 };
+export const DEFAULT_SQUAREVIEW = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
 
 export const VALID_MULTIPLIERS: number[] = [2, 3];
 
@@ -77,8 +81,10 @@ export const DEFAULT_PLAYER = new Player('id', 'name', []);
 
 export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
+export const LOCAL_PLAYER_ID = 'me';
+export const OPPONENT_ID = 'opponent';
 
-export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
+export const ON_YOUR_TURN_ACTIONS = [ActionType.PLACE, ActionType.EXCHANGE, ActionType.PASS, ActionType.HINT];
 
 export enum ExpectedCommandWordCount {
     Place = 3,
@@ -88,3 +94,6 @@ export enum ExpectedCommandWordCount {
     Help = 1,
     Reserve = 1,
 }
+
+export const PLAYER_1_INDEX = 1;
+export const PLAYER_2_INDEX = 2;

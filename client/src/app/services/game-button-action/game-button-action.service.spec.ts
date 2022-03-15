@@ -48,7 +48,7 @@ describe('GameButtonActionService', () => {
             const sendActionSpy = spyOn(service['gamePlayController'], 'sendAction').and.callFake(() => {
                 return;
             });
-            service['gameService'].gameId = DEFAULT_GAME_ID;
+            service['gameService']['gameId'] = DEFAULT_GAME_ID;
             const expectedActionData: ActionData = {
                 type: ActionType.PASS,
                 input: '',
@@ -102,7 +102,7 @@ describe('GameButtonActionService', () => {
             getPlayerIfTurnSpy = spyOn(service, 'getPlayerIfTurn').and.returnValue(player);
             checkIfPlayerHasTilesSpy = spyOn<any>(service, 'checkIfPlayerHasTiles').and.returnValue(true);
             sendErrorSpy = spyOn<any>(service, 'sendError');
-            service['gameService'].gameId = DEFAULT_GAME_ID;
+            service['gameService']['gameId'] = DEFAULT_GAME_ID;
         });
 
         it('should call sendAction', () => {

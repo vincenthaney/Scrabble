@@ -14,9 +14,9 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameDispatcherService implements OnDestroy {
-    gameId: string;
-    currentLobby: LobbyInfo | undefined;
-    currentName: string;
+    gameId: string = '';
+    currentName: string = '';
+    currentLobby: LobbyInfo | undefined = undefined;
 
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();

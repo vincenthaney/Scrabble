@@ -1,72 +1,60 @@
-import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
-import { StartGameData } from '@app/classes/communication/game-config';
+import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { AbstractPlayer } from '@app/classes/player';
+import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ID, TIME_TO_RECONNECT } from '@app/constants/game';
-import { MISSING_PLAYER_DATA_TO_INITIALIZE, NO_LOCAL_PLAYER } from '@app/constants/services-errors';
+import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
+import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
 import { CookieService } from '@app/services/cookie/cookie.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SocketService from '@app/services/socket/socket.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-export type UpdateTileReserveEventArgs = Required<Pick<GameUpdateData, 'tileReserve' | 'tileReserveTotal'>>;
 
 @Injectable({
     providedIn: 'root',
 })
 export default class GameService implements OnDestroy, IResetServiceData {
-    // highScoreService: HighScoreService;
-    // gameHistoryService: GameHistoryService;
-    // objectiveManagerService: ObjectiveManagerService;
-    player1: AbstractPlayer;
-    player2: AbstractPlayer;
     gameType: GameType;
     dictionnaryName: string;
-    gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>({
-        content: 'Début de la partie',
-        senderId: SYSTEM_ID,
-    });
     tileReserve: TileReserveData[];
-    tileReserveTotal: number;
-    updateTileRackEvent: EventEmitter<void>;
-    noActiveGameEvent: EventEmitter<void> = new EventEmitter<void>();
-    newActivePlayerEvent: EventEmitter<[PlayerData, boolean]> = new EventEmitter<[PlayerData, boolean]>();
-    rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
-    updateTileReserveEvent: EventEmitter<UpdateTileReserveEventArgs>;
-    playingTiles: EventEmitter<ActionPlacePayload>;
-    leaveGameSubject: Subject<string>;
-    serviceDestroyed$: Subject<boolean> = new Subject();
-    gameIsSetUp: boolean;
+
+    isGameSetUp: boolean;
     isGameOver: boolean;
-    gameId: string;
-    private localPlayerId: string;
+
+    private gameId: string;
+    private playerContainer?: PlayerContainer;
+    private serviceDestroyed$: Subject<boolean>;
 
     constructor(
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
+        private gameDispatcherController: GameDispatcherController,
         private gameController: GamePlayController,
         private socketService: SocketService,
         private cookieService: CookieService,
+        private gameViewEventManagerService: GameViewEventManagerService,
     ) {
-        this.updateTileRackEvent = new EventEmitter();
-        this.updateTileReserveEvent = new EventEmitter();
-        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.serviceDestroyed$ = new Subject();
+        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
+            this.handleInitializeGame(initializeValue),
+        );
+        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
-        this.leaveGameSubject = new Subject<string>();
-        this.playingTiles = new EventEmitter();
     }
 
     ngOnDestroy(): void {
@@ -74,54 +62,43 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.serviceDestroyed$.complete();
     }
 
+    async handleInitializeGame(initializeGameData: InitializeGameData | undefined): Promise<void> {
+        if (!initializeGameData) return;
+        return await this.initializeGame(initializeGameData.localPlayerId, initializeGameData.startGameData);
+    }
+
     async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
         this.gameId = startGameData.gameId;
-        this.localPlayerId = localPlayerId;
-        this.player1 = this.initializePlayer(startGameData.player1);
-        this.player2 = this.initializePlayer(startGameData.player2);
+        this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
         this.dictionnaryName = startGameData.dictionary;
-        this.roundManager.gameId = startGameData.gameId;
-        this.roundManager.localPlayerId = this.localPlayerId;
-        this.roundManager.maxRoundTime = startGameData.maxRoundTime;
-        this.roundManager.currentRound = this.roundManager.convertRoundDataToRound(startGameData.round);
         this.tileReserve = startGameData.tileReserve;
-        this.tileReserveTotal = startGameData.tileReserveTotal;
+
+        this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
-        this.gameIsSetUp = true;
+
+        this.isGameSetUp = true;
         this.isGameOver = false;
+
+        await this.handleReRouteOrReconnect(startGameData);
+    }
+
+    async handleReRouteOrReconnect(startGameData: StartGameData): Promise<void> {
         if (this.router.url !== '/game') {
-            this.roundManager.initialize();
-            this.roundManager.startRound(startGameData.maxRoundTime);
+            this.roundManager.initializeEvents();
+            this.roundManager.startRound();
             await this.router.navigateByUrl('game');
         } else {
             this.reconnectReinitialize(startGameData);
         }
     }
 
-    reconnectReinitialize(startGameData: StartGameData): void {
-        this.player1.updatePlayerData(startGameData.player1);
-        this.player2.updatePlayerData(startGameData.player2);
-        this.rerenderEvent.emit();
-        this.updateTileRackEvent.emit();
-        this.updateTileReserveEvent.emit({ tileReserve: startGameData.tileReserve, tileReserveTotal: startGameData.tileReserveTotal });
-        this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
-        this.roundManager.continueRound(this.roundManager.currentRound);
-    }
-
-    initializePlayer(playerData: PlayerData): AbstractPlayer {
-        if (playerData.id && playerData.name && playerData.tiles) return new Player(playerData.id, playerData.name, playerData.tiles);
-        throw new Error(MISSING_PLAYER_DATA_TO_INITIALIZE);
-    }
-
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.player1) {
-            this.player1.updatePlayerData(gameUpdateData.player1);
-            this.updateTileRackEvent.emit();
+            this.handleUpdatePlayerData(gameUpdateData.player1);
         }
         if (gameUpdateData.player2) {
-            this.player2.updatePlayerData(gameUpdateData.player2);
-            this.updateTileRackEvent.emit();
+            this.handleUpdatePlayerData(gameUpdateData.player2);
         }
         if (gameUpdateData.board) {
             this.boardService.updateBoard(gameUpdateData.board);
@@ -129,25 +106,28 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (gameUpdateData.round) {
             const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
             this.roundManager.updateRound(round);
-            const newActivePlayer: PlayerData = gameUpdateData.round.playerData;
-            this.newActivePlayerEvent.emit([newActivePlayer, this.isLocalPlayerPlaying()]);
         }
-        if (gameUpdateData.tileReserve && gameUpdateData.tileReserveTotal !== undefined) {
-            this.tileReserve = gameUpdateData.tileReserve;
-            this.tileReserveTotal = gameUpdateData.tileReserveTotal;
-            this.updateTileReserveEvent.emit({ tileReserve: gameUpdateData.tileReserve, tileReserveTotal: gameUpdateData.tileReserveTotal });
+        if (gameUpdateData.tileReserve) {
+            this.handleTileReserveUpdate(gameUpdateData.tileReserve);
         }
         if (gameUpdateData.isGameOver) {
-            this.gameOver();
+            this.handleGameOver();
         }
     }
 
-    updateGameUpdateData(newData: GameUpdateData): void {
-        this.gameUpdateValue.next(newData);
+    handleUpdatePlayerData(playerData: PlayerData): void {
+        if (this.playerContainer) {
+            this.playerContainer.updatePlayersData(playerData);
+        }
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+    }
+
+    handleTileReserveUpdate(tileReserve: TileReserveData[]): void {
+        this.tileReserve = [...tileReserve];
     }
 
     handleNewMessage(newMessage: Message): void {
-        this.newMessageValue.next(newMessage);
+        this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
     }
 
     getPlayingPlayerId(): string {
@@ -155,64 +135,88 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     isLocalPlayerPlaying(): boolean {
-        return this.getPlayingPlayerId() === this.localPlayerId;
+        if (!this.playerContainer) return false;
+        return this.getPlayingPlayerId() === this.playerContainer.getLocalPlayerId();
     }
 
     getGameId(): string {
         return this.gameId;
     }
 
+    resetGameId(): void {
+        this.gameId = '';
+    }
+
+    getPlayerByNumber(playerNumber: number): AbstractPlayer | undefined {
+        if (!this.playerContainer) return undefined;
+        return this.playerContainer.getPlayer(playerNumber);
+    }
+
     getLocalPlayer(): AbstractPlayer | undefined {
-        if (!this.localPlayerId) return undefined;
-        return this.player1.id === this.localPlayerId ? this.player1 : this.player2;
+        if (!this.playerContainer) return undefined;
+        return this.playerContainer.getLocalPlayer();
     }
 
     getLocalPlayerId(): string | undefined {
-        if (!this.localPlayerId) return undefined;
-        return this.player1.id === this.localPlayerId ? this.player1.id : this.player2.id;
+        if (!this.playerContainer) return undefined;
+        return this.playerContainer.getLocalPlayerId();
     }
 
-    gameOver(): void {
+    getTotalNumberOfTilesLeft(): number {
+        if (!this.tileReserve) return 0;
+        return this.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
+    }
+
+    handleGameOver(): void {
         this.isGameOver = true;
         this.roundManager.resetTimerData();
     }
 
-    reconnectGame(): void {
-        const gameIdCookie = this.cookieService.getCookie(GAME_ID_COOKIE);
-        const socketIdCookie = this.cookieService.getCookie(SOCKET_ID_COOKIE);
+    resetServiceData(): void {
+        this.gameType = undefined as unknown as GameType;
+        this.dictionnaryName = '';
+        this.tileReserve = [];
+        this.isGameOver = false;
+        this.gameId = '';
+        this.playerContainer = undefined;
+    }
 
-        if (gameIdCookie !== '' && gameIdCookie.length > 0) {
-            this.cookieService.eraseCookie(GAME_ID_COOKIE);
-            this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
-
-            this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
-        } else {
-            this.noActiveGameEvent.emit();
+    reconnectReinitialize(startGameData: StartGameData): void {
+        if (this.playerContainer) {
+            this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
         }
+        this.gameViewEventManagerService.emitGameViewEvent('reRender');
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+        this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
+        this.roundManager.continueRound(this.roundManager.currentRound);
+    }
+
+    reconnectGame(): void {
+        const gameIdCookie: string = this.cookieService.getCookie(GAME_ID_COOKIE);
+        const socketIdCookie: string = this.cookieService.getCookie(SOCKET_ID_COOKIE);
+
+        if (this.isGameIdCookieAbsent(gameIdCookie)) {
+            this.gameViewEventManagerService.emitGameViewEvent('noActiveGame');
+            return;
+        }
+        this.cookieService.eraseCookie(GAME_ID_COOKIE);
+        this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
+
+        this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
     }
 
     disconnectGame(): void {
         const gameId = this.gameId;
         const localPlayerId = this.getLocalPlayerId();
-        this.gameId = '';
-        this.player1.id = '';
-        this.player2.id = '';
-        this.localPlayerId = '';
+        this.resetServiceData();
+
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
         this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
         this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
         this.gameController.handleDisconnection(gameId, localPlayerId);
     }
 
-    resetServiceData(): void {
-        this.player1 = undefined as unknown as AbstractPlayer;
-        this.player2 = undefined as unknown as AbstractPlayer;
-        this.gameType = undefined as unknown as GameType;
-        this.dictionnaryName = '';
-        this.tileReserve = [];
-        this.tileReserveTotal = 0;
-        this.isGameOver = false;
-        this.gameId = '';
-        this.localPlayerId = '';
+    private isGameIdCookieAbsent(gameIdCookie: string): boolean {
+        return gameIdCookie === '' && gameIdCookie.length <= 0;
     }
 }

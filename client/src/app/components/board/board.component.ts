@@ -14,6 +14,7 @@ import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -24,34 +25,51 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./board.component.scss'],
 })
 export class BoardComponent extends FocusableComponent<KeyboardEvent> implements OnInit, OnDestroy {
-    boardDestroyed$: Subject<boolean> = new Subject();
-    marginLetters: LetterValue[];
     readonly marginColumnSize: number;
     gridSize: Vec2;
+    marginLetters: LetterValue[];
     squareGrid: SquareView[][];
-    boardUpdateSubscription: Subscription;
-    boardInitializationSubscription: Subscription;
     notAppliedSquares: SquareView[];
-    tileFontSize: number = SQUARE_TILE_DEFAULT_FONT_SIZE;
+    tileFontSize: number;
+    selectedSquare: SquareView | undefined;
 
     navigator: BoardNavigator;
-    selectedSquare: SquareView | undefined;
+    boardUpdateSubscription: Subscription;
+    boardInitializationSubscription: Subscription;
+    private componentDestroyed$: Subject<boolean>;
 
     constructor(
         private boardService: BoardService,
         private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
         private roundManagerService: RoundManagerService,
         private focusableComponentService: FocusableComponentsService,
     ) {
         super();
-        this.gridSize = { x: 0, y: 0 };
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
+        this.gridSize = { x: 0, y: 0 };
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+        this.squareGrid = [];
         this.notAppliedSquares = [];
+        this.tileFontSize = SQUARE_TILE_DEFAULT_FONT_SIZE;
+        this.selectedSquare = undefined;
+        this.componentDestroyed$ = new Subject<boolean>();
     }
 
     ngOnInit(): void {
-        this.initializeBoard(this.boardService.initialBoard);
+        this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
+        this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
+        this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
+            this.handlePlaceTiles(payload),
+        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
+        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => clearCursor());
+
+        if (!this.boardService.readInitialBoard()) return;
+        this.initializeBoard(this.boardService.readInitialBoard());
+
         this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
@@ -59,18 +77,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.selectedSquare = undefined;
             this.clearNotAppliedSquare();
         };
-
-        this.boardUpdateSubscription = this.boardService.boardUpdateEvent
-            .pipe(takeUntil(this.boardDestroyed$))
-            .subscribe((squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
-        this.boardInitializationSubscription = this.boardService.boardInitializationEvent
-            .pipe(takeUntil(this.boardDestroyed$))
-            .subscribe((board: Square[][]) => this.initializeBoard(board));
-        this.gameService.playingTiles
-            .pipe(takeUntil(this.boardDestroyed$))
-            .subscribe((payload: ActionPlacePayload) => this.handlePlaceTiles(payload));
-        this.gameService.newMessageValue.pipe(takeUntil(this.boardDestroyed$)).subscribe((message: Message) => this.handleNewMessage(message));
-        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.boardDestroyed$)).subscribe(() => clearCursor());
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handleBackspace = (): void => {
@@ -82,6 +88,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 this.selectedSquare.square.tile = null;
             }
         };
+
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         const handlePlaceLetter = (letter: string, squareView: SquareView | undefined): void => {
             if (!squareView) return;
@@ -92,29 +99,29 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         };
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onFocusableEvent = (exception: KeyboardEvent): void => {
-            switch (exception.key) {
+        this.onFocusableEvent = (event: KeyboardEvent): void => {
+            switch (event.key) {
                 case BACKSPACE:
-                    if (exception.type === KEYDOWN) handleBackspace();
+                    if (event.type === KEYDOWN) handleBackspace();
                     break;
                 case ESCAPE:
-                    if (exception.type === KEYDOWN) clearCursor();
+                    if (event.type === KEYDOWN) clearCursor();
                     break;
                 default:
-                    handlePlaceLetter(exception.key, this.selectedSquare);
+                    handlePlaceLetter(event.key, this.selectedSquare);
             }
         };
 
         // This must be defined in the onInit, otherwise selectedSquare is undefined
         this.onLoseFocusEvent = (): void => clearCursor();
 
-        this.subscribeToFocusableEvent(this.boardDestroyed$, this.onFocusableEvent);
-        this.subscribeToLoseFocusEvent(this.boardDestroyed$, this.onLoseFocusEvent);
+        this.subscribeToFocusableEvent(this.componentDestroyed$, this.onFocusableEvent);
+        this.subscribeToLoseFocusEvent(this.componentDestroyed$, this.onLoseFocusEvent);
     }
 
     ngOnDestroy(): void {
-        this.boardDestroyed$.next(true);
-        this.boardDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     onSquareClick(squareView: SquareView): boolean {
@@ -146,7 +153,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private clearNotAppliedSquare(): void {
-        this.notAppliedSquares.forEach((s) => (s.square.tile = null));
+        this.notAppliedSquares.forEach((squareView) => (squareView.square.tile = null));
         this.notAppliedSquares = [];
     }
 
@@ -161,7 +168,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
-                const square: Square = this.getBoardServiceSquare(board, i, j);
+                const square: Square = this.getSquare(board, i, j);
                 const squareView: SquareView = new SquareView(square, SQUARE_SIZE);
                 this.squareGrid[i][j] = squareView;
             }
@@ -169,7 +176,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
-    private getBoardServiceSquare(board: Square[][], row: number, column: number): Square {
+    private getSquare(board: Square[][], row: number, column: number): Square {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 
