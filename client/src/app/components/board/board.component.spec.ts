@@ -447,6 +447,11 @@ describe('BoardComponent', () => {
             component['handleNewMessage']({ senderId: 'system-error' } as Message);
             expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeTrue();
         });
+
+        it('should do nothing if sender is not system-error', () => {
+            component['handleNewMessage']({ senderId: 'system' } as Message);
+            expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeFalse();
+        });
     });
 
     describe('onFocusableEvent', () => {
