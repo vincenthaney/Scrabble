@@ -13,7 +13,7 @@ import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
+import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import * as chai from 'chai';
@@ -21,7 +21,7 @@ import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import HighScoresService from '@app/services/high-scores-service/high-scores-service';
-import { assert } from 'chai';
+import ActionHint from '@app/classes/actions/action-hint/action-hint';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -87,6 +87,7 @@ describe('GamePlayService', () => {
 
     afterEach(() => {
         getGameStub.restore();
+        chai.spy.restore();
     });
 
     describe('playAction', () => {
@@ -135,37 +136,15 @@ describe('GamePlayService', () => {
             expect(gameStub.isGameOver.called).to.be.true;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists #1)', async () => {
+        it('should call handleGameOver if gameOver ', async () => {
             gameStub.isGameOver.returns(true);
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const spy = chai.spy.on(gamePlayService, 'handleGameOver', () => {});
             const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result[0]!.isGameOver).to.be.true;
-        });
-
-        it('should set isGameOver to true if gameOver (updatedData exists #2)', async () => {
-            gameStub.isGameOver.returns(true);
-            actionStub.willEndTurn.returns(true);
-            actionStub.execute.returns({ player1: { score: DEFAULT_PLAYER_SCORE }, player2: { score: DEFAULT_PLAYER_SCORE } } as GameUpdateData);
-            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(result).to.exist;
-            expect(result[0]!.isGameOver).to.be.true;
-        });
-
-        it("should set isGameOver to true if gameOver (updatedData doesn't exists)", async () => {
-            gameStub.isGameOver.returns(true);
-            // actionStub.execute.returns(undefined);
-            // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            actionStub.willEndTurn.returns(true);
-
-            actionStub.execute.callsFake(() => {
-                return;
-            });
-
-            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(result).to.exist;
-            expect(result[0]!.isGameOver).to.be.true;
+            expect(spy).to.have.been.called;
         });
 
         it('should call next round when action ends turn', async () => {
@@ -200,8 +179,8 @@ describe('GamePlayService', () => {
             expect(roundManagerStub.nextRound.called).to.not.be.true;
         });
 
-        it('should throw when playerId is invalid', () => {
-            expect(async () => await gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
+        it('should throw when playerId is invalid', async () => {
+            await expect(gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.be.rejectedWith(Error);
         });
 
         it('should return tileReserve if updatedData exists', async () => {
@@ -283,6 +262,13 @@ describe('GamePlayService', () => {
             expect(action).to.be.instanceOf(ActionReserve);
         });
 
+        it('should return action of type ActionReserve when type is hint', () => {
+            const type = ActionType.HINT;
+            const payload = {};
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
+            expect(action).to.be.instanceOf(ActionHint);
+        });
+
         it("should throw if place payload doesn't have tiles", () => {
             const type = ActionType.PLACE;
             const payload = {
@@ -342,43 +328,35 @@ describe('GamePlayService', () => {
             expect(handlePlayerLeftEventSpy).to.have.been.called.with(DEFAULT_GAME_ID, playerWhoLeftId);
         });
 
-        it('handlePlayerLeftEvent should emit playerLeftFeedback', () => {
+        it('handlePlayerLeftEvent should emit playerLeftFeedback', async () => {
             gameStub.player1 = new Player(DEFAULT_PLAYER_ID, 'Cool Guy Name');
             gameStub.player2 = new Player(playerWhoLeftId, 'LeaverName');
-            const playerStillInGame: Player = gameStub.player1;
             const updatedData: GameUpdateData = {};
             const endOfGameMessages: string[] = ['test'];
 
-            const handleGameOverSpy = chai.spy.on(gamePlayService, 'handleGameOver', () => endOfGameMessages);
+            chai.spy.on(gamePlayService, 'handleGameOver', async () => endOfGameMessages);
             const emitSpy = chai.spy.on(gamePlayService['activeGameService'].playerLeftEvent, 'emit', () => {
                 return;
             });
 
-            gamePlayService.handlePlayerLeftEvent(DEFAULT_GAME_ID, playerWhoLeftId);
-            expect(handleGameOverSpy).to.have.been.called.with(playerStillInGame.name, gameStub, updatedData);
+            await gamePlayService.handlePlayerLeftEvent(DEFAULT_GAME_ID, playerWhoLeftId);
             expect(emitSpy).to.have.been.called.with('playerLeftFeedback', DEFAULT_GAME_ID, endOfGameMessages, updatedData);
         });
     });
 
     describe('handleGameOver', () => {
-        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
-
         beforeEach(() => {
-            activeGameServiceStub = createStubInstance(ActiveGameService);
             highScoresServiceStub = createStubInstance(HighScoresService);
             highScoresServiceStub.addHighScore.resolves(true);
-            gamePlayService = new GamePlayService(
-                activeGameServiceStub as unknown as ActiveGameService,
-                highScoresServiceStub as unknown as HighScoresService,
-            );
+            Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
         });
 
         it('should call end of game and endgame message', async () => {
             gameStub.isAddedToDatabase = true;
             await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
-            assert(gameStub.endOfGame.calledOnce);
-            assert(gameStub.endGameMessage.calledOnce);
+            expect(gameStub.endOfGame.calledOnce).to.be.true;
+            expect(gameStub.endGameMessage.calledOnce).to.be.true;
         });
 
         it('should change isAddedtoDatabase', async () => {
@@ -390,8 +368,27 @@ describe('GamePlayService', () => {
         it('should call getConnectedRealPlayers', async () => {
             gameStub.isAddedToDatabase = false;
             await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
-            assert(gameStub.getConnectedRealPlayers.calledOnce);
-            assert(highScoresServiceStub.addHighScore.calledOnce);
+            expect(gameStub.getConnectedRealPlayers.calledOnce).to.be.true;
+            expect(highScoresServiceStub.addHighScore.calledOnce).to.be.true;
+        });
+    });
+
+    describe('addMissingPlayerId', () => {
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        beforeEach(() => {
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
+
+            Object.defineProperty(gamePlayService, 'activeGameService', { value: activeGameServiceStub });
+        });
+
+        it('should modify both ids', async () => {
+            const result = await gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
+
+            gameStub.isAddedToDatabase = true;
+            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            expect(result.player1!.id).to.equal(gameStub.player1.id);
+            expect(result.player2!.id).to.equal(gameStub.player2.id);
         });
     });
 });

@@ -24,8 +24,7 @@ export class GamePlayService {
     async playAction(gameId: string, playerId: string, actionData: ActionData): Promise<[void | GameUpdateData, void | FeedbackMessages]> {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getPlayer(playerId, IS_REQUESTING);
-
-        if (player.id !== playerId) throw Error(NOT_PLAYER_TURN);
+        if (player.id !== playerId) throw new Error(NOT_PLAYER_TURN);
 
         const action: Action = this.getAction(player, game, actionData);
 
@@ -97,7 +96,6 @@ export class GamePlayService {
 
     async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
-
         if (!game.isAddedToDatabase) {
             const connectedRealPlayers = game.getConnectedRealPlayers();
             for (const player of connectedRealPlayers) {
