@@ -19,7 +19,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
-import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { Square, SquareView } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
@@ -333,7 +332,7 @@ describe('BoardComponent', () => {
 
     it('should call handlePlaceTiles on playingTiles', () => {
         const spy = spyOn<any>(component, 'handlePlaceTiles');
-        component['gameViewEventManagerService'].emitGameViewEvent('tilesPlayed');
+        component['gameViewEventManagerService'].emitGameViewEvent('usedTiles');
         expect(spy).toHaveBeenCalled();
     });
 
@@ -414,22 +413,6 @@ describe('BoardComponent', () => {
             component['handlePlaceTiles'](payload);
 
             expect(component.squareGrid[0][1].square.tile).toEqual(null);
-        });
-    });
-
-    describe('handleNewMessage', () => {
-        beforeEach(() => {
-            (component['notAppliedSquares'] as unknown[]) = [{ square: { tile: 1 } }, { square: { tile: 2 } }];
-        });
-
-        it('should clear notAppliedSquares', () => {
-            component['handleNewMessage']({ senderId: 'system-error' } as Message);
-            expect(component['notAppliedSquares'].length).toEqual(0);
-        });
-
-        it('should remove tiles from notAppliedSquares', () => {
-            component['handleNewMessage']({ senderId: 'system-error' } as Message);
-            expect(component['notAppliedSquares'].every((s) => s.square.tile === null)).toBeTrue();
         });
     });
 

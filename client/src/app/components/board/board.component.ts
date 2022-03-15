@@ -58,7 +58,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     ngOnInit(): void {
         this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
         this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
-        this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, this.handlePlaceTiles.bind(this));
+        this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handlePlaceTiles(payload));
         this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => clearCursor());
 
         if (!this.boardService.readInitialBoard()) return;

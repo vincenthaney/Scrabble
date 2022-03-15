@@ -42,7 +42,7 @@ describe('GameViewEventManagerService', () => {
         });
 
         it('should call next with payload', () => {
-            const event = 'tilesPlayed';
+            const event = 'usedTiles';
             const payload: ActionPlacePayload = {
                 tiles: [],
                 orientation: Orientation.Horizontal,
