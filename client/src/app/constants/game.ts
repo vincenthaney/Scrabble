@@ -1,3 +1,4 @@
+import { ActionType } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Square, SquareView } from '@app/classes/square';
@@ -79,7 +80,7 @@ export const DEFAULT_PLAYER = new Player('id', 'name', []);
 export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
 
-export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
+export const ON_YOUR_TURN_ACTIONS = [ActionType.PLACE, ActionType.EXCHANGE, ActionType.PASS, ActionType.HINT];
 
 export enum ExpectedCommandWordCount {
     Place = 3,
