@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { UNDEFINED_TILE } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, UNDEFINED_TILE } from '@app/constants/game';
 
 const AMOUNT_OF_TILE_BACKGROUND_IMG = 4;
 
@@ -38,6 +38,6 @@ export class TileComponent implements OnInit {
     }
 
     private isWorthlessTile(): boolean {
-        return this.tile.isBlank || (this.tile.letter === '*' && this.tile.value === 0);
+        return this.tile.isBlank || (this.tile.letter === BLANK_TILE_LETTER_VALUE && this.tile.value === 0);
     }
 }
