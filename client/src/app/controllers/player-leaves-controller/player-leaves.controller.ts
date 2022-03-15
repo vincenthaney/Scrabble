@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { PlayerName } from '@app/classes/communication/';
-import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
@@ -31,7 +30,7 @@ export class PlayerLeavesController implements OnDestroy {
         });
 
         this.socketService.on('cleanup', () => {
-            this.gamePlayController.newMessageValue.next(INITIAL_MESSAGE);
+            this.gamePlayController.newMessageValue.next(null);
             this.resetGameEvent.emit();
         });
     }

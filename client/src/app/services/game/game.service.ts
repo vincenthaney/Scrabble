@@ -10,7 +10,7 @@ import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
+import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ERROR_ID, TIME_TO_RECONNECT } from '@app/constants/game';
 import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
@@ -51,7 +51,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
             this.handleInitializeGame(initializeValue),
         );
-        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => this.handleNewMessage(newMessage));
+        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
         this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
     }
 
@@ -126,7 +128,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     handleNewMessage(newMessage: Message): void {
         this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
-        if (newMessage.senderId === 'system-error') this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+        if (newMessage.senderId === SYSTEM_ERROR_ID) this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 
     getPlayingPlayerId(): string {
@@ -140,6 +142,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     getGameId(): string {
         return this.gameId;
+    }
+
+    resetGameId(): void {
+        this.gameId = '';
     }
 
     getPlayerByNumber(playerNumber: number): AbstractPlayer | undefined {

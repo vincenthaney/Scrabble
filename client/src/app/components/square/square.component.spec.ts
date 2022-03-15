@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable dot-notation */
+/* eslint-disable max-classes-per-file */
 import { CommonModule } from '@angular/common';
 import { Component, Renderer2 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -12,10 +13,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Orientation } from '@app/classes/orientation';
 import { SquareView } from '@app/classes/square';
 import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { IconComponent } from '../icon/icon.component';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { SquareComponent } from './square.component';
 
 describe('SquareComponent', () => {
@@ -56,6 +58,7 @@ describe('SquareComponent', () => {
 
     it('ngOnOnInit should leave attributes undefined if no SquareView is attached', () => {
         const squareWrapper = new SquareTestWrapper();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(undefined);
         squareWrapper.createComponent();
 
@@ -73,19 +76,34 @@ describe('SquareComponent', () => {
         expect(getTextSpy).toHaveBeenCalled();
     });
 
-    it('getSquareSize should return UNDEFINED_SQUARE_SIZE if no SquareView is attached', () => {
-        const squareWrapper = new SquareTestWrapper();
-        spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
-        squareWrapper.createComponent();
+    describe('getSquareSize', () => {
+        it('getSquareSize should return UNDEFINED_SQUARE_SIZE if no SquareView is attached', () => {
+            const squareWrapper = new SquareTestWrapper();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
+            squareWrapper.createComponent();
 
-        expect(squareWrapper.squareComponent.getSquareSize()).toEqual(UNDEFINED_SQUARE_SIZE);
+            expect(squareWrapper.squareComponent.getSquareSize()).toEqual(UNDEFINED_SQUARE_SIZE);
+        });
+
+        it('getSquareSize should return square_size if SquareView is attached', () => {
+            const squareWrapper = new SquareTestWrapper();
+            squareWrapper.createComponent();
+
+            expect(squareWrapper.squareComponent.getSquareSize()).toEqual(squareWrapper.squareView.squareSize);
+        });
     });
 
-    it('getSquareSize should return square_size if SquareView is attached', () => {
-        const squareWrapper = new SquareTestWrapper();
-        squareWrapper.createComponent();
+    describe('getOrientationClass', () => {
+        it('should return right message for horizontal cursor orientation', () => {
+            component['cursorOrientation'] = Orientation.Horizontal;
+            expect(component.getOrientationClass()).toEqual('cursor-horizontal');
+        });
 
-        expect(squareWrapper.squareComponent.getSquareSize()).toEqual(squareWrapper.squareView.squareSize);
+        it('should return right message for vertical cursor orientation', () => {
+            component['cursorOrientation'] = Orientation.Vertical;
+            expect(component.getOrientationClass()).toEqual('cursor-vertical');
+        });
     });
 });
 

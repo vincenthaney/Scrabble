@@ -9,7 +9,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { CANNOT_REMOVE_UNUSED_TILE } from '@app/constants/component-errors';
 import { BACKSPACE, ENTER, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/components-constants';
-import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE, WILDCARD } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
@@ -97,12 +97,12 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         return true;
     }
 
-    isSamePosition(s1: SquareView | undefined, s2: SquareView | undefined): boolean {
+    isSamePosition(square1: SquareView | undefined, square2: SquareView | undefined): boolean {
         return (
-            s1 !== undefined &&
-            s2 !== undefined &&
-            s1.square.position.row === s2.square.position.row &&
-            s1.square.position.column === s2.square.position.column
+            square1 !== undefined &&
+            square2 !== undefined &&
+            square1.square.position.row === square2.square.position.row &&
+            square1.square.position.column === square2.square.position.column
         );
     }
 
@@ -132,7 +132,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         letter = letter.toUpperCase();
 
         if (!(LETTER_VALUES as string[]).includes(letter)) return;
-        if (letter === WILDCARD) return;
+        if (letter === BLANK_TILE_LETTER_VALUE) return;
 
         const availableTiles = [...(this.gameService.getLocalPlayer()?.getTiles() ?? [])];
         const usedTiles = [...(this.gameViewEventManagerService.getGameViewEventValue('usedTiles')?.tiles ?? [])];
@@ -189,7 +189,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         for (let i = 0; i < this.gridSize.y; i++) {
             this.squareGrid[i] = [];
             for (let j = 0; j < this.gridSize.x; j++) {
-                const square: Square = this.getBoardServiceSquare(board, i, j);
+                const square: Square = this.getSquare(board, i, j);
                 const squareView: SquareView = new SquareView(square, SQUARE_SIZE);
                 this.squareGrid[i][j] = squareView;
             }
@@ -197,7 +197,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
     }
 
-    private getBoardServiceSquare(board: Square[][], row: number, column: number): Square {
+    private getSquare(board: Square[][], row: number, column: number): Square {
         return board[row] && board[row][column] ? board[row][column] : UNDEFINED_SQUARE;
     }
 
@@ -208,7 +208,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
             Then, we check for each SquareView if it's square property's position 
-            matches one of the square in "squareToUpate".
+            matches one of the square in "squareToUpdate".
             If so, we change the board's square to be the updated square
         */
         ([] as SquareView[]).concat(...this.squareGrid).forEach((squareView: SquareView) => {

@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
@@ -27,7 +28,6 @@ import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-// import { BehaviorSubject } from 'rxjs';
 import { RackTile, TileRackComponent } from './tile-rack.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -50,9 +50,9 @@ describe('TileRackComponent', () => {
 
         const tileRackUpdate$ = new Subject();
         const usedTiles$ = new Subject();
-        const message$ = new Subject();
+        const message$ = new Subject<Message | null>();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
-        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
+        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
             switch (eventType) {
                 case 'tileRackUpdate':
                     tileRackUpdate$.next();
@@ -61,7 +61,7 @@ describe('TileRackComponent', () => {
                     usedTiles$.next();
                     break;
                 case 'newMessage':
-                    message$.next();
+                    message$.next(payload);
             }
         });
 
@@ -121,7 +121,6 @@ describe('TileRackComponent', () => {
         gameViewEventManagerSpy.emitGameViewEvent('tileRackUpdate');
         expect(spy).toHaveBeenCalled();
     });
-
     it('should call handleUsedTiles on usedTiles event', () => {
         gameViewEventManagerSpy.emitGameViewEvent('usedTiles', undefined);
         expect(handleUsedTileSpy).toHaveBeenCalled();
@@ -232,6 +231,17 @@ describe('TileRackComponent', () => {
             component.selectTile(type, tile);
 
             expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT call unselectAll if type is not select and does not change', () => {
+            const type: TileRackSelectType = 'exchange' as TileRackSelectType;
+            const tile: RackTile = {} as unknown as RackTile;
+            const spy = spyOn(component, 'unselectAll');
+
+            component['selectionType'] = 'exchange' as TileRackSelectType;
+            component.selectTile(type, tile);
+
+            expect(spy).not.toHaveBeenCalled();
         });
 
         it('should return false if tile already selected', () => {

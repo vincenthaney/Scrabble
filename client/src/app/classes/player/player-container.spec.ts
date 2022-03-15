@@ -1,5 +1,4 @@
 /* eslint-disable dot-notation */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 
 import { PlayerData } from '@app/classes/communication/';
 import { DEFAULT_PLAYER } from '@app/constants/game';

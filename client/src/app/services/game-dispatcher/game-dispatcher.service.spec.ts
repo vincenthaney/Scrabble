@@ -168,9 +168,8 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
     });
 
-    it('handleCreateGame should call gameDispatcherController.handleMultiplayerGameCreation \
-    with the correct parameters', () => {
-        const spyHandleMultiplayerGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
+    it('handleCreateGame should call gameDispatcherController.handleGameCreation with the correct parameters for solo game', () => {
+        const spyHandleGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -188,7 +187,29 @@ describe('GameDispatcherService', () => {
         };
 
         service.handleCreateGame(TEST_PLAYER_NAME, TEST_FORM);
-        expect(spyHandleMultiplayerGameCreation).toHaveBeenCalledWith(EXPECTED_GAME_CONFIG);
+        expect(spyHandleGameCreation).toHaveBeenCalledWith(EXPECTED_GAME_CONFIG);
+    });
+
+    it('handleCreateGame should call gameDispatcherController.handleGameCreation with the correct parameters for multiplayer game', () => {
+        const spyHandleGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
+            return;
+        });
+        spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
+            return TEST_PLAYER_ID;
+        });
+        const EXPECTED_GAME_CONFIG: GameConfigData = {
+            playerName: TEST_PLAYER_NAME,
+            playerId: TEST_PLAYER_ID,
+            gameType: TEST_GAME_PARAMETERS.gameType,
+            gameMode: GameMode.Multiplayer,
+            maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
+            dictionary: TEST_GAME_PARAMETERS.dictionary,
+        };
+
+        TEST_FORM.controls.gameMode.patchValue(GameMode.Multiplayer);
+        service.handleCreateGame(TEST_PLAYER_NAME, TEST_FORM);
+        expect(spyHandleGameCreation).toHaveBeenCalledWith(EXPECTED_GAME_CONFIG);
+        TEST_FORM.setValue(TEST_GAME_PARAMETERS);
     });
 
     describe('handleCancelGame', () => {
