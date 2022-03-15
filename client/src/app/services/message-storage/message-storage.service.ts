@@ -25,7 +25,7 @@ export class MessageStorageService {
         window.sessionStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(localMessages));
     }
 
-    resetMessages() {
+    resetMessages(): void {
         window.sessionStorage.clear();
     }
 }

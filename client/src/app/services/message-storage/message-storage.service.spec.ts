@@ -47,7 +47,7 @@ describe('SessionStorageService', () => {
             expect(setSpy).not.toHaveBeenCalled();
         });
 
-        it('should call setItem if key does not exists', () => {
+        it('should call setItem if key does not exist', () => {
             service.initializeMessages();
             expect(setSpy).toHaveBeenCalled();
         });
