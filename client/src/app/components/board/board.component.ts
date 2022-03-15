@@ -7,8 +7,8 @@ import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { BACKSPACE, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
-import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
+import { BACKSPACE, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/components-constants';
+import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE, WILDCARD } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
@@ -112,7 +112,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 if (event.type === KEYDOWN) this.clearCursor();
                 break;
             default:
-                this.handlePlaceLetter(event.key, this.selectedSquare);
+                this.handlePlaceLetter(event.key, event.shiftKey, this.selectedSquare);
         }
     }
 
@@ -120,8 +120,13 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.removeUsedTiles();
     }
 
-    private handlePlaceLetter(letter: string, squareView: SquareView | undefined): void {
+    private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
         if (!squareView) return;
+
+        letter = letter.toUpperCase();
+
+        if (!(LETTER_VALUES as string[]).includes(letter)) return;
+        if (letter === WILDCARD) return;
 
         const availableTile = [...(this.gameService.getLocalPlayer()?.getTiles() ?? [])];
         const usedTiles = [...(this.gameViewEventManagerService.getGameViewEventValue('usedTiles')?.tiles ?? [])];
@@ -131,10 +136,18 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             if (index >= 0) availableTile.splice(index, 1);
         }
 
-        const tile = availableTile.find((t) => t.letter === letter.toUpperCase());
+        let tile: Tile | undefined;
+
+        if (isUppercase) {
+            tile = availableTile.find((t) => t.isBlank);
+            if (tile) (tile.playedLetter as string) = letter;
+        } else {
+            tile = availableTile.find((t) => t.letter === letter);
+        }
+
         if (!tile) return;
 
-        this.useTile(new Tile(letter.toUpperCase() as LetterValue, 0));
+        this.useTile(tile);
         this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
     }
 
@@ -144,6 +157,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
             if (index >= 0) this.notAppliedSquares.splice(index, 1);
+            if (this.selectedSquare.square.tile) this.removeUsedTile(this.selectedSquare.square.tile);
             this.selectedSquare.square.tile = null;
         }
     }
@@ -255,6 +269,24 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 startPosition: { row: this.navigator.row, column: this.navigator.column },
                 tiles: [tile],
             });
+        }
+    }
+
+    private removeUsedTile(tile: Tile) {
+        const previousUsedTiles = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+
+        if (!previousUsedTiles) throw new Error("Cannot remove a tile that's not used");
+
+        const index = previousUsedTiles.tiles.findIndex((t) => t.letter === tile.letter);
+
+        if (index === NOT_FOUND) throw new Error("Cannot remove a tile that's not used");
+
+        previousUsedTiles.tiles.splice(index, 1);
+
+        if (previousUsedTiles.tiles.length > 0) {
+            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', { ...previousUsedTiles });
+        } else {
+            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
         }
     }
 }
