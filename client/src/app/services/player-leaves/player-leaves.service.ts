@@ -42,7 +42,7 @@ export class PlayerLeavesService implements OnDestroy {
     }
 
     handleLeaveLobby(): void {
-        const gameId = this.gameService.getGameId();
+        const gameId = this.gameDispatcherService.gameId;
         if (gameId) this.playerLeavesController.handleLeaveGame(gameId);
         this.gameDispatcherService.resetServiceData();
     }
