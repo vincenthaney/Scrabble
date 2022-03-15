@@ -17,8 +17,8 @@ export class DefaultDialogComponent {
     constructor(@Inject(MAT_DIALOG_DATA) public data: DefaultDialogParameters, private router: Router) {
         // Data must be handled because it is not typed correctly when used in dialog.open(...)
         if (!this.data.title || typeof this.data.title !== 'string') throw new Error(DIALOG_MUST_HAVE_TITLE);
-        if (!Array.isArray(this.data.buttons)) throw new Error(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
         if (!this.data.buttons) return;
+        if (!Array.isArray(this.data.buttons)) throw new Error(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
 
         this.title = this.data.title;
         this.content = this.data.content;
