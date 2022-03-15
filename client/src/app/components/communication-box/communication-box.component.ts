@@ -81,7 +81,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0 && !this.loading) {
-            this.inputParser.parseInput(message);
+            this.inputParser.handleInput(message);
             this.messageForm.reset({ content: '' });
             this.loading = true;
         }

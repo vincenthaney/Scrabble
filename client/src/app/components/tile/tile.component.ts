@@ -23,7 +23,7 @@ export class TileComponent implements OnInit {
         this.hideValue = false;
         this.applied = true;
         this.isPlayed = false;
-        this.backgroundPath = this.getBgPath();
+        this.backgroundPath = this.getBackgroundPath();
     }
 
     ngOnInit(): void {
@@ -32,7 +32,7 @@ export class TileComponent implements OnInit {
         }
     }
 
-    getBgPath(): string {
+    getBackgroundPath(): string {
         const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMG) + 1;
         return `assets/img/tiles/bg_${index}.svg`;
     }

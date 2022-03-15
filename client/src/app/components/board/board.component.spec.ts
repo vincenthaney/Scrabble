@@ -39,7 +39,7 @@ describe('BoardComponent', () => {
     let boardServiceSpy: SpyObj<BoardService>;
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
-    let getBoardServiceSquareSpy: jasmine.Spy;
+    let getSquareSpy: jasmine.Spy;
 
     const BOARD_SERVICE_GRID_SIZE: Vec2 = { x: 5, y: 5 };
     const createGrid = (gridSize: Vec2): Square[][] => {
@@ -130,7 +130,7 @@ describe('BoardComponent', () => {
         fixture.detectChanges();
 
         const grid: Square[][] = createGrid(BOARD_SERVICE_GRID_SIZE);
-        getBoardServiceSquareSpy = spyOn<any>(component, 'getBoardServiceSquare').and.callFake((board: Square[][], row: number, column: number) => {
+        getSquareSpy = spyOn<any>(component, 'getSquare').and.callFake((board: Square[][], row: number, column: number) => {
             return board[row][column];
         });
         component['initializeBoard'](grid);
@@ -173,7 +173,7 @@ describe('BoardComponent', () => {
                 component.squareGrid = [];
                 component.gridSize = { x: 0, y: 0 };
                 const grid: Square[][] = createGrid(boardSize);
-                getBoardServiceSquareSpy.and.callFake((board: Square[][], row: number, column: number) => {
+                getSquareSpy.and.callFake((board: Square[][], row: number, column: number) => {
                     return board[row][column];
                 });
 
@@ -211,7 +211,7 @@ describe('BoardComponent', () => {
             [UNDEFINED_SQUARE, UNDEFINED_SQUARE],
             [UNDEFINED_SQUARE, UNDEFINED_SQUARE],
         ];
-        getBoardServiceSquareSpy.and.callFake((board: Square[][], row: number, column: number) => {
+        getSquareSpy.and.callFake((board: Square[][], row: number, column: number) => {
             return board[row][column];
         });
 
