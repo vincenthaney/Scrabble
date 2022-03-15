@@ -7,6 +7,7 @@ import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { CANNOT_REMOVE_UNUSED_TILE } from '@app/constants/component-errors';
 import { BACKSPACE, ENTER, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/components-constants';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE, WILDCARD } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
@@ -285,11 +286,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     private removeUsedTile(tile: Tile) {
         const previousUsedTiles = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
 
-        if (!previousUsedTiles) throw new Error("Cannot remove a tile that's not used");
+        if (!previousUsedTiles) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
         const index = previousUsedTiles.tiles.findIndex((t) => t.letter === tile.letter);
 
-        if (index === NOT_FOUND) throw new Error("Cannot remove a tile that's not used");
+        if (index === NOT_FOUND) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
         previousUsedTiles.tiles.splice(index, 1);
 
