@@ -111,7 +111,7 @@ export class GamePlayController {
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
-                await this.handlePlayAction(gameId, playerId, { type: ActionType.PLACE, payload: {}, input: '' });
+                await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
             }
         }
     }

@@ -297,23 +297,23 @@ describe('GamePlayController', () => {
             });
         });
 
-        it('should call handlePlayAction when playAction throw word not in dictionary', async () => {
+        it.only('should call PASS when playAction throw word not in dictionary', async () => {
             const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
             (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
             gamePlayServiceStub.playAction.throws('error');
 
-            const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
-            isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
-
             const handleErrorStub = stub<GamePlayController, any>(gamePlayController, 'handleError');
             handleErrorStub.callsFake(async () => Promise.resolve());
+
+            const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
+            isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
 
             const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
             handlePlayActionStub.callThrough();
 
             await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
-            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' })).to.be.true;
+            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PASS, payload: {}, input: '' })).to.be.true;
         });
     });
 
