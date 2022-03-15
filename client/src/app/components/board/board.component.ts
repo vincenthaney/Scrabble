@@ -7,12 +7,13 @@ import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
-import { BACKSPACE, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/components-constants';
+import { BACKSPACE, ENTER, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/components-constants';
 import { LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE, WILDCARD } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject, Subscription } from 'rxjs';
@@ -43,6 +44,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         private gameViewEventManagerService: GameViewEventManagerService,
         private roundManagerService: RoundManagerService,
         private focusableComponentService: FocusableComponentsService,
+        private gameButtonActionService: GameButtonActionService,
     ) {
         super();
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
@@ -111,6 +113,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             case ESCAPE:
                 if (event.type === KEYDOWN) this.clearCursor();
                 break;
+            case ENTER:
+                this.handleEnter();
+                break;
             default:
                 this.handlePlaceLetter(event.key, event.shiftKey, this.selectedSquare);
         }
@@ -160,6 +165,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             if (this.selectedSquare.square.tile) this.removeUsedTile(this.selectedSquare.square.tile);
             this.selectedSquare.square.tile = null;
         }
+    }
+
+    private handleEnter() {
+        const placePayload = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (placePayload) this.gameButtonActionService.sendPlaceAction(placePayload);
     }
 
     private clearCursor(): void {
