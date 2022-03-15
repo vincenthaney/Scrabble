@@ -48,7 +48,8 @@ export class GameViewEventManagerService {
         const subject = this.eventMap.get(eventType);
 
         if (subject instanceof BehaviorSubject) return subject.value;
-        throw new Error();
+        if (!subject) throw new Error(SERVICE_ERRORS.NO_SUBJECT_FOR_EVENT);
+        throw new Error(SERVICE_ERRORS.IS_NOT_BEHAVIOR_OBJECT);
     }
 
     private getSubjectFromMap<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T): Subject<S> {

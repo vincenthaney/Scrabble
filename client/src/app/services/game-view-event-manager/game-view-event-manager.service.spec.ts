@@ -96,6 +96,26 @@ describe('GameViewEventManagerService', () => {
         });
     });
 
+    describe('getGameViewEventValue', () => {
+        it('should return value', () => {
+            const value = 'my-value';
+
+            service.emitGameViewEvent<'usedTiles', any>('usedTiles', value);
+
+            const result = service.getGameViewEventValue('usedTiles');
+
+            expect(result).toEqual(result);
+        });
+
+        it('should throw if is invalid event', () => {
+            expect(() => service.getGameViewEventValue<any, any, any>('invalidEvent')).toThrowError(SERVICE_ERRORS.NO_SUBJECT_FOR_EVENT);
+        });
+
+        it('should throw if event is not BehaviorSubject', () => {
+            expect(() => service.getGameViewEventValue<any, any, any>('tileRackUpdate')).toThrowError(SERVICE_ERRORS.IS_NOT_BEHAVIOR_OBJECT);
+        });
+    });
+
     describe('getSubjectFromMap', () => {
         const mockEventMap: Map<keyof EventTypes, Subject<any>> = new Map();
         const tileRackSubject: Subject<string> = new Subject<string>();
