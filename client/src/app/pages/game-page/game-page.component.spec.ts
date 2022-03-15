@@ -250,7 +250,7 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
     });
 
-    it('handlePlayerLeave should tell the playerLeavesService', () => {
+    it('handlePlayerLeave should notify the playerLeavesService', () => {
         const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
             return;
         });
