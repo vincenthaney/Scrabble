@@ -47,9 +47,9 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
             this.handlePlaceTiles(payload),
         );
-        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (message: Message) =>
-            this.handleNewMessage(message),
-        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
+            if (newMessage) this.handleNewMessage(newMessage);
+        });
     }
 
     ngOnDestroy(): void {

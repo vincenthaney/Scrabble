@@ -46,13 +46,15 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnInit(): void {
-        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage) => {
-            this.onReceiveNewMessage(newMessage);
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
+            if (newMessage) this.onReceiveNewMessage(newMessage);
         });
 
         const storedMessages = this.messageStorageService.getMessages();
-        if (storedMessages.length > 0) this.messages = this.messages.concat(storedMessages);
-        else this.onReceiveNewMessage(INITIAL_MESSAGE);
+        if (storedMessages.length > 0) {
+            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+            this.messages = this.messages.concat(storedMessages);
+        } else this.onReceiveNewMessage(INITIAL_MESSAGE);
     }
 
     ngAfterViewInit(): void {
@@ -92,6 +94,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     onReceiveNewMessage(newMessage: Message): void {
+        console.log(newMessage);
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();

@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
 import { GameService } from '@app/services/';
 import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -18,6 +19,7 @@ export class PlayerLeavesService implements OnDestroy {
         private readonly gameDispatcherService: GameDispatcherService,
         private readonly gameService: GameService,
         private readonly roundManagerService: RoundManagerService,
+        private readonly gameViewEventManager: GameViewEventManagerService,
     ) {
         this.playerLeavesController.subscribeToJoinerLeavesGameEvent(this.serviceDestroyed$, (leaverName: string) =>
             this.handleJoinerLeaveGame(leaverName),
@@ -35,7 +37,7 @@ export class PlayerLeavesService implements OnDestroy {
 
     handleLocalPlayerLeavesGame(): void {
         this.playerLeavesController.handleLeaveGame(this.gameService.getGameId());
-        // this.gameService.gameId = '';
+        this.gameViewEventManager.emitGameViewEvent('newMessage', undefined);
     }
 
     handleLeaveLobby(): void {
