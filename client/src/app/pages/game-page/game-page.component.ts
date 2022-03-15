@@ -44,6 +44,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
     playerLeftWithQuitButton: boolean;
+    playerLeftWithNoActiveGameDialog: boolean;
     componentDestroyed$: Subject<boolean>;
 
     constructor(
@@ -57,6 +58,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private gameButtonActionService: GameButtonActionService,
     ) {
         this.playerLeftWithQuitButton = false;
+        this.playerLeftWithNoActiveGameDialog = false;
         this.componentDestroyed$ = new Subject();
     }
 
@@ -75,7 +77,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
-        if (!this.playerLeftWithQuitButton) {
+        if (!this.playerLeftWithQuitButton && !this.playerLeftWithNoActiveGameDialog) {
             this.gameService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
@@ -85,13 +87,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcher.configureSocket();
 
-        // if (!this.gameService.getGameId()) this.gameService.reconnectGame();
-        // if (this.gameService.gameIsSetUp) this.isLocalPlayerTurn = this.gameService.isLocalPlayerPlaying();
-
-        // this.gameService.noActiveGameEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.noActiveGameDialog());
-        // this.gameService.newActivePlayerEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(([, isLocalPlayerTurn]) => {
-        //     this.isLocalPlayerTurn = isLocalPlayerTurn;
-        // });
         this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
         if (!this.gameService.getGameId()) {
             this.gameService.reconnectGame();
@@ -156,6 +151,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         closeDialog: false,
                         redirect: '/home',
                         style: 'background-color: rgb(231, 231, 231)',
+                        action: () => (this.playerLeftWithNoActiveGameDialog = true),
                     },
                 ],
             },
