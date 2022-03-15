@@ -59,63 +59,20 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
         this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
         this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handlePlaceTiles(payload));
-        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => clearCursor());
+        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.clearCursor());
 
         if (!this.boardService.readInitialBoard()) return;
         this.initializeBoard(this.boardService.readInitialBoard());
 
         this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
 
-        // This must be defined in the onInit, otherwise selectedSquare is undefined
-        const clearCursor = (): void => {
-            this.selectedSquare = undefined;
-            this.clearNotAppliedSquare();
-        };
-
-        // This must be defined in the onInit, otherwise selectedSquare is undefined
-        const handleBackspace = (): void => {
-            if (!this.selectedSquare) return;
-            this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
-            if (this.selectedSquare) {
-                const index = this.notAppliedSquares.indexOf(this.selectedSquare);
-                if (index >= 0) this.notAppliedSquares.splice(index, 1);
-                this.selectedSquare.square.tile = null;
-            }
-        };
-
-        // This must be defined in the onInit, otherwise selectedSquare is undefined
-        const handlePlaceLetter = (letter: string, squareView: SquareView | undefined): void => {
-            if (!squareView) return;
-            squareView.square.tile = new Tile(letter.toUpperCase() as LetterValue, 0);
-            squareView.applied = false;
-            this.notAppliedSquares.push(squareView);
-            this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
-        };
-
-        // This must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onFocusableEvent = (exception: KeyboardEvent): void => {
-            switch (exception.key) {
-                case BACKSPACE:
-                    if (exception.type === KEYDOWN) handleBackspace();
-                    break;
-                case ESCAPE:
-                    if (exception.type === KEYDOWN) clearCursor();
-                    break;
-                default:
-                    handlePlaceLetter(exception.key, this.selectedSquare);
-            }
-        };
-
-        // This must be defined in the onInit, otherwise selectedSquare is undefined
-        this.onLoseFocusEvent = (): void => clearCursor();
-
-        this.subscribeToFocusableEvent(this.componentDestroyed$, this.onFocusableEvent);
-        this.subscribeToLoseFocusEvent(this.componentDestroyed$, this.onLoseFocusEvent);
+        this.subscribeToFocusableEvents();
     }
 
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
+        this.unsubscribeToFocusableEvents();
     }
 
     onSquareClick(squareView: SquareView): boolean {
@@ -132,7 +89,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.navigator.setPosition(squareView.square.position);
         }
 
-        this.clearNotAppliedSquare();
+        this.removeUsedTiles();
 
         return true;
     }
@@ -146,9 +103,54 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         );
     }
 
-    private clearNotAppliedSquare(): void {
-        this.notAppliedSquares.forEach((s) => (s.square.tile = null));
-        this.notAppliedSquares = [];
+    protected onFocusableEvent(event: KeyboardEvent) {
+        switch (event.key) {
+            case BACKSPACE:
+                if (event.type === KEYDOWN) this.handleBackspace();
+                break;
+            case ESCAPE:
+                if (event.type === KEYDOWN) this.clearCursor();
+                break;
+            default:
+                this.handlePlaceLetter(event.key, this.selectedSquare);
+        }
+    }
+
+    protected onLoseFocusEvent() {
+        this.removeUsedTiles();
+    }
+
+    private handlePlaceLetter(letter: string, squareView: SquareView | undefined): void {
+        if (!squareView) return;
+
+        const availableTile = [...(this.gameService.getLocalPlayer()?.getTiles() ?? [])];
+        const usedTiles = [...(this.gameViewEventManagerService.getGameViewEventValue('usedTiles')?.tiles ?? [])];
+
+        for (const usedTile of usedTiles) {
+            const index = availableTile.findIndex((t) => t.letter === usedTile.letter);
+            if (index >= 0) availableTile.splice(index, 1);
+        }
+
+        const tile = availableTile.find((t) => t.letter === letter.toUpperCase());
+        if (!tile) return;
+
+        this.useTile(new Tile(letter.toUpperCase() as LetterValue, 0));
+        this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
+    }
+
+    private handleBackspace() {
+        if (!this.selectedSquare) return;
+        this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
+        if (this.selectedSquare) {
+            const index = this.notAppliedSquares.indexOf(this.selectedSquare);
+            if (index >= 0) this.notAppliedSquares.splice(index, 1);
+            this.selectedSquare.square.tile = null;
+        }
+    }
+
+    private clearCursor(): void {
+        this.selectedSquare = undefined;
+        this.removeUsedTiles();
     }
 
     private initializeBoard(board: Square[][]): void {
@@ -176,7 +178,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
         if (this.hasBoardBeenUpdated(squaresToUpdate)) return false;
-        this.clearNotAppliedSquare();
+        this.removeUsedTiles();
 
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
@@ -207,14 +209,14 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         return position.row < this.squareGrid.length && position.column < this.squareGrid[position.row].length;
     }
 
-    private clearUsedTiles(): void {
-        this.notAppliedSquares.forEach((square) => (square.square.tile = null));
-        this.notAppliedSquares = [];
+    private removeUsedTiles(): void {
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 
     private handlePlaceTiles(payload: ActionPlacePayload | undefined): void {
         if (!payload) {
-            this.clearUsedTiles();
+            this.notAppliedSquares.forEach((square) => (square.square.tile = null));
+            this.notAppliedSquares = [];
             return;
         }
 
@@ -226,7 +228,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
             const squareView = this.squareGrid[position.row][position.column];
 
-            if (!squareView.square.tile) {
+            if (!squareView.square.tile || !squareView.applied) {
                 squareView.square.tile = { ...payload.tiles[i] };
                 squareView.applied = false;
                 this.notAppliedSquares.push(squareView);
@@ -236,6 +238,23 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
 
             next();
+        }
+    }
+
+    private useTile(tile: Tile) {
+        const previousUsedTiles = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+
+        if (previousUsedTiles) {
+            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', {
+                ...previousUsedTiles,
+                tiles: [...previousUsedTiles.tiles, tile],
+            });
+        } else {
+            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', {
+                orientation: this.navigator.orientation,
+                startPosition: { row: this.navigator.row, column: this.navigator.column },
+                tiles: [tile],
+            });
         }
     }
 }
