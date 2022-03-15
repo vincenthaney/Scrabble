@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
-import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
@@ -59,12 +58,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     ngOnInit(): void {
         this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
         this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
-        this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
-            this.handlePlaceTiles(payload),
-        );
-        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (message: Message) =>
-            this.handleNewMessage(message),
-        );
+        this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, this.handlePlaceTiles.bind(this));
         this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => clearCursor());
 
         if (!this.boardService.readInitialBoard()) return;
@@ -213,7 +207,17 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         return position.row < this.squareGrid.length && position.column < this.squareGrid[position.row].length;
     }
 
-    private handlePlaceTiles(payload: ActionPlacePayload): void {
+    private clearUsedTiles(): void {
+        this.notAppliedSquares.forEach((square) => (square.square.tile = null));
+        this.notAppliedSquares = [];
+    }
+
+    private handlePlaceTiles(payload: ActionPlacePayload | undefined): void {
+        if (!payload) {
+            this.clearUsedTiles();
+            return;
+        }
+
         const position = { ...payload.startPosition };
         const next = () => (payload.orientation === Orientation.Horizontal ? position.column++ : position.row++);
 
@@ -232,13 +236,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
 
             next();
-        }
-    }
-
-    private handleNewMessage(message: Message): void {
-        if (message.senderId === 'system-error') {
-            this.notAppliedSquares.forEach((square) => (square.square.tile = null));
-            this.notAppliedSquares = [];
         }
     }
 }

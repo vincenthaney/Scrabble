@@ -150,7 +150,7 @@ export default class InputParserService {
             orientation: location.orientation,
         };
 
-        this.gameViewEventManagerService.emitGameViewEvent('tilesPlayed', placeActionPayload);
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', placeActionPayload);
 
         return placeActionPayload;
     }

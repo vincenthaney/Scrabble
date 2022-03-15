@@ -3,8 +3,8 @@ import { Message } from '@app/classes/communication/message';
 
 export interface EventTypes {
     tileRackUpdate: void;
-    tilesPlayed: ActionPlacePayload;
     noActiveGame: void;
     reRender: void;
     newMessage: Message;
+    usedTiles: ActionPlacePayload | undefined;
 }

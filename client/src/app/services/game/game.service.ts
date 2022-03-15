@@ -126,6 +126,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     handleNewMessage(newMessage: Message): void {
         this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
+        if (newMessage.senderId === 'system-error') this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 
     getPlayingPlayerId(): string {

@@ -22,10 +22,10 @@ export class GameViewEventManagerService {
 
     constructor() {
         this.eventMap.set('tileRackUpdate', new Subject<void>());
-        this.eventMap.set('tilesPlayed', new Subject<ActionPlacePayload>());
         this.eventMap.set('noActiveGame', new Subject<void>());
         this.eventMap.set('reRender', new Subject<void>());
         this.eventMap.set('newMessage', new BehaviorSubject<Message>(INITIAL_MESSAGE));
+        this.eventMap.set('usedTiles', new BehaviorSubject<ActionPlacePayload | undefined>(undefined));
     }
 
     emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S): void {
