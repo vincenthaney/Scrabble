@@ -1,13 +1,19 @@
+import { DictionaryData } from './dictionary-data';
 import DictionaryNode from './dictionary-node';
 
 export default class Dictionary extends DictionaryNode {
-    constructor(words: string[]) {
+    title: string;
+    description: string;
+
+    constructor(dictionaryData: DictionaryData) {
         super();
 
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        console.log('CREATED DICT WITH WORDS', words.length, words.slice(0, 6));
+        this.title = dictionaryData.title;
+        this.description = dictionaryData.description;
 
-        for (const word of words) {
+        if (dictionaryData.words.length > 100) throw new Error('Too many words: ' + dictionaryData.words.length);
+
+        for (const word of dictionaryData.words) {
             this.addWord(word);
         }
     }

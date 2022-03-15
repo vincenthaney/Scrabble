@@ -3,25 +3,31 @@
 /* eslint-disable dot-notation */
 import { expect } from 'chai';
 import Dictionary from './dictionary';
+import { DictionaryData } from './dictionary-data';
 
-const WORDS = ['abc', 'abcd', 'abcde', 'xyz', 'wxyz', 'ablmnop'];
+const TEST_WORDS = ['ab', 'abc', 'abcd', 'abcde'];
+const DICTIONARY_DATA: DictionaryData = {
+    title: 'Test dictionary',
+    description: 'Dictionary for testing',
+    words: TEST_WORDS,
+};
 
 describe('DictionaryNode', () => {
     let dictionary: Dictionary;
 
     beforeEach(() => {
-        dictionary = new Dictionary(WORDS);
+        dictionary = new Dictionary(DICTIONARY_DATA);
     });
 
     describe('constructor', () => {
         it('should contain all words', () => {
-            for (const word of WORDS) {
+            for (const word of TEST_WORDS) {
                 expect(dictionary.wordExists(word)).to.be.true;
             }
         });
 
         it('should not contain other words', () => {
-            for (const word of WORDS) {
+            for (const word of TEST_WORDS) {
                 expect(dictionary.wordExists(word + '-')).to.be.false;
             }
         });

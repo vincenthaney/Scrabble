@@ -19,6 +19,8 @@ import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -64,6 +66,7 @@ describe('GamePlayController', () => {
 
     beforeEach(() => {
         Container.reset();
+        Container.set(DictionaryService, getDictionaryTestService());
         gamePlayController = Container.get(GamePlayController);
         stub(gamePlayController['socketService'], 'removeFromRoom').callsFake(() => {
             return;

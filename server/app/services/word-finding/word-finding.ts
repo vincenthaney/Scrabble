@@ -29,7 +29,7 @@ import {
     QUICK_MOVE_TIME,
 } from '@app/constants/services-constants/word-finding.const';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
-import { DEFAULT_DICTIONARY_NAME } from '@app/constants/dictionary.const';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 // wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
@@ -37,7 +37,11 @@ import { DEFAULT_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
-    constructor(private wordVerificationService: WordsVerificationService, private scoreCalculatorService: ScoreCalculatorService) {}
+    constructor(
+        private wordVerificationService: WordsVerificationService,
+        private scoreCalculatorService: ScoreCalculatorService,
+        private dictionaryService: DictionaryService,
+    ) {}
 
     findWords(board: Board, tiles: Tile[], request: WordFindingRequest): ScoredWordPlacement[] {
         const startTime = new Date();
@@ -254,7 +258,10 @@ export default class WordFindingService {
         if (moveRequirements.isPossible && this.isWithinRequirements(moveRequirements, permutation.length)) {
             try {
                 const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
-                this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DEFAULT_DICTIONARY_NAME);
+                this.wordVerificationService.verifyWords(
+                    StringConversion.wordsToString(createdWords),
+                    this.dictionaryService.getDictionaryTitles()[0],
+                );
                 return {
                     tilesToPlace: permutation,
                     orientation,

@@ -2,34 +2,39 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { Dictionary } from '@app/classes/dictionary';
+import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Container } from 'typedi';
 import DictionaryService from './dictionary.service';
-import { DICTIONARIES } from '@app/constants/dictionary.const';
+import { DICTIONARY_PATHS, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 import { join } from 'path';
 import { SinonStub, stub } from 'sinon';
 import * as mock from 'mock-fs';
 
-const TEST_DICTIONARY_NAME = 'test dictionary';
-const TEST_DICTIONARY = {
-    name: TEST_DICTIONARY_NAME,
+const TEST_DICTIONARY_NAME = 'TEST_DICTIONARY';
+const TEST_DICTIONARY: DictionaryData = {
+    title: TEST_DICTIONARY_NAME,
     description: '',
     words: ['abc', 'abcd', 'abcde'],
 };
+const TEST_PATHS = ['../data/dictionary-french.json', '../data/dictionary-english.json', '../data/dictionary-spanish.json'];
+
+// mockPaths must be of type any because keys must be dynamic
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockPaths: any = [];
+for (const path of DICTIONARY_PATHS) {
+    mockPaths[join(__dirname, path)] = JSON.stringify(TEST_DICTIONARY);
+}
 
 describe('DictionaryService', () => {
     let service: DictionaryService;
-    // mockPaths must be of type any because keys must be dynamic
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let mockPaths: any;
-    let path: string;
+    let title: string;
 
     beforeEach(() => {
-        path = DICTIONARIES[0][0];
-        mockPaths[join(__dirname, path)] = TEST_DICTIONARY;
-
+        mock(mockPaths);
+        Container.reset();
         service = Container.get(DictionaryService);
+        title = service.getDictionaryTitles()[0];
     });
 
     afterEach(() => {
@@ -37,53 +42,50 @@ describe('DictionaryService', () => {
     });
 
     describe('getDictionary', () => {
-        let dictionary: Dictionary;
-
-        beforeEach(() => {
-            dictionary = new Dictionary([]);
-            service['dictionaries'].set(TEST_DICTIONARY_NAME, dictionary);
-        });
-
         it('should return dictionary if it exists', () => {
-            const result = service.getDictionary(TEST_DICTIONARY_NAME);
-            expect(result).to.equal(dictionary);
+            const result = service.getDictionary(title);
+            expect(result).to.exist;
         });
 
-        it("should return undefined if it doesn't exists", () => {
-            const result = service.getDictionary('invalid dictionary');
-            expect(result).to.be.undefined;
+        it("should throw if it doesn't exists", () => {
+            expect(() => service.getDictionary('invalid dictionary')).to.throw(INVALID_DICTIONARY_NAME);
         });
     });
 
     describe('addAllDictionaries', () => {
-        let dictionary: Dictionary;
         let fetchDictionaryWordsStub: SinonStub;
 
         beforeEach(() => {
-            dictionary = new Dictionary([]);
-            fetchDictionaryWordsStub = stub<DictionaryService, any>(service, 'fetchDictionaryWords').returns(dictionary);
+            service['dictionaryPaths'] = TEST_PATHS;
+            fetchDictionaryWordsStub = stub<DictionaryService, any>(service, 'fetchDictionaryWords').callsFake((path: string) => {
+                const index = TEST_PATHS.indexOf(path);
+                return new Dictionary({ ...TEST_DICTIONARY, title: `dictionary_${index}` });
+            });
         });
 
-        it('should add dictionaries to map', () => {
+        it('should call fetchDictionaryWordsStub n times', () => {
             service['addAllDictionaries']();
 
-            for (const [, dictionaryName] of DICTIONARIES) {
-                expect(service['dictionaries'].has(dictionaryName)).to.be.true;
-                expect(fetchDictionaryWordsStub.called).to.be.true;
-                fetchDictionaryWordsStub.reset();
-            }
+            expect(fetchDictionaryWordsStub.callCount).to.equal(TEST_PATHS.length);
+        });
+
+        it('should have n dictionaries in set after', () => {
+            service['dictionaries'] = new Map();
+            service['addAllDictionaries']();
+
+            expect(service['dictionaries'].size).to.equal(TEST_PATHS.length);
         });
     });
 
     describe('fetchDictionaryWords', () => {
         it('should return dictionary', () => {
-            const result = service['fetchDictionaryWords'](path);
+            const result = service['fetchDictionaryWords'](DICTIONARY_PATHS[0]);
 
             expect(result).to.exist;
         });
 
         it('should return dictionary with words', () => {
-            const result = service['fetchDictionaryWords'](path);
+            const result = service['fetchDictionaryWords'](DICTIONARY_PATHS[0]);
 
             for (const word of TEST_DICTIONARY.words) {
                 expect(result.wordExists(word)).to.be.true;

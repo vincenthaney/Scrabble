@@ -26,7 +26,7 @@ import {
     WordFindingUseCase,
 } from '@app/classes/word-finding';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { dictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -172,7 +172,7 @@ describe('WordFindingservice', () => {
         board = boardFromLetterValues(BOARD);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
 
-        Container.set(DictionaryService, dictionaryTestService);
+        Container.set(DictionaryService, getDictionaryTestService);
         service = Container.get(WordFindingService);
     });
 
@@ -302,7 +302,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract');
             // eslint-disable-next-line dot-notation
-            chai.spy.on(service['wordVerificationService'], 'verifyWords');
+            chai.spy.on(service['wordVerificationService'], 'verifyWords', () => undefined);
             const expected = {
                 tilesToPlace: SMALL_TILE_RACK,
                 orientation: Orientation.Horizontal,
@@ -350,7 +350,6 @@ describe('WordFindingservice', () => {
         it('should call attemptMove rackPermutations.length times', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const spyAttemptMove = stub(service, <any>'attemptMove').callsFake(() => {
-                console.log('called fake');
                 return [{ score: 1 } as unknown as ScoredWordPlacement];
             });
 
@@ -1008,7 +1007,7 @@ describe('WordFindingservice', () => {
             for (let tilesToChoose = BIG_TILE_RACK.length; tilesToChoose > 0; tilesToChoose--) {
                 expectedLength += permutationAmount(BIG_TILE_RACK.length, tilesToChoose);
             }
-            const result: Tile[][] = service['getRack Permutations'](BIG_TILE_RACK);
+            const result: Tile[][] = service['getRackPermutations'](BIG_TILE_RACK);
             expect(result.length).to.deep.equal(expectedLength);
         });
     });

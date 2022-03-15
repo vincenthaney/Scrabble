@@ -15,7 +15,6 @@ import { ActionErrorsMessages } from './action-errors';
 import { StringConversion } from '@app/utils/string-conversion';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
-import { DEFAULT_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 
 export default class ActionPlace extends ActionPlay {
     tilesToPlace: Tile[];
@@ -55,7 +54,7 @@ export default class ActionPlace extends ActionPlay {
         const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), DEFAULT_DICTIONARY_NAME);
+        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionnaryName);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 

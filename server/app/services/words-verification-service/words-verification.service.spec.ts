@@ -9,28 +9,30 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { WordsVerificationService } from './words-verification.service';
 import { Container } from 'typedi';
-import { DEFAULT_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { dictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 
 chai.use(spies);
 chai.use(chaiAsPromised);
 
 describe('WordsVerificationService', () => {
-    let wordsVerificationService: WordsVerificationService;
+    let service: WordsVerificationService;
+    let dictionaryTitle: string;
 
     beforeEach(() => {
-        Container.set(DictionaryService, dictionaryTestService);
-        wordsVerificationService = Container.get(WordsVerificationService);
+        Container.reset();
+        Container.set(DictionaryService, getDictionaryTestService());
+        service = Container.get(WordsVerificationService);
+        dictionaryTitle = service['dictionaryService'].getDictionaryTitles()[0];
     });
 
     it('should create', () => {
-        expect(wordsVerificationService).to.exist;
+        expect(service).to.exist;
     });
 
     describe('removeAccents', () => {
         it('should remove all accents', () => {
-            expect(wordsVerificationService['removeAccents']('ŠšŽžÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìiíiîiïiñòóôõöùúûýÿ')).to.equal(
+            expect(service['removeAccents']('ŠšŽžÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝàáâãäåçèéêëìiíiîiïiñòóôõöùúûýÿ')).to.equal(
                 'SsZzAAAAAACEEEEIIIINOOOOOUUUUYaaaaaaceeeeiiiiiiiinooooouuuyy',
             );
         });
@@ -39,44 +41,44 @@ describe('WordsVerificationService', () => {
     describe('verifyWords', () => {
         it('should return error because word too short', () => {
             const testWord = 'a';
-            const result = () => wordsVerificationService.verifyWords([testWord], DEFAULT_DICTIONARY_NAME);
+            const result = () => service.verifyWords([testWord], dictionaryTitle);
             expect(result).to.Throw(testWord + WORD_TOO_SHORT);
         });
 
         it('should return error because word contains asterisk', () => {
             const testWord = 'ka*ak';
-            const result = () => wordsVerificationService.verifyWords([testWord], DEFAULT_DICTIONARY_NAME);
+            const result = () => service.verifyWords([testWord], dictionaryTitle);
             expect(result).to.Throw(testWord + WORD_CONTAINS_ASTERISK);
         });
 
         it('should return error because word contains hyphen', () => {
             const testWord = 'a-a';
-            const result = () => wordsVerificationService.verifyWords([testWord], DEFAULT_DICTIONARY_NAME);
+            const result = () => service.verifyWords([testWord], dictionaryTitle);
             expect(result).to.Throw(testWord + WORD_CONTAINS_HYPHEN);
         });
 
         it('should return error because word contains apostrophe', () => {
             const testWord = "aaaa'aaaa";
-            const result = () => wordsVerificationService.verifyWords([testWord], DEFAULT_DICTIONARY_NAME);
+            const result = () => service.verifyWords([testWord], dictionaryTitle);
             expect(result).to.Throw(testWord + WORD_CONTAINS_APOSTROPHE);
         });
 
         it('should return error if word is not in dictionary', () => {
             const testWord = 'ufdwihfewa';
-            const result = () => wordsVerificationService.verifyWords([testWord], DEFAULT_DICTIONARY_NAME);
+            const result = () => service.verifyWords([testWord], dictionaryTitle);
             expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
         });
 
         it('should throw error if dictionary does not exist', () => {
             const testWord = 'ufdwihfewa';
-            const result = () => wordsVerificationService.verifyWords([testWord], 'truc');
+            const result = () => service.verifyWords([testWord], 'truc');
             expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
         });
 
         it('should NOT throw error when word is in the dictionary(one word)', () => {
             const wordsCount = 1;
             const words: string[] = [];
-            const dictionary = wordsVerificationService['activeDictionaries'].get(DEFAULT_DICTIONARY_NAME);
+            const dictionary = service['activeDictionaries'].get(dictionaryTitle);
 
             if (dictionary) {
                 const dictionaryIterator = dictionary[Symbol.iterator]();
@@ -86,13 +88,13 @@ describe('WordsVerificationService', () => {
                     i++;
                 }
             }
-            expect(() => wordsVerificationService.verifyWords(words, DEFAULT_DICTIONARY_NAME)).to.not.throw();
+            expect(() => service.verifyWords(words, dictionaryTitle)).to.not.throw();
         });
 
         it('should NOT throw error when word is in the dictionary (multiple words)', () => {
             const wordsCount = 4;
             const words: string[] = [];
-            const dictionary = wordsVerificationService['activeDictionaries'].get(DEFAULT_DICTIONARY_NAME);
+            const dictionary = service['activeDictionaries'].get(dictionaryTitle);
 
             if (dictionary) {
                 const dictionaryIterator = dictionary[Symbol.iterator]();
@@ -102,15 +104,15 @@ describe('WordsVerificationService', () => {
                     i++;
                 }
             }
-            expect(() => wordsVerificationService.verifyWords(words, DEFAULT_DICTIONARY_NAME)).to.not.throw();
+            expect(() => service.verifyWords(words, dictionaryTitle)).to.not.throw();
         });
 
         it('should call removeAccents if a word', () => {
             const words: string[] = ['dummy', 'dictionary'];
-            const removeAccentsSpy = spy.on(wordsVerificationService, 'removeAccents');
-            spy.on(wordsVerificationService['activeDictionaries'], 'get', () => undefined);
+            const removeAccentsSpy = spy.on(service, 'removeAccents');
+            spy.on(service['activeDictionaries'], 'get', () => undefined);
             try {
-                wordsVerificationService.verifyWords(words, DEFAULT_DICTIONARY_NAME);
+                service.verifyWords(words, dictionaryTitle);
                 // eslint-disable-next-line no-empty
             } catch (exception) {}
             expect(removeAccentsSpy).to.have.been.called();
@@ -118,10 +120,10 @@ describe('WordsVerificationService', () => {
 
         it('should NOT call removeAccents if a word', () => {
             const words: string[] = [''];
-            const removeAccentsSpy = spy.on(wordsVerificationService, 'removeAccents', () => {
+            const removeAccentsSpy = spy.on(service, 'removeAccents', () => {
                 return;
             });
-            wordsVerificationService.verifyWords(words, DEFAULT_DICTIONARY_NAME);
+            service.verifyWords(words, dictionaryTitle);
             expect(removeAccentsSpy).to.not.have.been.called();
         });
     });
