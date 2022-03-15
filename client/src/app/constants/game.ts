@@ -35,6 +35,8 @@ export const LETTER_VALUES: LetterValue[] = [
     '*',
 ];
 
+export const WILDCARD = '*';
+
 export const SQUARE_SIZE: Vec2 = { x: 1, y: 1 };
 export const MARGIN_COLUMN_SIZE = 1;
 
