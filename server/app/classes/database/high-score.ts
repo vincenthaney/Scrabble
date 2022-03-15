@@ -1,9 +1,11 @@
+import { GameType } from '@app/classes/game/game-type';
+
 export interface HighScore {
-    gameType: string;
+    gameType: GameType;
     score: number;
     names: string[];
 }
 
-export interface DbHighScoresData {
+export interface HighScoresData {
     highScores: HighScore[];
 }
