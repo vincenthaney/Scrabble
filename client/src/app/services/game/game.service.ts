@@ -10,7 +10,7 @@ import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
+import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ERROR_ID, TIME_TO_RECONNECT } from '@app/constants/game';
 import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
@@ -128,6 +128,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     handleNewMessage(newMessage: Message): void {
         this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
+        if (newMessage.senderId === SYSTEM_ERROR_ID) this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 
     getPlayingPlayerId(): string {

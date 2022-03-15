@@ -3,7 +3,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_PLAYER } from '@app/constants/game';
@@ -145,6 +145,40 @@ describe('GameButtonActionService', () => {
             service.sendExchangeAction(tiles);
 
             expect(sendErrorSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('sendPlaceAction', () => {
+        let player: AbstractPlayer;
+        let getPlayerIfTurnSpy: jasmine.Spy;
+        let sendActionSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            player = new Player('celine-58', 'Céline', []);
+            getPlayerIfTurnSpy = spyOn(service, 'getPlayerIfTurn').and.returnValue(player);
+            sendActionSpy = spyOn(service['gamePlayController'], 'sendAction');
+            service['gameService']['gameId'] = DEFAULT_GAME_ID;
+        });
+
+        it('should call sendAction', () => {
+            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+
+            service.sendPlaceAction(payload);
+
+            expect(sendActionSpy).toHaveBeenCalledOnceWith(DEFAULT_GAME_ID, player.id, {
+                type: ActionType.PLACE,
+                input: '',
+                payload,
+            });
+        });
+
+        it('should not call sendAction if no player', () => {
+            getPlayerIfTurnSpy.and.returnValue(undefined);
+            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+
+            service.sendPlaceAction(payload);
+
+            expect(sendActionSpy).not.toHaveBeenCalled();
         });
     });
 

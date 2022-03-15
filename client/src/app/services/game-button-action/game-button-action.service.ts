@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { CommandExceptionMessages } from '@app/constants/command-exception-messages';
@@ -55,6 +55,19 @@ export class GameButtonActionService {
         };
 
         this.gamePlayController.sendAction(gameId, player.id, actionExchange);
+    }
+
+    sendPlaceAction(payload: ActionPlacePayload) {
+        const player = this.getPlayerIfTurn();
+        if (!player) return;
+
+        const gameId = this.gameService.getGameId();
+
+        this.gamePlayController.sendAction(gameId, player.id, {
+            type: ActionType.PLACE,
+            input: '',
+            payload,
+        });
     }
 
     private checkIfPlayerHasTiles(tiles: Tile[], player: AbstractPlayer): boolean {
