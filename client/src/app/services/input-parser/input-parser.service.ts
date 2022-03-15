@@ -25,12 +25,12 @@ export default class InputParserService {
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {}
 
-    parseAndSendInput(input: string): void {
+    handleInput(input: string): void {
         const playerId = this.getLocalPlayer().id;
         const gameId = this.gameService.getGameId();
 
         if (this.isAction(input)) {
-            this.parseAndSendCommand(input, gameId, playerId);
+            this.handleCommand(input, gameId, playerId);
         } else {
             this.controller.sendMessage(gameId, playerId, {
                 content: input,
@@ -39,7 +39,7 @@ export default class InputParserService {
         }
     }
 
-    private parseAndSendCommand(input: string, gameId: string, playerId: string): void {
+    private handleCommand(input: string, gameId: string, playerId: string): void {
         try {
             this.controller.sendAction(gameId, playerId, this.createActionData(input));
         } catch (exception) {
