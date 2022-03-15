@@ -23,15 +23,14 @@ export class WordsVerificationService {
 
     verifyWords(words: string[], dictionary: string): void {
         for (let word of words) {
-            if (word.length > 0) {
-                word = this.removeAccents(word);
-                word = word.toLowerCase();
-                if (word.length < MINIMUM_WORD_LENGTH) throw new Error(word + WORD_TOO_SHORT);
-                if (word.includes('*')) throw new Error(word + WORD_CONTAINS_ASTERISK);
-                if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
-                if (word.includes("'")) throw new Error(word + WORD_CONTAINS_APOSTROPHE);
-                if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(INVALID_WORD(word.toUpperCase()));
-            }
+            if (word.length <= 0) continue;
+            word = this.removeAccents(word);
+            word = word.toLowerCase();
+            if (word.length < MINIMUM_WORD_LENGTH) throw new Error(word + WORD_TOO_SHORT);
+            if (word.includes('*')) throw new Error(word + WORD_CONTAINS_ASTERISK);
+            if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
+            if (word.includes("'")) throw new Error(word + WORD_CONTAINS_APOSTROPHE);
+            if (!this.activeDictionaries.get(dictionary)?.has(word)) throw new Error(INVALID_WORD(word.toUpperCase()));
         }
     }
 

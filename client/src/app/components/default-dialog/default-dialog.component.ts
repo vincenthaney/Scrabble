@@ -22,20 +22,19 @@ export class DefaultDialogComponent {
         this.content = this.data.content;
         this.buttons = [];
 
-        if (this.data.buttons) {
-            if (!Array.isArray(this.data.buttons)) throw new Error(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
+        if (!this.data.buttons) return;
+        if (!Array.isArray(this.data.buttons)) throw new Error(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
 
-            this.data.buttons.forEach((btn) => {
-                if (!btn.content) throw new Error(BUTTON_MUST_HAVE_CONTENT);
-                this.buttons.push({
-                    content: btn.content,
-                    closeDialog: btn.redirect ? true : btn.closeDialog ?? false,
-                    action: btn.action,
-                    redirect: btn.redirect,
-                    style: btn.style,
-                });
+        this.data.buttons.forEach((button) => {
+            if (!button.content) throw new Error(BUTTON_MUST_HAVE_CONTENT);
+            this.buttons.push({
+                content: button.content,
+                closeDialog: button.redirect ? true : button.closeDialog ?? false,
+                action: button.action,
+                redirect: button.redirect,
+                style: button.style,
             });
-        }
+        });
     }
 
     handleButtonClick(button: DefaultDialogButtonParameters): void {

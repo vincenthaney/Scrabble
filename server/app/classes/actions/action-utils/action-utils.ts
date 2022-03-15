@@ -10,16 +10,14 @@ export class ActionUtils {
 
         for (const tile of tilesToPlay) {
             const index = this.getIndexOfTile(unplayedTiles, tile, allowWildcard);
-            if (index >= 0) {
-                const playerTile = unplayedTiles.splice(index, 1)[0];
-                if (this.isBlankTile(playerTile)) {
-                    playerTile.playedLetter = tile.letter;
-                    playerTile.isBlank = true;
-                }
-                playedTiles.push(playerTile);
-            } else {
-                throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+            if (index < 0) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+
+            const playerTile = unplayedTiles.splice(index, 1)[0];
+            if (this.isBlankTile(playerTile)) {
+                playerTile.playedLetter = tile.letter;
+                playerTile.isBlank = true;
             }
+            playedTiles.push(playerTile);
         }
 
         return [playedTiles, unplayedTiles];
