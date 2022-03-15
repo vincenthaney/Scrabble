@@ -1,5 +1,6 @@
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import { Message } from '@app/classes/communication/message';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface EventTypes {
     tileRackUpdate: void;
@@ -7,4 +8,13 @@ export interface EventTypes {
     reRender: void;
     newMessage: Message;
     usedTiles: ActionPlacePayload | undefined;
+}
+
+type GenericEventClass<T> = {
+    [S in keyof T]: Subject<T[S]>;
+};
+
+export interface EventClass extends GenericEventClass<EventTypes> {
+    newMessage: BehaviorSubject<Message>;
+    usedTiles: BehaviorSubject<ActionPlacePayload | undefined>;
 }
