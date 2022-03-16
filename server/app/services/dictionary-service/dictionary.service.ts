@@ -26,8 +26,6 @@ export default class DictionaryService {
     protected fetchDictionaryWords(path: string): Dictionary {
         const buffer = readFileSync(join(__dirname, path));
         const data: DictionaryData = JSON.parse(buffer.toString());
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        if (data.words.length > 100) throw new Error('Too many words: ' + data.words.length);
         return new Dictionary(data);
     }
 
