@@ -67,6 +67,16 @@ export default class BoardNavigator {
         return this.isWithinBounds() ? distanceTravelled : Number.POSITIVE_INFINITY;
     }
 
+    nextLine(): void {
+        if (this.orientation === Orientation.Horizontal) {
+            this.position.row += 1;
+            this.position.column = 0;
+        } else {
+            this.position.row = 0;
+            this.position.column += 1;
+        }
+    }
+
     switchOrientation(): BoardNavigator {
         this.orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
         return this;
