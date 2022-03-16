@@ -159,7 +159,7 @@ export class GameDispatcherController {
     }
 
     private handleCancelGame(gameId: string, playerId: string): void {
-        const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
+        const waitingRoom = this.gameDispatcherService.getMultiplayerGameFromId(gameId);
         if (waitingRoom.joinedPlayer) {
             this.socketService.emitToSocket(waitingRoom.joinedPlayer.id, 'canceledGame', { name: waitingRoom.getConfig().player1.name });
         }
@@ -205,7 +205,7 @@ export class GameDispatcherController {
         }
     }
 
-    private handleCreateGame(config: GameConfigData): string {
+    private async handleCreateGame(config: GameConfigData): Promise<string> {
         if (config.playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameType === undefined) throw new HttpException(GAME_TYPE_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameMode === undefined) throw new HttpException(GAME_MODE_REQUIRED, StatusCodes.BAD_REQUEST);
@@ -217,15 +217,16 @@ export class GameDispatcherController {
         let gameId: string;
         if (config.gameMode === GameMode.Multiplayer) {
             gameId = this.gameDispatcherService.createMultiplayerGame(config);
+            this.socketService.addToRoom(config.playerId, gameId);
         } else {
             if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
             if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
-            // TODO : gameId = this.gameDispatcherService.createSoloGame(config);
-            gameId = ''; // CHANGE THIS ONCE SOLO GAME CREATION METHOD EXISTS
+            gameId = this.gameDispatcherService.createSoloGame(config);
+            const gameConfig = this.gameDispatcherService.getSoloGameFromId(gameId).getReadyConfig();
+            const startGameData = await this.activeGameService.beginGame(gameId, gameConfig);
+            this.socketService.addToRoom(config.playerId, gameId);
+            this.socketService.emitToRoom(gameId, 'startGame', startGameData);
         }
-
-        this.socketService.addToRoom(config.playerId, gameId);
-        this.handleLobbiesUpdate();
         return gameId;
     }
 
@@ -243,7 +244,7 @@ export class GameDispatcherController {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
 
         const gameConfig = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
-        const startGameData = await this.activeGameService.beginMultiplayerGame(gameId, gameConfig);
+        const startGameData = await this.activeGameService.beginGame(gameId, gameConfig);
 
         this.socketService.addToRoom(startGameData.player2.id, gameId);
         this.socketService.emitToRoom(gameId, 'startGame', startGameData);
