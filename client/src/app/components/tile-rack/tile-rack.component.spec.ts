@@ -15,14 +15,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer, Player } from '@app/classes/player';
-import { Tile } from '@app/classes/tile';
+import { Tile, LetterValue } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { ESCAPE } from '@app/constants/components-constants';
+import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
+import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
@@ -42,11 +44,13 @@ describe('TileRackComponent', () => {
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj(
             'GameService',
-            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent'],
+            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent', 'getTotalNumberOfTilesLeft'],
             ['playingTiles'],
         );
         gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(100);
 
         const tileRackUpdate$ = new Subject();
         const usedTiles$ = new Subject();
@@ -261,7 +265,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'selectTile');
 
-            component.selectTileExchange(tile);
+            component.selectTileToExchange(tile);
 
             expect(spy).toHaveBeenCalledOnceWith(TileRackSelectType.Exchange, tile);
         });
@@ -272,7 +276,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'selectTile');
 
-            component.selectTileMove(tile);
+            component.selectTileToMove(tile);
 
             expect(spy).toHaveBeenCalledOnceWith(TileRackSelectType.Move, tile);
         });
@@ -348,6 +352,143 @@ describe('TileRackComponent', () => {
 
             expect(spy).toHaveBeenCalled();
         });
+
+        it('should call moveSelectedTile on arrow', () => {
+            const tests: [arrow: string, direction: Direction][] = [
+                [ARROW_LEFT, Direction.Left],
+                [ARROW_RIGHT, Direction.Right],
+            ];
+
+            const spy = spyOn<any>(component, 'moveSelectedTile');
+
+            for (const [arrow, direction] of tests) {
+                const event = { key: arrow } as KeyboardEvent;
+
+                component['onFocusableEvent'](event);
+
+                expect(spy).toHaveBeenCalledOnceWith(direction);
+
+                spy.calls.reset();
+            }
+        });
+
+        it('should call selectTileFromKey if is key', () => {
+            const event = { key: 'A' } as KeyboardEvent;
+            const spy = spyOn<any>(component, 'selectTileFromKey');
+
+            component['onFocusableEvent'](event);
+
+            expect(spy).toHaveBeenCalledOnceWith(event);
+        });
+    });
+
+    describe('selectTileFromKey', () => {
+        let tiles: RackTile[];
+        let selectTileMoveSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            tiles = [
+                { letter: 'A', isSelected: false },
+                { letter: 'B', isSelected: false },
+                { letter: 'C', isSelected: false },
+                { letter: 'B', isSelected: false },
+                { letter: 'D', isSelected: false },
+                { letter: 'B', isSelected: false },
+            ] as RackTile[];
+            component.tiles = tiles;
+            selectTileMoveSpy = spyOn(component, 'selectTileToMove');
+        });
+
+        it('should call selectTileMove', () => {
+            const index = 0;
+            const key = tiles[index].letter;
+
+            component['selectTileFromKey']({ key } as KeyboardEvent);
+
+            expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
+        });
+
+        it('should call selectTileMove with next tile with same letter', () => {
+            tiles[1].isSelected = true;
+            const index = 3;
+            const key = tiles[index].letter;
+
+            component['selectTileFromKey']({ key } as KeyboardEvent);
+
+            expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
+        });
+
+        it('should call selectTileMove with next tile with same letter (2)', () => {
+            tiles[3].isSelected = true;
+            const index = 5;
+            const key = tiles[index].letter;
+
+            component['selectTileFromKey']({ key } as KeyboardEvent);
+
+            expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
+        });
+
+        it('should not call selectTileMove if no tile matches', () => {
+            const key = 'not a letter';
+
+            component['selectTileFromKey']({ key } as KeyboardEvent);
+
+            expect(selectTileMoveSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('moveSelectedTile', () => {
+        const tests: [selected: number, direction: Direction, expected: LetterValue[]][] = [
+            [1, Direction.Left, ['B', 'A', 'C', 'D']],
+            [1, Direction.Right, ['A', 'C', 'B', 'D']],
+            [0, Direction.Left, ['B', 'C', 'D', 'A']],
+            [3, Direction.Right, ['D', 'A', 'B', 'C']],
+        ];
+        let tiles: RackTile[];
+
+        beforeEach(() => {
+            tiles = [
+                { letter: 'A', isSelected: false },
+                { letter: 'B', isSelected: false },
+                { letter: 'C', isSelected: false },
+                { letter: 'D', isSelected: false },
+            ] as RackTile[];
+            component.tiles = tiles;
+        });
+
+        for (let i = 0; i < tests.length; ++i) {
+            it(`should move selected tile (${i + 1})`, () => {
+                const [selected, direction, expected] = tests[i];
+
+                component.selectTileToMove(tiles[selected]);
+
+                component['moveSelectedTile'](direction);
+
+                expect(component.tiles.map((t) => t.letter)).toEqual(expected);
+            });
+        }
+
+        it('should not change tiles if selection type is not move', () => {
+            const expected = [...tiles];
+
+            component.selectTileToMove(tiles[0]);
+            component.selectionType = TileRackSelectType.Exchange;
+
+            component['moveSelectedTile'](Direction.Right);
+
+            expect(component.tiles.map((t) => t.letter)).toEqual(expected.map((t) => t.letter));
+        });
+
+        it('should not change tiles if selectedTiles is empty', () => {
+            const expected = [...tiles];
+
+            component.selectTileToMove(tiles[0]);
+            component.selectedTiles = [];
+
+            component['moveSelectedTile'](Direction.Right);
+
+            expect(component.tiles.map((t) => t.letter)).toEqual(expected.map((t) => t.letter));
+        });
     });
 
     describe('canExchangeTiles', () => {
@@ -375,6 +516,11 @@ describe('TileRackComponent', () => {
 
         it('should be false if is not local player playing', () => {
             isLocalPlayerPlayingSpy.and.returnValue(false);
+            expect(component.canExchangeTiles()).toBeFalse();
+        });
+
+        it('should be false if is less than 7 tiles', () => {
+            gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(MAX_TILES_PER_PLAYER - 1);
             expect(component.canExchangeTiles()).toBeFalse();
         });
     });
@@ -411,6 +557,17 @@ describe('TileRackComponent', () => {
             canExchangeTile.and.returnValue(false);
             component.exchangeTiles();
             expect(sendExchangeActionSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('onScroll', () => {
+        it('should call moveSelectedTile', () => {
+            const value = 1;
+            const spy = spyOn<any>(component, 'moveSelectedTile');
+
+            component.onScroll({ deltaY: value } as WheelEvent);
+
+            expect(spy).toHaveBeenCalledOnceWith(value);
         });
     });
 

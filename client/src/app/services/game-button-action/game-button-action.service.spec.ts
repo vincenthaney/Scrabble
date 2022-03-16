@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
-import { Tile } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GameButtonActionService } from './game-button-action.service';
@@ -161,7 +161,7 @@ describe('GameButtonActionService', () => {
         });
 
         it('should call sendAction', () => {
-            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+            const payload: ActionPlacePayload = { tiles: [] as Tile[] } as ActionPlacePayload;
 
             service.sendPlaceAction(payload);
 
@@ -179,6 +179,22 @@ describe('GameButtonActionService', () => {
             service.sendPlaceAction(payload);
 
             expect(sendActionSpy).not.toHaveBeenCalled();
+        });
+
+        it('should convert blank tiles', () => {
+            const letter: LetterValue = 'G';
+            const payload: ActionPlacePayload = { tiles: [{ letter: '*', playedLetter: letter, isBlank: true }] as Tile[] } as ActionPlacePayload;
+            const tile = { letter, playedLetter: letter, isBlank: true } as Tile;
+
+            service.sendPlaceAction(payload);
+
+            expect(sendActionSpy).toHaveBeenCalledOnceWith(DEFAULT_GAME_ID, player.id, {
+                type: ActionType.PLACE,
+                input: '',
+                payload: {
+                    tiles: [tile],
+                },
+            });
         });
     });
 

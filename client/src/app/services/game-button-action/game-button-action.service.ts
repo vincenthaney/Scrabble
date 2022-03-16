@@ -63,6 +63,10 @@ export class GameButtonActionService {
 
         const gameId = this.gameService.getGameId();
 
+        payload.tiles.forEach((tile) => {
+            if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
+        });
+
         this.gamePlayController.sendAction(gameId, player.id, {
             type: ActionType.PLACE,
             input: '',

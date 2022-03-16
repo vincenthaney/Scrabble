@@ -17,7 +17,7 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -33,10 +33,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     notAppliedSquares: SquareView[];
     tileFontSize: number;
     selectedSquare: SquareView | undefined;
-
     navigator: BoardNavigator;
-    boardUpdateSubscription: Subscription;
-    boardInitializationSubscription: Subscription;
     private componentDestroyed$: Subject<boolean>;
 
     constructor(

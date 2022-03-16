@@ -6,6 +6,8 @@ export const LOCAL_PLAYER_ICON: IconName[] = ['user-astronaut', 'user-cowboy', '
 
 export const BACKSPACE = 'Backspace';
 export const ESCAPE = 'Escape';
+export const ARROW_LEFT = 'ArrowLeft';
+export const ARROW_RIGHT = 'ArrowRight';
 export const ENTER = 'Enter';
 export const KEYDOWN = 'keydown';
 export const DEFAULT_HIGH_SCORE: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0 };

@@ -1,10 +1,10 @@
 <div id="rack-grid" (click)="focus()">
     <mat-card>
-        <div id="rack-card-container" [class]="'selection-' + selectionType">
+        <div id="rack-card-container" [class]="'selection-' + selectionType" (wheel)="onScroll($event)">
             <div class="rack-tile-container" 
                 *ngFor="let tile of tiles" [ngClass]="{ selected: tile.isSelected, hidden: tile.isUsed }"
-                (click)="selectTileExchange(tile)"
-                (contextmenu)="selectTileMove(tile)"
+                (click)="selectTileToMove(tile)"
+                (contextmenu)="selectTileToExchange(tile)"
             >
                 <app-tile [tile]="tile" [ngStyle]="{'fontSize': tileFontSize+'em'}" class="rack-tile">
                     {{ tile.letter }}

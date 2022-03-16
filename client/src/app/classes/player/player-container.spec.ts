@@ -28,7 +28,7 @@ describe('PlayerContainer', () => {
         playerContainer = null as unknown as PlayerContainer;
     });
 
-    it('Creating PlayerContainer should initialize set and set localPlayerId', () => {
+    it('Creating PlayerContainer should initialize and set localPlayerId', () => {
         expect(playerContainer['players']).toBeTruthy();
         expect(playerContainer['localPlayerId']).toEqual(DEFAULT_LOCAL_PLAYER_ID);
     });
@@ -44,14 +44,14 @@ describe('PlayerContainer', () => {
         expect(playerContainer.getLocalPlayer()).toEqual(localPlayer);
     });
 
-    it('getLocalPlayer should return undefined if there is no player which id matchers localPlayerId', () => {
+    it('getLocalPlayer should return undefined if no player id matches localPlayerId', () => {
         const notLocalPlayer = new Player('not-local-player', 'test', []);
         playerContainer['players'].set(DEFAULT_PLAYER_NUMBER, notLocalPlayer);
 
         expect(playerContainer.getLocalPlayer()).toBeUndefined();
     });
 
-    it('initializePlayer should call addPlayer if playerData is valid', () => {
+    it('initializePlayer should call addPlayer if playerData is valid (1 player)', () => {
         const playerData: PlayerData = {
             id: '1',
             name: 'test',
@@ -83,7 +83,7 @@ describe('PlayerContainer', () => {
         expect(() => playerContainer.initializePlayer(DEFAULT_PLAYER_NUMBER, playerData)).toThrowError(MISSING_PLAYER_DATA_TO_INITIALIZE);
     });
 
-    it('initializePlayers should call addPlayer if playerData is valid', () => {
+    it('initializePlayers should call addPlayer if playerData is valid (2 players)', () => {
         const playerDatas: PlayerData[] = [
             {
                 id: '1',
@@ -131,7 +131,7 @@ describe('PlayerContainer', () => {
         expect(spy).toHaveBeenCalledWith(1, DEFAULT_PLAYER);
     });
 
-    it('removePlayer should delete provided player to set', () => {
+    it('removePlayer should delete provided player from set', () => {
         const spy = spyOn(playerContainer['players'], 'delete').and.callThrough();
 
         playerContainer.setPlayer(DEFAULT_PLAYER_NUMBER, DEFAULT_PLAYER);
