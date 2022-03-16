@@ -47,10 +47,18 @@ describe('TileRackComponent', () => {
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj(
             'GameService',
-            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent', 'getTotalNumberOfTilesLeft', 'getGameId'],
+            [
+                'getLocalPlayer',
+                'isLocalPlayerPlaying',
+                'subscribeToUpdateTileRackEvent',
+                'getTotalNumberOfTilesLeft',
+                'getGameId',
+                'getLocalPlayerId',
+            ],
             ['playingTiles'],
         );
         gameServiceSpy.getGameId.and.returnValue(DEFAULT_GAME_ID);
+        gameServiceSpy.getLocalPlayerId.and.returnValue(DEFAULT_PLAYER_ID);
         gameServiceSpy.getLocalPlayer.and.returnValue(new Player(DEFAULT_PLAYER_ID, 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -543,7 +551,9 @@ describe('TileRackComponent', () => {
                 fakePayload as unknown as ActionExchangePayload,
             );
             createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
-            sendAction = spyOn(component['actionService'], 'sendAction');
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
             unselectAllSpy = spyOn(component, 'unselectAll');
             canExchangeTile = spyOn(component, 'canExchangeTiles').and.returnValue(true);
             component.selectedTiles = [{ isUsed: false }, { isPlayed: false }] as RackTile[];
