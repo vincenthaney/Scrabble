@@ -193,7 +193,6 @@ describe('InformationBoxComponent', () => {
 
     describe('ngOndestroy', () => {
         beforeEach(() => {
-            // spyOnProperty<any>(mockRoundManager, 'endRoundEvent$', 'get').and.returnValue(null);
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         });
 

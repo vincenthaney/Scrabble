@@ -24,7 +24,7 @@ export default class RoundManagerService implements IResetServiceData {
     maxRoundTime: number;
     timeout: ReturnType<typeof setTimeout>;
     timer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
-    private endRoundEvent$: Subject<void> = new Subject();
+    private endRoundEvent$: Subject<void>;
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
 
     constructor(private gameplayController: GamePlayController, private router: Router) {
