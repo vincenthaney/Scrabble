@@ -12,9 +12,9 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 @Service()
 export class GameDispatcherService {
@@ -127,14 +127,7 @@ export class GameDispatcherService {
         const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
         const lobbyData: LobbyData[] = [];
         for (const room of waitingRooms) {
-            const config = room.getConfig();
-            lobbyData.push({
-                dictionary: config.dictionary,
-                playerName: config.player1.name,
-                maxRoundTime: config.maxRoundTime,
-                lobbyId: room.getId(),
-                gameType: config.gameType,
-            });
+            lobbyData.push(room.convertToLobbyData());
         }
 
         return lobbyData;
