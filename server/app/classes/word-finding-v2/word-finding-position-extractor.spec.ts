@@ -27,7 +27,7 @@ const letterToSquare = (letter: LetterValue | ' '): Square =>
         tile: letter === ' ' ? null : ({ letter } as Tile),
     } as Square);
 
-describe.only('WordFindingPositionExtractor', () => {
+describe('WordFindingPositionExtractor', () => {
     let board: Board;
     let player: Player;
     let extractor: WordFindingPositionExtractor;
