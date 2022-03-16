@@ -22,6 +22,8 @@ import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } fr
 import { Container } from 'typedi';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -59,6 +61,8 @@ describe('GamePlayService', () => {
     let game: Game;
 
     beforeEach(() => {
+        Container.set(DictionaryService, getDictionaryTestService);
+
         gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);

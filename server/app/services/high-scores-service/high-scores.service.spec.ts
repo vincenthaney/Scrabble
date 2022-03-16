@@ -134,8 +134,8 @@ describe('HighScoresService', () => {
             const newScore = 1111;
             expect(await highScoresService.replaceHighScore(newName, newScore, HIGH_SCORE_CLASSIC_1)).to.be.true;
             expect(await highScoresService['collection'].findOne({ score: HIGH_SCORE_CLASSIC_1.score, gameType: HIGH_SCORE_CLASSIC_1.gameType })).to
-                .be.undefined;
-            expect(await highScoresService['collection'].findOne({ score: newScore })).not.to.be.undefined;
+                .not.be.ok;
+            expect(await highScoresService['collection'].findOne({ score: newScore })).to.be.ok;
         });
     });
 

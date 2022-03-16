@@ -14,13 +14,14 @@ import {
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
 
-    constructor() {
+    constructor(private readonly dictionaryService: DictionaryService) {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
@@ -30,7 +31,7 @@ export class GameDispatcherService {
             player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
             maxRoundTime: configData.maxRoundTime,
-            dictionary: configData.dictionary,
+            dictionary: this.dictionaryService.getDictionaryTitles()[0],
         };
         const waitingRoom = new WaitingRoom(config);
         this.waitingRooms.push(waitingRoom);
