@@ -35,13 +35,15 @@ export class ActiveGameService {
     }
 
     removeGame(id: string, playerId: string): void {
+        let game: Game;
         try {
-            const game = this.getGame(id, playerId);
-            const index = this.activeGames.indexOf(game);
-            this.activeGames.splice(index, 1);
-            // If the game is already deleted, catch error but don't do anything
-            // eslint-disable-next-line no-empty
-        } catch (exception) {}
+            game = this.getGame(id, playerId);
+            // If the game is already deleted, return and don't do anything
+        } catch (exception) {
+            return;
+        }
+        const index = this.activeGames.indexOf(game);
+        this.activeGames.splice(index, 1);
     }
 
     isGameOver(gameId: string, playerId: string): boolean {

@@ -3,7 +3,6 @@ import { TileReserveData } from '@app/classes/tile/tile.types';
 import { PlayerData } from './';
 import { RoundData } from './round-data';
 
-// export type TileReserveData = { letter: LetterValue;}
 export default interface GameUpdateData {
     player1?: PlayerData;
     player2?: PlayerData;

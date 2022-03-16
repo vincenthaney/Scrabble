@@ -1,6 +1,5 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
-import { Orientation, Position } from '@app/classes/board';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -8,27 +7,21 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { Container } from 'typedi';
 import { ActionErrorsMessages } from './action-errors';
 import { StringConversion } from '@app/utils/string-conversion';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding/word-placement';
 
 export default class ActionPlace extends ActionPlay {
-    tilesToPlace: Tile[];
-    startPosition: Position;
-    orientation: Orientation;
+    wordPlacement: WordPlacement;
     private scoreCalculator: ScoreCalculatorService;
     private wordValidator: WordsVerificationService;
-    constructor(player: Player, game: Game, tilesToPlace: Tile[], startPosition: Position, orientation: Orientation) {
+    constructor(player: Player, game: Game, wordPlacement: WordPlacement) {
         super(player, game);
-        this.tilesToPlace = tilesToPlace;
-        this.startPosition = startPosition;
-        this.orientation = orientation;
-
+        this.wordPlacement = wordPlacement;
         this.scoreCalculator = Container.get(ScoreCalculatorService);
         this.wordValidator = Container.get(WordsVerificationService);
     }
@@ -50,12 +43,12 @@ export default class ActionPlace extends ActionPlay {
     }
 
     execute(): void | GameUpdateData {
-        const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
+        const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.wordPlacement.tilesToPlace, this.player);
         const wordExtraction = new WordExtraction(this.game.board);
-        const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
+        const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
+        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionnaryName);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
@@ -75,12 +68,8 @@ export default class ActionPlace extends ActionPlay {
     }
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {
-        const isAdjacentToPlacedTile = this.amountOfLettersInWords(words) !== this.tilesToPlace.length;
-        if (isAdjacentToPlacedTile) {
-            return true;
-        } else {
-            return this.containsCenterSquare(words);
-        }
+        const isAdjacentToPlacedTile = this.amountOfLettersInWords(words) !== this.wordPlacement.tilesToPlace.length;
+        return isAdjacentToPlacedTile ? true : this.containsCenterSquare(words);
     }
 
     amountOfLettersInWords(words: [Square, Tile][][]): number {
@@ -109,10 +98,10 @@ export default class ActionPlace extends ActionPlay {
     }
 
     getMessage(): string {
-        return `Vous avez placé ${this.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+        return `Vous avez placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
     }
 
     getOpponentMessage(): string {
-        return `${this.player.name} a placé ${this.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+        return `${this.player.name} a placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
     }
 }

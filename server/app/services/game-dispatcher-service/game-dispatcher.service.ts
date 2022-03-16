@@ -18,6 +18,7 @@ import {
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 @Service()
 export class GameDispatcherService {
@@ -25,7 +26,7 @@ export class GameDispatcherService {
     private lobbiesRoom: Room;
     private soloRooms: SoloRoom[];
 
-    constructor() {
+    constructor(private readonly dictionaryService: DictionaryService) {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }

@@ -42,8 +42,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
+    mustDisconnectGameOnLeave: boolean;
     componentDestroyed$: Subject<boolean>;
-    playerLeftWithQuitButton: boolean;
 
     constructor(
         public dialog: MatDialog,
@@ -55,7 +55,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private gameViewEventManagerService: GameViewEventManagerService,
         private gameButtonActionService: GameButtonActionService,
     ) {
-        this.playerLeftWithQuitButton = false;
+        this.mustDisconnectGameOnLeave = true;
         this.componentDestroyed$ = new Subject();
     }
 
@@ -71,10 +71,20 @@ export class GamePageComponent implements OnInit, OnDestroy {
     handleKeyboardEventBackspace(event: KeyboardEvent): void {
         this.focusableComponentService.emitKeyboard(event);
     }
+    @HostListener('document:keydown.arrowleft', ['$event'])
+    handleKeyboardEventArrowLeft(event: KeyboardEvent): void {
+        event.preventDefault();
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.arrowright', ['$event'])
+    handleKeyboardEventArrowRight(event: KeyboardEvent): void {
+        event.preventDefault();
+        this.focusableComponentService.emitKeyboard(event);
+    }
 
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
-        if (!this.playerLeftWithQuitButton) {
+        if (this.mustDisconnectGameOnLeave) {
             this.gameService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
@@ -107,7 +117,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         // We haven't been able to test that the right function is called because this
                         // arrow function creates a new instance of the function. We cannot spy on it.
                         // It totally works tho, try it!
-                        action: () => this.handlePlayerLeave(),
+                        action: () => this.handlePlayerLeaves(),
                     },
                     {
                         content: buttonsContent[1],
@@ -148,6 +158,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         closeDialog: false,
                         redirect: '/home',
                         style: 'background-color: rgb(231, 231, 231)',
+                        // We haven't been able to test that the right function is called because this
+                        // arrow function creates a new instance of the function. We cannot spy on it.
+                        // It totally works tho, try it!
+                        action: () => (this.mustDisconnectGameOnLeave = false),
                     },
                 ],
             },
@@ -168,8 +182,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
         return this.gameService.isLocalPlayerPlaying();
     }
 
-    private handlePlayerLeave(): void {
-        this.playerLeftWithQuitButton = true;
+    private handlePlayerLeaves(): void {
+        this.mustDisconnectGameOnLeave = false;
         this.playerLeavesService.handleLocalPlayerLeavesGame();
     }
 }

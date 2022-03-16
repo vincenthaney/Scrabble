@@ -7,12 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
-    pointHistory = new Map<number, number>();
+    pointHistory: Map<number, number>;
 
     private wordFindingService: WordFindingService;
     private activeGameService: ActiveGameService;
     constructor(gameId: string, name: string) {
         super(uuidv4(), name);
+        this.pointHistory = new Map<number, number>();
         this.gameId = gameId;
         this.wordFindingService = Container.get(WordFindingService);
         this.activeGameService = Container.get(ActiveGameService);

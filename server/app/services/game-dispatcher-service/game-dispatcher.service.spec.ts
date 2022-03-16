@@ -24,6 +24,8 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
 const expect = chai.expect;
 
@@ -49,6 +51,7 @@ describe('GameDispatcherService', () => {
 
     beforeEach(() => {
         Container.reset();
+        Container.set(DictionaryService, getDictionaryTestService());
         gameDispatcherService = Container.get(GameDispatcherService);
     });
 
@@ -78,7 +81,6 @@ describe('GameDispatcherService', () => {
             expect(waitingRoom.getConfig().player1.id).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId);
             expect(waitingRoom.getConfig().gameType).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.gameType);
             expect(waitingRoom.getConfig().maxRoundTime).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.maxRoundTime);
-            expect(waitingRoom.getConfig().dictionary).to.equal(DEFAULT_MULTIPLAYER_CONFIG_DATA.dictionary);
         });
 
         it('should return game id', () => {

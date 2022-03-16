@@ -3,7 +3,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
-import { MAX_TILE_PER_PLAYER, PLAYER_1_INDEX, PLAYER_2_INDEX, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { MAX_TILES_PER_PLAYER, PLAYER_1_INDEX, PLAYER_2_INDEX, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
@@ -32,7 +32,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
         private gameService: GameService,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
-        this.maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
+        this.maxTilesPerPlayer = MAX_TILES_PER_PLAYER;
     }
 
     ngOnInit(): void {
@@ -64,10 +64,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
                 this.updateActivePlayerBorder(activePlayer);
             });
         }
-
-        if (this.roundManager.endRoundEvent) {
-            this.roundManager.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.endRound());
-        }
+        this.roundManager.subscribeToEndRoundEvent(this.componentDestroyed$, () => this.endRound());
         this.isPlayer1 = this.checkIfIsPlayer1();
         this.localPlayerIcon = this.getLocalPlayerIcon();
     }

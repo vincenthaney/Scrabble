@@ -20,7 +20,7 @@
     <section id="text-box-container" #textBoxContainer>
         <mat-card>
             <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
-                <div [class]="'scroll-item ' + msg.class" *cdkVirtualFor="let msg of messages">
+                <div [class]="'scroll-item ' + msg.senderId" *cdkVirtualFor="let msg of messages">
                     <div class="message-container">
                         <p class="message" [innerHTML]="msg.content"></p>
                     </div>
