@@ -192,7 +192,7 @@ describe('GamePageComponent', () => {
             sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
                 return;
             });
-            component.createPassAction();
+            component.passButtonClicked();
             expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PASS);
             expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
         });

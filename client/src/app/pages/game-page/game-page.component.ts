@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActionType } from '@app/classes/actions/action-data';
+import { ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -101,11 +101,21 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    createPassAction(): void {
+    passButtonClicked(): void {
         this.actionService.sendAction(
             this.gameService.getGameId(),
             this.gameService.getLocalPlayerId(),
             this.actionService.createActionData(ActionType.PASS),
+        );
+    }
+
+    placeButtonClicked(): void {
+        const placePayload: ActionPlacePayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (!placePayload) return;
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PLACE, placePayload),
         );
     }
 
@@ -185,6 +195,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     isLocalPlayerTurn(): boolean {
         return this.gameService.isLocalPlayerPlaying();
+    }
+
+    canPass(): boolean {
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver;
+    }
+
+    canPlaceWord(): boolean {
+        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
     }
 
     private handlePlayerLeaves(): void {

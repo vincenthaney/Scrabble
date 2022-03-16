@@ -18,22 +18,12 @@
                             <span *ngIf="!gameService.isGameOver"> Abandonner</span>
                             <span *ngIf="gameService.isGameOver"> Quitter</span>
                         </button>
-                        <button
-                            mat-flat-button
-                            color="primary"
-                            [disabled]="!isLocalPlayerTurn() || gameService.isGameOver"
-                            (click)="createPassAction()"
-                        >
+                        <button mat-flat-button color="primary" [disabled]="!canPass()" (click)="passButtonClicked()">
                             <app-icon icon="redo"></app-icon> Passer
                         </button>
-                        <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
-                            <button mat-flat-button color="primary" [disabled]="true">
-                                <app-icon icon="square" styling="solid"></app-icon> Placer
-                            </button>
-                        </div>
-                        <div matTooltip="Veuillez utiliser le chat" matTooltipPosition="above">
-                            <button mat-flat-button color="primary" [disabled]="true"><app-icon icon="check"></app-icon> Confirmer action</button>
-                        </div>
+                        <button mat-flat-button color="primary" [disabled]="!canPlaceWord()" (click)="placeButtonClicked()">
+                            <app-icon icon="square" styling="solid"></app-icon> Placer
+                        </button>
                     </mat-card>
                 </div>
             </div>
