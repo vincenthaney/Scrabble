@@ -3,6 +3,7 @@ import { PointRange, WordFindingRequest, WordFindingUseCase } from '@app/classes
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WordFindingService from '@app/services/word-finding/word-finding';
 import { Container } from 'typedi';
+import { v4 as uuidv4 } from 'uuid';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
@@ -10,8 +11,8 @@ export abstract class AbstractVirtualPlayer extends Player {
 
     private wordFindingService: WordFindingService;
     private activeGameService: ActiveGameService;
-    constructor(gameId: string, id: string, name: string) {
-        super(id, name);
+    constructor(gameId: string, name: string) {
+        super(uuidv4(), name);
         this.gameId = gameId;
         this.wordFindingService = Container.get(WordFindingService);
         this.activeGameService = Container.get(ActiveGameService);
