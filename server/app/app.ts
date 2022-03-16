@@ -59,7 +59,7 @@ export class Application {
     }
 
     private connectDatabase(): void {
-        // Middlewares configuration
+        // Connect to the mongoDB database
         this.databaseService.connectToServer();
     }
 

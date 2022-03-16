@@ -10,7 +10,7 @@ import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
-import HighScoresService from '@app/services/high-scores-service/high-scores-service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { FeedbackMessages } from './feedback-messages';
 
 @Service()
