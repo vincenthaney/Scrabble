@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
@@ -47,7 +48,7 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
     return new Board(grid);
 };
 
-describe('BoardNavigator', () => {
+describe.only('BoardNavigator', () => {
     let board: Board;
     let navigator: BoardNavigator;
 
@@ -235,6 +236,29 @@ describe('BoardNavigator', () => {
                 }),
             ).to.equal(loops);
         });
+    });
+
+    describe('nextLine', () => {
+        const tests: [r0: number, c0: number, r1: number, c1: number, orientation: Orientation][] = [
+            [0, 0, 1, 0, Orientation.Horizontal],
+            [2, 4, 3, 0, Orientation.Horizontal],
+            [0, 0, 0, 1, Orientation.Vertical],
+            [6, 8, 0, 9, Orientation.Vertical],
+        ];
+
+        let index = 1;
+        for (const [r0, c0, r1, c1, orientation] of tests) {
+            it(`should go to next line (${index})`, () => {
+                navigator.position = new Position(r0, c0);
+                navigator.orientation = orientation;
+
+                navigator.nextLine();
+
+                expect(navigator.row).to.equal(r1);
+                expect(navigator.column).to.equal(c1);
+            });
+            index++;
+        }
     });
 
     describe('isWithinBounds', () => {
