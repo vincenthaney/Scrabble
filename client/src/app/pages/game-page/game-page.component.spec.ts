@@ -189,7 +189,9 @@ describe('GamePageComponent', () => {
             spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
 
             createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
-            sendAction = spyOn(component['actionService'], 'sendAction');
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
             component.createPassAction();
             expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PASS);
             expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
