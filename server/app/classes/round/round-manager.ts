@@ -55,7 +55,7 @@ export default class RoundManager {
         return this.beginRound();
     }
 
-    beginRound() {
+    beginRound(): Round {
         const player = this.getNextPlayer();
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
@@ -79,10 +79,9 @@ export default class RoundManager {
         return this.passCounter;
     }
 
-    private saveCompletedRound(round: Round, actionPlayed: Action) {
+    private saveCompletedRound(round: Round, actionPlayed: Action): void {
         const now = new Date();
-        if (actionPlayed instanceof ActionPass) this.passCounter++;
-        else this.passCounter = 0;
+        this.passCounter = actionPlayed instanceof ActionPass ? this.passCounter + 1 : 0;
         this.completedRounds.push({ ...round, completedTime: now, actionPlayed });
     }
 
