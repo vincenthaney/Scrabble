@@ -135,7 +135,7 @@ describe('RoundManagerService', () => {
         expect(service.completedRounds).toBeTruthy();
         expect(service['timerSource']).toBeTruthy();
         expect(service.timer).toBeTruthy();
-        expect(service.endRoundEvent).toBeTruthy();
+        expect(service['endRoundEvent$']).toBeTruthy();
     });
 
     describe('convertRoundDataToRound', () => {
@@ -310,8 +310,8 @@ describe('RoundManagerService', () => {
             expect(timeLeftSpy).toHaveBeenCalled();
         });
 
-        it('continueRound should emit endRoundEvent', () => {
-            const spy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+        it('continueRound should next endRoundEvent', () => {
+            const spy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
                 return;
             });
             service.continueRound(updatedRound);
@@ -476,7 +476,7 @@ describe('RoundManagerService', () => {
             let endRoundEventSpy: unknown;
 
             beforeEach(() => {
-                endRoundEventSpy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+                endRoundEventSpy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
                     return;
                 });
                 spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
