@@ -257,7 +257,11 @@ export default class WordFindingService {
         const moveRequirements = this.getCorrespondingMovePossibility(squareProperties, orientation);
         if (moveRequirements.isPossible && this.isWithinRequirements(moveRequirements, permutation.length)) {
             try {
-                const createdWords = this.wordExtraction.extract(permutation, squareProperties.square.position, orientation);
+                const createdWords = this.wordExtraction.extract({
+                    tilesToPlace: permutation,
+                    startPosition: squareProperties.square.position,
+                    orientation,
+                });
                 this.wordVerificationService.verifyWords(
                     StringConversion.wordsToString(createdWords),
                     this.dictionaryService.getDictionaryTitles()[0],
