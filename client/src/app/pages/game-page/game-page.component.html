@@ -18,12 +18,20 @@
                             <span *ngIf="!gameService.isGameOver"> Abandonner</span>
                             <span *ngIf="gameService.isGameOver"> Quitter</span>
                         </button>
-                        <button mat-flat-button color="primary" [disabled]="!canPass()" (click)="passButtonClicked()">
-                            <app-icon icon="redo"></app-icon> Passer
-                        </button>
-                        <button mat-flat-button color="primary" [disabled]="!canPlaceWord()" (click)="placeButtonClicked()">
-                            <app-icon icon="square" styling="solid"></app-icon> Placer
-                        </button>
+                        <div matTooltip="Ce n'est pas votre tour à jouer" matTooltipPosition="above" [matTooltipDisabled]="canPass()">
+                            <button mat-flat-button color="primary" [disabled]="!canPass()" (click)="passButtonClicked()">
+                                <app-icon icon="redo"></app-icon> Passer
+                            </button>
+                        </div>
+                        <div
+                            matTooltip="Ce n'est pas votre tour à jouer ou vous n'avez pas placé de mot encore"
+                            matTooltipPosition="above"
+                            [matTooltipDisabled]="canPlaceWord()"
+                        >
+                            <button mat-flat-button color="primary" [disabled]="!canPlaceWord()" (click)="placeButtonClicked()">
+                                <app-icon icon="square" styling="solid"></app-icon> Placer
+                            </button>
+                        </div>
                     </mat-card>
                 </div>
             </div>
