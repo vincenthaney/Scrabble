@@ -30,11 +30,11 @@ export class NameFieldComponent implements OnChanges {
         ]),
     });
 
-    ngOnChanges() {
+    ngOnChanges(): void {
         this.onChange();
     }
 
-    onChange() {
+    onChange(): void {
         if (this.formParameters.controls.inputName?.dirty) this.formParameters.controls.inputName?.markAsTouched();
         this.formParameters.controls.inputName?.updateValueAndValidity();
         const isNameValid: boolean = this.formParameters.get('inputName')?.valid ?? false;
