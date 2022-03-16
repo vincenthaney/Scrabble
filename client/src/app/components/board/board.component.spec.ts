@@ -16,16 +16,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { SquareComponent } from '@app/components/square/square.component';
 import { CANNOT_REMOVE_UNUSED_TILE } from '@app/constants/component-errors';
 import { BACKSPACE, ENTER, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
-import { SquareComponent } from '@app/components/square/square.component';
 import { UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
@@ -586,20 +586,27 @@ describe('BoardComponent', () => {
 
     describe('handleEnter', () => {
         let getPayloadSpy: jasmine.Spy;
-        let sendPlaceActionPayload: jasmine.Spy;
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
 
         beforeEach(() => {
             getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
-            sendPlaceActionPayload = spyOn(component['gameButtonActionService'], 'sendPlaceAction');
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction');
         });
 
-        it('should call sendPlaceAction', () => {
+        it('should sendAction through ActionService', () => {
             const payload: ActionPlacePayload = {} as ActionPlacePayload;
             getPayloadSpy.and.returnValue(payload);
 
             component['handleEnter']();
 
-            expect(sendPlaceActionPayload).toHaveBeenCalledOnceWith(payload);
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PLACE, payload);
+            expect(sendAction).toHaveBeenCalledOnceWith('gameId', 'playerId', fakeData);
         });
 
         it('should not call sendPlaceAction if no payload', () => {
@@ -607,7 +614,7 @@ describe('BoardComponent', () => {
 
             component['handleEnter']();
 
-            expect(sendPlaceActionPayload).not.toHaveBeenCalled();
+            expect(sendAction).not.toHaveBeenCalled();
         });
     });
 
