@@ -1,4 +1,3 @@
-/* eslint-disable no-redeclare */
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { AbstractPlayer } from '@app/classes/player';
 import { Tile } from '@app/classes/tile';
 import { CommandExceptionMessages } from '@app/constants/command-exception-messages';
@@ -23,7 +23,7 @@ export class GameButtonActionService {
 
         if (this.gameService.isLocalPlayerPlaying()) return player;
 
-        this.sendError(CommandExceptionMessages.NotYourTurn, this.gameService.gameId, player.id);
+        this.sendError(CommandExceptionMessages.NotYourTurn, this.gameService.getGameId(), player.id);
         return undefined;
     }
 
@@ -35,14 +35,14 @@ export class GameButtonActionService {
         };
         const localPlayerId = this.gameService.getLocalPlayerId();
         if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
-        this.gamePlayController.sendAction(this.gameService.gameId, localPlayerId, actionPass);
+        this.gamePlayController.sendAction(this.gameService.getGameId(), localPlayerId, actionPass);
     }
 
     sendExchangeAction(tiles: Tile[]): void {
         const player = this.getPlayerIfTurn();
         if (!player) return;
 
-        const gameId = this.gameService.gameId;
+        const gameId = this.gameService.getGameId();
 
         if (!this.checkIfPlayerHasTiles(tiles, player)) {
             return this.sendError(CommandExceptionMessages.DontHaveTiles, gameId, player.id);
@@ -55,6 +55,23 @@ export class GameButtonActionService {
         };
 
         this.gamePlayController.sendAction(gameId, player.id, actionExchange);
+    }
+
+    sendPlaceAction(payload: ActionPlacePayload) {
+        const player = this.getPlayerIfTurn();
+        if (!player) return;
+
+        const gameId = this.gameService.getGameId();
+
+        payload.tiles.forEach((tile) => {
+            if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
+        });
+
+        this.gamePlayController.sendAction(gameId, player.id, {
+            type: ActionType.PLACE,
+            input: '',
+            payload,
+        });
     }
 
     private checkIfPlayerHasTiles(tiles: Tile[], player: AbstractPlayer): boolean {

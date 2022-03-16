@@ -2,6 +2,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { LobbyData } from '@app/classes/communication/lobby-data';
 import { Message } from '@app/classes/communication/message';
 import { PlayerName } from '@app/classes/communication/player-name';
+import { HighScore } from '@app/classes/database/high-score';
 import { StartMultiplayerGameData } from '@app/classes/game/game-config';
 
 export type SocketEmitEvents =
@@ -13,6 +14,7 @@ export type SocketEmitEvents =
     | 'canceledGame'
     | 'joinerLeaveGame'
     | 'playerLeft'
+    | 'highScoresList'
     | 'newMessage'
     | 'cleanup'
     | '_test_event';
@@ -25,5 +27,6 @@ export type CanceledGameEmitArgs = PlayerName;
 export type JoinerLeaveGameEmitArgs = PlayerName;
 export type PlayerLeftGameEmitArgs = PlayerName;
 export type LobbiesUpdateEmitArgs = LobbyData[];
+export type HighScoresEmitArgs = HighScore[];
 export type NewMessageEmitArgs = Message;
 export type CleanupEmitArgs = never;

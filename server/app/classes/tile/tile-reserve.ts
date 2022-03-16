@@ -1,7 +1,5 @@
-import { promises } from 'fs';
-import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { join } from 'path';
 import { LetterValue, Tile } from '@app/classes/tile';
+import { LETTER_DISTRIBUTION_RELATIVE_PATH, TILE_RESERVE_THRESHOLD } from '@app/constants/classes-constants';
 import {
     AMOUNT_MUST_BE_GREATER_THAN_1,
     MUST_HAVE_7_TILES_TO_SWAP,
@@ -9,8 +7,10 @@ import {
     TILE_NOT_IN_RESERVE,
     TILE_RESERVE_MUST_BE_INITIATED,
 } from '@app/constants/classes-errors';
-import { LETTER_DISTRIBUTION_RELATIVE_PATH, TILE_RESERVE_THRESHOLD } from '@app/constants/classes-constants';
-import { LETTER_VALUES } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES } from '@app/constants/game';
+import { promises } from 'fs';
+import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { join } from 'path';
 import { LetterDistributionData, TileData } from './tile.types';
 
 export default class TileReserve {
@@ -33,7 +33,7 @@ export default class TileReserve {
         const letterDistribution = await TileReserve.fetchLetterDistribution();
         letterDistribution.forEach((tile) => {
             for (let i = 0; i < tile.amount; ++i) {
-                this.tiles.push({ letter: tile.letter as LetterValue, value: tile.score, isBlank: tile.letter === '*' });
+                this.tiles.push({ letter: tile.letter as LetterValue, value: tile.score, isBlank: tile.letter === BLANK_TILE_LETTER_VALUE });
             }
         });
         this.initialized = true;

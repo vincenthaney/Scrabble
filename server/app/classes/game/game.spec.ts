@@ -18,7 +18,8 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import Game, { GAME_OVER_PASS_THRESHOLD, LOOSE, WIN } from './game';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game-type';
 
@@ -33,6 +34,8 @@ const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
 const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
+const DEFAULT_VIRTUAL_PLAYER = new BeginnerVirtualPlayer('game', 'virtualplayerid', 'virtualplayername');
+
 const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
@@ -184,6 +187,26 @@ describe('Game', () => {
                 expect(() => game.getPlayer(invalidId, IS_OPPONENT)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
+        describe('getConnectedRealPlayers', () => {
+            it('should return both players if they are both real and connected', () => {
+                game.player1.isConnected = true;
+                game.player2.isConnected = true;
+                expect(game.getConnectedRealPlayers()).to.deep.equal([DEFAULT_PLAYER_1, DEFAULT_PLAYER_2]);
+            });
+
+            it('should return the player that is still connected (Player 1)', () => {
+                game.player1.isConnected = true;
+                game.player2.isConnected = false;
+                expect(game.getConnectedRealPlayers()).to.deep.equal([DEFAULT_PLAYER_1]);
+            });
+
+            it('should return the player that a real player ', () => {
+                game.player1 = DEFAULT_VIRTUAL_PLAYER;
+                game.player1.isConnected = true;
+                game.player2.isConnected = true;
+                expect(game.getConnectedRealPlayers()).to.deep.equal([DEFAULT_PLAYER_2]);
+            });
+        });
     });
 
     describe('isGameOver', () => {
@@ -312,7 +335,7 @@ describe('Game', () => {
             });
             game.endOfGame(game.player1.name);
 
-            expect(player1WinSpy).to.have.been.called.with(WIN, LOOSE);
+            expect(player1WinSpy).to.have.been.called.with(WIN, LOSE);
         });
 
         it('should call computeEndOfGameScore with player2Win if winnerName is player2.name', () => {
@@ -322,7 +345,7 @@ describe('Game', () => {
             });
             game.endOfGame(game.player2.name);
 
-            expect(player2WinSpy).to.have.been.called.with(LOOSE, WIN);
+            expect(player2WinSpy).to.have.been.called.with(LOSE, WIN);
         });
     });
 
@@ -489,7 +512,6 @@ describe('Game', () => {
             { letter: 'C', amount: 2 },
             { letter: 'F', amount: 8 },
         ];
-        const TILE_RESERVE_TOTAL = 13;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
         let board: Board;
         let round: Round;
@@ -525,7 +547,6 @@ describe('Game', () => {
                 gameId: DEFAULT_GAME_ID,
                 board: game.board.grid,
                 tileReserve: TILE_RESERVE_DATA,
-                tileReserveTotal: TILE_RESERVE_TOTAL,
                 round: roundManagerStub.convertRoundToRoundData(round),
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);

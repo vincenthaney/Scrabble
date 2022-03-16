@@ -1,11 +1,13 @@
 import { Board, Orientation } from '@app/classes/board';
+import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import BoardNavigator from '@app/classes/board/board-navigator';
 import Direction from '@app/classes/board/direction';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
+import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import {
-    PlacementEvaluationResults,
     MoveRequirements,
+    PlacementEvaluationResults,
     RejectedMove,
     SearchState,
     SquareProperties,
@@ -30,6 +32,14 @@ import {
 } from '@app/constants/services-constants/word-finding.const';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { arrayDeepCopy } from '@app/utils/deep-copy';
+import { Random } from '@app/utils/random';
+import { StringConversion } from '@app/utils/string-conversion';
+import { Service } from 'typedi';
 
 // wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
@@ -58,7 +68,7 @@ export default class WordFindingService {
             placementEvaluationResults.pointDistributionChance = this.assignAcceptanceProbability(request);
         }
 
-        const rackPermutations = this.getRackPermutations(tiles);
+        const rackPermutations = this.getRackPermutations(arrayDeepCopy(tiles));
         const emptySquares = board.getDesiredSquares((square: Square) => square.tile === null);
 
         while (emptySquares.length > 0 && searchState !== SearchState.Over) {
@@ -295,6 +305,7 @@ export default class WordFindingService {
                 tile.letter = BLANK_TILE_REPLACEMENT_LETTER;
             }
         }
+
         // Try every combination of either including or excluding each Tile of the array
         // eslint-disable-next-line no-bitwise
         const maxCombinations = 1 << tiles.length;
