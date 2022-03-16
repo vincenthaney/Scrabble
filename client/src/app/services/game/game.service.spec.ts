@@ -17,6 +17,7 @@ import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { BoardService, GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
@@ -567,6 +568,24 @@ describe('GameService', () => {
             const message: Message = {} as Message;
             service.handleNewMessage(message);
             expect(spy).toHaveBeenCalledWith('newMessage', message);
+        });
+
+        it('should call emitGameViewEvent if sender id is system-error', () => {
+            const spy = gameViewEventManagerSpy.emitGameViewEvent;
+
+            const message: Message = { senderId: SYSTEM_ERROR_ID } as Message;
+            service.handleNewMessage(message);
+
+            expect(spy).toHaveBeenCalledWith('usedTiles', undefined);
+        });
+
+        it('should not call emitGameViewEvent if sender id is not system-error', () => {
+            const spy = gameViewEventManagerSpy.emitGameViewEvent;
+
+            const message: Message = {} as Message;
+            service.handleNewMessage(message);
+
+            expect(spy).not.toHaveBeenCalledWith('usedTiles', undefined);
         });
     });
 

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionPlacePayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
-import { Message } from '@app/classes/communication/message';
 import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
@@ -15,7 +14,7 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import { Subject } from 'rxjs';
 import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 
-export type RackTile = Tile & { isPlayed: boolean; isSelected: boolean };
+export type RackTile = Tile & { isUsed: boolean; isSelected: boolean };
 
 @Component({
     selector: 'app-tile-rack',
@@ -47,12 +46,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.subscribeToFocusableEvents();
         this.updateTileRack();
         this.gameViewEventManagerService.subscribeToGameViewEvent('tileRackUpdate', this.componentDestroyed$, () => this.updateTileRack());
-        this.gameViewEventManagerService.subscribeToGameViewEvent('tilesPlayed', this.componentDestroyed$, (payload: ActionPlacePayload) =>
-            this.handlePlaceTiles(payload),
-        );
-        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
-            if (newMessage) this.handleNewMessage(newMessage);
-        });
+        this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handleUsedTiles(payload));
     }
 
     ngOnDestroy(): void {
@@ -118,7 +112,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         if (!this.canExchangeTiles()) return;
 
         this.gameButtonActionService.sendExchangeAction(this.selectedTiles);
-        this.selectedTiles.forEach((tile) => (tile.isPlayed = true));
+        this.selectedTiles.forEach((tile) => (tile.isUsed = true));
         this.unselectAll();
     }
 
@@ -182,21 +176,21 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     private createRackTile(tile: Tile): RackTile {
-        return { ...tile, isPlayed: false, isSelected: false };
+        return { ...tile, isUsed: false, isSelected: false };
     }
 
-    private handlePlaceTiles(payload: ActionPlacePayload): void {
-        for (const tile of payload.tiles) {
-            const filtered = this.tiles.filter((t) => t.value === tile.value && t.letter === tile.letter && !t.isPlayed);
-            if (filtered.length > 0) filtered[0].isPlayed = true;
+    private handleUsedTiles(usedTilesPayload: ActionPlacePayload | undefined): void {
+        if (!usedTilesPayload) {
+            this.tiles.forEach((tile) => (tile.isUsed = false));
+            return;
         }
-    }
 
-    private handleNewMessage(message: Message): void {
-        if (message.senderId === 'system-error') {
-            for (const tile of this.tiles) {
-                tile.isPlayed = false;
-            }
+        const usedTiles = [...usedTilesPayload.tiles];
+
+        for (const tile of this.tiles) {
+            const index = usedTiles.findIndex((usedTile) => usedTile.letter === tile.letter);
+            tile.isUsed = index >= 0;
+            if (index >= 0) usedTiles.splice(index, 1);
         }
     }
 }

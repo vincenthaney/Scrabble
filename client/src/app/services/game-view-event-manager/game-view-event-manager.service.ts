@@ -4,7 +4,7 @@ import { Message } from '@app/classes/communication/message';
 import * as SERVICE_ERRORS from '@app/constants/services-errors';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { EventTypes } from './event-types';
+import { EventClass, EventTypes } from './event-types';
 @Injectable({
     providedIn: 'root',
 })
@@ -21,10 +21,10 @@ export class GameViewEventManagerService {
 
     constructor() {
         this.eventMap.set('tileRackUpdate', new Subject<void>());
-        this.eventMap.set('tilesPlayed', new Subject<ActionPlacePayload>());
         this.eventMap.set('noActiveGame', new Subject<void>());
         this.eventMap.set('reRender', new Subject<void>());
         this.eventMap.set('newMessage', new BehaviorSubject<Message | null>(null));
+        this.eventMap.set('usedTiles', new BehaviorSubject<ActionPlacePayload | undefined>(undefined));
     }
 
     emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S): void {
@@ -39,6 +39,16 @@ export class GameViewEventManagerService {
     ): Subscription {
         const subject: Subject<S> = this.getSubjectFromMap(eventType);
         return subject.pipe(takeUntil(destroy$)).subscribe(next);
+    }
+
+    getGameViewEventValue<T extends keyof EventTypes, S extends EventClass[T], U extends EventTypes[T]>(
+        eventType: S extends BehaviorSubject<U> ? T : never,
+    ): U {
+        const subject = this.eventMap.get(eventType);
+
+        if (subject instanceof BehaviorSubject) return subject.value;
+        if (!subject) throw new Error(SERVICE_ERRORS.NO_SUBJECT_FOR_EVENT);
+        throw new Error(SERVICE_ERRORS.IS_NOT_BEHAVIOR_OBJECT);
     }
 
     private getSubjectFromMap<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T): Subject<S> {

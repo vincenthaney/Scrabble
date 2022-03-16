@@ -2,7 +2,7 @@
     <mat-card>
         <div id="rack-card-container" [class]="'selection-' + selectionType" (wheel)="onScroll($event)">
             <div class="rack-tile-container" 
-                *ngFor="let tile of tiles" [ngClass]="{ selected: tile.isSelected, hidden: tile.isPlayed }"
+                *ngFor="let tile of tiles" [ngClass]="{ selected: tile.isSelected, hidden: tile.isUsed }"
                 (click)="selectTileToMove(tile)"
                 (contextmenu)="selectTileToExchange(tile)"
             >
