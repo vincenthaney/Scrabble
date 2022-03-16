@@ -10,7 +10,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
-import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
+import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -40,7 +40,7 @@ export default class Game {
         }
     }
 
-    static async createMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<Game> {
+    static async createGame(id: string, config: ReadyGameConfig): Promise<Game> {
         const game = new Game();
 
         game.id = id;
@@ -61,10 +61,6 @@ export default class Game {
         game.roundManager.beginRound();
 
         return game;
-    }
-
-    static async createSoloGame(/* config: SoloGameConfig */): Promise<Game> {
-        throw new Error('Solo mode not implemented');
     }
 
     getTilesFromReserve(amount: number): Tile[] {
@@ -153,14 +149,12 @@ export default class Game {
         return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
     }
 
-    createStartGameData(): StartMultiplayerGameData {
+    createStartGameData(): StartGameData {
         const tileReserve: TileReserveData[] = [];
-        this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
-            tileReserve.push({ letter, amount });
-        });
+        this.addTilesToReserve(tileReserve);
         const round: Round = this.roundManager.getCurrentRound();
         const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
-        const startMultiplayerGameData: StartMultiplayerGameData = {
+        const startGameData: StartGameData = {
             player1: this.player1,
             player2: this.player2,
             gameType: this.gameType,
@@ -171,7 +165,13 @@ export default class Game {
             tileReserve,
             round: roundData,
         };
-        return startMultiplayerGameData;
+        return startGameData;
+    }
+
+    private addTilesToReserve(tileReserve: TileReserveData[]): void {
+        this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
     }
 
     private isPlayerFromGame(playerId: string): boolean {
