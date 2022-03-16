@@ -1,18 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
+import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
+import { ActionService } from '@app/services/action/action.service';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
-import { preserveArrayOrder } from '@app/utils/preserve-array-order';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { preserveArrayOrder } from '@app/utils/preserve-array-order';
 import { Subject } from 'rxjs';
-import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 
 export type RackTile = Tile & { isUsed: boolean; isSelected: boolean };
 
@@ -32,7 +32,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         public gameService: GameService,
         private readonly focusableComponentService: FocusableComponentsService,
         private readonly gameViewEventManagerService: GameViewEventManagerService,
-        private readonly gameButtonActionService: GameButtonActionService,
+        private readonly actionService: ActionService,
     ) {
         super();
         this.tiles = [];
@@ -111,7 +111,11 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     exchangeTiles(): void {
         if (!this.canExchangeTiles()) return;
 
-        this.gameButtonActionService.sendExchangeAction(this.selectedTiles);
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.EXCHANGE, this.actionService.createExchangeActionPayload(this.selectedTiles)),
+        );
         this.selectedTiles.forEach((tile) => (tile.isUsed = true));
         this.unselectAll();
     }

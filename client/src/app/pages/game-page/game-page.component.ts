@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActionType } from '@app/classes/actions/action-data';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -27,8 +28,8 @@ import {
 } from '@app/constants/tile-font-size';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
+import { ActionService } from '@app/services/action/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { Subject } from 'rxjs';
@@ -53,7 +54,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public surrenderDialog: MatDialog,
         private playerLeavesService: PlayerLeavesService,
         private gameViewEventManagerService: GameViewEventManagerService,
-        private gameButtonActionService: GameButtonActionService,
+        private actionService: ActionService,
     ) {
         this.mustDisconnectGameOnLeave = true;
         this.componentDestroyed$ = new Subject();
@@ -101,7 +102,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     createPassAction(): void {
-        this.gameButtonActionService.createPassAction();
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PASS),
+        );
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]): void {

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
@@ -12,9 +12,9 @@ import { BACKSPACE, ENTER, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/com
 import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
+import { ActionService } from '@app/services/action/action.service';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject } from 'rxjs';
@@ -42,7 +42,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         private gameViewEventManagerService: GameViewEventManagerService,
         private roundManagerService: RoundManagerService,
         private focusableComponentService: FocusableComponentsService,
-        private gameButtonActionService: GameButtonActionService,
+        private actionService: ActionService,
     ) {
         super();
         this.marginColumnSize = MARGIN_COLUMN_SIZE;
@@ -166,8 +166,13 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handleEnter(): void {
-        const placePayload = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
-        if (placePayload) this.gameButtonActionService.sendPlaceAction(placePayload);
+        const placePayload: ActionPlacePayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (!placePayload) return;
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PLACE, placePayload),
+        );
     }
 
     private clearCursor(): void {
