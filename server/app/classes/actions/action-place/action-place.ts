@@ -8,7 +8,6 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { Container } from 'typedi';

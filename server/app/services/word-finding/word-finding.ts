@@ -15,9 +15,6 @@ import {
     WordFindingUseCase,
 } from '@app/classes/word-finding';
 import { Service } from 'typedi';
-import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
-
-import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { StringConversion } from '@app/utils/string-conversion';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
@@ -32,14 +29,7 @@ import {
 } from '@app/constants/services-constants/word-finding.const';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
-import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { arrayDeepCopy } from '@app/utils/deep-copy';
-import { Random } from '@app/utils/random';
-import { StringConversion } from '@app/utils/string-conversion';
-import { Service } from 'typedi';
 
 // wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
