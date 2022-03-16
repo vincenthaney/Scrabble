@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActionData, ActionExchangePayload, ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
@@ -552,7 +552,7 @@ describe('TileRackComponent', () => {
         it('should send exchange action', () => {
             component.exchangeTiles();
             expect(createPayloadSpy).toHaveBeenCalledWith(component.selectedTiles);
-            expect(createActionDataSpy).toHaveBeenCalledWith(fakePayload);
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.EXCHANGE, fakePayload);
             expect(sendAction).toHaveBeenCalledOnceWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, fakeData);
         });
 
