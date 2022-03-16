@@ -48,7 +48,7 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
     return new Board(grid);
 };
 
-describe.only('BoardNavigator', () => {
+describe('BoardNavigator', () => {
     let board: Board;
     let navigator: BoardNavigator;
 
