@@ -26,7 +26,7 @@ export class GameDispatcherService {
         this.lobbiesRoom = new Room();
     }
 
-    createMultiplayerGame(configData: GameConfigData): string {
+    createMultiplayerGame(configData: GameConfigData): LobbyData {
         const config: GameConfig = {
             player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
@@ -36,7 +36,7 @@ export class GameDispatcherService {
         const waitingRoom = new WaitingRoom(config);
         this.waitingRooms.push(waitingRoom);
 
-        return waitingRoom.getId();
+        return waitingRoom.convertToLobbyData();
     }
 
     getLobbiesRoom(): Room {
