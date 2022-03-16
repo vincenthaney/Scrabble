@@ -55,6 +55,8 @@ export class GameDispatcherController implements OnDestroy {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
+        console.log('HANDLE CONFIRMATION');
+        console.log(gameId);
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }

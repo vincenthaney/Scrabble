@@ -45,7 +45,6 @@ export class GameDispatcherService {
         const config = this.generateGameConfig(configData);
         const waitingRoom = new WaitingRoom(config);
         this.waitingRooms.push(waitingRoom);
-
         return waitingRoom.getId();
     }
 
@@ -69,7 +68,6 @@ export class GameDispatcherService {
 
     async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<ReadyGameConfig> {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
-
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingRoom.joinedPlayer === undefined) {
@@ -151,6 +149,10 @@ export class GameDispatcherService {
     }
 
     getMultiplayerGameFromId(waitingRoomId: string): WaitingRoom {
+        console.log("ID:");
+        console.log(waitingRoomId);
+        console.log("WAITING ROOM:");
+        console.log(this.waitingRooms);
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
