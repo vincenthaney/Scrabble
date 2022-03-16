@@ -1,9 +1,13 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
-import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData, ReadyGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
+import SoloRoom from '@app/classes/game/solo-room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -19,19 +23,26 @@ import { Service } from 'typedi';
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
+    private soloRooms: SoloRoom[];
 
     constructor() {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
 
+    createSoloGame(configData: GameConfigData): string {
+        const soloRoom = new SoloRoom(this.generateGameConfig(configData));
+        soloRoom.setReadyConfig(
+            configData.virtualPlayerLevel === VirtualPlayerLevel.Beginner
+                ? new BeginnerVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string)
+                : new ExpertVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string),
+        );
+
+        return soloRoom.getId();
+    }
+
     createMultiplayerGame(configData: GameConfigData): string {
-        const config: GameConfig = {
-            player1: new Player(configData.playerId, configData.playerName),
-            gameType: configData.gameType,
-            maxRoundTime: configData.maxRoundTime,
-            dictionary: configData.dictionary,
-        };
+        const config = this.generateGameConfig(configData);
         const waitingRoom = new WaitingRoom(config);
         this.waitingRooms.push(waitingRoom);
 
@@ -43,7 +54,7 @@ export class GameDispatcherService {
     }
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {
             throw new HttpException(PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
         }
@@ -56,8 +67,8 @@ export class GameDispatcherService {
         return waitingRoom.getConfig();
     }
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<MultiplayerGameConfig> {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<ReadyGameConfig> {
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
@@ -72,7 +83,7 @@ export class GameDispatcherService {
         this.waitingRooms.splice(index, 1);
 
         // Start game
-        const config: MultiplayerGameConfig = {
+        const config: ReadyGameConfig = {
             ...waitingRoom.getConfig(),
             player2: waitingRoom.joinedPlayer,
         };
@@ -81,7 +92,7 @@ export class GameDispatcherService {
     }
 
     rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
@@ -97,7 +108,7 @@ export class GameDispatcherService {
     }
 
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer.id !== playerId) {
@@ -111,7 +122,7 @@ export class GameDispatcherService {
     }
 
     cancelGame(waitingRoomId: string, playerId: string): void {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
@@ -139,14 +150,29 @@ export class GameDispatcherService {
         return lobbyData;
     }
 
-    getGameFromId(waitingRoomId: string): WaitingRoom {
+    getMultiplayerGameFromId(waitingRoomId: string): WaitingRoom {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
+        throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
+    }
+
+    getSoloGameFromId(soloRoomId: string): SoloRoom {
+        const filteredSoloRoom = this.soloRooms.filter((g) => g.getId() === soloRoomId);
+        if (filteredSoloRoom.length > 0) return filteredSoloRoom[0];
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
     }
 
     isGameInWaitingRooms(gameId: string): boolean {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === gameId);
         return filteredWaitingRoom.length > 0;
+    }
+
+    private generateGameConfig(configData: GameConfigData): GameConfig {
+        return {
+            player1: new Player(configData.playerId, configData.playerName),
+            gameType: configData.gameType,
+            maxRoundTime: configData.maxRoundTime,
+            dictionary: configData.dictionary,
+        };
     }
 }
