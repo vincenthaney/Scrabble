@@ -20,7 +20,7 @@ import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import HighScoresService from '@app/services/high-scores-service/high-scores-service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 const expect = chai.expect;
 
