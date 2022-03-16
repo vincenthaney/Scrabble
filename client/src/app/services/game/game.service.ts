@@ -27,7 +27,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export default class GameService implements OnDestroy, IResetServiceData {
     gameType: GameType;
-    dictionnaryName: string;
+    dictionaryName: string;
     tileReserve: TileReserveData[];
 
     isGameSetUp: boolean;
@@ -71,7 +71,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameId = startGameData.gameId;
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.gameType = startGameData.gameType;
-        this.dictionnaryName = startGameData.dictionary;
+        this.dictionaryName = startGameData.dictionary;
         this.tileReserve = startGameData.tileReserve;
 
         this.roundManager.initialize(localPlayerId, startGameData);
@@ -175,7 +175,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     resetServiceData(): void {
         this.gameType = undefined as unknown as GameType;
-        this.dictionnaryName = '';
+        this.dictionaryName = '';
         this.tileReserve = [];
         this.isGameOver = false;
         this.gameId = '';
