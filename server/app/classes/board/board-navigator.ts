@@ -5,7 +5,7 @@ import Direction from './direction';
 
 export default class BoardNavigator {
     orientation: Orientation;
-    readonly position: Position;
+    position: Position;
 
     constructor(private board: Board, position: Position, orientation: Orientation) {
         this.position = position.copy();
