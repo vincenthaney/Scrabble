@@ -19,13 +19,13 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
 const expect = chai.expect;
 
@@ -68,7 +68,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
         });
 
@@ -93,7 +93,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
         });
 
@@ -125,7 +125,7 @@ describe('GameDispatcherService', () => {
         let tileReserveStub: SinonStubbedInstance<TileReserve>;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
             tileReserveStub = createStubInstance(TileReserve);
             tileReserveStub.init.returns(Promise.resolve());
             gameStub = createStubInstance(Game);
@@ -173,7 +173,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
@@ -208,7 +208,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
@@ -242,7 +242,7 @@ describe('GameDispatcherService', () => {
         let id: string;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
         });
 
         it('should remove waiting game from list', () => {
@@ -272,7 +272,7 @@ describe('GameDispatcherService', () => {
             const NTH_JOINED = 2;
 
             for (let i = 0; i < NTH_GAMES; ++i) {
-                const id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+                const id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
                 if (i < NTH_JOINED) {
                     gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
                 }
@@ -286,7 +286,7 @@ describe('GameDispatcherService', () => {
         let id: string;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA).lobbyId;
         });
 
         it('should find the waitingRoom', () => {

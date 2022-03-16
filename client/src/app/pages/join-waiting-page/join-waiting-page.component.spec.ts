@@ -21,9 +21,9 @@ class TestComponent {}
 
 const EMPTY_LOBBY = {} as unknown as LobbyInfo;
 
-const DEFAULT_LOBBY = {
+const DEFAULT_LOBBY: LobbyInfo = {
     lobbyId: '1',
-    playerName: 'Name1',
+    hostName: 'Name1',
     gameType: GameType.Classic,
     dictionary: 'default',
     maxRoundTime: 60,
