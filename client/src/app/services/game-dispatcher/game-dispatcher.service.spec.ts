@@ -244,6 +244,30 @@ describe('GameDispatcherService', () => {
         });
     });
 
+    describe('handleConvertToSolo', () => {
+        let convertSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            convertSpy = spyOn(service['gameDispatcherController'], 'handleConvertToSolo');
+        });
+
+        afterEach(() => {
+            convertSpy.calls.reset();
+        });
+
+        it('should call handleCancelGame if gameId is defined', () => {
+            service.gameId = BASE_GAME_ID;
+            service.handleConvertToSolo();
+            expect(convertSpy).toHaveBeenCalled();
+        });
+
+        it('should not call handleCancelGame if gameId is undefined', () => {
+            service.gameId = '';
+            service.handleConvertToSolo();
+            expect(convertSpy).not.toHaveBeenCalled();
+        });
+    });
+
     describe('handleConfirmation', () => {
         let confirmationSpy: jasmine.Spy;
 

@@ -77,6 +77,13 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         });
     }
 
+    confirmConvertToSoloToServer(): void {
+        this.isStartingGame = true;
+        if (!this.isOpponentFound) {
+            this.gameDispatcherService.handleConvertToSolo();
+        }
+    }
+
     confirmOpponentToServer(): void {
         this.isStartingGame = true;
         if (this.opponentName) {

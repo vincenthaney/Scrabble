@@ -21,10 +21,9 @@
             Rejeter cet adversaire
         </button>
 
-        <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
-            <button id="convert-solo-button" mat-flat-button class="button" color="primary" [disabled]="true">Convertir en partie solo</button>
-            <!-- <button id="convert-solo-button" mat-flat-button class="button" color="primary" [disabled]="isOpponentFound">Convertir en partie solo</button> -->
-        </div>
+        <button id="convert-solo-button" mat-flat-button class="button" color="primary" [disabled]="isOpponentFound" (click)="confirmConvertToSoloToServer()">
+            Convertir en partie solo
+        </button>
 
         <button id="cancel-button" mat-flat-button class="button" color="primary" routerLink="/game-creation">Annuler la partie</button>
 

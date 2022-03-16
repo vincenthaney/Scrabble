@@ -218,6 +218,26 @@ describe('GameDispatcherController', () => {
             });
         });
 
+        describe('/games/:gameId/player/:playerId/convert', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleConvertToSolo', () => {});
+
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/convert`)
+                    .expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw', async () => {
+                chai.spy.on(controller, 'handleConvertToSolo', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/convert`)
+                    .expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
         describe('/games/:gameId/player/:playerId/disconnect', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(controller, 'handleDisconnection', () => {});

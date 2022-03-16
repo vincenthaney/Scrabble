@@ -90,6 +90,10 @@ export default class GameDispatcherService implements OnDestroy {
         this.resetServiceData();
     }
 
+    handleConvertToSolo(): void {
+        if (this.gameId) this.gameDispatcherController.handleConvertToSolo(this.gameId);
+    }
+
     handleConfirmation(opponentName: string): void {
         if (this.gameId) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.gameId);
     }

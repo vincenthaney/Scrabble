@@ -372,14 +372,42 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     describe('convertSolo button', () => {
-        // it('should be enabled when the game is created and no opponent has joined it.', () => {
-        //     const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
-        //     expect(convertSoloButton.disabled).toBeFalsy();
-        // });
+        it('should be enabled when no opponent is found', () => {
+            component.isOpponentFound = false;
+            fixture.detectChanges();
+            const convertButton = fixture.nativeElement.querySelector('#convert-solo-button');
+            expect(convertButton.disabled).toBeFalsy();
+        });
 
-        it('should be disabled as it is not yet implemented', () => {
-            const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
-            expect(convertSoloButton.disabled).toBeTruthy();
+        it('should be disabled  when an opponent is found', async () => {
+            component.isOpponentFound = true;
+            fixture.detectChanges();
+            const convertButton = fixture.nativeElement.querySelector('#convert-solo-button');
+            expect(convertButton.disabled).toBeTruthy();
+        });
+
+        it('should call confirmConvertToSoloToServer() if no opponent is found on click', () => {
+            component.isOpponentFound = false;
+            const convertButton = fixture.debugElement.nativeElement.querySelector('#convert-solo-button');
+            convertButton.disabled = false;
+            fixture.detectChanges();
+
+            const spyDisconnect = spyOn(component, 'confirmConvertToSoloToServer').and.callThrough();
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConvertToSolo').and.callFake(() => {});
+            convertButton.click();
+
+            expect(spyDisconnect).toHaveBeenCalled();
+            expect(gameDispatcherSpy).toHaveBeenCalled();
+        });
+
+        it('should call not confirmConvertToSoloToServer() if an opponent is found on click', () => {
+            component.isOpponentFound = true;
+            component.confirmConvertToSoloToServer();
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConvertToSolo').and.callFake(() => {});
+
+            expect(gameDispatcherSpy).not.toHaveBeenCalled();
         });
     });
 
