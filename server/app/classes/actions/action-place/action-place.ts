@@ -52,7 +52,11 @@ export default class ActionPlace extends ActionPlay {
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.tilesToPlace, this.player);
         const wordExtraction = new WordExtraction(this.game.board);
-        const createdWords: [Square, Tile][][] = wordExtraction.extract(tilesToPlace, this.startPosition, this.orientation);
+        const createdWords: [Square, Tile][][] = wordExtraction.extract({
+            tilesToPlace,
+            startPosition: this.startPosition,
+            orientation: this.orientation,
+        });
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
         this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
