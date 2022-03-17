@@ -30,9 +30,9 @@ export class GamePlayController {
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
-        // A mon avis cest ici quon envoit au JV
         if (data.round) {
             if (IS_ID_VIRTUAL_PLAYER(data.round.playerData.id)) {
+                console.log('GAME UPDATE GAME PLAY CONTROLLER');
                 const virtualPlayer = this.activeGameService
                     .getGame(gameId, data.round.playerData.id)
                     .getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;

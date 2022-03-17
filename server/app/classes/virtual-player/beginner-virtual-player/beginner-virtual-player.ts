@@ -19,11 +19,14 @@ import { Delay } from '@app/utils/delay';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
+        console.log('PLAY TURN');
+        const time = new Date();
+        const temp = time.getTime();
         const waitNaturalTime = async (): Promise<void> => {
-            Delay.for(PRELIMINARY_WAIT_TIMEOUT);
+            await Delay.for(PRELIMINARY_WAIT_TIMEOUT);
         };
         const waitTimeout = async (): Promise<void> => {
-            Delay.for(FINAL_WAIT_TIMEOUT);
+            await Delay.for(FINAL_WAIT_TIMEOUT);
         };
 
         const play = async (): Promise<[ActionData, void]> => {
@@ -31,13 +34,15 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         };
 
         const result: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
-
+        const time2 = new Date();
+        console.log(time2.getTime() - temp);
         if (result) {
-            // API call Play
+            console.log('ACTION PLACE');
+            this.sendPayload();
         } else {
-            // API call Pass
+            console.log('ACTION PASS');
+            this.sendPayload();
         }
-
         return;
     }
 
