@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
@@ -19,14 +20,14 @@ export interface ActionPayload {}
 export interface ExchangeActionPayload extends ActionPayload {
     tiles: Tile[];
 }
-
-export interface ActionPlacePayload extends ExchangeActionPayload {
+export interface ActionPlacePayload extends ActionPayload {
+    tiles: Tile[];
     startPosition: Position;
     orientation: Orientation;
 }
 
-export interface ActionData {
+export interface ActionData<T extends ActionPayload = {}> {
     type: ActionType;
     input: string;
-    payload: ActionPlacePayload | ExchangeActionPayload | ActionPayload;
+    payload: T;
 }
