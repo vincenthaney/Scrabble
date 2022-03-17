@@ -18,7 +18,6 @@ import { GameButtonActionService } from '@app/services/game-button-action/game-b
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject } from 'rxjs';
-
 @Component({
     selector: 'app-board',
     templateUrl: './board.component.html',
@@ -154,7 +153,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handleBackspace(): void {
-        if (!this.selectedSquare) return;
+        if (!this.selectedSquare || !this.areTilesUsed()) return;
         this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
@@ -236,7 +235,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private handlePlaceTiles(payload: ActionPlacePayload | undefined): void {
         if (!payload) {
-            this.notAppliedSquares.forEach((square) => (square.square.tile = null));
+            this.notAppliedSquares.forEach((squareView: SquareView) => (squareView.square.tile = null));
             this.notAppliedSquares = [];
             return;
         }
@@ -284,7 +283,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         if (!previousUsedTiles) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
-        const index = previousUsedTiles.tiles.findIndex((t) => t.letter === tile.letter);
+        const index = previousUsedTiles.tiles.findIndex((t: Tile) => t.letter === tile.letter);
 
         if (index === NOT_FOUND) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
@@ -295,5 +294,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         } else {
             this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
         }
+    }
+
+    private areTilesUsed(): boolean {
+        const usedTiles: ActionPlacePayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        return usedTiles !== undefined && usedTiles.tiles.length > 0;
     }
 }

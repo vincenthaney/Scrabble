@@ -10,15 +10,12 @@ import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, SYSTEM_ERROR_ID, TIME_TO_RECONNECT } from '@app/constants/game';
-import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
+import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board/board.service';
-import { CookieService } from '@app/services/cookie/cookie.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import SocketService from '@app/services/socket/socket.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -43,8 +40,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private roundManager: RoundManagerService,
         private gameDispatcherController: GameDispatcherController,
         private gameController: GamePlayController,
-        private socketService: SocketService,
-        private cookieService: CookieService,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         this.serviceDestroyed$ = new Subject();
@@ -182,7 +177,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.playerContainer = undefined;
     }
 
-    reconnectReinitialize(startGameData: StartGameData): void {
+    private reconnectReinitialize(startGameData: StartGameData): void {
         if (this.playerContainer) {
             this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
         }
@@ -190,33 +185,5 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
         this.roundManager.continueRound(this.roundManager.currentRound);
-    }
-
-    reconnectGame(): void {
-        const gameIdCookie: string = this.cookieService.getCookie(GAME_ID_COOKIE);
-        const socketIdCookie: string = this.cookieService.getCookie(SOCKET_ID_COOKIE);
-        if (this.isGameIdCookieAbsent(gameIdCookie)) {
-            this.gameViewEventManagerService.emitGameViewEvent('noActiveGame');
-            return;
-        }
-        this.cookieService.eraseCookie(GAME_ID_COOKIE);
-        this.cookieService.eraseCookie(SOCKET_ID_COOKIE);
-
-        this.gameController.handleReconnection(gameIdCookie, socketIdCookie, this.socketService.getId());
-    }
-
-    disconnectGame(): void {
-        const gameId = this.gameId;
-        const localPlayerId = this.getLocalPlayerId();
-        this.resetServiceData();
-
-        if (!localPlayerId) throw new Error(NO_LOCAL_PLAYER);
-        this.cookieService.setCookie(GAME_ID_COOKIE, gameId, TIME_TO_RECONNECT);
-        this.cookieService.setCookie(SOCKET_ID_COOKIE, localPlayerId, TIME_TO_RECONNECT);
-        this.gameController.handleDisconnection(gameId, localPlayerId);
-    }
-
-    private isGameIdCookieAbsent(gameIdCookie: string): boolean {
-        return gameIdCookie === '' && gameIdCookie.length <= 0;
     }
 }
