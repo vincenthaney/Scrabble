@@ -85,7 +85,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
         if (this.mustDisconnectGameOnLeave) {
-            this.gameService.disconnectGame();
+            this.reconnectionService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
@@ -96,7 +96,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
         this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
         if (!this.gameService.getGameId()) {
-            this.gameService.reconnectGame();
+            this.reconnectionService.reconnectGame();
         }
     }
 
