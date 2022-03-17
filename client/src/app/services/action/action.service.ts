@@ -3,7 +3,6 @@ import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActi
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
-import { INVALID_PAYLOAD_FOR_ACTION_TYPE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 
@@ -54,22 +53,20 @@ export class ActionService {
         this.gamePlayController.sendAction(gameId, playerId, actionData);
     }
 
-    private convertBlankTilesLetter(tiles: Tile[]): void {
-        tiles.forEach((tile) => {
-            if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
-        });
-    }
-
     private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {
         switch (actionType) {
             case ActionType.PLACE:
-                if (!(payload as PlaceActionPayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
                 return ActionPayloadToString.placeActionPayloadToString(payload as PlaceActionPayload);
             case ActionType.EXCHANGE:
-                if (!(payload as ExchangeActionPayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
                 return ActionPayloadToString.exchangeActionPayloadToString(payload as ExchangeActionPayload);
             default:
                 return ActionPayloadToString.simpleActionToString(actionType);
         }
+    }
+
+    private convertBlankTilesLetter(tiles: Tile[]): void {
+        tiles.forEach((tile) => {
+            if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
+        });
     }
 }
