@@ -12,4 +12,4 @@ export enum CommandExceptionMessages {
     ExchangeRequireLowercaseLetters = 'Les lettres à échanger doivent être en minuscule.',
 }
 
-export const PLAYER_NOT_FOUND = 'Current player could not be found';
+export const PLAYER_NOT_FOUND = 'Aucun joueur actif trouvé';
