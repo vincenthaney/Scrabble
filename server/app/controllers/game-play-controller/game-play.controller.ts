@@ -33,14 +33,14 @@ export class GamePlayController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.post('/games/:gameId/players/:playerId/action', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
             try {
-                this.handlePlayAction(gameId, playerId, data);
+                await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -51,8 +51,8 @@ export class GamePlayController {
             try {
                 this.handleNewMessage(gameId, message);
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
 
@@ -63,8 +63,8 @@ export class GamePlayController {
             try {
                 this.handleNewError(playerId, message);
                 res.status(StatusCodes.NO_CONTENT).send();
-            } catch (e) {
-                HttpException.sendError(e, res);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
             }
         });
     }
@@ -74,7 +74,7 @@ export class GamePlayController {
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         try {
-            const [updateData, feedback] = this.gamePlayService.playAction(gameId, playerId, data);
+            const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
@@ -107,11 +107,11 @@ export class GamePlayController {
                     }
                 }
             }
-        } catch (e) {
-            await this.handleError(e, data.input, playerId, gameId);
+        } catch (exception) {
+            await this.handleError(exception, data.input, playerId, gameId);
 
-            if (this.isWordNotInDictionaryError(e)) {
-                this.handlePlayAction(gameId, playerId, { type: ActionType.PLACE, payload: {}, input: '' });
+            if (this.isWordNotInDictionaryError(exception)) {
+                await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
             }
         }
     }
@@ -133,8 +133,8 @@ export class GamePlayController {
         });
     }
 
-    private async handleError(e: Error, input: string, playerId: string, gameId: string): Promise<void> {
-        if (this.isWordNotInDictionaryError(e)) {
+    private async handleError(exception: Error, input: string, playerId: string, gameId: string): Promise<void> {
+        if (this.isWordNotInDictionaryError(exception)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
 
             const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
@@ -145,12 +145,12 @@ export class GamePlayController {
         }
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
-            content: COMMAND_IS_INVALID(input) + e.message,
+            content: COMMAND_IS_INVALID(input) + exception.message,
             senderId: SYSTEM_ERROR_ID,
         });
     }
 
-    private isWordNotInDictionaryError(e: Error): boolean {
-        return e.message.includes(" n'est pas dans le dictionnaire choisi.");
+    private isWordNotInDictionaryError(exception: Error): boolean {
+        return exception.message.includes(" n'est pas dans le dictionnaire choisi.");
     }
 }

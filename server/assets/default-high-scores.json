@@ -1,0 +1,14 @@
+{
+    "highScores": [
+        {"gameType": "Classique", "score": 123, "names": ["Elon Musk"] },
+        {"gameType": "Classique", "score": 99, "names": ["Ariana Petite"] },
+        {"gameType": "Classique", "score": 113, "names": ["Serpent Severe"] },
+        {"gameType": "Classique", "score": 42, "names": ["Tanguy"] },
+        {"gameType": "Classique", "score": 101, "names": ["George Washington"] },
+        {"gameType": "LOG2990", "score": 108, "names": ["Vincenzo"] },
+        {"gameType": "LOG2990", "score": 124, "names": ["Elon Moutarde"] },
+        {"gameType": "LOG2990", "score": 88, "names": ["Geff Pezos"] },
+        {"gameType": "LOG2990", "score": 69, "names": ["Captain Bobette"] },
+        {"gameType": "LOG2990", "score": 141, "names": ["Gee Nette"] }
+    ]
+}

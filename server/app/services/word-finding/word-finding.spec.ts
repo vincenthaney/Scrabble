@@ -6,16 +6,7 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { assert, expect } from 'chai';
-import { Container } from 'typedi';
-import WordFindingService from './word-finding';
-import * as chai from 'chai';
-import { stub, useFakeTimers } from 'sinon';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { StringConversion } from '@app/utils/string-conversion';
-import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import {
     MoveRequirements,
     PlacementEvaluationResults,
@@ -25,6 +16,18 @@ import {
     WordFindingRequest,
     WordFindingUseCase,
 } from '@app/classes/word-finding';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
+import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { StringConversion } from '@app/utils/string-conversion';
+import * as chai from 'chai';
+import { assert, expect } from 'chai';
+import { stub, useFakeTimers } from 'sinon';
+import { Container } from 'typedi';
+import WordFindingService from './word-finding';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -45,7 +48,7 @@ const DEFAULT_TILE_E: Tile = { letter: 'E', value: 5 };
 const DEFAULT_TILE_BLANK_E: Tile = { letter: 'E', value: 0, isBlank: true };
 const DEFAULT_TILE_F: Tile = { letter: 'F', value: 6 };
 const DEFAULT_TILE_G: Tile = { letter: 'G', value: 7 };
-const DEFAULT_TILE_WILD: Tile = { letter: '*', value: 0, isBlank: true };
+const DEFAULT_TILE_WILD: Tile = { letter: BLANK_TILE_LETTER_VALUE, value: 0, isBlank: true };
 const EMPTY_TILE_RACK: Tile[] = [];
 const SINGLE_TILE_TILE_RACK = [DEFAULT_TILE_A];
 const SMALL_TILE_RACK = [DEFAULT_TILE_A, DEFAULT_TILE_B, DEFAULT_TILE_C];
@@ -169,6 +172,8 @@ describe('WordFindingservice', () => {
     beforeEach(() => {
         board = boardFromLetterValues(BOARD);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
+
+        Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
     });
 
@@ -298,7 +303,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract');
             // eslint-disable-next-line dot-notation
-            chai.spy.on(service['wordVerificationService'], 'verifyWords');
+            chai.spy.on(service['wordVerificationService'], 'verifyWords', () => undefined);
             const expected = {
                 tilesToPlace: SMALL_TILE_RACK,
                 orientation: Orientation.Horizontal,

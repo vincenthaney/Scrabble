@@ -4,7 +4,7 @@ export default abstract class AbstractPlayer {
     id: string;
     name: string;
     score: number;
-    tiles: Tile[];
+    private tiles: Tile[];
 
     constructor(id: string, name: string, tiles: Tile[]) {
         this.id = id;
@@ -18,7 +18,7 @@ export default abstract class AbstractPlayer {
     }
 
     updatePlayerData(playerData: PlayerData): void {
-        this.id = playerData.id ? playerData.id : this.id;
+        this.id = playerData.id;
         this.name = playerData.name ? playerData.name : this.name;
         this.score = playerData.score ? playerData.score : this.score;
         this.tiles = playerData.tiles ? [...playerData.tiles] : this.tiles;

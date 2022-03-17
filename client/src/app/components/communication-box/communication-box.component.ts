@@ -2,17 +2,16 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from '@app/classes/communication/message';
-import { LetterValue } from '@app/classes/tile';
-import { VisualMessage, VisualMessageClass } from '@app/components/communication-box/visual-message';
-import { MAX_INPUT_LENGTH } from '@app/constants/game';
+import { TileReserveData } from '@app/classes/tile/tile.types';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { MessageStorageService } from '@app/services/message-storage/message-storage.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-
-export type LetterMapItem = { letter: LetterValue; amount: number };
 
 @Component({
     selector: 'app-communication-box',
@@ -24,102 +23,106 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('messageInput') messageInputElement: ElementRef;
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
-    componentDestroyed$: Subject<boolean> = new Subject();
 
-    messages: VisualMessage[] = [];
+    messages: Message[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    // objectives: string[] = ['Objectif 1', 'Objectif 2', 'Objectif    3', 'Objectif 4'];
-
-    lettersLeftTotal: number = 0;
-    lettersLeft: LetterMapItem[] = [];
-
     loading: boolean = false;
+    componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
         private inputParser: InputParserService,
         private gameService: GameService,
         private focusableComponentsService: FocusableComponentsService,
         private changeDetectorRef: ChangeDetectorRef,
+        private messageStorageService: MessageStorageService,
+        private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
+        this.messageStorageService.initializeMessages();
     }
 
     ngOnInit(): void {
-        this.lettersLeft = this.gameService.tileReserve;
-        this.lettersLeftTotal = this.gameService.tileReserveTotal;
+        this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
+            if (newMessage) this.onReceiveNewMessage(newMessage);
+        });
 
-        this.gameService.updateTileReserveEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(({ tileReserve, tileReserveTotal }) => {
-            this.onTileReserveUpdate(tileReserve, tileReserveTotal);
-        });
-        this.gameService.newMessageValue.pipe(takeUntil(this.componentDestroyed$)).subscribe((newMessage) => {
-            this.onReceiveNewMessage(newMessage);
-        });
+        this.initializeMessages();
     }
 
     ngAfterViewInit(): void {
-        this.subscribeToFocusableEvent(this.componentDestroyed$, this.handleKeyInput.bind(this));
+        this.subscribeToFocusableEvents();
     }
 
     ngOnDestroy(): void {
+        this.unsubscribeToFocusableEvents();
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
-    }
-
-    createVisualMessage(newMessage: Message): VisualMessage {
-        let messageClass: VisualMessageClass;
-        switch (newMessage.senderId) {
-            case this.gameService.getLocalPlayerId():
-                messageClass = 'me';
-                break;
-            case 'system':
-                messageClass = 'system';
-                break;
-            case 'system-error':
-                messageClass = 'system-error';
-                break;
-            default:
-                messageClass = 'opponent';
-                break;
-        }
-
-        return { ...newMessage, content: marked.parseInline(newMessage.content), class: messageClass };
+        this.messageStorageService.resetMessages();
     }
 
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
         if (message && message.length > 0 && !this.loading) {
-            this.inputParser.parseInput(message);
+            this.inputParser.handleInput(message);
             this.messageForm.reset({ content: '' });
             this.loading = true;
         }
     }
 
-    onReceiveNewMessage(newMessage: Message): void {
-        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
-        this.changeDetectorRef.detectChanges();
-        this.scrollToBottom();
-        if (!this.isOpponent(newMessage.senderId)) this.loading = false;
+    isOpponent(id: string): boolean {
+        return id !== SYSTEM_ID && id !== SYSTEM_ERROR_ID && id !== this.gameService.getLocalPlayerId();
     }
 
-    isOpponent(id: string) {
-        return id !== 'system' && id !== 'system-error' && id !== this.gameService.getLocalPlayerId();
+    getLettersLeft(): TileReserveData[] {
+        return this.gameService.tileReserve;
     }
 
-    onTileReserveUpdate(tileReserve: LetterMapItem[], tileReserveTotal: number): void {
-        this.lettersLeft = tileReserve;
-        this.lettersLeftTotal = tileReserveTotal;
+    getNumberOfTilesLeft(): number {
+        return this.gameService.getTotalNumberOfTilesLeft();
     }
 
-    onContainerClick() {
+    onContainerClick(): void {
         this.focusableComponentsService.setActiveKeyboardComponent(this);
     }
 
-    private handleKeyInput(event: KeyboardEvent): void {
+    protected onFocusableEvent(event: KeyboardEvent): void {
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
+    }
+
+    private initializeMessages(): void {
+        const storedMessages = this.messageStorageService.getMessages();
+        if (storedMessages.length > 0) {
+            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+            this.messages = this.messages.concat(storedMessages);
+        } else this.onReceiveNewMessage(INITIAL_MESSAGE);
+    }
+
+    private createVisualMessage(newMessage: Message): Message {
+        switch (newMessage.senderId) {
+            case this.gameService.getLocalPlayerId():
+                newMessage.senderId = LOCAL_PLAYER_ID;
+                break;
+            case SYSTEM_ID:
+            case SYSTEM_ERROR_ID:
+                break;
+            default:
+                newMessage.senderId = OPPONENT_ID;
+                break;
+        }
+
+        return { ...newMessage, content: marked.parseInline(newMessage.content) };
+    }
+
+    private onReceiveNewMessage(newMessage: Message): void {
+        this.messages = [...this.messages, this.createVisualMessage(newMessage)];
+        this.changeDetectorRef.detectChanges();
+        this.scrollToBottom();
+        if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
+        this.messageStorageService.saveMessage(newMessage);
     }
 
     private isCtrlC(event: KeyboardEvent): boolean {

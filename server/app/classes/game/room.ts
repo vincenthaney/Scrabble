@@ -7,7 +7,7 @@ export default class Room {
         this.id = uuidv4();
     }
 
-    getId() {
+    getId(): string {
         return this.id;
     }
 }

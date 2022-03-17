@@ -2,8 +2,8 @@ import { Action, ActionPass } from '@app/classes/actions';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
-import { CompletedRound, Round } from './round';
 import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
+import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;
 
@@ -38,15 +38,13 @@ export default class RoundManager {
     }
 
     getStartGameTime(): Date {
-        if (this.completedRounds.length === 0) {
-            if (this.currentRound) {
-                return this.currentRound.startTime;
-            } else {
-                throw new Error(ERROR_GAME_NOT_STARTED);
-            }
-        } else {
+        if (this.completedRounds.length !== 0) {
             return this.completedRounds[0].startTime;
         }
+        if (this.currentRound) {
+            return this.currentRound.startTime;
+        }
+        throw new Error(ERROR_GAME_NOT_STARTED);
     }
 
     nextRound(actionPlayed: Action): Round {
@@ -57,7 +55,7 @@ export default class RoundManager {
         return this.beginRound();
     }
 
-    beginRound() {
+    beginRound(): Round {
         const player = this.getNextPlayer();
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
@@ -73,18 +71,17 @@ export default class RoundManager {
         return this.currentRound;
     }
 
-    getMaxRoundTime() {
+    getMaxRoundTime(): number {
         return this.maxRoundTime;
     }
 
-    getPassCounter() {
+    getPassCounter(): number {
         return this.passCounter;
     }
 
-    private saveCompletedRound(round: Round, actionPlayed: Action) {
+    private saveCompletedRound(round: Round, actionPlayed: Action): void {
         const now = new Date();
-        if (actionPlayed instanceof ActionPass) this.passCounter++;
-        else this.passCounter = 0;
+        this.passCounter = actionPlayed instanceof ActionPass ? this.passCounter + 1 : 0;
         this.completedRounds.push({ ...round, completedTime: now, actionPlayed });
     }
 
@@ -93,8 +90,6 @@ export default class RoundManager {
             // Randomly get a player
             return Math.round(Math.random()) === 0 ? this.player1 : this.player2;
         }
-
-        if (this.currentRound.player === this.player1) return this.player2;
-        else return this.player1;
+        return this.currentRound.player === this.player1 ? this.player2 : this.player1;
     }
 }

@@ -11,15 +11,39 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Message } from '@app/classes/communication/message';
-import { Player } from '@app/classes/player';
-import { VisualMessage } from '@app/components/communication-box/visual-message';
+import { AbstractPlayer, Player } from '@app/classes/player';
+import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { DEFAULT_PLAYER, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { marked } from 'marked';
-import { CommunicationBoxComponent, LetterMapItem } from './communication-box.component';
+import { CommunicationBoxComponent } from './communication-box.component';
+
+const CURRENT_PLAYER_ID = 'idOfPlayer1';
+const OPPONENT_PLAYER_ID = 'idOfPlayer2';
+const DEFAULT_PLAYER1_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: CURRENT_PLAYER_ID,
+};
+const DEFAULT_PLAYER2_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: OPPONENT_PLAYER_ID,
+};
+const DEFAULT_SYSTEM_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: SYSTEM_ID,
+};
+const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
+    content: 'content of test message',
+    senderId: SYSTEM_ERROR_ID,
+};
+const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
+    ...DEFAULT_SYSTEM_ERROR_MESSAGE,
+    content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
+};
 
 describe('CommunicationBoxComponent', () => {
     let component: CommunicationBoxComponent;
@@ -27,38 +51,14 @@ describe('CommunicationBoxComponent', () => {
 
     let inputParserSpy: jasmine.SpyObj<InputParserService>;
     let virtualScrollSpy: jasmine.SpyObj<CdkVirtualScrollViewport>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let scrollToBottomSpy: jasmine.Spy<any>;
     let gameServiceMock: GameService;
     let formSpy: jasmine.Spy<any>;
-
-    const CURRENT_PLAYER_ID = 'idOfPlayer1';
-    const OPPONENT_PLAYER_ID = 'idOfPlayer2';
-    const DEFAULT_PLAYER1_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: CURRENT_PLAYER_ID,
-    };
-    const DEFAULT_PLAYER2_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: OPPONENT_PLAYER_ID,
-    };
-    const DEFAULT_SYSTEM_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: SYSTEM_ID,
-    };
-    const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
-        content: 'content of test message',
-        senderId: SYSTEM_ERROR_ID,
-    };
-    const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: VisualMessage = {
-        ...DEFAULT_SYSTEM_ERROR_MESSAGE,
-        content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
-        class: 'system-error',
-    };
+    let initializeMessagesSpy: jasmine.Spy;
 
     beforeEach(async () => {
-        inputParserSpy = jasmine.createSpyObj('InputParserService', ['parseInput']);
-        inputParserSpy.parseInput.and.callFake(() => {
+        inputParserSpy = jasmine.createSpyObj('InputParserService', ['handleInput']);
+        inputParserSpy['handleInput'].and.callFake(() => {
             return;
         });
 
@@ -90,9 +90,9 @@ describe('CommunicationBoxComponent', () => {
         }).compileComponents();
 
         gameServiceMock = TestBed.inject(GameService);
-        gameServiceMock.player1 = new Player(CURRENT_PLAYER_ID, 'player1', []);
-        gameServiceMock.player2 = new Player(OPPONENT_PLAYER_ID, 'player2', []);
-        gameServiceMock['localPlayerId'] = CURRENT_PLAYER_ID;
+        gameServiceMock['playerContainer'] = new PlayerContainer(CURRENT_PLAYER_ID);
+        gameServiceMock['playerContainer']['players'].set(1, new Player(CURRENT_PLAYER_ID, 'player1', []));
+        gameServiceMock['playerContainer']['players'].set(2, new Player(OPPONENT_PLAYER_ID, 'player2', []));
     });
 
     beforeEach(() => {
@@ -100,50 +100,45 @@ describe('CommunicationBoxComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom').and.callThrough();
         formSpy = spyOn(component.messageForm, 'reset');
+        initializeMessagesSpy = spyOn(component['messageStorageService'], 'initializeMessages');
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should call initializeMessage', () => {
+        expect(initializeMessagesSpy).toBeTruthy();
+    });
+
     describe('ngOnInit', () => {
-        let spyTile: jasmine.Spy;
         let spyMessage: jasmine.Spy;
 
         beforeEach(() => {
-            spyTile = spyOn(component['gameService'].updateTileReserveEvent, 'subscribe');
-            spyMessage = spyOn(component['gameService'].newMessageValue, 'subscribe');
+            spyMessage = spyOn(component['gameViewEventManagerService'], 'subscribeToGameViewEvent').and.callThrough();
         });
 
         afterEach(() => {
-            spyTile.and.callThrough();
             spyMessage.and.callThrough();
         });
 
-        it('should subscribe to updateTileReserveEvent', () => {
-            component.ngOnInit();
-            expect(spyTile).toHaveBeenCalled();
-        });
-
-        it('should call onTileReserveUpdate on updateTileReserveEvent', () => {
-            const spy = spyOn(component, 'onTileReserveUpdate');
-            component.ngOnInit();
-            component['gameService'].updateTileReserveEvent.emit({ tileReserve: [], tileReserveTotal: 0 });
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should subscribe to updateTileReserveEvent', () => {
+        it('should subscribe to newMessage', () => {
             component.ngOnInit();
             expect(spyMessage).toHaveBeenCalled();
+        });
+
+        it('should call initializeMessages', () => {
+            const spy = spyOn<any>(component, 'initializeMessages');
+            component.ngOnInit();
+            expect(spy).toHaveBeenCalled();
         });
     });
 
     describe('ngAfterViewInit', () => {
         it('should subscribe to focusable event', () => {
-            const spy = spyOn<any>(component, 'subscribeToFocusableEvent');
+            const spy = spyOn<any>(component, 'subscribeToFocusableEvents');
             component.ngAfterViewInit();
             expect(spy).toHaveBeenCalled();
         });
@@ -163,30 +158,36 @@ describe('CommunicationBoxComponent', () => {
             component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
+
+        it('should call messageStorageService.resetMessages', () => {
+            const spy = spyOn<any>(component['messageStorageService'], 'resetMessages');
+            component.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
     describe('createVisualMessage', () => {
         it('should create visualMessage from Message by player1', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_PLAYER1_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_PLAYER1_MESSAGE, class: 'me' };
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_PLAYER1_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_PLAYER1_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by player2', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_PLAYER2_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_PLAYER2_MESSAGE, class: 'opponent' };
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_PLAYER2_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_PLAYER2_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by system', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_SYSTEM_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_SYSTEM_MESSAGE, class: 'system' };
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_SYSTEM_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_SYSTEM_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
 
         it('should create visualMessage from Message by system-error', () => {
-            const returnValue: VisualMessage = component.createVisualMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
-            const expectedValue: VisualMessage = { ...DEFAULT_SYSTEM_ERROR_MESSAGE, class: 'system-error' };
+            const returnValue: Message = component['createVisualMessage'](DEFAULT_SYSTEM_ERROR_MESSAGE);
+            const expectedValue: Message = { ...DEFAULT_SYSTEM_ERROR_MESSAGE };
             expect(returnValue).toEqual(expectedValue);
         });
     });
@@ -195,88 +196,58 @@ describe('CommunicationBoxComponent', () => {
         it('onSendMessage should call appropriate functions if message is not empty', () => {
             component.messageForm.get('content')?.setValue('new input');
             component.onSendMessage();
-            expect(inputParserSpy.parseInput).toHaveBeenCalled();
+            expect(inputParserSpy.handleInput).toHaveBeenCalled();
             expect(formSpy).toHaveBeenCalled();
         });
 
         it('onSendMessage should NOT call appropriate functions if message is empty', () => {
             component.messageForm.setValue({ content: '' });
             component.onSendMessage();
-            expect(inputParserSpy.parseInput).not.toHaveBeenCalled();
+            expect(inputParserSpy.handleInput).not.toHaveBeenCalled();
             expect(formSpy).not.toHaveBeenCalled();
         });
     });
 
     describe('onReceiveMessage', () => {
+        beforeEach(() => {
+            spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as AbstractPlayer);
+        });
+
         it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
-            const onReceiveSpy = spyOn(component, 'onReceiveNewMessage');
+            const onReceiveSpy = spyOn<any>(component, 'onReceiveNewMessage');
             gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
             expect(onReceiveSpy).toHaveBeenCalled();
         });
 
-        it('onReceiveNewMessage should call appropriate functions and receive new message', () => {
+        it('onReceiveNewMessage should call appropriate functions and receive new message with defined message', () => {
+            const saveMessageSpy = spyOn(component['messageStorageService'], 'saveMessage');
             const messagesLengthBefore: number = component.messages.length;
+
             gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
+
             const messagesLengthAfter: number = component.messages.length;
             expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
             expect(scrollToBottomSpy).toHaveBeenCalled();
+            expect(saveMessageSpy).toHaveBeenCalled();
         });
 
         it('should add new visualmessage to messages', () => {
             component.messages = [];
-            spyOn(component, 'createVisualMessage').and.returnValue(DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE);
-            component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            spyOn<any>(component, 'createVisualMessage').and.returnValue(DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE);
+            component['onReceiveNewMessage'](DEFAULT_SYSTEM_ERROR_MESSAGE);
             expect(component.messages).toEqual([DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE]);
         });
 
         it('should set loading to false if new message is NOT from opponent', () => {
             component.loading = true;
-            spyOn(component, 'isOpponent').and.returnValue(false);
-            component.onReceiveNewMessage(DEFAULT_PLAYER2_MESSAGE);
+            component['onReceiveNewMessage'](DEFAULT_SYSTEM_MESSAGE);
             expect(component.loading).toBeFalse();
         });
 
         it('should NOT set loading to true if new message is from opponent', () => {
             component.loading = true;
-            spyOn(component, 'isOpponent').and.returnValue(true);
-            component.onReceiveNewMessage(DEFAULT_SYSTEM_ERROR_MESSAGE);
+            component['onReceiveNewMessage'](DEFAULT_PLAYER2_MESSAGE);
             expect(component.loading).toBeTrue();
-        });
-    });
-
-    describe('isOpponent', () => {
-        it('should return false if id = system', () => {
-            expect(component.isOpponent('system')).toBeFalse();
-        });
-
-        it('should return false if id = system-error ', () => {
-            expect(component.isOpponent('system-error')).toBeFalse();
-        });
-
-        it('should return false if id = local player id', () => {
-            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue(DEFAULT_PLAYER.id);
-            expect(component.isOpponent(DEFAULT_PLAYER.id)).toBeFalse();
-        });
-
-        it('should return true if id is other', () => {
-            expect(component.isOpponent('other id')).toBeTrue();
-        });
-    });
-
-    describe('onTileReserveUpdate', () => {
-        it('should set lettersLeft and tileReserveTotal', () => {
-            component.lettersLeft = [];
-            component.lettersLeftTotal = 0;
-            const expectedLettersLeft: LetterMapItem[] = [{ letter: 'A', amount: 0 }];
-            const expectedLettersLeftTotal = 1;
-
-            expect(component.lettersLeft).not.toEqual(expectedLettersLeft);
-            expect(component.lettersLeftTotal).not.toEqual(expectedLettersLeftTotal);
-
-            component.onTileReserveUpdate(expectedLettersLeft, expectedLettersLeftTotal);
-
-            expect(component.lettersLeft).toEqual(expectedLettersLeft);
-            expect(component.lettersLeftTotal).toEqual(expectedLettersLeftTotal);
         });
     });
 
@@ -288,7 +259,7 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    describe('handleKeyInput', () => {
+    describe('onFocusableEvent', () => {
         let focusSpy: jasmine.Spy;
 
         beforeEach(() => {
@@ -297,7 +268,7 @@ describe('CommunicationBoxComponent', () => {
 
         it('should call focus', () => {
             const event = new KeyboardEvent('keypress');
-            component['handleKeyInput'](event);
+            component['onFocusableEvent'](event);
             expect(focusSpy).toHaveBeenCalled();
         });
 
@@ -307,9 +278,27 @@ describe('CommunicationBoxComponent', () => {
             for (const key of keys) {
                 const event: any = { key: 'c' };
                 event[key] = true;
-                component['handleKeyInput'](event as KeyboardEvent);
+                component['onFocusableEvent'](event as KeyboardEvent);
                 expect(focusSpy).not.toHaveBeenCalled();
             }
+        });
+    });
+
+    describe('initializeMessages', () => {
+        it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
+            const storedMessages = [INITIAL_MESSAGE, INITIAL_MESSAGE];
+            spyOn(component['messageStorageService'], 'getMessages').and.returnValue(storedMessages);
+            component['messages'] = [];
+            component['initializeMessages']();
+            expect(component.messages.length).toEqual(storedMessages.length);
+        });
+
+        it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
+            spyOn(component['messageStorageService'], 'getMessages').and.returnValue([]);
+            const spy = spyOn<any>(component, 'onReceiveNewMessage');
+
+            component['initializeMessages']();
+            expect(spy).toHaveBeenCalledWith(INITIAL_MESSAGE);
         });
     });
 

@@ -1,28 +1,30 @@
-/* eslint-disable max-classes-per-file */
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';
-import { EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AbstractPlayer, Player } from '@app/classes/player';
+import { PlayerContainer } from '@app/classes/player/player-container';
 import { Timer } from '@app/classes/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
-import { BehaviorSubject, Observable, Subscription, timer } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, timer } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { InformationBoxComponent } from './information-box.component';
-
+import SpyObj = jasmine.SpyObj;
 class MockRoundManager {
     pTimerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([
         new Timer(0, 0),
         DEFAULT_PLAYER,
     ]);
     pTimer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
-    pEndRoundEvent: EventEmitter<void> = new EventEmitter();
+    pEndRoundEvent: Subject<void> = new Subject();
     pActivePlayer: AbstractPlayer = new Player('mockId', 'mockName', []);
 
     get timerSource(): BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> {
@@ -32,7 +34,7 @@ class MockRoundManager {
     get timer(): Observable<[timer: Timer, activePlayer: AbstractPlayer]> {
         return this.timerSource.asObservable();
     }
-    get endRoundEvent(): EventEmitter<void> {
+    get endRoundEvent(): Subject<void> {
         return this.pEndRoundEvent;
     }
 
@@ -43,35 +45,40 @@ class MockRoundManager {
     getActivePlayer(): AbstractPlayer | null {
         return this.activePlayer;
     }
-}
-
-class MockGameService {
-    pPlayer1: AbstractPlayer = new Player('id1', 'name1', []);
-    pPlayer2: AbstractPlayer = new Player('id2', 'name2', []);
-    rerenderEvent: EventEmitter<void> = new EventEmitter<void>();
-    gameIsSetUp: boolean = true;
-    get player1(): AbstractPlayer {
-        return this.pPlayer1;
-    }
-
-    get player2(): AbstractPlayer {
-        return this.pPlayer2;
-    }
-
-    getLocalPlayer(): AbstractPlayer {
-        return this.pPlayer1;
+    // eslint-disable-next-line no-unused-vars
+    subscribeToEndRoundEvent(destroy$: Observable<boolean>, next: () => void): Subscription {
+        return new Subscription();
     }
 }
 
 describe('InformationBoxComponent', () => {
     let component: InformationBoxComponent;
     let fixture: ComponentFixture<InformationBoxComponent>;
-    let mockGameService: MockGameService;
+    let gameServiceSpy: SpyObj<GameService>;
     let mockRoundManager: MockRoundManager;
+    let gameViewEventManagerSpy: SpyObj<GameViewEventManagerService>;
 
     beforeEach(() => {
-        mockGameService = new MockGameService();
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['getPlayerByNumber', 'getLocalPlayer']);
         mockRoundManager = new MockRoundManager();
+
+        const reRender$ = new Subject();
+        gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
+        gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
+            switch (eventType) {
+                case 'reRender':
+                    reRender$.next();
+                    break;
+            }
+        });
+
+        gameViewEventManagerSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any): Subscription => {
+            switch (eventType) {
+                case 'reRender':
+                    return reRender$.pipe(takeUntil(destroy$)).subscribe(next);
+            }
+            return new Subscription();
+        });
     });
 
     beforeEach(async () => {
@@ -79,8 +86,9 @@ describe('InformationBoxComponent', () => {
             imports: [HttpClientModule, MatCardModule, MatTooltipModule],
             declarations: [InformationBoxComponent, IconComponent],
             providers: [
-                { provide: GameService, useValue: mockGameService },
+                { provide: GameService, useValue: gameServiceSpy },
                 { provide: RoundManagerService, useValue: mockRoundManager },
+                { provide: GameViewEventManagerService, useValue: gameViewEventManagerSpy },
             ],
         }).compileComponents();
     });
@@ -96,11 +104,15 @@ describe('InformationBoxComponent', () => {
     });
 
     describe('ngOnInit', () => {
+        beforeEach(() => {
+            gameServiceSpy.isGameSetUp = true;
+        });
+
         it('ngOnInit should create ngUnsubscribe object', () => {
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
             spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
             component.ngOnInit();
-            expect(component['ngUnsubscribe']).toBeTruthy();
+            expect(component['componentDestroyed$']).toBeTruthy();
         });
 
         it('ngOnInit should create Timer object', () => {
@@ -127,6 +139,7 @@ describe('InformationBoxComponent', () => {
             spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
+            component.ngOnInit();
             const newTimer = new Timer(1, 0);
             mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
             expect(startTimerSpy).toHaveBeenCalledWith(newTimer);
@@ -139,19 +152,16 @@ describe('InformationBoxComponent', () => {
             const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
+            component.ngOnInit();
             const newTimer = new Timer(1, 0);
             mockRoundManager.timerSource.next([newTimer, DEFAULT_PLAYER]);
             expect(updateBorderSpy).toHaveBeenCalled();
         });
 
         it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
-            const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
+            const spy = spyOn(mockRoundManager, 'subscribeToEndRoundEvent');
             component.ngOnInit();
-            expect(subscribeSpy).toHaveBeenCalled();
-
-            const endRoundSpy = spyOn(component, 'endRound');
-            mockRoundManager.endRoundEvent.emit();
-            expect(endRoundSpy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalled();
         });
 
         it('ngOnInit should NOT subscribe to RoundManager endRoundEvent if roundManager.endRoundEvent is undefined', () => {
@@ -161,17 +171,13 @@ describe('InformationBoxComponent', () => {
             expect(subscribeSpy).not.toHaveBeenCalled();
         });
 
-        it('ngOnInit endRoundEvent subscription should call endRound', () => {
-            const endRoundSpy = spyOn(component, 'endRound');
-            mockRoundManager.endRoundEvent.emit();
-            expect(endRoundSpy).toHaveBeenCalled();
-        });
-
         it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {
             const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
             const ngAfterViewInitSpy = spyOn(component, 'ngAfterViewInit');
-            mockGameService.rerenderEvent.emit();
+
+            gameViewEventManagerSpy.emitGameViewEvent('reRender');
+
             expect(ngOnDestroySpy).toHaveBeenCalled();
             expect(ngOnInitSpy).toHaveBeenCalled();
             expect(ngAfterViewInitSpy).toHaveBeenCalled();
@@ -187,13 +193,12 @@ describe('InformationBoxComponent', () => {
 
     describe('ngOndestroy', () => {
         beforeEach(() => {
-            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         });
 
         it('should always call next and complete on ngUnsubscribe', () => {
-            const ngUnsubscribeNextSpy = spyOn(component['ngUnsubscribe'], 'next');
-            const ngUnsubscribeCompleteSpy = spyOn(component['ngUnsubscribe'], 'complete');
+            const ngUnsubscribeNextSpy = spyOn(component['componentDestroyed$'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn(component['componentDestroyed$'], 'complete');
 
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
@@ -264,12 +269,24 @@ describe('InformationBoxComponent', () => {
     });
 
     describe('updateActivePlayerBorder', () => {
-        it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
-            const player1 = new Player('1', 'Player1', []);
-            const player2 = new Player('2', 'Player2', []);
-            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
-            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
+        let player1: Player;
+        let player2: Player;
+        beforeEach(() => {
+            player1 = new Player('1', 'Player1', []);
+            player2 = new Player('2', 'Player2', []);
+            gameServiceSpy.getPlayerByNumber.and.callFake((id: number) => {
+                return id === 1 ? player1 : player2;
+            });
+        });
 
+        it('updateActivePlayerBorder should set no border if provided active player is undefined', () => {
+            component.updateActivePlayerBorder(undefined);
+
+            expect(component.isPlayer1Active).toBeFalse();
+            expect(component.isPlayer2Active).toBeFalse();
+        });
+
+        it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
             component.updateActivePlayerBorder(player1);
 
             expect(component.isPlayer1Active).toBeTrue();
@@ -277,11 +294,6 @@ describe('InformationBoxComponent', () => {
         });
 
         it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
-            const player1 = new Player('1', 'Player1', []);
-            const player2 = new Player('2', 'Player2', []);
-            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(player1);
-            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(player2);
-
             component.updateActivePlayerBorder(player2);
 
             expect(component.isPlayer2Active).toBeTrue();
@@ -290,23 +302,27 @@ describe('InformationBoxComponent', () => {
     });
 
     describe('getPlayer', () => {
+        beforeEach(() => {
+            gameServiceSpy['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER.id);
+        });
+
         it('getPlayer1 should return current gameservice player1 if it exists', () => {
-            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(DEFAULT_PLAYER);
+            gameServiceSpy.getPlayerByNumber.and.returnValue(DEFAULT_PLAYER);
             expect(component.getPlayer1()).toEqual(DEFAULT_PLAYER);
         });
 
         it('getPlayer1 should return a new player if gameservice player1 does not exist', () => {
-            spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(undefined);
+            gameServiceSpy.getPlayerByNumber.and.returnValue(undefined as unknown as AbstractPlayer);
             expect(component.getPlayer1()).toEqual(new Player('', 'Player1', []));
         });
 
         it('getPlayer2 should return current gameservice player2 if it exists', () => {
-            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(DEFAULT_PLAYER);
+            gameServiceSpy.getPlayerByNumber.and.returnValue(DEFAULT_PLAYER);
             expect(component.getPlayer2()).toEqual(DEFAULT_PLAYER);
         });
 
         it('getPlayer2 should return a new player if gameservice player2 does not exist', () => {
-            spyOnProperty<any>(mockGameService, 'player2', 'get').and.returnValue(undefined);
+            gameServiceSpy.getPlayerByNumber.and.returnValue(undefined as unknown as AbstractPlayer);
             expect(component.getPlayer2()).toEqual(new Player('', 'Player2', []));
         });
     });
@@ -317,14 +333,14 @@ describe('InformationBoxComponent', () => {
     });
 
     it('checkIfIsPlayer1 should return true if player1 is localPlayer', () => {
-        spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(DEFAULT_PLAYER);
-        spyOn(component['gameService'], 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER);
+        gameServiceSpy.getPlayerByNumber.and.returnValue(DEFAULT_PLAYER);
+        gameServiceSpy.getLocalPlayer.and.returnValue(DEFAULT_PLAYER);
         expect(component['checkIfIsPlayer1']()).toEqual(true);
     });
 
     it('checkIfIsPlayer1 should return false if player1 is not localPlayer', () => {
-        spyOnProperty<any>(mockGameService, 'player1', 'get').and.returnValue(DEFAULT_PLAYER);
-        spyOn(component['gameService'], 'getLocalPlayer').and.returnValue(new Player('id2', 'name of player2', []));
+        gameServiceSpy.getPlayerByNumber.and.returnValue(DEFAULT_PLAYER);
+        gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id2', 'name of player2', []));
         expect(component['checkIfIsPlayer1']()).toEqual(false);
     });
 

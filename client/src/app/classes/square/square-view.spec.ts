@@ -1,4 +1,3 @@
-/* eslint-disable dot-notation */
 import { NO_COLOR_FOR_MULTIPLIER, NO_SQUARE_FOR_SQUARE_VIEW } from '@app/constants/classes-errors';
 import { COLORS } from '@app/constants/colors';
 import { SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
@@ -22,7 +21,7 @@ class SquareViewWrapper {
     squareView: SquareView;
     private pSquare: Square;
 
-    createSquareView() {
+    createSquareView(): void {
         this.squareView = new SquareView(this.square, SQUARE_SIZE);
     }
     get square(): Square {

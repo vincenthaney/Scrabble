@@ -15,7 +15,6 @@ export interface ActionPlacePayload {
     tiles: Tile[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ActionExchangePayload {
     tiles: Tile[];
 }

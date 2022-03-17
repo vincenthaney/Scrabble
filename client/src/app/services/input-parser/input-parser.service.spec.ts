@@ -2,7 +2,6 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
@@ -89,7 +88,6 @@ describe('InputParserService', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(DEFAULT_PLAYER);
         gameServiceSpy.getGameId.and.returnValue(DEFAULT_GAME_ID);
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
-        gameServiceSpy.playingTiles = new EventEmitter();
 
         TestBed.configureTestingModule({
             providers: [
@@ -106,30 +104,30 @@ describe('InputParserService', () => {
         expect(service).toBeTruthy();
     });
 
-    describe('parseInput', () => {
+    describe('handleInput', () => {
         it('should always call getLocalPLayer, gameservice.getGameId', () => {
             const getLocalPlayerSpy = spyOn<any>(service, 'getLocalPlayer').and.returnValue(DEFAULT_PLAYER_ID);
-            service.parseInput(VALID_MESSAGE_INPUT);
+            service.handleInput(VALID_MESSAGE_INPUT);
             expect(getLocalPlayerSpy).toHaveBeenCalled();
             expect(gameServiceSpy.getGameId).toHaveBeenCalled();
         });
 
         it('should call sendMessage if input doesnt start with !', () => {
-            service.parseInput(VALID_MESSAGE_INPUT);
+            service.handleInput(VALID_MESSAGE_INPUT);
             expect(gamePlayControllerSpy.sendMessage).toHaveBeenCalled();
         });
 
-        it('should call parseCommand if input starts with !', () => {
-            const spy = spyOn<any>(service, 'parseCommand').and.returnValue(VALID_PASS_ACTION_DATA);
-            service.parseInput(VALID_PASS_INPUT);
+        it('should call handleCommand if input starts with !', () => {
+            const spy = spyOn<any>(service, 'handleCommand').and.returnValue(VALID_PASS_ACTION_DATA);
+            service.handleInput(VALID_PASS_INPUT);
             expect(spy).toHaveBeenCalled();
         });
     });
 
-    describe('parseCommand', () => {
+    describe('handleCommand', () => {
         it('should call sendAction if actionData doesnt throw error', () => {
             spyOn<any>(service, 'createActionData').and.returnValue(VALID_PASS_ACTION_DATA);
-            service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            service['handleCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendAction).toHaveBeenCalled();
         });
 
@@ -138,7 +136,7 @@ describe('InputParserService', () => {
             spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new CommandException(DEFAULT_COMMAND_ERROR_MESSAGE);
             });
-            service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            service['handleCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 content: `La commande **${VALID_PASS_INPUT}** est invalide :<br />${DEFAULT_COMMAND_ERROR_MESSAGE}`,
                 senderId: SYSTEM_ERROR_ID,
@@ -150,7 +148,7 @@ describe('InputParserService', () => {
             spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new CommandException(CommandExceptionMessages.NotYourTurn);
             });
-            service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            service['handleCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 content: CommandExceptionMessages.NotYourTurn,
                 senderId: SYSTEM_ERROR_ID,
@@ -162,7 +160,7 @@ describe('InputParserService', () => {
             spyOn<any>(service, 'createActionData').and.callFake(() => {
                 throw new Error('other error message');
             });
-            expect(() => service['parseCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID)).not.toThrow();
+            expect(() => service['handleCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID)).not.toThrow();
             expect(gamePlayControllerSpy.sendError).not.toHaveBeenCalled();
         });
     });
@@ -330,7 +328,9 @@ describe('InputParserService', () => {
         });
 
         it('should emit playingTiles', () => {
-            const emitSpy = spyOn<any>(service['gameService']['playingTiles'], 'emit');
+            const emitSpy = spyOn<any>(service['gameViewEventManagerService'], 'emitGameViewEvent').and.callFake(() => {
+                return;
+            });
             service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
             expect(emitSpy).toHaveBeenCalled();
         });
@@ -369,7 +369,7 @@ describe('InputParserService', () => {
         });
 
         it('should throw error with invalid input for place actions', () => {
-            const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
+            const invalidLetters = ['a&c"exception', 'abcdefghiklm', 'lmno', 'ABCD', 'aAB', 'aKL'];
             const errorMessages: CommandExceptionMessages[] = [
                 CommandExceptionMessages.DontHaveTiles,
                 CommandExceptionMessages.DontHaveTiles,
@@ -400,7 +400,7 @@ describe('InputParserService', () => {
         });
 
         it('should throw error with invalid input for exchange actions', () => {
-            const invalidLetters = ['a&c"e', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
+            const invalidLetters = ['a&c"exception', 'abcdefghiklm', 'lmno', 'ABCD', 'aaaa'];
             const errorMessages: CommandExceptionMessages[] = [
                 CommandExceptionMessages.DontHaveTiles,
                 CommandExceptionMessages.DontHaveTiles,
@@ -488,11 +488,19 @@ describe('InputParserService', () => {
             }).toThrow(new CommandException(CommandExceptionMessages.GameOver));
         });
 
-        it("should throw error if on your turn command and it is not the player's turn", () => {
+        it("should throw error if trying to pass and it is not the player's turn", () => {
             gameServiceSpy.isGameOver = false;
             gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
             expect(() => {
                 service['verifyActionValidity'](ActionType.PASS);
+            }).toThrow(new CommandException(CommandExceptionMessages.NotYourTurn));
+        });
+
+        it("should throw error if trying to get hint and it is not the player's turn", () => {
+            gameServiceSpy.isGameOver = false;
+            gameServiceSpy.isLocalPlayerPlaying.and.returnValue(false);
+            expect(() => {
+                service['verifyActionValidity'](ActionType.HINT);
             }).toThrow(new CommandException(CommandExceptionMessages.NotYourTurn));
         });
     });
