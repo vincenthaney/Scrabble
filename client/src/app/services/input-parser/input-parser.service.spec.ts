@@ -4,7 +4,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload } from '@app/classes/actions/action-data';
+import { ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -50,12 +50,12 @@ describe('InputParserService', () => {
     const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME, DEFAULT_TILES);
     const DEFAULT_COMMAND_ERROR_MESSAGE = CommandExceptionMessages.InvalidEntry;
 
-    const EXPECTED_PLACE_PAYLOAD_MULTI: ActionPlacePayload = {
+    const EXPECTED_PLACE_PAYLOAD_MULTI: PlaceActionPayload = {
         tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
         startPosition: { row: 1, column: 11 },
         orientation: Orientation.Horizontal,
     };
-    const EXPECTED_PLACE_PAYLOAD_SINGLE: ActionPlacePayload = {
+    const EXPECTED_PLACE_PAYLOAD_SINGLE: PlaceActionPayload = {
         tiles: [new Tile('A' as LetterValue, 1)],
         startPosition: { row: 1, column: 11 },
         orientation: Orientation.Horizontal,

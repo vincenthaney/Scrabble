@@ -3,7 +3,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionData, ActionPlacePayload, ActionType, ExchangeActionPayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_PLAYER } from '@app/constants/game';
@@ -13,7 +13,7 @@ const DEFAULT_PLAYER_ID = DEFAULT_PLAYER.id;
 const DEFAULT_GAME_ID = 'some id';
 
 const DEFAULT_TILES: Tile[] = [new Tile('A', 1), new Tile('A', 2, true)];
-const PLACE_PAYLOAD: ActionPlacePayload = {
+const PLACE_PAYLOAD: PlaceActionPayload = {
     tiles: DEFAULT_TILES,
     startPosition: { row: 0, column: 0 },
     orientation: Orientation.Horizontal,
@@ -39,7 +39,7 @@ describe('ActionService', () => {
     });
 
     it('createPlaceActionPayload should return ActionPlacePayload with the correct attributes', () => {
-        const expectedPayload: ActionPlacePayload = PLACE_PAYLOAD;
+        const expectedPayload: PlaceActionPayload = PLACE_PAYLOAD;
         const actualPayload = service.createPlaceActionPayload(PLACE_PAYLOAD.tiles, PLACE_PAYLOAD.startPosition, PLACE_PAYLOAD.orientation);
         expect(actualPayload).toEqual(expectedPayload);
         expect(typeof actualPayload).toBe(typeof expectedPayload);
@@ -78,7 +78,7 @@ describe('ActionService', () => {
         });
 
         it('if input is NOT defined, should call createInputFromPayload', () => {
-            actualData = service.createActionData(ActionType.PASS, undefined, '');
+            actualData = service.createActionData(ActionType.PASS, {}, '');
             expect(actualData.payload).toEqual({});
         });
 
@@ -187,7 +187,7 @@ describe('ActionService', () => {
         ];
         const expectedResult = { ...PLACE_PAYLOAD, tiles: expectedTiles };
 
-        service['convertBlankTilesLetter'](payload);
+        service['convertBlankTilesLetter'](payload.tiles);
         expect(payload).toEqual(expectedResult);
     });
 });

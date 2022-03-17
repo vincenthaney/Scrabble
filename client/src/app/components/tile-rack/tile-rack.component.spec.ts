@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActionData, ActionPlacePayload, ActionType, ExchangeActionPayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
@@ -596,10 +596,10 @@ describe('TileRackComponent', () => {
     });
 
     describe('handleUsedTiles', () => {
-        let payload: ActionPlacePayload;
+        let payload: PlaceActionPayload;
 
         beforeEach(() => {
-            payload = {} as ActionPlacePayload;
+            payload = {} as PlaceActionPayload;
             handleUsedTileSpy.and.callThrough();
         });
 

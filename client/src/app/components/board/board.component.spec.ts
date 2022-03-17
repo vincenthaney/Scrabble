@@ -16,7 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
@@ -350,7 +350,7 @@ describe('BoardComponent', () => {
     });
 
     describe('handlePlaceTiles', () => {
-        let payload: ActionPlacePayload;
+        let payload: PlaceActionPayload;
 
         beforeEach(() => {
             payload = {
@@ -602,7 +602,7 @@ describe('BoardComponent', () => {
         });
 
         it('should sendAction through ActionService', () => {
-            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
             getPayloadSpy.and.returnValue(payload);
 
             component['handleEnter']();
@@ -834,7 +834,7 @@ describe('BoardComponent', () => {
         });
 
         it('should call emitToGameViewEvent if has usedTiles', () => {
-            const previousPayload: ActionPlacePayload = {
+            const previousPayload: PlaceActionPayload = {
                 orientation: Orientation.Horizontal,
                 startPosition: { row: 0, column: 0 },
                 tiles: [],
@@ -857,7 +857,7 @@ describe('BoardComponent', () => {
             component.navigator.orientation = Orientation.Vertical;
             component.navigator.setPosition(1, 2);
 
-            const expectedPayload: ActionPlacePayload = {
+            const expectedPayload: PlaceActionPayload = {
                 orientation: component.navigator.orientation,
                 startPosition: { row: component.navigator.row, column: component.navigator.column },
                 tiles: [tile],

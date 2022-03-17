@@ -13,7 +13,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -217,7 +217,7 @@ describe('GamePageComponent', () => {
         });
 
         it('should sendAction through ActionService', () => {
-            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
             getPayloadSpy.and.returnValue(payload);
 
             component.placeButtonClicked();
@@ -327,7 +327,7 @@ describe('GamePageComponent', () => {
 
         it('should be able to pass if the conditions are met', () => {
             spyOn(component, 'canPass').and.returnValue(true);
-            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
             getPayloadSpy.and.returnValue(payload);
 
             expect(component.canPlaceWord()).toBeTrue();

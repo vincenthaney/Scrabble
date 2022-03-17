@@ -520,7 +520,7 @@ describe('RoundManagerService', () => {
                 spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
 
                 service.roundTimeout();
-                expect(actionServiceSpy.createActionData).toHaveBeenCalledWith(ActionType.PASS);
+                expect(actionServiceSpy.createActionData).toHaveBeenCalledWith(ActionType.PASS, {});
                 expect(actionServiceSpy.sendAction).toHaveBeenCalledOnceWith(
                     service.gameId,
                     service.localPlayerId,
