@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -8,7 +9,7 @@ import { Orientation, Position, BoardNavigator, Board } from '@app/classes/board
 import Direction from './direction';
 import { expect } from 'chai';
 import * as chai from 'chai';
-import { stub } from 'sinon';
+import { SinonStub, stub } from 'sinon';
 type LetterValues = (LetterValue | ' ')[][];
 
 const GRID: LetterValues = [
@@ -169,6 +170,44 @@ describe('BoardNavigator', () => {
             navigator.verifyAllNeighbors(SHOULD_BE_FILLED);
             expect(spy).to.have.been.called.twice;
         });
+    });
+
+    describe('verifyPerpendicularNeighbors', () => {
+        let verifyNeighborsStub: SinonStub;
+
+        beforeEach(() => {
+            verifyNeighborsStub = stub(navigator, 'verifyNeighbors');
+        });
+
+        it('should call verifyNeighbors with Vertical if Horizontal', () => {
+            const calledOrientation = Orientation.Horizontal;
+            const shouldBeFilled = false;
+
+            navigator.orientation = Orientation.Vertical;
+            navigator.verifyPerpendicularNeighbors(shouldBeFilled);
+
+            expect(verifyNeighborsStub.calledWith(calledOrientation, shouldBeFilled)).to.be.true;
+        });
+
+        it('should call verifyNeighbors with Horizontal if Vertical', () => {
+            const calledOrientation = Orientation.Vertical;
+            const shouldBeFilled = true;
+
+            navigator.orientation = Orientation.Horizontal;
+            navigator.verifyPerpendicularNeighbors(shouldBeFilled);
+
+            expect(verifyNeighborsStub.calledWith(calledOrientation, shouldBeFilled)).to.be.true;
+        });
+
+        for (const expected of [true, false]) {
+            it(`should return verifyNeighbors result (${expected})`, () => {
+                verifyNeighborsStub.returns(expected);
+
+                const result = navigator.verifyPerpendicularNeighbors(false);
+
+                expect(result).to.equal(expected);
+            });
+        }
     });
 
     describe('forward', () => {
