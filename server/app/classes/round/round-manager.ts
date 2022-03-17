@@ -3,7 +3,6 @@ import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
 import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;

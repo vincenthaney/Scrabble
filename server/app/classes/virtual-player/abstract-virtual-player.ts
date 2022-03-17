@@ -1,5 +1,5 @@
 import Player from '@app/classes/player/player';
-import { PointRange, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { PointRange } from '@app/classes/word-finding';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WordFindingService from '@app/services/word-finding/word-finding';
