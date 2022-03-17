@@ -1,7 +1,7 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LinePlacements, PlacementWithDistance } from './board-placement-types';
+import { BoardPlacement, LetterPosition, LinePlacements, PlacementWithDistance } from './board-placement-types';
 
 const PREVIOUS_EXISTS = -1;
 const SHOULD_BE_FILLED = true;
@@ -89,7 +89,7 @@ export default class BoardPlacementsExtractor {
         let letters = this.adjustDistances(linePlacements.letters, distance);
         let perpendicularLetters = this.adjustDistances(linePlacements.perpendicularLetters, distance);
 
-        if (letters.some((lp) => lp.distance === PREVIOUS_EXISTS)) return undefined;
+        if (this.hasTileJustBefore(letters)) return undefined;
 
         letters = letters.filter((letter) => letter.distance >= 0);
         perpendicularLetters = perpendicularLetters.filter((letter) => letter.distance >= 0);
@@ -123,6 +123,10 @@ export default class BoardPlacementsExtractor {
 
     private isValidBoardPlacement(boardPlacement: BoardPlacement): boolean {
         return boardPlacement.maxSize > boardPlacement.letters.length;
+    }
+
+    private hasTileJustBefore(letters: LetterPosition[]): boolean {
+        return letters.some((letter) => letter.distance === PREVIOUS_EXISTS);
     }
 
     private *moveThroughLine(navigator: BoardNavigator): Generator<number> {
