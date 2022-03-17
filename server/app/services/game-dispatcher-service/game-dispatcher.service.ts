@@ -12,6 +12,7 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
@@ -20,22 +21,22 @@ export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
 
-    constructor() {
+    constructor(private readonly dictionaryService: DictionaryService) {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
 
-    createMultiplayerGame(configData: GameConfigData): string {
+    createMultiplayerGame(configData: GameConfigData): LobbyData {
         const config: GameConfig = {
             player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
             maxRoundTime: configData.maxRoundTime,
-            dictionary: configData.dictionary,
+            dictionary: this.dictionaryService.getDictionaryTitles()[0],
         };
         const waitingRoom = new WaitingRoom(config);
         this.waitingRooms.push(waitingRoom);
 
-        return waitingRoom.getId();
+        return waitingRoom.convertToLobbyData();
     }
 
     getLobbiesRoom(): Room {
@@ -126,14 +127,7 @@ export class GameDispatcherService {
         const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
         const lobbyData: LobbyData[] = [];
         for (const room of waitingRooms) {
-            const config = room.getConfig();
-            lobbyData.push({
-                dictionary: config.dictionary,
-                playerName: config.player1.name,
-                maxRoundTime: config.maxRoundTime,
-                lobbyId: room.getId(),
-                gameType: config.gameType,
-            });
+            lobbyData.push(room.convertToLobbyData());
         }
 
         return lobbyData;

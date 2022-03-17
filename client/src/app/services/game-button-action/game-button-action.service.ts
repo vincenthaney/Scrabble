@@ -57,7 +57,7 @@ export class GameButtonActionService {
         this.gamePlayController.sendAction(gameId, player.id, actionExchange);
     }
 
-    sendPlaceAction(payload: ActionPlacePayload) {
+    sendPlaceAction(payload: ActionPlacePayload): void {
         const player = this.getPlayerIfTurn();
         if (!player) return;
 

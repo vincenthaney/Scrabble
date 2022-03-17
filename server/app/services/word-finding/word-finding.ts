@@ -14,7 +14,12 @@ import {
     WordFindingRequest,
     WordFindingUseCase,
 } from '@app/classes/word-finding';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { Service } from 'typedi';
+import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { StringConversion } from '@app/utils/string-conversion';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { Random } from '@app/utils/random';
+import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import {
     BLANK_TILE_REPLACEMENT_LETTER,
     HINT_AMOUNT_OF_WORDS,
@@ -22,14 +27,9 @@ import {
     LONG_MOVE_TIME,
     QUICK_MOVE_TIME,
 } from '@app/constants/services-constants/word-finding.const';
-import { DICTIONARY_NAME } from '@app/constants/services-constants/words-verification.service.const';
-import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { arrayDeepCopy } from '@app/utils/deep-copy';
-import { Random } from '@app/utils/random';
-import { StringConversion } from '@app/utils/string-conversion';
-import { Service } from 'typedi';
 
 // wildcards converted only to 'E'
 // Not currently ignoring repeating tiles
@@ -37,7 +37,11 @@ import { Service } from 'typedi';
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
-    constructor(private wordVerificationService: WordsVerificationService, private scoreCalculatorService: ScoreCalculatorService) {}
+    constructor(
+        private wordVerificationService: WordsVerificationService,
+        private scoreCalculatorService: ScoreCalculatorService,
+        private dictionaryService: DictionaryService,
+    ) {}
 
     findWords(board: Board, tiles: Tile[], request: WordFindingRequest): ScoredWordPlacement[] {
         const startTime = new Date();
@@ -258,7 +262,10 @@ export default class WordFindingService {
                     startPosition: squareProperties.square.position,
                     orientation,
                 });
-                this.wordVerificationService.verifyWords(StringConversion.wordsToString(createdWords), DICTIONARY_NAME);
+                this.wordVerificationService.verifyWords(
+                    StringConversion.wordsToString(createdWords),
+                    this.dictionaryService.getDictionaryTitles()[0],
+                );
                 return {
                     tilesToPlace: permutation,
                     orientation,

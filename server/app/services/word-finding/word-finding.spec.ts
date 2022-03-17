@@ -26,6 +26,8 @@ import { assert, expect } from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { Container } from 'typedi';
 import WordFindingService from './word-finding';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -170,6 +172,8 @@ describe('WordFindingservice', () => {
     beforeEach(() => {
         board = boardFromLetterValues(BOARD);
         navigator = new BoardNavigator(board, new Position(0, 0), DEFAULT_ORIENTATION);
+
+        Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
     });
 
@@ -307,7 +311,7 @@ describe('WordFindingservice', () => {
             // eslint-disable-next-line dot-notation
             chai.spy.on(service['wordExtraction'], 'extract');
             // eslint-disable-next-line dot-notation
-            chai.spy.on(service['wordVerificationService'], 'verifyWords');
+            chai.spy.on(service['wordVerificationService'], 'verifyWords', () => undefined);
             const expected = {
                 tilesToPlace: SMALL_TILE_RACK,
                 orientation: Orientation.Horizontal,

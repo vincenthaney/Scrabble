@@ -10,6 +10,9 @@ import { Orientation, Position } from '@app/classes/board';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
 import WordFindingService from '@app/services/word-finding/word-finding';
+import { Container } from 'typedi';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -20,6 +23,8 @@ describe('ActionHint', () => {
     let action: ActionHint;
 
     beforeEach(() => {
+        Container.set(DictionaryService, getDictionaryTestService());
+
         gameStub = createStubInstance(Game);
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
 

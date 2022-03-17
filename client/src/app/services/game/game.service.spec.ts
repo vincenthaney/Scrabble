@@ -240,10 +240,10 @@ describe('GameService', () => {
             expect(service.gameType).toEqual(defaultGameData.gameType);
         });
 
-        it('should set dictionnaryName', async () => {
-            expect(service.dictionnaryName).not.toBeDefined();
+        it('should set dictionaryName', async () => {
+            expect(service.dictionaryName).not.toBeDefined();
             await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service.dictionnaryName).toEqual(defaultGameData.dictionary);
+            expect(service.dictionaryName).toEqual(defaultGameData.dictionary);
         });
 
         it('should initialize roundManager', async () => {
