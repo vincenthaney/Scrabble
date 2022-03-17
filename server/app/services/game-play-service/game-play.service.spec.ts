@@ -61,7 +61,7 @@ describe('GamePlayService', () => {
     let game: Game;
 
     beforeEach(() => {
-        Container.set(DictionaryService, getDictionaryTestService);
+        Container.set(DictionaryService, getDictionaryTestService());
 
         gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
