@@ -2,6 +2,9 @@ import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virt
 import { PointRange } from '@app/classes/word-finding';
 
 export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
+    playTurn(): void {
+        return;
+    }
     findAction(): void {
         return;
     }
