@@ -23,7 +23,7 @@ const EXCHANGE_PAYLOAD: ExchangeActionPayload = {
     tiles: DEFAULT_TILES,
 };
 
-describe('ActionService', () => {
+fdescribe('ActionService', () => {
     let service: ActionService;
 
     beforeEach(() => {
@@ -38,18 +38,22 @@ describe('ActionService', () => {
         expect(service['preSendActionCallbacksMap']).toBeTruthy();
     });
 
-    it('createPlaceActionPayload should return ActionPlacePayload with the correct attributes', () => {
-        const expectedPayload: PlaceActionPayload = PLACE_PAYLOAD;
-        const actualPayload = service.createPlaceActionPayload(PLACE_PAYLOAD.tiles, PLACE_PAYLOAD.startPosition, PLACE_PAYLOAD.orientation);
-        expect(actualPayload).toEqual(expectedPayload);
-        expect(typeof actualPayload).toBe(typeof expectedPayload);
+    describe('createPlaceActionPayload', () => {
+        it('should return ActionPlacePayload with the correct attributes', () => {
+            const expectedPayload: PlaceActionPayload = PLACE_PAYLOAD;
+            const actualPayload = service.createPlaceActionPayload(PLACE_PAYLOAD.tiles, PLACE_PAYLOAD.startPosition, PLACE_PAYLOAD.orientation);
+            expect(actualPayload).toEqual(expectedPayload);
+            expect(typeof actualPayload).toBe(typeof expectedPayload);
+        });
     });
 
-    it('createExchangeActionPayload should return ActionExchangePayload with the correct attributes', () => {
-        const expectedPayload: ExchangeActionPayload = EXCHANGE_PAYLOAD;
-        const actualPayload = service.createExchangeActionPayload(DEFAULT_TILES);
-        expect(actualPayload).toEqual(expectedPayload);
-        expect(typeof actualPayload).toBe(typeof expectedPayload);
+    describe('createPlaceActionPayload', () => {
+        it('should return ActionExchangePayload with the correct attributes', () => {
+            const expectedPayload: ExchangeActionPayload = EXCHANGE_PAYLOAD;
+            const actualPayload = service.createExchangeActionPayload(DEFAULT_TILES);
+            expect(actualPayload).toEqual(expectedPayload);
+            expect(typeof actualPayload).toBe(typeof expectedPayload);
+        });
     });
 
     describe('createActionData', () => {
@@ -67,19 +71,9 @@ describe('ActionService', () => {
         });
 
         it('if input is NOT defined, should call createInputFromPayload', () => {
-            actualData = service.createActionData(ActionType.PASS, {}, '');
+            actualData = service.createActionData(ActionType.PASS, {});
             expect(inputSpy).toHaveBeenCalledWith(ActionType.PASS, {});
             expect(actualData.input).toEqual('spyInput');
-        });
-
-        it('if payload is defined, action data should have provided payload', () => {
-            actualData = service.createActionData(ActionType.EXCHANGE, EXCHANGE_PAYLOAD, 'input');
-            expect(actualData.payload).toEqual(EXCHANGE_PAYLOAD);
-        });
-
-        it('if input is NOT defined, should call createInputFromPayload', () => {
-            actualData = service.createActionData(ActionType.PASS, {}, '');
-            expect(actualData.payload).toEqual({});
         });
 
         it('should return ActionData with correct values', () => {
@@ -137,7 +131,7 @@ describe('ActionService', () => {
             actionData.payload = PLACE_PAYLOAD;
             service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
 
-            expect(convertBlankTilesLetterSpy).toHaveBeenCalledWith(actionData.payload);
+            expect(convertBlankTilesLetterSpy).toHaveBeenCalledWith(actionData.payload.tiles);
         });
 
         it('should call gamePlayController.sendAction with provided data', () => {
