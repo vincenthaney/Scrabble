@@ -18,6 +18,7 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject } from 'rxjs';
+
 @Component({
     selector: 'app-board',
     templateUrl: './board.component.html',
