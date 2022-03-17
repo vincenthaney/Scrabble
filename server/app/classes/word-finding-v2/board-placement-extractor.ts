@@ -1,7 +1,7 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from './board-placement-types';
+import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from './word-finding-types';
 
 const PREVIOUS_EXISTS = -1;
 const SHOULD_BE_FILLED = true;

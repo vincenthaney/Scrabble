@@ -1,5 +1,6 @@
 import { LetterValue } from '@app/classes/tile';
 import { Orientation, Position } from '@app/classes/board';
+import { DictionaryNode } from '@app/classes/dictionary';
 
 export interface WithDistance {
     distance: number;
@@ -22,4 +23,25 @@ export interface BoardPlacement {
     orientation: Orientation;
     maxSize: number;
     minSize: number;
+}
+
+export interface StackItem {
+    node: DictionaryNode;
+    playerTiles: string[];
+}
+
+export interface SearcherPerpendicularLetters {
+    before: string;
+    after: string;
+    distance: number;
+}
+
+export interface PerpendicularWord {
+    word: string;
+    distance: number;
+}
+
+export interface DictionarySearchResult {
+    word: string;
+    perpendicularWords: PerpendicularWord[];
 }

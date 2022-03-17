@@ -1,28 +1,7 @@
 import { DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
-import { BoardPlacement } from './board-placement-types';
-
-export interface StackItem {
-    node: DictionaryNode;
-    playerTiles: string[];
-}
-
-export interface SearcherPerpendicularLetters {
-    before: string;
-    after: string;
-    distance: number;
-}
-
-export interface PerpendicularWord {
-    word: string;
-    distance: number;
-}
-
-export interface DictionarySearchResult {
-    word: string;
-    perpendicularWords: PerpendicularWord[];
-}
+import { BoardPlacement, DictionarySearchResult, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
 
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;
