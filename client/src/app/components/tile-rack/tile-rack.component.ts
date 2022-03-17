@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
@@ -183,7 +183,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         return { ...tile, isUsed: false, isSelected: false };
     }
 
-    private handleUsedTiles(usedTilesPayload: ActionPlacePayload | undefined): void {
+    private handleUsedTiles(usedTilesPayload: PlaceActionPayload | undefined): void {
         if (!usedTilesPayload) {
             this.tiles.forEach((tile) => (tile.isUsed = false));
             return;

@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -110,7 +110,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     placeButtonClicked(): void {
-        const placePayload: ActionPlacePayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        const placePayload: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
         if (!placePayload) return;
         this.actionService.sendAction(
             this.gameService.getGameId(),

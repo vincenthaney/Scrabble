@@ -1,4 +1,4 @@
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Message } from '@app/classes/communication/message';
 import { BehaviorSubject, Subject } from 'rxjs';
 
@@ -7,7 +7,7 @@ export interface EventTypes {
     noActiveGame: void;
     reRender: void;
     newMessage: Message | null;
-    usedTiles: ActionPlacePayload | undefined;
+    usedTiles: PlaceActionPayload | undefined;
 }
 
 type GenericEventClass<T> = {
@@ -16,5 +16,5 @@ type GenericEventClass<T> = {
 
 export interface EventClass extends GenericEventClass<EventTypes> {
     newMessage: BehaviorSubject<Message | null>;
-    usedTiles: BehaviorSubject<ActionPlacePayload | undefined>;
+    usedTiles: BehaviorSubject<PlaceActionPayload | undefined>;
 }
