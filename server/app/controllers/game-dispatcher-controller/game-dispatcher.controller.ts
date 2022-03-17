@@ -3,6 +3,7 @@ import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/com
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { HttpException } from '@app/classes/http.exception';
+import Player from '@app/classes/player/player';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
@@ -13,8 +14,8 @@ import {
     NAME_IS_INVALID,
     PLAYER_LEFT_GAME,
     PLAYER_NAME_REQUIRED,
-    // VIRTUAL_PLAYER_LEVEL_REQUIRED,
-    // VIRTUAL_PLAYER_NAME_REQUIRED,
+    VIRTUAL_PLAYER_LEVEL_REQUIRED,
+    VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { IS_REQUESTING, SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -42,6 +43,10 @@ export class GameDispatcherController {
         );
     }
 
+    async delay(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     private configureRouter(): void {
         this.router = Router();
 
@@ -52,7 +57,6 @@ export class GameDispatcherController {
             try {
                 const gameId = this.handleCreateGame({ playerId, ...body });
                 res.status(StatusCodes.CREATED).send({ gameId });
-
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
@@ -214,23 +218,27 @@ export class GameDispatcherController {
 
         if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
-        let gameId: string = '';
+        let gameId: string;
         if (config.gameMode === GameMode.Multiplayer) {
             gameId = this.gameDispatcherService.createMultiplayerGame(config);
             this.socketService.addToRoom(config.playerId, gameId);
             this.handleLobbiesUpdate();
         } else {
-            // if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
-            // if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
-            // gameId = this.gameDispatcherService.createSoloGame(config);
-            // const gameConfig = this.gameDispatcherService.getSoloGameFromId(gameId).getReadyConfig();
-            // const startGameData = await this.activeGameService.beginGame(gameId, gameConfig);
-            // this.socketService.addToRoom(config.playerId, gameId);
-            // this.handleLobbiesUpdate();
-            // this.socketService.emitToRoom(gameId, 'startGame', startGameData);
+            if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
+            if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
+            gameId = this.gameDispatcherService.createSoloGame(config);
+            const gameConfig = this.gameDispatcherService.getSoloGameFromId(gameId).getReadyConfig();
+            const startGameData = await this.activeGameService.beginGame(gameId, gameConfig);
+            this.socketService.addToRoom(config.playerId, gameId);
+
+            startGameData.player2 = startGameData.player2 as Player;
+            const testP1 = new Player(startGameData.player2.id, startGameData.player2.name);
+            testP1.tiles = startGameData.player2.tiles;
+            testP1.isConnected = startGameData.player2.isConnected;
+            startGameData.player2 = testP1;
+
+            this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
         }
-        console.log('CREATE GAME');
-        console.log(gameId);
         return gameId;
     }
 

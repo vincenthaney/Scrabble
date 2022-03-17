@@ -23,11 +23,12 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
-    private lobbiesRoom: Room;
     private soloRooms: SoloRoom[];
+    private lobbiesRoom: Room;
 
     constructor(private readonly dictionaryService: DictionaryService) {
         this.waitingRooms = [];
+        this.soloRooms = [];
         this.lobbiesRoom = new Room();
     }
 
@@ -38,7 +39,7 @@ export class GameDispatcherService {
                 ? new BeginnerVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string)
                 : new ExpertVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string),
         );
-
+        this.soloRooms.push(soloRoom);
         return soloRoom.getId();
     }
 
@@ -150,10 +151,6 @@ export class GameDispatcherService {
     }
 
     getMultiplayerGameFromId(waitingRoomId: string): WaitingRoom {
-        console.log("ID:");
-        console.log(waitingRoomId);
-        console.log("WAITING ROOM:");
-        console.log(this.waitingRooms);
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
@@ -175,7 +172,7 @@ export class GameDispatcherService {
             player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
             maxRoundTime: configData.maxRoundTime,
-            dictionary: configData.dictionary,
+            dictionary: this.dictionaryService.getDictionaryTitles()[0],
         };
     }
 }
