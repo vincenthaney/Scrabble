@@ -151,7 +151,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handleBackspace(): void {
-        if (!this.selectedSquare) return;
+        if (!this.selectedSquare || !this.areTilesUsed()) return;
         this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
@@ -294,5 +294,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         } else {
             this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
         }
+    }
+
+    private areTilesUsed(): boolean {
+        const usedTiles: ActionPlacePayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        return usedTiles !== undefined && usedTiles.tiles.length > 0;
     }
 }
