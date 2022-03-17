@@ -67,9 +67,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             this.createGame();
         }
     }
-    async delay(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }
+
     createGame(): void {
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
         if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
