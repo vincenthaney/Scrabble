@@ -43,6 +43,11 @@ export default class BoardNavigator {
         );
     }
 
+    verifyPerpendicularNeighbors(shouldBeFilled: boolean): boolean {
+        const orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+        return this.verifyNeighbors(orientation, shouldBeFilled);
+    }
+
     move(direction: Direction, distance: number = DEFAULT_DISTANCE): BoardNavigator {
         this.position.move(this.orientation, direction, distance);
         return this;
