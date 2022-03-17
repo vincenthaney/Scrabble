@@ -20,14 +20,14 @@ import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import { LONG_MOVE_TIME, QUICK_MOVE_TIME } from '@app/constants/services-constants/word-finding.const';
 import { INVALID_REQUEST_POINT_RANGE, NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { StringConversion } from '@app/utils/string-conversion';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import { stub, useFakeTimers } from 'sinon';
 import { Container } from 'typedi';
 import WordFindingService from './word-finding';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -209,14 +209,6 @@ describe('WordFindingservice', () => {
             expect(spyFindSquareProperties).to.have.been.called;
             expect(spyAttemptPermutations).to.have.been.called;
             expect(spyChooseMove).to.have.been.called;
-        });
-
-        it('should not have changed the tiles values', () => {
-            BIG_TILE_RACK.push(DEFAULT_TILE_WILD);
-            service.findWords(board, BIG_TILE_RACK, request);
-
-            expect(BIG_TILE_RACK).to.contain(DEFAULT_TILE_WILD);
-            expect(BIG_TILE_RACK).not.to.contain(DEFAULT_TILE_BLANK_E);
         });
 
         it('should set timeOver to true and stop processing when timeout ', () => {

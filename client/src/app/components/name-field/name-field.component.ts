@@ -24,7 +24,7 @@ export class NameFieldComponent implements OnChanges {
             Validators.pattern(NAME_VALIDATION.rule),
             Validators.minLength(NAME_VALIDATION.minLength),
             Validators.maxLength(NAME_VALIDATION.maxLength),
-            // we must disable to use the custom validator created in this class.
+            // we must disable to use the custom validator (created in this class) in the form.
             // eslint-disable-next-line no-invalid-this
             this.nameDifferentFromVirtualPlayer(),
         ]),
