@@ -21,6 +21,7 @@ export default class GameDispatcherService implements OnDestroy {
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
+    private receivedGameIdEvent: Subject<void> = new Subject();
     private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
     private joinerRejectedEvent: Subject<string> = new Subject();
 
@@ -29,6 +30,7 @@ export default class GameDispatcherService implements OnDestroy {
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
         this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (gameId: string) => {
             this.gameId = gameId;
+            this.receivedGameIdEvent.next();
         });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
@@ -139,5 +141,9 @@ export default class GameDispatcherService implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToReceivedGameIdEvent(componentDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.receivedGameIdEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 }

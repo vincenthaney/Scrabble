@@ -62,21 +62,22 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         return this.gameParameters?.valid && this.playerNameValid;
     }
 
-    async onSubmit(): Promise<void> {
+    onSubmit(): void {
         if (this.isFormValid()) {
-            await this.createGame();
+            this.createGame();
         }
     }
     async delay(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
-    async createGame(): Promise<void> {
+    createGame(): void {
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
-        await this.delay(50);
         if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
             this.router.navigateByUrl('waiting-room');
         } else {
-            this.router.navigateByUrl('game');
+            this.gameDispatcherService.subscribeToReceivedGameIdEvent(this.serviceDestroyed$, () => {
+                this.router.navigateByUrl('game');
+            });
         }
     }
 
