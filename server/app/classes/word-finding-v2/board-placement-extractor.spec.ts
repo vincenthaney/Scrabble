@@ -8,11 +8,12 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import Player from '@app/classes/player/player';
-import BoardPlacementsExtractor, { BoardPlacement, LinePlacements, PlacementWithDistance } from './board-placement-extractor';
+import BoardPlacementsExtractor from './board-placement-extractor';
 import { Vec2 } from '@app/classes/vec2';
 import { SinonStub, stub } from 'sinon';
 import { expect } from 'chai';
 import Direction from '@app/classes/board/direction';
+import { BoardPlacement, LinePlacements, PlacementWithDistance } from './board-placement-types';
 
 const DEFAULT_BOARD: (LetterValue | ' ')[][] = [
     [' ', ' ', 'X', ' ', 'O', 'P'],

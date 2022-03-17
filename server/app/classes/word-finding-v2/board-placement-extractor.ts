@@ -1,29 +1,7 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-
-export interface PlacementWithDistance {
-    distance: number;
-}
-export interface LetterPosition extends PlacementWithDistance {
-    letter: LetterValue;
-}
-export interface PerpendicularLettersPosition extends PlacementWithDistance {
-    before: LetterValue[];
-    after: LetterValue[];
-}
-export interface LinePlacements {
-    letters: LetterPosition[];
-    perpendicularLetters: PerpendicularLettersPosition[];
-}
-export interface BoardPlacement {
-    letters: LetterPosition[];
-    perpendicularLetters: PerpendicularLettersPosition[];
-    position: Position;
-    orientation: Orientation;
-    maxSize: number;
-    minSize: number;
-}
+import { BoardPlacement, LinePlacements, PlacementWithDistance } from './board-placement-types';
 
 const PREVIOUS_EXISTS = -1;
 const SHOULD_BE_FILLED = true;
