@@ -1,82 +1,141 @@
-// /* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable dot-notation */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/orientation';
+import { Position } from '@app/classes/position';
+import { Tile } from '@app/classes/tile';
+import { INVALID_PAYLOAD_FOR_ACTION_TYPE } from '@app/constants/services-errors';
+import { ActionPayloadToString } from './action-payload-to-string';
 
-// import { Orientation, Position } from '@app/classes/board';
-// import { Tile } from '@app/classes/tile';
-// import { WordPlacement } from '@app/classes/word-finding/word-placement';
-// import { expect } from 'chai';
-// import { PlacementToString } from './placement-to-string';
+const DEFAULT_TILES: Tile[] = [new Tile('A', 1), new Tile('A', 2, true)];
 
-// describe('WordPlacement utils', () => {
-//     describe('positionNumberToLetter', () => {
-//         it('should convert 0 to a', () => {
-//             expect(PlacementToString.positionNumberToLetter(0)).to.equal('a');
-//         });
+const DEFAULT_PLACE_PAYLOAD: PlaceActionPayload = {
+    tiles: DEFAULT_TILES,
+    startPosition: { row: 0, column: 0 },
+    orientation: Orientation.Horizontal,
+};
+const EXPECTED_PLACE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} a1h aA`;
 
-//         it('should convert 5 to f', () => {
-//             expect(PlacementToString.positionNumberToLetter(5)).to.equal('f');
-//         });
-//     });
+const DEFAULT_EXCHANGE_PAYLOAD: ExchangeActionPayload = {
+    tiles: DEFAULT_TILES,
+};
+const EXPECTED_EXCHANGE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.EXCHANGE} aA`;
 
-//     describe('orientationToLetter', () => {
-//         it('should convert horizontal to h', () => {
-//             expect(PlacementToString.orientationToLetter(Orientation.Horizontal)).to.equal('h');
-//         });
+const EXPECTED_HELP_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.HELP}`;
 
-//         it('should convert vertical to v', () => {
-//             expect(PlacementToString.orientationToLetter(Orientation.Vertical)).to.equal('v');
-//         });
-//     });
+describe('ActionPayloadToString', () => {
+    describe('placeActionPayloadToString', () => {
+        it('should throw INVALID_PAYLOAD_FOR_TYPE if PLACE action with invalid payload', () => {
+            spyOn<any>(ActionPayloadToString, 'isInvalidPlacePayload').and.returnValue(true);
+            expect(() => {
+                ActionPayloadToString.placeActionPayloadToString(DEFAULT_PLACE_PAYLOAD);
+            }).toThrowError(INVALID_PAYLOAD_FOR_ACTION_TYPE);
+        });
 
-//     describe('tilesToString', () => {
-//         it('should convert', () => {
-//             const tiles: Tile[] = [
-//                 { letter: 'A', value: 0 },
-//                 { letter: 'B', value: 0 },
-//                 { letter: 'C', value: 0 },
-//             ];
-//             expect(PlacementToString.tilesToString(tiles)).to.equal('abc');
-//         });
+        it('should call tilesToString, positionNumberToLetter and orientationToLetter', () => {
+            const tilesToStringSpy = spyOn<any>(ActionPayloadToString, 'tilesToString');
+            const positionNumberToLetterSpy = spyOn<any>(ActionPayloadToString, 'positionNumberToLetter');
+            const orientationToLetterSpy = spyOn<any>(ActionPayloadToString, 'orientationToLetter');
 
-//         it('should convert blank tile to upper case', () => {
-//             const tiles: Tile[] = [
-//                 { letter: 'A', value: 0 },
-//                 { letter: 'B', value: 0, isBlank: true },
-//                 { letter: 'C', value: 0 },
-//             ];
-//             expect(PlacementToString.tilesToString(tiles)).to.equal('aBc');
-//         });
+            ActionPayloadToString.placeActionPayloadToString(DEFAULT_PLACE_PAYLOAD);
 
-//         it('should convert', () => {
-//             const tiles: Tile[] = [];
-//             expect(PlacementToString.tilesToString(tiles)).to.equal('');
-//         });
-//     });
+            expect(tilesToStringSpy).toHaveBeenCalled();
+            expect(positionNumberToLetterSpy).toHaveBeenCalled();
+            expect(orientationToLetterSpy).toHaveBeenCalled();
+        });
 
-//     describe('positionAndOrientationToString', () => {
-//         it('should convert', () => {
-//             const position = new Position(3, 4);
-//             const orientation = Orientation.Horizontal;
-//             expect(PlacementToString.positionAndOrientationToString(position, orientation)).to.equal('d5h');
-//         });
-//     });
+        it('should return corresponding input for valid exchange input', () => {
+            expect(ActionPayloadToString.placeActionPayloadToString(DEFAULT_PLACE_PAYLOAD)).toEqual(EXPECTED_PLACE_INPUT);
+        });
+    });
 
-//     describe('wordPlacementToCommandString', () => {
-//         it('should convert', () => {
-//             const tiles: Tile[] = [
-//                 { letter: 'X', value: 0 },
-//                 { letter: 'Y', value: 0 },
-//                 { letter: 'Z', value: 0 },
-//             ];
-//             const position = new Position(6, 2);
-//             const orientation = Orientation.Vertical;
+    describe('exchangeActionPayloadToString', () => {
+        it('should throw INVALID_PAYLOAD_FOR_TYPE if EXCHANGE action with invalid payload', () => {
+            expect(() => {
+                ActionPayloadToString.exchangeActionPayloadToString({} as ExchangeActionPayload);
+            }).toThrowError(INVALID_PAYLOAD_FOR_ACTION_TYPE);
+        });
 
-//             const placement: WordPlacement = {
-//                 startPosition: position,
-//                 tilesToPlace: tiles,
-//                 orientation,
-//             };
+        it('should call tilesToString', () => {
+            const tilesToStringSpy = spyOn<any>(ActionPayloadToString, 'tilesToString');
 
-//             expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('g3v xyz');
-//         });
-//     });
-// });
+            ActionPayloadToString.exchangeActionPayloadToString(DEFAULT_EXCHANGE_PAYLOAD);
+
+            expect(tilesToStringSpy).toHaveBeenCalled();
+        });
+
+        it('should return corresponding input for valid exchange input', () => {
+            expect(ActionPayloadToString.exchangeActionPayloadToString(DEFAULT_EXCHANGE_PAYLOAD)).toEqual(EXPECTED_EXCHANGE_INPUT);
+        });
+    });
+
+    describe('simpleActionToString', () => {
+        it('should return corresponding input for valid help input (same as other simple commands)', () => {
+            expect(ActionPayloadToString.simpleActionToString(ActionType.HELP)).toEqual(EXPECTED_HELP_INPUT);
+        });
+    });
+
+    describe('positionNumberToLetter', () => {
+        it('should return corresponding letter for position number)', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            const TEST_LETTERS = [0, 5, 8, 12, 14];
+            const EXPECTED_NUMBER = ['a', 'f', 'i', 'm', 'o'];
+
+            for (let i = 0; i < TEST_LETTERS.length; i++) {
+                expect(ActionPayloadToString['positionNumberToLetter'](TEST_LETTERS[i])).toEqual(EXPECTED_NUMBER[i]);
+            }
+        });
+    });
+
+    describe('orientationToLetter', () => {
+        it('should return h for horizontal orientation', () => {
+            expect(ActionPayloadToString['orientationToLetter'](Orientation.Horizontal)).toEqual(ORIENTATION_HORIZONTAL_LETTER);
+        });
+
+        it('should return v for vertical orientation', () => {
+            expect(ActionPayloadToString['orientationToLetter'](Orientation.Vertical)).toEqual(ORIENTATION_VERTICAL_LETTER);
+        });
+    });
+
+    describe('tilesToString', () => {
+        it('should expected strings for letters', () => {
+            const spy = spyOn<any>(ActionPayloadToString, 'tileToLetterConversion');
+            const TEST_TILES = [new Tile('A', 1), new Tile('B', 1), new Tile('C', 1), new Tile('D', 1)];
+            ActionPayloadToString['tilesToString'](TEST_TILES);
+            expect(spy).toHaveBeenCalledTimes(TEST_TILES.length);
+        });
+    });
+
+    describe('tileToLetterConversion', () => {
+        it('should expected strings for letters', () => {
+            const TEST_TILES = [new Tile('A', 1), new Tile('E', 1, true), new Tile('Z', 1), new Tile('I', 0, true)];
+            const EXPECTED_LETTERS = ['a', 'E', 'z', 'I'];
+
+            for (let i = 0; i < TEST_TILES.length; i++) {
+                expect(ActionPayloadToString['tileToLetterConversion'](TEST_TILES[i])).toEqual(EXPECTED_LETTERS[i]);
+            }
+        });
+    });
+
+    describe('isInvalidPlacePayload', () => {
+        it('should return false if orientation is undefined', () => {
+            expect(
+                ActionPayloadToString['isInvalidPlacePayload']({ ...DEFAULT_PLACE_PAYLOAD, orientation: undefined as unknown as Orientation }),
+            ).toBeTrue();
+        });
+
+        it('should return false if position is undefined', () => {
+            expect(
+                ActionPayloadToString['isInvalidPlacePayload']({ ...DEFAULT_PLACE_PAYLOAD, startPosition: undefined as unknown as Position }),
+            ).toBeTrue();
+        });
+
+        it('should return false if tiles are undefined', () => {
+            expect(ActionPayloadToString['isInvalidPlacePayload']({ ...DEFAULT_PLACE_PAYLOAD, tiles: undefined as unknown as Tile[] })).toBeTrue();
+        });
+
+        it('should return true if all payload attributes are defined', () => {
+            expect(ActionPayloadToString['isInvalidPlacePayload'](DEFAULT_PLACE_PAYLOAD)).toBeFalse();
+        });
+    });
+});

@@ -48,6 +48,6 @@ export class ActionPayloadToString {
     }
 
     private static isInvalidPlacePayload(placePayload: PlaceActionPayload): boolean {
-        return !placePayload.orientation || !placePayload.startPosition || !placePayload.tiles;
+        return placePayload.orientation === undefined || !placePayload.startPosition || !placePayload.tiles;
     }
 }
