@@ -28,24 +28,14 @@ export abstract class AbstractVirtualPlayer extends Player {
         return this.activeGameService;
     }
 
-    playTurn(): void {
-        this.findAction();
-    }
-
-    sendPayload() {
+    sendPayload(): void {
         // API call
         return;
-    }
-
-    generateWordFindingRequest(): WordFindingRequest {
-        return {
-            pointRange: this.findPointRange(),
-            useCase: WordFindingUseCase.Beginner,
-            pointHistory: this.pointHistory,
-        };
     }
 
     abstract findPointRange(): PointRange;
 
     abstract findAction(): void;
+
+    abstract playTurn(): void;
 }

@@ -59,9 +59,6 @@ export default class RoundManager {
         const player = this.getNextPlayer();
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
-        // eslint-disable-next-line no-empty
-        if (player instanceof AbstractVirtualPlayer) {
-        } // send event to virtual player
         return (this.currentRound = {
             player,
             startTime: now,
