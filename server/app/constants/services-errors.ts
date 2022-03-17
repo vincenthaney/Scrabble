@@ -24,6 +24,7 @@ export const WORD_CONTAINS_HYPHEN = ' Word cannot contain hyphen';
 export const WORD_CONTAINS_APOSTROPHE = ' Word cannot contain apostrophe';
 export const WORD_CONTAINS_ASTERISK = ' Word cannot contain asterisk';
 export const NO_GAME_FOUND_WITH_ID = 'No game could be found with id';
+export const PLAYER_HAS_NO_NAME = 'Player1 has no name';
 export const INVALID_PLAYER_ID_FOR_GAME = 'Invalid player id for game';
 export const COMMAND_IS_INVALID = (command: string) => `La commande **${command}** est invalide :<br>`;
 export const OPPONENT_PLAYED_INVALID_WORD = "Votre adversaire a joué un mot qui n'est pas dans le dictionnaire. Il perd son tour.";

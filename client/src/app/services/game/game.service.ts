@@ -195,7 +195,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     reconnectGame(): void {
         const gameIdCookie: string = this.cookieService.getCookie(GAME_ID_COOKIE);
         const socketIdCookie: string = this.cookieService.getCookie(SOCKET_ID_COOKIE);
-
         if (this.isGameIdCookieAbsent(gameIdCookie)) {
             this.gameViewEventManagerService.emitGameViewEvent('noActiveGame');
             return;
