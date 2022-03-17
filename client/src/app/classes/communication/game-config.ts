@@ -3,8 +3,8 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { PlayerData } from './';
 import { RoundData } from './round-data';
+import PlayerData from './player-data';
 
 export interface GameConfigData {
     playerName: string;
@@ -19,13 +19,16 @@ export interface GameConfigData {
 
 export interface GameConfig {
     player1: PlayerData;
-    player2: PlayerData;
     gameType: GameType;
     maxRoundTime: number;
     dictionary: string;
 }
 
-export interface StartGameData extends GameConfig {
+export interface ReadyGameConfig extends GameConfig {
+    player2: PlayerData;
+}
+
+export interface StartGameData extends ReadyGameConfig {
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];
