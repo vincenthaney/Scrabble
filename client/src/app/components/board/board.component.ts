@@ -62,9 +62,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         if (!this.boardService.readInitialBoard()) return;
         this.initializeBoard(this.boardService.readInitialBoard());
-
-        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
-
         this.subscribeToFocusableEvents();
     }
 
@@ -191,6 +188,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
         }
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+
+        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
     }
 
     private getSquare(board: Square[][], row: number, column: number): Square {
