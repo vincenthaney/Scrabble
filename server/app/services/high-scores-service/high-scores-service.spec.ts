@@ -10,7 +10,7 @@ import { MongoClient } from 'mongodb';
 import { HighScore, HighScoresData } from '@app/classes/database/high-score';
 import { GameType } from '@app/classes/game/game-type';
 import HighScoresService from './high-scores-service';
-import Container from 'typedi';
+import { Container } from 'typedi';
 import { DatabaseServiceMock } from '@app/services/database-service/database-service.mock.spec';
 import DatabaseService from '@app/services/database-service/database-service';
 import { stub } from 'sinon';
