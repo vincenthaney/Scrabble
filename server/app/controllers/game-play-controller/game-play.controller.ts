@@ -36,6 +36,7 @@ export class GamePlayController {
         this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
+
             try {
                 await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
@@ -75,6 +76,7 @@ export class GamePlayController {
 
         try {
             const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
+            const game = this.activeGameService.getGame(gameId, playerId);
             if (data.input.length > 0) {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
@@ -91,8 +93,8 @@ export class GamePlayController {
                         senderId: SYSTEM_ID,
                     });
                 }
-                if (feedback.opponentFeedback) {
-                    const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
+                if (feedback.opponentFeedback && !game.isSoloGame()) {
+                    const opponentId = game.getPlayer(playerId, IS_OPPONENT).id;
                     this.socketService.emitToSocket(opponentId, 'newMessage', {
                         content: feedback.opponentFeedback,
                         senderId: SYSTEM_ID,

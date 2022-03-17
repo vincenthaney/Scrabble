@@ -161,6 +161,10 @@ export default class Game {
         return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
     }
 
+    isSoloGame(): boolean {
+        return this.player1 instanceof AbstractVirtualPlayer || this.player2 instanceof AbstractVirtualPlayer;
+    }
+
     createStartGameData(): StartGameData {
         const tileReserve: TileReserveData[] = [];
         this.addTilesToReserve(tileReserve);

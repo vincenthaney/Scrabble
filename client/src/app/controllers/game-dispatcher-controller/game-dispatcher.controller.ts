@@ -39,7 +39,7 @@ export class GameDispatcherController implements OnDestroy {
         this.socketService.on('joinRequest', (opponent: PlayerName) => {
             this.joinRequestEvent.next(opponent.name);
         });
-        this.socketService.on('startGame', async (startGameData: StartGameData) => {
+        this.socketService.on('startGame', (startGameData: StartGameData) => {
             this.initializeGame$.next({ localPlayerId: this.socketService.getId(), startGameData });
         });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {

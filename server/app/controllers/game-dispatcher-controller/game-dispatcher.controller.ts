@@ -50,12 +50,12 @@ export class GameDispatcherController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.post('/games/:playerId', (req: CreateGameRequest, res: Response) => {
+        this.router.post('/games/:playerId', async (req: CreateGameRequest, res: Response) => {
             const { playerId } = req.params;
             const body: Omit<GameConfigData, 'playerId'> = req.body;
 
             try {
-                const gameId = this.handleCreateGame({ playerId, ...body });
+                const gameId = await this.handleCreateGame({ playerId, ...body });
                 res.status(StatusCodes.CREATED).send({ gameId });
             } catch (exception) {
                 HttpException.sendError(exception, res);
