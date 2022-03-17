@@ -36,7 +36,7 @@ describe('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
 
     beforeEach(async () => {
-        beginnerVirtualPlayer = new BeginnerVirtualPlayer(GAME_ID, PLAYER_ID, PLAYER_NAME);
+        beginnerVirtualPlayer = new BeginnerVirtualPlayer(PLAYER_ID, PLAYER_NAME);
     });
 
     afterEach(() => {

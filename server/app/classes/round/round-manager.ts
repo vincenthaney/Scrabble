@@ -3,6 +3,7 @@ import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
 import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;
@@ -51,7 +52,6 @@ export default class RoundManager {
         if (this.currentRound !== undefined) {
             this.saveCompletedRound(this.currentRound, actionPlayed);
         }
-
         return this.beginRound();
     }
 
@@ -59,7 +59,9 @@ export default class RoundManager {
         const player = this.getNextPlayer();
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
-
+        // eslint-disable-next-line no-empty
+        if (player instanceof AbstractVirtualPlayer) {
+        } // send event to virtual player
         return (this.currentRound = {
             player,
             startTime: now,

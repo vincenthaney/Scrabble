@@ -4,7 +4,7 @@
 import { Application } from '@app/app';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
-import { GameConfigData, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import { GameConfigData, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Room from '@app/classes/game/room';
@@ -275,7 +275,7 @@ describe('GameDispatcherController', () => {
             playerStub = createStubInstance(Player);
             playerStub.id = DEFAULT_PLAYER_ID;
             playerStub.isConnected = true;
-            gameStub.createStartGameData.callsFake(() => undefined as unknown as StartMultiplayerGameData);
+            gameStub.createStartGameData.callsFake(() => undefined as unknown as StartGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
             gameStub.getPlayer.returns(playerStub);
@@ -355,38 +355,38 @@ describe('GameDispatcherController', () => {
 
         it('should throw if config.playerName is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined, virtualPlayerLevel: VirtualPlayerLevel.Expert };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(PLAYER_NAME_REQUIRED);
         });
 
         it('should throw if config.gameType is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, gameType: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(GAME_TYPE_REQUIRED);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(GAME_TYPE_REQUIRED);
         });
 
         it('should throw if config.maxRoundTime is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, maxRoundTime: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(MAX_ROUND_TIME_REQUIRED);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(MAX_ROUND_TIME_REQUIRED);
         });
 
         it('should throw if config.dictionary is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, dictionary: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(DICTIONARY_REQUIRED);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(DICTIONARY_REQUIRED);
         });
 
         it('should throw if config.playerName is invalid', () => {
             const playerName = '     ';
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(NAME_IS_INVALID);
         });
 
         it('should throw if config.virtualPlayerName is undefined with solo game', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: GameMode.Solo, virtualPlayerName: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_NAME_REQUIRED);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_NAME_REQUIRED);
         });
 
         it('should throw if config.virtualPlayerLevel is undefined with solo game', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: GameMode.Solo, virtualPlayerLevel: undefined };
-            expect(() => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_LEVEL_REQUIRED);
+            expect(async () => controller['handleCreateGame'](config as unknown as GameConfigData)).to.throw(VIRTUAL_PLAYER_LEVEL_REQUIRED);
         });
     });
 
