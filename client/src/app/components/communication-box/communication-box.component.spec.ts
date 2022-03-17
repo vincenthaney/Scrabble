@@ -22,27 +22,33 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { marked } from 'marked';
 import { CommunicationBoxComponent } from './communication-box.component';
 
+const DEFAULT_GAME_ID = 'game id';
 const CURRENT_PLAYER_ID = 'idOfPlayer1';
 const OPPONENT_PLAYER_ID = 'idOfPlayer2';
 const DEFAULT_PLAYER1_MESSAGE: Message = {
     content: 'content of test message',
     senderId: CURRENT_PLAYER_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_PLAYER2_MESSAGE: Message = {
     content: 'content of test message',
     senderId: OPPONENT_PLAYER_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_SYSTEM_MESSAGE: Message = {
     content: 'content of test message',
     senderId: SYSTEM_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
     content: 'content of test message',
     senderId: SYSTEM_ERROR_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
     ...DEFAULT_SYSTEM_ERROR_MESSAGE,
     content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
+    gameId: DEFAULT_GAME_ID,
 };
 
 describe('CommunicationBoxComponent', () => {
@@ -286,7 +292,7 @@ describe('CommunicationBoxComponent', () => {
 
     describe('initializeMessages', () => {
         it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
-            const storedMessages = [INITIAL_MESSAGE, INITIAL_MESSAGE];
+            const storedMessages = [DEFAULT_PLAYER1_MESSAGE, DEFAULT_PLAYER1_MESSAGE];
             spyOn(component['messageStorageService'], 'getMessages').and.returnValue(storedMessages);
             component['messages'] = [];
             component['initializeMessages']();

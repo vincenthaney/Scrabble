@@ -4,7 +4,9 @@ import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { MESSAGE_STORAGE_KEY } from '@app/constants/session-storage-constants';
 import { MessageStorageService } from './message-storage.service';
 
-const TEST_MESSAGES = [INITIAL_MESSAGE, INITIAL_MESSAGE, INITIAL_MESSAGE];
+const DEFAULT_GAME_ID = 'game id';
+const DEFAULT_MESSAGE = { ...INITIAL_MESSAGE, gameId: DEFAULT_GAME_ID };
+const TEST_MESSAGES = [DEFAULT_MESSAGE, DEFAULT_MESSAGE, DEFAULT_MESSAGE];
 
 describe('SessionStorageService', () => {
     let service: MessageStorageService;
@@ -73,7 +75,7 @@ describe('SessionStorageService', () => {
     describe('saveMessage', () => {
         it('should call getMessages and setItem', () => {
             const spy = spyOn(service, 'getMessages').and.returnValue(TEST_MESSAGES);
-            service.saveMessage(INITIAL_MESSAGE);
+            service.saveMessage(DEFAULT_MESSAGE);
             expect(spy).toHaveBeenCalled();
             expect(setSpy).toHaveBeenCalled();
         });
@@ -83,7 +85,7 @@ describe('SessionStorageService', () => {
             spyOn(service, 'getMessages').and.returnValue(TEST_MESSAGES);
             const lengthBefore = TEST_MESSAGES.length;
 
-            service.saveMessage(INITIAL_MESSAGE);
+            service.saveMessage(DEFAULT_MESSAGE);
             const lengthAfter = JSON.parse(storage[MESSAGE_STORAGE_KEY]).length;
             expect(lengthAfter).toEqual(lengthBefore + 1);
         });

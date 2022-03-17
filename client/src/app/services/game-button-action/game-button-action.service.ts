@@ -92,6 +92,7 @@ export class GameButtonActionService {
         this.gamePlayController.sendError(gameId, playerId, {
             content: message,
             senderId: SYSTEM_ERROR_ID,
+            gameId,
         });
     }
 }
