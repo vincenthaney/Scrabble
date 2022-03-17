@@ -36,7 +36,7 @@ import SpyObj = jasmine.SpyObj;
 
 const OUT_OF_BOUNDS_POSITION = 999;
 
-fdescribe('BoardComponent', () => {
+describe('BoardComponent', () => {
     let boardServiceSpy: SpyObj<BoardService>;
     let component: BoardComponent;
     let fixture: ComponentFixture<BoardComponent>;
