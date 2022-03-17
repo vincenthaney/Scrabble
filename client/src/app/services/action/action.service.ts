@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionPayload, ActionPlacePayload, ActionType, ExchangeActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
@@ -16,7 +16,9 @@ export class ActionService {
     constructor(private gamePlayController: GamePlayController) {
         this.preSendActionCallbacksMap = new Map();
         this.preSendActionCallbacksMap.set(ActionType.PLACE, [
-            (actionData: ActionData) => this.convertBlankTilesLetter((actionData as ActionData<ActionPlacePayload>).payload),
+            (actionData: ActionData) => {
+                this.convertBlankTilesLetter((actionData.payload as ActionPlacePayload).tiles);
+            },
         ]);
     }
 
@@ -28,18 +30,17 @@ export class ActionService {
         };
     }
 
-    createExchangeActionPayload(tiles: Tile[]): ActionExchangePayload {
+    createExchangeActionPayload(tiles: Tile[]): ExchangeActionPayload {
         return { tiles };
     }
 
-    createActionData<T>(actionType: ActionType, actionPayload?: ActionPlacePayload | ActionExchangePayload, input?: string): ActionData<T> {
+    createActionData(actionType: ActionType, actionPayload: ActionPayload, input?: string): ActionData {
         input = input ?? this.createInputFromPayload(actionType, actionPayload);
-        actionPayload = actionPayload ? actionPayload : {};
         return {
             type: actionType,
             input,
-            payload: actionPayload as T,
-        } as ActionData<T;
+            payload: actionPayload,
+        };
     }
 
     sendAction(gameId: string, playerId: string | undefined, actionData: ActionData): void {
@@ -53,22 +54,21 @@ export class ActionService {
         this.gamePlayController.sendAction(gameId, playerId, actionData);
     }
 
-    private convertBlankTilesLetter(actionPlacePayload: ActionPlacePayload): void {
-        actionPlacePayload.tiles.forEach((tile) => {
+    private convertBlankTilesLetter(tiles: Tile[]): void {
+        tiles.forEach((tile) => {
             if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
         });
     }
 
-    private createInputFromPayload(actionType: ActionType, payload?: ActionPlacePayload | ActionExchangePayload): string {
+    private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {
         switch (actionType) {
             case ActionType.PLACE:
                 if (!(payload as ActionPlacePayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
                 return ActionPayloadToString.placeActionPayloadToString(payload as ActionPlacePayload);
             case ActionType.EXCHANGE:
-                if (!(payload as ActionExchangePayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
-                return ActionPayloadToString.exchangeActionPayloadToString(payload as ActionExchangePayload);
+                if (!(payload as ExchangeActionPayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
+                return ActionPayloadToString.exchangeActionPayloadToString(payload as ExchangeActionPayload);
             default:
-                if (payload) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
                 return ActionPayloadToString.simpleActionToString(actionType);
         }
     }

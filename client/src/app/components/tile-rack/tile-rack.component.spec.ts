@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType, ExchangeActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
@@ -548,7 +548,7 @@ describe('TileRackComponent', () => {
 
         beforeEach(() => {
             createPayloadSpy = spyOn(component['actionService'], 'createExchangeActionPayload').and.returnValue(
-                fakePayload as unknown as ActionExchangePayload,
+                fakePayload as unknown as ExchangeActionPayload,
             );
             createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
             sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {

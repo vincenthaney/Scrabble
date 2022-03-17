@@ -3,7 +3,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType, ExchangeActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_PLAYER } from '@app/constants/game';
@@ -19,7 +19,7 @@ const PLACE_PAYLOAD: ActionPlacePayload = {
     orientation: Orientation.Horizontal,
 };
 
-const EXCHANGE_PAYLOAD: ActionExchangePayload = {
+const EXCHANGE_PAYLOAD: ExchangeActionPayload = {
     tiles: DEFAULT_TILES,
 };
 
@@ -46,7 +46,7 @@ describe('ActionService', () => {
     });
 
     it('createExchangeActionPayload should return ActionExchangePayload with the correct attributes', () => {
-        const expectedPayload: ActionExchangePayload = EXCHANGE_PAYLOAD;
+        const expectedPayload: ExchangeActionPayload = EXCHANGE_PAYLOAD;
         const actualPayload = service.createExchangeActionPayload(DEFAULT_TILES);
         expect(actualPayload).toEqual(expectedPayload);
         expect(typeof actualPayload).toBe(typeof expectedPayload);
@@ -84,7 +84,7 @@ describe('ActionService', () => {
 
         it('should return ActionData with correct values', () => {
             actualData = service.createActionData(ActionType.EXCHANGE, EXCHANGE_PAYLOAD, 'input');
-            const expectedData: ActionData<ActionExchangePayload> = {
+            const expectedData: ActionData<ExchangeActionPayload> = {
                 type: ActionType.EXCHANGE,
                 payload: EXCHANGE_PAYLOAD,
                 input: 'input',
@@ -96,7 +96,7 @@ describe('ActionService', () => {
     describe('sendAction', () => {
         let sendActionSpy: jasmine.Spy;
         let convertBlankTilesLetterSpy: jasmine.Spy;
-        let actionData: ActionData<ActionExchangePayload>;
+        let actionData: ActionData<ExchangeActionPayload>;
 
         const mockObject = {
             fakeCallBack: (data: ActionData): ActionData => data,

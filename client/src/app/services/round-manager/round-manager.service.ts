@@ -123,7 +123,7 @@ export default class RoundManagerService implements IResetServiceData {
     roundTimeout(): void {
         if (this.router.url === '/game' && this.isActivePlayerLocalPlayer()) {
             this.endRoundEvent.emit();
-            this.actionService.sendAction(this.gameId, this.localPlayerId, this.actionService.createActionData(ActionType.PASS));
+            this.actionService.sendAction(this.gameId, this.localPlayerId, this.actionService.createActionData(ActionType.PASS, {}));
         }
     }
 }

@@ -4,7 +4,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
+import { ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -60,7 +60,7 @@ describe('InputParserService', () => {
         startPosition: { row: 1, column: 11 },
         orientation: Orientation.Horizontal,
     };
-    const EXPECTED_EXCHANGE_PAYLOAD: ActionExchangePayload = {
+    const EXPECTED_EXCHANGE_PAYLOAD: ExchangeActionPayload = {
         tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
     };
 

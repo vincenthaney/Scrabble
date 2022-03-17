@@ -1,4 +1,4 @@
-import { ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
+import { ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload } from '@app/classes/actions/action-data';
 import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
 
@@ -11,7 +11,7 @@ export class ActionPayloadToString {
         return `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${positionRow}${positionColumn}${orientation} ${tiles}`;
     }
 
-    static exchangeActionPayloadToString(exchangePayload: ActionExchangePayload): string {
+    static exchangeActionPayloadToString(exchangePayload: ExchangeActionPayload): string {
         return `${ACTION_COMMAND_INDICATOR}${ActionType.EXCHANGE} ${this.tilesToString(exchangePayload.tiles)}`;
     }
 

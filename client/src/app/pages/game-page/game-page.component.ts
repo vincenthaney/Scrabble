@@ -105,7 +105,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.actionService.sendAction(
             this.gameService.getGameId(),
             this.gameService.getLocalPlayerId(),
-            this.actionService.createActionData(ActionType.PASS),
+            this.actionService.createActionData(ActionType.PASS, {}),
         );
     }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
+import { ActionData, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -163,7 +163,7 @@ export default class InputParserService {
         return placeActionPayload;
     }
 
-    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
+    private createExchangeActionPayload(lettersToExchange: string): ExchangeActionPayload {
         return {
             tiles: this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE),
         };
