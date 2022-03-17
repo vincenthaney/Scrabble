@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionPayload, ActionPlacePayload, ActionType, ExchangeActionPayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
@@ -17,12 +17,12 @@ export class ActionService {
         this.preSendActionCallbacksMap = new Map();
         this.preSendActionCallbacksMap.set(ActionType.PLACE, [
             (actionData: ActionData) => {
-                this.convertBlankTilesLetter((actionData.payload as ActionPlacePayload).tiles);
+                this.convertBlankTilesLetter((actionData.payload as PlaceActionPayload).tiles);
             },
         ]);
     }
 
-    createPlaceActionPayload(tiles: Tile[], startPosition: Position, orientation: Orientation): ActionPlacePayload {
+    createPlaceActionPayload(tiles: Tile[], startPosition: Position, orientation: Orientation): PlaceActionPayload {
         return {
             tiles,
             startPosition,
@@ -63,8 +63,8 @@ export class ActionService {
     private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {
         switch (actionType) {
             case ActionType.PLACE:
-                if (!(payload as ActionPlacePayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
-                return ActionPayloadToString.placeActionPayloadToString(payload as ActionPlacePayload);
+                if (!(payload as PlaceActionPayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
+                return ActionPayloadToString.placeActionPayloadToString(payload as PlaceActionPayload);
             case ActionType.EXCHANGE:
                 if (!(payload as ExchangeActionPayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
                 return ActionPayloadToString.exchangeActionPayloadToString(payload as ExchangeActionPayload);

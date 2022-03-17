@@ -20,7 +20,7 @@ export interface ActionPayload {}
 export interface ExchangeActionPayload extends ActionPayload {
     tiles: Tile[];
 }
-export interface ActionPlacePayload extends ActionPayload {
+export interface PlaceActionPayload extends ActionPayload {
     tiles: Tile[];
     startPosition: Position;
     orientation: Orientation;

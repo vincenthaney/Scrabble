@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActionPlacePayload, ActionType } from '@app/classes/actions/action-data';
+import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
@@ -166,7 +166,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handleEnter(): void {
-        const placePayload: ActionPlacePayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        const placePayload: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
         if (!placePayload) return;
         this.actionService.sendAction(
             this.gameService.getGameId(),
@@ -240,7 +240,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 
-    private handlePlaceTiles(payload: ActionPlacePayload | undefined): void {
+    private handlePlaceTiles(payload: PlaceActionPayload | undefined): void {
         if (!payload) {
             this.notAppliedSquares.forEach((square) => (square.square.tile = null));
             this.notAppliedSquares = [];

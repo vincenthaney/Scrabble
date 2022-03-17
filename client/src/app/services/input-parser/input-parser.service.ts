@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -149,10 +149,10 @@ export default class InputParserService {
         };
     }
 
-    private createPlaceActionPayload(locationString: string, lettersToPlace: string): ActionPlacePayload {
+    private createPlaceActionPayload(locationString: string, lettersToPlace: string): PlaceActionPayload {
         const location: Location = this.createLocation(locationString, lettersToPlace.length);
 
-        const placeActionPayload: ActionPlacePayload = {
+        const placeActionPayload: PlaceActionPayload = {
             tiles: this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
             startPosition: this.getStartPosition(location),
             orientation: location.orientation,
