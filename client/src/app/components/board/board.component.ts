@@ -18,8 +18,6 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-
 @Component({
     selector: 'app-board',
     templateUrl: './board.component.html',
@@ -59,13 +57,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
         this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
         this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handlePlaceTiles(payload));
-        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.clearCursor());
+        this.roundManagerService.subscribeToEndRoundEvent(this.componentDestroyed$, () => this.clearCursor());
 
         if (!this.boardService.readInitialBoard()) return;
         this.initializeBoard(this.boardService.readInitialBoard());
-
-        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
-
         this.subscribeToFocusableEvents();
     }
 
@@ -155,7 +150,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handleBackspace(): void {
-        if (!this.selectedSquare) return;
+        if (!this.selectedSquare || !this.areTilesUsed()) return;
         this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
@@ -197,6 +192,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
         }
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+
+        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
     }
 
     private getSquare(board: Square[][], row: number, column: number): Square {
@@ -242,7 +239,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private handlePlaceTiles(payload: PlaceActionPayload | undefined): void {
         if (!payload) {
-            this.notAppliedSquares.forEach((square) => (square.square.tile = null));
+            this.notAppliedSquares.forEach((squareView: SquareView) => (squareView.square.tile = null));
             this.notAppliedSquares = [];
             return;
         }
@@ -290,7 +287,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         if (!previousUsedTiles) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
-        const index = previousUsedTiles.tiles.findIndex((t) => t.letter === tile.letter);
+        const index = previousUsedTiles.tiles.findIndex((t: Tile) => t.letter === tile.letter);
 
         if (index === NOT_FOUND) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
@@ -301,5 +298,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         } else {
             this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
         }
+    }
+
+    private areTilesUsed(): boolean {
+        const usedTiles: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        return usedTiles !== undefined && usedTiles.tiles.length > 0;
     }
 }

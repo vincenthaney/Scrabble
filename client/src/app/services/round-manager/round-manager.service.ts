@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionType } from '@app/classes/actions/action-data';
 import { StartGameData } from '@app/classes/communication/game-config';
@@ -10,7 +10,8 @@ import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
 import { ActionService } from '@app/services/action/action.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
@@ -23,11 +24,15 @@ export default class RoundManagerService implements IResetServiceData {
     maxRoundTime: number;
     timeout: ReturnType<typeof setTimeout>;
     timer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
-    endRoundEvent: EventEmitter<void>;
+    private endRoundEvent$: Subject<void>;
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
 
     constructor(private router: Router, private readonly actionService: ActionService) {
         this.initializeEvents();
+    }
+
+    subscribeToEndRoundEvent(destroy$: Observable<boolean>, next: () => void): Subscription {
+        return this.endRoundEvent$.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
     initialize(localPlayerId: string, startGameData: StartGameData): void {
@@ -41,7 +46,7 @@ export default class RoundManagerService implements IResetServiceData {
         this.completedRounds = [];
         this.timerSource = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([new Timer(0, 0), DEFAULT_PLAYER]);
         this.timer = this.timerSource.asObservable();
-        this.endRoundEvent = new EventEmitter();
+        this.endRoundEvent$ = new Subject();
     }
 
     convertRoundDataToRound(roundData: RoundData): Round {
@@ -61,7 +66,7 @@ export default class RoundManagerService implements IResetServiceData {
         this.localPlayerId = '';
         this.resetRoundData();
         this.resetTimerData();
-        this.endRoundEvent = new EventEmitter();
+        this.endRoundEvent$ = new Subject();
     }
 
     resetRoundData(): void {
@@ -79,13 +84,13 @@ export default class RoundManagerService implements IResetServiceData {
         this.currentRound.completedTime = round.startTime;
         this.completedRounds.push(this.currentRound);
         this.currentRound = round;
-        this.endRoundEvent.emit();
+        this.endRoundEvent$.next();
         this.startRound();
     }
 
     continueRound(round: Round): void {
         this.currentRound = round;
-        this.endRoundEvent.emit();
+        this.endRoundEvent$.next();
         this.startRound(this.timeLeft(round.limitTime));
     }
 
@@ -122,7 +127,7 @@ export default class RoundManagerService implements IResetServiceData {
 
     roundTimeout(): void {
         if (this.router.url === '/game' && this.isActivePlayerLocalPlayer()) {
-            this.endRoundEvent.emit();
+            this.endRoundEvent$.next();
             this.actionService.sendAction(this.gameId, this.localPlayerId, this.actionService.createActionData(ActionType.PASS, {}));
         }
     }
