@@ -24,7 +24,7 @@ export default class BoardPlacementsExtractor {
             this.navigator.orientation = orientation;
 
             do {
-                const lineBoardPlacement = this.extractBoardPlacementFromLine(this.navigator);
+                const lineBoardPlacement = this.extractBoardPlacementsFromLine(this.navigator);
                 boardPlacements = boardPlacements.concat(lineBoardPlacement);
                 this.navigator.nextLine();
             } while (this.navigator.isWithinBounds());
@@ -33,7 +33,7 @@ export default class BoardPlacementsExtractor {
         return boardPlacements;
     }
 
-    private extractBoardPlacementFromLine(navigator: BoardNavigator): BoardPlacement[] {
+    private extractBoardPlacementsFromLine(navigator: BoardNavigator): BoardPlacement[] {
         const boardPlacements: BoardPlacement[] = [];
 
         navigator = navigator.clone();

@@ -54,25 +54,25 @@ describe('WordFindingPositionExtractor', () => {
     });
 
     describe('extractBoardPlacements', () => {
-        let extractBoardPlacementFromLineStub: SinonStub;
+        let extractBoardPlacementsFromLineStub: SinonStub;
 
         beforeEach(() => {
-            extractBoardPlacementFromLineStub = stub(extractor, 'extractBoardPlacementFromLine' as any).returns([]);
+            extractBoardPlacementsFromLineStub = stub(extractor, 'extractBoardPlacementsFromLine' as any).returns([]);
         });
 
-        it('should call extractBoardPlacementFromLine # rows + # cols times', () => {
+        it('should call extractBoardPlacementsFromLine # rows + # cols times', () => {
             const expected = board.getSize().x + board.getSize().y;
             extractor.extractBoardPlacements();
-            expect(extractBoardPlacementFromLineStub.callCount).to.equal(expected);
+            expect(extractBoardPlacementsFromLineStub.callCount).to.equal(expected);
         });
 
-        it('should concat all of extractBoardPlacementFromLine results', () => {
+        it('should concat all of extractBoardPlacementsFromLine results', () => {
             const call0: BoardPlacement[] = [1, 2, 3] as unknown as BoardPlacement[];
             const call1: BoardPlacement[] = [4, 5, 6, 7] as unknown as BoardPlacement[];
             const expected = [...call0, ...call1];
 
-            extractBoardPlacementFromLineStub.onCall(0).returns(call0);
-            extractBoardPlacementFromLineStub.onCall(1).returns(call1);
+            extractBoardPlacementsFromLineStub.onCall(0).returns(call0);
+            extractBoardPlacementsFromLineStub.onCall(1).returns(call1);
 
             const result = extractor.extractBoardPlacements();
 
@@ -80,7 +80,7 @@ describe('WordFindingPositionExtractor', () => {
         });
     });
 
-    describe('extractBoardPlacementFromLine', () => {
+    describe('extractBoardPlacementsFromLine', () => {
         let extractLinePlacementsStub: SinonStub;
         let adjustLinePlacementsStub: SinonStub;
         let isValidBoardPlacementStub: SinonStub;
@@ -99,13 +99,13 @@ describe('WordFindingPositionExtractor', () => {
         });
 
         it('should call extractLinePlacements with navigator', () => {
-            extractor['extractBoardPlacementFromLine'](navigator);
+            extractor['extractBoardPlacementsFromLine'](navigator);
             expect(extractLinePlacementsStub.called).to.be.true;
         });
 
         it('should call extractPosition n times', () => {
             const n = board.getSize().x;
-            extractor['extractBoardPlacementFromLine'](navigator);
+            extractor['extractBoardPlacementsFromLine'](navigator);
             expect(adjustLinePlacementsStub.callCount).to.equal(n);
         });
 
@@ -120,7 +120,7 @@ describe('WordFindingPositionExtractor', () => {
                 });
             }
 
-            const result = extractor['extractBoardPlacementFromLine'](navigator);
+            const result = extractor['extractBoardPlacementsFromLine'](navigator);
             expect(result).to.have.length(n);
         });
 
@@ -131,7 +131,7 @@ describe('WordFindingPositionExtractor', () => {
             });
             isValidBoardPlacementStub.returns(false);
 
-            const result = extractor['extractBoardPlacementFromLine'](navigator);
+            const result = extractor['extractBoardPlacementsFromLine'](navigator);
             expect(result).to.be.empty;
         });
 
@@ -151,7 +151,7 @@ describe('WordFindingPositionExtractor', () => {
                 navigator.position = position;
                 navigator.orientation = Orientation.Horizontal;
 
-                const result = extractor['extractBoardPlacementFromLine'](navigator);
+                const result = extractor['extractBoardPlacementsFromLine'](navigator);
 
                 expect(result).to.have.length(1);
                 expect(result[0].letters).to.equal(extractedPositions.letters);
