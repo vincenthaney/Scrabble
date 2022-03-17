@@ -5,14 +5,14 @@ export const NO_MULTIPLIER_MAPPED_TO_INPUT = (data: string): string => {
 };
 
 export const BOARD_CONFIG_UNDEFINED_AT = (position: Position): string => {
-    return `La configuration de pateau est undefined à la ligne: ${position.row}, colonne: ${position.column}`;
+    return `La configuration de plateau n'est pas définie à la ligne: ${position.row}, colonne: ${position.column}`;
 };
 
 export const PLAYER_ALREADY_TRYING_TO_JOIN = 'Un joueur est déjà en train de rejoindre cette partie';
 export const NO_OPPONENT_IN_WAITING_GAME = "Aucun aversaire n'est en attente de la partie";
 export const OPPONENT_NAME_DOES_NOT_MATCH = "Le nom de l'adversaire ne correspond pas. Impossible d'accepter la partie";
 export const CANNOT_HAVE_SAME_NAME = "Impossible de rejoindre la partie d'un joueur portant le même nom";
-export const INVALID_COMMAND = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes pertinentes";
+export const INVALID_COMMAND = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes valides";
 export const INVALID_PAYLOAD = 'Payload invalide pour ce type de commande';
 export const NOT_PLAYER_TURN = "Ce n'est pas le tour du joueur demandeur de jouer";
 export const SOCKET_SERVICE_NOT_INITIALIZED = "SocketService n'est pas initalisé";
