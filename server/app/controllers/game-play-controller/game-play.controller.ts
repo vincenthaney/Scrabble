@@ -32,7 +32,6 @@ export class GamePlayController {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
         if (data.round) {
             if (IS_ID_VIRTUAL_PLAYER(data.round.playerData.id)) {
-                console.log('GAME UPDATE GAME PLAY CONTROLLER');
                 const virtualPlayer = this.activeGameService
                     .getGame(gameId, data.round.playerData.id)
                     .getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;

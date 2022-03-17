@@ -19,9 +19,6 @@ import { Delay } from '@app/utils/delay';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
-        console.log('PLAY TURN');
-        const time = new Date();
-        const temp = time.getTime();
         const waitNaturalTime = async (): Promise<void> => {
             await Delay.for(PRELIMINARY_WAIT_TIMEOUT);
         };
@@ -34,13 +31,12 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         };
 
         const result: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
-        const time2 = new Date();
-        console.log(time2.getTime() - temp);
+
         if (result) {
-            console.log('ACTION PLACE');
+            // create payload here
             this.sendPayload();
         } else {
-            console.log('ACTION PASS');
+            // create payload here
             this.sendPayload();
         }
         return;
