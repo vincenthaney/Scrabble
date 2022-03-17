@@ -5,7 +5,7 @@ import Direction from './direction';
 
 export default class BoardNavigator {
     orientation: Orientation;
-    readonly position: Position;
+    position: Position;
 
     constructor(private board: Board, position: Position, orientation: Orientation) {
         this.position = position.copy();
@@ -43,6 +43,11 @@ export default class BoardNavigator {
         );
     }
 
+    verifyPerpendicularNeighbors(shouldBeFilled: boolean): boolean {
+        const orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+        return this.verifyNeighbors(orientation, shouldBeFilled);
+    }
+
     move(direction: Direction, distance: number = DEFAULT_DISTANCE): BoardNavigator {
         this.position.move(this.orientation, direction, distance);
         return this;
@@ -65,6 +70,16 @@ export default class BoardNavigator {
             distanceTravelled++;
         }
         return this.isWithinBounds() ? distanceTravelled : Number.POSITIVE_INFINITY;
+    }
+
+    nextLine(): void {
+        if (this.orientation === Orientation.Horizontal) {
+            this.position.row += 1;
+            this.position.column = 0;
+        } else {
+            this.position.row = 0;
+            this.position.column += 1;
+        }
     }
 
     switchOrientation(): BoardNavigator {
