@@ -18,7 +18,6 @@ import { GameButtonActionService } from '@app/services/game-button-action/game-b
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-board',
@@ -59,7 +58,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.boardService.subscribeToInitializeBoard(this.componentDestroyed$, (board: Square[][]) => this.initializeBoard(board));
         this.boardService.subscribeToBoardUpdate(this.componentDestroyed$, (squaresToUpdate: Square[]) => this.updateBoard(squaresToUpdate));
         this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handlePlaceTiles(payload));
-        this.roundManagerService.endRoundEvent.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.clearCursor());
+        this.roundManagerService.subscribeToEndRoundEvent(this.componentDestroyed$, () => this.clearCursor());
 
         if (!this.boardService.readInitialBoard()) return;
         this.initializeBoard(this.boardService.readInitialBoard());
