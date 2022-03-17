@@ -26,6 +26,10 @@ export class GameDispatcherController implements OnDestroy {
         this.configureSocket();
     }
 
+    async delay(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
@@ -35,7 +39,7 @@ export class GameDispatcherController implements OnDestroy {
         this.socketService.on('joinRequest', (opponent: PlayerName) => {
             this.joinRequestEvent.next(opponent.name);
         });
-        this.socketService.on('startGame', (startGameData: StartGameData) => {
+        this.socketService.on('startGame', async (startGameData: StartGameData) => {
             this.initializeGame$.next({ localPlayerId: this.socketService.getId(), startGameData });
         });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
@@ -55,8 +59,6 @@ export class GameDispatcherController implements OnDestroy {
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
-        console.log('HANDLE CONFIRMATION');
-        console.log(gameId);
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();
     }
