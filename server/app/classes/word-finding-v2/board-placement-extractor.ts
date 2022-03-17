@@ -17,20 +17,20 @@ export default class BoardPlacementsExtractor {
 
     extractBoardPlacements(): BoardPlacement[] {
         const orientations = [Orientation.Horizontal, Orientation.Vertical];
-        let positions: BoardPlacement[] = [];
+        let boardPlacements: BoardPlacement[] = [];
 
         for (const orientation of orientations) {
             this.navigator.position = new Position(0, 0);
             this.navigator.orientation = orientation;
 
             do {
-                const lineExtraction = this.extractBoardPlacementFromLine(this.navigator);
-                positions = positions.concat(lineExtraction);
+                const lineBoardPlacement = this.extractBoardPlacementFromLine(this.navigator);
+                boardPlacements = boardPlacements.concat(lineBoardPlacement);
                 this.navigator.nextLine();
             } while (this.navigator.isWithinBounds());
         }
 
-        return positions;
+        return boardPlacements;
     }
 
     private extractBoardPlacementFromLine(navigator: BoardNavigator): BoardPlacement[] {
@@ -61,7 +61,7 @@ export default class BoardPlacementsExtractor {
     }
 
     private extractLinePlacements(navigator: BoardNavigator): LinePlacements {
-        const result: LinePlacements = {
+        const linePlacements: LinePlacements = {
             letters: [],
             perpendicularLetters: [],
         };
@@ -70,19 +70,19 @@ export default class BoardPlacementsExtractor {
 
         for (const distance of this.moveThroughLine(navigator)) {
             if (navigator.square.tile)
-                result.letters.push({
+                linePlacements.letters.push({
                     letter: navigator.square.tile.letter,
                     distance,
                 });
             else if (navigator.verifyPerpendicularNeighbors(SHOULD_BE_FILLED))
-                result.perpendicularLetters.push({
+                linePlacements.perpendicularLetters.push({
                     before: this.getPerpendicularLetters(navigator.clone().switchOrientation(), Direction.Backward).reverse(),
                     after: this.getPerpendicularLetters(navigator.clone().switchOrientation(), Direction.Forward),
                     distance,
                 });
         }
 
-        return result;
+        return linePlacements;
     }
 
     private adjustLinePlacements(linePlacements: LinePlacements, distance: number): LinePlacements | undefined {
