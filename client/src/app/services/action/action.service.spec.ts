@@ -7,6 +7,7 @@ import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } fro
 import { Orientation } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_PLAYER } from '@app/constants/game';
+import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { ActionService } from './action.service';
 
 const DEFAULT_PLAYER_ID = DEFAULT_PLAYER.id;
@@ -23,7 +24,7 @@ const EXCHANGE_PAYLOAD: ExchangeActionPayload = {
     tiles: DEFAULT_TILES,
 };
 
-fdescribe('ActionService', () => {
+describe('ActionService', () => {
     let service: ActionService;
 
     beforeEach(() => {
@@ -137,6 +138,26 @@ fdescribe('ActionService', () => {
         it('should call gamePlayController.sendAction with provided data', () => {
             service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(sendActionSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
+        });
+    });
+
+    describe('createInputFromPayload', () => {
+        it('should call placeActionPayloadToString on PLACE action', () => {
+            const spy = spyOn(ActionPayloadToString, 'placeActionPayloadToString').and.returnValue('');
+            service['createInputFromPayload'](ActionType.PLACE, {});
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call exchangeActionPayloadToString on EXCHANGE action', () => {
+            const spy = spyOn(ActionPayloadToString, 'exchangeActionPayloadToString').and.returnValue('');
+            service['createInputFromPayload'](ActionType.EXCHANGE, {});
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call simpleActionToString on other actions', () => {
+            const spy = spyOn(ActionPayloadToString, 'simpleActionToString').and.returnValue('');
+            service['createInputFromPayload'](ActionType.PASS, {});
+            expect(spy).toHaveBeenCalled();
         });
     });
 
