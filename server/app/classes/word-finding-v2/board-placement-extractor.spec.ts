@@ -13,7 +13,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { SinonStub, stub } from 'sinon';
 import { expect } from 'chai';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LinePlacements, PlacementWithDistance } from './board-placement-types';
+import { BoardPlacement, LinePlacements, WithDistance } from './board-placement-types';
 
 const DEFAULT_BOARD: (LetterValue | ' ')[][] = [
     [' ', ' ', 'X', ' ', 'O', 'P'],
@@ -368,7 +368,7 @@ describe('WordFindingPositionExtractor', () => {
         let index = 0;
         for (const [initials, distance] of tests) {
             it(`should adjust the distance (${index})`, () => {
-                const obj: PlacementWithDistance[] = initials.map((i) => ({ distance: i }));
+                const obj: WithDistance[] = initials.map((i) => ({ distance: i }));
 
                 const results = extractor['adjustDistances'](obj, distance);
 

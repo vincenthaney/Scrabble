@@ -1,7 +1,7 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LetterPosition, LinePlacements, PlacementWithDistance } from './board-placement-types';
+import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from './board-placement-types';
 
 const PREVIOUS_EXISTS = -1;
 const SHOULD_BE_FILLED = true;
@@ -106,7 +106,7 @@ export default class BoardPlacementsExtractor {
         return letters;
     }
 
-    private adjustDistances<T extends PlacementWithDistance>(placements: T[], distance: number): T[] {
+    private adjustDistances<T extends WithDistance>(placements: T[], distance: number): T[] {
         return placements.map((placement) => ({ ...placement, distance: placement.distance - distance }));
     }
 

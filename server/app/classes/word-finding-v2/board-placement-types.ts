@@ -1,13 +1,13 @@
 import { LetterValue } from '@app/classes/tile';
 import { Orientation, Position } from '@app/classes/board';
 
-export interface PlacementWithDistance {
+export interface WithDistance {
     distance: number;
 }
-export interface LetterPosition extends PlacementWithDistance {
+export interface LetterPosition extends WithDistance {
     letter: LetterValue;
 }
-export interface PerpendicularLettersPosition extends PlacementWithDistance {
+export interface PerpendicularLettersPosition extends WithDistance {
     before: LetterValue[];
     after: LetterValue[];
 }
