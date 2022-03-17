@@ -28,6 +28,7 @@ export class GamePlayController {
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
+        // A mon avis cest ici quon envoit au JV
     }
 
     private configureRouter(): void {
@@ -93,7 +94,7 @@ export class GamePlayController {
                         senderId: SYSTEM_ID,
                     });
                 }
-                if (feedback.opponentFeedback && !game.isSoloGame()) {
+                if (feedback.opponentFeedback) {
                     const opponentId = game.getPlayer(playerId, IS_OPPONENT).id;
                     this.socketService.emitToSocket(opponentId, 'newMessage', {
                         content: feedback.opponentFeedback,

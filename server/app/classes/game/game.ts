@@ -7,13 +7,12 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { WINNER_MESSAGE } from '@app/constants/game';
+import { WINNER_MESSAGE, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
 import { GameType } from './game-type';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
 export const LOSE = -1;
@@ -161,8 +160,8 @@ export default class Game {
         return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
     }
 
-    isSoloGame(): boolean {
-        return this.player1 instanceof AbstractVirtualPlayer || this.player2 instanceof AbstractVirtualPlayer;
+    isPlayerReal(playerId: string): boolean {
+        return !(this.getPlayer(playerId, IS_REQUESTING) instanceof AbstractVirtualPlayer);
     }
 
     createStartGameData(): StartGameData {

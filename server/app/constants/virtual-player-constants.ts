@@ -1,5 +1,7 @@
 import { PointRange } from '@app/classes/word-finding';
 
+export const VIRTUAL_PLAYER_ID_PREFIX = 'virtual-player-';
+
 export const PASS_ACTION_THRESHOLD = 0.1;
 export const EXCHANGE_ACTION_THRESHOLD = 0.2;
 export const LOW_SCORE_THRESHOLD = 0.4;

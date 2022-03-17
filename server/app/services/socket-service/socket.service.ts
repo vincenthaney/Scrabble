@@ -3,6 +3,7 @@
 
 import { HttpException } from '@app/classes/http.exception';
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
 import * as io from 'socket.io';
@@ -87,6 +88,10 @@ export class SocketService {
         return this.sio !== undefined;
     }
 
+    isIdVirtualPlayer(id: string): boolean {
+        return id.includes(VIRTUAL_PLAYER_ID_PREFIX);
+    }
+
     getSocket(id: string): io.Socket {
         const socket = this.sockets.get(id);
         if (!socket) throw new HttpException(INVALID_ID_FOR_SOCKET, StatusCodes.BAD_REQUEST);
@@ -106,6 +111,7 @@ export class SocketService {
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.isIdVirtualPlayer(id)) return;
         this.getSocket(id).emit(ev, ...args);
     }
 }
