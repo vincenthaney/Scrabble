@@ -95,7 +95,8 @@ export default class BoardPlacementsExtractor {
         perpendicularLetters = perpendicularLetters.filter((letter) => letter.distance >= 0);
 
         if (letters.length > 0 || perpendicularLetters.length > 0) return { letters, perpendicularLetters };
-        else return undefined;
+
+        return undefined;
     }
 
     private getPerpendicularLetters(navigator: BoardNavigator, direction: Direction): LetterValue[] {
