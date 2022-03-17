@@ -69,11 +69,7 @@ export default class ActionPlace extends ActionPlay {
 
     isLegalPlacement(words: [Square, Tile][][]): boolean {
         const isAdjacentToPlacedTile = this.amountOfLettersInWords(words) !== this.wordPlacement.tilesToPlace.length;
-        if (isAdjacentToPlacedTile) {
-            return true;
-        } else {
-            return this.containsCenterSquare(words);
-        }
+        return isAdjacentToPlacedTile ? true : this.containsCenterSquare(words);
     }
 
     amountOfLettersInWords(words: [Square, Tile][][]): number {

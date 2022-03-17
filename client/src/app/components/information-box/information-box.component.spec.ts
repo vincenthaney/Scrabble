@@ -2,7 +2,6 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';
-import { EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -25,7 +24,7 @@ class MockRoundManager {
         DEFAULT_PLAYER,
     ]);
     pTimer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
-    pEndRoundEvent: EventEmitter<void> = new EventEmitter();
+    pEndRoundEvent: Subject<void> = new Subject();
     pActivePlayer: AbstractPlayer = new Player('mockId', 'mockName', []);
 
     get timerSource(): BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> {
@@ -35,7 +34,7 @@ class MockRoundManager {
     get timer(): Observable<[timer: Timer, activePlayer: AbstractPlayer]> {
         return this.timerSource.asObservable();
     }
-    get endRoundEvent(): EventEmitter<void> {
+    get endRoundEvent(): Subject<void> {
         return this.pEndRoundEvent;
     }
 
@@ -45,6 +44,10 @@ class MockRoundManager {
 
     getActivePlayer(): AbstractPlayer | null {
         return this.activePlayer;
+    }
+    // eslint-disable-next-line no-unused-vars
+    subscribeToEndRoundEvent(destroy$: Observable<boolean>, next: () => void): Subscription {
+        return new Subscription();
     }
 }
 
@@ -156,13 +159,9 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
-            const event = mockRoundManager.endRoundEvent;
-            const pipedObservable: Observable<void> = event.pipe();
-            const pipedSpy = spyOn(pipedObservable, 'subscribe');
-            // eslint-disable-next-line @typescript-eslint/ban-types
-            spyOn(mockRoundManager.endRoundEvent, 'pipe').and.returnValue(pipedObservable as unknown as Observable<{}>);
+            const spy = spyOn(mockRoundManager, 'subscribeToEndRoundEvent');
             component.ngOnInit();
-            expect(pipedSpy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalled();
         });
 
         it('ngOnInit should NOT subscribe to RoundManager endRoundEvent if roundManager.endRoundEvent is undefined', () => {
@@ -170,13 +169,6 @@ describe('InformationBoxComponent', () => {
             spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(undefined);
             component.ngOnInit();
             expect(subscribeSpy).not.toHaveBeenCalled();
-        });
-
-        it('ngOnInit endRoundEvent subscription should call endRound', () => {
-            const endRoundSpy = spyOn(component, 'endRound');
-            component.ngOnInit();
-            mockRoundManager.endRoundEvent.emit();
-            expect(endRoundSpy).toHaveBeenCalled();
         });
 
         it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {
@@ -201,7 +193,6 @@ describe('InformationBoxComponent', () => {
 
     describe('ngOndestroy', () => {
         beforeEach(() => {
-            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(null);
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         });
 

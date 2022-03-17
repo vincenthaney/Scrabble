@@ -134,14 +134,18 @@ describe('GamePageComponent', () => {
 
     it('should call disconnectGame if player left with quit button or no active game dialog)', () => {
         component.mustDisconnectGameOnLeave = false;
-        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        const spyDiconnect = spyOn(component['reconnectionService'], 'disconnectGame').and.callFake(() => {
+            return;
+        });
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
     });
 
     it('should not call disconnectGame if player left abnormally during game', () => {
         component.mustDisconnectGameOnLeave = true;
-        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        const spyDiconnect = spyOn(component['reconnectionService'], 'disconnectGame').and.callFake(() => {
+            return;
+        });
         component.ngOnDestroy();
         expect(spyDiconnect).toHaveBeenCalled();
         component.mustDisconnectGameOnLeave = false;

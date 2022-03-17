@@ -26,12 +26,12 @@ import {
     SQUARE_TILE_MAX_FONT_SIZE,
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import { ReconnectionService } from '@app/services/reconnection/reconnection.service';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -50,7 +50,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         public gameService: GameService,
         private focusableComponentService: FocusableComponentsService,
-        private gameDispatcher: GameDispatcherController,
+        private readonly reconnectionService: ReconnectionService,
         public surrenderDialog: MatDialog,
         private playerLeavesService: PlayerLeavesService,
         private gameViewEventManagerService: GameViewEventManagerService,
@@ -86,18 +86,18 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
         if (this.mustDisconnectGameOnLeave) {
-            this.gameService.disconnectGame();
+            this.reconnectionService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
 
     ngOnInit(): void {
-        this.gameDispatcher.configureSocket();
+        this.reconnectionService.initializeControllerSockets();
 
         this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
         if (!this.gameService.getGameId()) {
-            this.gameService.reconnectGame();
+            this.reconnectionService.reconnectGame();
         }
     }
 
