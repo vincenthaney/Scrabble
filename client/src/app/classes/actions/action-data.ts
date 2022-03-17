@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
@@ -13,9 +12,9 @@ export enum ActionType {
     HELP = 'aide',
     HINT = 'indice',
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ActionPayload {}
+export interface ActionPayload {
+    playerId?: string;
+}
 
 export interface ExchangeActionPayload extends ActionPayload {
     tiles: Tile[];
@@ -25,8 +24,7 @@ export interface PlaceActionPayload extends ActionPayload {
     startPosition: Position;
     orientation: Orientation;
 }
-
-export interface ActionData<T extends ActionPayload = {}> {
+export interface ActionData<T extends ActionPayload = ActionPayload> {
     type: ActionType;
     input: string;
     payload: T;

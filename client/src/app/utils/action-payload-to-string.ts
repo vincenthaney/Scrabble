@@ -1,9 +1,9 @@
-import { ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload } from '@app/classes/actions/action-data';
+import { ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
 
 export class ActionPayloadToString {
-    static placeActionPayloadToString(placePayload: ActionPlacePayload): string {
+    static placeActionPayloadToString(placePayload: PlaceActionPayload): string {
         const tiles = this.tilesToString(placePayload.tiles);
         const positionRow = this.positionNumberToLetter(placePayload.startPosition.row);
         const positionColumn = `${placePayload.startPosition.column + 1}`;
