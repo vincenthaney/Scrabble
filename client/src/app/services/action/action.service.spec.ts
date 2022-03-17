@@ -36,7 +36,6 @@ describe('ActionService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
-        expect(service['preSendActionCallbacksMap']).toBeTruthy();
     });
 
     describe('createPlaceActionPayload', () => {
@@ -93,10 +92,6 @@ describe('ActionService', () => {
         let convertBlankTilesLetterSpy: jasmine.Spy;
         let actionData: ActionData<ExchangeActionPayload>;
 
-        const mockObject = {
-            fakeCallBack: (data: ActionData): ActionData => data,
-        };
-
         beforeEach(() => {
             sendActionSpy = spyOn(service['gamePlayController'], 'sendAction').and.callFake(() => {
                 return;
@@ -114,17 +109,6 @@ describe('ActionService', () => {
         it('if playerId is undefined, should not sendAction', () => {
             service.sendAction(DEFAULT_GAME_ID, undefined, actionData);
             expect(sendActionSpy).not.toHaveBeenCalled();
-        });
-
-        it('should call the callbacks of the action if it has any', () => {
-            const fakeSpy = spyOn(mockObject, 'fakeCallBack');
-            service['preSendActionCallbacksMap'] = new Map();
-            service['preSendActionCallbacksMap'].set(ActionType.HELP, [(data: ActionData) => mockObject.fakeCallBack(data)]);
-
-            actionData.type = ActionType.HELP;
-            service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
-
-            expect(fakeSpy).toHaveBeenCalledWith(actionData);
         });
 
         it('should convert blank tiles before PLACE action is sent', () => {

@@ -10,16 +10,7 @@ import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
     providedIn: 'root',
 })
 export class ActionService {
-    private preSendActionCallbacksMap: Map<ActionType, ((actionData: ActionData, gameId?: string, playerId?: string) => void)[]>;
-
-    constructor(private gamePlayController: GamePlayController) {
-        this.preSendActionCallbacksMap = new Map();
-        this.preSendActionCallbacksMap.set(ActionType.PLACE, [
-            (actionData: ActionData) => {
-                this.convertBlankTilesLetter((actionData.payload as PlaceActionPayload).tiles);
-            },
-        ]);
-    }
+    constructor(private gamePlayController: GamePlayController) {}
 
     createPlaceActionPayload(tiles: Tile[], startPosition: Position, orientation: Orientation): PlaceActionPayload {
         return {
@@ -45,10 +36,7 @@ export class ActionService {
     sendAction(gameId: string, playerId: string | undefined, actionData: ActionData): void {
         if (!playerId) return;
 
-        const callbacks = this.preSendActionCallbacksMap.get(actionData.type);
-        if (callbacks) {
-            callbacks.forEach((callback) => callback(actionData, gameId, playerId));
-        }
+        if (actionData.type === ActionType.PLACE) this.convertBlankTilesLetter((actionData.payload as PlaceActionPayload).tiles);
 
         this.gamePlayController.sendAction(gameId, playerId, actionData);
     }
