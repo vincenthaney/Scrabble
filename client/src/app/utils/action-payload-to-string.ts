@@ -3,13 +3,15 @@ import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER
 import { Tile } from '@app/classes/tile';
 import { INVALID_PAYLOAD_FOR_ACTION_TYPE } from '@app/constants/services-errors';
 
+const COLUMN_INDEX_ADJUSTMENT = 1;
+
 export class ActionPayloadToString {
     static placeActionPayloadToString(placePayload: PlaceActionPayload): string {
         if (this.isInvalidPlacePayload(placePayload)) throw new Error(INVALID_PAYLOAD_FOR_ACTION_TYPE);
 
         const tiles = this.tilesToString(placePayload.tiles);
         const positionRow = this.positionNumberToLetter(placePayload.startPosition.row);
-        const positionColumn = `${placePayload.startPosition.column + 1}`;
+        const positionColumn = `${placePayload.startPosition.column + COLUMN_INDEX_ADJUSTMENT}`;
         const orientation = this.orientationToLetter(placePayload.orientation);
         return `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${positionRow}${positionColumn}${orientation} ${tiles}`;
     }
@@ -29,12 +31,7 @@ export class ActionPayloadToString {
     }
 
     private static orientationToLetter(orientation: Orientation): string {
-        switch (orientation) {
-            case Orientation.Horizontal:
-                return ORIENTATION_HORIZONTAL_LETTER;
-            case Orientation.Vertical:
-                return ORIENTATION_VERTICAL_LETTER;
-        }
+        return orientation === Orientation.Horizontal ? ORIENTATION_HORIZONTAL_LETTER : ORIENTATION_VERTICAL_LETTER;
     }
 
     private static tilesToString(tiles: Tile[]): string {
