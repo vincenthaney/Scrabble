@@ -1,6 +1,6 @@
 import { DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
-import { NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { BoardPlacement, DictionarySearchResult, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
 
@@ -96,6 +96,7 @@ export default class DictionarySearcher {
     private getLettersLeft(letters: string[], playing: string): string[] {
         let index = letters.indexOf(playing);
         if (index === NOT_FOUND) index = letters.indexOf(BLANK_TILE_LETTER_VALUE);
+        if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
 
         const lettersLeft = [...letters];
         lettersLeft.splice(index, 1);
