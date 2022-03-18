@@ -39,6 +39,7 @@ export interface SearcherPerpendicularLetters {
 export interface PerpendicularWord {
     word: string;
     distance: number;
+    connect: number;
 }
 
 export interface DictionarySearchResult {

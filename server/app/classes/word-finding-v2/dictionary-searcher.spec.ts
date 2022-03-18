@@ -520,9 +520,9 @@ describe('DictionarySearcher', () => {
         beforeEach(() => {
             wordExistsStub = stub(searcher['node'], 'wordExists').returns(true);
             words = [
-                { word: 'abc', distance: 0 },
-                { word: 'abcd', distance: 0 },
-                { word: 'abcde', distance: 0 },
+                { word: 'abc', distance: 0, connect: 0 },
+                { word: 'abcd', distance: 0, connect: 0 },
+                { word: 'abcde', distance: 0, connect: 0 },
             ];
         });
 
