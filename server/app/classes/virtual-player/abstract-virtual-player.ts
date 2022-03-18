@@ -35,11 +35,6 @@ export abstract class AbstractVirtualPlayer extends Player {
         return this.activeGameService;
     }
 
-    sendPayload(): void {
-        // API call
-        return;
-    }
-
     abstract findPointRange(): PointRange;
 
     abstract findAction(): void;

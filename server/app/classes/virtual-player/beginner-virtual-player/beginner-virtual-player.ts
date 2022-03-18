@@ -29,17 +29,8 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         const play = async (): Promise<[ActionData, void]> => {
             return await Promise.all([this.findAction(), waitNaturalTime()]);
         };
-
-        const result: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
-
-        if (result) {
-            // create payload here
-            this.sendPayload();
-        } else {
-            // create payload here
-            this.sendPayload();
-        }
-        return;
+        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
+        this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
     }
 
     findPointRange(): PointRange {
