@@ -93,13 +93,13 @@ export default class DictionarySearcher {
         return [[...new Set([...letters, ...ALPHABET])], true];
     }
 
-    private getLettersLeft(tiles: string[], playing: string): string[] {
-        let index = tiles.indexOf(playing);
-        if (index === NOT_FOUND) index = tiles.indexOf(BLANK_TILE_LETTER_VALUE);
+    private getLettersLeft(letters: string[], playing: string): string[] {
+        let index = letters.indexOf(playing);
+        if (index === NOT_FOUND) index = letters.indexOf(BLANK_TILE_LETTER_VALUE);
 
-        const tilesLeft = [...tiles];
-        tilesLeft.splice(index, 1);
-        return tilesLeft;
+        const lettersLeft = [...letters];
+        lettersLeft.splice(index, 1);
+        return lettersLeft;
     }
 
     private getPerpendicularWords(word: string): PerpendicularWord[] {
