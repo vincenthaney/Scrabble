@@ -248,6 +248,7 @@ export class GameDispatcherController {
         const gameConfig = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
         const startGameData = await this.activeGameService.beginMultiplayerGame(gameId, gameConfig);
 
+        console.log('----------------------------------handleAcceptRequest');
         this.socketService.addToRoom(startGameData.player2.id, gameId);
         this.socketService.emitToRoom(gameId, 'startGame', startGameData);
     }

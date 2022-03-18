@@ -1,10 +1,12 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
@@ -12,6 +14,7 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import { MessageStorageService } from '@app/services/message-storage/message-storage.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-communication-box',
@@ -30,6 +33,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     });
 
     loading: boolean = false;
+    gameId: string = 'default';
     componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
@@ -39,6 +43,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         private changeDetectorRef: ChangeDetectorRef,
         private messageStorageService: MessageStorageService,
         private gameViewEventManagerService: GameViewEventManagerService,
+        private gameDispatcherController: GameDispatcherController,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
@@ -49,8 +54,14 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
-
-        this.initializeMessages();
+        // eslint-disable-next-line dot-notation
+        this.gameDispatcherController['initializeGame$']
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((gameData: InitializeGameData | undefined) => {
+                console.log('dans le subscribe');
+                this.gameId = gameData?.startGameData.gameId ?? this.gameId;
+                this.initializeMessages();
+            });
     }
 
     ngAfterViewInit(): void {
@@ -95,10 +106,17 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     private initializeMessages(): void {
         const storedMessages = this.messageStorageService.getMessages();
-        if (storedMessages.length > 0) {
-            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+        const gameId = this.gameService.getGameId();
+        if (storedMessages.length > 0 && this.messages.length === 0) {
+            storedMessages.forEach((message: Message) => {
+                if (message.gameId === gameId) {
+                    message.content = marked.parseInline(message.content);
+                }
+            });
             this.messages = this.messages.concat(storedMessages);
-        } else this.onReceiveNewMessage({ ...INITIAL_MESSAGE, gameId: this.gameService.getGameId() });
+        }
+
+        if (this.messages.length < 1) this.onReceiveNewMessage({ ...INITIAL_MESSAGE, gameId: this.gameService.getGameId() });
     }
 
     private createVisualMessage(newMessage: Message): Message {
