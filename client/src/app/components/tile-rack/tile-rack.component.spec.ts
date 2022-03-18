@@ -14,12 +14,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer, Player } from '@app/classes/player';
-import { Tile, LetterValue } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -33,6 +33,9 @@ import { takeUntil } from 'rxjs/operators';
 import { RackTile, TileRackComponent } from './tile-rack.component';
 import SpyObj = jasmine.SpyObj;
 
+const DEFAULT_GAME_ID = 'gameId';
+const DEFAULT_PLAYER_ID = 'playerId';
+
 describe('TileRackComponent', () => {
     const EMPTY_TILE_RACK: RackTile[] = [];
     let gameServiceSpy: SpyObj<GameService>;
@@ -44,10 +47,19 @@ describe('TileRackComponent', () => {
     beforeEach(() => {
         gameServiceSpy = jasmine.createSpyObj(
             'GameService',
-            ['getLocalPlayer', 'isLocalPlayerPlaying', 'subscribeToUpdateTileRackEvent', 'getTotalNumberOfTilesLeft'],
+            [
+                'getLocalPlayer',
+                'isLocalPlayerPlaying',
+                'subscribeToUpdateTileRackEvent',
+                'getTotalNumberOfTilesLeft',
+                'getGameId',
+                'getLocalPlayerId',
+            ],
             ['playingTiles'],
         );
-        gameServiceSpy.getLocalPlayer.and.returnValue(new Player('id', 'name', []));
+        gameServiceSpy.getGameId.and.returnValue(DEFAULT_GAME_ID);
+        gameServiceSpy.getLocalPlayerId.and.returnValue(DEFAULT_PLAYER_ID);
+        gameServiceSpy.getLocalPlayer.and.returnValue(new Player(DEFAULT_PLAYER_ID, 'name', []));
         gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(100);
@@ -526,12 +538,22 @@ describe('TileRackComponent', () => {
     });
 
     describe('exchangeTiles', () => {
-        let sendExchangeActionSpy: jasmine.Spy;
+        const fakePayload = { fake: 'payload' };
+        const fakeData = { fake: 'data' };
+        let createPayloadSpy: jasmine.Spy;
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
         let unselectAllSpy: jasmine.Spy;
         let canExchangeTile: jasmine.Spy;
 
         beforeEach(() => {
-            sendExchangeActionSpy = spyOn(component['gameButtonActionService'], 'sendExchangeAction');
+            createPayloadSpy = spyOn(component['actionService'], 'createExchangeActionPayload').and.returnValue(
+                fakePayload as unknown as ExchangeActionPayload,
+            );
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
             unselectAllSpy = spyOn(component, 'unselectAll');
             canExchangeTile = spyOn(component, 'canExchangeTiles').and.returnValue(true);
             component.selectedTiles = [{ isUsed: false }, { isPlayed: false }] as RackTile[];
@@ -539,7 +561,9 @@ describe('TileRackComponent', () => {
 
         it('should send exchange action', () => {
             component.exchangeTiles();
-            expect(sendExchangeActionSpy).toHaveBeenCalledOnceWith(component.selectedTiles);
+            expect(createPayloadSpy).toHaveBeenCalledWith(component.selectedTiles);
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.EXCHANGE, fakePayload);
+            expect(sendAction).toHaveBeenCalledOnceWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, fakeData);
         });
 
         it('should set all selectedTiles as played', () => {
@@ -556,7 +580,7 @@ describe('TileRackComponent', () => {
         it('should not send action if cannot exchange', () => {
             canExchangeTile.and.returnValue(false);
             component.exchangeTiles();
-            expect(sendExchangeActionSpy).not.toHaveBeenCalled();
+            expect(sendAction).not.toHaveBeenCalled();
         });
     });
 
@@ -572,10 +596,10 @@ describe('TileRackComponent', () => {
     });
 
     describe('handleUsedTiles', () => {
-        let payload: ActionPlacePayload;
+        let payload: PlaceActionPayload;
 
         beforeEach(() => {
-            payload = {} as ActionPlacePayload;
+            payload = {} as PlaceActionPayload;
             handleUsedTileSpy.and.callThrough();
         });
 

@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -26,8 +27,8 @@ import {
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
+import { ActionService } from '@app/services/action/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
 import { ReconnectionService } from '@app/services/reconnection/reconnection.service';
@@ -53,7 +54,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public surrenderDialog: MatDialog,
         private playerLeavesService: PlayerLeavesService,
         private gameViewEventManagerService: GameViewEventManagerService,
-        private gameButtonActionService: GameButtonActionService,
+        private actionService: ActionService,
     ) {
         this.mustDisconnectGameOnLeave = true;
         this.componentDestroyed$ = new Subject();
@@ -100,8 +101,22 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    createPassAction(): void {
-        this.gameButtonActionService.createPassAction();
+    passButtonClicked(): void {
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PASS, {}),
+        );
+    }
+
+    placeButtonClicked(): void {
+        const placePayload: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (!placePayload) return;
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PLACE, placePayload),
+        );
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]): void {
@@ -180,6 +195,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     isLocalPlayerTurn(): boolean {
         return this.gameService.isLocalPlayerPlaying();
+    }
+
+    canPass(): boolean {
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver;
+    }
+
+    canPlaceWord(): boolean {
+        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
     }
 
     private handlePlayerLeaves(): void {
