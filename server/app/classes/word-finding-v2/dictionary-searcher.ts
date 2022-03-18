@@ -94,7 +94,7 @@ export default class DictionarySearcher {
     }
 
     private isWordValid(word: string) {
-        return this.wordSizeIsWithinBounds(word) && this.nextDoesNotHaveLetter(word);
+        return this.wordSizeIsWithinBounds(word) && this.nextDoesNotHaveLetter(word) && this.hasAnyNewLetters(word);
     }
 
     private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
@@ -146,5 +146,9 @@ export default class DictionarySearcher {
 
     private wordSizeIsWithinBounds(word: string): boolean {
         return word.length >= this.boardPlacement.minSize && word.length <= this.boardPlacement.maxSize;
+    }
+
+    private hasAnyNewLetters(word: string): boolean {
+        return this.boardPlacement.letters.filter((letter) => letter.distance < word.length).length < word.length;
     }
 }
