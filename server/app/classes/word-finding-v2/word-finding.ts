@@ -17,6 +17,8 @@ import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case'
 import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
 
 export default class WordFinding {
+    private wordPlacements: ScoredWordPlacement[] = [];
+
     constructor(
         private board: Board,
         private tiles: Tile[],
@@ -26,7 +28,6 @@ export default class WordFinding {
     ) {}
 
     findWords(): ScoredWordPlacement[] {
-        const wordPlacements: ScoredWordPlacement[] = [];
         const playerLetters = this.convertTilesToLetters(this.tiles);
 
         for (const boardPlacement of this.boardPlacements()) {
@@ -36,14 +37,12 @@ export default class WordFinding {
                 const wordPlacement = this.getWordPlacement(wordResult, boardPlacement);
 
                 if (this.validateWordPlacement(wordPlacement)) {
-                    wordPlacements.push(wordPlacement);
-
-                    if (this.findCompleted(wordPlacements)) return wordPlacements;
+                    if (this.handleWordPlacement(wordPlacement)) return this.wordPlacements;
                 }
             }
         }
 
-        return wordPlacements;
+        return this.wordPlacements;
     }
 
     *boardPlacements(): Generator<BoardPlacement> {
@@ -74,6 +73,22 @@ export default class WordFinding {
 
     validateWordPlacement(wordPlacement: ScoredWordPlacement): boolean {
         return this.request.pointRange ? this.isWithinPointRange(wordPlacement.score, this.request.pointRange) : true;
+    }
+
+    handleWordPlacement(wordPlacement: ScoredWordPlacement): [endSearch: boolean] {
+        if (this.request.useCase === WordFindingUseCase.Hint) {
+            this.wordPlacements.push(wordPlacement);
+            if (this.wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS) return [true];
+        } else if (this.request.useCase === WordFindingUseCase.Beginner) {
+            if (this.request.pointRange && this.isWithinPointRange(wordPlacement.score, this.request.pointRange)) {
+                this.wordPlacements.push(wordPlacement);
+                return [true];
+            }
+        } else {
+            throw new Error('Not implemented');
+        }
+
+        return [false];
     }
 
     findCompleted(wordPlacements: ScoredWordPlacement[]): boolean {
