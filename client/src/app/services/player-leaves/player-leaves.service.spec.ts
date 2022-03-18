@@ -4,11 +4,13 @@
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DEFAULT_GAME_ID, DEFAULT_LEAVER } from '@app/constants/controller-constants';
+import { DEFAULT_LEAVER, DEFAULT_GAME_ID } from '@app/constants/controller-test-constants';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
 import { Subject } from 'rxjs';
 import { SocketService } from '..';
 import { PlayerLeavesService } from './player-leaves.service';
+
+
 
 describe('PlayerLeavesService', () => {
     let service: PlayerLeavesService;
