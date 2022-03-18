@@ -8,6 +8,7 @@ export const PASS_ACTION_THRESHOLD = 0.1;
 export const EXCHANGE_ACTION_THRESHOLD = 0.2;
 export const LOW_SCORE_THRESHOLD = 0.4;
 export const MEDIUM_SCORE_THRESHOLD = 0.7;
+export const CONTENT_TYPE = 'Content-Type';
 export const LOW_SCORE_RANGE: PointRange = {
     minimum: 0,
     maximum: 6,
