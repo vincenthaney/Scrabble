@@ -10,6 +10,7 @@ export default class Dictionary extends DictionaryNode {
 
         this.title = dictionaryData.title;
         this.description = dictionaryData.description;
+        this.depth = -1;
 
         for (const word of dictionaryData.words) {
             this.addWord(word);
