@@ -6,7 +6,8 @@ import { Container } from 'typedi';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
 import BoardPlacementsExtractor from './board-placement-extractor';
-import DictionarySearcher, { DictionarySearchResult } from './dictionary-searcher';
+import DictionarySearcher from './dictionary-searcher';
+import { DictionarySearchResult } from './word-finding-types';
 
 const GRID: (LetterValue | ' ')[][] = [
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', ' ', ' ', ' ', ' '],
