@@ -16,10 +16,9 @@ export default class BoardPlacementsExtractor {
     }
 
     extractBoardPlacements(): BoardPlacement[] {
-        const orientations = [Orientation.Horizontal, Orientation.Vertical];
         let boardPlacements: BoardPlacement[] = [];
 
-        for (const orientation of orientations) {
+        for (const orientation of [Orientation.Horizontal, Orientation.Vertical]) {
             this.navigator.position = new Position(0, 0);
             this.navigator.orientation = orientation;
 
