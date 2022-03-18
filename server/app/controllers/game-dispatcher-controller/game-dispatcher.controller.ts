@@ -4,7 +4,6 @@ import { GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
@@ -23,6 +22,7 @@ import { IS_ID_VIRTUAL_PLAYER } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { validateName } from '@app/utils/validate-name';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -35,6 +35,7 @@ export class GameDispatcherController {
         private gameDispatcherService: GameDispatcherService,
         private socketService: SocketService,
         private activeGameService: ActiveGameService,
+        private virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
         this.activeGameService.playerLeftEvent.on(
@@ -240,10 +241,10 @@ export class GameDispatcherController {
             startGameData.player2 = testP1;
             this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
             if (IS_ID_VIRTUAL_PLAYER(startGameData.round.playerData.id)) {
-                const virtualPlayer = this.activeGameService
-                    .getGame(gameId, startGameData.round.playerData.id)
-                    .getPlayer(startGameData.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
-                virtualPlayer.playTurn();
+                this.virtualPlayerService.triggerVirtualPlayerTurn(
+                    startGameData,
+                    this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
+                );
             }
         }
         return gameId;

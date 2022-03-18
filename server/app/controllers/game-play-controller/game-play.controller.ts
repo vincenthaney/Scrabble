@@ -3,13 +3,13 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { INVALID_WORD_TIMEOUT, IS_OPPONENT, IS_REQUESTING, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { IS_ID_VIRTUAL_PLAYER } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { Delay } from '@app/utils/delay';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -24,6 +24,7 @@ export class GamePlayController {
         private readonly gamePlayService: GamePlayService,
         private readonly socketService: SocketService,
         private readonly activeGameService: ActiveGameService,
+        private virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
     }
@@ -32,10 +33,7 @@ export class GamePlayController {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
         if (data.round) {
             if (IS_ID_VIRTUAL_PLAYER(data.round.playerData.id)) {
-                const virtualPlayer = this.activeGameService
-                    .getGame(gameId, data.round.playerData.id)
-                    .getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
-                virtualPlayer.playTurn();
+                this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
             }
         }
     }
@@ -46,7 +44,6 @@ export class GamePlayController {
         this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data = req.body;
-            console.log(data);
             try {
                 await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
