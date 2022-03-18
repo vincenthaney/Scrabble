@@ -27,7 +27,7 @@ export interface BoardPlacement {
 
 export interface StackItem {
     node: DictionaryNode;
-    playerTiles: string[];
+    playerLetters: string[];
 }
 
 export interface SearcherPerpendicularLetters {
