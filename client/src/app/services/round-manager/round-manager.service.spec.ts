@@ -221,7 +221,7 @@ describe('RoundManagerService', () => {
         expect(service.maxRoundTime).toEqual(0);
     });
 
-    fdescribe('resetTimerData', () => {
+    describe('resetTimerData', () => {
         let clearTimeoutSpy: jasmine.Spy;
         let completeSpy: jasmine.Spy;
         let endRoundSpy: jasmine.Spy;
