@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-expressions */
@@ -10,16 +11,16 @@ import { getDictionaryTestService } from '@app/services/dictionary-service/dicti
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Container } from 'typedi';
 import { Orientation, Position } from '@app/classes/board';
-import { BoardPlacement, PerpendicularWord, StackItem } from './word-finding-types';
+import { BoardPlacement, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
 import { SinonStub, stub } from 'sinon';
-import { NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
-import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
+import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 
-describe.only('DictionarySearcher', () => {
+describe('DictionarySearcher', () => {
     let searcher: DictionarySearcher;
     let node: DictionaryNode;
     let playerLetters: LetterValue[];
@@ -285,6 +286,12 @@ describe.only('DictionarySearcher', () => {
             expect(unshiftStub.callCount).to.equal(lettersToUse.length);
         });
 
+        it('should not call unshift if getNode returns undefined', () => {
+            getNodeStub.returns(undefined);
+            searcher['addChildrenToStack'](node, letters);
+            expect(unshiftStub.called).to.be.false;
+        });
+
         it('should add every node to stack', () => {
             const n = 3;
             const nodes: DictionaryNode[] = [];
@@ -322,6 +329,16 @@ describe.only('DictionarySearcher', () => {
             searcher['addChildrenToStack'](node, letters);
 
             expect(searcher['stack'][0].playerLetters).to.deep.equal(letters);
+        });
+
+        it('should not continue if depth exceeded max size', () => {
+            const max = 5;
+            getDepthStub.returns(max + 1);
+            searcher['boardPlacement'].maxSize = max;
+
+            searcher['addChildrenToStack'](node, letters);
+
+            expect(getSearchLettersForNextNodeStub.called).to.be.false;
         });
     });
 
@@ -385,6 +402,177 @@ describe.only('DictionarySearcher', () => {
                 const [, result] = searcher['getSearchLettersForNextNode'](0, letters);
 
                 expect(result).to.equal(removeFromLetters);
+            });
+            index++;
+        }
+
+        it('should return array with letters if no lock and no wild card', () => {
+            const letters = ['a', 'b', 'c'];
+
+            stub(searcher['letters'], 'get').returns(undefined);
+
+            const [result] = searcher['getSearchLettersForNextNode'](0, letters);
+
+            expect(result).to.have.length(letters.length);
+            for (const letter of letters) expect(result).to.include(letter);
+        });
+
+        it('should return array with every letters in alphabet if wildcard', () => {
+            const letters = ['a', 'b', 'c', '*'];
+
+            stub(searcher['letters'], 'get').returns(undefined);
+
+            const [result] = searcher['getSearchLettersForNextNode'](0, letters);
+
+            expect(result).to.have.length(ALPHABET.length + 1);
+            for (const letter of ALPHABET) expect(result).to.include(letter);
+        });
+
+        it('should return lock letter if it exists', () => {
+            const letters = ['a', 'b', 'c'];
+            const lock = 'z';
+
+            stub(searcher['letters'], 'get').returns(lock);
+
+            const [result] = searcher['getSearchLettersForNextNode'](0, letters);
+
+            expect(result).to.have.length(1);
+            expect(result).to.include(lock);
+        });
+    });
+
+    describe('getLettersLeft', () => {
+        const tests: [letters: string[], playing: string, expected: string[]][] = [
+            [['a', 'b', 'c'], 'b', ['a', 'c']],
+            [['a', 'b', '*'], 'z', ['a', 'b']],
+            [['a', 'b', '*'], 'b', ['a', '*']],
+        ];
+
+        let index = 0;
+        for (const [letters, playing, expected] of tests) {
+            it(`should remove playing letter (${index})`, () => {
+                expect(searcher['getLettersLeft'](letters, playing)).to.deep.equal(expected);
+            });
+            index++;
+        }
+
+        it('should throw if letter not present', () => {
+            const letters = ['a', 'b', 'c'];
+            const playing = 'z';
+
+            expect(() => searcher['getLettersLeft'](letters, playing)).to.throw(ERROR_PLAYER_DOESNT_HAVE_TILE);
+        });
+    });
+
+    describe('getPerpendicularWords', () => {
+        const tests: [word: string, perpendicular: SearcherPerpendicularLetters[], expected: [word: string, distance: number][]][] = [
+            ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1]]],
+            ['abc', [{ before: 'xy', after: 'z', distance: 5 }], []],
+            [
+                'abc',
+                [
+                    { before: 'xy', after: 'z', distance: 1 },
+                    { before: '', after: 'lmn', distance: 2 },
+                ],
+                [
+                    ['xybz', 1],
+                    ['clmn', 2],
+                ],
+            ],
+        ];
+
+        let index = 0;
+        for (const [word, perpendicular, expected] of tests) {
+            it(`should extract perpendicular words (${index})`, () => {
+                searcher['perpendicularLetters'] = perpendicular;
+
+                expect(searcher['getPerpendicularWords'](word)).to.deep.equal(expected.map(([w, distance]) => ({ word: w, distance })));
+            });
+            index++;
+        }
+    });
+
+    describe('copyTiles', () => {
+        const tests: [input: LetterValue[], output: string[]][] = [
+            [
+                ['A', 'B', 'C'],
+                ['a', 'b', 'c'],
+            ],
+            [[], []],
+        ];
+
+        let index = 0;
+        for (const [input, output] of tests) {
+            it(`should copy array and set to lowercase (${index})`, () => {
+                const result = searcher['copyTiles'](input);
+
+                expect(result).to.not.equal(output);
+                expect(result).to.deep.equal(output);
+            });
+            index++;
+        }
+    });
+
+    describe('areValidPerpendicularWords', () => {
+        let wordExistsStub: SinonStub;
+        let words: PerpendicularWord[];
+
+        beforeEach(() => {
+            wordExistsStub = stub(searcher['node'], 'wordExists').returns(true);
+            words = [
+                { word: 'abc', distance: 0 },
+                { word: 'abcd', distance: 0 },
+                { word: 'abcde', distance: 0 },
+            ];
+        });
+
+        it('should return true if empty', () => {
+            expect(searcher['areValidPerpendicularWords']([])).to.be.true;
+        });
+
+        it('should return true if every word exists', () => {
+            expect(searcher['areValidPerpendicularWords'](words)).to.be.true;
+        });
+
+        for (let i = 0; i < 3; ++i) {
+            it(`should return false if any word does not exists (${i})`, () => {
+                wordExistsStub.onCall(i).returns(false);
+                expect(searcher['areValidPerpendicularWords'](words)).to.be.false;
+            });
+        }
+    });
+
+    describe('nextDoesNotHaveLetter', () => {
+        const tests: [word: string, position: number, expected: boolean][] = [
+            ['abc', 2, true],
+            ['abc', 3, false],
+            ['abc', 4, true],
+        ];
+
+        let index = 0;
+        for (const [word, position, expected] of tests) {
+            it(`should check (${index})`, () => {
+                searcher['letters'] = new Map([[position, 'z']]);
+                expect(searcher['nextDoesNotHaveLetter'](word)).to.equal(expected);
+            });
+            index++;
+        }
+    });
+
+    describe('wordSizeIsWithinBounds', () => {
+        const tests: [word: string, min: number, max: number, expected: boolean][] = [
+            ['abc', 0, 5, true],
+            ['abc', 3, 3, true],
+            ['abc', 0, 2, false],
+            ['abc', 4, 5, false],
+        ];
+
+        let index = 0;
+        for (const [word, min, max, expected] of tests) {
+            it(`should check if word is within bounds (${index})`, () => {
+                searcher['boardPlacement'].minSize = min;
+                searcher['boardPlacement'].maxSize = max;
+                expect(searcher['wordSizeIsWithinBounds'](word)).to.equal(expected);
             });
             index++;
         }
