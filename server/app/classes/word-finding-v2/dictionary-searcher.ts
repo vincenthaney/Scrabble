@@ -1,5 +1,6 @@
 import { DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
+import { NEXT_NODE_DOESNT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { BoardPlacement, DictionarySearchResult, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
 
@@ -13,7 +14,7 @@ export default class DictionarySearcher {
     constructor(node: DictionaryNode, playerLetters: LetterValue[], boardPlacement: BoardPlacement) {
         this.node = node;
         this.boardPlacement = boardPlacement;
-        this.stack = [{ node, playerTiles: this.copyTiles(playerLetters) }];
+        this.stack = [{ node, playerLetters: this.copyTiles(playerLetters) }];
         this.letters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
         this.perpendicularLetters = boardPlacement.perpendicularLetters.map((perpendicularLetter) => ({
             before: perpendicularLetter.before.join('').toLowerCase(),
@@ -29,9 +30,9 @@ export default class DictionarySearcher {
     next(): DictionarySearchResult {
         const stackItem = this.stack.pop();
 
-        if (!stackItem) throw new Error("Next node doesn't exists.");
+        if (!stackItem) throw new Error(NEXT_NODE_DOESNT_EXISTS);
 
-        this.addChildrenToStack(stackItem.node, stackItem.playerTiles);
+        this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
 
         return this.getWord(stackItem.node) ?? this.next();
     }
@@ -41,15 +42,11 @@ export default class DictionarySearcher {
 
         try {
             while (this.hasNext()) results.push(this.next());
-        } catch (e) {
-            // nothing
+        } finally {
+            // nothing to do
         }
 
         return results;
-    }
-
-    private copyTiles(letters: LetterValue[]): string[] {
-        return letters.map((letter) => letter.toLowerCase());
     }
 
     private getWord(node: DictionaryNode): DictionarySearchResult | undefined {
@@ -66,18 +63,18 @@ export default class DictionarySearcher {
         return undefined;
     }
 
-    private addChildrenToStack(node: DictionaryNode, tiles: string[]): void {
+    private addChildrenToStack(node: DictionaryNode, letters: string[]): void {
         if (node.getDepth() > this.boardPlacement.maxSize) return;
 
-        const [tilesToUse, removeFromTiles] = this.getSearchTilesForNextNode(node.getDepth(), tiles);
+        const [lettersToUse, removeFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), letters);
 
-        for (const tile of tilesToUse) {
-            const child = node.getNode(tile);
+        for (const letter of lettersToUse) {
+            const child = node.getNode(letter);
 
             if (child) {
                 this.stack.unshift({
                     node: child,
-                    playerTiles: removeFromTiles ? this.getTilesLeft(tiles, tile) : [...tiles],
+                    playerLetters: removeFromLetters ? this.getLettersLeft(letters, letter) : [...letters],
                 });
             }
         }
@@ -87,16 +84,16 @@ export default class DictionarySearcher {
         return this.wordSizeIsWithinBounds(word) && this.nextDoesNotHaveLetter(word);
     }
 
-    private getSearchTilesForNextNode(index: number, tiles: string[]): [tiles: string[], removeFromTiles: boolean] {
+    private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
         const lock = this.letters.get(index + 1);
 
         if (lock) return [[lock], false];
 
-        if (!tiles.includes(BLANK_TILE_LETTER_VALUE)) return [[...new Set(tiles)], true];
-        return [[...new Set([...tiles, ...ALPHABET])], true];
+        if (!letters.includes(BLANK_TILE_LETTER_VALUE)) return [[...new Set(letters)], true];
+        return [[...new Set([...letters, ...ALPHABET])], true];
     }
 
-    private getTilesLeft(tiles: string[], playing: string): string[] {
+    private getLettersLeft(tiles: string[], playing: string): string[] {
         let index = tiles.indexOf(playing);
         if (index === NOT_FOUND) index = tiles.indexOf(BLANK_TILE_LETTER_VALUE);
 
@@ -114,6 +111,10 @@ export default class DictionarySearcher {
         }
 
         return words;
+    }
+
+    private copyTiles(letters: LetterValue[]): string[] {
+        return letters.map((letter) => letter.toLowerCase());
     }
 
     private areValidPerpendicularWords(words: PerpendicularWord[]): boolean {
