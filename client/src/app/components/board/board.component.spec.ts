@@ -16,17 +16,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
+import { SquareComponent } from '@app/components/square/square.component';
 import { CANNOT_REMOVE_UNUSED_TILE } from '@app/constants/component-errors';
 import { BACKSPACE, ENTER, ESCAPE, KEYDOWN } from '@app/constants/components-constants';
-import { SquareComponent } from '@app/components/square/square.component';
-import { UNDEFINED_SQUARE } from '@app/constants/game';
+import { SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { BoardService } from '@app/services';
 import { Observable, Subject } from 'rxjs';
@@ -152,6 +152,14 @@ describe('BoardComponent', () => {
         const initSpy = spyOn<any>(component, 'initializeBoard');
         component.ngOnInit();
         expect(initSpy).not.toHaveBeenCalled();
+    });
+
+    it('Component should clearCursor when the round ends', () => {
+        const clearCursorSpy = spyOn<any>(component, 'clearCursor').and.callFake(() => {
+            return;
+        });
+        component['roundManagerService']['endRoundEvent$'].next();
+        expect(clearCursorSpy).toHaveBeenCalled();
     });
 
     boardSizesToTest.forEach((testCase) => {
@@ -350,7 +358,7 @@ describe('BoardComponent', () => {
     });
 
     describe('handlePlaceTiles', () => {
-        let payload: ActionPlacePayload;
+        let payload: PlaceActionPayload;
 
         beforeEach(() => {
             payload = {
@@ -415,6 +423,15 @@ describe('BoardComponent', () => {
             component['handlePlaceTiles'](payload);
 
             expect(component.squareGrid[0][1].square.tile).toEqual(null);
+        });
+
+        it('should reset notAppliedSquares values', () => {
+            const squareView: SquareView = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
+            squareView.square.tile = new Tile('A', 0);
+            component.notAppliedSquares = [squareView];
+            component['handlePlaceTiles'](undefined);
+
+            expect(squareView.square.tile).toBeNull();
         });
     });
 
@@ -508,6 +525,7 @@ describe('BoardComponent', () => {
         let previousSquare: SquareView;
         let nextEmptySpy: jasmine.Spy;
         let removeUsedTileSpy: jasmine.Spy;
+        let usedTilesSpy: jasmine.Spy;
 
         beforeEach(() => {
             selectedSquare = { square: { tile: {} } } as SquareView;
@@ -518,6 +536,7 @@ describe('BoardComponent', () => {
 
             nextEmptySpy = spyOn(component['navigator'], 'nextEmpty').and.returnValue(previousSquare);
             removeUsedTileSpy = spyOn<any>(component, 'removeUsedTile');
+            usedTilesSpy = spyOn<any>(component, 'areTilesUsed').and.returnValue(true);
         });
 
         it('should call nextEmpty with backward direction', () => {
@@ -582,24 +601,40 @@ describe('BoardComponent', () => {
 
             expect(nextEmptySpy).not.toHaveBeenCalled();
         });
+
+        it('should not call nextEmpty if no tiles are placed', () => {
+            usedTilesSpy.and.returnValue(false);
+            component['handleBackspace']();
+
+            expect(nextEmptySpy).not.toHaveBeenCalled();
+        });
     });
 
     describe('handleEnter', () => {
         let getPayloadSpy: jasmine.Spy;
-        let sendPlaceActionPayload: jasmine.Spy;
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
 
         beforeEach(() => {
             getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
-            sendPlaceActionPayload = spyOn(component['gameButtonActionService'], 'sendPlaceAction');
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
         });
 
-        it('should call sendPlaceAction', () => {
-            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+        it('should sendAction through ActionService', () => {
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
             getPayloadSpy.and.returnValue(payload);
 
             component['handleEnter']();
 
-            expect(sendPlaceActionPayload).toHaveBeenCalledOnceWith(payload);
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PLACE, payload);
+            expect(sendAction).toHaveBeenCalledOnceWith('gameId', 'playerId', fakeData);
         });
 
         it('should not call sendPlaceAction if no payload', () => {
@@ -607,7 +642,7 @@ describe('BoardComponent', () => {
 
             component['handleEnter']();
 
-            expect(sendPlaceActionPayload).not.toHaveBeenCalled();
+            expect(sendAction).not.toHaveBeenCalled();
         });
     });
 
@@ -825,7 +860,7 @@ describe('BoardComponent', () => {
         });
 
         it('should call emitToGameViewEvent if has usedTiles', () => {
-            const previousPayload: ActionPlacePayload = {
+            const previousPayload: PlaceActionPayload = {
                 orientation: Orientation.Horizontal,
                 startPosition: { row: 0, column: 0 },
                 tiles: [],
@@ -848,7 +883,7 @@ describe('BoardComponent', () => {
             component.navigator.orientation = Orientation.Vertical;
             component.navigator.setPosition(1, 2);
 
-            const expectedPayload: ActionPlacePayload = {
+            const expectedPayload: PlaceActionPayload = {
                 orientation: component.navigator.orientation,
                 startPosition: { row: component.navigator.row, column: component.navigator.column },
                 tiles: [tile],
@@ -916,6 +951,30 @@ describe('BoardComponent', () => {
             component['removeUsedTile'](tileToRemove);
 
             expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', undefined);
+        });
+    });
+
+    describe('areTilesUsed', () => {
+        it('areTilesUsed should return true if usedTiles has tiles', () => {
+            const placePayload: PlaceActionPayload = {
+                tiles: [new Tile('A', 1)],
+                startPosition: { row: 0, column: 0 },
+                orientation: Orientation.Horizontal,
+            };
+            spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue').and.returnValue(placePayload);
+            const result = component['areTilesUsed']();
+            expect(result).toBeTrue();
+        });
+
+        it('areTilesUsed should return false if usedTiles has no tiles', () => {
+            const emptyPlacePayload: PlaceActionPayload = {
+                tiles: [],
+                startPosition: { row: -1, column: -1 },
+                orientation: Orientation.Horizontal,
+            };
+            spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue').and.returnValue(emptyPlacePayload);
+            const result = component['areTilesUsed']();
+            expect(result).toBeFalse();
         });
     });
 });

@@ -4,7 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
-import { DEFAULT_GAME_ID, DEFAULT_OPPONENT_NAME } from '@app/constants/controller-constants';
+import { DEFAULT_GAME_ID, DEFAULT_OPPONENT_NAME } from '@app/constants/controller-test-constants';
 import { GameService, SocketService } from '@app/services';
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';

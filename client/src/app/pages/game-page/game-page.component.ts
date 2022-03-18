@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -25,12 +26,12 @@ import {
     SQUARE_TILE_MAX_FONT_SIZE,
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
+import { ActionService } from '@app/services/action/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameButtonActionService } from '@app/services/game-button-action/game-button-action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import { ReconnectionService } from '@app/services/reconnection/reconnection.service';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -49,11 +50,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         public gameService: GameService,
         private focusableComponentService: FocusableComponentsService,
-        private gameDispatcher: GameDispatcherController,
+        private readonly reconnectionService: ReconnectionService,
         public surrenderDialog: MatDialog,
         private playerLeavesService: PlayerLeavesService,
         private gameViewEventManagerService: GameViewEventManagerService,
-        private gameButtonActionService: GameButtonActionService,
+        private actionService: ActionService,
     ) {
         this.mustDisconnectGameOnLeave = true;
         this.componentDestroyed$ = new Subject();
@@ -85,23 +86,37 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
         if (this.mustDisconnectGameOnLeave) {
-            this.gameService.disconnectGame();
+            this.reconnectionService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
 
     ngOnInit(): void {
-        this.gameDispatcher.configureSocket();
+        this.reconnectionService.initializeControllerSockets();
 
         this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
         if (!this.gameService.getGameId()) {
-            this.gameService.reconnectGame();
+            this.reconnectionService.reconnectGame();
         }
     }
 
-    createPassAction(): void {
-        this.gameButtonActionService.createPassAction();
+    passButtonClicked(): void {
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PASS, {}),
+        );
+    }
+
+    placeButtonClicked(): void {
+        const placePayload: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (!placePayload) return;
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PLACE, placePayload),
+        );
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]): void {
@@ -180,6 +195,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     isLocalPlayerTurn(): boolean {
         return this.gameService.isLocalPlayerPlaying();
+    }
+
+    canPass(): boolean {
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver;
+    }
+
+    canPlaceWord(): boolean {
+        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
     }
 
     private handlePlayerLeaves(): void {
