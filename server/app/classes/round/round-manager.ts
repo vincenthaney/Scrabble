@@ -51,7 +51,6 @@ export default class RoundManager {
         if (this.currentRound !== undefined) {
             this.saveCompletedRound(this.currentRound, actionPlayed);
         }
-
         return this.beginRound();
     }
 
@@ -59,7 +58,6 @@ export default class RoundManager {
         const player = this.getNextPlayer();
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
-
         return (this.currentRound = {
             player,
             startTime: now,

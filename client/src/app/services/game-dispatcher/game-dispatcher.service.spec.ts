@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
-import { LobbyData, LobbyInfo } from '@app/classes/communication';
+import { LobbyInfo } from '@app/classes/communication';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -16,16 +16,12 @@ import { GameDispatcherService, SocketService } from '@app/services/';
 const BASE_GAME_ID = 'baseGameId';
 const TEST_PLAYER_ID = 'playerId';
 const TEST_PLAYER_NAME = 'playerName';
-
-const TEST_LOBBY_DATA: LobbyData = {
-    lobbyId: BASE_GAME_ID,
-    hostName: '',
+const TEST_LOBBY_INFO = {
+    lobbyId: '',
+    playerName: '',
     gameType: GameType.Classic,
     maxRoundTime: 0,
     dictionary: '',
-};
-const TEST_LOBBY_INFO: LobbyInfo = {
-    ...TEST_LOBBY_DATA,
     canJoin: true,
 };
 const TEST_LOBBIES = [TEST_LOBBY_INFO];
@@ -49,7 +45,6 @@ const TEST_FORM: FormGroup = new FormGroup(TEST_FORM_CONTENT);
 TEST_FORM.setValue(TEST_GAME_PARAMETERS);
 
 describe('GameDispatcherService', () => {
-    let getCurrentLobbyIdSpy: jasmine.Spy;
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
 
@@ -60,7 +55,7 @@ describe('GameDispatcherService', () => {
         });
         service = TestBed.inject(GameDispatcherService);
 
-        getCurrentLobbyIdSpy = spyOn(service, 'getCurrentLobbyId').and.returnValue(BASE_GAME_ID);
+        service.gameId = BASE_GAME_ID;
         gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
     });
 
@@ -70,9 +65,9 @@ describe('GameDispatcherService', () => {
 
     describe('Subscriptions', () => {
         it('should set gameId on createGameEvent', () => {
-            getCurrentLobbyIdSpy.and.callThrough();
-            service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
-            expect(service.getCurrentLobbyId()).toEqual(TEST_LOBBY_DATA.lobbyId);
+            service.gameId = '';
+            service['gameDispatcherController']['createGameEvent'].next(BASE_GAME_ID);
+            expect(service.gameId).toEqual(BASE_GAME_ID);
         });
 
         it('should call handleJoinRequest on joinRequestEvent', () => {
@@ -113,22 +108,6 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    describe('getCurrentLobbyId', () => {
-        beforeEach(() => {
-            getCurrentLobbyIdSpy.and.callThrough();
-        });
-
-        it('should return current lobby id if current lobby is defined', () => {
-            service.currentLobby = TEST_LOBBY_INFO;
-            expect(service.getCurrentLobbyId()).toEqual(TEST_LOBBY_INFO.lobbyId);
-        });
-
-        it('should return empty string if current lobby is undefined', () => {
-            service.currentLobby = undefined;
-            expect(service.getCurrentLobbyId()).toEqual('');
-        });
-    });
-
     describe('ngOnDestroy', () => {
         it('should call next', () => {
             const spy = spyOn<any>(service['serviceDestroyed$'], 'next');
@@ -148,12 +127,12 @@ describe('GameDispatcherService', () => {
     it('resetData should set right attributes', () => {
         service.currentLobby = TEST_LOBBY_INFO;
         service.currentName = 'default name';
-        getCurrentLobbyIdSpy.and.callThrough();
+        service.gameId = 'default game id';
 
         service.resetServiceData();
         expect(service.currentLobby).toBeUndefined();
         expect(service.currentName).toEqual('');
-        expect(service.getCurrentLobbyId()).toEqual('');
+        expect(service.gameId).toEqual('');
     });
 
     describe('handleJoinLobby', () => {
@@ -172,12 +151,12 @@ describe('GameDispatcherService', () => {
         it('handleJoinLobby should set right attributes', () => {
             service.currentLobby = undefined;
             service.currentName = '';
-            getCurrentLobbyIdSpy.and.callThrough();
+            service.gameId = '';
 
             service.handleJoinLobby(TEST_LOBBY_INFO, TEST_PLAYER_NAME);
             expect(service.currentLobby).toBeTruthy();
             expect(service.currentName).toEqual(TEST_PLAYER_NAME);
-            expect(service.getCurrentLobbyId()).toEqual(TEST_LOBBY_INFO.lobbyId);
+            expect(service.gameId).toEqual(TEST_LOBBY_INFO.lobbyId);
         });
     });
 
@@ -248,13 +227,13 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call handleCancelGame if gameId is defined', () => {
-            getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
+            service.gameId = BASE_GAME_ID;
             service.handleCancelGame();
             expect(cancelGameSpy).toHaveBeenCalledWith(BASE_GAME_ID);
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            getCurrentLobbyIdSpy.and.returnValue('');
+            service.gameId = '';
             service.handleCancelGame();
             expect(cancelGameSpy).not.toHaveBeenCalled();
         });
@@ -277,13 +256,13 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call handleCancelGame if gameId is defined', () => {
-            getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
+            service.gameId = BASE_GAME_ID;
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            getCurrentLobbyIdSpy.and.returnValue('');
+            service.gameId = '';
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).not.toHaveBeenCalled();
         });
@@ -301,13 +280,13 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call handleCancelGame if gameId is defined', () => {
-            getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
+            service.gameId = BASE_GAME_ID;
             service.handleRejection(TEST_PLAYER_NAME);
             expect(rejectionSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
         });
 
-        it('should not call handleCancelGame if currentLobbyId is undefined', () => {
-            getCurrentLobbyIdSpy.and.returnValue('');
+        it('should not call handleCancelGame if gameId is undefined', () => {
+            service.gameId = '';
             service.handleRejection(TEST_PLAYER_NAME);
             expect(rejectionSpy).not.toHaveBeenCalled();
         });

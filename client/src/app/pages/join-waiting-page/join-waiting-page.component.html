@@ -5,7 +5,7 @@
         <div id="cell" class="align-left">Votre nom:</div>
         <div id="cell" class="align-right">{{ currentName }}</div>
         <div id="cell" class="align-left">Votre adversaire:</div>
-        <div id="cell" class="align-right">{{ currentLobby.hostName }}</div>
+        <div id="cell" class="align-right">{{ currentLobby.playerName }}</div>
         <div id="cell" class="align-left">Type de partie:</div>
         <div id="cell" class="align-right">{{ currentLobby.gameType }}</div>
         <div id="cell" class="align-left">Temps par tour:</div>
@@ -14,4 +14,5 @@
         <div id="cell" class="align-right">{{ currentLobby.dictionary }}</div>
     </div>
     <button id="cancel-button" mat-flat-button color="primary" [routerLink]="'/lobby'">Annuler</button>
+
 </div>

@@ -145,6 +145,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     updateLobbyAttributes(lobby: LobbyInfo): void {
         const gameType = this.filterFormGroup.get('gameType')?.value;
         lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
-        lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.hostName;
+        lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
     }
 }

@@ -18,7 +18,6 @@ class TestClass extends AbstractVirtualPlayer {
     }
 }
 
-const gameId = 'testGameId';
 const playerId = 'testPlayerId';
 const playerName = 'ElScrabblo';
 
@@ -26,7 +25,7 @@ describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
 
     beforeEach(async () => {
-        abstractPlayer = new TestClass(gameId, playerId, playerName);
+        abstractPlayer = new TestClass(playerId, playerName);
     });
 
     afterEach(() => {
