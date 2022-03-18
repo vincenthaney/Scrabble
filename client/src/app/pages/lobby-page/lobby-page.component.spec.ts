@@ -112,9 +112,9 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(() => {
         component.lobbies = [
-            { lobbyId: '1', hostName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
-            { lobbyId: '2', hostName: 'Name2', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: true },
-            { lobbyId: '3', hostName: 'Name3', gameType: GameType.LOG2990, dictionary: 'default', maxRoundTime: 90, canJoin: false },
+            { lobbyId: '1', playerName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
+            { lobbyId: '2', playerName: 'Name2', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: true },
+            { lobbyId: '3', playerName: 'Name3', gameType: GameType.LOG2990, dictionary: 'default', maxRoundTime: 90, canJoin: false },
         ];
 
         component.nameField = new NameFieldComponent();
@@ -201,7 +201,7 @@ describe('LobbyPageComponent', () => {
             component.lobbies = [
                 {
                     lobbyId: 'id',
-                    hostName: 'name',
+                    playerName: 'name',
                     gameType: GameType.Classic,
                     maxRoundTime: 60,
                     dictionary: 'dictionary',
@@ -288,7 +288,7 @@ describe('LobbyPageComponent', () => {
         beforeEach(() => {
             lobby = {
                 lobbyId: '1',
-                hostName: 'player',
+                playerName: 'player',
                 gameType: GameType.Classic,
                 maxRoundTime: 0,
                 dictionary: 'default',
@@ -348,8 +348,8 @@ describe('LobbyPageComponent', () => {
     });
 
     it('updateLobbies should be called when lobbiesUpdateEvent is emittted', () => {
-        const emitLobbies: LobbyInfo[] = [
-            { lobbyId: '1', hostName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
+        const emitLobbies = [
+            { lobbyId: '1', playerName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
         ];
         const spySetOpponent = spyOn(component, 'updateLobbies').and.callFake(() => {
             return;

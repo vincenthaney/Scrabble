@@ -24,11 +24,11 @@ export interface GameConfig {
     dictionary: string;
 }
 
-export interface MultiplayerGameConfig extends GameConfig {
+export interface ReadyGameConfig extends GameConfig {
     player2: Player;
 }
 
-export interface StartMultiplayerGameData extends MultiplayerGameConfig {
+export interface StartGameData extends ReadyGameConfig {
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];

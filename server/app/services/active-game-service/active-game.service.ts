@@ -1,5 +1,5 @@
 import Game from '@app/classes/game/game';
-import { MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
+import { ReadyGameConfig, StartGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http.exception';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board/board.service';
@@ -18,8 +18,8 @@ export class ActiveGameService {
         Game.injectServices(this.boardService);
     }
 
-    async beginMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<StartMultiplayerGameData> {
-        const game = await Game.createMultiplayerGame(id, config);
+    async beginGame(id: string, config: ReadyGameConfig): Promise<StartGameData> {
+        const game = await Game.createGame(id, config);
         this.activeGames.push(game);
         return game.createStartGameData();
     }

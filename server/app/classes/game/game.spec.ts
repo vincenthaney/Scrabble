@@ -20,8 +20,8 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { Container } from 'typedi';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
-import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game-type';
+import { ReadyGameConfig, StartGameData } from './game-config';
 
 const expect = chai.expect;
 
@@ -34,9 +34,9 @@ const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
 const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
-const DEFAULT_VIRTUAL_PLAYER = new BeginnerVirtualPlayer('game', 'virtualplayerid', 'virtualplayername');
+const DEFAULT_VIRTUAL_PLAYER = new BeginnerVirtualPlayer('virtualplayerid', 'virtualplayername');
 
-const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
+const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
@@ -79,7 +79,7 @@ describe('Game', () => {
         let game: Game;
 
         beforeEach(async () => {
-            game = await Game.createMultiplayerGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            game = await Game.createGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
         });
 
         it('should create', () => {
@@ -106,18 +106,12 @@ describe('Game', () => {
         });
     });
 
-    describe('createSoloGame', () => {
-        it('is not implemented', () => {
-            return expect(Game.createSoloGame()).to.be.rejectedWith('Solo mode not implemented');
-        });
-    });
-
     describe('General', () => {
         let game: Game;
         let tileReserveStub: SinonStubbedInstance<TileReserve>;
 
         beforeEach(async () => {
-            game = await Game.createMultiplayerGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            game = await Game.createGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
             tileReserveStub = createStubInstance(TileReserve);
             game['tileReserve'] = tileReserveStub as unknown as TileReserve;
         });
@@ -538,7 +532,7 @@ describe('Game', () => {
 
         it('should return the expected StartMultiplayerGameData', () => {
             const result = game['createStartGameData']();
-            const expectedMultiplayerGameData: StartMultiplayerGameData = {
+            const expectedMultiplayerGameData: StartGameData = {
                 player1: game.player1,
                 player2: game.player2,
                 gameType: game.gameType,

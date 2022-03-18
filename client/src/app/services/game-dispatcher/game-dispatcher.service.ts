@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LobbyData, LobbyInfo } from '@app/classes/communication/';
+import { LobbyInfo } from '@app/classes/communication/';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -14,20 +14,23 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameDispatcherService implements OnDestroy {
+    gameId: string = '';
     currentName: string = '';
     currentLobby: LobbyInfo | undefined = undefined;
 
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
+    private receivedGameIdEvent: Subject<void> = new Subject();
     private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
     private joinerRejectedEvent: Subject<string> = new Subject();
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
-        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
-            this.currentLobby = lobbyData;
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (gameId: string) => {
+            this.gameId = gameId;
+            this.receivedGameIdEvent.next();
         });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
@@ -45,11 +48,6 @@ export default class GameDispatcherService implements OnDestroy {
         );
     }
 
-    getCurrentLobbyId(): string {
-        if (!this.currentLobby) return '';
-        return this.currentLobby.lobbyId;
-    }
-
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
@@ -58,12 +56,14 @@ export default class GameDispatcherService implements OnDestroy {
     resetServiceData(): void {
         this.currentLobby = undefined;
         this.currentName = '';
+        this.gameId = '';
     }
 
     handleJoinLobby(lobby: LobbyInfo, playerName: string): void {
         this.currentLobby = lobby;
         this.currentName = playerName;
-        this.gameDispatcherController.handleLobbyJoinRequest(this.getCurrentLobbyId(), playerName);
+        this.gameId = lobby.lobbyId;
+        this.gameDispatcherController.handleLobbyJoinRequest(this.gameId, playerName);
     }
 
     handleLobbyListRequest(): void {
@@ -88,16 +88,16 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     handleCancelGame(): void {
-        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleCancelGame(this.getCurrentLobbyId());
+        if (this.gameId) this.gameDispatcherController.handleCancelGame(this.gameId);
         this.resetServiceData();
     }
 
     handleConfirmation(opponentName: string): void {
-        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.getCurrentLobbyId());
+        if (this.gameId) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.gameId);
     }
 
     handleRejection(opponentName: string): void {
-        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.getCurrentLobbyId());
+        if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
     }
 
     handleJoinRequest(opponentName: string): void {
@@ -141,5 +141,9 @@ export default class GameDispatcherService implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToReceivedGameIdEvent(componentDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.receivedGameIdEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 }
