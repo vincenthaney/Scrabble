@@ -51,6 +51,14 @@ describe('DictionaryNode', () => {
         });
     });
 
+    describe('getDepth', () => {
+        it('should return dwpth', () => {
+            const expected = 4;
+            node['depth'] = expected;
+            expect(node.getDepth()).to.equal(expected);
+        });
+    });
+
     describe('getNode', () => {
         const word = 'abcdefg';
 
