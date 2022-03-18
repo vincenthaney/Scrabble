@@ -4,6 +4,7 @@ import { GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
@@ -18,6 +19,7 @@ import {
     VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { IS_REQUESTING, SYSTEM_ID } from '@app/constants/game';
+import { IS_ID_VIRTUAL_PLAYER } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -236,8 +238,13 @@ export class GameDispatcherController {
             testP1.tiles = startGameData.player2.tiles;
             testP1.isConnected = startGameData.player2.isConnected;
             startGameData.player2 = testP1;
-
             this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
+            if (IS_ID_VIRTUAL_PLAYER(startGameData.round.playerData.id)) {
+                const virtualPlayer = this.activeGameService
+                    .getGame(gameId, startGameData.round.playerData.id)
+                    .getPlayer(startGameData.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
+                virtualPlayer.playTurn();
+            }
         }
         return gameId;
     }
