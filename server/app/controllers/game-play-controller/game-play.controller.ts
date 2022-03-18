@@ -44,14 +44,22 @@ export class GamePlayController {
         this.router = Router();
 
         this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
+            console.log('IS THIS HERE?');
             const { gameId, playerId } = req.params;
-            const data: ActionData = req.body;
+            console.log(gameId);
+            console.log(playerId);
+            console.log(req.body);
 
             try {
+                console.log('TRY');
+                console.log(playerId.includes('virtual-player'));
+                const data = req.body;
+                console.log(data);
                 await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
+                console.log('MUCHO SAD');
             }
         });
 
