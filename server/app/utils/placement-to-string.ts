@@ -37,6 +37,6 @@ export class PlacementToString {
     }
 
     private static tileToLetterConversion(tile: Tile): string {
-        return tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
+        return tile.isBlank ? (tile.playedLetter ? tile.playedLetter.toUpperCase() : tile.letter.toUpperCase()) : tile.letter.toLowerCase();
     }
 }
