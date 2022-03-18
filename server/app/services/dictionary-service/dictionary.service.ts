@@ -23,6 +23,10 @@ export default class DictionaryService {
         throw new Error(INVALID_DICTIONARY_NAME);
     }
 
+    getDefaultDictionary(): Dictionary {
+        return this.getDictionary(this.getDictionaryTitles()[0]);
+    }
+
     protected fetchDictionaryWords(path: string): Dictionary {
         const buffer = readFileSync(join(__dirname, path));
         const data: DictionaryData = JSON.parse(buffer.toString());
