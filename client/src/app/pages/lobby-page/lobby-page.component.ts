@@ -24,24 +24,28 @@ import { Subject, Subscription } from 'rxjs';
 export class LobbyPageComponent implements OnInit, OnDestroy {
     @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
 
+    filterFormGroup: FormGroup;
+    numberOfLobbiesMeetingFilter: number;
     nameValid: boolean;
+    lobbies: LobbyInfo[];
+
     lobbiesUpdateSubscription: Subscription;
     lobbyFullSubscription: Subscription;
     lobbyCanceledSubscription: Subscription;
-    componentDestroyed$: Subject<boolean> = new Subject();
-    lobbies: LobbyInfo[];
-
-    filterFormGroup: FormGroup = new FormGroup({
-        gameType: new FormControl('all'),
-    });
-    numberOfLobbiesMeetingFilter: number = 0;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         private ref: ChangeDetectorRef,
         public gameDispatcherService: GameDispatcherService,
         public dialog: MatDialog,
         private snackBar: MatSnackBar,
-    ) {}
+    ) {
+        this.componentDestroyed$ = new Subject();
+        this.filterFormGroup = new FormGroup({
+            gameType: new FormControl('all'),
+        });
+        this.numberOfLobbiesMeetingFilter = 0;
+    }
 
     ngOnInit(): void {
         this.gameDispatcherService.subscribeToLobbiesUpdateEvent(this.componentDestroyed$, (lobbies) => this.updateLobbies(lobbies));
@@ -141,6 +145,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     updateLobbyAttributes(lobby: LobbyInfo): void {
         const gameType = this.filterFormGroup.get('gameType')?.value;
         lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
-        lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.playerName;
+        lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.hostName;
     }
 }

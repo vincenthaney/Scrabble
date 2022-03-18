@@ -3,8 +3,9 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
-import { MAX_TILE_PER_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { MAX_TILES_PER_PLAYER, PLAYER_1_INDEX, PLAYER_2_INDEX, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import { Observable, Subject, Subscription, timer as timerCreationFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -15,45 +16,36 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./information-box.component.scss'],
 })
 export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit {
+    readonly maxTilesPerPlayer;
     isPlayer1Active: boolean;
     isPlayer2Active: boolean;
     isPlayer1: boolean;
     localPlayerIcon: IconName;
-
-    readonly maxTilesPerPlayer = MAX_TILE_PER_PLAYER;
-
     timer: Timer;
+
     timerSource: Observable<number>;
     timerSubscription: Subscription;
-    endRoundSubscription: Subscription;
-    rerenderSubscription: Subscription;
-    private ngUnsubscribe: Subject<void>;
+    private componentDestroyed$: Subject<boolean>;
 
-    constructor(private roundManager: RoundManagerService, private gameService: GameService) {}
+    constructor(
+        private roundManager: RoundManagerService,
+        private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {
+        this.maxTilesPerPlayer = MAX_TILES_PER_PLAYER;
+    }
 
     ngOnInit(): void {
         this.timer = new Timer(0, 0);
-        this.ngUnsubscribe = new Subject();
-        this.rerenderSubscription = this.gameService.rerenderEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+        this.componentDestroyed$ = new Subject();
+        this.gameViewEventManagerService.subscribeToGameViewEvent('reRender', this.componentDestroyed$, () => {
             this.ngOnDestroy();
             this.ngOnInit();
             this.ngAfterViewInit();
         });
 
-        if (this.gameService.gameIsSetUp) {
-            if (!this.roundManager.timer) return;
-
-            if (this.roundManager.timer)
-                this.roundManager.timer.pipe(takeUntil(this.ngUnsubscribe)).subscribe(([timer, activePlayer]) => {
-                    this.startTimer(timer);
-                    this.updateActivePlayerBorder(activePlayer);
-                });
-            if (!this.roundManager.endRoundEvent) return;
-            this.endRoundSubscription = this.roundManager.endRoundEvent.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.endRound());
-
-            this.isPlayer1 = this.checkIfIsPlayer1();
-            this.localPlayerIcon = this.getLocalPlayerIcon();
-        }
+        if (!this.gameService.isGameSetUp) return;
+        this.setupGame();
     }
 
     ngAfterViewInit(): void {
@@ -61,17 +53,26 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     ngOnDestroy(): void {
-        this.ngUnsubscribe.next();
-        this.ngUnsubscribe.complete();
-        if (this.endRoundSubscription) this.endRoundSubscription.unsubscribe();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
+    }
 
-        if (this.timerSubscription) this.timerSubscription.unsubscribe();
+    setupGame(): void {
+        if (this.roundManager.timer) {
+            this.roundManager.timer.pipe(takeUntil(this.componentDestroyed$)).subscribe(([timer, activePlayer]) => {
+                this.startTimer(timer);
+                this.updateActivePlayerBorder(activePlayer);
+            });
+        }
+        this.roundManager.subscribeToEndRoundEvent(this.componentDestroyed$, () => this.endRound());
+        this.isPlayer1 = this.checkIfIsPlayer1();
+        this.localPlayerIcon = this.getLocalPlayerIcon();
     }
 
     startTimer(timer: Timer): void {
         this.timer = timer;
         this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
-        this.timerSubscription = this.timerSource.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => this.timer.decrement());
+        this.timerSubscription = this.timerSource.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.timer.decrement());
     }
 
     endRound(): void {
@@ -82,24 +83,25 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
+        const player1 = this.getPlayer1();
+        const player2 = this.getPlayer2();
         if (!activePlayer) {
             this.isPlayer1Active = false;
             this.isPlayer2Active = false;
-        } else if (activePlayer.id === this.gameService.player1.id) {
-            this.isPlayer1Active = true;
-            this.isPlayer2Active = false;
-        } else if (activePlayer.id === this.gameService.player2.id) {
-            this.isPlayer2Active = true;
-            this.isPlayer1Active = false;
+            return;
         }
+        this.isPlayer1Active = player1 && activePlayer.id === player1.id;
+        this.isPlayer2Active = player2 && activePlayer.id === player2.id;
     }
 
     getPlayer1(): AbstractPlayer {
-        return this.gameService.player1 ? this.gameService.player1 : new Player('', 'Player1', []);
+        const player1 = this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
+        return player1 ? player1 : new Player('', 'Player1', []);
     }
 
     getPlayer2(): AbstractPlayer {
-        return this.gameService.player2 ? this.gameService.player2 : new Player('', 'Player2', []);
+        const player2 = this.gameService.getPlayerByNumber(PLAYER_2_INDEX);
+        return player2 ? player2 : new Player('', 'Player2', []);
     }
 
     private createTimer(length: number): Observable<number> {
@@ -107,7 +109,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private checkIfIsPlayer1(): boolean {
-        return this.gameService.getLocalPlayer() === this.gameService.player1;
+        return this.gameService.getLocalPlayer() === this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
     }
 
     private getLocalPlayerIcon(): IconName {

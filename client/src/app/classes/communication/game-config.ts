@@ -29,6 +29,10 @@ export interface StartGameData extends GameConfig {
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];
-    tileReserveTotal: number;
     round: RoundData;
+}
+
+export interface InitializeGameData {
+    localPlayerId: string;
+    startGameData: StartGameData;
 }

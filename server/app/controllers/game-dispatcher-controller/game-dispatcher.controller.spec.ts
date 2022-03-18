@@ -25,6 +25,8 @@ import {
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
@@ -68,6 +70,7 @@ describe('GameDispatcherController', () => {
 
     beforeEach(() => {
         Container.reset();
+        Container.set(DictionaryService, getDictionaryTestService());
         controller = Container.get(GameDispatcherController);
         socketServiceStub = createStubInstance(SocketService);
         controller['socketService'] = socketServiceStub as unknown as SocketService;

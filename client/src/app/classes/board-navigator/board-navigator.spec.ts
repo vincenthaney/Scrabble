@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
@@ -161,6 +160,7 @@ describe('BoardNavigator', () => {
         });
 
         it('should return undefined when no next empty', () => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             navigator.setPosition(4, 4);
             expect(navigator.nextEmpty(Direction.Forward, false)).toBeUndefined();
         });

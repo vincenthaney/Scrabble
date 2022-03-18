@@ -1,10 +1,9 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { LobbyInfo, PlayerName } from '@app/classes/communication/';
-import { GameConfig, GameConfigData, StartGameData } from '@app/classes/communication/game-config';
-import GameService from '@app/services/game/game.service';
+import { LobbyData, LobbyInfo, PlayerName } from '@app/classes/communication/';
+import { GameConfig, GameConfigData, InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import SocketService from '@app/services/socket/socket.service';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -12,17 +11,18 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameDispatcherController implements OnDestroy {
-    private createGameEvent: Subject<string> = new Subject();
+    private createGameEvent: Subject<LobbyData> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
     private lobbyRequestValidEvent: Subject<void> = new Subject();
     private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
     private joinerRejectedEvent: Subject<string> = new Subject();
+    private initializeGame$: BehaviorSubject<InitializeGameData | undefined> = new BehaviorSubject<InitializeGameData | undefined>(undefined);
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(private http: HttpClient, public socketService: SocketService, private readonly gameService: GameService) {
+    constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();
     }
 
@@ -36,7 +36,7 @@ export class GameDispatcherController implements OnDestroy {
             this.joinRequestEvent.next(opponent.name);
         });
         this.socketService.on('startGame', (startGameData: StartGameData) => {
-            this.gameService.initializeGame(this.socketService.getId(), startGameData);
+            this.initializeGame$.next({ localPlayerId: this.socketService.getId(), startGameData });
         });
         this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
             this.lobbiesUpdateEvent.next(lobbies);
@@ -49,8 +49,8 @@ export class GameDispatcherController implements OnDestroy {
 
     handleGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
-        this.http.post<{ gameId: string }>(endpoint, gameConfig).subscribe((response) => {
-            this.createGameEvent.next(response.gameId);
+        this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig).subscribe((response) => {
+            this.createGameEvent.next(response.lobbyData);
         });
     }
 
@@ -96,7 +96,7 @@ export class GameDispatcherController implements OnDestroy {
         }
     }
 
-    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (gameId: string) => void): void {
+    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbyData: LobbyData) => void): void {
         this.createGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
@@ -122,5 +122,9 @@ export class GameDispatcherController implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(serviceDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToInitializeGame(serviceDestroyed$: Subject<boolean>, callback: (value: InitializeGameData | undefined) => void): void {
+        this.initializeGame$.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 }

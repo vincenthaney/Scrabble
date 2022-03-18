@@ -6,12 +6,13 @@ import { Container } from 'typedi';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
-    pointHistory = new Map<number, number>();
+    pointHistory: Map<number, number>;
 
     private wordFindingService: WordFindingService;
     private activeGameService: ActiveGameService;
     constructor(gameId: string, id: string, name: string) {
         super(id, name);
+        this.pointHistory = new Map<number, number>();
         this.gameId = gameId;
         this.wordFindingService = Container.get(WordFindingService);
         this.activeGameService = Container.get(ActiveGameService);

@@ -1,5 +1,5 @@
 import { MONGO_DATABASE_NAME, MONGO_DB_URL } from '@app/constants/services-constants/mongo-db.const';
-import { Db, MongoClient, Document, Collection } from 'mongodb';
+import { Collection, Db, Document, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
 @Service()
@@ -26,8 +26,13 @@ export default class DatabaseService {
         } catch (exception) {
             // Log the error but allow the server to not crash if it can't connect to the database
             // eslint-disable-next-line no-console
-            console.error(exception);
+            console.error('Unable to connect to the Mongo Database');
+            return null;
         }
+        // Log when the server is connected to the database
+        // eslint-disable-next-line no-console
+        console.log('Connected to the Mongo Database');
+
         return this.mongoClient;
     }
     async closeConnection(): Promise<void> {

@@ -4,20 +4,22 @@ import Direction from '@app/classes/board/direction';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import { WordPlacement } from '@app/classes/word-finding/word-placement';
+import { switchOrientation } from '@app/utils/switch-orientation';
 
 export class WordExtraction {
     constructor(private board: Board) {}
 
-    extract(tilesToPlace: Tile[], startPosition: Position, orientation: Orientation): [Square, Tile][][] {
-        const navigator = this.board.navigate(startPosition, orientation);
+    extract(wordPlacement: WordPlacement): [Square, Tile][][] {
+        const navigator = this.board.navigate(wordPlacement.startPosition, wordPlacement.orientation);
 
         if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
-        if (this.isWordWithinBounds(navigator, tilesToPlace)) throw new Error(POSITION_OUT_OF_BOARD);
+        if (this.isWordWithinBounds(navigator, wordPlacement.tilesToPlace)) throw new Error(POSITION_OUT_OF_BOARD);
 
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
 
-        for (let i = 0; i < tilesToPlace.length; ) {
+        for (let i = 0; i < wordPlacement.tilesToPlace.length; ) {
             if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
 
             if (navigator.verify(HAS_TILE)) {
@@ -26,12 +28,12 @@ export class WordExtraction {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 newWord.push([navigator.square, navigator.square.tile!]);
             } else {
-                newWord.push([navigator.square, tilesToPlace[i]]);
+                newWord.push([navigator.square, wordPlacement.tilesToPlace[i]]);
 
                 // Add the words created in the opposite Orientation of the move
-                const oppositeOrientation = orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+                const oppositeOrientation = switchOrientation(wordPlacement.orientation);
                 if (navigator.verifyNeighbors(oppositeOrientation, HAS_TILE)) {
-                    wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, tilesToPlace[i]));
+                    wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, wordPlacement.tilesToPlace[i]));
                 }
 
                 i++;
@@ -41,8 +43,8 @@ export class WordExtraction {
         }
         navigator.backward();
 
-        const beforeWord = this.extractWordInDirection(orientation, Direction.Backward, startPosition);
-        const afterWord = this.extractWordInDirection(orientation, Direction.Forward, navigator.position);
+        const beforeWord = this.extractWordInDirection(wordPlacement.orientation, Direction.Backward, wordPlacement.startPosition);
+        const afterWord = this.extractWordInDirection(wordPlacement.orientation, Direction.Forward, navigator.position);
         const word = [...beforeWord, ...newWord, ...afterWord];
 
         if (word.length > 1) wordsCreated.push(word);

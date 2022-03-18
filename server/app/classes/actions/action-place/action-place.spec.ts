@@ -13,6 +13,7 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile, TileReserve } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
@@ -95,6 +96,12 @@ const testEvaluatedPlacement = {
     score: TEST_SCORE,
 };
 
+const VALID_PLACEMENT: WordPlacement = {
+    tilesToPlace: VALID_TILES_TO_PLACE,
+    startPosition: DEFAULT_POSITION,
+    orientation: DEFAULT_ORIENTATION,
+};
+
 describe('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let tileReserveStub: SinonStubbedInstance<TileReserve>;
@@ -130,7 +137,7 @@ describe('ActionPlace', () => {
     });
 
     it('should create', () => {
-        const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+        const action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         expect(action).to.exist;
     });
 
@@ -162,7 +169,7 @@ describe('ActionPlace', () => {
             let wordsToStringSpy: unknown;
 
             beforeEach(() => {
-                action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+                action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
 
                 action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
@@ -283,7 +290,11 @@ describe('ActionPlace', () => {
                 game.player1.tiles = userTiles;
                 gameStub.getTilesFromReserve.returns(returnTiles);
 
-                action = new ActionPlace(game.player1, game, playTiles, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+                action = new ActionPlace(game.player1, game, {
+                    tilesToPlace: playTiles,
+                    startPosition: DEFAULT_POSITION,
+                    orientation: DEFAULT_ORIENTATION,
+                });
                 action.execute();
 
                 for (const tile of userTiles) {
@@ -298,7 +309,11 @@ describe('ActionPlace', () => {
 
     describe('updateBoard', () => {
         it('should return array with changed tiles', () => {
-            const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            const action = new ActionPlace(game.player1, game, {
+                tilesToPlace: VALID_TILES_TO_PLACE,
+                startPosition: DEFAULT_POSITION,
+                orientation: DEFAULT_ORIENTATION,
+            });
             const result = action.updateBoard(EXTRACT_RETURN);
 
             for (const changes of EXTRACT_RETURN) {
@@ -315,7 +330,7 @@ describe('ActionPlace', () => {
         });
 
         it('should return an empty array if all the square are already filled', () => {
-            const action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            const action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
             const copiedExtractReturn: [Square, Tile][][] = EXTRACT_RETURN.map((row) => row.map(([square, tile]) => [{ ...square }, { ...tile }]));
             copiedExtractReturn.forEach((row) => row.forEach(([square, tile]) => (square.tile = tile)));
             const result = action.updateBoard(EXTRACT_RETURN);
@@ -328,7 +343,11 @@ describe('ActionPlace', () => {
         let action: ActionPlace;
 
         beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            action = new ActionPlace(game.player1, game, {
+                tilesToPlace: VALID_TILES_TO_PLACE,
+                startPosition: DEFAULT_POSITION,
+                orientation: DEFAULT_ORIENTATION,
+            });
         });
 
         it('should return message', () => {
@@ -340,7 +359,7 @@ describe('ActionPlace', () => {
         let action: ActionPlace;
 
         beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         });
 
         it('should return OpponentMessage', () => {
@@ -352,7 +371,7 @@ describe('ActionPlace', () => {
         let action: ActionPlace;
 
         beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         });
 
         it('should return the correct number of tiles', () => {
@@ -364,7 +383,7 @@ describe('ActionPlace', () => {
         let action: ActionPlace;
 
         beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         });
 
         it('should call amountOfLettersInWords', () => {
@@ -389,7 +408,7 @@ describe('ActionPlace', () => {
         let action: ActionPlace;
 
         beforeEach(() => {
-            action = new ActionPlace(game.player1, game, VALID_TILES_TO_PLACE, DEFAULT_POSITION, DEFAULT_ORIENTATION);
+            action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         });
 
         it('should return true if it contains center square', () => {

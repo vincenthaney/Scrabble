@@ -15,7 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
-import { BACKSPACE, ESCAPE } from '@app/constants/components-constants';
+import { ARROW_LEFT, ARROW_RIGHT, BACKSPACE, ESCAPE } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
@@ -121,24 +121,26 @@ describe('GamePageComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameServiceMock = TestBed.inject(GameService);
+        component['mustDisconnectGameOnLeave'] = false;
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should call disconnectGame if there is a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => 'id');
-        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
-        component.ngOnDestroy();
-        expect(spyDiconnect).toHaveBeenCalled();
-    });
-
-    it('should not call disconnectGame if there no a gameId', () => {
-        spyOn(gameServiceMock, 'getGameId').and.callFake(() => null as unknown as string);
+    it('should call disconnectGame if player left with quit button or no active game dialog)', () => {
+        component.mustDisconnectGameOnLeave = false;
         const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
         component.ngOnDestroy();
         expect(spyDiconnect).not.toHaveBeenCalled();
+    });
+
+    it('should not call disconnectGame if player left abnormally during game', () => {
+        component.mustDisconnectGameOnLeave = true;
+        const spyDiconnect = spyOn(gameServiceMock, 'disconnectGame');
+        component.ngOnDestroy();
+        expect(spyDiconnect).toHaveBeenCalled();
+        component.mustDisconnectGameOnLeave = false;
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
@@ -149,70 +151,40 @@ describe('GamePageComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should call emitKeyboard on keyboardEvent', () => {
-        const event: KeyboardEvent = new KeyboardEvent('keypress', {
-            key: '.',
-            cancelable: true,
+    describe('keypress/keydown', () => {
+        const tests: [method: keyof GamePageComponent, key: string][] = [
+            ['handleKeyboardEvent', 'a'],
+            ['handleKeyboardEventEsc', ESCAPE],
+            ['handleKeyboardEventBackspace', BACKSPACE],
+            ['handleKeyboardEventArrowLeft', ARROW_LEFT],
+            ['handleKeyboardEventArrowRight', ARROW_RIGHT],
+        ];
+        let emitKeyboardSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            emitKeyboardSpy = spyOn(component['focusableComponentService'], 'emitKeyboard');
         });
-        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
-        component.handleKeyboardEvent(event);
-        expect(spy).toHaveBeenCalledWith(event);
+
+        for (const [method, key] of tests) {
+            it(`should call emitKeyboard on ${method}`, () => {
+                const event: KeyboardEvent = new KeyboardEvent('keypress', {
+                    key,
+                    cancelable: true,
+                });
+
+                (component[method] as (e: unknown) => void)(event);
+                expect(emitKeyboardSpy).toHaveBeenCalledWith(event);
+            });
+        }
     });
 
-    it('should call emitKeyboard on keydown.escape', () => {
-        const event: KeyboardEvent = new KeyboardEvent('keypress', {
-            key: ESCAPE,
-            cancelable: true,
-        });
-        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
-        component.handleKeyboardEventEsc(event);
-        expect(spy).toHaveBeenCalledWith(event);
-    });
-
-    it('should call emitKeyboard on keydown.escape', () => {
-        const event: KeyboardEvent = new KeyboardEvent('keypress', {
-            key: BACKSPACE,
-            cancelable: true,
-        });
-        const spy = spyOn(component['focusableComponentService'], 'emitKeyboard');
-        component.handleKeyboardEventBackspace(event);
-        expect(spy).toHaveBeenCalledWith(event);
-    });
-
-    describe('ngOnInit', () => {
-        it('should update isLocalPlayerTurn after subscription to newActivePlayerEvent', () => {
-            component.isLocalPlayerTurn = false;
-            gameServiceMock.newActivePlayerEvent.emit([DEFAULT_PLAYER, true]);
-            expect(component.isLocalPlayerTurn).toBeTrue();
-        });
-    });
-
-    describe('createpassAction', () => {
+    describe('createPassAction', () => {
         it('should call gameButtonActionService.createPassAction()', () => {
             const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
                 return;
             });
             component.createPassAction();
             expect(createPassActionSpy).toHaveBeenCalled();
-        });
-    });
-
-    describe('handlePlayerLeaves', () => {
-        it('should reset gameServiceId', () => {
-            spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            gameServiceMock.gameId = 'something';
-            component['handlePlayerLeaves']();
-            expect(gameServiceMock.gameId).toEqual('');
-        });
-
-        it('should call playerLeavesService.handleLocalPlayerLeavesGame', () => {
-            const handleLocalPlayerLeavesGameSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
-                return;
-            });
-            component['handlePlayerLeaves']();
-            expect(handleLocalPlayerLeavesGameSpy).toHaveBeenCalled();
         });
     });
 
@@ -278,5 +250,15 @@ describe('GamePageComponent', () => {
 
         component.quitButtonClicked();
         expect(spy).toHaveBeenCalledOnceWith(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, buttonsContent);
+    });
+
+    it('handlePlayerLeave should notify the playerLeavesService', () => {
+        component['mustDisconnectGameOnLeave'] = true;
+        const leaveSpy = spyOn(component['playerLeavesService'], 'handleLocalPlayerLeavesGame').and.callFake(() => {
+            return;
+        });
+        component['handlePlayerLeaves']();
+        expect(component.mustDisconnectGameOnLeave).toBeFalse();
+        expect(leaveSpy).toHaveBeenCalled();
     });
 });

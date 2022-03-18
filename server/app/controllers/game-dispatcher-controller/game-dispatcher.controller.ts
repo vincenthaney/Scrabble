@@ -1,4 +1,5 @@
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { LobbyData } from '@app/classes/communication/lobby-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -50,9 +51,9 @@ export class GameDispatcherController {
             const body: Omit<GameConfigData, 'playerId'> = req.body;
 
             try {
-                const gameId = this.handleCreateGame({ playerId, ...body });
+                const lobbyData: LobbyData | undefined = this.handleCreateGame({ playerId, ...body });
 
-                res.status(StatusCodes.CREATED).send({ gameId });
+                res.status(StatusCodes.CREATED).send({ lobbyData });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
@@ -173,26 +174,26 @@ export class GameDispatcherController {
             const result = this.gameDispatcherService.leaveLobbyRequest(gameId, playerId);
             this.socketService.emitToSocket(result[0], 'joinerLeaveGame', { name: result[1] });
             this.handleLobbiesUpdate();
-        } else {
-            // Check if there is no player left --> cleanup server and client
-            if (!this.socketService.doesRoomExist(gameId)) {
-                this.activeGameService.removeGame(gameId, playerId);
-                return;
-            }
-            try {
-                this.socketService.removeFromRoom(playerId, gameId);
-                this.socketService.emitToSocket(playerId, 'cleanup');
-                // catch errors caused by inexistent socket after client closed application
-                // eslint-disable-next-line no-empty
-            } catch (exception) {}
-            const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
-
-            this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
-
-            if (this.activeGameService.isGameOver(gameId, playerId)) return;
-
-            this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
+            return;
         }
+        // Check if there is no player left --> cleanup server and client
+        if (!this.socketService.doesRoomExist(gameId)) {
+            this.activeGameService.removeGame(gameId, playerId);
+            return;
+        }
+        try {
+            this.socketService.removeFromRoom(playerId, gameId);
+            this.socketService.emitToSocket(playerId, 'cleanup');
+            // catch errors caused by inexistent socket after client closed application
+            // eslint-disable-next-line no-empty
+        } catch (exception) {}
+        const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
+
+        this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
+
+        if (this.activeGameService.isGameOver(gameId, playerId)) return;
+
+        this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
     }
 
     private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData): void {
@@ -205,7 +206,7 @@ export class GameDispatcherController {
         }
     }
 
-    private handleCreateGame(config: GameConfigData): string {
+    private handleCreateGame(config: GameConfigData): LobbyData | undefined {
         if (config.playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameType === undefined) throw new HttpException(GAME_TYPE_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameMode === undefined) throw new HttpException(GAME_MODE_REQUIRED, StatusCodes.BAD_REQUEST);
@@ -214,19 +215,20 @@ export class GameDispatcherController {
 
         if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
-        let gameId: string;
+        let lobbyData: LobbyData | undefined;
         if (config.gameMode === GameMode.Multiplayer) {
-            gameId = this.gameDispatcherService.createMultiplayerGame(config);
+            lobbyData = this.gameDispatcherService.createMultiplayerGame(config);
         } else {
             if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
             if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
             // TODO : gameId = this.gameDispatcherService.createSoloGame(config);
-            gameId = ''; // CHANGE THIS ONCE SOLO GAME CREATION METHOD EXISTS
+            lobbyData = undefined; // CHANGE THIS ONCE SOLO GAME CREATION METHOD EXISTS
         }
+        if (!lobbyData) return undefined;
 
-        this.socketService.addToRoom(config.playerId, gameId);
+        this.socketService.addToRoom(config.playerId, lobbyData.lobbyId);
         this.handleLobbiesUpdate();
-        return gameId;
+        return lobbyData;
     }
 
     private handleJoinGame(gameId: string, playerId: string, playerName: string): void {

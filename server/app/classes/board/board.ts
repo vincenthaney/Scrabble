@@ -35,11 +35,11 @@ export default class Board {
         return desiredSquares;
     }
 
-    navigate(position: Position, orientation: Orientation) {
+    navigate(position: Position, orientation: Orientation): BoardNavigator {
         return new BoardNavigator(this, position, orientation);
     }
 
-    verifyNeighbors(position: Position, orientation: Orientation, shouldBeFilled: boolean = true) {
+    verifyNeighbors(position: Position, orientation: Orientation, shouldBeFilled: boolean = true): boolean {
         let backward: boolean;
         let forward: boolean;
 

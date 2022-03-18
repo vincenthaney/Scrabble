@@ -1,3 +1,6 @@
+// Must disable because the file is too big
+/* eslint-disable max-lines */
+
 export interface IconInputs {
     icon: IconName;
     styling?: IconStyle;
@@ -8,7 +11,6 @@ export interface IconInputs {
 
 export type IconType = IconName | IconInputs;
 
-/* eslint-disable max-lines */
 export type IconStyle = 'solid' | 'regular' | 'light' | 'duotone';
 
 export type IconPrefix = 'far' | 'fal' | 'fas' | 'fad';

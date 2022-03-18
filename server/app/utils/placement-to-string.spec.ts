@@ -37,6 +37,15 @@ describe('WordPlacement utils', () => {
             expect(PlacementToString.tilesToString(tiles)).to.equal('abc');
         });
 
+        it('should convert blank tile to upper case', () => {
+            const tiles: Tile[] = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0, isBlank: true },
+                { letter: 'C', value: 0 },
+            ];
+            expect(PlacementToString.tilesToString(tiles)).to.equal('aBc');
+        });
+
         it('should convert', () => {
             const tiles: Tile[] = [];
             expect(PlacementToString.tilesToString(tiles)).to.equal('');
@@ -67,7 +76,7 @@ describe('WordPlacement utils', () => {
                 orientation,
             };
 
-            expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('g3v xyz');
+            expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('!placer g3v xyz');
         });
     });
 });
