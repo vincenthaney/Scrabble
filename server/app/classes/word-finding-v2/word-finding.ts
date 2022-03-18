@@ -16,16 +16,18 @@ import { ScoreCalculatorService } from '@app/services/score-calculator-service/s
 import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
 import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
 
-export default class WordFinding {
-    private wordPlacements: ScoredWordPlacement[] = [];
+export default abstract class WordFinding {
+    protected wordPlacements: ScoredWordPlacement[] = [];
 
     constructor(
         private board: Board,
         private tiles: Tile[],
-        private request: WordFindingRequest,
+        protected request: WordFindingRequest,
         private dictionary: Dictionary,
         private scoreCalculatorService: ScoreCalculatorService,
-    ) {}
+    ) {
+        console.log('NEW WORD FINDING', board, tiles, request, dictionary, scoreCalculatorService);
+    }
 
     findWords(): ScoredWordPlacement[] {
         const playerLetters = this.convertTilesToLetters(this.tiles);
@@ -37,7 +39,9 @@ export default class WordFinding {
                 const wordPlacement = this.getWordPlacement(wordResult, boardPlacement);
 
                 if (this.validateWordPlacement(wordPlacement)) {
-                    if (this.handleWordPlacement(wordPlacement)) return this.wordPlacements;
+                    this.handleWordPlacement(wordPlacement);
+
+                    if (this.isSearchCompleted()) return this.wordPlacements;
                 }
             }
         }
@@ -61,6 +65,7 @@ export default class WordFinding {
         const score = this.scoreCalculatorService.calculatePoints([wordSquareTiles, ...perpendicularWordsSquareTiles]);
 
         const squareTilesToPlace = wordSquareTiles.filter(([square]) => !square.tile);
+        console.log('getWordPlacement', squareTilesToPlace);
         const tilesToPlace = squareTilesToPlace.map(([, tile]) => tile);
 
         return {
@@ -73,22 +78,6 @@ export default class WordFinding {
 
     validateWordPlacement(wordPlacement: ScoredWordPlacement): boolean {
         return this.request.pointRange ? this.isWithinPointRange(wordPlacement.score, this.request.pointRange) : true;
-    }
-
-    handleWordPlacement(wordPlacement: ScoredWordPlacement): [endSearch: boolean] {
-        if (this.request.useCase === WordFindingUseCase.Hint) {
-            this.wordPlacements.push(wordPlacement);
-            if (this.wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS) return [true];
-        } else if (this.request.useCase === WordFindingUseCase.Beginner) {
-            if (this.request.pointRange && this.isWithinPointRange(wordPlacement.score, this.request.pointRange)) {
-                this.wordPlacements.push(wordPlacement);
-                return [true];
-            }
-        } else {
-            throw new Error('Not implemented');
-        }
-
-        return [false];
     }
 
     findCompleted(wordPlacements: ScoredWordPlacement[]): boolean {
@@ -156,10 +145,15 @@ export default class WordFinding {
     }
 
     convertTilesToLetters(tiles: Tile[]): LetterValue[] {
+        console.log('convert', tiles);
         return tiles.map((tile) => tile.letter);
     }
 
     isWithinPointRange(score: number, range: PointRange) {
         return score >= range.minimum && score <= range.maximum;
     }
+
+    abstract handleWordPlacement(wordPlacement: ScoredWordPlacement): void;
+
+    abstract isSearchCompleted(): boolean;
 }
