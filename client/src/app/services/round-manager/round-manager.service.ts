@@ -78,6 +78,7 @@ export default class RoundManagerService implements IResetServiceData {
     resetTimerData(): void {
         clearTimeout(this.timeout);
         this.timerSource.complete();
+        this.endRoundEvent$.next();
     }
 
     updateRound(round: Round): void {
