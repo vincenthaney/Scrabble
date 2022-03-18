@@ -1,5 +1,6 @@
 import { Square } from '@app/classes/square';
 import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
+import { switchOrientation } from '@app/utils/switch-orientation';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 
@@ -44,8 +45,7 @@ export default class BoardNavigator {
     }
 
     verifyPerpendicularNeighbors(shouldBeFilled: boolean): boolean {
-        const orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
-        return this.verifyNeighbors(orientation, shouldBeFilled);
+        return this.verifyNeighbors(switchOrientation(this.orientation), shouldBeFilled);
     }
 
     move(direction: Direction, distance: number = DEFAULT_DISTANCE): BoardNavigator {
@@ -83,7 +83,7 @@ export default class BoardNavigator {
     }
 
     switchOrientation(): BoardNavigator {
-        this.orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+        this.orientation = switchOrientation(this.orientation);
         return this;
     }
 
