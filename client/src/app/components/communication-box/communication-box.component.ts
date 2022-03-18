@@ -6,7 +6,6 @@ import { Message } from '@app/classes/communication/message';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
@@ -14,7 +13,6 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import { MessageStorageService } from '@app/services/message-storage/message-storage.service';
 import { marked } from 'marked';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-communication-box',
@@ -43,7 +41,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         private changeDetectorRef: ChangeDetectorRef,
         private messageStorageService: MessageStorageService,
         private gameViewEventManagerService: GameViewEventManagerService,
-        private gameDispatcherController: GameDispatcherController,
     ) {
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
@@ -54,14 +51,23 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
-        // eslint-disable-next-line dot-notation
-        this.gameDispatcherController['initializeGame$']
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((gameData: InitializeGameData | undefined) => {
+        this.gameViewEventManagerService.subscribeToGameViewEvent(
+            'gameInitialized',
+            this.componentDestroyed$,
+            (gameData: InitializeGameData | undefined) => {
                 console.log('dans le subscribe');
                 this.gameId = gameData?.startGameData.gameId ?? this.gameId;
                 this.initializeMessages();
-            });
+            },
+        );
+        // // eslint-disable-next-line dot-notation
+        // this.gameDispatcherController['initializeGame$']
+        //     .pipe(takeUntil(this.componentDestroyed$))
+        //     .subscribe((gameData: InitializeGameData | undefined) => {
+        //         console.log('dans le subscribe');
+        //         this.gameId = gameData?.startGameData.gameId ?? this.gameId;
+        //         this.initializeMessages();
+        //     });
     }
 
     ngAfterViewInit(): void {
