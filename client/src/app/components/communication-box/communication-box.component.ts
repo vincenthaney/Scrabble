@@ -55,19 +55,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             'gameInitialized',
             this.componentDestroyed$,
             (gameData: InitializeGameData | undefined) => {
-                console.log('dans le subscribe');
                 this.gameId = gameData?.startGameData.gameId ?? this.gameId;
                 this.initializeMessages();
             },
         );
-        // // eslint-disable-next-line dot-notation
-        // this.gameDispatcherController['initializeGame$']
-        //     .pipe(takeUntil(this.componentDestroyed$))
-        //     .subscribe((gameData: InitializeGameData | undefined) => {
-        //         console.log('dans le subscribe');
-        //         this.gameId = gameData?.startGameData.gameId ?? this.gameId;
-        //         this.initializeMessages();
-        //     });
     }
 
     ngAfterViewInit(): void {
