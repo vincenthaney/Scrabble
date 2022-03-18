@@ -5,17 +5,17 @@ import Player from '@app/classes/player/player';
 import { WordFindingUseCase } from '@app/classes/word-finding';
 import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { FOUND_WORDS, HINT_ACTION_NUMBER_OF_WORDS, NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import WordFindingServiceV2 from '@app/services/word-finding/word-finding-v2';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { Container } from 'typedi';
 
 export default class ActionHint extends ActionInfo {
-    private wordFindingService: WordFindingService;
+    private wordFindingService: WordFindingServiceV2;
     private hintResult: WordPlacement[];
 
     constructor(player: Player, game: Game) {
         super(player, game);
-        this.wordFindingService = Container.get(WordFindingService);
+        this.wordFindingService = Container.get(WordFindingServiceV2);
         this.hintResult = [];
     }
 
