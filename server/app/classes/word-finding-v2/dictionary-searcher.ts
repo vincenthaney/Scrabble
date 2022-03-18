@@ -14,13 +14,15 @@ export default class DictionarySearcher {
     constructor(node: DictionaryNode, playerLetters: LetterValue[], boardPlacement: BoardPlacement) {
         this.node = node;
         this.boardPlacement = boardPlacement;
-        this.stack = [{ node, playerLetters: this.copyTiles(playerLetters) }];
+        this.stack = [];
         this.letters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
         this.perpendicularLetters = boardPlacement.perpendicularLetters.map((perpendicularLetter) => ({
             before: perpendicularLetter.before.join('').toLowerCase(),
             after: perpendicularLetter.after.join('').toLowerCase(),
             distance: perpendicularLetter.distance,
         }));
+
+        this.addChildrenToStack(node, this.copyTiles(playerLetters));
     }
 
     hasNext(): boolean {
