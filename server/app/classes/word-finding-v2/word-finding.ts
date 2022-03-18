@@ -11,14 +11,19 @@ import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import PointRange from '@app/classes/word-finding/point-range';
 import { Square } from '@app/classes/square';
 import { switchOrientation } from '@app/utils/switch-orientation';
-
-// const squareTileToString = ([square, tile]: [Square, Tile]) =>
-//     `(${square.position.row}, ${square.position.column}) ${tile.letter}${square.tile ? '' : ' (N)'}`;
-const posToStr = (position: Position) => `(${position.row}, ${position.column})`;
-const orientationToString = (orientation: Orientation) => (orientation === Orientation.Horizontal ? 'H' : 'V');
+import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
+import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
 
 export default class WordFinding {
-    constructor(private board: Board, private tiles: Tile[], private request: WordFindingRequest, private dictionary: Dictionary) {}
+    constructor(
+        private board: Board,
+        private tiles: Tile[],
+        private request: WordFindingRequest,
+        private dictionary: Dictionary,
+        private scoreCalculatorService: ScoreCalculatorService,
+    ) {}
 
     findWords(): ScoredWordPlacement[] {
         const wordPlacements: ScoredWordPlacement[] = [];
@@ -27,19 +32,7 @@ export default class WordFinding {
         for (const boardPlacement of this.boardPlacements()) {
             const searcher = new DictionarySearcher(this.dictionary, playerLetters, boardPlacement);
 
-            console.log(
-                posToStr(boardPlacement.position),
-                orientationToString(boardPlacement.orientation),
-                boardPlacement.letters.map((a) => [a.letter, a.distance]),
-            );
-
             for (const wordResult of searcher.getWords()) {
-                console.log(
-                    wordResult.word,
-                    `(${boardPlacement.position.row}, ${boardPlacement.position.column})`,
-                    orientationToString(boardPlacement.orientation),
-                    wordResult.perpendicularWords,
-                );
                 const wordPlacement = this.getWordPlacement(wordResult, boardPlacement);
 
                 if (this.validateWordPlacement(wordPlacement)) {
@@ -66,18 +59,15 @@ export default class WordFinding {
     getWordPlacement(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): ScoredWordPlacement {
         const wordSquareTiles = this.extractWordSquareTile(wordResult, boardPlacement);
         const perpendicularWordsSquareTiles = this.extractPerpendicularWordsSquareTile(wordResult, boardPlacement);
-        const score = this.calculateScore(wordResult, boardPlacement);
+        const score = this.scoreCalculatorService.calculatePoints([wordSquareTiles, ...perpendicularWordsSquareTiles]);
 
-        // console.log('===== word', wordSquareTiles.map(squareTileToString));
-        // console.log('===== perpendicularWords');
-        // for (const p of perpendicularWordsSquareTiles) {
-        //     console.log('=== ', p.map(squareTileToString));
-        // }
+        const squareTilesToPlace = wordSquareTiles.filter(([square]) => !square.tile);
+        const tilesToPlace = squareTilesToPlace.map(([, tile]) => tile);
 
         return {
-            tilesToPlace: wordSquareTiles.map(([, tile]) => tile),
+            tilesToPlace,
             orientation: boardPlacement.orientation,
-            startPosition: boardPlacement.position,
+            startPosition: squareTilesToPlace[0][0].position,
             score: score + perpendicularWordsSquareTiles.length,
         };
     }
@@ -87,8 +77,13 @@ export default class WordFinding {
     }
 
     findCompleted(wordPlacements: ScoredWordPlacement[]): boolean {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return wordPlacements.length > 3;
+        switch (this.request.useCase) {
+            case WordFindingUseCase.Hint:
+                return wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS;
+            case WordFindingUseCase.Beginner:
+            case WordFindingUseCase.Expert:
+                return wordPlacements.length >= 1;
+        }
     }
 
     extractWordSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][] {
@@ -114,11 +109,7 @@ export default class WordFinding {
         for (let i = 0; i < word.length; ++i) {
             let tile: Tile;
             if (!navigator.square.tile) {
-                const index = playerTiles.findIndex((playerTile) => playerTile.letter === word.charAt(i).toUpperCase());
-                const foundTile = playerTiles.splice(index, 1).pop();
-
-                if (!foundTile) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
-                tile = foundTile;
+                tile = this.getTileFromLetter(playerTiles, word.charAt(i));
             } else {
                 tile = navigator.square.tile;
             }
@@ -129,6 +120,20 @@ export default class WordFinding {
         }
 
         return squareTiles;
+    }
+
+    getTileFromLetter(tiles: Tile[], letter: string): Tile {
+        let index = tiles.findIndex((tile) => tile.letter === letter.toUpperCase());
+
+        if (index === NOT_FOUND) {
+            index = tiles.findIndex((tile) => tile.letter === BLANK_TILE_LETTER_VALUE);
+            if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+            const foundBlankTile = tiles.splice(index, 1);
+            return { ...foundBlankTile[0], playedLetter: letter.toUpperCase() as LetterValue };
+        }
+
+        const foundTile = tiles.splice(index, 1);
+        return foundTile[0];
     }
 
     calculateScore(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): number {
