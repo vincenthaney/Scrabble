@@ -10,8 +10,6 @@ import { Subject } from 'rxjs';
 import { SocketService } from '..';
 import { PlayerLeavesService } from './player-leaves.service';
 
-
-
 describe('PlayerLeavesService', () => {
     let service: PlayerLeavesService;
     let playerLeavesController: PlayerLeavesController;
