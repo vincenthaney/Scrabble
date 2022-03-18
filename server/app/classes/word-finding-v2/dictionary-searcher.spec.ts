@@ -14,7 +14,7 @@ import { BoardPlacement, PerpendicularWord, StackItem } from './word-finding-typ
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
 import { SinonStub, stub } from 'sinon';
-import { NEXT_NODE_DOESNT_EXISTS } from '@app/constants/classes-errors';
+import { NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
@@ -103,7 +103,7 @@ describe.only('DictionarySearcher', () => {
 
         it('next should throw if stack is empty', () => {
             popStub.returns(undefined);
-            expect(() => searcher.next()).to.throw(NEXT_NODE_DOESNT_EXISTS);
+            expect(() => searcher.next()).to.throw(NEXT_NODE_DOES_NOT_EXISTS);
         });
 
         it('should call addChildrenToStack with node and playerTile', () => {

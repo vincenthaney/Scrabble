@@ -1,6 +1,6 @@
 import { DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
-import { NEXT_NODE_DOESNT_EXISTS } from '@app/constants/classes-errors';
+import { NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { BoardPlacement, DictionarySearchResult, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
 
@@ -30,7 +30,7 @@ export default class DictionarySearcher {
     next(): DictionarySearchResult {
         const stackItem = this.stack.pop();
 
-        if (!stackItem) throw new Error(NEXT_NODE_DOESNT_EXISTS);
+        if (!stackItem) throw new Error(NEXT_NODE_DOES_NOT_EXISTS);
 
         this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
 
