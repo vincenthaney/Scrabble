@@ -2,17 +2,17 @@ import { Board, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Container } from 'typedi';
-import WordFindingRequest from '../word-finding/word-finding-request';
-import WordFindingUseCase from '../word-finding/word-finding-use-case';
-import { ScoredWordPlacement } from '../word-finding/word-placement';
+import WordFindingRequest from '@app/classes/word-finding/word-finding-request';
+import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
+import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import WordFinding from './word-finding';
-import { BoardPlacement, DictionarySearchResult } from './word-finding-types';
 
 type LetterValues = (LetterValue | ' ')[][];
 
 const GRID: LetterValues = [
-//    0    1    2    3    4    5    6    7    8    9   10   11   12   13   14 
+    // 0   1    2    3    4    5    6    7    8    9   10   11   12   13   14
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', ' ', ' ', ' ', ' '], // 0
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'A', ' ', ' ', ' ', ' ', 'P'], // 1
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'R', ' ', ' ', ' ', ' ', 'A'], // 2
@@ -54,76 +54,35 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
 
 const lettersToTiles = (letters: LetterValue[]) => letters.map<Tile>((letter) => ({ letter, value: 0 }));
 
-interface Benchmark {
-    findWordsDuration: number;
-    getWordPlacementDuration: number;
-    extractWordSquareTileDuration: number;
-    extractPerpendicularWordsSquareTileDuration: number;
-}
-
-class WordFindingBenchmark extends WordFinding implements Benchmark {
-    findWordsDuration: number;
-    getWordPlacementDuration: number;
-    extractWordSquareTileDuration: number;
-    extractPerpendicularWordsSquareTileDuration: number;
-
-    findWords(): ScoredWordPlacement[] {
-        const start = Date.now();
-        const result = super.findWords();
-        this.findWordsDuration = Date.now() - start;
-        return result;
-    }
-
-    getWordPlacement(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): ScoredWordPlacement {
-        const start = Date.now();
-        const result = super.getWordPlacement(wordResult, boardPlacement);
-        this.getWordPlacementDuration = Date.now() - start;
-        return result;
-    }
-
-    extractWordSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][] {
-        const start = Date.now();
-        const result = super.extractWordSquareTile(wordResult, boardPlacement);
-        this.extractWordSquareTileDuration = Date.now() - start;
-        return result;
-    }
-
-    extractPerpendicularWordsSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
-        const start = Date.now();
-        const result = super.extractPerpendicularWordsSquareTile(wordResult, boardPlacement);
-        this.extractPerpendicularWordsSquareTileDuration = Date.now() - start;
-        return result;
-    }
-
-    print() {
-        console.log(
-            // eslint-disable-next-line max-len
-            `Total: ${this.findWordsDuration}ms \n\tgetWordPlacement: ${this.getWordPlacementDuration} ms\n\t\textractWordSquareTile: ${this.extractWordSquareTileDuration} ms\n\t\textractPerpendicularWordsSquareTile:${this.extractPerpendicularWordsSquareTileDuration} ms`,
-        );
-    }
-}
-
 describe.only('WordFinding', () => {
     it('should work', () => {
         const board = boardFromLetterValues(GRID);
         const dictionary = Container.get(DictionaryService).getDefaultDictionary();
-        const tiles = lettersToTiles(['A', 'B', 'S', 'T', 'M', 'E', '*']);
+        const scoreCalculator = Container.get(ScoreCalculatorService);
+        const tiles = lettersToTiles(['A', 'B', 'S', '*', 'T', 'M', 'E']);
         const request: WordFindingRequest = {
             useCase: WordFindingUseCase.Beginner,
             pointRange: { minimum: 4, maximum: 100 },
         };
 
-        const iterations = 2;
+        const iterations = 20;
+        let results: ScoredWordPlacement[] = [];
         let totalTime = 0;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         for (let i = 0; i < iterations; ++i) {
-            console.log(`========== TEST ${i + 1} ==========`);
             const start = Date.now();
-            const wordFinding = new WordFindingBenchmark(board, tiles, request, dictionary);
-            wordFinding.findWords();
+            const wordFinding = new WordFinding(board, tiles, request, dictionary, scoreCalculator);
+            results = results.concat(wordFinding.findWords());
             totalTime += Date.now() - start;
-            // wordFinding.print();
         }
+
+        console.log(
+            ...results.map(
+                (p) =>
+                    `(${p.startPosition.row}, ${p.startPosition.column}) ${p.orientation} ${p.tilesToPlace
+                        .map((l) => `${l.letter}${l.playedLetter ? l.playedLetter : ''}`)
+                        .join()} - ${p.score}\n`,
+            ),
+        );
 
         console.log(`runned ${iterations} times in ${totalTime} ms (${totalTime / iterations} ms avr.)`);
     });
