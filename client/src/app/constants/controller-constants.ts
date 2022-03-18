@@ -5,5 +5,3 @@ export const INITIAL_MESSAGE: Message = {
     content: 'Début de la partie',
     senderId: SYSTEM_ID,
 };
-
-
