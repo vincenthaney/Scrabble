@@ -9,26 +9,35 @@ import { NAME_NO_MATCH_REGEX, NAME_SAME_AS_VIRTUAL_PLAYER, NAME_TOO_LONG, NAME_T
     styleUrls: ['./name-field.component.scss'],
 })
 export class NameFieldComponent implements OnChanges {
-    @Input() virtualPlayerName: string = '';
-    @Input() mustVerifyVirtualPlayerName: boolean = false;
-    @Output() isInputNameValid = new EventEmitter<boolean>();
-    @Output() playerNameChange = new EventEmitter<[name: string, valid: boolean]>();
-    errorNameTooShort: string = NAME_TOO_SHORT;
-    errorNameTooLong: string = NAME_TOO_LONG;
-    errorNameNoMatchRegex: string = NAME_NO_MATCH_REGEX;
-    errorSameNameAsVirtualPlayer: string = NAME_SAME_AS_VIRTUAL_PLAYER;
+    @Input() virtualPlayerName: string;
+    @Input() mustVerifyVirtualPlayerName: boolean;
+    @Output() isInputNameValid;
+    @Output() playerNameChange;
+    errorNameTooShort: string;
+    errorNameTooLong: string;
+    errorNameNoMatchRegex: string;
+    errorSameNameAsVirtualPlayer: string;
+    formParameters: FormGroup;
 
-    formParameters = new FormGroup({
-        inputName: new FormControl('', [
-            Validators.required,
-            Validators.pattern(NAME_VALIDATION.rule),
-            Validators.minLength(NAME_VALIDATION.minLength),
-            Validators.maxLength(NAME_VALIDATION.maxLength),
-            // we must disable to use the custom validator (created in this class) in the form.
-            // eslint-disable-next-line no-invalid-this
-            this.nameDifferentFromVirtualPlayer(),
-        ]),
-    });
+    constructor() {
+        this.virtualPlayerName = '';
+        this.mustVerifyVirtualPlayerName = false;
+        this.isInputNameValid = new EventEmitter<boolean>();
+        this.playerNameChange = new EventEmitter<[name: string, valid: boolean]>();
+        this.errorNameTooShort = NAME_TOO_SHORT;
+        this.errorNameTooLong = NAME_TOO_LONG;
+        this.errorNameNoMatchRegex = NAME_NO_MATCH_REGEX;
+        this.errorSameNameAsVirtualPlayer = NAME_SAME_AS_VIRTUAL_PLAYER;
+        this.formParameters = new FormGroup({
+            inputName: new FormControl('', [
+                Validators.required,
+                Validators.pattern(NAME_VALIDATION.rule),
+                Validators.minLength(NAME_VALIDATION.minLength),
+                Validators.maxLength(NAME_VALIDATION.maxLength),
+                this.nameDifferentFromVirtualPlayer(),
+            ]),
+        });
+    }
 
     ngOnChanges(): void {
         this.onChange();
