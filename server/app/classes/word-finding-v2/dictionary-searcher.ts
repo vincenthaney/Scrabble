@@ -87,7 +87,7 @@ export default class DictionarySearcher {
     }
 
     private isWordValid(word: string) {
-        return this.wordSizeIsWithinBounds(word) && this.nextDoesNotHaveLetter(word);
+        return this.wordSizeIsWithinBounds(word) && this.nextTileIsEmpty(word);
     }
 
     private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
@@ -128,7 +128,7 @@ export default class DictionarySearcher {
         return words.length > 0 ? words.every((word) => this.node.wordExists(word.word)) : true;
     }
 
-    private nextDoesNotHaveLetter(word: string): boolean {
+    private nextTileIsEmpty(word: string): boolean {
         return !this.letters.has(word.length);
     }
 
