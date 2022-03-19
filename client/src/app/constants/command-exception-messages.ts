@@ -1,3 +1,6 @@
+import { Message } from '@app/classes/communication/message';
+import { SYSTEM_ID } from './game';
+
 export enum CommandExceptionMessages {
     BadSyntax = 'La commande ne respecte pas la syntaxe requise.',
     PlaceBadSyntax = 'La commande placer doit suivre le format _!placer ‹position› ‹lettres›_',
@@ -13,3 +16,8 @@ export enum CommandExceptionMessages {
 }
 
 export const PLAYER_NOT_FOUND = 'Aucun joueur actif trouvé';
+
+export const WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE: Message = {
+    content: "Veuillez attendre la confirmation de votre commande précédente avant d'en envoyer une autre.",
+    senderId: SYSTEM_ID,
+};
