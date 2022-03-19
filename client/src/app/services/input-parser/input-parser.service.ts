@@ -18,6 +18,7 @@ import {
 } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
+import { ActionService } from '@app/services/action/action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
 
@@ -31,6 +32,7 @@ export default class InputParserService {
         private controller: GamePlayController,
         private gameService: GameService,
         private gameViewEventManagerService: GameViewEventManagerService,
+        private actionService: ActionService,
     ) {}
 
     handleInput(input: string): void {
@@ -49,7 +51,7 @@ export default class InputParserService {
 
     private handleCommand(input: string, gameId: string, playerId: string): void {
         try {
-            this.controller.sendAction(gameId, playerId, this.createActionData(input));
+            this.actionService.sendAction(gameId, playerId, this.createActionData(input));
         } catch (exception) {
             if (exception instanceof CommandException) {
                 const errorMessageContent =
@@ -76,57 +78,44 @@ export default class InputParserService {
 
         switch (actionType) {
             case ActionType.PLACE:
-                if (inputWords.length !== ExpectedCommandWordCount.Place) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
-                actionData = {
+                return {
                     type: ActionType.PLACE,
                     input,
                     payload: this.createPlaceActionPayload(inputWords[1], inputWords[2]),
                 };
-                break;
             case ActionType.EXCHANGE:
-                if (inputWords.length !== ExpectedCommandWordCount.Exchange) throw new CommandException(CommandExceptionMessages.ExchangeBadSyntax);
-                actionData = {
+                return {
                     type: ActionType.EXCHANGE,
                     input,
                     payload: this.createExchangeActionPayload(inputWords[1]),
                 };
-                break;
             case ActionType.PASS:
-                if (inputWords.length !== ExpectedCommandWordCount.Pass) throw new CommandException(CommandExceptionMessages.PassBadSyntax);
-                actionData = {
+                return {
                     type: ActionType.PASS,
                     input,
                     payload: {},
                 };
-                break;
             case ActionType.RESERVE:
-                if (inputWords.length !== ExpectedCommandWordCount.Reserve) throw new CommandException(CommandExceptionMessages.BadSyntax);
-                actionData = {
+                return {
                     type: ActionType.RESERVE,
                     input,
                     payload: {},
                 };
-                break;
             case ActionType.HINT:
-                if (inputWords.length !== ExpectedCommandWordCount.Hint) throw new CommandException(CommandExceptionMessages.BadSyntax);
-                actionData = {
+                return {
                     type: ActionType.HINT,
                     input,
                     payload: {},
                 };
-                break;
             case ActionType.HELP:
-                if (inputWords.length !== ExpectedCommandWordCount.Help) throw new CommandException(CommandExceptionMessages.BadSyntax);
-                actionData = {
+                return {
                     type: ActionType.HELP,
                     input,
                     payload: {},
                 };
-                break;
             default:
                 throw new CommandException(CommandExceptionMessages.InvalidEntry);
         }
-        return actionData;
     }
 
     private createLocation(locationString: string, nLettersToPlace: number): Location {
