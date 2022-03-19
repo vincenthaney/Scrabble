@@ -38,8 +38,8 @@ export class ActiveGameService {
         let game: Game;
         try {
             game = this.getGame(id, playerId);
-            // If the game is already deleted, return and don't do anything
         } catch (exception) {
+            // If the game is already deleted, return and don't do anything
             return;
         }
         const index = this.activeGames.indexOf(game);
