@@ -18,7 +18,7 @@ import { InputParserService } from '@app/services';
 import { ActionService } from '@app/services/action/action.service';
 import GameService from '@app/services/game/game.service';
 
-fdescribe('InputParserService', () => {
+describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';
     const VALID_LOCATION_INPUT = 'b12h';
     const VALID_LOCATION_INPUT_SINGLE = 'b12';
@@ -26,7 +26,6 @@ fdescribe('InputParserService', () => {
     const VALID_LETTERS_INPUT_SINGLE = 'a';
 
     const VALID_PLACE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
-    // const VALID_PLACE_INPUT_SINGLE = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
     const VALID_EXCHANGE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.EXCHANGE} ${VALID_LETTERS_INPUT_MULTI}`;
     const VALID_PASS_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PASS}`;
     const VALID_PASS_ACTION_DATA = { type: ActionType.PASS, payload: {} };
@@ -50,20 +49,6 @@ fdescribe('InputParserService', () => {
     ];
     const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME, DEFAULT_TILES);
     const DEFAULT_COMMAND_ERROR_MESSAGE = CommandExceptionMessages.InvalidEntry;
-
-    // const EXPECTED_PLACE_PAYLOAD_MULTI: PlaceActionPayload = {
-    //     tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
-    //     startPosition: { row: 1, column: 11 },
-    //     orientation: Orientation.Horizontal,
-    // };
-    // const EXPECTED_PLACE_PAYLOAD_SINGLE: PlaceActionPayload = {
-    //     tiles: [new Tile('A' as LetterValue, 1)],
-    //     startPosition: { row: 1, column: 11 },
-    //     orientation: Orientation.Horizontal,
-    // };
-    // const EXPECTED_EXCHANGE_PAYLOAD: ExchangeActionPayload = {
-    //     tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
-    // };
 
     let service: InputParserService;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
