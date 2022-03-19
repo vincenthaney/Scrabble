@@ -4,9 +4,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { GameUpdateData } from '@app/classes/communication';
+import { Message } from '@app/classes/communication/message';
 import { Orientation } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
-import { DEFAULT_PLAYER } from '@app/constants/game';
+import { DEFAULT_PLAYER, OPPONENT_ID, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { ActionService } from './action.service';
 
@@ -36,6 +38,42 @@ describe('ActionService', () => {
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    describe('hasActionBeenPlayed handling', () => {
+        let resetSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            resetSpy = spyOn<any>(service, 'resetHasActionBeenSent').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should reset hasActionBeenPlayed if service received gameUpdate event', () => {
+            const gameUpdateData: GameUpdateData = {
+                isGameOver: true,
+            };
+            service['gamePlayController'].gameUpdateValue.next(gameUpdateData);
+            expect(resetSpy).toHaveBeenCalled();
+        });
+
+        it('should reset hasActionBeenPlayed if service received message from SYSTEM_ERROR', () => {
+            const message: Message = {
+                content: 'test',
+                senderId: SYSTEM_ERROR_ID,
+            };
+            service['gamePlayController'].newMessageValue.next(message);
+            expect(resetSpy).toHaveBeenCalled();
+        });
+
+        it('should NOT reset hasActionBeenPlayed if service received message from NOT from SYSTEM_ERROR', () => {
+            const message: Message = {
+                content: 'test',
+                senderId: OPPONENT_ID,
+            };
+            service['gamePlayController'].newMessageValue.next(message);
+            expect(resetSpy).not.toHaveBeenCalled();
+        });
     });
 
     describe('createPlaceActionPayload', () => {
@@ -104,10 +142,17 @@ describe('ActionService', () => {
                 payload: EXCHANGE_PAYLOAD,
                 input: 'input',
             };
+            service.hasActionBeenPlayed = false;
         });
 
         it('if playerId is undefined, should not sendAction', () => {
             service.sendAction(DEFAULT_GAME_ID, undefined, actionData);
+            expect(sendActionSpy).not.toHaveBeenCalled();
+        });
+
+        it('if action has been played, should not sendAction', () => {
+            service.hasActionBeenPlayed = true;
+            service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(sendActionSpy).not.toHaveBeenCalled();
         });
 
@@ -122,6 +167,11 @@ describe('ActionService', () => {
         it('should call gamePlayController.sendAction with provided data', () => {
             service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(sendActionSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
+        });
+
+        it('should set hasActionBeenPlayed to true', () => {
+            service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
+            expect(service.hasActionBeenPlayed).toBeTrue();
         });
     });
 
@@ -188,5 +238,11 @@ describe('ActionService', () => {
 
         service['convertBlankTilesLetter'](payload.tiles);
         expect(payload).toEqual(expectedResult);
+    });
+
+    it('resetHasActionBeenSent should set hasActionBeenPlayed to false', () => {
+        service.hasActionBeenPlayed = true;
+        service['resetHasActionBeenSent']();
+        expect(service.hasActionBeenPlayed).toBeFalse();
     });
 });

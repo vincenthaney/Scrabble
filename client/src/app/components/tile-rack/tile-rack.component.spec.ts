@@ -510,6 +510,7 @@ describe('TileRackComponent', () => {
             component.selectionType = TileRackSelectType.Exchange;
             component.selectedTiles = [{}, {}] as RackTile[];
             isLocalPlayerPlayingSpy = gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+            component['actionService'].hasActionBeenPlayed = false;
         });
 
         it('should be true if can exchange', () => {
@@ -534,6 +535,12 @@ describe('TileRackComponent', () => {
         it('should be false if is less than 7 tiles', () => {
             gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(MAX_TILES_PER_PLAYER - 1);
             expect(component.canExchangeTiles()).toBeFalse();
+        });
+
+        it('should be false if action has been played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            expect(component.canExchangeTiles()).toBeFalse();
+            component['actionService'].hasActionBeenPlayed = false;
         });
     });
 
