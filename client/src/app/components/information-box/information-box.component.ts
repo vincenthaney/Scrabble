@@ -64,9 +64,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
                 this.updateActivePlayerBorder(activePlayer);
             });
         }
-        this.roundManager.subscribeToEndRoundEvent(this.componentDestroyed$, () => {
-            this.endRound();
-        });
+        this.roundManager.subscribeToEndRoundEvent(this.componentDestroyed$, () => this.endRound());
         this.isPlayer1 = this.checkIfIsPlayer1();
         this.localPlayerIcon = this.getLocalPlayerIcon();
     }
