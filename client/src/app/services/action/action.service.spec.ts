@@ -6,6 +6,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
+import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/command-exception-messages';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { ActionService } from './action.service';
@@ -103,11 +104,15 @@ describe('ActionService', () => {
     });
 
     describe('sendAction', () => {
+        let errorMessageSpy: jasmine.Spy;
         let sendActionSpy: jasmine.Spy;
         let convertBlankTilesLetterSpy: jasmine.Spy;
         let actionData: ActionData<ExchangeActionPayload>;
 
         beforeEach(() => {
+            errorMessageSpy = spyOn<any>(service, 'sendWaitForConfirmationMessage').and.callFake(() => {
+                return;
+            });
             sendActionSpy = spyOn(service['gamePlayController'], 'sendAction').and.callFake(() => {
                 return;
             });
@@ -127,10 +132,11 @@ describe('ActionService', () => {
             expect(sendActionSpy).not.toHaveBeenCalled();
         });
 
-        it('if action has been played, should not sendAction', () => {
+        it('if action has been played, should not sendAction and send error', () => {
             service.hasActionBeenPlayed = true;
             service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(sendActionSpy).not.toHaveBeenCalled();
+            expect(errorMessageSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
         });
 
         it('should convert blank tiles before PLACE action is sent', () => {
@@ -215,6 +221,14 @@ describe('ActionService', () => {
 
         service['convertBlankTilesLetter'](payload.tiles);
         expect(payload).toEqual(expectedResult);
+    });
+
+    it('sendWaitForConfirmationMessage should sendError to gamePlayController', () => {
+        const sendSpy = spyOn(service['gamePlayController'], 'sendError').and.callFake(() => {
+            return;
+        });
+        service['sendWaitForConfirmationMessage'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+        expect(sendSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE);
     });
 
     it('resetHasActionBeenSent should set hasActionBeenPlayed to false', () => {
