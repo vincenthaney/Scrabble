@@ -8,7 +8,6 @@ import BoardPlacementsExtractor from './board-placement-extractor';
 import { Random } from '@app/utils/random';
 import DictionarySearcher from './dictionary-searcher';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
-import PointRange from '@app/classes/word-finding/point-range';
 import { Square } from '@app/classes/square';
 import { switchOrientation } from '@app/utils/switch-orientation';
 import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
