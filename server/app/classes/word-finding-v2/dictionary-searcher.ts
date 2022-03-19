@@ -99,8 +99,8 @@ export default class DictionarySearcher {
         return [[...new Set([...letters, ...ALPHABET])], true];
     }
 
-    private getLettersLeft(letters: string[], playing: string): string[] {
-        let index = letters.indexOf(playing);
+    private getLettersLeft(letters: string[], playingLetter: string): string[] {
+        let index = letters.indexOf(playingLetter);
         if (index === NOT_FOUND) index = letters.indexOf(BLANK_TILE_LETTER_VALUE);
         if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
 
