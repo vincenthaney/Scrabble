@@ -176,7 +176,9 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         const newTiles = [...player.getTiles()];
 
         this.unselectAll();
-        this.tiles = preserveArrayOrder(newTiles, previousTiles, (a: Tile, b: Tile) => a.letter === b.letter).map(this.createRackTile);
+        this.tiles = preserveArrayOrder(newTiles, previousTiles, (a: Tile, b: RackTile) => {
+            return a.letter === b.letter;
+        }).map(this.createRackTile);
     }
 
     private createRackTile(tile: Tile): RackTile {

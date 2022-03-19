@@ -160,11 +160,19 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with tiles should return the player tiles', () => {
-        const tiles: RackTile[] = [{ letter: 'A', value: 10, isUsed: false, isSelected: false }];
-        const localPlayer: AbstractPlayer = new Player('', 'Test', []);
+        const tiles: RackTile[] = [
+            { letter: 'A', value: 10, isUsed: false, isSelected: false },
+            { letter: 'B', value: 1, isUsed: false, isSelected: false },
+            { letter: 'D', value: 1, isUsed: true, isSelected: false },
+        ];
+        const localPlayer: AbstractPlayer = new Player('', 'Test', [
+            { letter: 'B', value: 1 },
+            { letter: 'D', value: 1 },
+            { letter: 'A', value: 10 },
+        ]);
 
+        component['tiles'] = tiles;
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
-        spyOn(localPlayer, 'getTiles').and.returnValue(tiles);
 
         component['updateTileRack']();
 
