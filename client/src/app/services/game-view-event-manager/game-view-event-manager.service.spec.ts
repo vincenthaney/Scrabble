@@ -90,7 +90,7 @@ describe('GameViewEventManagerService', () => {
         });
 
         it('should call subscribe to subject and bind the provided function', () => {
-            const event = 'tileRackUpdate';
+            const event = 'gameInitialized';
             service.subscribeToGameViewEvent(event, componentDestroyed$, fakeNext);
             expect(subscribeSpy).toHaveBeenCalledWith(fakeNext);
         });

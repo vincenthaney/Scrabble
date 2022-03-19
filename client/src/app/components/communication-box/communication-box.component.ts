@@ -31,7 +31,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     });
 
     loading: boolean = false;
-    gameId: string = 'default';
+    gameId: string = '';
     componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
@@ -55,8 +55,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             'gameInitialized',
             this.componentDestroyed$,
             (gameData: InitializeGameData | undefined) => {
-                this.gameId = gameData?.startGameData.gameId ?? this.gameId;
-                this.initializeMessages();
+                if (gameData) this.initializeMessages(gameData);
             },
         );
     }
@@ -81,10 +80,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         }
     }
 
-    isOpponent(id: string): boolean {
-        return id !== SYSTEM_ID && id !== SYSTEM_ERROR_ID && id !== this.gameService.getLocalPlayerId();
-    }
-
     getLettersLeft(): TileReserveData[] {
         return this.gameService.tileReserve;
     }
@@ -101,16 +96,12 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
     }
 
-    private initializeMessages(): void {
+    private initializeMessages(gameData: InitializeGameData): void {
         const storedMessages = this.messageStorageService.getMessages();
-        const gameId = this.gameService.getGameId();
         if (storedMessages.length > 0 && this.messages.length === 0) {
-            storedMessages.forEach((message: Message) => {
-                if (message.gameId === gameId) {
-                    message.content = marked.parseInline(message.content);
-                }
-            });
-            this.messages = this.messages.concat(storedMessages);
+            const localGameMessages: Message[] = storedMessages.filter((message: Message) => message.gameId === gameData.startGameData.gameId);
+            localGameMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+            this.messages = this.messages.concat(localGameMessages);
         }
 
         if (this.messages.length < 1) this.onReceiveNewMessage({ ...INITIAL_MESSAGE, gameId: this.gameService.getGameId() });
