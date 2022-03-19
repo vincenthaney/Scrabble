@@ -19,7 +19,7 @@ import { Delay } from '@app/utils/delay';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
-        const waitNaturalTime = async (): Promise<void> => {
+        const waitPreliminaryTime = async (): Promise<void> => {
             await Delay.for(PRELIMINARY_WAIT_TIMEOUT);
         };
         const waitTimeout = async (): Promise<void> => {
@@ -27,7 +27,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         };
 
         const play = async (): Promise<[ActionData, void]> => {
-            return await Promise.all([this.findAction(), waitNaturalTime()]);
+            return await Promise.all([this.findAction(), waitPreliminaryTime()]);
         };
         const actionResult: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
