@@ -1,6 +1,6 @@
 export const MISSING_PLAYER_DATA_TO_INITIALIZE = 'Certaines informations sont manquantes pour créer le joueur';
 export const NO_LOCAL_PLAYER = "Aucun joueur local n'a encore été défini";
-export const INVALID_COMMAND = 'Cette commande est invalide';
+export const INVALID_COMMAND = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes valides";
 export const INVALID_PAYLOAD_FOR_ACTION_TYPE = 'Payload invalide pour ce type de commande';
 export const NO_CURRENT_ROUND = "Aucune round n'est active présentement";
 export const NO_START_GAME_TIME = "La partie n'et pas encore commencée, alors il n'y a pas encore de temps de départ";
