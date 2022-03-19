@@ -17,7 +17,10 @@ export enum CommandExceptionMessages {
 
 export const PLAYER_NOT_FOUND = 'Aucun joueur actif trouvé';
 
-export const WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE: Message = {
-    content: "Veuillez attendre la confirmation de votre commande précédente avant d'en envoyer une autre.",
-    senderId: SYSTEM_ID,
+export const WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE = (gameId: string): Message => {
+    return {
+        content: "Veuillez attendre la confirmation de votre commande précédente avant d'en envoyer une autre.",
+        senderId: SYSTEM_ID,
+        gameId,
+    };
 };

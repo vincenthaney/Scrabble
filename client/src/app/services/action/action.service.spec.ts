@@ -228,7 +228,7 @@ describe('ActionService', () => {
             return;
         });
         service['sendWaitForConfirmationMessage'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-        expect(sendSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE);
+        expect(sendSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE(DEFAULT_GAME_ID));
     });
 
     it('resetHasActionBeenSent should set hasActionBeenPlayed to false', () => {

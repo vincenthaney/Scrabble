@@ -77,7 +77,7 @@ export class ActionService {
     }
 
     private sendWaitForConfirmationMessage(gameId: string, playerId: string): void {
-        this.gamePlayController.sendError(gameId, playerId, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE);
+        this.gamePlayController.sendError(gameId, playerId, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE(gameId));
     }
 
     private resetHasActionBeenSent(): void {
