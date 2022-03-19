@@ -31,7 +31,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     });
 
     loading: boolean = false;
-    gameId: string = '';
     componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
