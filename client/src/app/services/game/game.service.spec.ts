@@ -27,6 +27,9 @@ import { takeUntil } from 'rxjs/operators';
 import SpyObj = jasmine.SpyObj;
 
 const DEFAULT_PLAYER_ID = 'cov-id';
+const DEFAULT_GAME_ID = 'game id';
+const DEFAULT_MESSAGE = { ...INITIAL_MESSAGE, gameId: DEFAULT_GAME_ID };
+
 const DEFAULT_SQUARE: Omit<Square, 'position'> = { tile: null, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_GRID_SIZE = 8;
 const DEFAULT_PLAYER_1 = {
@@ -141,7 +144,7 @@ describe('GameService', () => {
 
         it('should call handleNewMessage if new message from gameController is Message', () => {
             const spy = spyOn(service, 'handleNewMessage');
-            service['gameController'].newMessageValue.next(INITIAL_MESSAGE);
+            service['gameController'].newMessageValue.next(DEFAULT_MESSAGE);
             expect(spy).toHaveBeenCalled();
         });
 

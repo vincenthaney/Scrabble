@@ -140,6 +140,7 @@ describe('InputParserService', () => {
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 content: `La commande **${VALID_PASS_INPUT}** est invalide :<br />${DEFAULT_COMMAND_ERROR_MESSAGE}`,
                 senderId: SYSTEM_ERROR_ID,
+                gameId: DEFAULT_GAME_ID,
             });
         });
 
@@ -152,6 +153,7 @@ describe('InputParserService', () => {
             expect(gamePlayControllerSpy.sendError).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 content: CommandExceptionMessages.NotYourTurn,
                 senderId: SYSTEM_ERROR_ID,
+                gameId: DEFAULT_GAME_ID,
             });
         });
 
