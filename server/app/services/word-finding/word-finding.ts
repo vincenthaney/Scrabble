@@ -218,7 +218,7 @@ export default class WordFindingService {
             moveRequirements.isPossible = false;
             return moveRequirements;
         }
-        moveRequirements.maximumLength = tileRackSize - this.findTilesLeftLengthAtExtremity(navigator, tileRackSize - moveRequirements.minLength);
+        moveRequirements.maximumLength = tileRackSize - this.findTilesLeftLengthAtExtremity(navigator, tileRackSize - moveRequirements.minimumLength);
 
         return moveRequirements;
     }
@@ -288,7 +288,7 @@ export default class WordFindingService {
     }
 
     private isWithinRequirements(movePossibility: MoveRequirements, target: number): boolean {
-        return movePossibility.minLength <= target && target <= movePossibility.maxLength;
+        return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
     }
 
     private getTilesCombinations(tiles: Tile[]) {
