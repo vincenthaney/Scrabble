@@ -14,6 +14,7 @@ import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
 import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
+import { arrayDeepCopy } from '@app/utils/deep-copy';
 
 export default abstract class WordFinding {
     protected wordPlacements: ScoredWordPlacement[] = [];
@@ -24,7 +25,9 @@ export default abstract class WordFinding {
         protected request: WordFindingRequest,
         private dictionary: Dictionary,
         private scoreCalculatorService: ScoreCalculatorService,
-    ) {}
+    ) {
+        this.tiles = arrayDeepCopy(this.tiles);
+    }
 
     findWords(): ScoredWordPlacement[] {
         const playerLetters = this.convertTilesToLetters(this.tiles);
