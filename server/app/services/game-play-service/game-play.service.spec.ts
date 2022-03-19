@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '@app/classes/actions';
+import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -15,15 +16,14 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
 import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import ActionHint from '@app/classes/actions/action-hint/action-hint';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -343,7 +343,7 @@ describe('GamePlayService', () => {
                 return;
             });
 
-            await gamePlayService.handlePlayerLeftEvent(DEFAULT_GAME_ID, playerWhoLeftId);
+            await gamePlayService['handlePlayerLeftEvent'](DEFAULT_GAME_ID, playerWhoLeftId);
             expect(emitSpy).to.have.been.called.with('playerLeftFeedback', DEFAULT_GAME_ID, endOfGameMessages, updatedData);
         });
     });
@@ -358,20 +358,20 @@ describe('GamePlayService', () => {
 
         it('should call end of game and endgame message', async () => {
             gameStub.isAddedToDatabase = true;
-            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(gameStub.endOfGame.calledOnce).to.be.true;
             expect(gameStub.endGameMessage.calledOnce).to.be.true;
         });
 
         it('should change isAddedtoDatabase', async () => {
             gameStub.isAddedToDatabase = false;
-            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(gameStub.isAddedToDatabase).to.be.true;
         });
 
         it('should call getConnectedRealPlayers', async () => {
             gameStub.isAddedToDatabase = false;
-            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(gameStub.getConnectedRealPlayers.calledOnce).to.be.true;
             expect(highScoresServiceStub.addHighScore.calledOnce).to.be.true;
         });
@@ -390,7 +390,7 @@ describe('GamePlayService', () => {
             const result = await gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
 
             gameStub.isAddedToDatabase = true;
-            await gamePlayService.handleGameOver('', gameStub as unknown as Game, {});
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(result.player1!.id).to.equal(gameStub.player1.id);
             expect(result.player2!.id).to.equal(gameStub.player2.id);
         });
