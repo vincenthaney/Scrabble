@@ -74,7 +74,7 @@ const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 const DEFAULT_JOINED_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 
-describe.only('GameDispatcherController', () => {
+describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
     let socketServiceStub: SinonStubbedInstance<SocketService>;
 
@@ -542,7 +542,7 @@ describe.only('GameDispatcherController', () => {
         });
     });
 
-    describe.only('handleCancelGame', () => {
+    describe('handleCancelGame', () => {
         let getGameFromIdSpy: unknown;
         let emitToSocketSpy: unknown;
         let cancelGameSpy: unknown;
