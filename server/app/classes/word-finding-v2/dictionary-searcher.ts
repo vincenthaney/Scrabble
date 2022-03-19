@@ -8,6 +8,7 @@ import {
     PerpendicularWord,
     SearcherPerpendicularLetters,
     DictionarySearcherStackItem,
+    PerpendicularLettersPosition,
 } from './word-finding-types';
 
 export default class DictionarySearcher {
@@ -22,11 +23,7 @@ export default class DictionarySearcher {
         this.boardPlacement = boardPlacement;
         this.stack = [{ node, playerLetters: this.copyTiles(playerLetters) }];
         this.alreadyPlacedLetters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
-        this.perpendicularLetters = boardPlacement.perpendicularLetters.map((perpendicularLetter) => ({
-            before: perpendicularLetter.before.join('').toLowerCase(),
-            after: perpendicularLetter.after.join('').toLowerCase(),
-            distance: perpendicularLetter.distance,
-        }));
+        this.perpendicularLetters = this.convertPerpendicularWords(boardPlacement.perpendicularLetters);
     }
 
     hasNext(): boolean {
@@ -134,5 +131,13 @@ export default class DictionarySearcher {
 
     private wordSizeIsWithinBounds(word: string): boolean {
         return word.length >= this.boardPlacement.minSize && word.length <= this.boardPlacement.maxSize;
+    }
+
+    private convertPerpendicularWords(perpendicularLettersPosition: PerpendicularLettersPosition[]): SearcherPerpendicularLetters[] {
+        return perpendicularLettersPosition.map((perpendicularLetter) => ({
+            before: perpendicularLetter.before.join('').toLowerCase(),
+            after: perpendicularLetter.after.join('').toLowerCase(),
+            distance: perpendicularLetter.distance,
+        }));
     }
 }
