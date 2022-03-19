@@ -169,7 +169,7 @@ describe('GamePlayController', () => {
     });
 
     it('obvserveNewMessage should return newMessage$ as observable', () => {
-        const result: Observable<Message | null> = controller.obvserveNewMessage();
+        const result: Observable<Message | null> = controller.observeNewMessage();
         expect(result).toEqual(controller['newMessage$'].asObservable());
     });
 });

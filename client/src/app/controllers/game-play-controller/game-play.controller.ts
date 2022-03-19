@@ -60,7 +60,7 @@ export class GamePlayController {
         return this.gameUpdate$.asObservable();
     }
 
-    obvserveNewMessage(): Observable<Message | null> {
+    observeNewMessage(): Observable<Message | null> {
         return this.newMessage$.asObservable();
     }
 

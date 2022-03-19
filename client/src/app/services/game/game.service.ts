@@ -47,7 +47,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
             this.handleInitializeGame(initializeValue);
         });
         this.gameController
-            .obvserveNewMessage()
+            .observeNewMessage()
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((newMessage) => {
                 if (newMessage) this.handleNewMessage(newMessage);
