@@ -47,12 +47,4 @@ describe('AbstractVirtualPlayer', () => {
         const activeGameServiceTest = abstractPlayer.getActiveGameService();
         expect(abstractPlayer['activeGameService']).to.equal(activeGameServiceTest);
     });
-
-    it('playTurn should call findAction method', () => {
-        const findActionSpy = chai.spy.on(abstractPlayer, 'findAction', () => {
-            return;
-        });
-        abstractPlayer.playTurn();
-        expect(findActionSpy).to.be.called();
-    });
 });
