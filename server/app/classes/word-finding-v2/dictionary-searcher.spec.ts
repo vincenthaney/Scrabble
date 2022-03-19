@@ -11,7 +11,7 @@ import { getDictionaryTestService } from '@app/services/dictionary-service/dicti
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Container } from 'typedi';
 import { Orientation, Position } from '@app/classes/board';
-import { BoardPlacement, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
+import { BoardPlacement, PerpendicularWord, SearcherPerpendicularLetters, DictionarySearcherStackItem } from './word-finding-types';
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
 import { SinonStub, stub } from 'sinon';
@@ -69,13 +69,13 @@ describe('DictionarySearcher', () => {
 
     describe('hasNext', () => {
         it('should return true if stack has items left', () => {
-            searcher['stack'] = [{}, {}, {}] as StackItem[];
+            searcher['stack'] = [{}, {}, {}] as DictionarySearcherStackItem[];
 
             expect(searcher.hasNext()).to.be.true;
         });
 
         it('should return false if stack has no item left', () => {
-            searcher['stack'] = [] as StackItem[];
+            searcher['stack'] = [] as DictionarySearcherStackItem[];
 
             expect(searcher.hasNext()).to.be.false;
         });

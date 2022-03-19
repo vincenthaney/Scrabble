@@ -2,11 +2,17 @@ import { DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
-import { BoardPlacement, DictionarySearchResult, PerpendicularWord, SearcherPerpendicularLetters, StackItem } from './word-finding-types';
+import {
+    BoardPlacement,
+    DictionarySearchResult,
+    PerpendicularWord,
+    SearcherPerpendicularLetters,
+    DictionarySearcherStackItem,
+} from './word-finding-types';
 
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;
-    private stack: StackItem[];
+    private stack: DictionarySearcherStackItem[];
     private letters: Map<number, string>;
     private perpendicularLetters: SearcherPerpendicularLetters[];
     private node: DictionaryNode;

@@ -25,7 +25,7 @@ export interface BoardPlacement {
     minSize: number;
 }
 
-export interface StackItem {
+export interface DictionarySearcherStackItem {
     node: DictionaryNode;
     playerLetters: string[];
 }
