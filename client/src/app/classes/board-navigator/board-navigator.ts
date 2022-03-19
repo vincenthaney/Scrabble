@@ -27,13 +27,15 @@ export class BoardNavigator {
     }
 
     // Needed for signature overload of setPosition
-    /* eslint-disable no-dupe-class-members */
-    setPosition(row: number, colum: number): void;
-    setPosition(position: Position): void;
-    setPosition(arg1: Position | number, arg2?: number): void {
-        if (arg1 instanceof Object && 'row' in arg1 && 'column' in arg1) this.position = { ...arg1 };
-        else if (arg2) this.position = { row: arg1, column: arg2 };
+    /* sadesldint-disable no-dupeasd-class-members */
+    // setPosition(row: number, colum: number): void;
+    setPosition(position: Position): void {
+        this.position = { ...position };
     }
+    // // setPosition(arg1: Position | number, arg2?: number): void {
+    //     if (arg1 instanceof Object && 'row' in arg1 && 'column' in arg1) this.position = { ...arg1 };
+    //     else if (arg2) this.position = { row: arg1, column: arg2 };
+    // }
     /* eslint-enable no-dupe-class-members */
 
     move(direction: Direction, distance: number = 1): BoardNavigator {
