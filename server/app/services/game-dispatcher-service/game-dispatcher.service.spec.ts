@@ -27,6 +27,7 @@ import { Container } from 'typedi';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
+import { v4 as uuidv4 } from 'uuid';
 const expect = chai.expect;
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
@@ -34,6 +35,13 @@ const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
     playerName: 'player',
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
+    maxRoundTime: 1,
+    dictionary: 'francais',
+};
+
+const DEFAULT_MULTIPLAYER_CONFIG: GameConfig = {
+    player1: new Player('id', 'newKidOnTheBlock'),
+    gameType: GameType.Classic,
     maxRoundTime: 1,
     dictionary: 'francais',
 };
@@ -68,7 +76,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
         });
 
@@ -93,7 +101,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
         });
 
@@ -125,7 +133,7 @@ describe('GameDispatcherService', () => {
         let tileReserveStub: SinonStubbedInstance<TileReserve>;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
             tileReserveStub = createStubInstance(TileReserve);
             tileReserveStub.init.returns(Promise.resolve());
             gameStub = createStubInstance(Game);
@@ -173,7 +181,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
@@ -208,7 +216,7 @@ describe('GameDispatcherService', () => {
         let waitingRoom: WaitingRoom;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
             waitingRoom = gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)[0];
             gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
         });
@@ -242,7 +250,7 @@ describe('GameDispatcherService', () => {
         let id: string;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
         });
 
         it('should remove waiting game from list', () => {
@@ -261,7 +269,7 @@ describe('GameDispatcherService', () => {
             const NTH_GAMES = 2;
 
             for (let i = 0; i < NTH_GAMES; ++i) {
-                gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+                gameDispatcherService.addToWaitingRoom(new WaitingRoom(DEFAULT_MULTIPLAYER_CONFIG));
             }
 
             expect(gameDispatcherService.getAvailableWaitingRooms()).to.have.lengthOf(NTH_GAMES);
@@ -272,7 +280,7 @@ describe('GameDispatcherService', () => {
             const NTH_JOINED = 2;
 
             for (let i = 0; i < NTH_GAMES; ++i) {
-                const id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+                const id = uuidv4();
                 if (i < NTH_JOINED) {
                     gameDispatcherService.requestJoinGame(id, DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
                 }
@@ -286,7 +294,7 @@ describe('GameDispatcherService', () => {
         let id: string;
 
         beforeEach(() => {
-            id = gameDispatcherService.createMultiplayerGame(DEFAULT_MULTIPLAYER_CONFIG_DATA);
+            id = uuidv4();
         });
 
         it('should find the waitingRoom', () => {

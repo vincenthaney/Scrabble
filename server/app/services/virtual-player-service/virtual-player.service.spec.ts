@@ -3,7 +3,7 @@ import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { VirtualPlayerService } from './virtual-player.service';
 // import fetch from 'node-fetch';
 
-describe.only('sendAction should', () => {
+describe('sendAction should', () => {
     let virtualPlayerService: VirtualPlayerService;
     beforeEach(() => {
         virtualPlayerService = new VirtualPlayerService();

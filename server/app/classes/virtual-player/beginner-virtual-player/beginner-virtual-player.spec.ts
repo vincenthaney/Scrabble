@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
+import { WordFindingUseCase } from '@app/classes/word-finding';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { HIGH_SCORE_RANGE, MEDIUM_SCORE_RANGE, LOW_SCORE_RANGE } from '@app/constants/virtual-player-constants';
 import {
@@ -18,6 +19,7 @@ import {
     RANDOM_VALUE_PLACE,
     TEST_COUNT_VALUE,
     TEST_ORIENTATION,
+    TEST_POINT_RANGE,
     TEST_SCORE,
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
@@ -190,6 +192,22 @@ describe('BeginnerVirtualPlayer', () => {
             expect(getGameSpy).to.have.been.called();
         });
     });
+
+    it('generateWordFindingRequest should call findPointRange method', () => {
+        const findPointRangeSpy = spy.on(beginnerVirtualPlayer, 'findPointRange', () => {
+            return;
+        });
+        beginnerVirtualPlayer.generateWordFindingRequest();
+        expect(findPointRangeSpy).to.have.been.called();
+    });
+
+    it('generateWordFindingRequest should return WordFindingRequest with correct data', () => {
+        const testWordFindingRequest = beginnerVirtualPlayer.generateWordFindingRequest();
+        expect(testWordFindingRequest.useCase).to.equal(WordFindingUseCase.Beginner);
+        expect(testWordFindingRequest.pointHistory).to.deep.equal(beginnerVirtualPlayer.pointHistory);
+        expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
+    });
+
     describe('createWordFindingPlacement', () => {
         let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
 
