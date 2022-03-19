@@ -1,11 +1,11 @@
 import Player from '@app/classes/player/player';
-import { PointRange } from '@app/classes/word-finding';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import WordFindingServiceV2 from '@app/services/word-finding/word-finding-v2';
 import { Container } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
+import Range from '../range/range';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
@@ -35,7 +35,7 @@ export abstract class AbstractVirtualPlayer extends Player {
         return this.activeGameService;
     }
 
-    abstract findPointRange(): PointRange;
+    abstract findPointRange(): Range;
 
     abstract findAction(): void;
 

@@ -1,5 +1,5 @@
+import Range from '@app/classes/range/range';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { PointRange } from '@app/classes/word-finding';
 
 export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     playTurn(): void {
@@ -8,10 +8,7 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     findAction(): void {
         return;
     }
-    findPointRange(): PointRange {
-        return {
-            minimum: 0,
-            maximum: 0,
-        };
+    findPointRange(): Range {
+        return new Range(0, 0);
     }
 }
