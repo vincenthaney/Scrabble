@@ -73,10 +73,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         }
     }
 
-    isOpponent(id: string): boolean {
-        return id !== SYSTEM_ID && id !== SYSTEM_ERROR_ID && id !== this.gameService.getLocalPlayerId();
-    }
-
     getLettersLeft(): TileReserveData[] {
         return this.gameService.tileReserve;
     }
