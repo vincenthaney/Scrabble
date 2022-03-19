@@ -46,7 +46,7 @@ export default class DictionarySearcher {
         try {
             while (this.hasNext()) results.push(this.next());
         } finally {
-            // nothing to do
+            // A throw means the iterator reached its end. Nothing special to handle, only return the result
         }
 
         return results;
