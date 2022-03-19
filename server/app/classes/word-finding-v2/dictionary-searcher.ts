@@ -15,10 +15,10 @@ export default class DictionarySearcher {
     private stack: DictionarySearcherStackItem[];
     private alreadyPlacedLetters: Map<number, string>;
     private perpendicularLetters: SearcherPerpendicularLetters[];
-    private node: DictionaryNode;
+    private rootNode: DictionaryNode;
 
     constructor(node: DictionaryNode, playerLetters: LetterValue[], boardPlacement: BoardPlacement) {
-        this.node = node;
+        this.rootNode = node;
         this.boardPlacement = boardPlacement;
         this.stack = [{ node, playerLetters: this.copyTiles(playerLetters) }];
         this.alreadyPlacedLetters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
@@ -125,7 +125,7 @@ export default class DictionarySearcher {
     }
 
     private areValidPerpendicularWords(words: PerpendicularWord[]): boolean {
-        return words.length > 0 ? words.every((word) => this.node.wordExists(word.word)) : true;
+        return words.length > 0 ? words.every((word) => this.rootNode.wordExists(word.word)) : true;
     }
 
     private nextTileIsEmpty(word: string): boolean {
