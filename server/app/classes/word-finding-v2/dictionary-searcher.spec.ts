@@ -62,7 +62,7 @@ describe('DictionarySearcher', () => {
 
         it('should add letters as map', () => {
             for (const letter of boardPlacement.letters) {
-                expect(searcher['letters'].get(letter.distance)).to.equal(letter.letter.toLowerCase());
+                expect(searcher['alreadyPlacedLetters'].get(letter.distance)).to.equal(letter.letter.toLowerCase());
             }
         });
     });
@@ -142,7 +142,7 @@ describe('DictionarySearcher', () => {
             nextStub = stub(searcher, 'next').returns({ word: '', perpendicularWords: [] });
         });
 
-        it("should call hasNext while it's value is true", () => {
+        it('should call hasNext while its value is true', () => {
             const n = 5;
 
             for (let i = 0; i < n; ++i) hasNextStub.onCall(i).returns(true);
@@ -344,11 +344,11 @@ describe('DictionarySearcher', () => {
 
     describe('isWordValid', () => {
         let wordSizeIsWithinBoundsStub: SinonStub;
-        let nextDoesNotHaveLetter: SinonStub;
+        let nextTileIsEmptyStub: SinonStub;
 
         beforeEach(() => {
             wordSizeIsWithinBoundsStub = stub(searcher, 'wordSizeIsWithinBounds' as any);
-            nextDoesNotHaveLetter = stub(searcher, 'nextDoesNotHaveLetter' as any);
+            nextTileIsEmptyStub = stub(searcher, 'nextTileIsEmpty' as any);
         });
 
         const tests: [sizeValid: boolean, nextLetter: boolean, expected: boolean][] = [
@@ -361,7 +361,7 @@ describe('DictionarySearcher', () => {
         for (const [sizeValid, nextLetter, expected] of tests) {
             it(`should return ${expected} for ${sizeValid} && ${nextLetter}`, () => {
                 wordSizeIsWithinBoundsStub.returns(sizeValid);
-                nextDoesNotHaveLetter.returns(nextLetter);
+                nextTileIsEmptyStub.returns(nextLetter);
 
                 const result = searcher['isWordValid'](DEFAULT_WORD);
 
@@ -375,12 +375,12 @@ describe('DictionarySearcher', () => {
             expect(wordSizeIsWithinBoundsStub.calledWith(DEFAULT_WORD)).to.be.true;
         });
 
-        it('should call nextDoesNotHaveLetter with word', () => {
+        it('should call nextTileIsEmpty with word', () => {
             wordSizeIsWithinBoundsStub.returns(true);
 
             searcher['isWordValid'](DEFAULT_WORD);
 
-            expect(nextDoesNotHaveLetter.calledWith(DEFAULT_WORD)).to.be.true;
+            expect(nextTileIsEmptyStub.calledWith(DEFAULT_WORD)).to.be.true;
         });
     });
 
@@ -397,7 +397,7 @@ describe('DictionarySearcher', () => {
                 const letters = ['a', 'b', 'c'];
                 if (hasWildCard) letters.push(BLANK_TILE_LETTER_VALUE);
 
-                stub(searcher['letters'], 'get').returns(lock);
+                stub(searcher['alreadyPlacedLetters'], 'get').returns(lock);
 
                 const [, result] = searcher['getSearchLettersForNextNode'](0, letters);
 
@@ -409,7 +409,7 @@ describe('DictionarySearcher', () => {
         it('should return array with letters if no lock and no wild card', () => {
             const letters = ['a', 'b', 'c'];
 
-            stub(searcher['letters'], 'get').returns(undefined);
+            stub(searcher['alreadyPlacedLetters'], 'get').returns(undefined);
 
             const [result] = searcher['getSearchLettersForNextNode'](0, letters);
 
@@ -420,7 +420,7 @@ describe('DictionarySearcher', () => {
         it('should return array with every letters in alphabet if wildcard', () => {
             const letters = ['a', 'b', 'c', '*'];
 
-            stub(searcher['letters'], 'get').returns(undefined);
+            stub(searcher['alreadyPlacedLetters'], 'get').returns(undefined);
 
             const [result] = searcher['getSearchLettersForNextNode'](0, letters);
 
@@ -432,7 +432,7 @@ describe('DictionarySearcher', () => {
             const letters = ['a', 'b', 'c'];
             const lock = 'z';
 
-            stub(searcher['letters'], 'get').returns(lock);
+            stub(searcher['alreadyPlacedLetters'], 'get').returns(lock);
 
             const [result] = searcher['getSearchLettersForNextNode'](0, letters);
 
@@ -518,7 +518,7 @@ describe('DictionarySearcher', () => {
         let words: PerpendicularWord[];
 
         beforeEach(() => {
-            wordExistsStub = stub(searcher['node'], 'wordExists').returns(true);
+            wordExistsStub = stub(searcher['rootNode'], 'wordExists').returns(true);
             words = [
                 { word: 'abc', distance: 0 },
                 { word: 'abcd', distance: 0 },
@@ -542,7 +542,7 @@ describe('DictionarySearcher', () => {
         }
     });
 
-    describe('nextDoesNotHaveLetter', () => {
+    describe('nextTileIsEmpty', () => {
         const tests: [word: string, position: number, expected: boolean][] = [
             ['abc', 2, true],
             ['abc', 3, false],
@@ -552,8 +552,8 @@ describe('DictionarySearcher', () => {
         let index = 0;
         for (const [word, position, expected] of tests) {
             it(`should check (${index})`, () => {
-                searcher['letters'] = new Map([[position, 'z']]);
-                expect(searcher['nextDoesNotHaveLetter'](word)).to.equal(expected);
+                searcher['alreadyPlacedLetters'] = new Map([[position, 'z']]);
+                expect(searcher['nextTileIsEmpty'](word)).to.equal(expected);
             });
             index++;
         }
