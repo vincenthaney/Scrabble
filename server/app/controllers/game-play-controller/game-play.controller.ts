@@ -43,7 +43,8 @@ export class GamePlayController {
 
         this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
-            const data = req.body;
+            const data: ActionData = req.body;
+
             try {
                 await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();

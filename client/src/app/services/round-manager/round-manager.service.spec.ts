@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionType } from '@app/classes/actions/action-data';
 import { PlayerData } from '@app/classes/communication';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
@@ -19,7 +19,7 @@ import { Tile } from '@app/classes/tile';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
-import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { ActionService } from '@app/services/action/action.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SpyObj = jasmine.SpyObj;
 
@@ -62,7 +62,7 @@ const DEFAULT_PLAYER_DATA: PlayerData = { name: 'name', id: 'id', score: 1, tile
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
-    let gameplayControllerSpy: SpyObj<GamePlayController>;
+    let actionServiceSpy: SpyObj<ActionService>;
 
     const currentRound: Round = {
         player: DEFAULT_PLAYER,
@@ -72,7 +72,7 @@ describe('RoundManagerService', () => {
     };
 
     beforeEach(() => {
-        gameplayControllerSpy = jasmine.createSpyObj('GamePlayController', ['sendAction']);
+        actionServiceSpy = jasmine.createSpyObj('ActionService', ['createActionData', 'sendAction']);
     });
 
     beforeEach(() => {
@@ -84,7 +84,7 @@ describe('RoundManagerService', () => {
                     { path: 'home', component: TestComponent },
                 ]),
             ],
-            providers: [{ provide: GamePlayController, useValue: gameplayControllerSpy }],
+            providers: [{ provide: ActionService, useValue: actionServiceSpy }],
         });
         service = TestBed.inject(RoundManagerService);
     });
@@ -474,13 +474,16 @@ describe('RoundManagerService', () => {
 
         describe('RoundTimeout', () => {
             let endRoundEventSpy: unknown;
+            const fakeData = { fake: 'data' };
 
             beforeEach(() => {
                 endRoundEventSpy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
                     return;
                 });
                 spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
-                gameplayControllerSpy.sendAction.and.callFake(() => {
+
+                actionServiceSpy.createActionData.and.returnValue(fakeData as unknown as ActionData);
+                actionServiceSpy.sendAction.and.callFake(() => {
                     return;
                 });
             });
@@ -497,7 +500,7 @@ describe('RoundManagerService', () => {
             it('RoundTimeout should not send pass event if the local player is not the active player', () => {
                 spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
                 service.roundTimeout();
-                expect(gameplayControllerSpy.sendAction).not.toHaveBeenCalled();
+                expect(actionServiceSpy.sendAction).not.toHaveBeenCalled();
             });
 
             it('RoundTimeout should emit endRoundEvent', fakeAsync(() => {
@@ -516,14 +519,13 @@ describe('RoundManagerService', () => {
                 tick();
                 spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
 
-                const actionPass = {
-                    type: ActionType.PASS,
-                    input: '',
-                    payload: {},
-                };
-
                 service.roundTimeout();
-                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
+                expect(actionServiceSpy.createActionData).toHaveBeenCalledWith(ActionType.PASS, {});
+                expect(actionServiceSpy.sendAction).toHaveBeenCalledOnceWith(
+                    service.gameId,
+                    service.localPlayerId,
+                    fakeData as unknown as ActionData,
+                );
             }));
         });
     });

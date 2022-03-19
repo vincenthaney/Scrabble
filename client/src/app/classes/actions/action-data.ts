@@ -12,18 +12,19 @@ export enum ActionType {
     HELP = 'aide',
     HINT = 'indice',
 }
+export interface ActionPayload {
+    playerId?: string;
+}
 
-export interface ActionPlacePayload {
+export interface ExchangeActionPayload extends ActionPayload {
+    tiles: Tile[];
+}
+export interface PlaceActionPayload extends ActionPayload {
     tiles: Tile[];
     startPosition: Position;
     orientation: Orientation;
 }
-
-export interface ActionExchangePayload {
-    tiles: Tile[];
-}
-
-export interface ActionData<T extends unknown = unknown> {
+export interface ActionData<T extends ActionPayload = ActionPayload> {
     type: ActionType;
     input: string;
     payload: T;
