@@ -202,6 +202,9 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     it('generateWordFindingRequest should return WordFindingRequest with correct data', () => {
+        spy.on(beginnerVirtualPlayer, 'findPointRange', () => {
+            return TEST_POINT_RANGE;
+        });
         const testWordFindingRequest = beginnerVirtualPlayer.generateWordFindingRequest();
         expect(testWordFindingRequest.useCase).to.equal(WordFindingUseCase.Beginner);
         expect(testWordFindingRequest.pointHistory).to.deep.equal(beginnerVirtualPlayer.pointHistory);
