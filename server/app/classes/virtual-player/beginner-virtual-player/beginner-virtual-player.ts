@@ -22,14 +22,14 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         const waitPreliminaryTime = async (): Promise<void> => {
             await Delay.for(PRELIMINARY_WAIT_TIME);
         };
-        const waitTimeout = async (): Promise<void> => {
+        const waitFinalTime = async (): Promise<void> => {
             await Delay.for(FINAL_WAIT_TIME);
         };
 
         const play = async (): Promise<[ActionData, void]> => {
             return await Promise.all([this.findAction(), waitPreliminaryTime()]);
         };
-        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
+        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
     }
 
