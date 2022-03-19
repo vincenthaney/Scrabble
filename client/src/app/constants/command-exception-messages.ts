@@ -3,7 +3,7 @@ export enum CommandExceptionMessages {
     PlaceBadSyntax = 'La commande placer doit suivre le format _!placer ‹position› ‹lettres›_',
     ExchangeBadSyntax = 'La commande échanger doit suivre le format _!échanger ‹lettres›_',
     PassBadSyntax = 'La commande passer doit suivre le format _!passer_',
-    InvalidEntry = "Cette commande n'existe pas.",
+    InvalidEntry = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes valides",
     ImpossibleCommand = 'Cette commande est impossible à réaliser.',
     DontHaveTiles = "Vous n'avez pas les tuiles requises.",
     PositionFormat = 'La position doit être de format _‹a-o›‹1-15›‹h/v›_.',
