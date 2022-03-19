@@ -1,4 +1,4 @@
-import { Board, Position } from '@app/classes/board';
+import { Board, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
@@ -54,6 +54,25 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
 
 const lettersToTiles = (letters: LetterValue[]) => letters.map<Tile>((letter) => ({ letter, value: 0 }));
 
+class WordFindingTest extends WordFinding {
+    private bestWordPlacement: ScoredWordPlacement = {
+        orientation: Orientation.Horizontal,
+        startPosition: new Position(0, 0),
+        tilesToPlace: [],
+        score: 0,
+    };
+
+    handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
+        if (wordPlacement.score > this.bestWordPlacement.score) {
+            this.bestWordPlacement = wordPlacement;
+            this.wordPlacements = [wordPlacement];
+        }
+    }
+    isSearchCompleted(): boolean {
+        return false;
+    }
+}
+
 describe.only('WordFinding', () => {
     it('should work', () => {
         const board = boardFromLetterValues(GRID);
@@ -65,12 +84,12 @@ describe.only('WordFinding', () => {
             pointRange: { minimum: 4, maximum: 100 },
         };
 
-        const iterations = 20;
+        const iterations = 10;
         let results: ScoredWordPlacement[] = [];
         let totalTime = 0;
         for (let i = 0; i < iterations; ++i) {
             const start = Date.now();
-            const wordFinding = new WordFinding(board, tiles, request, dictionary, scoreCalculator);
+            const wordFinding = new WordFindingTest(board, tiles, request, dictionary, scoreCalculator);
             results = results.concat(wordFinding.findWords());
             totalTime += Date.now() - start;
         }
