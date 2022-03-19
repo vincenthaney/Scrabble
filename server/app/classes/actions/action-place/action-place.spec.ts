@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
@@ -181,7 +183,10 @@ describe('ActionPlace', () => {
                 scoreCalculatorServiceStub.bonusPoints.returns(0);
                 gameStub.getTilesFromReserve.returns(GET_TILES_RETURN);
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
-                isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(true);
+                isLegalPlacementStub = stub(ActionPlace.prototype, <any>'isLegalPlacement').returns(true) as SinonStub<
+                    [words: [Square, Tile][][]],
+                    boolean
+                >;
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
             });
@@ -238,7 +243,10 @@ describe('ActionPlace', () => {
 
             it('should throw if isLegalPlacement returns false', () => {
                 isLegalPlacementStub.restore();
-                isLegalPlacementStub = stub(ActionPlace.prototype, 'isLegalPlacement').returns(false);
+                isLegalPlacementStub = stub(ActionPlace.prototype, <any>'isLegalPlacement').returns(false) as SinonStub<
+                    [words: [Square, Tile][][]],
+                    boolean
+                >;
                 const result = () => action.execute();
                 expect(result).to.throw(ActionErrorsMessages.ImpossibleAction);
             });
@@ -314,7 +322,7 @@ describe('ActionPlace', () => {
                 startPosition: DEFAULT_POSITION,
                 orientation: DEFAULT_ORIENTATION,
             });
-            const result = action.updateBoard(EXTRACT_RETURN);
+            const result = action['updateBoard'](EXTRACT_RETURN);
 
             for (const changes of EXTRACT_RETURN) {
                 for (const [square, tile] of changes) {
@@ -333,7 +341,7 @@ describe('ActionPlace', () => {
             const action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
             const copiedExtractReturn: [Square, Tile][][] = EXTRACT_RETURN.map((row) => row.map(([square, tile]) => [{ ...square }, { ...tile }]));
             copiedExtractReturn.forEach((row) => row.forEach(([square, tile]) => (square.tile = tile)));
-            const result = action.updateBoard(EXTRACT_RETURN);
+            const result = action['updateBoard'](EXTRACT_RETURN);
 
             expect(result).to.be.empty;
         });
@@ -375,7 +383,7 @@ describe('ActionPlace', () => {
         });
 
         it('should return the correct number of tiles', () => {
-            expect(action.amountOfLettersInWords(EXTRACT_RETURN)).to.equal(EXTRACT_RETURN_LETTERS);
+            expect(action['amountOfLettersInWords'](EXTRACT_RETURN)).to.equal(EXTRACT_RETURN_LETTERS);
         });
     });
 
@@ -388,16 +396,16 @@ describe('ActionPlace', () => {
 
         it('should call amountOfLettersInWords', () => {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            const amountOfLettersInWordsStub = stub(ActionPlace.prototype, 'amountOfLettersInWords').returns(1000);
-            action.isLegalPlacement(EXTRACT_RETURN);
+            const amountOfLettersInWordsStub = stub(ActionPlace.prototype, <any>'amountOfLettersInWords').returns(1000);
+            action['isLegalPlacement'](EXTRACT_RETURN);
             assert(amountOfLettersInWordsStub.calledOnce);
             amountOfLettersInWordsStub.restore();
         });
         it('should call containsCenterSquare if amountOfLettersInWords return the same amount than tileToPlace', () => {
             chai.spy.restore(ActionPlace.prototype, 'amountOfLettersInWords');
-            const containsCenterSquareStub = stub(action, 'containsCenterSquare').returns(true);
-            const amountOfLettersInWordsStub = stub(action, 'amountOfLettersInWords').returns(VALID_TILES_TO_PLACE.length);
-            action.isLegalPlacement(EXTRACT_RETURN);
+            const containsCenterSquareStub = stub(action, <any>'containsCenterSquare').returns(true);
+            const amountOfLettersInWordsStub = stub(action, <any>'amountOfLettersInWords').returns(VALID_TILES_TO_PLACE.length);
+            action['isLegalPlacement'](EXTRACT_RETURN);
             assert(containsCenterSquareStub.calledOnce);
             containsCenterSquareStub.restore();
             amountOfLettersInWordsStub.restore();
@@ -412,12 +420,12 @@ describe('ActionPlace', () => {
         });
 
         it('should return true if it contains center square', () => {
-            const result = action.containsCenterSquare(EXTRACT_CENTER);
+            const result = action['containsCenterSquare'](EXTRACT_CENTER);
             expect(result).to.be.true;
         });
 
         it('should return true if it contains center square', () => {
-            const result = action.containsCenterSquare(EXTRACT_RETURN);
+            const result = action['containsCenterSquare'](EXTRACT_RETURN);
             expect(result).to.be.false;
         });
     });
