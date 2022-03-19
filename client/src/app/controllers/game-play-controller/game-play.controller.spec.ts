@@ -162,4 +162,9 @@ describe('GamePlayController', () => {
         };
         expect(() => controller['handleDisconnectError'](error)).not.toThrowError(error.message);
     });
+
+    it('observeActionDone should return actionDone$ as observable', () => {
+        const result: Observable<void> = controller.observeActionDone();
+        expect(result).toEqual(controller['actionDone$'].asObservable());
+    });
 });
