@@ -39,7 +39,7 @@ const DEFAULT_LETTER_ARRAY: LetterOrEmpty[][] = [
 const HAS_TILE_POSITION: Position = new Position(1, 2);
 const DEFAULT_ORIENTATION: Orientation = Orientation.Horizontal;
 
-describe.only('WordExtract', () => {
+describe('WordExtract', () => {
     let board: Board;
     let grid: Square[][];
     let extraction: WordExtraction;
@@ -170,7 +170,6 @@ describe.only('WordExtract', () => {
             expect(extraction['extractWordInDirection'](orientation, direction, position).length).to.equal(0);
             stubVerify.reset();
             stubVerify.restore();
-
         });
     });
 });
