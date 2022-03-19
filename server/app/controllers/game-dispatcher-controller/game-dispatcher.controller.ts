@@ -45,10 +45,6 @@ export class GameDispatcherController {
         );
     }
 
-    async delay(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-
     private configureRouter(): void {
         this.router = Router();
 
