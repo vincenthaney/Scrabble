@@ -104,7 +104,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             this.messages = this.messages.concat(localGameMessages);
         }
 
-        if (this.messages.length < 1) this.onReceiveNewMessage({ ...INITIAL_MESSAGE, gameId: this.gameService.getGameId() });
+        if (this.messages.length === 0) this.onReceiveNewMessage({ ...INITIAL_MESSAGE, gameId: this.gameService.getGameId() });
     }
 
     private createVisualMessage(newMessage: Message): Message {
