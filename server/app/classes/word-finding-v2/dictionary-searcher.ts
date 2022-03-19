@@ -110,14 +110,14 @@ export default class DictionarySearcher {
     }
 
     private getPerpendicularWords(word: string): PerpendicularWord[] {
-        const words: PerpendicularWord[] = [];
+        const perpendicularWords: PerpendicularWord[] = [];
 
         for (const { before, after, distance } of this.perpendicularLetters) {
             const letter = word.charAt(distance);
-            if (letter !== '') words.push({ word: before + word.charAt(distance) + after, distance });
+            if (letter !== '') perpendicularWords.push({ word: before + word.charAt(distance) + after, distance });
         }
 
-        return words;
+        return perpendicularWords;
     }
 
     private copyTiles(letters: LetterValue[]): string[] {
