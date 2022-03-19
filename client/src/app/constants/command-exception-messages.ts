@@ -9,15 +9,6 @@ export const BAD_SYNTAX_MESSAGES = new Map<ActionType, string>([
     [ActionType.RESERVE, 'La commande passer doit suivre le format _!réserve_.'],
 ]);
 
-// const enum BadSyntaxMessages {
-//     PLACE = 'La commande placer doit suivre le format _!placer ‹position› ‹lettres›_',
-//     EXCHANGE = 'La commande échanger doit suivre le format _!échanger ‹lettres›_',
-//     PASS = 'La commande passer doit suivre le format _!passer_',
-//     HELP = 'La commande passer doit suivre le format _!aide',
-//     HINT = 'La commande passer doit suivre le format _!indice',
-//     RESERVE = 'La commande passer doit suivre le format _!réserve',
-// }
-
 export enum CommandExceptionMessages {
     BadSyntax = 'La commande ne respecte pas la syntaxe requise.',
     InvalidEntry = "Cette commande n'existe pas.",

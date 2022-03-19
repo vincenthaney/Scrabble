@@ -92,8 +92,8 @@ export default class InputParserService {
             default:
                 /* This line cannot be covered in tests because we already throw an error before the switch case
                 if the command is not part of the known commands (verifyActionValidity) so we will never reach the 
-                default. We still need to a default that throws or else the compiler does not recognise that we will 
-                always return an ActionData because the switch case covers every type of known action. */
+                default. We still need to have a default that throws or else the compiler does not recognise that 
+                we will always return an ActionData because the switch case covers every type of known action. */
                 throw new CommandException(CommandExceptionMessages.InvalidEntry);
         }
     }
