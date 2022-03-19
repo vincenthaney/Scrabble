@@ -37,3 +37,5 @@ export const ORIENTATION_VERTICAL_LETTER = 'v';
 
 export const NO_WORDS_FOUND = 'Aucun mot trouvé.';
 export const FOUND_WORDS = '**Mots trouvés**';
+
+export const WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD = 0.7;
