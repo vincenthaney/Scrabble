@@ -144,12 +144,12 @@ export default class WordFindingService {
     private assignAcceptanceProbability(request: WordFindingRequest): Map<number, number> {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
-        if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
+        if (request.pointRange.min > request.pointRange.max) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
         const minFrequency = this.findMinFrequencyInRange(request);
         const scoreChanceDistribution = new Map<number, number>();
 
-        for (let score = request.pointRange.minimum; score <= request.pointRange.maximum; score++) {
+        for (let score = request.pointRange.min; score <= request.pointRange.max; score++) {
             const scoreFrequency = request.pointHistory.get(score);
             if (scoreFrequency) {
                 scoreChanceDistribution.set(score, 1 / (scoreFrequency - minFrequency + 1));
@@ -181,7 +181,7 @@ export default class WordFindingService {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         const foundMoves = new Map<number, ScoredWordPlacement[]>();
         for (const move of validMoves) {
-            if (request.pointRange.minimum <= move.score && move.score <= request.pointRange.maximum) {
+            if (request.pointRange.min <= move.score && move.score <= request.pointRange.max) {
                 if (foundMoves.has(move.score)) {
                     foundMoves.get(move.score)?.push(move);
                 } else {
@@ -195,10 +195,10 @@ export default class WordFindingService {
     private findMinFrequencyInRange(request: WordFindingRequest): number {
         if (!request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
         if (!request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
-        if (request.pointRange.minimum > request.pointRange.maximum) throw new Error(INVALID_REQUEST_POINT_RANGE);
+        if (request.pointRange.min > request.pointRange.max) throw new Error(INVALID_REQUEST_POINT_RANGE);
 
         let minFrequency = Number.MAX_VALUE;
-        for (let score = request.pointRange.minimum; score <= request.pointRange.maximum; score++) {
+        for (let score = request.pointRange.min; score <= request.pointRange.max; score++) {
             const scoreFrequency = request.pointHistory.get(score);
             if (scoreFrequency && scoreFrequency < minFrequency) {
                 minFrequency = scoreFrequency;
@@ -218,7 +218,7 @@ export default class WordFindingService {
             moveRequirements.isPossible = false;
             return moveRequirements;
         }
-        moveRequirements.maximumLength = tileRackSize - this.findTilesLeftLengthAtExtremity(navigator, tileRackSize - moveRequirements.minimumLength);
+        moveRequirements.maximumLength = tileRackSize - this.findTilesLeftLengthAtExtremity(navigator, tileRackSize - moveRequirements.minLength);
 
         return moveRequirements;
     }
@@ -288,7 +288,7 @@ export default class WordFindingService {
     }
 
     private isWithinRequirements(movePossibility: MoveRequirements, target: number): boolean {
-        return movePossibility.minimumLength <= target && target <= movePossibility.maximumLength;
+        return movePossibility.minLength <= target && target <= movePossibility.maxLength;
     }
 
     private getTilesCombinations(tiles: Tile[]) {
