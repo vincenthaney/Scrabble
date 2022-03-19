@@ -23,8 +23,6 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameService implements OnDestroy, IResetServiceData {
-    gameType: GameType;
-    dictionaryName: string;
     tileReserve: TileReserveData[];
 
     isGameSetUp: boolean;
@@ -32,6 +30,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     private gameId: string;
     private playerContainer?: PlayerContainer;
+    private gameType: GameType;
+    private dictionaryName: string;
     private serviceDestroyed$: Subject<boolean>;
 
     constructor(
