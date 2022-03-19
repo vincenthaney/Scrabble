@@ -13,7 +13,7 @@ import {
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;
     private stack: DictionarySearcherStackItem[];
-    private letters: Map<number, string>;
+    private alreadyPlacedLetters: Map<number, string>;
     private perpendicularLetters: SearcherPerpendicularLetters[];
     private node: DictionaryNode;
 
@@ -21,7 +21,7 @@ export default class DictionarySearcher {
         this.node = node;
         this.boardPlacement = boardPlacement;
         this.stack = [{ node, playerLetters: this.copyTiles(playerLetters) }];
-        this.letters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
+        this.alreadyPlacedLetters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
         this.perpendicularLetters = boardPlacement.perpendicularLetters.map((perpendicularLetter) => ({
             before: perpendicularLetter.before.join('').toLowerCase(),
             after: perpendicularLetter.after.join('').toLowerCase(),
@@ -91,7 +91,7 @@ export default class DictionarySearcher {
     }
 
     private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
-        const lock = this.letters.get(index + 1);
+        const lock = this.alreadyPlacedLetters.get(index + 1);
 
         if (lock) return [[lock], false];
 
@@ -129,7 +129,7 @@ export default class DictionarySearcher {
     }
 
     private nextTileIsEmpty(word: string): boolean {
-        return !this.letters.has(word.length);
+        return !this.alreadyPlacedLetters.has(word.length);
     }
 
     private wordSizeIsWithinBounds(word: string): boolean {
