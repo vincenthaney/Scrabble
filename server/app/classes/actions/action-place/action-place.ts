@@ -1,5 +1,6 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
+import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -7,8 +8,10 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
+import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding/word-placement';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { StringConversion } from '@app/utils/string-conversion';
 import { Container } from 'typedi';
 import { ActionErrorsMessages } from './action-errors';
 import { StringConversion } from '@app/utils/string-conversion';
@@ -67,20 +70,28 @@ export default class ActionPlace extends ActionPlay {
         return response;
     }
 
-    isLegalPlacement(words: [Square, Tile][][]): boolean {
+    getMessage(): string {
+        return `Vous avez placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+    }
+
+    getOpponentMessage(): string {
+        return `${this.player.name} a placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+    }
+
+    private isLegalPlacement(words: [Square, Tile][][]): boolean {
         const isAdjacentToPlacedTile = this.amountOfLettersInWords(words) !== this.wordPlacement.tilesToPlace.length;
         return isAdjacentToPlacedTile ? true : this.containsCenterSquare(words);
     }
 
-    amountOfLettersInWords(words: [Square, Tile][][]): number {
+    private amountOfLettersInWords(words: [Square, Tile][][]): number {
         return words.reduce((lettersInWords, word) => (lettersInWords += word.length), 0);
     }
 
-    containsCenterSquare(words: [Square, Tile][][]): boolean {
+    private containsCenterSquare(words: [Square, Tile][][]): boolean {
         return words.some((word) => word.some(([square]) => square.isCenter));
     }
 
-    updateBoard(words: [Square, Tile][][]): Square[] {
+    private updateBoard(words: [Square, Tile][][]): Square[] {
         const updatedSquares: Square[] = [];
         for (const word of words) {
             for (const [square, tile] of word) {
@@ -95,13 +106,5 @@ export default class ActionPlace extends ActionPlay {
         }
 
         return updatedSquares;
-    }
-
-    getMessage(): string {
-        return `Vous avez placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
-    }
-
-    getOpponentMessage(): string {
-        return `${this.player.name} a placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
     }
 }

@@ -27,6 +27,9 @@ import { takeUntil } from 'rxjs/operators';
 import SpyObj = jasmine.SpyObj;
 
 const DEFAULT_PLAYER_ID = 'cov-id';
+const DEFAULT_GAME_ID = 'game id';
+const DEFAULT_MESSAGE = { ...INITIAL_MESSAGE, gameId: DEFAULT_GAME_ID };
+
 const DEFAULT_SQUARE: Omit<Square, 'position'> = { tile: null, scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
 const DEFAULT_GRID_SIZE = 8;
 const DEFAULT_PLAYER_1 = {
@@ -141,7 +144,7 @@ describe('GameService', () => {
 
         it('should call handleNewMessage if new message from gameController is Message', () => {
             const spy = spyOn(service, 'handleNewMessage');
-            service['gameController'].newMessageValue.next(INITIAL_MESSAGE);
+            service['gameController'].newMessageValue.next(DEFAULT_MESSAGE);
             expect(spy).toHaveBeenCalled();
         });
 
@@ -232,18 +235,6 @@ describe('GameService', () => {
         it('should set player 2', async () => {
             await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
             expect(service['playerContainer']!.getPlayer(2)).toBeDefined();
-        });
-
-        it('should set gameType', async () => {
-            expect(service.gameType).not.toBeDefined();
-            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service.gameType).toEqual(defaultGameData.gameType);
-        });
-
-        it('should set dictionaryName', async () => {
-            expect(service.dictionaryName).not.toBeDefined();
-            await service.initializeGame(DEFAULT_PLAYER_ID, defaultGameData);
-            expect(service.dictionaryName).toEqual(defaultGameData.dictionary);
         });
 
         it('should initialize roundManager', async () => {
@@ -521,14 +512,14 @@ describe('GameService', () => {
         });
 
         it('should call gameOver if gameOver', () => {
-            const spy = spyOn(service, 'handleGameOver');
+            const spy = spyOn<any>(service, 'handleGameOver');
             gameUpdateData.isGameOver = true;
             service.handleGameUpdate(gameUpdateData);
             expect(spy).toHaveBeenCalled();
         });
 
         it('should not call gameOver if gameOver is false or undefined', () => {
-            const spy = spyOn(service, 'handleGameOver');
+            const spy = spyOn<any>(service, 'handleGameOver');
             service.handleGameUpdate(gameUpdateData);
             expect(spy).not.toHaveBeenCalled();
         });
@@ -631,12 +622,12 @@ describe('GameService', () => {
 
     describe('gameOver', () => {
         it('should change attribute "isGameOver" to true', () => {
-            service.handleGameOver();
+            service['handleGameOver']();
             expect(service['isGameOver']).toEqual(true);
         });
 
         it('should call roundManager.resetTimerData()', () => {
-            service.handleGameOver();
+            service['handleGameOver']();
             expect(roundManagerSpy.resetTimerData).toHaveBeenCalled();
         });
     });

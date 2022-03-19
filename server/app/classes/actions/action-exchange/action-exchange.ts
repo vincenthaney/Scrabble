@@ -8,7 +8,7 @@ import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 
 export default class ActionExchange extends ActionPlay {
-    tilesToExchange: Tile[];
+    private tilesToExchange: Tile[];
 
     constructor(player: Player, game: Game, tilesToExchange: Tile[]) {
         super(player, game);

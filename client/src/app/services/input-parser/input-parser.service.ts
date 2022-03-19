@@ -43,6 +43,7 @@ export default class InputParserService {
             this.controller.sendMessage(gameId, playerId, {
                 content: input,
                 senderId: playerId,
+                gameId,
             });
         }
     }
@@ -60,6 +61,7 @@ export default class InputParserService {
                 this.controller.sendError(gameId, playerId, {
                     content: errorMessageContent,
                     senderId: SYSTEM_ERROR_ID,
+                    gameId,
                 });
             }
         }
