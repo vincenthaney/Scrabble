@@ -25,9 +25,7 @@ export default abstract class WordFinding {
         protected request: WordFindingRequest,
         private dictionary: Dictionary,
         private scoreCalculatorService: ScoreCalculatorService,
-    ) {
-        console.log('NEW WORD FINDING', board, tiles, request, dictionary, scoreCalculatorService);
-    }
+    ) {}
 
     findWords(): ScoredWordPlacement[] {
         const playerLetters = this.convertTilesToLetters(this.tiles);
@@ -65,7 +63,6 @@ export default abstract class WordFinding {
         const score = this.scoreCalculatorService.calculatePoints([wordSquareTiles, ...perpendicularWordsSquareTiles]);
 
         const squareTilesToPlace = wordSquareTiles.filter(([square]) => !square.tile);
-        console.log('getWordPlacement', squareTilesToPlace);
         const tilesToPlace = squareTilesToPlace.map(([, tile]) => tile);
 
         return {
@@ -145,7 +142,6 @@ export default abstract class WordFinding {
     }
 
     convertTilesToLetters(tiles: Tile[]): LetterValue[] {
-        console.log('convert', tiles);
         return tiles.map((tile) => tile.letter);
     }
 
