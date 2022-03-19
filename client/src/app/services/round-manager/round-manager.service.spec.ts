@@ -221,16 +221,32 @@ describe('RoundManagerService', () => {
         expect(service.maxRoundTime).toEqual(0);
     });
 
-    it('resetTimerData should call clearTimeout and timerSource.complete', () => {
-        const clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callFake(() => {
-            return;
+    describe('resetTimerData', () => {
+        let clearTimeoutSpy: jasmine.Spy;
+        let completeSpy: jasmine.Spy;
+        let endRoundSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callFake(() => {
+                return;
+            });
+            completeSpy = spyOn(service['timerSource'], 'complete').and.callFake(() => {
+                return;
+            });
+            endRoundSpy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
+                return;
+            });
+            service.resetTimerData();
         });
-        const completeSpy = spyOn(service['timerSource'], 'complete').and.callFake(() => {
-            return;
+        it('should call clearTimeout', () => {
+            expect(clearTimeoutSpy).toHaveBeenCalled();
         });
-        service.resetTimerData();
-        expect(clearTimeoutSpy).toHaveBeenCalled();
-        expect(completeSpy).toHaveBeenCalled();
+        it('should call timerSource.complete', () => {
+            expect(completeSpy).toHaveBeenCalled();
+        });
+        it('should call endRound event', () => {
+            expect(endRoundSpy).toHaveBeenCalled();
+        });
     });
 
     describe('UpdateRound', () => {

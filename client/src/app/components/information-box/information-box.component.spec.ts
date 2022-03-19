@@ -18,6 +18,7 @@ import { BehaviorSubject, Observable, Subject, Subscription, timer } from 'rxjs'
 import { takeUntil } from 'rxjs/operators';
 import { InformationBoxComponent } from './information-box.component';
 import SpyObj = jasmine.SpyObj;
+
 class MockRoundManager {
     pTimerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([
         new Timer(0, 0),
@@ -47,7 +48,7 @@ class MockRoundManager {
     }
     // eslint-disable-next-line no-unused-vars
     subscribeToEndRoundEvent(destroy$: Observable<boolean>, next: () => void): Subscription {
-        return new Subscription();
+        return this.pEndRoundEvent.pipe(takeUntil(destroy$)).subscribe(next);
     }
 }
 
@@ -164,11 +165,27 @@ describe('InformationBoxComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('ngOnInit should NOT subscribe to RoundManager endRoundEvent if roundManager.endRoundEvent is undefined', () => {
+        it('ngOnInit should NOT subscribe to RoundManager endRoundEvent if game is not setup', () => {
             const subscribeSpy = spyOn(mockRoundManager.endRoundEvent, 'subscribe');
-            spyOnProperty<any>(mockRoundManager, 'endRoundEvent', 'get').and.returnValue(undefined);
+            component['gameService'].isGameSetUp = false;
             component.ngOnInit();
             expect(subscribeSpy).not.toHaveBeenCalled();
+        });
+
+        it('should call endRound() on round manager end round event', () => {
+            const spy = spyOn(component, 'endRound');
+            component.setupGame();
+            mockRoundManager.endRoundEvent.next();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call startTimer and updateActivePlayerBorder on round manager timer event', () => {
+            const startTimerSpy = spyOn(component, 'startTimer');
+            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder');
+            component.setupGame();
+            mockRoundManager.timerSource.next([{} as unknown as Timer, {} as unknown as AbstractPlayer]);
+            expect(startTimerSpy).toHaveBeenCalled();
+            expect(updateBorderSpy).toHaveBeenCalled();
         });
 
         it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {

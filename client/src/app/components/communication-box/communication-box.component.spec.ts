@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
@@ -10,7 +11,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { PlayerData } from '@app/classes/communication';
+import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
@@ -22,27 +26,53 @@ import { FocusableComponentsService } from '@app/services/focusable-components/f
 import { marked } from 'marked';
 import { CommunicationBoxComponent } from './communication-box.component';
 
+const DEFAULT_GAME_ID = 'game id';
 const CURRENT_PLAYER_ID = 'idOfPlayer1';
 const OPPONENT_PLAYER_ID = 'idOfPlayer2';
 const DEFAULT_PLAYER1_MESSAGE: Message = {
     content: 'content of test message',
     senderId: CURRENT_PLAYER_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_PLAYER2_MESSAGE: Message = {
     content: 'content of test message',
     senderId: OPPONENT_PLAYER_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_SYSTEM_MESSAGE: Message = {
     content: 'content of test message',
     senderId: SYSTEM_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_SYSTEM_ERROR_MESSAGE: Message = {
     content: 'content of test message',
     senderId: SYSTEM_ERROR_ID,
+    gameId: DEFAULT_GAME_ID,
 };
 const DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE: Message = {
     ...DEFAULT_SYSTEM_ERROR_MESSAGE,
     content: marked.parseInline(DEFAULT_SYSTEM_ERROR_MESSAGE.content),
+    gameId: DEFAULT_GAME_ID,
+};
+
+const DEFAULT_START_GAME_DATA: InitializeGameData = {
+    localPlayerId: CURRENT_PLAYER_ID,
+    startGameData: {
+        player1: undefined as unknown as PlayerData,
+        player2: undefined as unknown as PlayerData,
+        gameType: GameType.Classic,
+        maxRoundTime: 0,
+        dictionary: '',
+        gameId: DEFAULT_GAME_ID,
+        board: [[]],
+        tileReserve: [],
+        round: {
+            playerData: { id: CURRENT_PLAYER_ID },
+            startTime: undefined as unknown as Date,
+            limitTime: undefined as unknown as Date,
+            completedTime: null,
+        },
+    },
 };
 
 describe('CommunicationBoxComponent', () => {
@@ -54,7 +84,7 @@ describe('CommunicationBoxComponent', () => {
     let scrollToBottomSpy: jasmine.Spy<any>;
     let gameServiceMock: GameService;
     let formSpy: jasmine.Spy<any>;
-    let initializeMessagesSpy: jasmine.Spy;
+    let storageInitializeMessagesSpy: jasmine.Spy;
 
     beforeEach(async () => {
         inputParserSpy = jasmine.createSpyObj('InputParserService', ['handleInput']);
@@ -102,7 +132,7 @@ describe('CommunicationBoxComponent', () => {
 
         scrollToBottomSpy = spyOn<any>(component, 'scrollToBottom').and.callThrough();
         formSpy = spyOn(component.messageForm, 'reset');
-        initializeMessagesSpy = spyOn(component['messageStorageService'], 'initializeMessages');
+        storageInitializeMessagesSpy = spyOn(component['messageStorageService'], 'initializeMessages');
     });
 
     it('should create', () => {
@@ -110,29 +140,37 @@ describe('CommunicationBoxComponent', () => {
     });
 
     it('should call initializeMessage', () => {
-        expect(initializeMessagesSpy).toBeTruthy();
+        expect(storageInitializeMessagesSpy).toBeTruthy();
     });
 
     describe('ngOnInit', () => {
-        let spyMessage: jasmine.Spy;
+        let gameViewManagerSubscribeSpy: jasmine.Spy;
 
         beforeEach(() => {
-            spyMessage = spyOn(component['gameViewEventManagerService'], 'subscribeToGameViewEvent').and.callThrough();
+            gameViewManagerSubscribeSpy = spyOn(component['gameViewEventManagerService'], 'subscribeToGameViewEvent').and.callThrough();
         });
 
         afterEach(() => {
-            spyMessage.and.callThrough();
+            gameViewManagerSubscribeSpy.and.callThrough();
         });
 
-        it('should subscribe to newMessage', () => {
+        it('should subscribe to newMessage and gameInitialized', () => {
             component.ngOnInit();
-            expect(spyMessage).toHaveBeenCalled();
+            expect(gameViewManagerSubscribeSpy).toHaveBeenCalledTimes(2);
         });
 
-        it('should call initializeMessages', () => {
+        it('should call initializeMessages on gameInitialized event if gameData is defined', () => {
             const spy = spyOn<any>(component, 'initializeMessages');
             component.ngOnInit();
+            component['gameViewEventManagerService'].emitGameViewEvent('gameInitialized', DEFAULT_START_GAME_DATA);
             expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT call initializeMessages on gameInitialized event if gameData is undefined', () => {
+            const spy = spyOn<any>(component, 'initializeMessages');
+            component.ngOnInit();
+            component['gameViewEventManagerService'].emitGameViewEvent('gameInitialized', undefined);
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 
@@ -285,20 +323,41 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('initializeMessages', () => {
-        it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
-            const storedMessages = [INITIAL_MESSAGE, INITIAL_MESSAGE];
-            spyOn(component['messageStorageService'], 'getMessages').and.returnValue(storedMessages);
-            component['messages'] = [];
-            component['initializeMessages']();
-            expect(component.messages.length).toEqual(storedMessages.length);
+        const storedMessages = [DEFAULT_PLAYER1_MESSAGE, { ...DEFAULT_PLAYER1_MESSAGE, gameId: 'other game id' }, DEFAULT_PLAYER1_MESSAGE];
+        let getMessagesSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            getMessagesSpy = spyOn<any>(component['messageStorageService'], 'getMessages').and.returnValue([]);
+            spyOn(component['gameService'], 'getGameId').and.returnValue(DEFAULT_GAME_ID);
         });
 
-        it('should add stored messages to messages if messageStorage has more than 0 messages', () => {
-            spyOn(component['messageStorageService'], 'getMessages').and.returnValue([]);
+        it('should call messageStorageService.getMessages', () => {
+            component['initializeMessages'](DEFAULT_START_GAME_DATA);
+            expect(getMessagesSpy).toHaveBeenCalled();
+        });
+
+        it('should add stored messages with same gameid to messages if messageStorage has messages and there are no local messages', () => {
+            component['messages'] = [];
+            getMessagesSpy.and.returnValue(storedMessages);
+
+            component['initializeMessages'](DEFAULT_START_GAME_DATA);
+            expect(component.messages.length).toEqual(storedMessages.length - 1);
+        });
+
+        it('should NOT add stored messages with same gameid to messages if messageStorage has messages and there are local messages', () => {
+            const initialMessages = [DEFAULT_SYSTEM_MESSAGE];
+            component['messages'] = initialMessages;
+            getMessagesSpy.and.returnValue(storedMessages);
+
+            component['initializeMessages'](DEFAULT_START_GAME_DATA);
+            expect(component.messages.length).toEqual(initialMessages.length);
+        });
+
+        it('should add INITIAL_MESSAGE to messages if there are no local messages', () => {
             const spy = spyOn<any>(component, 'onReceiveNewMessage');
 
-            component['initializeMessages']();
-            expect(spy).toHaveBeenCalledWith(INITIAL_MESSAGE);
+            component['initializeMessages'](DEFAULT_START_GAME_DATA);
+            expect(spy).toHaveBeenCalledWith({ ...INITIAL_MESSAGE, gameId: DEFAULT_GAME_ID });
         });
     });
 
