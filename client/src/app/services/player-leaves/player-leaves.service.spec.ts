@@ -4,7 +4,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DEFAULT_GAME_ID, DEFAULT_LEAVER } from '@app/constants/controller-constants';
+import { DEFAULT_LEAVER, DEFAULT_GAME_ID } from '@app/constants/controller-test-constants';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
 import { Subject } from 'rxjs';
 import { SocketService } from '..';
@@ -75,10 +75,8 @@ describe('PlayerLeavesService', () => {
         expect(handleLeaveGameSpy).toHaveBeenCalled();
     });
 
-    it('handleLeaveLobby should call playerLeavesController.handleLeaveGame if this.gameId true', () => {
-        spyOn(service, 'getGameId').and.callFake(() => {
-            return DEFAULT_GAME_ID;
-        });
+    it('handleLeaveLobby should call playerLeavesController.handleLeaveGame if this.currentLobbyId is defined', () => {
+        spyOn(service['gameDispatcherService'], 'getCurrentLobbyId').and.returnValue(DEFAULT_GAME_ID);
         const handleLeaveGameSpy = spyOn(service['playerLeavesController'], 'handleLeaveGame').and.callFake(() => {
             return;
         });

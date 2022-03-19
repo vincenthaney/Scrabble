@@ -1,9 +1,11 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LobbyInfo } from '@app/classes/communication/';
+import { LobbyData, LobbyInfo } from '@app/classes/communication/';
 import { GameConfigData } from '@app/classes/communication/game-config';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -12,9 +14,8 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameDispatcherService implements OnDestroy {
-    gameId: string;
-    currentLobby: LobbyInfo | undefined;
-    currentName: string;
+    currentName: string = '';
+    currentLobby: LobbyInfo | undefined = undefined;
 
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
@@ -25,8 +26,8 @@ export default class GameDispatcherService implements OnDestroy {
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
-        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (gameId: string) => {
-            this.gameId = gameId;
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
+            this.currentLobby = lobbyData;
         });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
@@ -44,6 +45,11 @@ export default class GameDispatcherService implements OnDestroy {
         );
     }
 
+    getCurrentLobbyId(): string {
+        if (!this.currentLobby) return '';
+        return this.currentLobby.lobbyId;
+    }
+
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
@@ -52,14 +58,12 @@ export default class GameDispatcherService implements OnDestroy {
     resetServiceData(): void {
         this.currentLobby = undefined;
         this.currentName = '';
-        this.gameId = '';
     }
 
     handleJoinLobby(lobby: LobbyInfo, playerName: string): void {
         this.currentLobby = lobby;
         this.currentName = playerName;
-        this.gameId = lobby.lobbyId;
-        this.gameDispatcherController.handleLobbyJoinRequest(this.gameId, playerName);
+        this.gameDispatcherController.handleLobbyJoinRequest(this.getCurrentLobbyId(), playerName);
     }
 
     handleLobbyListRequest(): void {
@@ -67,27 +71,33 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     handleCreateGame(playerName: string, gameParameters: FormGroup): void {
+        const gameMode: GameMode = gameParameters.get('gameMode')?.value as GameMode;
         const gameConfig: GameConfigData = {
             playerName,
             playerId: this.gameDispatcherController.socketService.getId(),
             gameType: gameParameters.get('gameType')?.value as GameType,
+            gameMode,
             maxRoundTime: gameParameters.get('timer')?.value as number,
             dictionary: gameParameters.get('dictionary')?.value as string,
         };
-        this.gameDispatcherController.handleMultiplayerGameCreation(gameConfig);
+        if (gameMode === GameMode.Solo) {
+            gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
+            gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
+        }
+        this.gameDispatcherController.handleGameCreation(gameConfig);
     }
 
     handleCancelGame(): void {
-        if (this.gameId) this.gameDispatcherController.handleCancelGame(this.gameId);
+        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleCancelGame(this.getCurrentLobbyId());
         this.resetServiceData();
     }
 
     handleConfirmation(opponentName: string): void {
-        if (this.gameId) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.gameId);
+        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.getCurrentLobbyId());
     }
 
     handleRejection(opponentName: string): void {
-        if (this.gameId) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.gameId);
+        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.getCurrentLobbyId());
     }
 
     handleJoinRequest(opponentName: string): void {

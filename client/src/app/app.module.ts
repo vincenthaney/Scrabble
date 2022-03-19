@@ -21,11 +21,13 @@ import { IconComponent } from './components/icon/icon.component';
 import { InformationBoxComponent } from './components/information-box/information-box.component';
 import { LobbyInfoComponent } from './components/lobby-info/lobby-info.component';
 import { NameFieldComponent } from './components/name-field/name-field.component';
+import { PageHeaderComponent } from './components/page-header/page-header.component';
 import { TimerSelectionComponent } from './components/timer-selection/timer-selection.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
 import { SocketService } from './services';
-// import { ReconnectionService } from './services/reconnection/reconnection.service';
+import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-page.component';
+import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 
 /**
  * Main module that is used in main.ts.
@@ -53,6 +55,9 @@ import { SocketService } from './services';
         IconComponent,
         NameFieldComponent,
         TimerSelectionComponent,
+        PageHeaderComponent,
+        HighScoresPageComponent,
+        HighScoreBoxComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -72,13 +77,6 @@ import { SocketService } from './services';
             deps: [SocketService],
             multi: true,
         },
-        // ReconnectionService,
-        // {
-        //     provide: APP_INITIALIZER,
-        //     useFactory: (reconnectionService: ReconnectionService) => async () => reconnectionService.setupReconnection(),
-        //     deps: [ReconnectionService, SocketService],
-        //     multi: true,
-        // },
     ],
     bootstrap: [AppComponent],
 })

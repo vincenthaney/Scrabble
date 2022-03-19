@@ -55,10 +55,10 @@ describe('WordExtract', () => {
 
     describe('extract', () => {
         const testWords = (letters: LetterValue[], column: number, row: number, orientation: Orientation, expected: string[]) => {
-            const tiles: Tile[] = tilesFromLetters(letters);
-            const position = new Position(row, column);
+            const tilesToPlace: Tile[] = tilesFromLetters(letters);
+            const startPosition = new Position(row, column);
 
-            const result = extraction.extract(tiles, position, orientation);
+            const result = extraction.extract({ tilesToPlace, startPosition, orientation });
             const resultWords = result.map((word) => word.reduce((prev, [, t]) => (prev += t.letter), ''));
 
             for (const word of expected) {
@@ -106,29 +106,31 @@ describe('WordExtract', () => {
         });
 
         it('should throw if square already has a tile', () => {
-            expect(() => extraction.extract([], HAS_TILE_POSITION, DEFAULT_ORIENTATION)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+            expect(() => extraction.extract({ tilesToPlace: [], startPosition: HAS_TILE_POSITION, orientation: DEFAULT_ORIENTATION })).to.throw(
+                EXTRACTION_SQUARE_ALREADY_FILLED,
+            );
         });
 
         it('should throw if tiles go outside board', () => {
-            const tiles = tilesFromLetters(['X', 'Y', 'Z']);
-            const position = new Position(0, 4);
+            const tilesToPlace = tilesFromLetters(['X', 'Y', 'Z']);
+            const startPosition = new Position(0, 4);
             const orientation = Orientation.Horizontal;
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
+            expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw(POSITION_OUT_OF_BOARD);
         });
 
         it("should throw if letters doesn't go over edge, but tiles are already there", () => {
-            const tiles = tilesFromLetters(['V', 'W', 'X', 'Y', 'Z']);
-            const position = new Position(1, 1);
+            const tilesToPlace = tilesFromLetters(['V', 'W', 'X', 'Y', 'Z']);
+            const startPosition = new Position(1, 1);
             const orientation = Orientation.Horizontal;
 
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
+            expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw(POSITION_OUT_OF_BOARD);
         });
 
         it('should throw if letter is not adjacent', () => {
-            const tiles = tilesFromLetters(['X']);
-            const position = new Position(4, 4);
+            const tilesToPlace = tilesFromLetters(['X']);
+            const startPosition = new Position(4, 4);
             const orientation = Orientation.Horizontal;
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw();
+            expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw();
         });
     });
 

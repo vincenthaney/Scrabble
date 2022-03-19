@@ -1,10 +1,10 @@
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { HttpException } from './http.exception';
-import { describe } from 'mocha';
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { describe } from 'mocha';
+import { HttpException } from './http.exception';
 
 const expect = chai.expect;
 
@@ -45,8 +45,8 @@ describe('HttpException', () => {
 
             try {
                 throw new Error();
-            } catch (e) {
-                HttpException.sendError(e, response);
+            } catch (exception) {
+                HttpException.sendError(exception, response);
                 expect(spy).to.have.been.called.with(expectedStatus);
             }
         });
@@ -57,8 +57,8 @@ describe('HttpException', () => {
 
             try {
                 throw new HttpException('', expectedStatus);
-            } catch (e) {
-                HttpException.sendError(e, response);
+            } catch (exception) {
+                HttpException.sendError(exception, response);
                 expect(spy).to.have.been.called.with(expectedStatus);
             }
         });

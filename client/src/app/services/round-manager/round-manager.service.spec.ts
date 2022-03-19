@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-classes-per-file */
@@ -7,21 +8,25 @@ import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionType } from '@app/classes/actions/action-data';
+import { ActionData, ActionType } from '@app/classes/actions/action-data';
 import { PlayerData } from '@app/classes/communication';
+import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
+import { GameType } from '@app/classes/game-type';
+import { Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Tile } from '@app/classes/tile';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
-import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { ActionService } from '@app/services/action/action.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
 import SpyObj = jasmine.SpyObj;
 
 class RoundManagerServiceWrapper {
     roundManagerService: RoundManagerService;
     pCurrentRound: Round;
+
     constructor(roundManagerService: RoundManagerService) {
         this.roundManagerService = roundManagerService;
         this.currentRound = roundManagerService.currentRound;
@@ -57,7 +62,7 @@ const DEFAULT_PLAYER_DATA: PlayerData = { name: 'name', id: 'id', score: 1, tile
 
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
-    let gameplayControllerSpy: SpyObj<GamePlayController>;
+    let actionServiceSpy: SpyObj<ActionService>;
 
     const currentRound: Round = {
         player: DEFAULT_PLAYER,
@@ -67,7 +72,7 @@ describe('RoundManagerService', () => {
     };
 
     beforeEach(() => {
-        gameplayControllerSpy = jasmine.createSpyObj('GamePlayController', ['sendAction']);
+        actionServiceSpy = jasmine.createSpyObj('ActionService', ['createActionData', 'sendAction']);
     });
 
     beforeEach(() => {
@@ -79,7 +84,7 @@ describe('RoundManagerService', () => {
                     { path: 'home', component: TestComponent },
                 ]),
             ],
-            providers: [{ provide: GamePlayController, useValue: gameplayControllerSpy }],
+            providers: [{ provide: ActionService, useValue: actionServiceSpy }],
         });
         service = TestBed.inject(RoundManagerService);
     });
@@ -88,29 +93,52 @@ describe('RoundManagerService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('initialize should define attributes', () => {
-        service.initialize();
+    it('initialize should define attributes with provided information', () => {
+        const roundData: RoundData = {
+            playerData: DEFAULT_PLAYER_DATA,
+            startTime: CURRENT_DATE,
+            limitTime: FUTURE_DATE,
+            completedTime: null,
+        };
+        const round: Round = {
+            player: new Player(DEFAULT_PLAYER_DATA.id, DEFAULT_PLAYER_DATA.name!, DEFAULT_PLAYER_DATA.tiles!),
+            startTime: roundData.startTime,
+            limitTime: roundData.limitTime,
+            completedTime: roundData.completedTime,
+        };
+        spyOn(service, 'convertRoundDataToRound').and.returnValue(round);
+
+        const gameId = 'gameId';
+        const player2Data = DEFAULT_PLAYER_DATA;
+        player2Data.id = 'notLocal';
+        const startGameData: StartGameData = {
+            player1: DEFAULT_PLAYER_DATA,
+            player2: player2Data,
+            gameType: GameType.Classic,
+            maxRoundTime: DEFAULT_MAX_ROUND_TIME,
+            dictionary: 'default',
+            gameId,
+            board: [],
+            tileReserve: [],
+            round: roundData,
+        };
+        service.initialize(DEFAULT_PLAYER_DATA.id, startGameData);
+
+        expect(service.gameId).toEqual(startGameData.gameId);
+        expect(service.localPlayerId).toEqual(DEFAULT_PLAYER_DATA.id);
+        expect(service.maxRoundTime).toEqual(startGameData.maxRoundTime);
+        expect(service.currentRound).toEqual(round);
+    });
+
+    it('initializeEvents should define attributes', () => {
+        service.initializeEvents();
         expect(service.completedRounds).toBeTruthy();
         expect(service['timerSource']).toBeTruthy();
         expect(service.timer).toBeTruthy();
-        expect(service.endRoundEvent).toBeTruthy();
+        expect(service['endRoundEvent$']).toBeTruthy();
     });
 
     describe('convertRoundDataToRound', () => {
-        it('should throw error if roundData.playerData.id is undefined', () => {
-            const roundData = {
-                playerData: {
-                    name: DEFAULT_PLAYER_NAME,
-                    score: DEFAULT_PLAYER_SCORE,
-                    tiles: DEFAULT_PLAYER_TILES,
-                },
-                startTime: CURRENT_DATE,
-                limitTime: CURRENT_DATE,
-                completedTime: null,
-            };
-            expect(() => service.convertRoundDataToRound(roundData)).toThrowError(INVALID_ROUND_DATA_PLAYER);
-        });
-
         it('should throw error if roundData.playerData.name is undefined', () => {
             const roundData = {
                 playerData: {
@@ -193,16 +221,32 @@ describe('RoundManagerService', () => {
         expect(service.maxRoundTime).toEqual(0);
     });
 
-    it('resetTimerData should call clearTimeout and timerSource.complete', () => {
-        const clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callFake(() => {
-            return;
+    describe('resetTimerData', () => {
+        let clearTimeoutSpy: jasmine.Spy;
+        let completeSpy: jasmine.Spy;
+        let endRoundSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            clearTimeoutSpy = spyOn(window, 'clearTimeout').and.callFake(() => {
+                return;
+            });
+            completeSpy = spyOn(service['timerSource'], 'complete').and.callFake(() => {
+                return;
+            });
+            endRoundSpy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
+                return;
+            });
+            service.resetTimerData();
         });
-        const completeSpy = spyOn(service['timerSource'], 'complete').and.callFake(() => {
-            return;
+        it('should call clearTimeout', () => {
+            expect(clearTimeoutSpy).toHaveBeenCalled();
         });
-        service.resetTimerData();
-        expect(clearTimeoutSpy).toHaveBeenCalled();
-        expect(completeSpy).toHaveBeenCalled();
+        it('should call timerSource.complete', () => {
+            expect(completeSpy).toHaveBeenCalled();
+        });
+        it('should call endRound event', () => {
+            expect(endRoundSpy).toHaveBeenCalled();
+        });
     });
 
     describe('UpdateRound', () => {
@@ -282,8 +326,8 @@ describe('RoundManagerService', () => {
             expect(timeLeftSpy).toHaveBeenCalled();
         });
 
-        it('continueRound should emit endRoundEvent', () => {
-            const spy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+        it('continueRound should next endRoundEvent', () => {
+            const spy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
                 return;
             });
             service.continueRound(updatedRound);
@@ -314,9 +358,7 @@ describe('RoundManagerService', () => {
         });
 
         it('should throw an error if roundData is missing information', () => {
-            roundData.playerData.id = undefined;
             let result = () => service.convertRoundDataToRound(roundData);
-            expect(result).toThrowError(INVALID_ROUND_DATA_PLAYER);
             roundData.playerData.id = DEFAULT_PLAYER_DATA.id;
 
             roundData.playerData.name = undefined;
@@ -407,21 +449,28 @@ describe('RoundManagerService', () => {
         });
 
         describe('StartRound', () => {
+            const randomTimerValue = 69;
             let startTimerSpy: unknown;
 
             beforeEach(() => {
                 startTimerSpy = spyOn(service, 'startTimer').and.callFake(() => {
                     return;
                 });
-                service.startRound(DEFAULT_MAX_ROUND_TIME);
             });
 
             it('startRound should set new timeout', () => {
+                service.startRound();
                 expect(service.timeout).toBeTruthy();
             });
 
-            it('startRound should call startTimer', () => {
-                expect(startTimerSpy).toHaveBeenCalled();
+            it('startRound should call startTimer with passed timer value', () => {
+                service.startRound(randomTimerValue);
+                expect(startTimerSpy).toHaveBeenCalledWith(randomTimerValue);
+            });
+
+            it('startRound should call startTimer with maxRoundTime if no value is provided', () => {
+                service.startRound();
+                expect(startTimerSpy).toHaveBeenCalledWith(service.maxRoundTime);
             });
         });
 
@@ -441,13 +490,16 @@ describe('RoundManagerService', () => {
 
         describe('RoundTimeout', () => {
             let endRoundEventSpy: unknown;
+            const fakeData = { fake: 'data' };
 
             beforeEach(() => {
-                endRoundEventSpy = spyOn(service.endRoundEvent, 'emit').and.callFake(() => {
+                endRoundEventSpy = spyOn(service['endRoundEvent$'], 'next').and.callFake(() => {
                     return;
                 });
                 spyOn(service, 'getActivePlayer').and.returnValue(DEFAULT_PLAYER);
-                gameplayControllerSpy.sendAction.and.callFake(() => {
+
+                actionServiceSpy.createActionData.and.returnValue(fakeData as unknown as ActionData);
+                actionServiceSpy.sendAction.and.callFake(() => {
                     return;
                 });
             });
@@ -464,7 +516,7 @@ describe('RoundManagerService', () => {
             it('RoundTimeout should not send pass event if the local player is not the active player', () => {
                 spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(false);
                 service.roundTimeout();
-                expect(gameplayControllerSpy.sendAction).not.toHaveBeenCalled();
+                expect(actionServiceSpy.sendAction).not.toHaveBeenCalled();
             });
 
             it('RoundTimeout should emit endRoundEvent', fakeAsync(() => {
@@ -483,14 +535,13 @@ describe('RoundManagerService', () => {
                 tick();
                 spyOn(service, 'isActivePlayerLocalPlayer').and.returnValue(true);
 
-                const actionPass = {
-                    type: ActionType.PASS,
-                    input: '',
-                    payload: {},
-                };
-
                 service.roundTimeout();
-                expect(gameplayControllerSpy.sendAction).toHaveBeenCalledWith(service.gameId, DEFAULT_PLAYER.id, actionPass);
+                expect(actionServiceSpy.createActionData).toHaveBeenCalledWith(ActionType.PASS, {});
+                expect(actionServiceSpy.sendAction).toHaveBeenCalledOnceWith(
+                    service.gameId,
+                    service.localPlayerId,
+                    fakeData as unknown as ActionData,
+                );
             }));
         });
     });

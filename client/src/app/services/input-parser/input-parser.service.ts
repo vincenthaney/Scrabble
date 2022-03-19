@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -7,9 +7,18 @@ import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
-import { BOARD_SIZE, DEFAULT_ORIENTATION, ExpectedCommandWordCount, LETTER_VALUES, ON_YOUR_TURN_ACTIONS, SYSTEM_ERROR_ID } from '@app/constants/game';
+import {
+    BLANK_TILE_LETTER_VALUE,
+    BOARD_SIZE,
+    DEFAULT_ORIENTATION,
+    ExpectedCommandWordCount,
+    LETTER_VALUES,
+    ON_YOUR_TURN_ACTIONS,
+    SYSTEM_ERROR_ID,
+} from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
 import { removeAccents } from '@app/utils/remove-accents';
 
@@ -19,23 +28,28 @@ const ASCII_VALUE_OF_LOWERCASE_A = 97;
     providedIn: 'root',
 })
 export default class InputParserService {
-    constructor(private controller: GamePlayController, private gameService: GameService) {}
+    constructor(
+        private controller: GamePlayController,
+        private gameService: GameService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+    ) {}
 
-    parseInput(input: string): void {
+    handleInput(input: string): void {
         const playerId = this.getLocalPlayer().id;
         const gameId = this.gameService.getGameId();
 
         if (this.isAction(input)) {
-            this.parseCommand(input, gameId, playerId);
+            this.handleCommand(input, gameId, playerId);
         } else {
             this.controller.sendMessage(gameId, playerId, {
                 content: input,
                 senderId: playerId,
+                gameId,
             });
         }
     }
 
-    private parseCommand(input: string, gameId: string, playerId: string): void {
+    private handleCommand(input: string, gameId: string, playerId: string): void {
         try {
             this.controller.sendAction(gameId, playerId, this.createActionData(input));
         } catch (exception) {
@@ -48,6 +62,7 @@ export default class InputParserService {
                 this.controller.sendError(gameId, playerId, {
                     content: errorMessageContent,
                     senderId: SYSTEM_ERROR_ID,
+                    gameId,
                 });
             }
         }
@@ -137,20 +152,21 @@ export default class InputParserService {
         };
     }
 
-    private createPlaceActionPayload(locationString: string, lettersToPlace: string): ActionPlacePayload {
+    private createPlaceActionPayload(locationString: string, lettersToPlace: string): PlaceActionPayload {
         const location: Location = this.createLocation(locationString, lettersToPlace.length);
 
-        const placeActionPayload: ActionPlacePayload = {
+        const placeActionPayload: PlaceActionPayload = {
             tiles: this.parseLettersToTiles(removeAccents(lettersToPlace), ActionType.PLACE),
             startPosition: this.getStartPosition(location),
             orientation: location.orientation,
         };
 
-        this.gameService.playingTiles.emit(placeActionPayload);
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', placeActionPayload);
+
         return placeActionPayload;
     }
 
-    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
+    private createExchangeActionPayload(lettersToExchange: string): ExchangeActionPayload {
         return {
             tiles: this.parseLettersToTiles(removeAccents(lettersToExchange), ActionType.EXCHANGE),
         };
@@ -187,14 +203,18 @@ export default class InputParserService {
     }
 
     private isValidBlankTileCombination(playerLetter: string, placeLetter: string): boolean {
-        return playerLetter === '*' && LETTER_VALUES.includes(placeLetter as LetterValue) && placeLetter === placeLetter.toUpperCase();
+        return (
+            playerLetter === BLANK_TILE_LETTER_VALUE &&
+            LETTER_VALUES.includes(placeLetter as LetterValue) &&
+            placeLetter === placeLetter.toUpperCase()
+        );
     }
 
-    private isPositionWithinBounds(position: Position) {
+    private isPositionWithinBounds(position: Position): boolean {
         return position.row >= 0 && position.column >= 0 && position.row < BOARD_SIZE && position.column < BOARD_SIZE;
     }
 
-    private isAction(input: string) {
+    private isAction(input: string): boolean {
         return input[0] === ACTION_COMMAND_INDICATOR;
     }
 
@@ -202,7 +222,7 @@ export default class InputParserService {
         return input.substring(1).split(' ');
     }
 
-    private verifyActionValidity(actionName: ActionType) {
+    private verifyActionValidity(actionName: ActionType): void {
         if (!actionName) throw new CommandException(CommandExceptionMessages.InvalidEntry);
         if (this.gameService.isGameOver) throw new CommandException(CommandExceptionMessages.GameOver);
         if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName))

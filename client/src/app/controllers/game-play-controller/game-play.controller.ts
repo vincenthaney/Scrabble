@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { ActionData } from '@app/classes/actions/action-data';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
-import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { HTTP_ABORT_ERROR } from '@app/constants/controllers-errors';
 import SocketService from '@app/services/socket/socket.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -14,7 +13,8 @@ import { environment } from 'src/environments/environment';
 })
 export class GamePlayController {
     gameUpdateValue = new BehaviorSubject<GameUpdateData>({});
-    newMessageValue = new BehaviorSubject<Message>(INITIAL_MESSAGE);
+    newMessageValue = new BehaviorSubject<Message | null>(null);
+    private actionDone$ = new Subject<void>();
 
     constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();
@@ -31,7 +31,9 @@ export class GamePlayController {
 
     sendAction(gameId: string, playerId: string, action: ActionData): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/action`;
-        this.http.post(endpoint, { type: action.type, payload: action.payload, input: action.input }).subscribe();
+        this.http.post(endpoint, action).subscribe(() => {
+            this.actionDone$.next();
+        });
     }
 
     sendMessage(gameId: string, playerId: string, message: Message): void {
@@ -55,6 +57,10 @@ export class GamePlayController {
         // In the initialization of the game-page component, a reconnect request is made which does not allow the
         // server to send a response, triggered a Abort 0  error code which is why we catch it if it this this code
         this.http.delete(endpoint, { observe: 'response' }).subscribe(this.handleDisconnectResponse, this.handleDisconnectError);
+    }
+
+    observeActionDone(): Observable<void> {
+        return this.actionDone$.asObservable();
     }
 
     private handleDisconnectResponse(): void {

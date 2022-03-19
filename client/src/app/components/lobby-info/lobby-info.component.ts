@@ -10,11 +10,12 @@ import { Timer } from '@app/classes/timer';
 })
 export class LobbyInfoComponent implements OnInit {
     @Input() lobby: LobbyInfo;
-    @Output() joinLobbyId = new EventEmitter<string>();
+    @Output() joinLobbyId: EventEmitter<string>;
     roundTime: Timer;
 
     constructor() {
-        this.lobby = { lobbyId: '0', dictionary: '', playerName: '', gameType: GameType.Classic, maxRoundTime: 0, canJoin: false };
+        this.joinLobbyId = new EventEmitter<string>();
+        this.lobby = { lobbyId: '0', dictionary: '', hostName: '', gameType: GameType.Classic, maxRoundTime: 0, canJoin: false };
         this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 

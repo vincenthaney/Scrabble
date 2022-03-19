@@ -4,12 +4,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NAME_NO_MATCH_REGEX, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { NAME_NO_MATCH_REGEX, NAME_SAME_AS_VIRTUAL_PLAYER, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
 import { NameFieldComponent } from './name-field.component';
 
 const fakeNameChange = () => {
     return false;
 };
+const INVALID_NAME = '!nval!dName';
+const VALID_NAME = 'valid name';
 
 describe('NameFieldComponent', () => {
     let component: NameFieldComponent;
@@ -17,7 +20,7 @@ describe('NameFieldComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [NameFieldComponent],
+            declarations: [NameFieldComponent, IconComponent],
             imports: [BrowserAnimationsModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
         }).compileComponents();
     });
@@ -32,29 +35,37 @@ describe('NameFieldComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('onNameChange should change the playerName', () => {
-        const expected = 'ThOm';
-        component.playerName = 'Charles';
-        component.onNameChange(expected);
-        expect(component.playerName).toBe(expected);
+    describe('ngOnChanges', () => {
+        it('should call onChange()', () => {
+            const spy = spyOn(component, 'onChange').and.callFake(() => {
+                return;
+            });
+            component.ngOnChanges();
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
-    it('onNameChange should emit isInputNameValid true with a valid name', () => {
-        const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
-        component.formParameters.patchValue({ inputName: 'testName' });
-        component.onNameChange('testName');
-        expect(spy).toHaveBeenCalled();
-        expect(component.isInputNameValid.emit).toHaveBeenCalledWith(true);
+    describe('onChange', () => {
+        let nameValidEmitSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            nameValidEmitSpy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
+        });
+
+        it('onNameChange should emit isInputNameValid true with a valid name', () => {
+            component.formParameters.patchValue({ inputName: VALID_NAME });
+            component.onChange();
+            expect(nameValidEmitSpy).toHaveBeenCalledWith(true);
+        });
+
+        it('onNameChange should emit isInputNameValid false with an invalid name', () => {
+            component.formParameters.controls.inputName.markAsDirty();
+            component.formParameters.patchValue({ inputName: INVALID_NAME });
+            component.onChange();
+            expect(nameValidEmitSpy).toHaveBeenCalledWith(false);
+        });
     });
 
-    it('onNameChange should emit isInputNameValid false with an invalid name', () => {
-        const spy = spyOn(component.isInputNameValid, 'emit').and.callFake(fakeNameChange);
-        component.formParameters.patchValue({ inputName: '!nval!dName' });
-        component.onNameChange('!nval!dName');
-        expect(spy).toHaveBeenCalled();
-        expect(component.isInputNameValid.emit).toHaveBeenCalledWith(false);
-    });
-    // Html add a space on each side as it is the only text in the <mat-error> tag
     const MESSAGE_NAME_TOO_SHORT = ' ' + NAME_TOO_SHORT + ' ';
     const MESSAGE_NAME_TOO_LONG = ' ' + NAME_TOO_LONG + ' ';
     const MESSAGE_NAME_NO_MATCH_REGEX = ' ' + NAME_NO_MATCH_REGEX + ' ';
@@ -97,5 +108,16 @@ describe('NameFieldComponent', () => {
             const errorMessage = fixture.debugElement.query(By.css('.alert'));
             expect(errorMessage).toBeFalsy();
         });
+    });
+
+    it('name should not be valid if mustVerifyVirtualPlayer and is same as virtualPlayer', () => {
+        component.mustVerifyVirtualPlayerName = true;
+        component.virtualPlayerName = VALID_NAME;
+        component.formParameters.setValue({ inputName: VALID_NAME });
+        fixture.detectChanges();
+
+        const errorMessage = fixture.debugElement.query(By.css('.alert'));
+        expect(errorMessage).toBeTruthy();
+        expect(errorMessage.nativeElement.innerHTML).toBe(' ' + NAME_SAME_AS_VIRTUAL_PLAYER + ' ');
     });
 });
