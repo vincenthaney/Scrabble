@@ -52,7 +52,7 @@ describe('DictionaryNode', () => {
     });
 
     describe('getDepth', () => {
-        it('should return dwpth', () => {
+        it('should return depth', () => {
             const expected = 4;
             node['depth'] = expected;
             expect(node.getDepth()).to.equal(expected);
