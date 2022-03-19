@@ -16,7 +16,7 @@ export class VirtualPlayerService {
         fetch(`${environment.serverUrl}/games/${gameId}/players/${playerId}/action`, {
             method: 'POST',
             headers: { [CONTENT_TYPE]: 'application/json' },
-            body: JSON.stringify({ type: action.type, payload: action.payload, input: action.input }),
+            body: JSON.stringify(action),
         });
     }
 
