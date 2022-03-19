@@ -41,7 +41,11 @@ export class ActionPayloadToString {
     }
 
     private static tileToLetterConversion(tile: Tile): string {
-        return tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
+        return tile.isBlank ? this.getBlankTileLetter(tile).toUpperCase() : tile.letter.toLocaleLowerCase();
+    }
+
+    private static getBlankTileLetter(tile: Tile): string {
+        return tile.playedLetter ? tile.playedLetter : tile.letter;
     }
 
     private static isInvalidPlacePayload(placePayload: PlaceActionPayload): boolean {
