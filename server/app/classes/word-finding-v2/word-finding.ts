@@ -74,7 +74,7 @@ export default abstract class WordFinding {
     }
 
     validateWordPlacement(wordPlacement: ScoredWordPlacement): boolean {
-        return this.request.pointRange ? this.isWithinPointRange(wordPlacement.score, this.request.pointRange) : true;
+        return this.isWithinPointRange(wordPlacement.score);
     }
 
     findCompleted(wordPlacements: ScoredWordPlacement[]): boolean {
@@ -145,8 +145,9 @@ export default abstract class WordFinding {
         return tiles.map((tile) => tile.letter);
     }
 
-    isWithinPointRange(score: number, range: PointRange) {
-        return score >= range.minimum && score <= range.maximum;
+    isWithinPointRange(score: number): boolean {
+        if (!this.request.pointRange) return true;
+        return this.request.pointRange.isWithinRange(score);
     }
 
     abstract handleWordPlacement(wordPlacement: ScoredWordPlacement): void;
