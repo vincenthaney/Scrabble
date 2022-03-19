@@ -4,12 +4,12 @@ import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/c
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import {
     BoardPlacement,
+    DictionarySearcherStackItem,
     DictionarySearchResult,
+    PerpendicularLettersPosition,
     PerpendicularWord,
     SearcherPerpendicularLetters,
-    DictionarySearcherStackItem,
-    PerpendicularLettersPosition,
-} from './word-finding-types';
+} from '@app/classes/word-finding';
 
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;

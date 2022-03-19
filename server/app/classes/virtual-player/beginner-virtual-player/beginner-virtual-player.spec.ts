@@ -4,7 +4,14 @@
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
-import { HIGH_SCORE_RANGE, MEDIUM_SCORE_RANGE, LOW_SCORE_RANGE } from '@app/constants/virtual-player-constants';
+import {
+    HIGH_SCORE_RANGE_MAX,
+    HIGH_SCORE_RANGE_MIN,
+    LOW_SCORE_RANGE_MAX,
+    LOW_SCORE_RANGE_MIN,
+    MEDIUM_SCORE_RANGE_MAX,
+    MEDIUM_SCORE_RANGE_MIN,
+} from '@app/constants/virtual-player-constants';
 import {
     EXPECTED_INCREMENT_VALUE,
     GAME_ID,
@@ -22,8 +29,7 @@ import {
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import WordFindingService from '@app/services/word-finding/word-finding';
-import WordFindingServiceV2 from '@app/services/word-finding/word-finding-v2';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -55,8 +61,8 @@ describe('BeginnerVirtualPlayer', () => {
             });
 
             const testPointRange = beginnerVirtualPlayer.findPointRange();
-            expect(testPointRange.minimum).to.equal(LOW_SCORE_RANGE.minimum);
-            expect(testPointRange.maximum).to.equal(LOW_SCORE_RANGE.maximum);
+            expect(testPointRange.min).to.equal(LOW_SCORE_RANGE_MIN);
+            expect(testPointRange.max).to.equal(LOW_SCORE_RANGE_MAX);
         });
 
         it('findPointRange should return medium range values', () => {
@@ -65,8 +71,8 @@ describe('BeginnerVirtualPlayer', () => {
             });
 
             const testPointRange = beginnerVirtualPlayer.findPointRange();
-            expect(testPointRange.minimum).to.equal(MEDIUM_SCORE_RANGE.minimum);
-            expect(testPointRange.maximum).to.equal(MEDIUM_SCORE_RANGE.maximum);
+            expect(testPointRange.min).to.equal(MEDIUM_SCORE_RANGE_MIN);
+            expect(testPointRange.max).to.equal(MEDIUM_SCORE_RANGE_MAX);
         });
 
         it('findPointRange should return high range values', () => {
@@ -75,8 +81,8 @@ describe('BeginnerVirtualPlayer', () => {
             });
 
             const testPointRange = beginnerVirtualPlayer.findPointRange();
-            expect(testPointRange.minimum).to.equal(HIGH_SCORE_RANGE.minimum);
-            expect(testPointRange.maximum).to.equal(HIGH_SCORE_RANGE.maximum);
+            expect(testPointRange.min).to.equal(HIGH_SCORE_RANGE_MIN);
+            expect(testPointRange.max).to.equal(HIGH_SCORE_RANGE_MAX);
         });
     });
 
@@ -196,7 +202,7 @@ describe('BeginnerVirtualPlayer', () => {
 
         beforeEach(async () => {
             wordFindingServiceStub = createStubInstance(WordFindingService);
-            beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingServiceV2;
+            beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
         });
 
         afterEach(() => {

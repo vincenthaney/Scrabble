@@ -1,6 +1,6 @@
 import { Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
-import { WordPlacement } from '@app/classes/word-finding/word-placement';
+import { WordPlacement } from '@app/classes/word-finding';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
 
 export class PlacementToString {

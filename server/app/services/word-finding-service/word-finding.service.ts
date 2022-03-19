@@ -1,17 +1,16 @@
 import { Board } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
-import { WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { Service } from 'typedi';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import WordFinding from '@app/classes/word-finding-v2/word-finding';
+import AbstractWordFinding from '@app/classes/word-finding/abstract-word-finding/abstract-word-finding';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import WordFindingHint from '@app/classes/word-finding-v2/word-finding-hint';
-import WordFindingBeginner from '@app/classes/word-finding-v2/word-finding-beginner';
+import WordFindingHint from '@app/classes/word-finding/word-finding-hint/word-finding-hint';
+import WordFindingBeginner from '@app/classes/word-finding/word-finding-beginner/word-finding-beginner';
 import { Dictionary } from '@app/classes/dictionary';
+import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 @Service()
-export default class WordFindingServiceV2 {
+export default class WordFindingService {
     constructor(private readonly dictionaryService: DictionaryService, private readonly scoreCalculatorService: ScoreCalculatorService) {}
 
     findWords(board: Board, tiles: Tile[], request: WordFindingRequest): ScoredWordPlacement[] {
@@ -23,7 +22,7 @@ export default class WordFindingServiceV2 {
             dictionary,
             this.scoreCalculatorService,
         ];
-        let wordFinding: WordFinding;
+        let wordFinding: AbstractWordFinding;
 
         switch (request.useCase) {
             case WordFindingUseCase.Hint:

@@ -11,12 +11,12 @@ import { getDictionaryTestService } from '@app/services/dictionary-service/dicti
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Container } from 'typedi';
 import { Orientation, Position } from '@app/classes/board';
-import { BoardPlacement, PerpendicularWord, SearcherPerpendicularLetters, DictionarySearcherStackItem } from './word-finding-types';
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
 import { SinonStub, stub } from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
+import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 

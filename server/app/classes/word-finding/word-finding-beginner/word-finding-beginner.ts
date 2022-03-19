@@ -1,14 +1,12 @@
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { Board } from '@app/classes/board';
 import { Dictionary } from '@app/classes/dictionary';
 import { Tile } from '@app/classes/tile';
-import WordFindingRequest from '@app/classes/word-finding/word-finding-request';
-import WordFinding from './word-finding';
 import { WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD } from '@app/constants/classes-constants';
+import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
 
-export default class WordFindingBeginner extends WordFinding {
+export default class WordFindingBeginner extends AbstractWordFinding {
     private placementFoundAcceptance: number = Number.MIN_VALUE;
     private acceptanceProbabilities: Map<number, number>;
 

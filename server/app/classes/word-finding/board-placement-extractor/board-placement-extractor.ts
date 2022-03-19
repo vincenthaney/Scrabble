@@ -1,7 +1,7 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from './word-finding-types';
+import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from '@app/classes/word-finding';
 import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { INITIAL_POSITION } from '@app/constants/game';
 

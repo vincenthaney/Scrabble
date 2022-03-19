@@ -1,6 +1,7 @@
-import { LetterValue } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { Orientation, Position } from '@app/classes/board';
 import { DictionaryNode } from '@app/classes/dictionary';
+import Range from '@app/classes/range/range';
 
 export interface WithDistance {
     distance: number;
@@ -45,4 +46,26 @@ export interface PerpendicularWord {
 export interface DictionarySearchResult {
     word: string;
     perpendicularWords: PerpendicularWord[];
+}
+
+export interface WordFindingRequest {
+    useCase: WordFindingUseCase;
+    pointRange?: Range;
+    pointHistory?: Map<number, number>;
+}
+
+export enum WordFindingUseCase {
+    Expert,
+    Beginner,
+    Hint,
+}
+
+export interface WordPlacement {
+    tilesToPlace: Tile[];
+    orientation: Orientation;
+    startPosition: Position;
+}
+
+export interface ScoredWordPlacement extends WordPlacement {
+    score: number;
 }

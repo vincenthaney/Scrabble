@@ -7,7 +7,8 @@ import { Container } from 'typedi';
 import WordFindingRequest from '@app/classes/word-finding/word-finding-request';
 import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
-import WordFinding from './word-finding';
+import AbstractWordFinding from './abstract-word-finding';
+import Range from '@app/classes/range/range';
 
 type LetterValues = (LetterValue | ' ')[][];
 
@@ -54,7 +55,7 @@ const boardFromLetterValues = (letterValues: LetterValues) => {
 
 const lettersToTiles = (letters: LetterValue[]) => letters.map<Tile>((letter) => ({ letter, value: 0 }));
 
-class WordFindingTest extends WordFinding {
+class WordFindingTest extends AbstractWordFinding {
     private bestWordPlacement: ScoredWordPlacement = {
         orientation: Orientation.Horizontal,
         startPosition: new Position(0, 0),
@@ -81,7 +82,8 @@ describe.only('WordFinding', () => {
         const tiles = lettersToTiles(['A', 'B', 'S', '*', 'T', 'M', 'E']);
         const request: WordFindingRequest = {
             useCase: WordFindingUseCase.Beginner,
-            pointRange: { minimum: 4, maximum: 100 },
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            pointRange: new Range(4, 100),
         };
 
         const iterations = 10;

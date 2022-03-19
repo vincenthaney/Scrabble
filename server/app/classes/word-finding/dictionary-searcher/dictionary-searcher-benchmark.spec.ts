@@ -5,9 +5,8 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import { Container } from 'typedi';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Square } from '@app/classes/square';
-import BoardPlacementsExtractor from './board-placement-extractor';
 import DictionarySearcher from './dictionary-searcher';
-import { DictionarySearchResult } from './word-finding-types';
+import { BoardPlacementsExtractor, DictionarySearchResult } from '@app/classes/word-finding';
 
 const GRID: (LetterValue | ' ')[][] = [
     [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'B', ' ', ' ', ' ', ' ', ' '],

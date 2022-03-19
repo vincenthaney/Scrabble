@@ -1,22 +1,25 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue, Tile } from '@app/classes/tile';
-import WordFindingRequest from '@app/classes/word-finding/word-finding-request';
 import { Dictionary } from '@app/classes/dictionary';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
-import { BoardPlacement, DictionarySearchResult } from './word-finding-types';
-import BoardPlacementsExtractor from './board-placement-extractor';
 import { Random } from '@app/utils/random';
-import DictionarySearcher from './dictionary-searcher';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { Square } from '@app/classes/square';
 import { switchOrientation } from '@app/utils/switch-orientation';
 import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
 import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
 import { arrayDeepCopy } from '@app/utils/deep-copy';
+import {
+    BoardPlacement,
+    BoardPlacementsExtractor,
+    DictionarySearcher,
+    DictionarySearchResult,
+    ScoredWordPlacement,
+    WordFindingRequest,
+    WordFindingUseCase,
+} from '@app/classes/word-finding';
 
-export default abstract class WordFinding {
+export default abstract class AbstractWordFinding {
     protected wordPlacements: ScoredWordPlacement[] = [];
 
     constructor(

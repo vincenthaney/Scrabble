@@ -13,7 +13,7 @@ import { Vec2 } from '@app/classes/vec2';
 import { SinonStub, stub } from 'sinon';
 import { expect } from 'chai';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LinePlacements, WithDistance } from './word-finding-types';
+import { BoardPlacement, LinePlacements, WithDistance } from '@app/classes/word-finding';
 
 const DEFAULT_BOARD: (LetterValue | ' ')[][] = [
     [' ', ' ', 'X', ' ', 'O', 'P'],

@@ -13,13 +13,12 @@ import {
     PRELIMINARY_WAIT_TIMEOUT,
 } from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Board } from '@app/classes/board';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { Delay } from '@app/utils/delay';
 import Range from '@app/classes/range/range';
+import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {

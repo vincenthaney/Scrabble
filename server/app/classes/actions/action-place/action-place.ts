@@ -13,7 +13,7 @@ import { Container } from 'typedi';
 import { ActionErrorsMessages } from './action-errors';
 import { StringConversion } from '@app/utils/string-conversion';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding/';
 
 export default class ActionPlace extends ActionPlay {
     wordPlacement: WordPlacement;
