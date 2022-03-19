@@ -28,6 +28,12 @@ module.exports = function (config) {
             dir: require('path').join(__dirname, './coverage/client'),
             subdir: '.',
             reporters: [{ type: 'html' }, { type: 'text' }],
+            check: {
+                global: {
+                    statements: 90,
+                    lines: 90,
+                },
+            },
             combineBrowserReports: true,
         },
         reporters: ['progress', 'kjhtml'],

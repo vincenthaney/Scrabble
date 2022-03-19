@@ -1,4 +1,3 @@
-// export { default as ActionClue } from './action-hint/action-hint';
 export { default as Action } from './action';
 export { default as ActionExchange } from './action-exchange/action-exchange';
 export { default as ActionHelp } from './action-help/action-help';

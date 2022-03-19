@@ -16,7 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
@@ -358,7 +358,7 @@ describe('BoardComponent', () => {
     });
 
     describe('handlePlaceTiles', () => {
-        let payload: ActionPlacePayload;
+        let payload: PlaceActionPayload;
 
         beforeEach(() => {
             payload = {
@@ -612,20 +612,29 @@ describe('BoardComponent', () => {
 
     describe('handleEnter', () => {
         let getPayloadSpy: jasmine.Spy;
-        let sendPlaceActionPayload: jasmine.Spy;
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
 
         beforeEach(() => {
             getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
-            sendPlaceActionPayload = spyOn(component['gameButtonActionService'], 'sendPlaceAction');
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
         });
 
-        it('should call sendPlaceAction', () => {
-            const payload: ActionPlacePayload = {} as ActionPlacePayload;
+        it('should sendAction through ActionService', () => {
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
             getPayloadSpy.and.returnValue(payload);
 
             component['handleEnter']();
 
-            expect(sendPlaceActionPayload).toHaveBeenCalledOnceWith(payload);
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PLACE, payload);
+            expect(sendAction).toHaveBeenCalledOnceWith('gameId', 'playerId', fakeData);
         });
 
         it('should not call sendPlaceAction if no payload', () => {
@@ -633,7 +642,7 @@ describe('BoardComponent', () => {
 
             component['handleEnter']();
 
-            expect(sendPlaceActionPayload).not.toHaveBeenCalled();
+            expect(sendAction).not.toHaveBeenCalled();
         });
     });
 
@@ -851,7 +860,7 @@ describe('BoardComponent', () => {
         });
 
         it('should call emitToGameViewEvent if has usedTiles', () => {
-            const previousPayload: ActionPlacePayload = {
+            const previousPayload: PlaceActionPayload = {
                 orientation: Orientation.Horizontal,
                 startPosition: { row: 0, column: 0 },
                 tiles: [],
@@ -874,7 +883,7 @@ describe('BoardComponent', () => {
             component.navigator.orientation = Orientation.Vertical;
             component.navigator.setPosition(1, 2);
 
-            const expectedPayload: ActionPlacePayload = {
+            const expectedPayload: PlaceActionPayload = {
                 orientation: component.navigator.orientation,
                 startPosition: { row: component.navigator.row, column: component.navigator.column },
                 tiles: [tile],
@@ -947,7 +956,7 @@ describe('BoardComponent', () => {
 
     describe('areTilesUsed', () => {
         it('areTilesUsed should return true if usedTiles has tiles', () => {
-            const placePayload: ActionPlacePayload = {
+            const placePayload: PlaceActionPayload = {
                 tiles: [new Tile('A', 1)],
                 startPosition: { row: 0, column: 0 },
                 orientation: Orientation.Horizontal,
@@ -958,7 +967,7 @@ describe('BoardComponent', () => {
         });
 
         it('areTilesUsed should return false if usedTiles has no tiles', () => {
-            const emptyPlacePayload: ActionPlacePayload = {
+            const emptyPlacePayload: PlaceActionPayload = {
                 tiles: [],
                 startPosition: { row: -1, column: -1 },
                 orientation: Orientation.Horizontal,

@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
-import { ActionPlacePayload } from '@app/classes/actions/action-data';
+import { PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import * as SERVICE_ERRORS from '@app/constants/services-errors';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -43,7 +43,7 @@ describe('GameViewEventManagerService', () => {
 
         it('should call next with payload', () => {
             const event = 'usedTiles';
-            const payload: ActionPlacePayload = {
+            const payload: PlaceActionPayload = {
                 tiles: [],
                 orientation: Orientation.Horizontal,
                 startPosition: { row: 0, column: 0 },

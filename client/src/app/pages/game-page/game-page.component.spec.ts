@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable max-classes-per-file */
@@ -10,8 +11,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -101,6 +104,7 @@ describe('GamePageComponent', () => {
                 FormsModule,
                 ScrollingModule,
                 HttpClientTestingModule,
+                MatTooltipModule,
                 RouterTestingModule.withRoutes([]),
             ],
             providers: [
@@ -182,13 +186,58 @@ describe('GamePageComponent', () => {
         }
     });
 
-    describe('createPassAction', () => {
-        it('should call gameButtonActionService.createPassAction()', () => {
-            const createPassActionSpy = spyOn(component['gameButtonActionService'], 'createPassAction').and.callFake(() => {
+    describe('passButtonClicked', () => {
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
+
+        it('should use action service to pass', () => {
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
                 return;
             });
-            component.createPassAction();
-            expect(createPassActionSpy).toHaveBeenCalled();
+            component.passButtonClicked();
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PASS, {});
+            expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
+        });
+    });
+
+    describe('placeButtonClicked', () => {
+        let getPayloadSpy: jasmine.Spy;
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
+
+        beforeEach(() => {
+            getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should sendAction through ActionService', () => {
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
+            getPayloadSpy.and.returnValue(payload);
+
+            component.placeButtonClicked();
+
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PLACE, payload);
+            expect(sendAction).toHaveBeenCalledOnceWith('gameId', 'playerId', fakeData);
+        });
+
+        it('should not call sendPlaceAction if no payload', () => {
+            getPayloadSpy.and.returnValue(undefined);
+
+            component.placeButtonClicked();
+
+            expect(sendAction).not.toHaveBeenCalled();
         });
     });
 
@@ -242,6 +291,52 @@ describe('GamePageComponent', () => {
             component.changeTileFontSize('smaller');
             expect(component.tileRackComponent.tileFontSize).toEqual(RACK_TILE_MIN_FONT_SIZE);
             expect(component.boardComponent.tileFontSize).toEqual(SQUARE_TILE_MIN_FONT_SIZE);
+        });
+    });
+
+    describe('canPass', () => {
+        it('should not be able to pass if its not the player turn', () => {
+            spyOn(component, 'isLocalPlayerTurn').and.returnValue(false);
+            expect(component.canPass()).toBeFalse();
+        });
+
+        it('should not be able to pass if the game is over', () => {
+            component['gameService'].isGameOver = true;
+            expect(component.canPass()).toBeFalse();
+            component['gameService'].isGameOver = false;
+        });
+
+        it('should be able to pass if the conditions are met', () => {
+            spyOn(component, 'isLocalPlayerTurn').and.returnValue(true);
+            component['gameService'].isGameOver = false;
+            expect(component.canPass()).toBeTrue();
+        });
+    });
+
+    describe('canPlaceWord', () => {
+        let getPayloadSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
+        });
+
+        it('should not be able to place word if pass conditions are not met', () => {
+            spyOn(component, 'canPass').and.returnValue(false);
+            expect(component.canPlaceWord()).toBeFalse();
+        });
+
+        it('should not be able to place word if there are no tiles played', () => {
+            spyOn(component, 'canPass').and.returnValue(true);
+            getPayloadSpy.and.returnValue(undefined);
+            expect(component.canPlaceWord()).toBeFalse();
+        });
+
+        it('should be able to pass if the conditions are met', () => {
+            spyOn(component, 'canPass').and.returnValue(true);
+            const payload: PlaceActionPayload = {} as PlaceActionPayload;
+            getPayloadSpy.and.returnValue(payload);
+
+            expect(component.canPlaceWord()).toBeTrue();
         });
     });
 

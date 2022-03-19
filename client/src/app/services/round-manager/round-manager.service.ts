@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionData, ActionType } from '@app/classes/actions/action-data';
+import { ActionType } from '@app/classes/actions/action-data';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
@@ -9,7 +9,7 @@ import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND, NO_START_GAME_TIME } from '@app/constants/services-errors';
-import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { ActionService } from '@app/services/action/action.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -27,7 +27,7 @@ export default class RoundManagerService implements IResetServiceData {
     private endRoundEvent$: Subject<void>;
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
 
-    constructor(private gameplayController: GamePlayController, private router: Router) {
+    constructor(private router: Router, private readonly actionService: ActionService) {
         this.initializeEvents();
     }
 
@@ -127,13 +127,8 @@ export default class RoundManagerService implements IResetServiceData {
 
     roundTimeout(): void {
         if (this.router.url === '/game' && this.isActivePlayerLocalPlayer()) {
-            const actionPass: ActionData = {
-                type: ActionType.PASS,
-                input: '',
-                payload: {},
-            };
             this.endRoundEvent$.next();
-            this.gameplayController.sendAction(this.gameId, this.getActivePlayer().id, actionPass);
+            this.actionService.sendAction(this.gameId, this.localPlayerId, this.actionService.createActionData(ActionType.PASS, {}));
         }
     }
 }

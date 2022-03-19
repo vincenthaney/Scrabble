@@ -77,7 +77,8 @@ export const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
 export const MAX_TILES_PER_PLAYER = 7;
 
-export const DEFAULT_PLAYER = new Player('id', 'name', []);
+export const DEFAULT_PLAYER_ID = 'id';
+export const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, 'name', []);
 
 export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
