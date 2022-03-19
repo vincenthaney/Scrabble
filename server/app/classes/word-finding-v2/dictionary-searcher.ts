@@ -88,9 +88,9 @@ export default class DictionarySearcher {
     }
 
     private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
-        const lock = this.alreadyPlacedLetters.get(index + 1);
+        const alreadyPlacedLetter = this.alreadyPlacedLetters.get(index + 1);
 
-        if (lock) return [[lock], false];
+        if (alreadyPlacedLetter) return [[alreadyPlacedLetter], false];
 
         if (!letters.includes(BLANK_TILE_LETTER_VALUE)) return [[...new Set(letters)], true];
         return [[...new Set([...letters, ...ALPHABET])], true];
