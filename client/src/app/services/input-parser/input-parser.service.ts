@@ -11,7 +11,7 @@ import {
     BLANK_TILE_LETTER_VALUE,
     BOARD_SIZE,
     DEFAULT_ORIENTATION,
-    ExpectedCommandWordCount,
+    EXPECTED_COMMAND_WORD_COUNT,
     LETTER_VALUES,
     ON_YOUR_TURN_ACTIONS,
     SYSTEM_ERROR_ID,
@@ -67,12 +67,14 @@ export default class InputParserService {
 
     private createActionData(input: string): ActionData {
         const inputWords: string[] = this.separateCommandWords(input);
-        const actionName: string = inputWords[0];
-        let actionData: ActionData;
+        const actionType: string = inputWords[0];
 
-        this.verifyActionValidity(actionName as ActionType);
+        this.verifyActionValidity(actionType as ActionType);
+        if (inputWords.length !== EXPECTED_COMMAND_WORD_COUNT.get(actionType as ActionType)) {
+            throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
+        }
 
-        switch (actionName) {
+        switch (actionType) {
             case ActionType.PLACE:
                 if (inputWords.length !== ExpectedCommandWordCount.Place) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
                 actionData = {
