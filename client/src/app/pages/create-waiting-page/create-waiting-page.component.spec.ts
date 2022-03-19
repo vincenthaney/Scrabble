@@ -372,7 +372,7 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     describe('convertSolo button', () => {
-        // it('should be enabled when the game is created and no opponent has joined it.', () => {
+        // it('should be enabled when the game is created and no opponent has joined it', () => {
         //     const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
         //     expect(convertSoloButton.disabled).toBeFalsy();
         // });
@@ -383,7 +383,7 @@ describe('CreateWaitingPageComponent', () => {
         });
     });
 
-    it('cancelButton should be enabled when the game is created and no opponent has joined it.', () => {
+    it('cancelButton should be enabled when the game is created and no opponent has joined it', () => {
         const cancelButtonButton = fixture.nativeElement.querySelector('#cancel-button');
         expect(cancelButtonButton.disabled).toBeFalsy();
     });

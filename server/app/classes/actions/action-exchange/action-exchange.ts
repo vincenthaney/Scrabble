@@ -48,7 +48,7 @@ export default class ActionExchange extends ActionPlay {
     }
 
     lettersToSwap(): string {
-        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter.toLowerCase()), '')}.`;
+        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter), '')}`;
     }
 
     getOpponentMessage(): string {
