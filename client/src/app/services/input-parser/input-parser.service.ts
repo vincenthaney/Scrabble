@@ -143,21 +143,18 @@ export default class InputParserService {
     private createPlaceActionPayload(locationString: string, lettersToPlace: string): PlaceActionPayload {
         const location: Location = this.createLocation(locationString, lettersToPlace.length);
 
-        const placeActionPayload: PlaceActionPayload = {
-            tiles: this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
-            startPosition: this.getStartPosition(location),
-            orientation: location.orientation,
-        };
+        const placeActionPayload: PlaceActionPayload = this.actionService.createPlaceActionPayload(
+            this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
+            this.getStartPosition(location),
+            location.orientation,
+        );
 
         this.gameViewEventManagerService.emitGameViewEvent('usedTiles', placeActionPayload);
-
         return placeActionPayload;
     }
 
     private createExchangeActionPayload(lettersToExchange: string): ExchangeActionPayload {
-        return {
-            tiles: this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE),
-        };
+        return this.actionService.createExchangeActionPayload(this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE));
     }
 
     private parseLettersToTiles(lettersToParse: string, actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {
