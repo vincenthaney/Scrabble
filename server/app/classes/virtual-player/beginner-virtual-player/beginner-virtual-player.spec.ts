@@ -23,6 +23,7 @@ import {
 } from '@app/constants/virtual-player-tests-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WordFindingService from '@app/services/word-finding/word-finding';
+import WordFindingServiceV2 from '@app/services/word-finding/word-finding-v2';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -195,7 +196,7 @@ describe('BeginnerVirtualPlayer', () => {
 
         beforeEach(async () => {
             wordFindingServiceStub = createStubInstance(WordFindingService);
-            beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
+            beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingServiceV2;
         });
 
         afterEach(() => {
