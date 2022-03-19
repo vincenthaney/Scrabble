@@ -1,13 +1,13 @@
 import {
     EXCHANGE_ACTION_THRESHOLD,
-    FINAL_WAIT_TIMEOUT,
+    FINAL_WAIT_TIME,
     HIGH_SCORE_RANGE,
     LOW_SCORE_RANGE,
     LOW_SCORE_THRESHOLD,
     MEDIUM_SCORE_RANGE,
     MEDIUM_SCORE_THRESHOLD,
     PASS_ACTION_THRESHOLD,
-    PRELIMINARY_WAIT_TIMEOUT,
+    PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { PointRange, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
@@ -20,10 +20,10 @@ import { Delay } from '@app/utils/delay';
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
         const waitPreliminaryTime = async (): Promise<void> => {
-            await Delay.for(PRELIMINARY_WAIT_TIMEOUT);
+            await Delay.for(PRELIMINARY_WAIT_TIME);
         };
         const waitTimeout = async (): Promise<void> => {
-            await Delay.for(FINAL_WAIT_TIMEOUT);
+            await Delay.for(FINAL_WAIT_TIME);
         };
 
         const play = async (): Promise<[ActionData, void]> => {

@@ -2,8 +2,8 @@ import { PointRange } from '@app/classes/word-finding';
 
 export const VIRTUAL_PLAYER_ID_PREFIX = 'virtual-player-';
 export const GAME_SHOULD_CONTAIN_ROUND = 'Game object should contain round to enable virtual player to play.';
-export const PRELIMINARY_WAIT_TIMEOUT = 3000;
-export const FINAL_WAIT_TIMEOUT = 20000;
+export const PRELIMINARY_WAIT_TIME = 3000;
+export const FINAL_WAIT_TIME = 20000;
 export const PASS_ACTION_THRESHOLD = 0.1;
 export const EXCHANGE_ACTION_THRESHOLD = 0.2;
 export const LOW_SCORE_THRESHOLD = 0.4;
