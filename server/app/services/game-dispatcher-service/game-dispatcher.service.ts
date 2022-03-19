@@ -5,9 +5,7 @@ import SoloRoom from '@app/classes/game/solo-room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -34,11 +32,7 @@ export class GameDispatcherService {
 
     createSoloGame(configData: GameConfigData): string {
         const soloRoom = new SoloRoom(this.generateGameConfig(configData));
-        soloRoom.setReadyConfig(
-            configData.virtualPlayerLevel === VirtualPlayerLevel.Beginner
-                ? new BeginnerVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string)
-                : new ExpertVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string),
-        );
+        soloRoom.setReadyConfig(new BeginnerVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string));
         this.soloRooms.push(soloRoom);
         return soloRoom.getId();
     }
