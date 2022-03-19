@@ -19,6 +19,7 @@ import {
 import { IS_REQUESTING, SYSTEM_ID } from '@app/constants/game';
 import { IS_ID_VIRTUAL_PLAYER } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
@@ -34,6 +35,7 @@ export class GameDispatcherController {
         private gameDispatcherService: GameDispatcherService,
         private socketService: SocketService,
         private activeGameService: ActiveGameService,
+        private createGameService: CreateGameService,
         private virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
@@ -218,16 +220,16 @@ export class GameDispatcherController {
 
         let gameId: string;
         if (config.gameMode === GameMode.Multiplayer) {
-            gameId = this.gameDispatcherService.createMultiplayerGame(config);
+            const waitingRoom = this.createGameService.createMultiplayerGame(config);
+            gameId = waitingRoom.getId();
+            this.gameDispatcherService.addToWaitingRoom(waitingRoom);
             this.socketService.addToRoom(config.playerId, gameId);
             this.handleLobbiesUpdate();
         } else {
             if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
             if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
-            gameId = this.gameDispatcherService.createSoloGame(config);
-            const gameConfig = this.gameDispatcherService.getSoloGameFromId(gameId).getReadyConfig();
-            const startGameData = await this.activeGameService.beginGame(gameId, gameConfig);
-
+            const startGameData = await this.createGameService.createSoloGame(config);
+            gameId = startGameData.gameId;
             this.socketService.addToRoom(config.playerId, gameId);
 
             startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
