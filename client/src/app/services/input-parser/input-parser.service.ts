@@ -6,7 +6,7 @@ import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
+import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
 import {
     BLANK_TILE_LETTER_VALUE,
     BOARD_SIZE,
@@ -71,49 +71,29 @@ export default class InputParserService {
         const inputWords: string[] = this.separateCommandWords(input);
         const actionType: string = inputWords[0];
 
-        this.verifyActionValidity(actionType as ActionType);
+        this.verifyActionValidity(actionType);
         if (inputWords.length !== EXPECTED_COMMAND_WORD_COUNT.get(actionType as ActionType)) {
-            throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
+            throw new CommandException(BAD_SYNTAX_MESSAGES.get(actionType as ActionType) ?? CommandExceptionMessages.BadSyntax);
         }
 
         switch (actionType) {
             case ActionType.PLACE:
-                return {
-                    type: ActionType.PLACE,
-                    input,
-                    payload: this.createPlaceActionPayload(inputWords[1], inputWords[2]),
-                };
+                return this.actionService.createActionData(ActionType.PLACE, this.createPlaceActionPayload(inputWords[1], inputWords[2]), input);
             case ActionType.EXCHANGE:
-                return {
-                    type: ActionType.EXCHANGE,
-                    input,
-                    payload: this.createExchangeActionPayload(inputWords[1]),
-                };
+                return this.actionService.createActionData(ActionType.EXCHANGE, this.createExchangeActionPayload(inputWords[1]), input);
             case ActionType.PASS:
-                return {
-                    type: ActionType.PASS,
-                    input,
-                    payload: {},
-                };
+                return this.actionService.createActionData(ActionType.PASS, {}, input);
             case ActionType.RESERVE:
-                return {
-                    type: ActionType.RESERVE,
-                    input,
-                    payload: {},
-                };
+                return this.actionService.createActionData(ActionType.RESERVE, {}, input);
             case ActionType.HINT:
-                return {
-                    type: ActionType.HINT,
-                    input,
-                    payload: {},
-                };
+                return this.actionService.createActionData(ActionType.HINT, {}, input);
             case ActionType.HELP:
-                return {
-                    type: ActionType.HELP,
-                    input,
-                    payload: {},
-                };
+                return this.actionService.createActionData(ActionType.HELP, {}, input);
             default:
+                /* This line cannot be covered in tests because we already throw an error before the switch case
+                if the command is not part of the known commands (verifyActionValidity) so we will never reach the 
+                default. We still need to a default that throws or else the compiler does not recognise that we will 
+                always return an ActionData because the switch case covers every type of known action. */
                 throw new CommandException(CommandExceptionMessages.InvalidEntry);
         }
     }
@@ -125,7 +105,7 @@ export default class InputParserService {
         let orientation: Orientation;
 
         if (isNumber(locationLastChar)) {
-            if (nLettersToPlace !== 1) throw new CommandException(CommandExceptionMessages.PlaceBadSyntax);
+            if (nLettersToPlace !== 1) throw new CommandException(BAD_SYNTAX_MESSAGES.get(ActionType.PLACE) ?? CommandExceptionMessages.BadSyntax);
             orientation = DEFAULT_ORIENTATION;
         } else {
             if (locationLastChar === 'h') orientation = Orientation.Horizontal;
@@ -207,11 +187,15 @@ export default class InputParserService {
         return input.substring(1).split(' ');
     }
 
-    private verifyActionValidity(actionName: ActionType): void {
-        if (!actionName) throw new CommandException(CommandExceptionMessages.InvalidEntry);
+    private verifyActionValidity(actionName: string): void {
+        if (!this.isKnownCommand(actionName)) throw new CommandException(CommandExceptionMessages.InvalidEntry);
         if (this.gameService.isGameOver) throw new CommandException(CommandExceptionMessages.GameOver);
-        if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName))
+        if (!this.gameService.isLocalPlayerPlaying() && ON_YOUR_TURN_ACTIONS.includes(actionName as ActionType))
             throw new CommandException(CommandExceptionMessages.NotYourTurn);
+    }
+
+    private isKnownCommand(actionName: string): boolean {
+        return Object.values(ActionType).includes(actionName as ActionType);
     }
 
     private getStartPosition(location: Location): Position {
