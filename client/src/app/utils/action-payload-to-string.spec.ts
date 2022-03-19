@@ -108,12 +108,27 @@ describe('ActionPayloadToString', () => {
 
     describe('tileToLetterConversion', () => {
         it('should expected strings for letters', () => {
-            const TEST_TILES = [new Tile('A', 1), new Tile('E', 1, true), new Tile('Z', 1), new Tile('I', 0, true)];
-            const EXPECTED_LETTERS = ['a', 'E', 'z', 'I'];
+            const blankPlayedTile: Tile = new Tile('*', 0, true);
+            blankPlayedTile.playedLetter = 'E';
+            const TEST_TILES = [new Tile('A', 1), new Tile('E', 1, true), new Tile('Z', 1), new Tile('I', 0, true), blankPlayedTile];
+            const EXPECTED_LETTERS = ['a', 'E', 'z', 'I', 'E'];
 
             for (let i = 0; i < TEST_TILES.length; i++) {
                 expect(ActionPayloadToString['tileToLetterConversion'](TEST_TILES[i])).toEqual(EXPECTED_LETTERS[i]);
             }
+        });
+    });
+
+    describe('getBlankTileLetter', () => {
+        it('should return playedLetter if it is defined', () => {
+            const tile: Tile = new Tile('*', 0, true);
+            tile.playedLetter = 'E';
+            expect(ActionPayloadToString['getBlankTileLetter'](tile)).toEqual('E');
+        });
+
+        it('should return letter if playedLetter is undefined', () => {
+            const tile: Tile = new Tile('*', 0, true);
+            expect(ActionPayloadToString['getBlankTileLetter'](tile)).toEqual('*');
         });
     });
 
