@@ -46,7 +46,7 @@ describe('GamePlayController', () => {
 
     describe('Configure Socket', () => {
         it('On gameUpdate, should push new gameUpdate', () => {
-            const spy = spyOn(controller.gameUpdateValue, 'next').and.callFake(() => {
+            const spy = spyOn(controller['gameUpdate$'], 'next').and.callFake(() => {
                 return;
             });
             const gameUpdateData: GameUpdateData = {
@@ -57,7 +57,7 @@ describe('GamePlayController', () => {
         });
 
         it('On newMessage, should push new message', () => {
-            const spy = spyOn(controller.newMessageValue, 'next').and.callFake(() => {
+            const spy = spyOn(controller['newMessage$'], 'next').and.callFake(() => {
                 return;
             });
             const newMessage: Message = {
@@ -161,5 +161,15 @@ describe('GamePlayController', () => {
             status: HTTP_ABORT_ERROR,
         };
         expect(() => controller['handleDisconnectError'](error)).not.toThrowError(error.message);
+    });
+
+    it('observeGameUpdate should return gameUpdate$ as observable', () => {
+        const result: Observable<GameUpdateData> = controller.observeGameUpdate();
+        expect(result).toEqual(controller['gameUpdate$'].asObservable());
+    });
+
+    it('obvserveNewMessage should return newMessage$ as observable', () => {
+        const result: Observable<Message | null> = controller.obvserveNewMessage();
+        expect(result).toEqual(controller['newMessage$'].asObservable());
     });
 });

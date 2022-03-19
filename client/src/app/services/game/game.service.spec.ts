@@ -144,13 +144,13 @@ describe('GameService', () => {
 
         it('should call handleNewMessage if new message from gameController is Message', () => {
             const spy = spyOn(service, 'handleNewMessage');
-            service['gameController'].newMessageValue.next(DEFAULT_MESSAGE);
+            service['gameController']['newMessage$'].next(DEFAULT_MESSAGE);
             expect(spy).toHaveBeenCalled();
         });
 
         it('should NOT call handleNewMessage if new message from gameController is null', () => {
             const spy = spyOn(service, 'handleNewMessage');
-            service['gameController'].newMessageValue.next(null);
+            service['gameController']['newMessage$'].next(null);
             expect(spy).not.toHaveBeenCalled();
         });
     });

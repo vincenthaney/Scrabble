@@ -52,14 +52,6 @@ describe('PlayerLeavesController', () => {
         expect(cleanupSpy).toHaveBeenCalled();
     });
 
-    it('On cleanup, configureSocket should call gamePlayController.newMessageValue.next', async () => {
-        const cleanupSpy = spyOn(controller['gamePlayController'].newMessageValue, 'next').and.callFake(async () => {
-            return;
-        });
-        socketHelper.peerSideEmit('cleanup');
-        expect(cleanupSpy).toHaveBeenCalled();
-    });
-
     it('handleLeaveGame should send delete request', () => {
         const fakeObservable = of<string>('fakeResponse');
         const deleteSpy = spyOn(controller['http'], 'delete').and.returnValue(fakeObservable);
