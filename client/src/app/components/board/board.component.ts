@@ -17,6 +17,7 @@ import { FocusableComponent } from '@app/services/focusable-components/focusable
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import { removeAccents } from '@app/utils/remove-accents';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -122,7 +123,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
         if (!squareView) return;
 
-        letter = letter.toUpperCase();
+        letter = removeAccents(letter.toUpperCase());
 
         if (!(LETTER_VALUES as string[]).includes(letter)) return;
         if (letter === BLANK_TILE_LETTER_VALUE) return;
