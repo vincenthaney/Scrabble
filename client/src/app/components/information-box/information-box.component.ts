@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Timer } from '@app/classes/timer/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
@@ -15,7 +15,7 @@ import { takeUntil } from 'rxjs/operators';
     templateUrl: './information-box.component.html',
     styleUrls: ['./information-box.component.scss'],
 })
-export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit {
+export class InformationBoxComponent implements OnInit, OnDestroy {
     readonly maxTilesPerPlayer;
     isPlayer1Active: boolean;
     isPlayer2Active: boolean;
@@ -46,10 +46,6 @@ export class InformationBoxComponent implements OnInit, OnDestroy, AfterViewInit
 
         if (!this.gameService.isGameSetUp) return;
         this.setupGame();
-    }
-
-    ngAfterViewInit(): void {
-        setTimeout(() => this.updateActivePlayerBorder(this.roundManager.getActivePlayer()), 0);
     }
 
     ngOnDestroy(): void {
