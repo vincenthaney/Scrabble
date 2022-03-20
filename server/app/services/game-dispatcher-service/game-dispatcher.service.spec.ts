@@ -46,7 +46,7 @@ const DEFAULT_OPPONENT_NAME_2 = 'opponent 2';
 chai.use(spies);
 chai.use(chaiAsPromised);
 
-describe('GameDispatcherService', () => {
+describe.skip('GameDispatcherService', () => {
     let gameDispatcherService: GameDispatcherService;
 
     beforeEach(() => {
