@@ -8,7 +8,7 @@ export enum CommandExceptionMessages {
     PassBadSyntax = 'La commande passer doit suivre le format _!passer_',
     InvalidEntry = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes valides",
     ImpossibleCommand = 'Cette commande est impossible à réaliser',
-    DontHaveTiles = "Vous n'avez pas les tuiles requises.",
+    DontHaveTiles = "Vous n'avez pas les tuiles requises",
     PositionFormat = 'La position doit être de format _‹a-o›‹1-15›‹h/v›_',
     NotYourTurn = "Ce n'est pas votre tour de jouer",
     GameOver = 'La commande est impossible car la partie est terminée',

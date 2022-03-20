@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -11,7 +11,7 @@ import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { Socket } from 'socket.io-client';
 
@@ -246,11 +246,7 @@ describe('GameDispatcherController', () => {
             const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller.handleJoinError(
-                new HttpErrorResponse({
-                    status: HttpStatusCode.Unauthorized,
-                }),
-            );
+            controller.handleJoinError(HttpStatusCode.Unauthorized);
             expect(lobbyFullNextSpy).toHaveBeenCalled();
             expect(canceledGameNextSpy).not.toHaveBeenCalled();
         });
@@ -262,11 +258,7 @@ describe('GameDispatcherController', () => {
             const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller.handleJoinError(
-                new HttpErrorResponse({
-                    status: HttpStatusCode.Gone,
-                }),
-            );
+            controller.handleJoinError(HttpStatusCode.Gone);
             expect(lobbyFullNextSpy).not.toHaveBeenCalled();
             expect(canceledGameNextSpy).toHaveBeenCalled();
         });
@@ -278,11 +270,7 @@ describe('GameDispatcherController', () => {
             const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller.handleJoinError(
-                new HttpErrorResponse({
-                    status: HttpStatusCode.BadGateway,
-                }),
-            );
+            controller.handleJoinError(HttpStatusCode.BadGateway);
             expect(lobbyFullNextSpy).not.toHaveBeenCalled();
             expect(canceledGameNextSpy).not.toHaveBeenCalled();
         });

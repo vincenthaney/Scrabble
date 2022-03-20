@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { FocusableComponent } from './focusable-component';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 
 @Injectable({
     providedIn: 'root',

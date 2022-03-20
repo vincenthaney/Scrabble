@@ -27,7 +27,7 @@ import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-const
 import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RackTile, TileRackComponent } from './tile-rack.component';

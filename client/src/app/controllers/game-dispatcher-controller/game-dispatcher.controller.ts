@@ -2,7 +2,7 @@ import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { LobbyData, LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -81,17 +81,15 @@ export class GameDispatcherController implements OnDestroy {
                 this.lobbyRequestValidEvent.next();
             },
             (error) => {
-                this.handleJoinError(error);
+                this.handleJoinError(error.status as HttpStatusCode);
             },
         );
     }
 
-    // error has any type so we must disable no explicit any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleJoinError(error: any): void {
-        if (error.status === HttpStatusCode.Unauthorized) {
+    handleJoinError(errorStatus: HttpStatusCode): void {
+        if (errorStatus === HttpStatusCode.Unauthorized) {
             this.lobbyFullEvent.next();
-        } else if (error.status === HttpStatusCode.Gone) {
+        } else if (errorStatus === HttpStatusCode.Gone) {
             this.canceledGameEvent.next('Le créateur');
         }
     }

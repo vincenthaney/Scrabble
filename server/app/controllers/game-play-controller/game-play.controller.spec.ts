@@ -11,7 +11,7 @@ import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import Game from '@app/classes/game/game';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';

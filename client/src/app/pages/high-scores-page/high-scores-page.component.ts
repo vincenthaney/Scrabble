@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
-import HighScoresService from '@app/services/high-scores/high-scores.service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { Subject } from 'rxjs';
 
 @Component({

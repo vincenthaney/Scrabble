@@ -12,7 +12,7 @@ export default class Board {
     constructor(grid: Square[][]) {
         this.grid = grid;
     }
-    // Verifies if the position is valid and if the square at the given position in the board has a tile or not
+
     verifySquare(position: Position, shouldBeFilled: boolean): boolean {
         if (this.isWithinBounds(position)) {
             return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
