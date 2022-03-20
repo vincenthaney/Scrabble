@@ -15,6 +15,7 @@ import { ScoredWordPlacement } from '@app/classes/word-finding/word-finding-type
 import WordFindingBeginner from './word-finding-beginner';
 import Range from '@app/classes/range/range';
 import { WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD } from '@app/constants/classes-constants';
+import { NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
 
 const GRID: LetterValues = [
     // 0   1    2    3    4
@@ -25,7 +26,7 @@ const GRID: LetterValues = [
     [' ', ' ', ' ', ' ', 'Z'], // 4
 ];
 
-describe.only('WordFindingBeginner', () => {
+describe('WordFindingBeginner', () => {
     let wordFinding: WordFindingBeginner;
     let board: Board;
     let tiles: Tile[];
@@ -113,6 +114,18 @@ describe.only('WordFindingBeginner', () => {
             expect(wordFinding['placementFoundAcceptance']).to.equal(found);
             expect(wordFinding['wordPlacements']).to.deep.equal([]);
         });
+
+        it('should not update values if acceptanceProbability is lower than found acceptance (value is undefined)', () => {
+            const found = 0.5;
+            wordFinding['placementFoundAcceptance'] = found;
+            wordFinding['wordPlacements'] = [];
+            acceptanceProbabilitiesGetStub.returns(undefined);
+
+            wordFinding['handleWordPlacement'](wordPlacement);
+
+            expect(wordFinding['placementFoundAcceptance']).to.equal(found);
+            expect(wordFinding['wordPlacements']).to.deep.equal([]);
+        });
     });
 
     describe('isSearchCompleted', () => {
@@ -187,6 +200,18 @@ describe.only('WordFindingBeginner', () => {
             }
             expect(wordFinding['acceptanceProbabilities'].size).to.equal(range.max - range.min + 1);
         });
+
+        it('should throw if no pointRange', () => {
+            wordFinding['request'].pointRange = undefined;
+
+            expect(() => wordFinding['calculateAcceptanceProbabilities']()).to.throw(NO_REQUEST_POINT_RANGE);
+        });
+
+        it('should throw if no pointRange', () => {
+            wordFinding['request'].pointHistory = undefined;
+
+            expect(() => wordFinding['calculateAcceptanceProbabilities']()).to.throw(NO_REQUEST_POINT_HISTORY);
+        });
     });
 
     describe('findScoreMinimumFrequency', () => {
@@ -223,6 +248,18 @@ describe.only('WordFindingBeginner', () => {
             wordFinding['request'].pointHistory?.set(4, 1);
 
             expect(wordFinding['findScoreMinimumFrequency']()).to.equal(0);
+        });
+
+        it('should throw if no pointRange', () => {
+            wordFinding['request'].pointRange = undefined;
+
+            expect(() => wordFinding['findScoreMinimumFrequency']()).to.throw(NO_REQUEST_POINT_RANGE);
+        });
+
+        it('should throw if no pointRange', () => {
+            wordFinding['request'].pointHistory = undefined;
+
+            expect(() => wordFinding['findScoreMinimumFrequency']()).to.throw(NO_REQUEST_POINT_HISTORY);
         });
     });
 });
