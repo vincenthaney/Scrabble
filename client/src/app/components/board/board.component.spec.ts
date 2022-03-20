@@ -881,7 +881,7 @@ describe('BoardComponent', () => {
             getGameViewEventValueSpy.and.returnValue(undefined);
 
             component.navigator.orientation = Orientation.Vertical;
-            component.navigator.setPosition(1, 2);
+            component.navigator.setPosition({ row: 1, column: 2 });
 
             const expectedPayload: PlaceActionPayload = {
                 orientation: component.navigator.orientation,
