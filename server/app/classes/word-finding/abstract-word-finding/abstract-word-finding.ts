@@ -142,11 +142,11 @@ export default abstract class AbstractWordFinding {
         return tiles.map((tile) => tile.letter);
     }
 
-    private getPerpendicularWordPosition(boardPlacement: BoardPlacement, distance: number, connect: number): Position {
+    private getPerpendicularWordPosition(boardPlacement: BoardPlacement, distance: number, junctionDistance: number): Position {
         return new BoardNavigator(this.board, boardPlacement.position, boardPlacement.orientation)
             .forward(distance)
             .switchOrientation()
-            .backward(connect).position;
+            .backward(junctionDistance).position;
     }
 
     protected abstract handleWordPlacement(wordPlacement: ScoredWordPlacement): void;

@@ -461,22 +461,25 @@ describe('DictionarySearcher', () => {
     });
 
     describe('getPerpendicularWords', () => {
-        const tests: [word: string, perpendicular: SearcherPerpendicularLetters[], expected: [word: string, distance: number, connect: number][]][] =
+        const tests: [
+            word: string,
+            perpendicular: SearcherPerpendicularLetters[],
+            expected: [word: string, distance: number, junctionDistance: number][],
+        ][] = [
+            ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1, 2]]],
+            ['abc', [{ before: 'xy', after: 'z', distance: 5 }], []],
             [
-                ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1, 2]]],
-                ['abc', [{ before: 'xy', after: 'z', distance: 5 }], []],
+                'abc',
                 [
-                    'abc',
-                    [
-                        { before: 'xy', after: 'z', distance: 1 },
-                        { before: '', after: 'lmn', distance: 2 },
-                    ],
-                    [
-                        ['xybz', 1, 2],
-                        ['clmn', 2, 0],
-                    ],
+                    { before: 'xy', after: 'z', distance: 1 },
+                    { before: '', after: 'lmn', distance: 2 },
                 ],
-            ];
+                [
+                    ['xybz', 1, 2],
+                    ['clmn', 2, 0],
+                ],
+            ],
+        ];
 
         let index = 0;
         for (const [word, perpendicular, expected] of tests) {
@@ -484,7 +487,7 @@ describe('DictionarySearcher', () => {
                 searcher['perpendicularLetters'] = perpendicular;
 
                 expect(searcher['getPerpendicularWords'](word)).to.deep.equal(
-                    expected.map(([w, distance, connect]) => ({ word: w, distance, connect })),
+                    expected.map(([w, distance, junctionDistance]) => ({ word: w, distance, junctionDistance })),
                 );
             });
             index++;
