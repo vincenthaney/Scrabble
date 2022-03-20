@@ -21,8 +21,6 @@ export const LOSE = -1;
 export default class Game {
     private static boardService: BoardService;
     roundManager: RoundManager;
-    // Not used yet, for future features
-    wordsPlayed: string[];
     gameType: GameType;
     board: Board;
     dictionnaryName: string;
@@ -49,7 +47,6 @@ export default class Game {
         game.player1 = config.player1;
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
-        game.wordsPlayed = [];
         game.gameType = config.gameType;
         game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();

@@ -90,7 +90,6 @@ describe('Game', () => {
             expect(game.player1).to.exist;
             expect(game.player2).to.exist;
             expect(game.roundManager).to.exist;
-            expect(game.wordsPlayed).to.exist;
             expect(game.gameType).to.exist;
             expect(game['tileReserve']).to.exist;
             expect(game.board).to.exist;
