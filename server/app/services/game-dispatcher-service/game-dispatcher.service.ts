@@ -2,7 +2,7 @@ import { LobbyData } from '@app/classes/communication/lobby-data';
 import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http.exception';
 import Player from '@app/classes/player/player';
 import {
     CANNOT_HAVE_SAME_NAME,

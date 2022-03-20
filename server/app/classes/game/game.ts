@@ -9,7 +9,7 @@ import { TileReserveData } from '@app/classes/tile/tile.types';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
-import BoardService from '@app/services/board/board.service';
+import BoardService from '@app/services/board-service/board.service';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
 import { GameType } from './game-type';

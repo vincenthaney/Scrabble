@@ -7,7 +7,7 @@ import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
-import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { MessageStorageService } from '@app/services/message-storage/message-storage.service';

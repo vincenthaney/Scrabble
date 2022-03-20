@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
-import { Timer } from '@app/classes/timer';
+import { Timer } from '@app/classes/timer/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
@@ -279,7 +279,6 @@ describe('InformationBoxComponent', () => {
             component.startTimer(new Timer(1, 0));
             const spy = spyOn(component.timerSubscription, 'unsubscribe');
             component.timerSubscription = undefined as unknown as Subscription;
-            // spyOnProperty<any>(component, 'timerSubscription', 'set').and.returnValue(null);
             component.endRound();
             expect(spy).not.toHaveBeenCalled();
         });

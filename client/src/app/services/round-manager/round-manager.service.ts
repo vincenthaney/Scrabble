@@ -6,7 +6,7 @@ import { RoundData } from '@app/classes/communication/round-data';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
-import { Timer } from '@app/classes/timer';
+import { Timer } from '@app/classes/timer/timer';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
 import { ActionService } from '@app/services/action/action.service';

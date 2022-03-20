@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import { Application } from '@app/app';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http.exception';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

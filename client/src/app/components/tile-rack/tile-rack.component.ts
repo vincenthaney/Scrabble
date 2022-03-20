@@ -8,7 +8,7 @@ import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action/action.service';
-import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { preserveArrayOrder } from '@app/utils/preserve-array-order';

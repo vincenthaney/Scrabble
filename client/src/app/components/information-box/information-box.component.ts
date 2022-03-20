@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractPlayer, Player } from '@app/classes/player';
-import { Timer } from '@app/classes/timer';
+import { Timer } from '@app/classes/timer/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
 import { MAX_TILES_PER_PLAYER, PLAYER_1_INDEX, PLAYER_2_INDEX, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
