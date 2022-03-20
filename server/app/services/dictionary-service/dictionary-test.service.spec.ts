@@ -8,7 +8,7 @@ const DEFAULT_DICTIONARY: DictionaryData = {
     title: TEST_TITLE,
     description: 'Dictionary for testing',
     words: TEST_WORDS,
-}
+};
 
 const getDictionaryTestService = () =>
     createStubInstance(DictionaryService, {

@@ -16,5 +16,5 @@ export {
     WordFindingRequest,
     WordFindingUseCase,
     WordPlacement,
-    ScoredWordPlacement
+    ScoredWordPlacement,
 } from './word-finding-types';

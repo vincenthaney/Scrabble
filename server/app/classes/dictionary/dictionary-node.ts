@@ -1,6 +1,6 @@
 export default class DictionaryNode {
-    private value: string | undefined;
     protected depth: number;
+    private value: string | undefined;
     private nodes: Map<string, DictionaryNode>;
 
     constructor(value?: string, depth: number = 0) {
