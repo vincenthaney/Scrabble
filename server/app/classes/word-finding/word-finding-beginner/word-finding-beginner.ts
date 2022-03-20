@@ -15,7 +15,7 @@ export default class WordFindingBeginner extends AbstractWordFinding {
         this.calculateAcceptanceProbabilities();
     }
 
-    handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
+    protected handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
         if (this.isWithinPointRange(wordPlacement.score)) {
             const acceptanceProbability = this.acceptanceProbabilities.get(wordPlacement.score) ?? 0;
             if (acceptanceProbability > this.placementFoundAcceptance) {
@@ -24,7 +24,7 @@ export default class WordFindingBeginner extends AbstractWordFinding {
             }
         }
     }
-    isSearchCompleted(): boolean {
+    protected isSearchCompleted(): boolean {
         return this.wordPlacements.length > 0 && this.placementFoundAcceptance >= WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD;
     }
 
