@@ -6,8 +6,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/orientation';
 import { Tile } from '@app/classes/tile';
-import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/command-exception-messages';
 import { DEFAULT_PLAYER } from '@app/constants/game';
+import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { ActionService } from './action.service';
 
