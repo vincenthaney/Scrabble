@@ -89,7 +89,7 @@ export class GameDispatcherService {
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME); 
+            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
         }

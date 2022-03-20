@@ -55,11 +55,11 @@ describe('ActiveGameService', () => {
         expect(activeGameService['activeGames']).to.be.empty;
     });
 
-    describe('beginMultiplayerGame', () => {
+    describe('beginGame', () => {
         let spy: unknown;
 
         beforeEach(() => {
-            spy = chai.spy.on(Game, 'createMultiplayerGame', async () => Promise.resolve(DEFAULT_GAME));
+            spy = chai.spy.on(Game, 'createGame', async () => Promise.resolve(DEFAULT_GAME));
         });
 
         afterEach(() => {
@@ -72,7 +72,7 @@ describe('ActiveGameService', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
         });
 
-        it('should call Game.createMultiplayerGame', async () => {
+        it('should call Game.createGame', async () => {
             await activeGameService.beginGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
             expect(spy).to.have.been.called();
         });

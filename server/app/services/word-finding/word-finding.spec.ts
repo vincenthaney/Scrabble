@@ -211,14 +211,6 @@ describe('WordFindingservice', () => {
             expect(spyChooseMove).to.have.been.called;
         });
 
-        it('should not have changed the tiles values', () => {
-            BIG_TILE_RACK.push(DEFAULT_TILE_WILD);
-            service.findWords(board, BIG_TILE_RACK, request);
-
-            expect(BIG_TILE_RACK).to.contain(DEFAULT_TILE_WILD);
-            expect(BIG_TILE_RACK).not.to.contain(DEFAULT_TILE_BLANK_E);
-        });
-
         it('should set timeOver to true and stop processing when timeout ', () => {
             const clock = useFakeTimers();
             const spyGetRackPermutations = chai.spy.on(service, 'getRackPermutations', () => {
