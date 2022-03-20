@@ -5,7 +5,7 @@ import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from '@a
 import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { INITIAL_POSITION } from '@app/constants/game';
 
-const PREVIOUS_EXISTS = -1;
+const HAS_TILE_IN_PREVIOUS_POSITION = -1;
 const SHOULD_BE_FILLED = true;
 
 export default class BoardPlacementsExtractor {
@@ -138,7 +138,7 @@ export default class BoardPlacementsExtractor {
     }
 
     private hasTileJustBefore(letters: LetterPosition[]): boolean {
-        return letters.some((letter) => letter.distance === PREVIOUS_EXISTS);
+        return letters.some((letter) => letter.distance === HAS_TILE_IN_PREVIOUS_POSITION);
     }
 
     private *moveThroughLine(navigator: BoardNavigator): Generator<number> {
