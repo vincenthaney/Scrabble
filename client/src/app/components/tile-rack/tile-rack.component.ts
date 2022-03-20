@@ -104,7 +104,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
             this.selectionType === TileRackSelectType.Exchange &&
             this.selectedTiles.length > 0 &&
             this.gameService.isLocalPlayerPlaying() &&
-            this.gameService.getTotalNumberOfTilesLeft() >= MAX_TILES_PER_PLAYER
+            this.gameService.getTotalNumberOfTilesLeft() >= MAX_TILES_PER_PLAYER &&
+            !this.actionService.hasActionBeenPlayed
         );
     }
 

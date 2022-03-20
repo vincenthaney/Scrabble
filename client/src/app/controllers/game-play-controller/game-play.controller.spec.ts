@@ -172,4 +172,9 @@ describe('GamePlayController', () => {
         const result: Observable<Message | null> = controller.observeNewMessage();
         expect(result).toEqual(controller['newMessage$'].asObservable());
     });
+
+    it('observeActionDone should return actionDone$ as observable', () => {
+        const result: Observable<void> = controller.observeActionDone();
+        expect(result).toEqual(controller['actionDone$'].asObservable());
+    });
 });

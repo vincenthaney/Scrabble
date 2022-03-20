@@ -20,6 +20,7 @@ import { GamePlayController } from '@app/controllers/game-play-controller/game-p
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
+import { removeAccents } from '@app/utils/remove-accents';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -155,7 +156,7 @@ export default class InputParserService {
         const location: Location = this.createLocation(locationString, lettersToPlace.length);
 
         const placeActionPayload: PlaceActionPayload = {
-            tiles: this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
+            tiles: this.parseLettersToTiles(removeAccents(lettersToPlace), ActionType.PLACE),
             startPosition: this.getStartPosition(location),
             orientation: location.orientation,
         };
@@ -167,7 +168,7 @@ export default class InputParserService {
 
     private createExchangeActionPayload(lettersToExchange: string): ExchangeActionPayload {
         return {
-            tiles: this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE),
+            tiles: this.parseLettersToTiles(removeAccents(lettersToExchange), ActionType.EXCHANGE),
         };
     }
 

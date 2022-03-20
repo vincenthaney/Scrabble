@@ -184,9 +184,9 @@ export class GameDispatcherController {
         try {
             this.socketService.removeFromRoom(playerId, gameId);
             this.socketService.emitToSocket(playerId, 'cleanup');
+        } catch (exception) {
             // catch errors caused by inexistent socket after client closed application
-            // eslint-disable-next-line no-empty
-        } catch (exception) {}
+        }
         const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
 
         this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system', gameId });
@@ -273,8 +273,6 @@ export class GameDispatcherController {
     private handleReconnection(gameId: string, playerId: string, newPlayerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
 
-        // TODO: Add condition once we have singleplayer games
-        // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
         if (game.isGameOver()) {
             throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
         }
@@ -289,8 +287,7 @@ export class GameDispatcherController {
 
     private handleDisconnection(gameId: string, playerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
-        // TODO: Add condition once we have singleplayer games
-        // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
+
         if (!game.isGameOver()) {
             const disconnectedPlayer = game.getPlayer(playerId, IS_REQUESTING);
             disconnectedPlayer.isConnected = false;
