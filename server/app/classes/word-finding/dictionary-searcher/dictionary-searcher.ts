@@ -54,17 +54,6 @@ export default class DictionarySearcher {
         return results;
     }
 
-    *getWords(): Generator<DictionarySearchResult> {
-        try {
-            while (this.hasNext()) {
-                const value = this.next();
-                if (value) yield value;
-            }
-        } catch (e) {
-            // nothing to do
-        }
-    }
-
     private getWord(node: DictionaryNode): DictionarySearchResult | undefined {
         const word = node.getValue();
 
