@@ -14,7 +14,7 @@ export default class DictionaryService {
     }
 
     getDictionaryTitles(): string[] {
-        return [...this.dictionaries.keys()] || [];
+        return [...this.dictionaries.keys()];
     }
 
     getDictionary(title: string): Dictionary {
