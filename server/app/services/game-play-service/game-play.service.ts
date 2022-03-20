@@ -9,8 +9,8 @@ import Player from '@app/classes/player/player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { Service } from 'typedi';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import { Service } from 'typedi';
 import { FeedbackMessages } from './feedback-messages';
 
 @Service()
@@ -94,7 +94,7 @@ export class GamePlayService {
         return payload;
     }
 
-    async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
+    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (!game.isAddedToDatabase) {
             const connectedRealPlayers = game.getConnectedRealPlayers();
@@ -113,7 +113,7 @@ export class GamePlayService {
         return game.endGameMessage(winnerName);
     }
 
-    async handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): Promise<void> {
+    private async handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): Promise<void> {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.getPlayer(playerWhoLeftId, IS_OPPONENT);
         game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;

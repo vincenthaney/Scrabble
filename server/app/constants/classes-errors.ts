@@ -12,3 +12,4 @@ export const TILE_RESERVE_MUST_BE_INITIATED = 'La réserve de tuiles doit être 
 export const EXTRACTION_SQUARE_ALREADY_FILLED = 'Il y a déjà une tuile à la position de départ';
 export const EXTRACTION_TILES_INVALID = 'Les tuiles à extraires ne sont pas de la longueur correcte';
 export const EXTRACTION_NO_WORDS_CREATED = "Aucun mot n'a été créé avec le placement de tuile.";
+export const NEXT_NODE_DOES_NOT_EXISTS = "Next node doesn't exists.";

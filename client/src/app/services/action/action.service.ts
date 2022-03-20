@@ -3,14 +3,27 @@ import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActi
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
+import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ActionService {
-    constructor(private gamePlayController: GamePlayController) {}
+    hasActionBeenPlayed: boolean;
+    serviceDestroyed$: Subject<boolean>;
+
+    constructor(private gamePlayController: GamePlayController) {
+        this.hasActionBeenPlayed = false;
+        this.serviceDestroyed$ = new Subject();
+        this.gamePlayController
+            .observeActionDone()
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe(() => this.resetHasActionBeenSent());
+    }
 
     createPlaceActionPayload(tiles: Tile[], startPosition: Position, orientation: Orientation): PlaceActionPayload {
         return {
@@ -35,10 +48,15 @@ export class ActionService {
 
     sendAction(gameId: string, playerId: string | undefined, actionData: ActionData): void {
         if (!playerId) return;
+        if (this.hasActionBeenPlayed) {
+            this.sendWaitForConfirmationMessage(gameId, playerId);
+            return;
+        }
 
         if (actionData.type === ActionType.PLACE) this.convertBlankTilesLetter((actionData.payload as PlaceActionPayload).tiles);
 
         this.gamePlayController.sendAction(gameId, playerId, actionData);
+        this.hasActionBeenPlayed = true;
     }
 
     private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {
@@ -56,5 +74,13 @@ export class ActionService {
         tiles.forEach((tile) => {
             if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
         });
+    }
+
+    private sendWaitForConfirmationMessage(gameId: string, playerId: string): void {
+        this.gamePlayController.sendError(gameId, playerId, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE(gameId));
+    }
+
+    private resetHasActionBeenSent(): void {
+        this.hasActionBeenPlayed = false;
     }
 }

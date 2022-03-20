@@ -63,6 +63,7 @@ describe('GamePlayController', () => {
             const newMessage: Message = {
                 content: 'Allo',
                 senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             socketHelper.peerSideEmit('newMessage', newMessage);
             expect(spy).toHaveBeenCalled();
@@ -89,6 +90,7 @@ describe('GamePlayController', () => {
             const newMessage: Message = {
                 content: 'Allo',
                 senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             const endpoint = `${environment.serverUrl}/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`;
 
@@ -101,6 +103,7 @@ describe('GamePlayController', () => {
             const newMessage: Message = {
                 content: 'error',
                 senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             const endpoint = `${environment.serverUrl}/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`;
 
@@ -158,5 +161,10 @@ describe('GamePlayController', () => {
             status: HTTP_ABORT_ERROR,
         };
         expect(() => controller['handleDisconnectError'](error)).not.toThrowError(error.message);
+    });
+
+    it('observeActionDone should return actionDone$ as observable', () => {
+        const result: Observable<void> = controller.observeActionDone();
+        expect(result).toEqual(controller['actionDone$'].asObservable());
     });
 });

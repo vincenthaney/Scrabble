@@ -1,6 +1,7 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
@@ -49,8 +50,13 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
-
-        this.initializeMessages();
+        this.gameViewEventManagerService.subscribeToGameViewEvent(
+            'gameInitialized',
+            this.componentDestroyed$,
+            (gameData: InitializeGameData | undefined) => {
+                if (gameData) this.initializeMessages(gameData);
+            },
+        );
     }
 
     ngAfterViewInit(): void {
@@ -89,12 +95,15 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
     }
 
-    private initializeMessages(): void {
+    private initializeMessages(gameData: InitializeGameData): void {
         const storedMessages = this.messageStorageService.getMessages();
-        if (storedMessages.length > 0) {
-            storedMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
-            this.messages = this.messages.concat(storedMessages);
-        } else this.onReceiveNewMessage(INITIAL_MESSAGE);
+        if (storedMessages.length > 0 && this.messages.length === 0) {
+            const localGameMessages: Message[] = storedMessages.filter((message: Message) => message.gameId === gameData.startGameData.gameId);
+            localGameMessages.forEach((message: Message) => (message.content = marked.parseInline(message.content)));
+            this.messages = this.messages.concat(localGameMessages);
+        }
+
+        if (this.messages.length === 0) this.onReceiveNewMessage({ ...INITIAL_MESSAGE, gameId: this.gameService.getGameId() });
     }
 
     private createVisualMessage(newMessage: Message): Message {

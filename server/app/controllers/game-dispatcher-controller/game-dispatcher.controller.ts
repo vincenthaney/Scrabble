@@ -184,12 +184,12 @@ export class GameDispatcherController {
         try {
             this.socketService.removeFromRoom(playerId, gameId);
             this.socketService.emitToSocket(playerId, 'cleanup');
+        } catch (exception) {
             // catch errors caused by inexistent socket after client closed application
-            // eslint-disable-next-line no-empty
-        } catch (exception) {}
+        }
         const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
 
-        this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system' });
+        this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system', gameId });
 
         if (this.activeGameService.isGameOver(gameId, playerId)) return;
 
@@ -202,6 +202,7 @@ export class GameDispatcherController {
             this.socketService.emitToRoom(gameId, 'newMessage', {
                 content: message,
                 senderId: SYSTEM_ID,
+                gameId,
             });
         }
     }

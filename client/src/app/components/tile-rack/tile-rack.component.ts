@@ -104,7 +104,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
             this.selectionType === TileRackSelectType.Exchange &&
             this.selectedTiles.length > 0 &&
             this.gameService.isLocalPlayerPlaying() &&
-            this.gameService.getTotalNumberOfTilesLeft() >= MAX_TILES_PER_PLAYER
+            this.gameService.getTotalNumberOfTilesLeft() >= MAX_TILES_PER_PLAYER &&
+            !this.actionService.hasActionBeenPlayed
         );
     }
 
@@ -176,7 +177,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         const newTiles = [...player.getTiles()];
 
         this.unselectAll();
-        this.tiles = preserveArrayOrder(newTiles, previousTiles, (a: Tile, b: Tile) => a.letter === b.letter).map(this.createRackTile);
+        this.tiles = preserveArrayOrder(newTiles, previousTiles, (a: Tile, b: RackTile) => a.letter === b.letter).map(this.createRackTile);
     }
 
     private createRackTile(tile: Tile): RackTile {

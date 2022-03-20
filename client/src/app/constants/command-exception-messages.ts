@@ -11,7 +11,7 @@ export const BAD_SYNTAX_MESSAGES = new Map<ActionType, string>([
 
 export enum CommandExceptionMessages {
     BadSyntax = 'La commande ne respecte pas la syntaxe requise.',
-    InvalidEntry = "Cette commande n'existe pas.",
+    InvalidEntry = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes valides.",
     ImpossibleCommand = 'Cette commande est impossible à réaliser.',
     DontHaveTiles = "Vous n'avez pas les tuiles requises.",
     PositionFormat = 'La position doit être de format _‹a-o›‹1-15›‹h/v›_.',
@@ -19,5 +19,3 @@ export enum CommandExceptionMessages {
     GameOver = 'La commande est impossible car la partie est terminée.',
     ExchangeRequireLowercaseLetters = 'Les lettres à échanger doivent être en minuscule.',
 }
-
-export const PLAYER_NOT_FOUND = 'Aucun joueur actif trouvé';

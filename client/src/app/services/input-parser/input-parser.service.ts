@@ -6,7 +6,7 @@ import { Orientation } from '@app/classes/orientation';
 import { AbstractPlayer } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
+import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
 import {
     BLANK_TILE_LETTER_VALUE,
     BOARD_SIZE,
@@ -16,6 +16,7 @@ import {
     ON_YOUR_TURN_ACTIONS,
     SYSTEM_ERROR_ID,
 } from '@app/constants/game';
+import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action/action.service';
@@ -45,6 +46,7 @@ export default class InputParserService {
             this.controller.sendMessage(gameId, playerId, {
                 content: input,
                 senderId: playerId,
+                gameId,
             });
         }
     }
@@ -62,6 +64,7 @@ export default class InputParserService {
                 this.controller.sendError(gameId, playerId, {
                     content: errorMessageContent,
                     senderId: SYSTEM_ERROR_ID,
+                    gameId,
                 });
             }
         }
@@ -213,7 +216,7 @@ export default class InputParserService {
         if (localPlayer) {
             return localPlayer;
         }
-        throw new Error(PLAYER_NOT_FOUND);
+        throw new Error(ACTIVE_PLAYER_NOT_FOUND);
     }
 
     private getRowNumberFromChar(char: string): number {

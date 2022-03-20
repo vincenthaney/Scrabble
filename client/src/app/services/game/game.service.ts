@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
-import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -23,8 +22,6 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class GameService implements OnDestroy, IResetServiceData {
-    gameType: GameType;
-    dictionaryName: string;
     tileReserve: TileReserveData[];
 
     isGameSetUp: boolean;
@@ -43,9 +40,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         this.serviceDestroyed$ = new Subject();
-        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
-            this.handleInitializeGame(initializeValue),
-        );
+        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) => {
+            this.handleInitializeGame(initializeValue);
+        });
         this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
             if (newMessage) this.handleNewMessage(newMessage);
         });
@@ -59,14 +56,13 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     async handleInitializeGame(initializeGameData: InitializeGameData | undefined): Promise<void> {
         if (!initializeGameData) return;
-        return await this.initializeGame(initializeGameData.localPlayerId, initializeGameData.startGameData);
+        await this.initializeGame(initializeGameData.localPlayerId, initializeGameData.startGameData);
+        this.gameViewEventManagerService.emitGameViewEvent('gameInitialized', initializeGameData);
     }
 
     async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
         this.gameId = startGameData.gameId;
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
-        this.gameType = startGameData.gameType;
-        this.dictionaryName = startGameData.dictionary;
         this.tileReserve = startGameData.tileReserve;
 
         this.roundManager.initialize(localPlayerId, startGameData);
@@ -163,18 +159,16 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
     }
 
-    handleGameOver(): void {
-        this.isGameOver = true;
-        this.roundManager.resetTimerData();
-    }
-
     resetServiceData(): void {
-        this.gameType = undefined as unknown as GameType;
-        this.dictionaryName = '';
         this.tileReserve = [];
         this.isGameOver = false;
         this.gameId = '';
         this.playerContainer = undefined;
+    }
+
+    private handleGameOver(): void {
+        this.isGameOver = true;
+        this.roundManager.resetTimerData();
     }
 
     private reconnectReinitialize(startGameData: StartGameData): void {

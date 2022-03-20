@@ -198,7 +198,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     canPass(): boolean {
-        return this.isLocalPlayerTurn() && !this.gameService.isGameOver;
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver && !this.actionService.hasActionBeenPlayed;
     }
 
     canPlaceWord(): boolean {
