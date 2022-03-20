@@ -60,7 +60,7 @@ class WordFindingTest extends AbstractWordFinding {
     }
 }
 
-describe.only('AbstractWordFinding', () => {
+describe('AbstractWordFinding', () => {
     let wordFinding: AbstractWordFinding;
     let board: Board;
     let tiles: Tile[];
