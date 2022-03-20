@@ -9,32 +9,30 @@ import WordFindingBeginner from '@app/classes/word-finding/word-finding-beginner
 import { Dictionary } from '@app/classes/dictionary';
 import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
+export type WordFindingParameters = [Board, Tile[], WordFindingRequest, Dictionary, ScoreCalculatorService];
+
 @Service()
 export default class WordFindingService {
     constructor(private readonly dictionaryService: DictionaryService, private readonly scoreCalculatorService: ScoreCalculatorService) {}
 
     findWords(board: Board, tiles: Tile[], request: WordFindingRequest): ScoredWordPlacement[] {
-        const dictionary = this.dictionaryService.getDefaultDictionary();
-        const params: [Board, Tile[], WordFindingRequest, Dictionary, ScoreCalculatorService] = [
+        return this.getWordFindingInstance(request.useCase, [
             board,
             tiles,
             request,
-            dictionary,
+            this.dictionaryService.getDefaultDictionary(),
             this.scoreCalculatorService,
-        ];
-        let wordFinding: AbstractWordFinding;
+        ]).findWords();
+    }
 
-        switch (request.useCase) {
+    private getWordFindingInstance(useCase: WordFindingUseCase, params: WordFindingParameters): AbstractWordFinding {
+        switch (useCase) {
             case WordFindingUseCase.Hint:
-                wordFinding = new WordFindingHint(...params);
-                break;
+                return new WordFindingHint(...params);
             case WordFindingUseCase.Beginner:
-                wordFinding = new WordFindingBeginner(...params);
-                break;
+                return new WordFindingBeginner(...params);
             case WordFindingUseCase.Expert:
                 throw new Error('Not implemented');
         }
-
-        return wordFinding.findWords();
     }
 }
