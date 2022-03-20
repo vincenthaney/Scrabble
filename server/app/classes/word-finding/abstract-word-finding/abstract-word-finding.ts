@@ -92,10 +92,13 @@ export default abstract class AbstractWordFinding {
     private extractPerpendicularWordsSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
         const squareTiles: [Square, Tile][][] = [];
         for (const { word, distance, connect } of wordResult.perpendicularWords) {
-            const navigator = new BoardNavigator(this.board, boardPlacement.position, boardPlacement.orientation);
-            const position = navigator.forward(distance).switchOrientation().backward(connect).position;
-
-            squareTiles.push(this.extractSquareTile(position, switchOrientation(boardPlacement.orientation), word));
+            squareTiles.push(
+                this.extractSquareTile(
+                    this.getPerpendicularWordPosition(boardPlacement, distance, connect),
+                    switchOrientation(boardPlacement.orientation),
+                    word,
+                ),
+            );
         }
         return squareTiles;
     }
@@ -137,6 +140,13 @@ export default abstract class AbstractWordFinding {
 
     private convertTilesToLetters(tiles: Tile[]): LetterValue[] {
         return tiles.map((tile) => tile.letter);
+    }
+
+    private getPerpendicularWordPosition(boardPlacement: BoardPlacement, distance: number, connect: number): Position {
+        return new BoardNavigator(this.board, boardPlacement.position, boardPlacement.orientation)
+            .forward(distance)
+            .switchOrientation()
+            .backward(connect).position;
     }
 
     protected abstract handleWordPlacement(wordPlacement: ScoredWordPlacement): void;
