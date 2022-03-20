@@ -21,6 +21,7 @@ export default class Range {
     }
     set max(maximum: number) {
         if (!Range.validateRangeValues(this.minimum, maximum)) throw new Error(INVALID_POINT_RANGE);
+        this.maximum = maximum;
     }
 
     *[Symbol.iterator]() {
