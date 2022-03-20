@@ -22,7 +22,7 @@ import { TileComponent } from '@app/components/tile/tile.component';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
-import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { marked } from 'marked';
 import { CommunicationBoxComponent } from './communication-box.component';
 

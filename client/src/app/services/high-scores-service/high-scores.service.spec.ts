@@ -7,7 +7,7 @@ import HighScore, { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
 import { HighScoresController } from '@app/controllers/high-scores-controller/high-scores.controller';
 import { Subject } from 'rxjs';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import HighScoresService from './high-scores.service';
 
 const DEFAULT_CLASSIC_HIGH_SCORES: SingleHighScore[] = [
