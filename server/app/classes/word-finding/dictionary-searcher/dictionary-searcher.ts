@@ -117,7 +117,7 @@ export default class DictionarySearcher {
                 perpendicularWords.push({
                     word: before + word.charAt(distance) + after,
                     distance,
-                    connect: before.length,
+                    junctionDistance: before.length,
                 });
         }
 

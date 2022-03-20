@@ -91,10 +91,10 @@ export default abstract class AbstractWordFinding {
 
     private extractPerpendicularWordsSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
         const squareTiles: [Square, Tile][][] = [];
-        for (const { word, distance, connect } of wordResult.perpendicularWords) {
+        for (const { word, distance, junctionDistance } of wordResult.perpendicularWords) {
             squareTiles.push(
                 this.extractSquareTile(
-                    this.getPerpendicularWordPosition(boardPlacement, distance, connect),
+                    this.getPerpendicularWordPosition(boardPlacement, distance, junctionDistance),
                     switchOrientation(boardPlacement.orientation),
                     word,
                 ),

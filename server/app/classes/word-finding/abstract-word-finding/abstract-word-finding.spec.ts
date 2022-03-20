@@ -67,7 +67,7 @@ const DEFAULT_TILE: Tile = {
 const DEFAULT_PERPENDICULAR_WORD: PerpendicularWord = {
     word: 'abcd',
     distance: 1,
-    connect: 1,
+    junctionDistance: 1,
 };
 
 const boardFromLetterValues = (letterValues: LetterValues) => {
@@ -442,7 +442,7 @@ describe.only('AbstractWordFinding', () => {
                 ...DEFAULT_WORD_RESULT,
                 perpendicularWords: [
                     { ...DEFAULT_PERPENDICULAR_WORD, distance: 2 },
-                    { ...DEFAULT_PERPENDICULAR_WORD, connect: 3 },
+                    { ...DEFAULT_PERPENDICULAR_WORD, junctionDistance: 3 },
                 ],
             };
             const boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
