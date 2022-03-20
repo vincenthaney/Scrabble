@@ -950,7 +950,7 @@ describe('BoardComponent', () => {
 
             component['removeUsedTile'](tileToRemove);
 
-            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', undefined);
+            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles');
         });
     });
 
