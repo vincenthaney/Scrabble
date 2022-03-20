@@ -11,8 +11,9 @@ import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
+import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
 import { DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
+import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
 import { ActionService } from '@app/services/action/action.service';
@@ -512,7 +513,7 @@ describe('InputParserService', () => {
 
         it('should throw PLAYER_NOT_FOUND if gameservice.localPlayer does not exist', () => {
             gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
-            expect(() => service['getLocalPlayer']()).toThrowError(PLAYER_NOT_FOUND);
+            expect(() => service['getLocalPlayer']()).toThrowError(ACTIVE_PLAYER_NOT_FOUND);
         });
     });
 });
