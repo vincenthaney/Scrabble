@@ -56,10 +56,6 @@ describe('DictionarySearcher', () => {
             expect(searcher['stack']).to.have.length(1);
         });
 
-        it('should add node to stack', () => {
-            expect(searcher['stack'][0].node).to.equal(node);
-        });
-
         it('should add letters as map', () => {
             for (const letter of boardPlacement.letters) {
                 expect(searcher['alreadyPlacedLetters'].get(letter.distance)).to.equal(letter.letter.toLowerCase());
@@ -465,28 +461,31 @@ describe('DictionarySearcher', () => {
     });
 
     describe('getPerpendicularWords', () => {
-        const tests: [word: string, perpendicular: SearcherPerpendicularLetters[], expected: [word: string, distance: number][]][] = [
-            ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1]]],
-            ['abc', [{ before: 'xy', after: 'z', distance: 5 }], []],
+        const tests: [word: string, perpendicular: SearcherPerpendicularLetters[], expected: [word: string, distance: number, connect: number][]][] =
             [
-                'abc',
+                ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1, 2]]],
+                ['abc', [{ before: 'xy', after: 'z', distance: 5 }], []],
                 [
-                    { before: 'xy', after: 'z', distance: 1 },
-                    { before: '', after: 'lmn', distance: 2 },
+                    'abc',
+                    [
+                        { before: 'xy', after: 'z', distance: 1 },
+                        { before: '', after: 'lmn', distance: 2 },
+                    ],
+                    [
+                        ['xybz', 1, 2],
+                        ['clmn', 2, 0],
+                    ],
                 ],
-                [
-                    ['xybz', 1],
-                    ['clmn', 2],
-                ],
-            ],
-        ];
+            ];
 
         let index = 0;
         for (const [word, perpendicular, expected] of tests) {
             it(`should extract perpendicular words (${index})`, () => {
                 searcher['perpendicularLetters'] = perpendicular;
 
-                expect(searcher['getPerpendicularWords'](word)).to.deep.equal(expected.map(([w, distance]) => ({ word: w, distance })));
+                expect(searcher['getPerpendicularWords'](word)).to.deep.equal(
+                    expected.map(([w, distance, connect]) => ({ word: w, distance, connect })),
+                );
             });
             index++;
         }
