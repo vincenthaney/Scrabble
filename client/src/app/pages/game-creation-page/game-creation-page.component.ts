@@ -16,33 +16,39 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit, OnDestroy {
-    gameTypes = GameType;
-    gameModes = GameMode;
-    virtualPlayerLevels = VirtualPlayerLevel;
-    dictionaryOptions: string[] = [];
-    virtualPlayerNames: string[] = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
-    playerName: string = '';
-    playerNameValid: boolean = false;
+    gameTypes: typeof GameType;
+    gameModes: typeof GameMode;
+    virtualPlayerLevels: typeof VirtualPlayerLevel;
+    dictionaryOptions: string[];
+    virtualPlayerNames: string[];
+    playerName: string;
+    playerNameValid: boolean;
+    pageDestroyed$: Subject<boolean>;
+    gameParameters: FormGroup;
 
-    serviceDestroyed$: Subject<boolean> = new Subject();
-
-    gameParameters: FormGroup = new FormGroup({
-        gameType: new FormControl(GameType.Classic, Validators.required),
-        gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
-        level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-        // we must disable to use the first name from the randomized virtual player names array created in this class as the default value.
-        // eslint-disable-next-line no-invalid-this
-        virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
-        timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-        dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
-    });
-
-    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {}
+    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {
+        this.gameTypes = GameType;
+        this.gameModes = GameMode;
+        this.virtualPlayerLevels = VirtualPlayerLevel;
+        this.dictionaryOptions = [];
+        this.virtualPlayerNames = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
+        this.playerName = '';
+        this.playerNameValid = false;
+        this.pageDestroyed$ = new Subject();
+        this.gameParameters = new FormGroup({
+            gameType: new FormControl(GameType.Classic, Validators.required),
+            gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
+            level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
+            virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
+            timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
+            dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
+        });
+    }
 
     ngOnInit(): void {
         this.gameParameters
             .get('gameMode')
-            ?.valueChanges.pipe(takeUntil(this.serviceDestroyed$))
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
             .subscribe((value) => {
                 if (value === this.gameModes.Solo) {
                     this.gameParameters?.get('level')?.setValidators([Validators.required]);
@@ -54,8 +60,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.pageDestroyed$.next(true);
+        this.pageDestroyed$.complete();
     }
 
     isFormValid(): boolean {

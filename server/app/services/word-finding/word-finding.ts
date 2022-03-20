@@ -31,9 +31,6 @@ import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { arrayDeepCopy } from '@app/utils/deep-copy';
 
-// wildcards converted only to 'E'
-// Not currently ignoring repeating tiles
-
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
@@ -272,9 +269,9 @@ export default class WordFindingService {
                     startPosition: squareProperties.square.position,
                     score: this.scoreCalculatorService.calculatePoints(createdWords) + this.scoreCalculatorService.bonusPoints(permutation),
                 };
+            } catch (exception) {
                 // Try to play the current move, if an error is thrown, it is invalid and do nothing
-                // eslint-disable-next-line no-empty
-            } catch (exception) {}
+            }
         }
         return undefined;
     }

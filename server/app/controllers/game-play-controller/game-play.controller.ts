@@ -36,6 +36,7 @@ export class GamePlayController {
         this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
+
             try {
                 await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
@@ -57,11 +58,11 @@ export class GamePlayController {
         });
 
         this.router.post('/games/:gameId/players/:playerId/error', (req: GameRequest, res: Response) => {
-            const playerId = req.params.playerId;
+            const { playerId, gameId } = req.params;
             const message: Message = req.body;
 
             try {
-                this.handleNewError(playerId, message);
+                this.handleNewError(playerId, gameId, message);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
@@ -79,6 +80,7 @@ export class GamePlayController {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
                     senderId: playerId,
+                    gameId,
                 });
             }
             if (updateData) {
@@ -89,6 +91,7 @@ export class GamePlayController {
                     this.socketService.emitToSocket(playerId, 'newMessage', {
                         content: feedback.localPlayerFeedback,
                         senderId: SYSTEM_ID,
+                        gameId,
                     });
                 }
                 if (feedback.opponentFeedback) {
@@ -96,6 +99,7 @@ export class GamePlayController {
                     this.socketService.emitToSocket(opponentId, 'newMessage', {
                         content: feedback.opponentFeedback,
                         senderId: SYSTEM_ID,
+                        gameId,
                     });
                 }
                 if (feedback.endGameFeedback) {
@@ -103,6 +107,7 @@ export class GamePlayController {
                         this.socketService.emitToRoom(gameId, 'newMessage', {
                             content: message,
                             senderId: SYSTEM_ID,
+                            gameId,
                         });
                     }
                 }
@@ -123,13 +128,14 @@ export class GamePlayController {
         this.socketService.emitToRoom(gameId, 'newMessage', message);
     }
 
-    private handleNewError(playerId: string, message: Message): void {
+    private handleNewError(playerId: string, gameId: string, message: Message): void {
         if (message.senderId === undefined) throw new HttpException(SENDER_REQUIRED, StatusCodes.BAD_REQUEST);
         if (message.content === undefined) throw new HttpException(CONTENT_REQUIRED, StatusCodes.BAD_REQUEST);
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: message.content,
             senderId: SYSTEM_ERROR_ID,
+            gameId,
         });
     }
 
@@ -141,12 +147,14 @@ export class GamePlayController {
             this.socketService.emitToSocket(opponentId, 'newMessage', {
                 content: OPPONENT_PLAYED_INVALID_WORD,
                 senderId: SYSTEM_ID,
+                gameId,
             });
         }
 
         this.socketService.emitToSocket(playerId, 'newMessage', {
             content: COMMAND_IS_INVALID(input) + exception.message,
             senderId: SYSTEM_ERROR_ID,
+            gameId,
         });
     }
 

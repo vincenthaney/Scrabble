@@ -814,7 +814,11 @@ describe('GameDispatcherController', () => {
             const updatedData: GameUpdateData = {};
             controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
             messages.forEach((message) => {
-                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', { content: message, senderId: SYSTEM_ID });
+                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', {
+                    content: message,
+                    senderId: SYSTEM_ID,
+                    gameId: DEFAULT_GAME_ID,
+                });
             });
         });
     });

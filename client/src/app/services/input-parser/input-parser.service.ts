@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
+import { ActionData, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
@@ -20,6 +20,7 @@ import { GamePlayController } from '@app/controllers/game-play-controller/game-p
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
+import { removeAccents } from '@app/utils/remove-accents';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -43,6 +44,7 @@ export default class InputParserService {
             this.controller.sendMessage(gameId, playerId, {
                 content: input,
                 senderId: playerId,
+                gameId,
             });
         }
     }
@@ -60,6 +62,7 @@ export default class InputParserService {
                 this.controller.sendError(gameId, playerId, {
                     content: errorMessageContent,
                     senderId: SYSTEM_ERROR_ID,
+                    gameId,
                 });
             }
         }
@@ -149,11 +152,11 @@ export default class InputParserService {
         };
     }
 
-    private createPlaceActionPayload(locationString: string, lettersToPlace: string): ActionPlacePayload {
+    private createPlaceActionPayload(locationString: string, lettersToPlace: string): PlaceActionPayload {
         const location: Location = this.createLocation(locationString, lettersToPlace.length);
 
-        const placeActionPayload: ActionPlacePayload = {
-            tiles: this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
+        const placeActionPayload: PlaceActionPayload = {
+            tiles: this.parseLettersToTiles(removeAccents(lettersToPlace), ActionType.PLACE),
             startPosition: this.getStartPosition(location),
             orientation: location.orientation,
         };
@@ -163,9 +166,9 @@ export default class InputParserService {
         return placeActionPayload;
     }
 
-    private createExchangeActionPayload(lettersToExchange: string): ActionExchangePayload {
+    private createExchangeActionPayload(lettersToExchange: string): ExchangeActionPayload {
         return {
-            tiles: this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE),
+            tiles: this.parseLettersToTiles(removeAccents(lettersToExchange), ActionType.EXCHANGE),
         };
     }
 

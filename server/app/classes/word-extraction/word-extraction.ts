@@ -5,6 +5,7 @@ import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { WordPlacement } from '@app/classes/word-finding/word-placement';
+import { switchOrientation } from '@app/utils/switch-orientation';
 
 export class WordExtraction {
     constructor(private board: Board) {}
@@ -22,15 +23,12 @@ export class WordExtraction {
             if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
 
             if (navigator.verify(HAS_TILE)) {
-                // The square already has a letter, this means that the at the tile at index 'i' must be placed in next square
-                // We know that square has a tile because it was checked in the if
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                newWord.push([navigator.square, navigator.square.tile!]);
+                if (navigator.square.tile) newWord.push([navigator.square, navigator.square.tile]);
             } else {
                 newWord.push([navigator.square, wordPlacement.tilesToPlace[i]]);
 
                 // Add the words created in the opposite Orientation of the move
-                const oppositeOrientation = wordPlacement.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+                const oppositeOrientation = switchOrientation(wordPlacement.orientation);
                 if (navigator.verifyNeighbors(oppositeOrientation, HAS_TILE)) {
                     wordsCreated.push(this.extractWordAroundTile(oppositeOrientation, navigator.position, wordPlacement.tilesToPlace[i]));
                 }
@@ -67,9 +65,7 @@ export class WordExtraction {
         const word: [Square, Tile][] = [];
 
         while (navigator.move(direction).verify(HAS_TILE)) {
-            // We know that square has a tile because it was checked in the while condition
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            word.push([navigator.square, navigator.square.tile!]);
+            if (navigator.square.tile) word.push([navigator.square, navigator.square.tile]);
         }
 
         if (direction === Direction.Backward) word.reverse();

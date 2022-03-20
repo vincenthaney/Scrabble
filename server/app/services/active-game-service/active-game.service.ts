@@ -38,7 +38,6 @@ export class ActiveGameService {
         let game: Game;
         try {
             game = this.getGame(id, playerId);
-            // If the game is already deleted, return and don't do anything
         } catch (exception) {
             return;
         }

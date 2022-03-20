@@ -1,6 +1,6 @@
 import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { LobbyInfo, PlayerName } from '@app/classes/communication/';
+import { LobbyData, LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import SocketService from '@app/services/socket/socket.service';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameDispatcherController implements OnDestroy {
-    private createGameEvent: Subject<string> = new Subject();
+    private createGameEvent: Subject<LobbyData> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
@@ -49,8 +49,8 @@ export class GameDispatcherController implements OnDestroy {
 
     handleGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
-        this.http.post<{ gameId: string }>(endpoint, gameConfig).subscribe((response) => {
-            this.createGameEvent.next(response.gameId);
+        this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig).subscribe((response) => {
+            this.createGameEvent.next(response.lobbyData);
         });
     }
 
@@ -86,22 +86,20 @@ export class GameDispatcherController implements OnDestroy {
                 this.lobbyRequestValidEvent.next();
             },
             (error) => {
-                this.handleJoinError(error);
+                this.handleJoinError(error.status as HttpStatusCode);
             },
         );
     }
 
-    // error has any type so we must disable no explicit any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleJoinError(error: any): void {
-        if (error.status === HttpStatusCode.Unauthorized) {
+    handleJoinError(errorStatus: HttpStatusCode): void {
+        if (errorStatus === HttpStatusCode.Unauthorized) {
             this.lobbyFullEvent.next();
-        } else if (error.status === HttpStatusCode.Gone) {
+        } else if (errorStatus === HttpStatusCode.Gone) {
             this.canceledGameEvent.next('Le créateur');
         }
     }
 
-    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (gameId: string) => void): void {
+    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbyData: LobbyData) => void): void {
         this.createGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 

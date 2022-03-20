@@ -14,7 +14,7 @@ $primary-color: #1b5e20;
     #inner-container {
         width: 100%;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        grid-template-columns: auto minmax(0, 1fr) auto;
         gap: 24px;
         padding: 8px 12px;
         box-sizing: border-box;
@@ -76,8 +76,7 @@ $primary-color: #1b5e20;
                 text-align: left;
 
                 &.active-player {
-                    margin-right: 50%;
-                    padding-left: 5px;
+                    padding: 0 5px;
                 }
 
                 .player-name {
@@ -94,8 +93,7 @@ $primary-color: #1b5e20;
                 text-align: right;
 
                 &.active-player {
-                    margin-left: 50%;
-                    padding-right: 5px;
+                    padding: 0 5px;
                 }
 
                 .player-name {
