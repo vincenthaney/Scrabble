@@ -1,6 +1,6 @@
 import Game from '@app/classes/game/game';
 import { MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
-import { HttpException } from '@app/classes/http-exception/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { StatusCodes } from 'http-status-codes';

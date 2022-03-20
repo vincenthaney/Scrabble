@@ -5,7 +5,7 @@ import Player from '@app/classes/player/player';
 import { WordFindingUseCase } from '@app/classes/word-finding';
 import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { FOUND_WORDS, HINT_ACTION_NUMBER_OF_WORDS, NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import WordFindingService from '@app/services/word-finding-service/word-finding';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { Container } from 'typedi';
 
