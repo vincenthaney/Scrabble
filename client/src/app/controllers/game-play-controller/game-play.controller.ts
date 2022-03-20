@@ -4,7 +4,7 @@ import { ActionData } from '@app/classes/actions/action-data';
 import GameUpdateData from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { HTTP_ABORT_ERROR } from '@app/constants/controllers-errors';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -55,7 +55,7 @@ export class GamePlayController {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/disconnect`;
         // When reloading the page, a the disconnect http request is fired on destruction of the game-page component.
         // In the initialization of the game-page component, a reconnect request is made which does not allow the
-        // server to send a response, triggered a Abort 0  error code which is why we catch it if it this this code
+        // server to send a response, triggering a Abort 0  error code which is why we catch it if it this this code
         this.http.delete(endpoint, { observe: 'response' }).subscribe(this.handleDisconnectResponse, this.handleDisconnectError);
     }
 

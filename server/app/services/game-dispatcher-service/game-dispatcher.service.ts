@@ -2,7 +2,7 @@ import { LobbyData } from '@app/classes/communication/lobby-data';
 import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import {
     CANNOT_HAVE_SAME_NAME,
@@ -68,11 +68,9 @@ export class GameDispatcherService {
             throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
-        // Remove game from wait
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
 
-        // Start game
         const config: MultiplayerGameConfig = {
             ...waitingRoom.getConfig(),
             player2: waitingRoom.joinedPlayer,
@@ -118,7 +116,6 @@ export class GameDispatcherService {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         }
 
-        // Remove game from wait
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
     }

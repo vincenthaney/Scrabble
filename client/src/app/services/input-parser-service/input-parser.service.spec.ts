@@ -16,8 +16,8 @@ import { DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
-import { ActionService } from '@app/services/action/action.service';
-import GameService from '@app/services/game/game.service';
+import { ActionService } from '@app/services/action-service/action.service';
+import GameService from '@app/services/game-service/game.service';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';

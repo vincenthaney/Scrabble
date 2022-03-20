@@ -3,7 +3,7 @@ import { LobbyData } from '@app/classes/communication/lobby-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
@@ -273,8 +273,6 @@ export class GameDispatcherController {
     private handleReconnection(gameId: string, playerId: string, newPlayerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
 
-        // TODO: Add condition once we have singleplayer games
-        // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
         if (game.isGameOver()) {
             throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
         }
@@ -289,8 +287,7 @@ export class GameDispatcherController {
 
     private handleDisconnection(gameId: string, playerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
-        // TODO: Add condition once we have singleplayer games
-        // if (!game.isGameOver()&& game.gameMode === gameMode.multiplayer)
+
         if (!game.isGameOver()) {
             const disconnectedPlayer = game.getPlayer(playerId, IS_REQUESTING);
             disconnectedPlayer.isConnected = false;

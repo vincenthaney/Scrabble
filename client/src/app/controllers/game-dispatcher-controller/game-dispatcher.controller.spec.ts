@@ -11,7 +11,7 @@ import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { Socket } from 'socket.io-client';
 

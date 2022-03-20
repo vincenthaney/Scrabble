@@ -19,9 +19,10 @@ import {
 import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
-import { ActionService } from '@app/services/action/action.service';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { ActionService } from '@app/services/action-service/action.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { isNumber } from '@app/utils/is-number';
+import { removeAccents } from '@app/utils/remove-accents';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -137,7 +138,7 @@ export default class InputParserService {
     }
 
     private createExchangeActionPayload(lettersToExchange: string): ExchangeActionPayload {
-        return this.actionService.createExchangeActionPayload(this.parseLettersToTiles(lettersToExchange, ActionType.EXCHANGE));
+        return this.actionService.createExchangeActionPayload(this.parseLettersToTiles(removeAccents(lettersToExchange), ActionType.EXCHANGE));
     }
 
     private parseLettersToTiles(lettersToParse: string, actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {

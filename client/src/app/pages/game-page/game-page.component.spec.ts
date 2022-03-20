@@ -32,7 +32,7 @@ import {
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
-import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
