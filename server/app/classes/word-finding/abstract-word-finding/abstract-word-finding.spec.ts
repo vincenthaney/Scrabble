@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
+import { Board, Orientation, Position } from '@app/classes/board';
 import { Dictionary } from '@app/classes/dictionary';
 import { Square } from '@app/classes/square';
-import { LetterValue, Tile } from '@app/classes/tile';
+import { Tile } from '@app/classes/tile';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { expect } from 'chai';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -18,14 +20,23 @@ import {
     WordFindingUseCase,
     DictionarySearchResult,
     BoardPlacementsExtractor,
-    PerpendicularWord,
 } from '@app/classes/word-finding';
 import AbstractWordFinding from './abstract-word-finding';
 import Range from '@app/classes/range/range';
 import { Random } from '@app/utils/random';
 import { switchOrientation } from '@app/utils/switch-orientation';
-
-type LetterValues = (LetterValue | ' ')[][];
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
+import {
+    boardFromLetterValues,
+    DEFAULT_BOARD_PLACEMENT,
+    DEFAULT_PERPENDICULAR_WORD,
+    DEFAULT_SQUARE,
+    DEFAULT_TILE,
+    DEFAULT_WORD_PLACEMENT,
+    DEFAULT_WORD_RESULT,
+    lettersToTiles,
+    LetterValues,
+} from '@app/classes/word-finding/helper.spec';
 
 const GRID: LetterValues = [
     // 0   1    2    3    4
@@ -35,64 +46,6 @@ const GRID: LetterValues = [
     [' ', ' ', ' ', ' ', 'Y'], // 3
     [' ', ' ', ' ', ' ', 'Z'], // 4
 ];
-const DEFAULT_BOARD_PLACEMENT: BoardPlacement = {
-    letters: [],
-    perpendicularLetters: [],
-    position: new Position(0, 0),
-    orientation: Orientation.Horizontal,
-    minSize: 0,
-    maxSize: 0,
-};
-const DEFAULT_WORD_RESULT: DictionarySearchResult = {
-    word: 'abc',
-    perpendicularWords: [],
-};
-const DEFAULT_WORD_PLACEMENT: ScoredWordPlacement = {
-    tilesToPlace: [],
-    orientation: Orientation.Horizontal,
-    startPosition: new Position(0, 0),
-    score: 0,
-};
-const DEFAULT_SQUARE: Square = {
-    tile: null,
-    position: new Position(0, 0),
-    scoreMultiplier: null,
-    wasMultiplierUsed: false,
-    isCenter: false,
-};
-const DEFAULT_TILE: Tile = {
-    letter: 'A',
-    value: 0,
-};
-const DEFAULT_PERPENDICULAR_WORD: PerpendicularWord = {
-    word: 'abcd',
-    distance: 1,
-    junctionDistance: 1,
-};
-
-const boardFromLetterValues = (letterValues: LetterValues) => {
-    const grid: Square[][] = [];
-
-    letterValues.forEach((line, row) => {
-        const boardRow: Square[] = [];
-
-        line.forEach((letter, column) => {
-            boardRow.push({
-                tile: letter === ' ' ? null : { letter: letter as LetterValue, value: 1 },
-                position: new Position(row, column),
-                scoreMultiplier: null,
-                wasMultiplierUsed: false,
-                isCenter: false,
-            });
-        });
-
-        grid.push(boardRow);
-    });
-
-    return new Board(grid);
-};
-
-const lettersToTiles = (letters: LetterValue[]) => letters.map<Tile>((letter) => ({ letter, value: 0 }));
 
 function* mockGenerator<T>(array: T[]): Generator<T> {
     for (const a of array) yield a;
@@ -436,28 +389,137 @@ describe.only('AbstractWordFinding', () => {
     });
 
     describe('extractPerpendicularWordsSquareTile', () => {
-        it('should call extractSquareTile for every perpendicularWord', () => {
-            const extractSquareTileStub = stub(wordFinding, 'extractSquareTile' as any);
-            const wordResult = {
+        let extractSquareTileStub: SinonStub;
+        let getPerpendicularWordPositionStub: SinonStub;
+        let position: Position;
+        let wordResult: DictionarySearchResult;
+        let boardPlacement: BoardPlacement;
+
+        beforeEach(() => {
+            position = new Position(0, 0);
+            wordResult = {
                 ...DEFAULT_WORD_RESULT,
                 perpendicularWords: [
                     { ...DEFAULT_PERPENDICULAR_WORD, distance: 2 },
                     { ...DEFAULT_PERPENDICULAR_WORD, junctionDistance: 3 },
                 ],
             };
-            const boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
+            boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
 
+            extractSquareTileStub = stub(wordFinding, 'extractSquareTile' as any);
+            getPerpendicularWordPositionStub = stub(wordFinding, 'getPerpendicularWordPosition' as any).returns(position);
+        });
+
+        it('should call getPerpendicularWordPosition for every perpendicularWord', () => {
             wordFinding['extractPerpendicularWordsSquareTile'](wordResult, boardPlacement);
 
             for (const placement of wordResult.perpendicularWords) {
-                const position = new BoardNavigator(board, boardPlacement.position, boardPlacement.orientation)
-                    .forward(placement.distance)
-                    .switchOrientation()
-                    .backward(placement.connect).position;
-                const orientation = switchOrientation(boardPlacement.orientation);
-
-                expect(extractSquareTileStub.calledWith(position, orientation, placement.word));
+                expect(getPerpendicularWordPositionStub.calledWithExactly(boardPlacement, placement.distance, placement.junctionDistance));
             }
         });
+
+        it('should call extractSquareTile for every perpendicularWord', () => {
+            wordFinding['extractPerpendicularWordsSquareTile'](wordResult, boardPlacement);
+
+            for (const placement of wordResult.perpendicularWords) {
+                const orientation = switchOrientation(boardPlacement.orientation);
+                expect(extractSquareTileStub.calledWithExactly(position, orientation, placement.word));
+            }
+        });
+    });
+
+    describe('extractSquareTile', () => {
+        it('should extract square tile', () => {
+            const tests: [row: number, column: number, orientation: Orientation, word: string, expected: [Square, Tile][]][] = [
+                [
+                    1,
+                    2,
+                    Orientation.Vertical,
+                    'lam',
+                    [
+                        [board.grid[1][2], tiles[0]],
+                        [board.grid[2][2], board.grid[2][2].tile!],
+                        [board.grid[3][2], tiles[1]],
+                    ],
+                ],
+                [
+                    4,
+                    2,
+                    Orientation.Horizontal,
+                    'mnz',
+                    [
+                        [board.grid[4][2], tiles[1]],
+                        [board.grid[4][3], tiles[2]],
+                        [board.grid[4][4], board.grid[4][4].tile!],
+                    ],
+                ],
+            ];
+
+            for (const [row, column, orientation, word, expected] of tests) {
+                const position = new Position(row, column);
+                const result = wordFinding['extractSquareTile'](position, orientation, word);
+
+                expect(result).to.deep.equal(expected);
+            }
+        });
+    });
+
+    describe('getTileFromLetter', () => {
+        const testTiles = lettersToTiles(['A', 'B', 'C', '*']);
+
+        const tests: [letter: string, expected: Tile][] = [
+            ['a', testTiles[0]],
+            ['b', testTiles[1]],
+            ['z', { ...testTiles[3], playedLetter: 'Z' }],
+        ];
+
+        let index = 0;
+        for (const [letter, expected] of tests) {
+            it(`should get tile (${index})`, () => {
+                const playTiles = [...testTiles];
+                const result = wordFinding['getTileFromLetter'](playTiles, letter);
+
+                expect(result).to.deep.equal(expected);
+            });
+            index++;
+        }
+
+        it("should throw if does't have letter", () => {
+            expect(() => wordFinding['getTileFromLetter'](tiles, 'z')).to.throw(ERROR_PLAYER_DOESNT_HAVE_TILE);
+        });
+    });
+
+    describe('convertTilesToLetters', () => {
+        it('should convert', () => {
+            expect(wordFinding['convertTilesToLetters'](tiles)).to.deep.equal(['L', 'M', 'N']);
+        });
+    });
+
+    describe('getPerpendicularWordPosition', () => {
+        const tests: [
+            row: number,
+            col: number,
+            orientation: Orientation,
+            distance: number,
+            junctionDistance: number,
+            expectedRow: number,
+            expectedCol: number,
+        ][] = [
+            [0, 0, Orientation.Horizontal, 2, 3, -3, 2],
+            [5, 7, Orientation.Vertical, 1, 4, 6, 3],
+        ];
+
+        let index = 0;
+        for (const [row, col, orientation, distance, junctionDistance, expectedRow, expectedCol] of tests) {
+            it(`should get position (${index})`, () => {
+                const position = new Position(row, col);
+                const boardPlacement = { ...DEFAULT_BOARD_PLACEMENT, position, orientation };
+                const result = wordFinding['getPerpendicularWordPosition'](boardPlacement, distance, junctionDistance);
+
+                expect(result.row).to.equal(expectedRow);
+                expect(result.column).to.equal(expectedCol);
+            });
+            index++;
+        }
     });
 });
