@@ -14,6 +14,8 @@ import { SinonStub, stub } from 'sinon';
 import { expect } from 'chai';
 import Direction from '@app/classes/board/direction';
 import { BoardPlacement, LinePlacements, WithDistance } from '@app/classes/word-finding';
+import { INITIAL_POSITION } from '@app/constants/game';
+import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 
 const DEFAULT_BOARD: (LetterValue | ' ')[][] = [
     [' ', ' ', 'X', ' ', 'O', 'P'],
@@ -77,6 +79,21 @@ describe('WordFindingPositionExtractor', () => {
             const result = extractor.extractBoardPlacements();
 
             expect(result).to.deep.equal(expected);
+        });
+
+        it('should add center position if board is empty', () => {
+            stub(extractor, 'isBoardEmpty' as any).returns(true);
+
+            const result = extractor.extractBoardPlacements();
+
+            expect(result).to.have.length(1);
+            expect(result[0].position.row).to.equal(INITIAL_POSITION.x);
+            expect(result[0].position.column).to.equal(INITIAL_POSITION.y);
+            expect(result[0].orientation).to.equal(Orientation.Horizontal);
+            expect(result[0].letters).to.deep.equal([]);
+            expect(result[0].perpendicularLetters).to.deep.equal([]);
+            expect(result[0].minSize).to.equal(0);
+            expect(result[0].maxSize).to.equal(MAX_TILES_PER_PLAYER);
         });
     });
 
