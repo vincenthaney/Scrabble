@@ -24,15 +24,8 @@ export default class DatabaseService {
             this.mongoClient = client;
             this.db = this.mongoClient.db(MONGO_DATABASE_NAME);
         } catch (exception) {
-            // Log the error but allow the server to not crash if it can't connect to the database
-            // eslint-disable-next-line no-console
-            console.error('Unable to connect to the Mongo Database');
             return null;
         }
-        // Log when the server is connected to the database
-        // eslint-disable-next-line no-console
-        console.log('Connected to the Mongo Database');
-
         return this.mongoClient;
     }
     async closeConnection(): Promise<void> {

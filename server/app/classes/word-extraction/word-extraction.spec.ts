@@ -3,13 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 
-import { Board, Orientation, Position } from '@app/classes/board';
+import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { expect } from 'chai';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { WordExtraction } from './word-extraction';
 import Direction from '@app/classes/board/direction';
+import { stub } from 'sinon';
 
 type LetterOrEmpty = LetterValue | ' ';
 
@@ -132,6 +133,22 @@ describe('WordExtract', () => {
             const orientation = Orientation.Horizontal;
             expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw();
         });
+
+        it('should not push', () => {
+            const tilesToPlace: Tile[] = tilesFromLetters(['X', 'Y', 'Z']);
+            const startPosition = new Position(1, 3);
+
+            const result = () => extraction.extract({ tilesToPlace, startPosition, orientation: Orientation.Vertical });
+            const stubVerify = stub(BoardNavigator.prototype, 'verify');
+            stubVerify.onCall(0).returns(false);
+            stubVerify.onCall(1).returns(true);
+            stubVerify.onCall(2).callsFake(() => {
+                throw new Error();
+            });
+            expect(result).to.Throw();
+            stubVerify.reset();
+            stubVerify.restore();
+        });
     });
 
     describe('extractWordInDirection', () => {
@@ -140,6 +157,19 @@ describe('WordExtract', () => {
             const direction = Direction.Forward;
             const position = new Position(1, 2);
             expect(() => extraction['extractWordInDirection'](orientation, direction, position)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+        });
+
+        it('should not push', () => {
+            const stubVerify = stub(BoardNavigator.prototype, 'verify');
+            stubVerify.onCall(0).returns(false);
+            stubVerify.onCall(1).returns(true);
+            stubVerify.onCall(2).returns(false);
+            const orientation = Orientation.Horizontal;
+            const direction = Direction.Forward;
+            const position = new Position(0, 0);
+            expect(extraction['extractWordInDirection'](orientation, direction, position).length).to.equal(0);
+            stubVerify.reset();
+            stubVerify.restore();
         });
     });
 });

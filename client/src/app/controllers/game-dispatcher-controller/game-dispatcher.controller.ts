@@ -81,17 +81,15 @@ export class GameDispatcherController implements OnDestroy {
                 this.lobbyRequestValidEvent.next();
             },
             (error) => {
-                this.handleJoinError(error);
+                this.handleJoinError(error.status as HttpStatusCode);
             },
         );
     }
 
-    // error has any type so we must disable no explicit any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    handleJoinError(error: any): void {
-        if (error.status === HttpStatusCode.Unauthorized) {
+    handleJoinError(errorStatus: HttpStatusCode): void {
+        if (errorStatus === HttpStatusCode.Unauthorized) {
             this.lobbyFullEvent.next();
-        } else if (error.status === HttpStatusCode.Gone) {
+        } else if (errorStatus === HttpStatusCode.Gone) {
             this.canceledGameEvent.next('Le créateur');
         }
     }

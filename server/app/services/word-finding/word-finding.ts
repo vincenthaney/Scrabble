@@ -272,9 +272,9 @@ export default class WordFindingService {
                     startPosition: squareProperties.square.position,
                     score: this.scoreCalculatorService.calculatePoints(createdWords) + this.scoreCalculatorService.bonusPoints(permutation),
                 };
+            } catch (exception) {
                 // Try to play the current move, if an error is thrown, it is invalid and do nothing
-                // eslint-disable-next-line no-empty
-            } catch (exception) {}
+            }
         }
         return undefined;
     }
