@@ -41,7 +41,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         this.gameViewEventManagerService.subscribeToGameViewEvent('reRender', this.componentDestroyed$, () => {
             this.ngOnDestroy();
             this.ngOnInit();
-            this.ngAfterViewInit();
+        });
+        this.gameViewEventManagerService.subscribeToGameViewEvent('gameInitialized', this.componentDestroyed$, () => {
+            this.localPlayerIcon = this.getLocalPlayerIcon();
+            setTimeout(() => this.updateActivePlayerBorder(this.roundManager.getActivePlayer()), 0);
         });
 
         if (!this.gameService.isGameSetUp) return;
@@ -62,7 +65,6 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         }
         this.roundManager.subscribeToEndRoundEvent(this.componentDestroyed$, () => this.endRound());
         this.isPlayer1 = this.checkIfIsPlayer1();
-        this.localPlayerIcon = this.getLocalPlayerIcon();
     }
 
     startTimer(timer: Timer): void {
