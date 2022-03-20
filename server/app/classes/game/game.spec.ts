@@ -220,9 +220,6 @@ describe('Game', () => {
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
-            // game.player1 = DEFAULT_PLAYER_1;
-            // game.player2 = DEFAULT_PLAYER_2;
-
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
             game.player1.tiles = [

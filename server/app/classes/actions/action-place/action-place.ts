@@ -68,11 +68,11 @@ export default class ActionPlace extends ActionPlay {
     }
 
     getMessage(): string {
-        return `Vous avez placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+        return `Vous avez placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => prev + tile.letter, '')}`;
     }
 
     getOpponentMessage(): string {
-        return `${this.player.name} a placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+        return `${this.player.name} a placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => prev + tile.letter, '')}`;
     }
 
     private isLegalPlacement(words: [Square, Tile][][]): boolean {
@@ -81,7 +81,7 @@ export default class ActionPlace extends ActionPlay {
     }
 
     private amountOfLettersInWords(words: [Square, Tile][][]): number {
-        return words.reduce((lettersInWords, word) => (lettersInWords += word.length), 0);
+        return words.reduce((lettersInWords, word) => lettersInWords + word.length, 0);
     }
 
     private containsCenterSquare(words: [Square, Tile][][]): boolean {
