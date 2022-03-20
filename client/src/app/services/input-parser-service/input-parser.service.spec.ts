@@ -15,7 +15,7 @@ import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/comma
 import { DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
-import GameService from '@app/services/game/game.service';
+import GameService from '@app/services/game-service/game.service';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';

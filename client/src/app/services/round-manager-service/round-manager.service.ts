@@ -9,7 +9,7 @@ import { Round } from '@app/classes/round';
 import { Timer } from '@app/classes/timer/timer';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
-import { ActionService } from '@app/services/action/action.service';
+import { ActionService } from '@app/services/action-service/action.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
