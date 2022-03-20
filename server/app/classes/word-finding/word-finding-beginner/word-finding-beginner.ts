@@ -24,6 +24,7 @@ export default class WordFindingBeginner extends AbstractWordFinding {
             }
         }
     }
+
     protected isSearchCompleted(): boolean {
         return this.wordPlacements.length > 0 && this.placementFoundAcceptance >= WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD;
     }
