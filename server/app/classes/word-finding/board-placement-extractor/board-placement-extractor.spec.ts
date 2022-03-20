@@ -405,7 +405,7 @@ describe('WordFindingPositionExtractor', () => {
 
             const result = extractor['getMinSize'](linePlacements);
 
-            expect(result).to.equal(expected);
+            expect(result).to.equal(expected + 1);
         });
 
         it('should return first letters distance if smaller than first perpendicular letter distance', () => {
@@ -429,7 +429,7 @@ describe('WordFindingPositionExtractor', () => {
 
             const result = extractor['getMinSize'](linePlacements);
 
-            expect(result).to.equal(perpendicularLettersDistance);
+            expect(result).to.equal(perpendicularLettersDistance + 1);
         });
 
         it('should return infinity if none', () => {
