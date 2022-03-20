@@ -2,12 +2,9 @@ import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board
 import { LetterValue, Tile } from '@app/classes/tile';
 import { Dictionary } from '@app/classes/dictionary';
 import { Random } from '@app/utils/random';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { Square } from '@app/classes/square';
 import { switchOrientation } from '@app/utils/switch-orientation';
-import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { HINT_ACTION_NUMBER_OF_WORDS } from '@app/constants/classes-constants';
 import { arrayDeepCopy } from '@app/utils/deep-copy';
 import {
     BoardPlacement,
@@ -16,8 +13,9 @@ import {
     DictionarySearchResult,
     ScoredWordPlacement,
     WordFindingRequest,
-    WordFindingUseCase,
 } from '@app/classes/word-finding';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
+import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 
 export default abstract class AbstractWordFinding {
     protected wordPlacements: ScoredWordPlacement[] = [];
@@ -35,10 +33,10 @@ export default abstract class AbstractWordFinding {
     findWords(): ScoredWordPlacement[] {
         const playerLetters = this.convertTilesToLetters(this.tiles);
 
-        for (const boardPlacement of this.boardPlacements()) {
+        for (const boardPlacement of this.randomBoardPlacements()) {
             const searcher = new DictionarySearcher(this.dictionary, playerLetters, boardPlacement);
 
-            for (const wordResult of searcher.getWords()) {
+            for (const wordResult of searcher.getAllWords()) {
                 const wordPlacement = this.getWordPlacement(wordResult, boardPlacement);
 
                 if (this.validateWordPlacement(wordPlacement)) {
@@ -52,7 +50,12 @@ export default abstract class AbstractWordFinding {
         return this.wordPlacements;
     }
 
-    *boardPlacements(): Generator<BoardPlacement> {
+    protected isWithinPointRange(score: number): boolean {
+        if (!this.request.pointRange) return true;
+        return this.request.pointRange.isWithinRange(score);
+    }
+
+    private *randomBoardPlacements(): Generator<BoardPlacement> {
         const extractor = new BoardPlacementsExtractor(this.board);
         const boardPlacements = extractor.extractBoardPlacements();
 
@@ -62,7 +65,7 @@ export default abstract class AbstractWordFinding {
         }
     }
 
-    getWordPlacement(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): ScoredWordPlacement {
+    private getWordPlacement(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): ScoredWordPlacement {
         const wordSquareTiles = this.extractWordSquareTile(wordResult, boardPlacement);
         const perpendicularWordsSquareTiles = this.extractPerpendicularWordsSquareTile(wordResult, boardPlacement);
         const score = this.scoreCalculatorService.calculatePoints([wordSquareTiles, ...perpendicularWordsSquareTiles]);
@@ -74,29 +77,19 @@ export default abstract class AbstractWordFinding {
             tilesToPlace,
             orientation: boardPlacement.orientation,
             startPosition: squareTilesToPlace[0][0].position,
-            score: score + perpendicularWordsSquareTiles.length,
+            score,
         };
     }
 
-    validateWordPlacement(wordPlacement: ScoredWordPlacement): boolean {
+    private validateWordPlacement(wordPlacement: ScoredWordPlacement): boolean {
         return this.isWithinPointRange(wordPlacement.score);
     }
 
-    findCompleted(wordPlacements: ScoredWordPlacement[]): boolean {
-        switch (this.request.useCase) {
-            case WordFindingUseCase.Hint:
-                return wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS;
-            case WordFindingUseCase.Beginner:
-            case WordFindingUseCase.Expert:
-                return wordPlacements.length >= 1;
-        }
-    }
-
-    extractWordSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][] {
+    private extractWordSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][] {
         return this.extractSquareTile(boardPlacement.position, boardPlacement.orientation, wordResult.word);
     }
 
-    extractPerpendicularWordsSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
+    private extractPerpendicularWordsSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
         const squareTiles: [Square, Tile][][] = [];
         for (const { word, distance, connect } of wordResult.perpendicularWords) {
             const navigator = new BoardNavigator(this.board, boardPlacement.position, boardPlacement.orientation);
@@ -107,7 +100,7 @@ export default abstract class AbstractWordFinding {
         return squareTiles;
     }
 
-    extractSquareTile(position: Position, orientation: Orientation, word: string): [Square, Tile][] {
+    private extractSquareTile(position: Position, orientation: Orientation, word: string): [Square, Tile][] {
         const navigator = new BoardNavigator(this.board, position, orientation);
         const playerTiles = [...this.tiles];
         const squareTiles: [Square, Tile][] = [];
@@ -128,7 +121,7 @@ export default abstract class AbstractWordFinding {
         return squareTiles;
     }
 
-    getTileFromLetter(tiles: Tile[], letter: string): Tile {
+    private getTileFromLetter(tiles: Tile[], letter: string): Tile {
         let index = tiles.findIndex((tile) => tile.letter === letter.toUpperCase());
 
         if (index === NOT_FOUND) {
@@ -142,20 +135,11 @@ export default abstract class AbstractWordFinding {
         return foundTile[0];
     }
 
-    calculateScore(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): number {
-        return wordResult.word.length + boardPlacement.orientation;
-    }
-
-    convertTilesToLetters(tiles: Tile[]): LetterValue[] {
+    private convertTilesToLetters(tiles: Tile[]): LetterValue[] {
         return tiles.map((tile) => tile.letter);
     }
 
-    isWithinPointRange(score: number): boolean {
-        if (!this.request.pointRange) return true;
-        return this.request.pointRange.isWithinRange(score);
-    }
+    protected abstract handleWordPlacement(wordPlacement: ScoredWordPlacement): void;
 
-    abstract handleWordPlacement(wordPlacement: ScoredWordPlacement): void;
-
-    abstract isSearchCompleted(): boolean;
+    protected abstract isSearchCompleted(): boolean;
 }
