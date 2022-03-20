@@ -31,15 +31,13 @@ export interface DictionarySearcherStackItem {
     playerLetters: string[];
 }
 
-export interface SearcherPerpendicularLetters {
+export interface SearcherPerpendicularLetters extends WithDistance {
     before: string;
     after: string;
-    distance: number;
 }
 
-export interface PerpendicularWord {
+export interface PerpendicularWord extends WithDistance {
     word: string;
-    distance: number;
     connect: number;
 }
 
