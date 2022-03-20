@@ -13,4 +13,4 @@ export const EXTRACTION_SQUARE_ALREADY_FILLED = 'Il y a déjà une tuile à la p
 export const EXTRACTION_TILES_INVALID = 'Les tuiles à extraires ne sont pas de la longueur correcte';
 export const EXTRACTION_NO_WORDS_CREATED = "Aucun mot n'a été créé avec le placement de tuile.";
 export const NEXT_NODE_DOES_NOT_EXISTS = "Next node doesn't exists.";
-export const INVALID_POINT_RANGE = 'La valeur minimum doit être inférieure ou égale à la valeur maximale.';
+export const INVALID_POINT_RANGE = 'La valeur minimale doit être inférieure ou égale à la valeur maximale.';
