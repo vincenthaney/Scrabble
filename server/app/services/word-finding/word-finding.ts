@@ -31,7 +31,6 @@ import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { arrayDeepCopy } from '@app/utils/deep-copy';
 
-
 @Service()
 export default class WordFindingService {
     private wordExtraction: WordExtraction;
