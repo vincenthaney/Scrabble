@@ -39,7 +39,6 @@ export class ActiveGameService {
         try {
             game = this.getGame(id, playerId);
         } catch (exception) {
-            // If the game is already deleted, return and don't do anything
             return;
         }
         const index = this.activeGames.indexOf(game);

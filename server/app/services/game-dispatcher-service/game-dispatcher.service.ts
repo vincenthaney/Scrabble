@@ -68,11 +68,9 @@ export class GameDispatcherService {
             throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
-        // Remove game from wait
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
 
-        // Start game
         const config: MultiplayerGameConfig = {
             ...waitingRoom.getConfig(),
             player2: waitingRoom.joinedPlayer,
@@ -118,7 +116,6 @@ export class GameDispatcherService {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         }
 
-        // Remove game from wait
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
     }
