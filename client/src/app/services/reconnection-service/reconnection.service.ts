@@ -3,10 +3,10 @@ import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/consta
 import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import { CookieService } from '@app/services/cookie/cookie.service';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
-import GameService from '@app/services/game/game.service';
-import SocketService from '@app/services/socket/socket.service';
+import { CookieService } from '@app/services/cookie-service/cookie.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import GameService from '@app/services/game-service/game.service';
+import SocketService from '@app/services/socket-service/socket.service';
 
 @Injectable({
     providedIn: 'root',

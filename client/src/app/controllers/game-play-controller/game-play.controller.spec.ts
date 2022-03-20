@@ -9,7 +9,7 @@ import { Message } from '@app/classes/communication/message';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { HTTP_ABORT_ERROR } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { Observable, of, Subscription } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';

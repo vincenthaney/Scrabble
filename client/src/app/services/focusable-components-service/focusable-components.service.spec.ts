@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { FocusableComponent } from './focusable-component';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 
 import { FocusableComponentsService } from './focusable-components.service';
 

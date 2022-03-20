@@ -4,7 +4,7 @@ import * as spies from 'chai-spies';
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { describe } from 'mocha';
-import { HttpException } from './http.exception';
+import { HttpException } from './http-exception';
 
 const expect = chai.expect;
 

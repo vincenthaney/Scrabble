@@ -16,11 +16,11 @@ import { GameType } from '@app/classes/game-type';
 import { Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Tile } from '@app/classes/tile';
-import { Timer } from '@app/classes/timer';
+import { Timer } from '@app/classes/timer/timer';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
-import { ActionService } from '@app/services/action/action.service';
-import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import { ActionService } from '@app/services/action-service/action.service';
+import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import SpyObj = jasmine.SpyObj;
 
 class RoundManagerServiceWrapper {
