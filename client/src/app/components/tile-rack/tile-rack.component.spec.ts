@@ -66,6 +66,7 @@ describe('TileRackComponent', () => {
 
         const tileRackUpdate$ = new Subject();
         const usedTiles$ = new Subject();
+        const resetUsedTiles$ = new Subject();
         const message$ = new Subject<Message | null>();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
         gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
@@ -75,6 +76,9 @@ describe('TileRackComponent', () => {
                     break;
                 case 'usedTiles':
                     usedTiles$.next();
+                    break;
+                case 'resetUsedTiles':
+                    resetUsedTiles$.next();
                     break;
                 case 'newMessage':
                     message$.next(payload);
@@ -87,6 +91,8 @@ describe('TileRackComponent', () => {
                     return tileRackUpdate$.pipe(takeUntil(destroy$)).subscribe(next);
                 case 'usedTiles':
                     return usedTiles$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'resetUsedTiles':
+                    return resetUsedTiles$.pipe(takeUntil(destroy$)).subscribe(next);
                 case 'newMessage':
                     return message$.pipe(takeUntil(destroy$)).subscribe(next);
             }
