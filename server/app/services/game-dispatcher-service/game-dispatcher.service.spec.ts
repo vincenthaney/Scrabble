@@ -5,11 +5,13 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
 import Game from '@app/classes/game/game';
-import { GameConfig, GameConfigData } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
 import {
     CANNOT_HAVE_SAME_NAME,
@@ -19,20 +21,26 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
+import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
-import { spy } from 'chai';
 
 const expect = chai.expect;
 
 const DEFAULT_PLAYER_NAME = 'newKidOnTheBlock';
 const DEFAULT_PLAYER_ID = 'id';
+const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_OPPONENT_ID = 'opponent_id';
 const DEFAULT_OPPONENT_NAME = 'opponent';
 const DEFAULT_OPPONENT_ID_2 = 'opponent_id_2';
@@ -41,6 +49,55 @@ const DEFAULT_DICTIONARY = 'francais';
 const DEFAULT_ROUND_TIME = 1;
 
 const DEFAULT_OPPONENT = new Player(DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
+
+// const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
+//     playerName: DEFAULT_PLAYER_NAME,
+//     playerId: DEFAULT_PLAYER_ID,
+//     gameType: GameType.Classic,
+//     gameMode: GameMode.Multiplayer,
+//     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
+//     virtualPlayerName: DEFAULT_PLAYER_NAME,
+//     maxRoundTime: DEFAULT_ROUND_TIME,
+//     dictionary: DEFAULT_DICTIONARY,
+// };
+
+const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
+    playerName: DEFAULT_PLAYER_NAME,
+    playerId: DEFAULT_PLAYER_ID,
+    gameType: GameType.Classic,
+    gameMode: GameMode.Solo,
+    virtualPlayerLevel: VirtualPlayerLevel.Beginner,
+    virtualPlayerName: DEFAULT_PLAYER_NAME,
+    maxRoundTime: DEFAULT_ROUND_TIME,
+    dictionary: DEFAULT_DICTIONARY,
+};
+
+const DEFAULT_GAME_CONFIG: GameConfig = {
+    player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
+    gameType: GameType.Classic,
+    maxRoundTime: DEFAULT_ROUND_TIME,
+    dictionary: DEFAULT_DICTIONARY,
+};
+
+// const DEFAULT_EXCEPTION = 'exception';
+
+const DEFAULT_PLAYER = new Player(VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+const DEFAULT_JOINED_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+
+const DEFAULT_START_GAME_DATA: StartGameData = {
+    ...DEFAULT_GAME_CONFIG,
+    gameId: DEFAULT_GAME_ID,
+    board: undefined as unknown as Square[][],
+    tileReserve: [],
+    round: {
+        playerData: {
+            id: VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID,
+        },
+        startTime: new Date(),
+        limitTime: new Date(),
+    },
+    player2: DEFAULT_JOINED_PLAYER,
+};
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
     playerId: DEFAULT_PLAYER_ID,
@@ -65,11 +122,23 @@ chai.use(chaiAsPromised);
 
 describe('GameDispatcherService', () => {
     let gameDispatcherService: GameDispatcherService;
+    let socketService: SocketService;
+    let createGameService: CreateGameService;
+    let virtualPlayerService: VirtualPlayerService;
+    let activeGameService: ActiveGameService;
 
     beforeEach(() => {
         Container.reset();
         Container.set(DictionaryService, getDictionaryTestService());
         gameDispatcherService = Container.get(GameDispatcherService);
+        socketService = Container.get(SocketService);
+        createGameService = Container.get(CreateGameService);
+        virtualPlayerService = Container.get(VirtualPlayerService);
+        activeGameService = Container.get(ActiveGameService);
+    });
+
+    afterEach(() => {
+        chai.spy.restore();
     });
 
     it('should create', () => {
@@ -87,37 +156,65 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    // describe('createSoloGame', () => {
-    //     it('should call createGameService.createSoloGame', async () => {
-    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-    //         expect(startGameDataSpy).to.have.been.called();
-    //     });
+    describe('createSoloGame', () => {
+        let createSoloGameSpy: unknown;
+        let addToRoomSpy: unknown;
+        let sliceVirtualPlayerToPlayerSpy: unknown;
+        let socketServiceSpy: unknown;
+        let virtualPlayerServiceSpy: unknown;
+        let activeGameServiceSpy: unknown;
 
-    //     it('should call socketService.addToRoom', async () => {
-    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-    //         expect(addToRoomSpy).to.have.been.called();
-    //     });
+        beforeEach(() => {
+            createSoloGameSpy = chai.spy.on(createGameService, 'createSoloGame', () => {
+                return DEFAULT_START_GAME_DATA;
+            });
+            addToRoomSpy = chai.spy.on(socketService, 'addToRoom', () => {
+                return;
+            });
+            sliceVirtualPlayerToPlayerSpy = chai.spy.on(virtualPlayerService, 'sliceVirtualPlayerToPlayer', () => {
+                return DEFAULT_PLAYER;
+            });
+            socketServiceSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+                return;
+            });
+            virtualPlayerServiceSpy = chai.spy.on(virtualPlayerService, 'triggerVirtualPlayerTurn', () => {
+                return;
+            });
+            activeGameServiceSpy = chai.spy.on(activeGameService, 'getGame', () => {
+                return;
+            });
+        });
 
-    //     it('should call virtualPlayerService.sliceVirtualPlayerToPlayer', async () => {
-    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-    //         expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
-    //     });
+        it('should call createGameService.createSoloGame', async () => {
+            await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(createSoloGameSpy).to.have.been.called();
+            expect(addToRoomSpy).to.have.been.called();
+            expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
+            expect(socketServiceSpy).to.have.been.called();
+            expect(virtualPlayerServiceSpy).to.have.been.called();
+            expect(activeGameServiceSpy).to.have.been.called();
+        });
 
-    //     it('should call socketService.emitToSocket', async () => {
-    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-    //         expect(socketServiceSpy).to.have.been.called();
-    //     });
+        // it('should call socketService.addToRoom', async () => {
+        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+        // });
 
-    //     it('should call virtualPlayerService.triggerVirtualPlayerTurn', async () => {
-    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-    //         expect(virtualPlayerServiceSpy).to.have.been.called();
-    //     });
+        // it('should call virtualPlayerService.sliceVirtualPlayerToPlayer', async () => {
+        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+        // });
 
-    //     it('should call activeGameService.getGame', async () => {
-    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-    //         expect(activeGameServiceSpy).to.have.been.called();
-    //     });
-    // });
+        // it('should call socketService.emitToSocket', async () => {
+        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+        // });
+
+        // it('should call virtualPlayerService.triggerVirtualPlayerTurn', async () => {
+        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+        // });
+
+        // it('should call activeGameService.getGame', async () => {
+        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+        // });
+    });
 
     describe('requestJoinGame', () => {
         let id: string;
