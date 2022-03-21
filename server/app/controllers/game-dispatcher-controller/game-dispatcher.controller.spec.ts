@@ -669,7 +669,7 @@ describe('GameDispatcherController', () => {
         it('should not call socketService.emitToSocket', () => {
             waitingRoomStub.joinedPlayer = undefined;
             controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-            expect(emitToSocketSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.not.have.been.called();
         });
 
         it('should call gameDispatcherService.cancelGame', () => {
