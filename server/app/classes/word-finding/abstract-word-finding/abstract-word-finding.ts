@@ -65,8 +65,8 @@ export default abstract class AbstractWordFinding {
     }
 
     private getWordPlacement(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): ScoredWordPlacement {
-        const wordSquareTiles = this.extractWordSquareTile(wordResult, boardPlacement);
-        const perpendicularWordsSquareTiles = this.extractPerpendicularWordsSquareTile(wordResult, boardPlacement);
+        const wordSquareTiles = this.extractWordSquareTiles(wordResult, boardPlacement);
+        const perpendicularWordsSquareTiles = this.extractPerpendicularWordsSquareTiles(wordResult, boardPlacement);
         const score = this.scoreCalculatorService.calculatePoints([wordSquareTiles, ...perpendicularWordsSquareTiles]);
 
         const squareTilesToPlace = wordSquareTiles.filter(([square]) => !square.tile);
@@ -84,11 +84,11 @@ export default abstract class AbstractWordFinding {
         return this.isWithinPointRange(wordPlacement.score);
     }
 
-    private extractWordSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][] {
+    private extractWordSquareTiles(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][] {
         return this.extractSquareTiles(boardPlacement.position, boardPlacement.orientation, wordResult.word);
     }
 
-    private extractPerpendicularWordsSquareTile(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
+    private extractPerpendicularWordsSquareTiles(wordResult: DictionarySearchResult, boardPlacement: BoardPlacement): [Square, Tile][][] {
         const squareTiles: [Square, Tile][][] = [];
         for (const { word, distance, junctionDistance } of wordResult.perpendicularWords) {
             squareTiles.push(

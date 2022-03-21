@@ -268,29 +268,29 @@ describe('AbstractWordFinding', () => {
     });
 
     describe('getWordPlacement', () => {
-        let extractWordSquareTileStub: SinonStub;
-        let extractPerpendicularWordsSquareTileStub: SinonStub;
+        let extractWordSquareTilesStub: SinonStub;
+        let extractPerpendicularWordsSquareTilesStub: SinonStub;
         let wordResult: DictionarySearchResult;
         let boardPlacement: BoardPlacement;
 
         beforeEach(() => {
-            extractWordSquareTileStub = stub(wordFinding, 'extractWordSquareTile' as any).returns([[{ ...DEFAULT_SQUARE }, { ...DEFAULT_TILE }]]);
-            extractPerpendicularWordsSquareTileStub = stub(wordFinding, 'extractPerpendicularWordsSquareTile' as any).returns([]);
+            extractWordSquareTilesStub = stub(wordFinding, 'extractWordSquareTiles' as any).returns([[{ ...DEFAULT_SQUARE }, { ...DEFAULT_TILE }]]);
+            extractPerpendicularWordsSquareTilesStub = stub(wordFinding, 'extractPerpendicularWordsSquareTiles' as any).returns([]);
 
             wordResult = { ...DEFAULT_WORD_RESULT };
             boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
         });
 
-        it('should call extractWordSquareTile with wordResult and boardPlacement', () => {
+        it('should call extractWordSquareTiles with wordResult and boardPlacement', () => {
             wordFinding['getWordPlacement'](wordResult, boardPlacement);
 
-            expect(extractWordSquareTileStub.calledWith(wordResult, boardPlacement)).to.be.true;
+            expect(extractWordSquareTilesStub.calledWith(wordResult, boardPlacement)).to.be.true;
         });
 
-        it('should call extractPerpendicularWordsSquareTile with wordResult and boardPlacement', () => {
+        it('should call extractPerpendicularWordsSquareTiles with wordResult and boardPlacement', () => {
             wordFinding['getWordPlacement'](wordResult, boardPlacement);
 
-            expect(extractPerpendicularWordsSquareTileStub.calledWith(wordResult, boardPlacement)).to.be.true;
+            expect(extractPerpendicularWordsSquareTilesStub.calledWith(wordResult, boardPlacement)).to.be.true;
         });
 
         it('should call calculatePoints with wordSquareTiles and perpendicularWordsSquareTiles', () => {
@@ -298,8 +298,8 @@ describe('AbstractWordFinding', () => {
             const perpendicularWordsSquareTiles: [Square, Tile][][] = [[[{ ...DEFAULT_SQUARE }, { ...DEFAULT_TILE }]]];
             const expected = [wordSquareTiles, ...perpendicularWordsSquareTiles];
 
-            extractWordSquareTileStub.returns(wordSquareTiles);
-            extractPerpendicularWordsSquareTileStub.returns(perpendicularWordsSquareTiles);
+            extractWordSquareTilesStub.returns(wordSquareTiles);
+            extractPerpendicularWordsSquareTilesStub.returns(perpendicularWordsSquareTiles);
 
             wordFinding['getWordPlacement'](wordResult, boardPlacement);
 
@@ -318,7 +318,7 @@ describe('AbstractWordFinding', () => {
                 wordSquareTiles.push([{ ...DEFAULT_SQUARE, tile: { ...DEFAULT_TILE } }, { ...DEFAULT_TILE }]);
             }
 
-            extractWordSquareTileStub.returns(wordSquareTiles);
+            extractWordSquareTilesStub.returns(wordSquareTiles);
 
             const result = wordFinding['getWordPlacement'](wordResult, boardPlacement);
 
@@ -347,7 +347,7 @@ describe('AbstractWordFinding', () => {
                 wordSquareTiles.push([{ ...DEFAULT_SQUARE }, { ...DEFAULT_TILE }]);
             }
 
-            extractWordSquareTileStub.returns(wordSquareTiles);
+            extractWordSquareTilesStub.returns(wordSquareTiles);
 
             const result = wordFinding['getWordPlacement'](wordResult, boardPlacement);
 
@@ -376,19 +376,19 @@ describe('AbstractWordFinding', () => {
         });
     });
 
-    describe('extractWordSquareTile', () => {
+    describe('extractWordSquareTiles', () => {
         it('should call extractSquareTiles', () => {
             const extractSquareTilesStub = stub(wordFinding, 'extractSquareTiles' as any);
             const wordResult = { ...DEFAULT_WORD_RESULT };
             const boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
 
-            wordFinding['extractWordSquareTile'](wordResult, boardPlacement);
+            wordFinding['extractWordSquareTiles'](wordResult, boardPlacement);
 
             expect(extractSquareTilesStub.calledWith(boardPlacement.position, boardPlacement.orientation, wordResult.word));
         });
     });
 
-    describe('extractPerpendicularWordsSquareTile', () => {
+    describe('extractPerpendicularWordsSquareTiles', () => {
         let extractSquareTilesStub: SinonStub;
         let getPerpendicularWordPositionStub: SinonStub;
         let position: Position;
@@ -411,7 +411,7 @@ describe('AbstractWordFinding', () => {
         });
 
         it('should call getPerpendicularWordPosition for every perpendicularWord', () => {
-            wordFinding['extractPerpendicularWordsSquareTile'](wordResult, boardPlacement);
+            wordFinding['extractPerpendicularWordsSquareTiles'](wordResult, boardPlacement);
 
             for (const placement of wordResult.perpendicularWords) {
                 expect(getPerpendicularWordPositionStub.calledWithExactly(boardPlacement, placement.distance, placement.junctionDistance));
@@ -419,7 +419,7 @@ describe('AbstractWordFinding', () => {
         });
 
         it('should call extractSquareTiles for every perpendicularWord', () => {
-            wordFinding['extractPerpendicularWordsSquareTile'](wordResult, boardPlacement);
+            wordFinding['extractPerpendicularWordsSquareTiles'](wordResult, boardPlacement);
 
             for (const placement of wordResult.perpendicularWords) {
                 const orientation = switchOrientation(boardPlacement.orientation);
