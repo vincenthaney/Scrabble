@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { VirtualPlayerService } from './virtual-player.service';
 import * as mockttp from 'mockttp';

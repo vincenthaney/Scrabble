@@ -11,6 +11,7 @@ import { GamePlayService } from '@app/services/game-play-service/game-play.servi
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { Delay } from '@app/utils/delay';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -32,7 +33,7 @@ export class GamePlayController {
     gameUpdate(gameId: string, data: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
         if (data.round) {
-            if (VirtualPlayerService.isIdVirtualPlayer(data.round.playerData.id)) {
+            if (isIdVirtualPlayer(data.round.playerData.id)) {
                 this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
             }
         }

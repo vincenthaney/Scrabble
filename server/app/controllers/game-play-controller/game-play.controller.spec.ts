@@ -18,6 +18,7 @@ import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
@@ -62,7 +63,7 @@ const DEFAULT_BOARD: Square[][] = [
 ];
 const DEFAULT_ERROR_MESSAGE = INVALID_COMMAND;
 const DEFAULT_MESSAGE_CONTENT = 'content';
-const DEFAULT_VIRTUAL_PLAYER_ID = 'virtualPlayerID';
+const DEFAULT_VIRTUAL_PLAYER_ID = VIRTUAL_PLAYER_ID_PREFIX + 'ID';
 const DEFAULT_VIRTUAL_PLAYER_DATA = {
     id: DEFAULT_VIRTUAL_PLAYER_ID,
 };

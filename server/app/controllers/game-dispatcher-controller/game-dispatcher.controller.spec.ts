@@ -26,12 +26,12 @@ import {
     VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
 import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -88,7 +88,7 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
 const DEFAULT_ROOM = new WaitingRoom(DEFAULT_GAME_CONFIG);
 const DEFAULT_EXCEPTION = 'exception';
 
-const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+const DEFAULT_PLAYER = new Player(VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 const DEFAULT_JOINED_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 
 const DEFAULT_STARTING_GAME_DATA: StartGameData = {
@@ -98,7 +98,7 @@ const DEFAULT_STARTING_GAME_DATA: StartGameData = {
     tileReserve: [],
     round: {
         playerData: {
-            id: DEFAULT_PLAYER_ID,
+            id: VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID,
         },
         startTime: new Date(),
         limitTime: new Date(),
@@ -378,7 +378,7 @@ describe('GameDispatcherController', () => {
         let virtualPlayerServiceSpy: unknown;
         let activeGameServiceSpy: unknown;
 
-        stub(VirtualPlayerService, 'isIdVirtualPlayer').returns(true);
+        // stub(VirtualPlayerService, 'isIdVirtualPlayer').returns(true);
 
         beforeEach(() => {
             startGameDataSpy = spy.on(controller['createGameService'], 'createSoloGame', () => {

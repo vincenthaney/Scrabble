@@ -22,6 +22,7 @@ import { CreateGameService } from '@app/services/create-game-service/create-game
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { validateName } from '@app/utils/validate-name';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -236,7 +237,7 @@ export class GameDispatcherController {
 
             this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
 
-            if (VirtualPlayerService.isIdVirtualPlayer(startGameData.round.playerData.id)) {
+            if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
                 this.virtualPlayerService.triggerVirtualPlayerTurn(
                     startGameData,
                     this.activeGameService.getGame(gameId, startGameData.round.playerData.id),

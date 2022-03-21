@@ -4,7 +4,6 @@ import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
 import * as io from 'socket.io';
 import { Service } from 'typedi';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import {
     CanceledGameEmitArgs,
     CleanupEmitArgs,
@@ -18,6 +17,7 @@ import {
     SocketEmitEvents,
     StartGameEmitArgs,
 } from './socket-types';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 
 @Service()
 export class SocketService {
@@ -108,7 +108,7 @@ export class SocketService {
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
-        if (VirtualPlayerService.isIdVirtualPlayer(id)) return;
+        if (isIdVirtualPlayer(id)) return;
         this.getSocket(id).emit(ev, ...args);
     }
 }
