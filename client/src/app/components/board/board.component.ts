@@ -247,6 +247,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         const position = { ...payload.startPosition };
         const next = () => (payload.orientation === Orientation.Horizontal ? position.column++ : position.row++);
+        this.notAppliedSquares = [];
 
         for (let i = 0; i < payload.tiles.length; ) {
             if (!this.isInBounds(position)) return;
@@ -292,7 +293,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             return;
         }
 
-        const index = previousUsedTiles.tiles.findIndex((t: Tile) => t.letter === tile.letter);
+        const index = previousUsedTiles.tiles.map((t) => t.letter).lastIndexOf(tile.letter);
 
         if (index === NOT_FOUND) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
