@@ -378,8 +378,6 @@ describe('GameDispatcherController', () => {
         let virtualPlayerServiceSpy: unknown;
         let activeGameServiceSpy: unknown;
 
-        // stub(VirtualPlayerService, 'isIdVirtualPlayer').returns(true);
-
         beforeEach(() => {
             startGameDataSpy = spy.on(controller['createGameService'], 'createSoloGame', () => {
                 return DEFAULT_STARTING_GAME_DATA;

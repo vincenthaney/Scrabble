@@ -219,30 +219,38 @@ export class GameDispatcherController {
 
         if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
-        let gameId: string;
         if (config.gameMode === GameMode.Multiplayer) {
-            const waitingRoom = this.createGameService.createMultiplayerGame(config);
-            gameId = waitingRoom.getId();
-            this.gameDispatcherService.addToWaitingRoom(waitingRoom);
-            this.socketService.addToRoom(config.playerId, gameId);
-            this.handleLobbiesUpdate();
+            return this.handleCreateMultiplayerGame(config);
         } else {
-            if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
-            if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
-            const startGameData = await this.createGameService.createSoloGame(config);
-            gameId = startGameData.gameId;
-            this.socketService.addToRoom(config.playerId, gameId);
+            return this.handleCreateSoloGame(config);
+        }
+    }
 
-            startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
+    private handleCreateMultiplayerGame(config: GameConfigData): string {
+        const waitingRoom = this.createGameService.createMultiplayerGame(config);
+        const gameId = waitingRoom.getId();
+        this.gameDispatcherService.addToWaitingRoom(waitingRoom);
+        this.socketService.addToRoom(config.playerId, gameId);
+        this.handleLobbiesUpdate();
+        return gameId;
+    }
 
-            this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
+    private async handleCreateSoloGame(config: GameConfigData): Promise<string> {
+        if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
+        if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
+        const startGameData = await this.createGameService.createSoloGame(config);
+        const gameId = startGameData.gameId;
+        this.socketService.addToRoom(config.playerId, gameId);
 
-            if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
-                this.virtualPlayerService.triggerVirtualPlayerTurn(
-                    startGameData,
-                    this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
-                );
-            }
+        startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
+
+        this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
+
+        if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(
+                startGameData,
+                this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
+            );
         }
         return gameId;
     }
