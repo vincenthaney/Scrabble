@@ -11,8 +11,6 @@ const expect = chai.expect;
 chai.use(spies);
 chai.use(chaiAsPromised);
 
-// const DEFAULT_MESSAGE = 'default message';
-
 class MockResponse {
     // eslint-disable-next-line no-unused-vars
     status(s: string): MockResponse {

@@ -361,14 +361,23 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    it('scrollToBottom should call scrollTo on viewport', async () => {
-        jasmine.clock().install();
-        const spy = spyOn(component.scrollViewport, 'scrollTo');
-        scrollToBottomSpy.call(component, {});
-        expect(scrollToBottomSpy).toHaveBeenCalled();
-        Promise.resolve().then(() => {
-            jasmine.clock().tick(1);
-            expect(spy).toHaveBeenCalled();
+    describe('scrollToBottom', () => {
+        beforeEach(() => {
+            jasmine.clock().install();
+        });
+
+        afterEach(() => {
+            jasmine.clock().uninstall();
+        });
+
+        it('scrollToBottom should call scrollTo on viewport', async () => {
+            const spy = spyOn(component.scrollViewport, 'scrollTo');
+            scrollToBottomSpy.call(component, {});
+            expect(scrollToBottomSpy).toHaveBeenCalled();
+            Promise.resolve().then(() => {
+                jasmine.clock().tick(1);
+                expect(spy).toHaveBeenCalled();
+            });
         });
     });
 });

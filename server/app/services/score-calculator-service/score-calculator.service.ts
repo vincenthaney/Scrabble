@@ -8,7 +8,7 @@ import { Service } from 'typedi';
 @Service()
 export class ScoreCalculatorService {
     calculatePoints(wordsToScore: [Square, Tile][][]): number {
-        return wordsToScore.reduce((total, word) => (total += this.calculatePointsPerWord(word)), DEFAULT_SCORE);
+        return wordsToScore.reduce((total, word) => total + this.calculatePointsPerWord(word), DEFAULT_SCORE);
     }
 
     bonusPoints(tilesToPlace: Tile[]): number {
@@ -27,7 +27,7 @@ export class ScoreCalculatorService {
             wordScore += this.letterValue(square, tile);
             wordMultiplier *= this.wordMultiplier(square);
         });
-        return (wordScore *= wordMultiplier);
+        return wordScore * wordMultiplier;
     }
 
     private letterValue(square: Square, tile: Tile): number {

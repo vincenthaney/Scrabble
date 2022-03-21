@@ -16,7 +16,7 @@ export default class Player {
     }
 
     getTileRackPoints(): number {
-        return this.tiles.reduce((prev, next) => (prev += next.value), 0);
+        return this.tiles.reduce((prev, next) => prev + next.value, 0);
     }
 
     hasTilesLeft(): boolean {
@@ -28,6 +28,6 @@ export default class Player {
     }
 
     tilesToString(): string {
-        return this.tiles.reduce((prev, next) => (prev += next.letter.toLocaleLowerCase()), '');
+        return this.tiles.reduce((prev, next) => prev + next.letter.toLocaleLowerCase(), '');
     }
 }

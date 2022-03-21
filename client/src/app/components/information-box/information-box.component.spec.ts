@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AbstractPlayer, Player } from '@app/classes/player';
@@ -64,11 +64,15 @@ describe('InformationBoxComponent', () => {
         mockRoundManager = new MockRoundManager();
 
         const reRender$ = new Subject();
+        const gameInitialized$ = new Subject();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
         gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
             switch (eventType) {
                 case 'reRender':
                     reRender$.next();
+                    break;
+                case 'gameInitialized':
+                    gameInitialized$.next();
                     break;
             }
         });
@@ -77,6 +81,8 @@ describe('InformationBoxComponent', () => {
             switch (eventType) {
                 case 'reRender':
                     return reRender$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'gameInitialized':
+                    return gameInitialized$.pipe(takeUntil(destroy$)).subscribe(next);
             }
             return new Subscription();
         });
@@ -107,6 +113,10 @@ describe('InformationBoxComponent', () => {
     describe('ngOnInit', () => {
         beforeEach(() => {
             gameServiceSpy.isGameSetUp = true;
+        });
+
+        afterAll(() => {
+            jasmine.clock().uninstall();
         });
 
         it('ngOnInit should create ngUnsubscribe object', () => {
@@ -188,25 +198,36 @@ describe('InformationBoxComponent', () => {
             expect(updateBorderSpy).toHaveBeenCalled();
         });
 
-        it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {
+        it('ngOnInit endRoundEvent subscription should call the functions to end the round', () => {
             const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
-            const ngAfterViewInitSpy = spyOn(component, 'ngAfterViewInit');
 
             gameViewEventManagerSpy.emitGameViewEvent('reRender');
 
             expect(ngOnDestroySpy).toHaveBeenCalled();
             expect(ngOnInitSpy).toHaveBeenCalled();
-            expect(ngAfterViewInitSpy).toHaveBeenCalled();
+        });
+
+        it('ngOnInit reRender subscription should call the functions to rerender the component', () => {
+            const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
+            const ngOnInitSpy = spyOn(component, 'ngOnInit');
+            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder');
+
+            gameViewEventManagerSpy.emitGameViewEvent('reRender');
+
+            expect(ngOnDestroySpy).toHaveBeenCalled();
+            expect(ngOnInitSpy).toHaveBeenCalled();
+            expect(updateBorderSpy).toHaveBeenCalled();
+        });
+
+        it('ngOnInit gameInitialized subscription should call the right functions', async () => {
+            const getIconSpy = spyOn<any>(component, 'getLocalPlayerIcon');
+
+            gameViewEventManagerSpy.emitGameViewEvent('gameInitialized');
+
+            expect(getIconSpy).toHaveBeenCalled();
         });
     });
-
-    it('ngAfterViewInit should call updateActivePlayerBorder', fakeAsync(() => {
-        const spy = spyOn(component, 'updateActivePlayerBorder');
-        component.ngAfterViewInit();
-        tick(1);
-        expect(spy).toHaveBeenCalled();
-    }));
 
     describe('ngOndestroy', () => {
         beforeEach(() => {

@@ -221,7 +221,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                     (square: Square) =>
                         square.position.row === squareView.square.position.row && square.position.column === squareView.square.position.column,
                 )
-                .map((sameSquare: Square) => {
+                .forEach((sameSquare: Square) => {
                     squareView.square = sameSquare;
                     squareView.applied = true;
                 });
