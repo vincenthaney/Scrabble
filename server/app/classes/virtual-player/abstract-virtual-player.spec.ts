@@ -6,6 +6,7 @@ import PointRange from '@app/classes/word-finding/point-range';
 import { AbstractVirtualPlayer } from './abstract-virtual-player';
 import * as chai from 'chai';
 import { expect } from 'chai';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 class TestClass extends AbstractVirtualPlayer {
     findAction(): void {
         return;
@@ -46,5 +47,9 @@ describe('AbstractVirtualPlayer', () => {
     it('should return true when getActiveGameService', () => {
         const activeGameServiceTest = abstractPlayer.getActiveGameService();
         expect(abstractPlayer['activeGameService']).to.equal(activeGameServiceTest);
+    });
+
+    it('should return virtualPlayerService', () => {
+        expect(abstractPlayer.getVirtualPlayerService() instanceof VirtualPlayerService).to.be.true;
     });
 });
