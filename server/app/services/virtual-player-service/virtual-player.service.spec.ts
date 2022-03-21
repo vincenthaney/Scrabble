@@ -1,10 +1,8 @@
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { VirtualPlayerService } from './virtual-player.service';
-import { StatusCodes } from 'http-status-codes';
-import * as mockttp from 'mockttp'
+import * as mockttp from 'mockttp';
 import * as chai from 'chai';
 import * as spies from 'chai-spies';
-import { environment } from '@app/environments/environment';
 import Player from '@app/classes/player/player';
 import Game from '@app/classes/game/game';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
@@ -12,8 +10,8 @@ import { GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constan
 import { GameConfig, StartGameData } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game-type';
 import { Square } from '@app/classes/square';
-
-const expect = chai.expect;
+import { expect } from 'chai';
+import { StatusCodes } from 'http-status-codes';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';
@@ -57,9 +55,9 @@ const DEFAULT_GAME_UPDATE_DATA = {
 
 describe('VirtualPlayerService', () => {
     let virtualPlayerService: VirtualPlayerService;
-    let mockServer: mockttp.Mockttp;
-    beforeEach(() => {
-        mockServer = mockttp.getLocal();
+    let mockServer:  mockttp.Mockttp;
+
+    beforeEach( async () => {
         virtualPlayerService = new VirtualPlayerService();
     });
 
@@ -77,21 +75,18 @@ describe('VirtualPlayerService', () => {
 
     describe('sendAction', () => {
         it('should call fetch', async () => {
+            mockServer = mockttp.getLocal();
+            await mockServer.start(3000);
             const TEST_GAME_ID = 'coocookachoo';
             const TEST_PLAYER_ID = 'IAmTheWalrus';
             const TEST_ACTION: ActionData = { type: ActionType.PLACE, input: '', payload: {} };
-            const endpoint = `/games/${TEST_GAME_ID}/players/${TEST_PLAYER_ID}/action`;
-            chai.spy.on(virtualPlayerService, 'getEndpoint', () => {mockServer.url})
-            await mockServer.forPost(endpoint).thenReply(StatusCodes.NO_CONTENT, 'Action played');
-            const response = virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
-            console.log((await response));
-            expect(response).to.equal('Action played');
-        });
-    });
-
-    describe('getEndPoint', () => {
-        it('should return endpoint', async () => {
-            expect(virtualPlayerService['getEndPoint']).to.equal(environment.serverUrl);
+            const endpoint = `/api/games/${TEST_GAME_ID}/players/${TEST_PLAYER_ID}/action`;
+            chai.spy.on(virtualPlayerService, 'getEndpoint', () => mockServer.url)
+            console.log(mockServer.url);
+            await mockServer.forPost(endpoint).thenReply(StatusCodes.NO_CONTENT);
+            const response = await virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
+            expect(response.status).to.equal(StatusCodes.NO_CONTENT);
+            mockServer.stop();
         });
     });
 
