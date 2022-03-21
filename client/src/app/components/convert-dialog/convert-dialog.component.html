@@ -36,7 +36,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align='end'>
     <ng-container>
-        <button mat-button mat-dialog-close  (click)='handleReturnClick(btn)'>Retourner en attente</button>
+        <button mat-button mat-dialog-close  (click)='returnToWaiting()'>Retourner en attente</button>
         <div class="buttons">
             <div
                 class="button-container"
@@ -44,7 +44,7 @@
                 [matTooltipDisabled]="isFormValid()"
                 matTooltipPosition="above"
             >
-                <button mat-flat-button color="primary" type="submit" id="convert-game-button" [disabled]="!isFormValid()" cdkFocusInitial>
+                <button mat-flat-button color="primary" type="submit" id="convert-game-button" [disabled]="!isFormValid()" (click)='handleConvertToSolo()' cdkFocusInitial>
                     Démarrer la partie solo
                 </button>
             </div>

@@ -1,5 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
@@ -19,7 +20,7 @@ export class ConvertDialogComponent implements OnDestroy {
     gameParameters: FormGroup;
     isConverting: boolean;
 
-    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {
+    constructor(@Inject(MAT_DIALOG_DATA) public hostName: string, private router: Router, private gameDispatcherService: GameDispatcherService) {
         this.isConverting = false;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.virtualPlayerNames = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
@@ -32,9 +33,9 @@ export class ConvertDialogComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.returnToWaiting();
         this.pageDestroyed$.next(true);
         this.pageDestroyed$.complete();
-
     }
 
     isFormValid(): boolean {

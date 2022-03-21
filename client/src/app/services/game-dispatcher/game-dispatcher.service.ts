@@ -91,7 +91,7 @@ export default class GameDispatcherService implements OnDestroy {
         if (!this.currentLobby) return;
 
         const gameConfig: GameConfigData = {
-            playerName: this.currentLobby?.hostName as string,
+            playerName: this.currentLobby?.playerName as string,
             playerId: this.gameDispatcherController.socketService.getId(),
             gameType: this.currentLobby?.gameType as GameType,
             gameMode: GameMode.Multiplayer,
@@ -110,7 +110,7 @@ export default class GameDispatcherService implements OnDestroy {
         if (!this.currentLobby) return;
 
         const gameConfig: GameConfigData = {
-            playerName: this.currentLobby?.hostName as string,
+            playerName: this.currentLobby?.playerName as string,
             playerId: this.gameDispatcherController.socketService.getId(),
             gameType: this.currentLobby?.gameType as GameType,
             gameMode: GameMode.Solo,
