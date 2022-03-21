@@ -71,7 +71,7 @@ export default class DictionarySearcher {
     private addChildrenToStack(node: DictionaryNode, letters: string[]): void {
         if (node.getDepth() > this.boardPlacement.maxSize) return;
 
-        const [lettersToUse, removeFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), letters);
+        const [lettersToUse, shouldRemoveFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), letters);
 
         for (const letter of lettersToUse) {
             const child = node.getNode(letter);
@@ -79,7 +79,7 @@ export default class DictionarySearcher {
             if (child) {
                 this.stack.unshift({
                     node: child,
-                    playerLetters: removeFromLetters ? this.getLettersLeft(letters, letter) : [...letters],
+                    playerLetters: shouldRemoveFromLetters ? this.getLettersLeft(letters, letter) : [...letters],
                 });
             }
         }
@@ -89,7 +89,7 @@ export default class DictionarySearcher {
         return this.wordSizeIsWithinBounds(word) && this.nextTileIsEmpty(word) && this.hasAnyNewLetters(word);
     }
 
-    private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
+    private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], shouldRemoveFromLetters: boolean] {
         const alreadyPlacedLetter = this.alreadyPlacedLetters.get(index + 1);
 
         if (alreadyPlacedLetter) return [[alreadyPlacedLetter], false];
