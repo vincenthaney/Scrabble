@@ -25,7 +25,7 @@ export default class DictionarySearcher {
         this.alreadyPlacedLetters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
         this.perpendicularLetters = this.convertPerpendicularWords(boardPlacement.perpendicularLetters);
 
-        this.addChildrenToStack(node, this.copyTiles(playerLetters));
+        this.addChildrenToStack(node, this.convertLetterValues(playerLetters));
     }
 
     hasNext(): boolean {
@@ -124,7 +124,7 @@ export default class DictionarySearcher {
         return perpendicularWords;
     }
 
-    private copyTiles(letters: LetterValue[]): string[] {
+    private convertLetterValues(letters: LetterValue[]): string[] {
         return letters.map((letter) => letter.toLowerCase());
     }
 

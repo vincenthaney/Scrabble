@@ -494,7 +494,7 @@ describe('DictionarySearcher', () => {
         }
     });
 
-    describe('copyTiles', () => {
+    describe('convertLetterValues', () => {
         const tests: [input: LetterValue[], output: string[]][] = [
             [
                 ['A', 'B', 'C'],
@@ -506,7 +506,7 @@ describe('DictionarySearcher', () => {
         let index = 0;
         for (const [input, output] of tests) {
             it(`should copy array and set to lowercase (${index})`, () => {
-                const result = searcher['copyTiles'](input);
+                const result = searcher['convertLetterValues'](input);
 
                 expect(result).to.not.equal(output);
                 expect(result).to.deep.equal(output);
