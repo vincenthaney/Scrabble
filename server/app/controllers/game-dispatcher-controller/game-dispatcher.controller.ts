@@ -51,8 +51,8 @@ export class GameDispatcherController {
             const body: Omit<GameConfigData, 'playerId'> = req.body;
 
             try {
-                const gameId = await this.handleCreateGame({ playerId, ...body });
-                res.status(StatusCodes.CREATED).send({ gameId });
+                const lobbyData = await this.handleCreateGame({ playerId, ...body });
+                res.status(StatusCodes.CREATED).send({ lobbyData });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
