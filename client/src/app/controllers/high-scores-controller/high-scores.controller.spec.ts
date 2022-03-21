@@ -6,7 +6,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { HighScore } from '@app/classes/admin';
 import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';

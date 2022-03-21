@@ -12,9 +12,9 @@ import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import BoardService from '@app/services/board/board.service';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
-import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import BoardService from '@app/services/board-service/board.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -43,10 +43,16 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) => {
             this.handleInitializeGame(initializeValue);
         });
-        this.gameController.newMessageValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newMessage) => {
-            if (newMessage) this.handleNewMessage(newMessage);
-        });
-        this.gameController.gameUpdateValue.pipe(takeUntil(this.serviceDestroyed$)).subscribe((newData) => this.handleGameUpdate(newData));
+        this.gameController
+            .observeNewMessage()
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe((newMessage) => {
+                if (newMessage) this.handleNewMessage(newMessage);
+            });
+        this.gameController
+            .observeGameUpdate()
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe((newData) => this.handleGameUpdate(newData));
     }
 
     ngOnDestroy(): void {

@@ -1,4 +1,5 @@
-// Must disable because the file is too big
+// Must disable because the file is too big. This file comes from FontAwesome and we need it to use their icons.
+// We don't want to modify it as it comes as is and allows us to use new icons without having to modify the file
 /* eslint-disable max-lines */
 
 export interface IconInputs {

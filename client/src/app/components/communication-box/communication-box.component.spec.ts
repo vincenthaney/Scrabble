@@ -22,7 +22,7 @@ import { TileComponent } from '@app/components/tile/tile.component';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
-import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
+import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { marked } from 'marked';
 import { CommunicationBoxComponent } from './communication-box.component';
 
@@ -361,14 +361,23 @@ describe('CommunicationBoxComponent', () => {
         });
     });
 
-    it('scrollToBottom should call scrollTo on viewport', async () => {
-        jasmine.clock().install();
-        const spy = spyOn(component.scrollViewport, 'scrollTo');
-        scrollToBottomSpy.call(component, {});
-        expect(scrollToBottomSpy).toHaveBeenCalled();
-        Promise.resolve().then(() => {
-            jasmine.clock().tick(1);
-            expect(spy).toHaveBeenCalled();
+    describe('scrollToBottom', () => {
+        beforeEach(() => {
+            jasmine.clock().install();
+        });
+
+        afterEach(() => {
+            jasmine.clock().uninstall();
+        });
+
+        it('scrollToBottom should call scrollTo on viewport', async () => {
+            const spy = spyOn(component.scrollViewport, 'scrollTo');
+            scrollToBottomSpy.call(component, {});
+            expect(scrollToBottomSpy).toHaveBeenCalled();
+            Promise.resolve().then(() => {
+                jasmine.clock().tick(1);
+                expect(spy).toHaveBeenCalled();
+            });
         });
     });
 });

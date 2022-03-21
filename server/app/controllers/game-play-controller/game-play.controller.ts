@@ -2,7 +2,7 @@ import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, IS_REQUESTING, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';

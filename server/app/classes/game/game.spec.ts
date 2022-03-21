@@ -11,7 +11,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
-import BoardService from '@app/services/board/board.service';
+import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -90,7 +90,6 @@ describe('Game', () => {
             expect(game.player1).to.exist;
             expect(game.player2).to.exist;
             expect(game.roundManager).to.exist;
-            expect(game.wordsPlayed).to.exist;
             expect(game.gameType).to.exist;
             expect(game['tileReserve']).to.exist;
             expect(game.board).to.exist;

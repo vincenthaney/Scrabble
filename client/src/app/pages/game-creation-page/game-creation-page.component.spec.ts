@@ -136,8 +136,8 @@ describe('GameCreationPageComponent', () => {
 
     describe('ngOndestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
-            const ngUnsubscribeNextSpy = spyOn<any>(component.serviceDestroyed$, 'next');
-            const ngUnsubscribeCompleteSpy = spyOn<any>(component.serviceDestroyed$, 'complete');
+            const ngUnsubscribeNextSpy = spyOn<any>(component.pageDestroyed$, 'next');
+            const ngUnsubscribeCompleteSpy = spyOn<any>(component.pageDestroyed$, 'complete');
 
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();

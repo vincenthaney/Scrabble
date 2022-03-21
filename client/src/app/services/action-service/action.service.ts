@@ -3,7 +3,7 @@ import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActi
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
-import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/command-exception-messages';
+import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { Subject } from 'rxjs';
