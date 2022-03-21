@@ -159,8 +159,10 @@ export default class InputParserService {
                     parsedTiles.push(playerTiles.splice(i, 1)[0]);
                     break;
                 } else if (actionType === ActionType.PLACE && this.isValidBlankTileCombination(playerTiles[i].letter, letter)) {
-                    const tile = playerTiles.splice(i, 1)[0];
-                    parsedTiles.push(new Tile(letter as LetterValue, tile.value, true));
+                    const tile: Tile = playerTiles.splice(i, 1)[0];
+                    const newTile = new Tile(tile.letter, tile.value, true);
+                    newTile.playedLetter = letter as LetterValue;
+                    parsedTiles.push(newTile);
                     break;
                 }
             }
