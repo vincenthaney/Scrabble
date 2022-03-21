@@ -68,7 +68,11 @@ describe('TileRackComponent', () => {
         const usedTiles$ = new Subject();
         const resetUsedTiles$ = new Subject();
         const message$ = new Subject<Message | null>();
-        gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
+        gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', [
+            'emitGameViewEvent',
+            'subscribeToGameViewEvent',
+            'getGameViewEventValue',
+        ]);
         gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
             switch (eventType) {
                 case 'tileRackUpdate':

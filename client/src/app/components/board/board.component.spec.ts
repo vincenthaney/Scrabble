@@ -913,9 +913,11 @@ describe('BoardComponent', () => {
         });
 
         it('should throw if tile is not in previousTiles', () => {
-            getGameViewEventValueSpy.and.returnValue({ tiles: [] });
+            const previousUsedTiles = { tiles: [{ letter: 'A' }, { letter: 'B' }] as Tile[] };
+            getGameViewEventValueSpy.and.returnValue(previousUsedTiles);
+            const tileToRemove: Tile = new Tile('C', 0, false);
 
-            expect(() => component['removeUsedTile'](tile)).toThrowError(CANNOT_REMOVE_UNUSED_TILE);
+            expect(() => component['removeUsedTile'](tileToRemove)).toThrowError(CANNOT_REMOVE_UNUSED_TILE);
         });
 
         it('should remove tile from previousUsedTiles', () => {
