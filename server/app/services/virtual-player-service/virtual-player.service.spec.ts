@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { VirtualPlayerService } from './virtual-player.service';
 import * as mockttp from 'mockttp';
@@ -64,20 +62,6 @@ describe('VirtualPlayerService', () => {
 
     beforeEach(async () => {
         virtualPlayerService = new VirtualPlayerService();
-    });
-
-    describe('isIdVirtualPlayer', () => {
-        it('should return true when id belongs to virtual player', async () => {
-            const TEST_ID = 'virtual-player-1234';
-            expect(() => {
-                VirtualPlayerService.isIdVirtualPlayer(TEST_ID);
-            }).to.be.true;
-        });
-
-        it("should return false when id doesn't belong to virtual player", async () => {
-            const TEST_ID = '1234';
-            expect(VirtualPlayerService.isIdVirtualPlayer(TEST_ID)).to.be.false;
-        });
     });
 
     describe('sendAction', () => {

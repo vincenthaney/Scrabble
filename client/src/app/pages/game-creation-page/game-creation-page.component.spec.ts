@@ -44,7 +44,7 @@ describe('GameCreationPageComponent', () => {
     const EMPTY_VALUE = '';
 
     beforeEach(() => {
-        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleCreateGame']);
+        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleCreateGame', 'subscribeToReceivedGameIdEvent']);
     });
 
     beforeEach(async () => {
@@ -243,12 +243,10 @@ describe('GameCreationPageComponent', () => {
             expect(spy).toHaveBeenCalledWith('waiting-room');
         });
 
-        it('createGame should reroute to game if solo game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
+        it('createGame should call subscribeToReceivedGameIdEvent if solo game', () => {
             component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-
             component.createGame();
-            expect(spy).toHaveBeenCalledWith('game');
+            expect(gameDispatcherSpy.subscribeToReceivedGameIdEvent).toHaveBeenCalled();
         });
 
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
