@@ -87,13 +87,41 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.handleGameCreation(gameConfig);
     }
 
+    handleReturnToWaiting(): void {
+        if (!this.currentLobby) return;
+
+        const gameConfig: GameConfigData = {
+            playerName: this.currentLobby?.hostName as string,
+            playerId: this.gameDispatcherController.socketService.getId(),
+            gameType: this.currentLobby?.gameType as GameType,
+            gameMode: GameMode.Multiplayer,
+            maxRoundTime: this.currentLobby?.maxRoundTime as number,
+            dictionary: this.currentLobby?.dictionary as string,
+        };
+        this.gameDispatcherController.handleGameCreation(gameConfig);
+    }
+
     handleCancelGame(): void {
         if (this.getCurrentLobbyId()) this.gameDispatcherController.handleCancelGame(this.getCurrentLobbyId());
         this.resetServiceData();
     }
 
-    handleConvertToSolo(): void {
-        if (this.gameId) this.gameDispatcherController.handleConvertToSolo(this.gameId);
+    handleConvertToSolo(gameParameters: FormGroup): void {
+        if (!this.currentLobby) return;
+
+        const gameConfig: GameConfigData = {
+            playerName: this.currentLobby?.hostName as string,
+            playerId: this.gameDispatcherController.socketService.getId(),
+            gameType: this.currentLobby?.gameType as GameType,
+            gameMode: GameMode.Solo,
+            maxRoundTime: this.currentLobby?.maxRoundTime as number,
+            dictionary: this.currentLobby?.dictionary as string,
+            virtualPlayerName: gameParameters.get('virtualPlayerName')?.value as string,
+            virtualPlayerLevel: gameParameters.get('level')?.value as VirtualPlayerLevel,
+        };
+        this.gameDispatcherController.handleGameCreation(gameConfig);
+
+        // if (this.gameId) this.gameDispatcherController.handleConvertToSolo(this.gameId);
     }
 
     handleConfirmation(opponentName: string): void {

@@ -79,6 +79,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmConvertToSoloToServer(): void {
+        this.gameDispatcherService.handleCancelGame();
         this.dialog.open(ConvertDialogComponent, {
             data: {
                 hostName: this.host.name,

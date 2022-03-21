@@ -17,8 +17,10 @@ export class ConvertDialogComponent implements OnDestroy {
     playerName: string;
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
+    isConverting: boolean;
 
     constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {
+        this.isConverting = false;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.virtualPlayerNames = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
         this.playerName = '';
@@ -32,20 +34,28 @@ export class ConvertDialogComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.pageDestroyed$.next(true);
         this.pageDestroyed$.complete();
+
     }
 
     isFormValid(): boolean {
-        return this.gameParameters?.valid;
+        return this.gameParameters?.valid && this.gameParameters.get('virtualPlayerName')?.value !== this.playerName;
     }
 
     onSubmit(): void {
         if (this.isFormValid()) {
-            this.createGame();
+            this.isConverting = true;
+            this.handleConvertToSolo();
         }
     }
 
-    createGame(): void {
-        this.router.navigateByUrl('game');
+    handleConvertToSolo(): void {
+        this.gameDispatcherService.handleConvertToSolo(this.gameParameters);
+        // this.router.navigateByUrl('game');
+        // this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
+    }
+
+    returnToWaiting(): void {
+        this.gameDispatcherService.handleReturnToWaiting();
         // this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
     }
 }
