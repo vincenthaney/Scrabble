@@ -142,6 +142,14 @@ describe('TileRackComponent', () => {
         expect(handleUsedTileSpy).toHaveBeenCalled();
     });
 
+    it('should call resetUsedTiles on resetUsedTiles event', () => {
+        const resetSpy: jasmine.Spy = spyOn<any>(component, 'resetUsedTiles').and.callFake(() => {
+            return;
+        });
+        gameViewEventManagerSpy.emitGameViewEvent('resetUsedTiles');
+        expect(resetSpy).toHaveBeenCalled();
+    });
+
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
         component['updateTileRack']();
@@ -645,20 +653,6 @@ describe('TileRackComponent', () => {
             }
         });
 
-        it('should mark all tiles as unused it payload is undefined', () => {
-            component.tiles = [
-                { letter: 'A', isUsed: true },
-                { letter: 'B', isUsed: true },
-                { letter: 'C', isUsed: true },
-            ] as RackTile[];
-
-            component['handleUsedTiles'](undefined);
-
-            for (const tile of component.tiles) {
-                expect(tile.isUsed).toBeFalse();
-            }
-        });
-
         it('should only mark one tile as used if two with same letter', () => {
             component.tiles = [
                 { letter: 'A', isUsed: false },
@@ -672,5 +666,19 @@ describe('TileRackComponent', () => {
             expect(component.tiles[0].isUsed).toBeTrue();
             expect(component.tiles[1].isUsed).toBeFalse();
         });
+    });
+
+    it('resetUsedTiles should reset all used tiles to false', () => {
+        component.tiles = [
+            { letter: 'A', isUsed: true },
+            { letter: 'B', isUsed: true },
+            { letter: 'C', isUsed: true },
+        ] as RackTile[];
+
+        component['resetUsedTiles']();
+
+        for (const tile of component.tiles) {
+            expect(tile.isUsed).toBeFalse();
+        }
     });
 });
