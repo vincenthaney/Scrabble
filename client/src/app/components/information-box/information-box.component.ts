@@ -41,10 +41,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         this.gameViewEventManagerService.subscribeToGameViewEvent('reRender', this.componentDestroyed$, () => {
             this.ngOnDestroy();
             this.ngOnInit();
+            this.updateActivePlayerBorder(this.roundManager.getActivePlayer());
         });
         this.gameViewEventManagerService.subscribeToGameViewEvent('gameInitialized', this.componentDestroyed$, () => {
             this.localPlayerIcon = this.getLocalPlayerIcon();
-            setTimeout(() => this.updateActivePlayerBorder(this.roundManager.getActivePlayer()), 0);
         });
 
         if (!this.gameService.isGameSetUp) return;
