@@ -5,6 +5,7 @@ import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
 import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,13 +17,14 @@ export class ActionService {
     hasActionBeenPlayed: boolean;
     serviceDestroyed$: Subject<boolean>;
 
-    constructor(private gamePlayController: GamePlayController) {
+    constructor(private gamePlayController: GamePlayController, private readonly gameViewEventManagerService: GameViewEventManagerService) {
         this.hasActionBeenPlayed = false;
         this.serviceDestroyed$ = new Subject();
         this.gamePlayController
             .observeActionDone()
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe(() => this.resetHasActionBeenSent());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('resetUsedTiles', this.serviceDestroyed$, () => this.handleResetUsedTiles());
     }
 
     createPlaceActionPayload(tiles: Tile[], startPosition: Position, orientation: Orientation): PlaceActionPayload {
@@ -53,8 +55,6 @@ export class ActionService {
             return;
         }
 
-        if (actionData.type === ActionType.PLACE) this.convertBlankTilesLetter((actionData.payload as PlaceActionPayload).tiles);
-
         this.gamePlayController.sendAction(gameId, playerId, actionData);
         this.hasActionBeenPlayed = true;
     }
@@ -70,17 +70,21 @@ export class ActionService {
         }
     }
 
-    private convertBlankTilesLetter(tiles: Tile[]): void {
-        tiles.forEach((tile) => {
-            if (tile.isBlank && tile.playedLetter) tile.letter = tile.playedLetter;
-        });
-    }
-
     private sendWaitForConfirmationMessage(gameId: string, playerId: string): void {
         this.gamePlayController.sendError(gameId, playerId, WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE(gameId));
     }
 
     private resetHasActionBeenSent(): void {
         this.hasActionBeenPlayed = false;
+    }
+
+    private handleResetUsedTiles(): void {
+        const usedTiles: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (usedTiles) {
+            usedTiles.tiles.forEach((tile: Tile) => {
+                if (tile.isBlank) tile.playedLetter = undefined;
+            });
+        }
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 }

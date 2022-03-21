@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
@@ -13,7 +14,6 @@ import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { ActionService } from '@app/services/action-service/action.service';
-import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
@@ -86,7 +86,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.navigator.setPosition(squareView.square.position);
         }
 
-        this.removeUsedTiles();
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         return true;
     }
@@ -117,7 +117,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     protected onLoseFocusEvent(): void {
-        this.removeUsedTiles();
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
     }
 
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
@@ -157,7 +157,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
             if (index >= 0) this.notAppliedSquares.splice(index, 1);
-            if (this.selectedSquare.square.tile) this.removeUsedTile(this.selectedSquare.square.tile);
+            const tile: Tile | null = this.selectedSquare.square.tile;
+            if (tile) {
+                this.removeUsedTile(tile);
+            }
             this.selectedSquare.square.tile = null;
         }
     }
@@ -174,7 +177,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private clearCursor(): void {
         this.selectedSquare = undefined;
-        this.removeUsedTiles();
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
     }
 
     private initializeBoard(board: Square[][]): void {
@@ -204,7 +207,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private updateBoard(squaresToUpdate: Square[]): boolean {
         if (this.hasBoardBeenUpdated(squaresToUpdate)) return false;
-        this.removeUsedTiles();
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
@@ -233,10 +236,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private isInBounds(position: Position): boolean {
         return position.row < this.squareGrid.length && position.column < this.squareGrid[position.row].length;
-    }
-
-    private removeUsedTiles(): void {
-        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
     }
 
     private handlePlaceTiles(payload: PlaceActionPayload | undefined): void {
@@ -298,7 +297,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (previousUsedTiles.tiles.length > 0) {
             this.gameViewEventManagerService.emitGameViewEvent('usedTiles', { ...previousUsedTiles });
         } else {
-            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+            this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
         }
     }
 

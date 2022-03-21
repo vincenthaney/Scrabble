@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import Direction from '@app/classes/board-navigator/direction';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { Tile } from '@app/classes/tile';
 import { TileRackSelectType } from '@app/classes/tile-rack-select-type';
 import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-constants';
@@ -8,7 +9,6 @@ import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { RACK_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
-import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { preserveArrayOrder } from '@app/utils/preserve-array-order';
@@ -47,6 +47,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.updateTileRack();
         this.gameViewEventManagerService.subscribeToGameViewEvent('tileRackUpdate', this.componentDestroyed$, () => this.updateTileRack());
         this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handleUsedTiles(payload));
+        this.gameViewEventManagerService.subscribeToGameViewEvent('resetUsedTiles', this.componentDestroyed$, () => this.resetUsedTiles());
     }
 
     ngOnDestroy(): void {
@@ -185,17 +186,17 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     private handleUsedTiles(usedTilesPayload: PlaceActionPayload | undefined): void {
-        if (!usedTilesPayload) {
-            this.tiles.forEach((tile) => (tile.isUsed = false));
-            return;
-        }
+        if (!usedTilesPayload) return;
 
         const usedTiles = [...usedTilesPayload.tiles];
-
         for (const tile of this.tiles) {
             const index = usedTiles.findIndex((usedTile) => usedTile.letter === tile.letter);
             tile.isUsed = index >= 0;
             if (index >= 0) usedTiles.splice(index, 1);
         }
+    }
+
+    private resetUsedTiles(): void {
+        this.tiles.forEach((tile) => (tile.isUsed = false));
     }
 }
