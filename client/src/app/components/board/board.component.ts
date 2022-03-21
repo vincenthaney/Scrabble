@@ -86,7 +86,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.navigator.setPosition(squareView.square.position);
         }
 
-        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        if (!this.actionService.hasActionBeenPlayed) this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         return true;
     }
@@ -177,7 +177,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private clearCursor(): void {
         this.selectedSquare = undefined;
-        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        if (!this.actionService.hasActionBeenPlayed) this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
     }
 
     private initializeBoard(board: Square[][]): void {
