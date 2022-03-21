@@ -6,6 +6,7 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
+import { ConvertDialogParameters } from './convert-dialog.component.type';
 
 @Component({
     selector: 'app-convert-dialog',
@@ -20,11 +21,15 @@ export class ConvertDialogComponent implements OnDestroy {
     gameParameters: FormGroup;
     isConverting: boolean;
 
-    constructor(@Inject(MAT_DIALOG_DATA) public hostName: string, private router: Router, private gameDispatcherService: GameDispatcherService) {
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: ConvertDialogParameters,
+        private router: Router,
+        private gameDispatcherService: GameDispatcherService,
+    ) {
         this.isConverting = false;
+        this.playerName = data.hostName;
         this.virtualPlayerLevels = VirtualPlayerLevel;
-        this.virtualPlayerNames = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
-        this.playerName = '';
+        this.virtualPlayerNames = randomizeArray(['Victoria', 'Aristote', 'Herménégilde'].filter((name: string) => name !== this.playerName));
         this.pageDestroyed$ = new Subject();
         this.gameParameters = new FormGroup({
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
@@ -33,30 +38,24 @@ export class ConvertDialogComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.returnToWaiting();
+        if (!this.isConverting) this.returnToWaiting();
         this.pageDestroyed$.next(true);
         this.pageDestroyed$.complete();
     }
 
-    isFormValid(): boolean {
-        return this.gameParameters?.valid && this.gameParameters.get('virtualPlayerName')?.value !== this.playerName;
-    }
-
     onSubmit(): void {
-        if (this.isFormValid()) {
-            this.isConverting = true;
-            this.handleConvertToSolo();
-        }
+        this.isConverting = true;
+        this.handleConvertToSolo();
     }
 
     handleConvertToSolo(): void {
-        this.gameDispatcherService.handleConvertToSolo(this.gameParameters);
-        // this.router.navigateByUrl('game');
-        // this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
+        this.gameDispatcherService.handleRecreateGame(this.gameParameters);
+        this.gameDispatcherService.subscribeToReceivedGameIdEvent(this.pageDestroyed$, () => {
+            this.router.navigateByUrl('game');
+        });
     }
 
     returnToWaiting(): void {
-        this.gameDispatcherService.handleReturnToWaiting();
-        // this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
+        this.gameDispatcherService.handleRecreateGame();
     }
 }
