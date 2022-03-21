@@ -287,18 +287,17 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         const previousUsedTiles = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
 
         if (!previousUsedTiles) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
+        if (previousUsedTiles.tiles.length <= 1) {
+            this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+            return;
+        }
 
         const index = previousUsedTiles.tiles.findIndex((t: Tile) => t.letter === tile.letter);
 
         if (index === NOT_FOUND) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
         previousUsedTiles.tiles.splice(index, 1);
-
-        if (previousUsedTiles.tiles.length > 0) {
-            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', { ...previousUsedTiles });
-        } else {
-            this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
-        }
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', { ...previousUsedTiles });
     }
 
     private areTilesUsed(): boolean {
