@@ -77,6 +77,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         if (squareView.square.tile !== null) return false;
         if (!this.gameService.isLocalPlayerPlaying()) return false;
+        if (this.actionService.hasActionBeenPlayed) {
+            this.clearCursor();
+            return false;
+        }
 
         if (this.selectedSquare === squareView && this.notAppliedSquares.length === 0) {
             this.navigator.switchOrientation();
@@ -86,7 +90,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.navigator.setPosition(squareView.square.position);
         }
 
-        if (!this.actionService.hasActionBeenPlayed) this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         return true;
     }
@@ -121,7 +125,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
-        if (!squareView) return;
+        if (!squareView || this.actionService.hasActionBeenPlayed) return;
 
         letter = removeAccents(letter.toUpperCase());
 
@@ -152,7 +156,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handleBackspace(): void {
-        if (!this.selectedSquare || !this.areTilesUsed()) return;
+        if (this.cannotBackspace()) return;
         this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
@@ -165,6 +169,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
+    private cannotBackspace(): boolean {
+        return !this.selectedSquare || !this.areTilesUsed() || this.actionService.hasActionBeenPlayed;
+    }
+
     private handleEnter(): void {
         const placePayload: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
         if (!placePayload) return;
@@ -173,6 +181,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             this.gameService.getLocalPlayerId(),
             this.actionService.createActionData(ActionType.PLACE, placePayload),
         );
+        this.clearCursor();
     }
 
     private clearCursor(): void {
