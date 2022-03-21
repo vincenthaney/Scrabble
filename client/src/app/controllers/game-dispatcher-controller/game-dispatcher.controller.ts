@@ -54,11 +54,6 @@ export class GameDispatcherController implements OnDestroy {
         });
     }
 
-    // handleConvertToSolo(gameId: string): void {
-    //     const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/convert`;
-    //     this.http.post(endpoint, {}).subscribe();
-    // }
-
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/accept`;
         this.http.post(endpoint, { opponentName }).subscribe();

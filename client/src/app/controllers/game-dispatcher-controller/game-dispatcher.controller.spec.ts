@@ -141,24 +141,6 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleConvertToSolo', () => {
-        it('handleConvertToSolo should make an HTTP post request', () => {
-            const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
-            controller.handleConvertToSolo(DEFAULT_GAME_ID);
-            expect(httpPostSpy).toHaveBeenCalled();
-        });
-
-        it('handleConvertToSolo should subscribe after making an HTTP post request', async () => {
-            spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
-            const observable = new Observable();
-            spyOn(controller['http'], 'post').and.returnValue(observable);
-            const spy = spyOn(observable, 'subscribe');
-
-            controller.handleConvertToSolo({} as unknown as string);
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('handleRejectionGameCreation', () => {
         it('handleRejectionGameCreation should make an HTTP post request', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
