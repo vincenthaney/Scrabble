@@ -52,6 +52,7 @@ describe('GameDispatcherService', () => {
     let getCurrentLobbyIdSpy: jasmine.Spy;
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
+    let socketServiceMock: SocketService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -62,6 +63,7 @@ describe('GameDispatcherService', () => {
 
         getCurrentLobbyIdSpy = spyOn(service, 'getCurrentLobbyId').and.returnValue(BASE_GAME_ID);
         gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
+        socketServiceMock = TestBed.inject(SocketService);
     });
 
     it('should be created', () => {
@@ -263,29 +265,51 @@ describe('GameDispatcherService', () => {
             service.handleCancelGame();
             expect(resetDataSpy).toHaveBeenCalled();
         });
+
+        it('should call not call resetData if mustResetData = false', () => {
+            service.handleCancelGame(false);
+            expect(resetDataSpy).not.toHaveBeenCalled();
+        });
     });
 
-    describe('handleConvertToSolo', () => {
-        let convertSpy: jasmine.Spy;
+    describe('handleRecreateGame', () => {
+        let createSpy: jasmine.Spy;
 
         beforeEach(() => {
-            convertSpy = spyOn(service['gameDispatcherController'], 'handleConvertToSolo');
+            createSpy = spyOn(service['gameDispatcherController'], 'handleGameCreation');
+            spyOn(socketServiceMock, 'getId').and.returnValue('socketid');
         });
 
         afterEach(() => {
-            convertSpy.calls.reset();
+            createSpy.calls.reset();
         });
 
-        it('should call handleCancelGame if gameId is defined', () => {
-            service.gameId = BASE_GAME_ID;
-            service.handleConvertToSolo();
-            expect(convertSpy).toHaveBeenCalled();
+        const gameParametersForm: FormGroup = new FormGroup({
+            level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
+            virtualPlayerName: new FormControl('', Validators.required),
+        });
+        const formValues = {
+            virtualPlayerName: 'JVname',
+            level: VirtualPlayerLevel.Beginner,
+        };
+        gameParametersForm.setValue(formValues);
+
+        it('should call handleGameCreation if the lobby is defined and create a SoloGame', () => {
+            service.currentLobby = TEST_LOBBY_INFO;
+            service.handleRecreateGame(gameParametersForm);
+            expect(createSpy).toHaveBeenCalled();
+        });
+
+        it('should call handleGameCreation if the lobby is defined  and create a MultiplayerGame', () => {
+            service.currentLobby = TEST_LOBBY_INFO;
+            service.handleRecreateGame();
+            expect(createSpy).toHaveBeenCalled();
         });
 
         it('should not call handleCancelGame if gameId is undefined', () => {
-            service.gameId = '';
-            service.handleConvertToSolo();
-            expect(convertSpy).not.toHaveBeenCalled();
+            service.currentLobby = undefined;
+            service.handleRecreateGame();
+            expect(createSpy).not.toHaveBeenCalled();
         });
     });
 

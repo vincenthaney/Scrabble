@@ -157,30 +157,6 @@ export class GameDispatcherController {
                 HttpException.sendError(exception, res);
             }
         });
-
-        this.router.post('/games/:gameId/players/:playerId/convert', (req: GameRequest, res: Response) => {
-            const { gameId, playerId } = req.params;
-
-            try {
-                this.handleConvertToSolo(gameId, playerId);
-
-                res.status(StatusCodes.NO_CONTENT).send();
-            } catch (exception) {
-                HttpException.sendError(exception, res);
-            }
-        });
-    }
-
-    // TODO: Implement rest of function
-    // eslint-disable-next-line no-unused-vars
-    private handleConvertToSolo(gameId: string, playerId: string): void {
-        const waitingRoom = this.gameDispatcherService.getGameFromId(gameId);
-        if (waitingRoom.joinedPlayer) {
-            this.socketService.emitToSocket(waitingRoom.joinedPlayer.id, 'canceledGame', { name: waitingRoom.getConfig().player1.name });
-        }
-        // this.gameDispatcherService.convertGame(gameId, playerId);
-
-        this.handleLobbiesUpdate();
     }
 
     private handleCancelGame(gameId: string, playerId: string): void {
