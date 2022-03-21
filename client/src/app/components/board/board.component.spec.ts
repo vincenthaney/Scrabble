@@ -708,12 +708,12 @@ describe('BoardComponent', () => {
             component.ngOnInit();
         });
 
-        it('should emit resetUsedTile event', () => {
-            const spy = spyOn<any>(component['gameViewEventManagerService'], 'emitGameViewEvent');
+        it('should call clearCursor', () => {
+            const spy = spyOn<any>(component, 'clearCursor');
 
             component['onLoseFocusEvent']!();
 
-            expect(spy).toHaveBeenCalledWith('resetUsedTiles');
+            expect(spy).toHaveBeenCalled();
         });
     });
 

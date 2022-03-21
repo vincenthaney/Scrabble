@@ -117,7 +117,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     protected onLoseFocusEvent(): void {
-        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        this.clearCursor();
     }
 
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
