@@ -106,7 +106,6 @@ describe('ActionService', () => {
     describe('sendAction', () => {
         let errorMessageSpy: jasmine.Spy;
         let sendActionSpy: jasmine.Spy;
-        let convertBlankTilesLetterSpy: jasmine.Spy;
         let actionData: ActionData<ExchangeActionPayload>;
 
         beforeEach(() => {
@@ -114,9 +113,6 @@ describe('ActionService', () => {
                 return;
             });
             sendActionSpy = spyOn(service['gamePlayController'], 'sendAction').and.callFake(() => {
-                return;
-            });
-            convertBlankTilesLetterSpy = spyOn<any>(service, 'convertBlankTilesLetter').and.callFake(() => {
                 return;
             });
             actionData = {
@@ -137,14 +133,6 @@ describe('ActionService', () => {
             service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(sendActionSpy).not.toHaveBeenCalled();
             expect(errorMessageSpy).toHaveBeenCalledWith(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-        });
-
-        it('should convert blank tiles before PLACE action is sent', () => {
-            actionData.type = ActionType.PLACE;
-            actionData.payload = PLACE_PAYLOAD;
-            service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
-
-            expect(convertBlankTilesLetterSpy).toHaveBeenCalledWith(actionData.payload.tiles);
         });
 
         it('should call gamePlayController.sendAction with provided data', () => {
@@ -176,51 +164,6 @@ describe('ActionService', () => {
             service['createInputFromPayload'](ActionType.PASS, {});
             expect(spy).toHaveBeenCalled();
         });
-    });
-
-    it('convertBlankTilesLetter should set letter to playedLetter if tile is blank', () => {
-        const originalTiles: Tile[] = [
-            {
-                letter: '*',
-                value: 0,
-                playedLetter: 'A',
-                isBlank: true,
-            },
-            {
-                letter: '*',
-                value: 0,
-                isBlank: true,
-            },
-            {
-                letter: '*',
-                value: 0,
-                playedLetter: 'A',
-            },
-        ];
-
-        const payload = { ...PLACE_PAYLOAD, tiles: originalTiles };
-        const expectedTiles: Tile[] = [
-            {
-                letter: 'A',
-                value: 0,
-                playedLetter: 'A',
-                isBlank: true,
-            },
-            {
-                letter: '*',
-                value: 0,
-                isBlank: true,
-            },
-            {
-                letter: '*',
-                value: 0,
-                playedLetter: 'A',
-            },
-        ];
-        const expectedResult = { ...PLACE_PAYLOAD, tiles: expectedTiles };
-
-        service['convertBlankTilesLetter'](payload.tiles);
-        expect(payload).toEqual(expectedResult);
     });
 
     it('sendWaitForConfirmationMessage should sendError to gamePlayController', () => {
