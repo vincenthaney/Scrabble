@@ -23,9 +23,9 @@ export class PlacementToString {
         return `${this.positionNumberToLetter(position.row)}${position.column + 1}${this.orientationToLetter(orientation)}`;
     }
 
-    static tilesToString(tiles: Tile[]): string {
+    static tilesToString(tiles: Tile[], inUpperCase: boolean = false): string {
         return tiles.reduce((str, tile) => {
-            return str + this.tileToLetterConversion(tile);
+            return str + this.tileToLetterConversion(tile, inUpperCase);
         }, '');
     }
 
@@ -36,7 +36,7 @@ export class PlacementToString {
         )} ${this.tilesToString(placement.tilesToPlace)}`;
     }
 
-    private static tileToLetterConversion(tile: Tile): string {
-        return tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
+    private static tileToLetterConversion(tile: Tile, inUpperCase: boolean = false): string {
+        return inUpperCase || tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
     }
 }

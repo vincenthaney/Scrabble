@@ -279,7 +279,6 @@ describe('InformationBoxComponent', () => {
             component.startTimer(new Timer(1, 0));
             const spy = spyOn(component.timerSubscription, 'unsubscribe');
             component.timerSubscription = undefined as unknown as Subscription;
-            // spyOnProperty<any>(component, 'timerSubscription', 'set').and.returnValue(null);
             component.endRound();
             expect(spy).not.toHaveBeenCalled();
         });
