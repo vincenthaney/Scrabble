@@ -3,11 +3,11 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
-import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { MessageStorageService } from '@app/services/message-storage-service/message-storage.service';
@@ -30,7 +30,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
 
-    loading: boolean = false;
     componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
@@ -72,10 +71,9 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     onSendMessage(): void {
         const message = this.messageForm.get('content')?.value;
-        if (message && message.length > 0 && !this.loading) {
+        if (message && message.length > 0) {
             this.inputParser.handleInput(message);
             this.messageForm.reset({ content: '' });
-            this.loading = true;
         }
     }
 
@@ -126,7 +124,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();
-        if (newMessage.senderId !== OPPONENT_ID) this.loading = false;
         this.messageStorageService.saveMessage(newMessage);
     }
 
