@@ -4,6 +4,17 @@
     background: $page-background;
 }
 
+$border-radius: 6px;
+
+:host ::ng-deep {
+    span.mat-button-toggle-label-content {
+        line-height: 1em;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        border-radius: $border-radius;
+    }
+}
 
 $border-radius: 6px;
 
