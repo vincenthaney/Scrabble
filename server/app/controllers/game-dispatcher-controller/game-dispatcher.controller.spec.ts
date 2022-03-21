@@ -28,6 +28,7 @@ import {
 import { SYSTEM_ID } from '@app/constants/game';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
@@ -85,7 +86,6 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
     dictionary: DEFAULT_DICTIONARY,
 };
 
-const DEFAULT_ROOM = new WaitingRoom(DEFAULT_GAME_CONFIG);
 const DEFAULT_EXCEPTION = 'exception';
 
 const DEFAULT_PLAYER = new Player(VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
@@ -109,12 +109,14 @@ const DEFAULT_STARTING_GAME_DATA: StartGameData = {
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
     let socketServiceStub: SinonStubbedInstance<SocketService>;
+    let createGameServiceStub: SinonStubbedInstance<CreateGameService>;
 
     beforeEach(() => {
         Container.reset();
         Container.set(DictionaryService, getDictionaryTestService());
         controller = Container.get(GameDispatcherController);
         socketServiceStub = createStubInstance(SocketService);
+        createGameServiceStub = createStubInstance(CreateGameService);
         controller['socketService'] = socketServiceStub as unknown as SocketService;
     });
 
@@ -371,82 +373,29 @@ describe('GameDispatcherController', () => {
     });
 
     describe('handleCreateGame', async () => {
-        let startGameDataSpy: unknown;
-        let addToRoomSpy: unknown;
-        let sliceVirtualPlayerToPlayerSpy: unknown;
-        let socketServiceSpy: unknown;
-        let virtualPlayerServiceSpy: unknown;
-        let activeGameServiceSpy: unknown;
-
         beforeEach(() => {
-            startGameDataSpy = spy.on(controller['createGameService'], 'createSoloGame', () => {
+            controller['createGameService'] = createGameServiceStub as unknown as CreateGameService;
+            spy.on(controller['createGameService'], 'createSoloGame', () => {
                 return DEFAULT_STARTING_GAME_DATA;
             });
-            addToRoomSpy = spy.on(controller['socketService'], 'addToRoom', () => {});
-            sliceVirtualPlayerToPlayerSpy = spy.on(controller['virtualPlayerService'], 'sliceVirtualPlayerToPlayer', () => {
-                return DEFAULT_PLAYER;
-            });
-            socketServiceSpy = spy.on(controller['socketService'], 'emitToSocket', () => {});
-            virtualPlayerServiceSpy = spy.on(controller['virtualPlayerService'], 'triggerVirtualPlayerTurn', () => {});
-            activeGameServiceSpy = spy.on(controller['activeGameService'], 'getGame', () => {});
         });
+
         afterEach(() => {
             chai.spy.restore();
         });
 
-        it('should call createGameService.createSoloGame', async () => {
-            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(startGameDataSpy).to.have.been.called();
-        });
-
-        it('should call socketService.addToRoom', async () => {
-            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(addToRoomSpy).to.have.been.called();
-        });
-
-        it('should call virtualPlayerService.sliceVirtualPlayerToPlayer', async () => {
-            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
-        });
-
-        it('should call socketService.emitToSocket', async () => {
-            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(socketServiceSpy).to.have.been.called();
-        });
-
-        it('should call virtualPlayerService.triggerVirtualPlayerTurn', async () => {
-            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(virtualPlayerServiceSpy).to.have.been.called();
-        });
-
-        it('should call activeGameService.getGame', async () => {
-            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(activeGameServiceSpy).to.have.been.called();
-        });
-
-        it('should return game id', async () => {
-            chai.spy.on(controller['createGameService'], 'createMultiplayerGame', () => {
-                return DEFAULT_ROOM;
+        it('should call createSoloGame', async () => {
+            const createGameServiceSpy = chai.spy.on(controller, 'handleCreateSoloGame', () => {
+                return;
             });
-            stub(WaitingRoom.prototype, 'getId').returns(DEFAULT_GAME_ID);
-            chai.spy.on(controller['gameDispatcherService'], 'addToWaitingRoom', () => {});
-            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
-            const id = await controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
-            expect(id).to.equal(DEFAULT_GAME_ID);
-        });
-
-        it('should call createGameService.createMultiplayerGame', () => {
-            const createGameServiceSpy = chai.spy.on(controller['createGameService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
-            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
-            controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createGameServiceSpy).to.have.been.called();
         });
 
-        it('should call socketService.addToRoom', () => {
-            chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
-            chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
+        it('should call createMultiplayerGame', () => {
+            const createGameServiceSpy = chai.spy.on(controller, 'handleCreateMultiplayerGame', () => DEFAULT_GAME_ID);
             controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
-            expect(addToRoomSpy).to.have.been.called();
+            expect(createGameServiceSpy).to.have.been.called();
         });
 
         it('should throw if config.playerName is undefined', async () => {

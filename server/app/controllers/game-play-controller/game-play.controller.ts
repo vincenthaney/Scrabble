@@ -1,6 +1,5 @@
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { LobbyData } from '@app/classes/communication/lobby-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http-exception/http-exception';
@@ -31,10 +30,10 @@ export class GamePlayController {
         this.configureRouter();
     }
 
-    gameUpdate(lobbyData: LobbyData, data: GameUpdateData): void {
-        this.socketService.emitToRoom(lobbyData.lobbyId, 'gameUpdate', data);
+    gameUpdate(gameId: string, data: GameUpdateData): void {
+        this.socketService.emitToRoom(gameId, 'gameUpdate', data);
         if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
-            this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(lobbyData.lobbyId, data.round.playerData.id));
+            this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
         }
     }
 

@@ -19,6 +19,7 @@ import { CreateGameService } from '@app/services/create-game-service/create-game
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
 
 @Service()
 export class GameDispatcherService {
@@ -58,14 +59,19 @@ export class GameDispatcherService {
                 this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
             );
         }
-        return 
+        const startGameConfig: GameConfig = {
+            ...config,
+            player1: startGameData.player1,
+        };
+
+        return convertToLobbyData(startGameConfig, gameId);
     }
 
     createMultiplayerGame(config: GameConfigData): LobbyData {
         const waitingRoom = this.createGameService.createMultiplayerGame(config);
         this.addToWaitingRoom(waitingRoom);
         this.socketService.addToRoom(config.playerId, waitingRoom.getId());
-        return waitingRoom.convertToLobbyData();
+        return convertToLobbyData(waitingRoom.getConfig(), waitingRoom.getId());
     }
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
@@ -149,14 +155,7 @@ export class GameDispatcherService {
         const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
         const lobbyData: LobbyData[] = [];
         for (const room of waitingRooms) {
-            const config = room.getConfig();
-            lobbyData.push({
-                dictionary: config.dictionary,
-                playerName: config.player1.name,
-                maxRoundTime: config.maxRoundTime,
-                lobbyId: room.getId(),
-                gameType: config.gameType,
-            });
+            lobbyData.push(convertToLobbyData(room.getConfig(), room.getId()));
         }
 
         return lobbyData;

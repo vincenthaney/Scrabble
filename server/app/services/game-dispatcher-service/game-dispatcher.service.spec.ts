@@ -87,6 +87,38 @@ describe('GameDispatcherService', () => {
         });
     });
 
+    // describe('createSoloGame', () => {
+    //     it('should call createGameService.createSoloGame', async () => {
+    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+    //         expect(startGameDataSpy).to.have.been.called();
+    //     });
+
+    //     it('should call socketService.addToRoom', async () => {
+    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+    //         expect(addToRoomSpy).to.have.been.called();
+    //     });
+
+    //     it('should call virtualPlayerService.sliceVirtualPlayerToPlayer', async () => {
+    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+    //         expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
+    //     });
+
+    //     it('should call socketService.emitToSocket', async () => {
+    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+    //         expect(socketServiceSpy).to.have.been.called();
+    //     });
+
+    //     it('should call virtualPlayerService.triggerVirtualPlayerTurn', async () => {
+    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+    //         expect(virtualPlayerServiceSpy).to.have.been.called();
+    //     });
+
+    //     it('should call activeGameService.getGame', async () => {
+    //         await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+    //         expect(activeGameServiceSpy).to.have.been.called();
+    //     });
+    // });
+
     describe('requestJoinGame', () => {
         let id: string;
 
