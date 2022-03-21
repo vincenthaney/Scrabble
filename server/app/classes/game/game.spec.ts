@@ -121,8 +121,9 @@ describe('Game', () => {
         });
 
         it('initTileReserve should call init ', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const initStub = tileReserveStub.init.callsFake(async () => {});
+            const initStub = tileReserveStub.init.callsFake(async () => {
+                return;
+            });
             await game.initTileReserve();
             assert(initStub.calledOnce);
         });
@@ -170,7 +171,9 @@ describe('Game', () => {
                 expect(game.isPlayerReal(DEFAULT_PLAYER_1_ID)).to.equal(true);
             });
             it('should return false when player is virtual player', async () => {
-                spy.on(game, 'getPlayer', () => { return DEFAULT_VIRTUAL_PLAYER})
+                spy.on(game, 'getPlayer', () => {
+                    return DEFAULT_VIRTUAL_PLAYER;
+                });
                 expect(game.isPlayerReal(DEFAULT_VIRTUAL_PLAYER_ID)).to.equal(false);
             });
         });

@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { GameConfig, GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
@@ -46,7 +47,8 @@ describe('CreateGameService', async () => {
 
     afterEach(() => {
         chai.spy.restore();
-    })
+    });
+
     describe('createSoloGame', () => {
         it('should call activeGameService.beginGame', () => {
             spy.on(createGameService, 'generateGameConfig', () => {
@@ -74,7 +76,7 @@ describe('CreateGameService', async () => {
             });
             createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(generateReadyGameConfigSpy).to.have.been.called();
-        })
+        });
     });
 
     describe('createMultiplayerGame', () => {
@@ -92,7 +94,7 @@ describe('CreateGameService', async () => {
             const configSpy = spy.on(createGameService, 'generateGameConfig');
             createGameService.createMultiplayerGame(DEFAULT_GAME_CONFIG_DATA);
             expect(configSpy).to.have.been.called();
-        })
+        });
     });
 
     describe('generateReadyGameConfig', () => {
@@ -102,9 +104,8 @@ describe('CreateGameService', async () => {
             const DEFAULT_READY_GAME_CONFIG = {
                 ...DEFAULT_GAME_CONFIG,
                 player2: DEFAULT_PLAYER_2,
-            } 
+            };
             expect(newReadyGameConfig).to.deep.equal(DEFAULT_READY_GAME_CONFIG);
         });
     });
 });
-

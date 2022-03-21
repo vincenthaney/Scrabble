@@ -24,10 +24,6 @@ export class VirtualPlayerService {
         });
     }
 
-    private getEndPoint(): string{
-        return environment.serverUrl;
-    }
-
     triggerVirtualPlayerTurn(data: StartGameData | GameUpdateData, game: Game): void {
         if (!data.round) throw new Error(GAME_SHOULD_CONTAIN_ROUND);
         const virtualPlayer = game.getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
@@ -39,5 +35,9 @@ export class VirtualPlayerService {
         player.tiles = virtualPlayer.tiles;
         player.isConnected = virtualPlayer.isConnected;
         return player;
+    }
+
+    private getEndPoint(): string {
+        return environment.serverUrl;
     }
 }
