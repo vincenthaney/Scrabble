@@ -12,7 +12,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
@@ -311,6 +311,7 @@ describe('GamePlayController', () => {
             expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_PLAYER_ID, 'newMessage', {
                 content: COMMAND_IS_INVALID(DEFAULT_DATA.input) + DEFAULT_ERROR_MESSAGE,
                 senderId: SYSTEM_ERROR_ID,
+                gameId: DEFAULT_GAME_ID,
             });
         });
 
@@ -397,6 +398,7 @@ describe('GamePlayController', () => {
             const validMessage: Message = {
                 content: DEFAULT_MESSAGE_CONTENT,
                 senderId: DEFAULT_PLAYER_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             gamePlayController['handleNewMessage'](DEFAULT_GAME_ID, validMessage);
             expect(emitToRoomSpy).to.have.been.called();
@@ -411,23 +413,24 @@ describe('GamePlayController', () => {
         });
 
         it('should throw if message.senderId is undefined', () => {
-            expect(() => gamePlayController['handleNewError'](DEFAULT_GAME_ID, { content: DEFAULT_MESSAGE_CONTENT } as Message)).to.throw(
-                SENDER_REQUIRED,
-            );
+            expect(() =>
+                gamePlayController['handleNewError'](DEFAULT_PLAYER_ID, DEFAULT_GAME_ID, { content: DEFAULT_MESSAGE_CONTENT } as Message),
+            ).to.throw(SENDER_REQUIRED);
         });
 
         it('should throw if message.content is undefined', () => {
-            expect(() => gamePlayController['handleNewError'](DEFAULT_GAME_ID, { senderId: DEFAULT_PLAYER_ID } as Message)).to.throw(
-                CONTENT_REQUIRED,
-            );
+            expect(() =>
+                gamePlayController['handleNewError'](DEFAULT_PLAYER_ID, DEFAULT_GAME_ID, { senderId: DEFAULT_PLAYER_ID } as Message),
+            ).to.throw(CONTENT_REQUIRED);
         });
 
         it('should call emitToRoom if message is valid', () => {
             const validMessage: Message = {
                 content: DEFAULT_MESSAGE_CONTENT,
                 senderId: DEFAULT_PLAYER_ID,
+                gameId: DEFAULT_GAME_ID,
             };
-            gamePlayController['handleNewError'](DEFAULT_GAME_ID, validMessage);
+            gamePlayController['handleNewError'](DEFAULT_PLAYER_ID, DEFAULT_GAME_ID, validMessage);
             expect(emitToRoomSpy).to.have.been.called();
         });
     });

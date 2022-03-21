@@ -69,8 +69,8 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
-        let scoreCount = this.pointHistory.get(scoredWordPlacement.score);
-        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? ++scoreCount : 1);
+        const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
+        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
     }
 
     getGameBoard(gameId: string, playerId: string): Board {

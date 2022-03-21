@@ -18,8 +18,8 @@ import {
     HOST_WAITING_MESSAGE,
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
-import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
 import { of } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 
@@ -372,7 +372,7 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     describe('convertSolo button', () => {
-        // it('should be enabled when the game is created and no opponent has joined it.', () => {
+        // it('should be enabled when the game is created and no opponent has joined it', () => {
         //     const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
         //     expect(convertSoloButton.disabled).toBeFalsy();
         // });
@@ -383,7 +383,7 @@ describe('CreateWaitingPageComponent', () => {
         });
     });
 
-    it('cancelButton should be enabled when the game is created and no opponent has joined it.', () => {
+    it('cancelButton should be enabled when the game is created and no opponent has joined it', () => {
         const cancelButtonButton = fixture.nativeElement.querySelector('#cancel-button');
         expect(cancelButtonButton.disabled).toBeFalsy();
     });

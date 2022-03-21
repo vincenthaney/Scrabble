@@ -24,7 +24,7 @@ import {
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import WordFindingService from '@app/services/word-finding-service/word-finding';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';

@@ -12,9 +12,9 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameType } from '@app/classes/game-type';
-import { Timer } from '@app/classes/timer';
-import { AppMaterialModule } from '@app/modules/material.module';
+import { Timer } from '@app/classes/timer/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
+import { AppMaterialModule } from '@app/modules/material.module';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { LobbyInfoComponent } from './lobby-info.component';
 

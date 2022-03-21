@@ -9,7 +9,7 @@ import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
@@ -909,7 +909,11 @@ describe('GameDispatcherController', () => {
             const updatedData: GameUpdateData = {};
             controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
             messages.forEach((message) => {
-                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', { content: message, senderId: SYSTEM_ID });
+                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', {
+                    content: message,
+                    senderId: SYSTEM_ID,
+                    gameId: DEFAULT_GAME_ID,
+                });
             });
         });
     });

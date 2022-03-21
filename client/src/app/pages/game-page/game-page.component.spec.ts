@@ -32,7 +32,7 @@ import {
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
-import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
@@ -306,9 +306,16 @@ describe('GamePageComponent', () => {
             component['gameService'].isGameOver = false;
         });
 
+        it('should not be able to pass if action has been played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            expect(component.canPass()).toBeFalse();
+            component['actionService'].hasActionBeenPlayed = false;
+        });
+
         it('should be able to pass if the conditions are met', () => {
             spyOn(component, 'isLocalPlayerTurn').and.returnValue(true);
             component['gameService'].isGameOver = false;
+            component['actionService'].hasActionBeenPlayed = false;
             expect(component.canPass()).toBeTrue();
         });
     });

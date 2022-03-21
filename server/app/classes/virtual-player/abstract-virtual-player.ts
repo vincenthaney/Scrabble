@@ -3,7 +3,7 @@ import { PointRange } from '@app/classes/word-finding';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import WordFindingService from '@app/services/word-finding-service/word-finding';
 import { Container } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 

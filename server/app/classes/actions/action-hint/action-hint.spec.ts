@@ -9,7 +9,7 @@ import ActionHint from './action-hint';
 import { Orientation, Position } from '@app/classes/board';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import WordFindingService from '@app/services/word-finding/word-finding';
+import WordFindingService from '@app/services/word-finding-service/word-finding';
 import { Container } from 'typedi';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';

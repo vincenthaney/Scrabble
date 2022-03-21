@@ -8,7 +8,7 @@ import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 
 export default class ActionExchange extends ActionPlay {
-    tilesToExchange: Tile[];
+    private tilesToExchange: Tile[];
 
     constructor(player: Player, game: Game, tilesToExchange: Tile[]) {
         super(player, game);
@@ -48,7 +48,7 @@ export default class ActionExchange extends ActionPlay {
     }
 
     lettersToSwap(): string {
-        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter.toLowerCase()), '')}.`;
+        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter), '')}`;
     }
 
     getOpponentMessage(): string {

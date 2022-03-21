@@ -6,7 +6,7 @@ import { ReadyGameConfig } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
-import BoardService from '@app/services/board/board.service';
+import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';

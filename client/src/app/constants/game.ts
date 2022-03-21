@@ -87,14 +87,14 @@ export const OPPONENT_ID = 'opponent';
 
 export const ON_YOUR_TURN_ACTIONS = [ActionType.PLACE, ActionType.EXCHANGE, ActionType.PASS, ActionType.HINT];
 
-export enum ExpectedCommandWordCount {
-    Place = 3,
-    Exchange = 2,
-    Pass = 1,
-    Hint = 1,
-    Help = 1,
-    Reserve = 1,
-}
+export const EXPECTED_COMMAND_WORD_COUNT = new Map<ActionType, number>([
+    [ActionType.PLACE, 3],
+    [ActionType.EXCHANGE, 2],
+    [ActionType.PASS, 1],
+    [ActionType.HINT, 1],
+    [ActionType.HELP, 1],
+    [ActionType.RESERVE, 1],
+]);
 
 export const PLAYER_1_INDEX = 1;
 export const PLAYER_2_INDEX = 2;

@@ -27,11 +27,11 @@ import {
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
 import { GameService } from '@app/services';
-import { ActionService } from '@app/services/action/action.service';
-import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
-import { ReconnectionService } from '@app/services/reconnection/reconnection.service';
+import { ActionService } from '@app/services/action-service/action.service';
+import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { ReconnectionService } from '@app/services/reconnection-service/reconnection.service';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -198,7 +198,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     canPass(): boolean {
-        return this.isLocalPlayerTurn() && !this.gameService.isGameOver;
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver && !this.actionService.hasActionBeenPlayed;
     }
 
     canPlaceWord(): boolean {

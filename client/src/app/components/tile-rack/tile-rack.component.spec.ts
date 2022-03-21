@@ -27,7 +27,7 @@ import { ARROW_LEFT, ARROW_RIGHT, ESCAPE } from '@app/constants/components-const
 import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RackTile, TileRackComponent } from './tile-rack.component';
@@ -160,11 +160,19 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with tiles should return the player tiles', () => {
-        const tiles: RackTile[] = [{ letter: 'A', value: 10, isUsed: false, isSelected: false }];
-        const localPlayer: AbstractPlayer = new Player('', 'Test', []);
+        const tiles: RackTile[] = [
+            { letter: 'A', value: 10, isUsed: false, isSelected: false },
+            { letter: 'B', value: 1, isUsed: false, isSelected: false },
+            { letter: 'D', value: 1, isUsed: true, isSelected: false },
+        ];
+        const localPlayer: AbstractPlayer = new Player('', 'Test', [
+            { letter: 'B', value: 1 },
+            { letter: 'D', value: 1 },
+            { letter: 'A', value: 10 },
+        ]);
 
+        component['tiles'] = tiles;
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
-        spyOn(localPlayer, 'getTiles').and.returnValue(tiles);
 
         component['updateTileRack']();
 
@@ -510,6 +518,7 @@ describe('TileRackComponent', () => {
             component.selectionType = TileRackSelectType.Exchange;
             component.selectedTiles = [{}, {}] as RackTile[];
             isLocalPlayerPlayingSpy = gameServiceSpy.isLocalPlayerPlaying.and.returnValue(true);
+            component['actionService'].hasActionBeenPlayed = false;
         });
 
         it('should be true if can exchange', () => {
@@ -534,6 +543,12 @@ describe('TileRackComponent', () => {
         it('should be false if is less than 7 tiles', () => {
             gameServiceSpy.getTotalNumberOfTilesLeft.and.returnValue(MAX_TILES_PER_PLAYER - 1);
             expect(component.canExchangeTiles()).toBeFalse();
+        });
+
+        it('should be false if action has been played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            expect(component.canExchangeTiles()).toBeFalse();
+            component['actionService'].hasActionBeenPlayed = false;
         });
     });
 

@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { PlayerName } from '@app/classes/communication/';
-import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -15,7 +14,7 @@ export class PlayerLeavesController implements OnDestroy {
     private resetGameEvent: EventEmitter<string> = new EventEmitter();
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(private http: HttpClient, public socketService: SocketService, private readonly gamePlayController: GamePlayController) {
+    constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();
     }
 
@@ -30,7 +29,6 @@ export class PlayerLeavesController implements OnDestroy {
         });
 
         this.socketService.on('cleanup', () => {
-            this.gamePlayController.newMessageValue.next(null);
             this.resetGameEvent.emit();
         });
     }
