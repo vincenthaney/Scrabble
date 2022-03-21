@@ -79,7 +79,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
             this.router.navigateByUrl('waiting-room');
         } else {
-            this.gameDispatcherService.subscribeToReceivedGameIdEvent(this.serviceDestroyed$, () => {
+            this.gameDispatcherService.subscribeToReceivedGameIdEvent(this.pageDestroyed$, () => {
                 this.router.navigateByUrl('game');
             });
         }
