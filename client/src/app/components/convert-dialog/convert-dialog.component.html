@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>Convertir en partie solo</h2>
+<mat-dialog-content>
+    <div class="container">
+        <mat-card>
+            <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
+    <ng-container>
+        <mat-label class="button-toggle-label" id="level-label">Choisissez le niveau de votre adversaire virtuel</mat-label>
+        <mat-button-toggle-group id="level-buttons" formControlName="level">
+            <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">
+                <mat-card class="content">
+                    <app-icon icon="turtle" styling="solid"></app-icon>
+                    <p class="text">{{ virtualPlayerLevels.Beginner }}</p>
+                </mat-card>
+            </mat-button-toggle>
+
+            <div matTooltip="Pas encore implémenté" matTooltipPosition="above">
+                <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert" [disabled]="true">
+                    <mat-card class="content">
+                        <app-icon icon="rabbit" styling="solid"></app-icon>
+                        <p class="text">{{ virtualPlayerLevels.Expert }}</p>
+                    </mat-card>
+                </mat-button-toggle>
+            </div>
+        </mat-button-toggle-group>
+
+        <mat-form-field appearance="outline">
+            <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
+            <mat-select formControlName="virtualPlayerName" (selectionChange)="isFormValid()">
+                <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </ng-container>
+</form>
+</mat-card>
+</div>
+</mat-dialog-content>
+<mat-dialog-actions align='end'>
+    <!-- <ng-container *ngFor="let btn of buttons">
+        <button [style]="btn.style" mat-button mat-dialog-close *ngIf='btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
+        <button [style]="btn.style" mat-button *ngIf='!btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
+    </ng-container>  -->
+</mat-dialog-actions>

@@ -2,6 +2,7 @@ import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
+import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import {
@@ -78,10 +79,16 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     confirmConvertToSoloToServer(): void {
-        this.isStartingGame = true;
-        if (!this.isOpponentFound) {
-            this.gameDispatcherService.handleConvertToSolo();
+        this.dialog.open(ConvertDialogComponent, {
+            data: {
+                hostName: this.host.name,
+            }
         }
+
+        // this.isStartingGame = true;
+        // if (!this.isOpponentFound) {
+        //     this.gameDispatcherService.handleConvertToSolo();
+        // }
     }
 
     confirmOpponentToServer(): void {
