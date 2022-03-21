@@ -377,19 +377,19 @@ describe('AbstractWordFinding', () => {
     });
 
     describe('extractWordSquareTile', () => {
-        it('should call extractSquareTile', () => {
-            const extractSquareTileStub = stub(wordFinding, 'extractSquareTile' as any);
+        it('should call extractSquareTiles', () => {
+            const extractSquareTilesStub = stub(wordFinding, 'extractSquareTiles' as any);
             const wordResult = { ...DEFAULT_WORD_RESULT };
             const boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
 
             wordFinding['extractWordSquareTile'](wordResult, boardPlacement);
 
-            expect(extractSquareTileStub.calledWith(boardPlacement.position, boardPlacement.orientation, wordResult.word));
+            expect(extractSquareTilesStub.calledWith(boardPlacement.position, boardPlacement.orientation, wordResult.word));
         });
     });
 
     describe('extractPerpendicularWordsSquareTile', () => {
-        let extractSquareTileStub: SinonStub;
+        let extractSquareTilesStub: SinonStub;
         let getPerpendicularWordPositionStub: SinonStub;
         let position: Position;
         let wordResult: DictionarySearchResult;
@@ -406,7 +406,7 @@ describe('AbstractWordFinding', () => {
             };
             boardPlacement = { ...DEFAULT_BOARD_PLACEMENT };
 
-            extractSquareTileStub = stub(wordFinding, 'extractSquareTile' as any);
+            extractSquareTilesStub = stub(wordFinding, 'extractSquareTiles' as any);
             getPerpendicularWordPositionStub = stub(wordFinding, 'getPerpendicularWordPosition' as any).returns(position);
         });
 
@@ -418,17 +418,17 @@ describe('AbstractWordFinding', () => {
             }
         });
 
-        it('should call extractSquareTile for every perpendicularWord', () => {
+        it('should call extractSquareTiles for every perpendicularWord', () => {
             wordFinding['extractPerpendicularWordsSquareTile'](wordResult, boardPlacement);
 
             for (const placement of wordResult.perpendicularWords) {
                 const orientation = switchOrientation(boardPlacement.orientation);
-                expect(extractSquareTileStub.calledWithExactly(position, orientation, placement.word));
+                expect(extractSquareTilesStub.calledWithExactly(position, orientation, placement.word));
             }
         });
     });
 
-    describe('extractSquareTile', () => {
+    describe('extractSquareTiles', () => {
         it('should extract square tile', () => {
             const tests: [row: number, column: number, orientation: Orientation, word: string, expected: [Square, Tile][]][] = [
                 [
@@ -457,7 +457,7 @@ describe('AbstractWordFinding', () => {
 
             for (const [row, column, orientation, word, expected] of tests) {
                 const position = new Position(row, column);
-                const result = wordFinding['extractSquareTile'](position, orientation, word);
+                const result = wordFinding['extractSquareTiles'](position, orientation, word);
 
                 expect(result).to.deep.equal(expected);
             }
