@@ -12,11 +12,11 @@ import { BACKSPACE, ENTER, ESCAPE, KEYDOWN, NOT_FOUND } from '@app/constants/com
 import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE, UNDEFINED_SQUARE } from '@app/constants/game';
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
-import { ActionService } from '@app/services/action/action.service';
-import { FocusableComponent } from '@app/services/focusable-components/focusable-component';
-import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
-import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import { ActionService } from '@app/services/action-service/action.service';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
+import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { removeAccents } from '@app/utils/remove-accents';
 import { Subject } from 'rxjs';
 
@@ -218,7 +218,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                     (square: Square) =>
                         square.position.row === squareView.square.position.row && square.position.column === squareView.square.position.column,
                 )
-                .map((sameSquare: Square) => {
+                .forEach((sameSquare: Square) => {
                     squareView.square = sameSquare;
                     squareView.applied = true;
                 });
@@ -236,7 +236,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private removeUsedTiles(): void {
-        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles');
     }
 
     private handlePlaceTiles(payload: PlaceActionPayload | undefined): void {
@@ -298,7 +298,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (previousUsedTiles.tiles.length > 0) {
             this.gameViewEventManagerService.emitGameViewEvent('usedTiles', { ...previousUsedTiles });
         } else {
-            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+            this.gameViewEventManagerService.emitGameViewEvent('usedTiles');
         }
     }
 

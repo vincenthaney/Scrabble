@@ -4,14 +4,12 @@ import * as spies from 'chai-spies';
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { describe } from 'mocha';
-import { HttpException } from './http.exception';
+import { HttpException } from './http-exception';
 
 const expect = chai.expect;
 
 chai.use(spies);
 chai.use(chaiAsPromised);
-
-// const DEFAULT_MESSAGE = 'default message';
 
 class MockResponse {
     // eslint-disable-next-line no-unused-vars

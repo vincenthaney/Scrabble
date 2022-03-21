@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { LobbyInfo } from '@app/classes/communication/';
 import { GameType } from '@app/classes/game-type';
-import { Timer } from '@app/classes/timer';
+import { Timer } from '@app/classes/timer/timer';
 
 @Component({
     selector: 'app-lobby-info',

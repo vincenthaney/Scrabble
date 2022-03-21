@@ -1,5 +1,5 @@
 import { HighScoresRequest } from '@app/classes/communication/request';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Response, Router } from 'express';

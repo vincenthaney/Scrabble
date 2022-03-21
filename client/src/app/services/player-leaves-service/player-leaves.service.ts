@@ -1,9 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
 import { GameService } from '@app/services/';
-import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager/game-view-event-manager.service';
-import RoundManagerService from '@app/services/round-manager/round-manager.service';
+import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

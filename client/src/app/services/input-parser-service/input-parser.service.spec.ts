@@ -4,18 +4,20 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { ActionType, ACTION_COMMAND_INDICATOR } from '@app/classes/actions/action-data';
 import CommandException from '@app/classes/command-exception';
 import { Location } from '@app/classes/location';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { CommandExceptionMessages, PLAYER_NOT_FOUND } from '@app/constants/command-exception-messages';
+import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
 import { DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
+import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
-import GameService from '@app/services/game/game.service';
+import { ActionService } from '@app/services/action-service/action.service';
+import GameService from '@app/services/game-service/game.service';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';
@@ -25,7 +27,6 @@ describe('InputParserService', () => {
     const VALID_LETTERS_INPUT_SINGLE = 'a';
 
     const VALID_PLACE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${VALID_LOCATION_INPUT} ${VALID_LETTERS_INPUT_MULTI}`;
-    const VALID_PLACE_INPUT_SINGLE = `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${VALID_LOCATION_INPUT_SINGLE} ${VALID_LETTERS_INPUT_SINGLE}`;
     const VALID_EXCHANGE_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.EXCHANGE} ${VALID_LETTERS_INPUT_MULTI}`;
     const VALID_PASS_INPUT = `${ACTION_COMMAND_INDICATOR}${ActionType.PASS}`;
     const VALID_PASS_ACTION_DATA = { type: ActionType.PASS, payload: {} };
@@ -50,39 +51,32 @@ describe('InputParserService', () => {
     const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME, DEFAULT_TILES);
     const DEFAULT_COMMAND_ERROR_MESSAGE = CommandExceptionMessages.InvalidEntry;
 
-    const EXPECTED_PLACE_PAYLOAD_MULTI: PlaceActionPayload = {
-        tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
-        startPosition: { row: 1, column: 11 },
-        orientation: Orientation.Horizontal,
-    };
-    const EXPECTED_PLACE_PAYLOAD_SINGLE: PlaceActionPayload = {
-        tiles: [new Tile('A' as LetterValue, 1)],
-        startPosition: { row: 1, column: 11 },
-        orientation: Orientation.Horizontal,
-    };
-    const EXPECTED_EXCHANGE_PAYLOAD: ExchangeActionPayload = {
-        tiles: [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
-    };
-
     let service: InputParserService;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let gamePlayControllerSpy: jasmine.SpyObj<GamePlayController>;
+    let actionServiceSpy: jasmine.SpyObj<ActionService>;
 
     beforeEach(() => {
-        gameServiceSpy = jasmine.createSpyObj('GameService', ['getLocalPlayer, getGameId']);
-    });
-
-    beforeEach(() => {
-        gamePlayControllerSpy = jasmine.createSpyObj('GamePlayController', ['sendMessage', 'sendError', 'sendAction']);
+        gamePlayControllerSpy = jasmine.createSpyObj('GamePlayController', ['sendMessage', 'sendError']);
         gamePlayControllerSpy.sendMessage.and.callFake(() => {
             return;
         });
         gamePlayControllerSpy.sendError.and.callFake(() => {
             return;
         });
-        gamePlayControllerSpy.sendAction.and.callFake(() => {
+
+        actionServiceSpy = jasmine.createSpyObj('ActionService', [
+            'sendAction',
+            'createPlaceActionPayload',
+            'createExchangeActionPayload',
+            'createActionData',
+        ]);
+        actionServiceSpy.sendAction.and.callFake(() => {
             return;
         });
+        actionServiceSpy.createActionData.and.callThrough();
+        actionServiceSpy.createPlaceActionPayload.and.callThrough();
+        actionServiceSpy.createExchangeActionPayload.and.callThrough();
 
         gameServiceSpy = jasmine.createSpyObj('GameService', ['getLocalPlayer', 'getGameId', 'isLocalPlayerPlaying']);
         gameServiceSpy.getLocalPlayer.and.returnValue(DEFAULT_PLAYER);
@@ -93,6 +87,7 @@ describe('InputParserService', () => {
             providers: [
                 { provide: GamePlayController, useValue: gamePlayControllerSpy },
                 { provide: GameService, useValue: gameServiceSpy },
+                { provide: ActionService, useValue: actionServiceSpy },
                 InputParserService,
             ],
             imports: [HttpClientTestingModule, RouterTestingModule.withRoutes([])],
@@ -128,7 +123,7 @@ describe('InputParserService', () => {
         it('should call sendAction if actionData doesnt throw error', () => {
             spyOn<any>(service, 'createActionData').and.returnValue(VALID_PASS_ACTION_DATA);
             service['handleCommand'](VALID_PASS_INPUT, DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-            expect(gamePlayControllerSpy.sendAction).toHaveBeenCalled();
+            expect(actionServiceSpy.sendAction).toHaveBeenCalled();
         });
 
         it('should have right error message content if createActionData throws error NotYourTurn', () => {
@@ -176,68 +171,21 @@ describe('InputParserService', () => {
             expect(verifyValiditySpy).toHaveBeenCalled();
         });
 
-        it('should return right ActionData if input is a valid place command', () => {
-            expect(service['createActionData'](VALID_PLACE_INPUT_SINGLE)).toEqual({
-                type: ActionType.PLACE,
-                input: VALID_PLACE_INPUT_SINGLE,
-                payload: EXPECTED_PLACE_PAYLOAD_SINGLE,
-            });
-            expect(service['createActionData'](VALID_PLACE_INPUT)).toEqual({
-                type: ActionType.PLACE,
-                input: VALID_PLACE_INPUT,
-                payload: EXPECTED_PLACE_PAYLOAD_MULTI,
-            });
-        });
-
-        it('should call createPlaceActionPayload if input is a valid place command', () => {
-            const spy = spyOn<any>(service, 'createPlaceActionPayload').and.returnValue(EXPECTED_PLACE_PAYLOAD_SINGLE);
-            service['createActionData'](VALID_PLACE_INPUT_SINGLE);
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should return right ActionData if input is a valid exchange command', () => {
-            expect(service['createActionData'](VALID_EXCHANGE_INPUT)).toEqual({
-                type: ActionType.EXCHANGE,
-                input: VALID_EXCHANGE_INPUT,
-                payload: EXPECTED_EXCHANGE_PAYLOAD,
-            });
-        });
-
-        it('should call createExchangeActionPayload if input is a valid exchange command', () => {
-            const spy = spyOn<any>(service, 'createExchangeActionPayload').and.returnValue(EXPECTED_EXCHANGE_PAYLOAD);
-            service['createActionData'](VALID_EXCHANGE_INPUT);
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should return right Actiondata if input is a valid pass command', () => {
-            expect(service['createActionData'](VALID_PASS_INPUT)).toEqual({ type: ActionType.PASS, input: VALID_PASS_INPUT, payload: {} });
-        });
-
-        it('should return right Actiondata if input is a valid reserve command', () => {
-            expect(service['createActionData'](VALID_RESERVE_INPUT)).toEqual({
-                type: ActionType.RESERVE,
-                input: VALID_RESERVE_INPUT,
-                payload: {},
-            });
-        });
-
-        it('should return right Actiondata if input is a valid hint command', () => {
-            expect(service['createActionData'](VALID_HINT_INPUT)).toEqual({ type: ActionType.HINT, input: VALID_HINT_INPUT, payload: {} });
-        });
-
-        it('should return right Actiondata if input is a valid help command', () => {
-            expect(service['createActionData'](VALID_HELP_INPUT)).toEqual({ type: ActionType.HELP, input: VALID_HELP_INPUT, payload: {} });
-        });
-
         it('should throw error if commands have incorrect lengths', () => {
-            const invalidCommands: [command: string, error: CommandExceptionMessages][] = [
-                [`${ACTION_COMMAND_INDICATOR}placer abc`, CommandExceptionMessages.PlaceBadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}échanger one two three`, CommandExceptionMessages.ExchangeBadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}passer thing`, CommandExceptionMessages.PassBadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}réserve second word`, CommandExceptionMessages.BadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}indice not length of two`, CommandExceptionMessages.BadSyntax],
-                [`${ACTION_COMMAND_INDICATOR}aide help`, CommandExceptionMessages.BadSyntax],
+            const invalidCommands: [command: string, error: string][] = [
+                [`${ACTION_COMMAND_INDICATOR}placer abc`, BAD_SYNTAX_MESSAGES.get(ActionType.PLACE) ?? CommandExceptionMessages.BadSyntax],
+                [
+                    `${ACTION_COMMAND_INDICATOR}échanger one two three`,
+                    BAD_SYNTAX_MESSAGES.get(ActionType.EXCHANGE) ?? CommandExceptionMessages.BadSyntax,
+                ],
+                [`${ACTION_COMMAND_INDICATOR}passer thing`, BAD_SYNTAX_MESSAGES.get(ActionType.PASS) ?? CommandExceptionMessages.BadSyntax],
+                [
+                    `${ACTION_COMMAND_INDICATOR}indice not length of two`,
+                    BAD_SYNTAX_MESSAGES.get(ActionType.HINT) ?? CommandExceptionMessages.BadSyntax,
+                ],
+                [`${ACTION_COMMAND_INDICATOR}aide help`, BAD_SYNTAX_MESSAGES.get(ActionType.HELP) ?? CommandExceptionMessages.BadSyntax],
             ];
+
             for (const [command, error] of invalidCommands) {
                 expect(() => service['createActionData'](command)).toThrow(new CommandException(error));
             }
@@ -247,6 +195,15 @@ describe('InputParserService', () => {
             expect(() => {
                 service['createActionData']('!trouver un ami');
             }).toThrow(new CommandException(CommandExceptionMessages.InvalidEntry));
+        });
+
+        it('should call actionService.createActionData for all valid command types', () => {
+            const validInputs = [VALID_PLACE_INPUT, VALID_EXCHANGE_INPUT, VALID_PASS_INPUT, VALID_HINT_INPUT, VALID_HELP_INPUT, VALID_RESERVE_INPUT];
+
+            for (const input of validInputs) {
+                service['createActionData'](input);
+                expect(actionServiceSpy.createActionData).toHaveBeenCalled();
+            }
         });
     });
 
@@ -295,7 +252,7 @@ describe('InputParserService', () => {
         it('should throw if lastChar is a number and trying to place multiple letters', () => {
             expect(() => {
                 service['createLocation'](VALID_LOCATION_INPUT_SINGLE, VALID_LETTERS_INPUT_MULTI.length);
-            }).toThrow(new CommandException(CommandExceptionMessages.PlaceBadSyntax));
+            }).toThrow(new CommandException(BAD_SYNTAX_MESSAGES.get(ActionType.PLACE) ?? CommandExceptionMessages.BadSyntax));
         });
 
         it('should have horizontal orientation if last char is number and trying to place one letter', () => {
@@ -336,6 +293,11 @@ describe('InputParserService', () => {
             service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
             expect(emitSpy).toHaveBeenCalled();
         });
+
+        it('should call createPlaceActionPayload if input is a valid place command', () => {
+            service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
+            expect(actionServiceSpy.createPlaceActionPayload).toHaveBeenCalled();
+        });
     });
 
     describe('createExchangeActionPayload', () => {
@@ -345,8 +307,9 @@ describe('InputParserService', () => {
             expect(letterToTilesSpy).toHaveBeenCalledWith(VALID_LETTERS_INPUT_MULTI, ActionType.EXCHANGE);
         });
 
-        it('createExchangeActionPayload should return expected payload', () => {
-            expect(service['createExchangeActionPayload'](VALID_LETTERS_INPUT_MULTI)).toEqual(EXPECTED_EXCHANGE_PAYLOAD);
+        it('should call createExchangeActionPayload if input is a valid exchange command', () => {
+            service['createExchangeActionPayload'](VALID_LETTERS_INPUT_MULTI);
+            expect(actionServiceSpy.createExchangeActionPayload).toHaveBeenCalled();
         });
     });
 
@@ -507,6 +470,16 @@ describe('InputParserService', () => {
         });
     });
 
+    describe('isKnownCommand', () => {
+        it('should return false if command type is not in enum', () => {
+            expect(service['isKnownCommand']('bonjour')).toBeFalse();
+        });
+
+        it('should return true if command type is in enum', () => {
+            expect(service['isKnownCommand']('aide')).toBeTrue();
+        });
+    });
+
     describe('getStartPosition', () => {
         it('should call isPositionWithinBounds', () => {
             const isWithinBoundsSpy = spyOn<any>(service, 'isPositionWithinBounds').and.returnValue(true);
@@ -540,7 +513,7 @@ describe('InputParserService', () => {
 
         it('should throw PLAYER_NOT_FOUND if gameservice.localPlayer does not exist', () => {
             gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
-            expect(() => service['getLocalPlayer']()).toThrowError(PLAYER_NOT_FOUND);
+            expect(() => service['getLocalPlayer']()).toThrowError(ACTIVE_PLAYER_NOT_FOUND);
         });
     });
 });

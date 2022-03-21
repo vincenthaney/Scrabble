@@ -10,6 +10,7 @@ import { MongoClient } from 'mongodb';
 import { HighScore, HighScoresData } from '@app/classes/database/high-score';
 import { GameType } from '@app/classes/game/game-type';
 import HighScoresService from './high-scores.service';
+// eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { DatabaseServiceMock } from '@app/services/database-service/database-service.mock.spec';
 import DatabaseService from '@app/services/database-service/database-service';
@@ -151,7 +152,7 @@ describe('HighScoresService', () => {
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
-            expect(await (await highScoresService['collection'].find({}).toArray()).length).to.equal(0);
+            expect((await highScoresService['collection'].find({}).toArray()).length).to.equal(0);
         });
     });
 
@@ -202,16 +203,6 @@ describe('HighScoresService', () => {
             const newScore = HIGH_SCORE_CLASSIC_3.score + 1;
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
             expect(spyUpdateHighScore).to.have.been.called;
-        });
-
-        it('should not update the highScore if the name is already on it ', async () => {
-            const newName = HIGH_SCORE_CLASSIC_1.names[0];
-            expect(await highScoresService.updateHighScore(newName, HIGH_SCORE_CLASSIC_1)).to.be.false;
-            const updatedHighScore = await highScoresService['collection'].findOne({
-                score: HIGH_SCORE_CLASSIC_1.score,
-                gameType: HIGH_SCORE_CLASSIC_1.gameType,
-            });
-            expect(updatedHighScore).to.deep.equal(HIGH_SCORE_CLASSIC_1);
         });
     });
 

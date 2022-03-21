@@ -13,7 +13,7 @@ import {
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
 import { Subject } from 'rxjs';
 
 @Component({

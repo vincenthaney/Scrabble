@@ -3,7 +3,7 @@ import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActi
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
-import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/command-exception-messages';
+import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
 import { Subject } from 'rxjs';
@@ -38,7 +38,8 @@ export class ActionService {
     }
 
     createActionData(actionType: ActionType, actionPayload: ActionPayload, input?: string): ActionData {
-        input = input ?? this.createInputFromPayload(actionType, actionPayload);
+        if (!input) input = this.actionNeedsInput(actionType) ? this.createInputFromPayload(actionType, actionPayload) : '';
+
         return {
             type: actionType,
             input,
@@ -57,6 +58,10 @@ export class ActionService {
 
         this.gamePlayController.sendAction(gameId, playerId, actionData);
         this.hasActionBeenPlayed = true;
+    }
+
+    private actionNeedsInput(actionType: ActionType): boolean {
+        return actionType === ActionType.PLACE || actionType === ActionType.EXCHANGE;
     }
 
     private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {
