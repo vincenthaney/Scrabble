@@ -51,8 +51,7 @@ export default abstract class AbstractWordFinding {
     }
 
     protected isWithinPointRange(score: number): boolean {
-        if (!this.request.pointRange) return true;
-        return this.request.pointRange.isWithinRange(score);
+        return this.request.pointRange ? this.request.pointRange.isWithinRange(score) : true;
     }
 
     private *randomBoardPlacements(): Generator<BoardPlacement> {
