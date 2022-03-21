@@ -171,12 +171,12 @@ describe('ActionExchange', () => {
         it('should return message', () => {
             action = new ActionExchange(game.player1, game, PLAYER_TILES);
 
-            expect(action.getMessage()).to.equal('Vous avez échangé les tuiles abc.');
+            expect(action.getMessage()).to.equal('Vous avez échangé les tuiles ABC');
         });
 
         it('should return message', () => {
             action = new ActionExchange(game.player1, game, [PLAYER_TILES[0]]);
-            expect(action.getMessage()).to.equal('Vous avez échangé la tuile a.');
+            expect(action.getMessage()).to.equal('Vous avez échangé la tuile A');
         });
 
         it('should call lettersToSwap', () => {
