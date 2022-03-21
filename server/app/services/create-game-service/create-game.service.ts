@@ -16,8 +16,7 @@ export class CreateGameService {
             new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string),
             this.generateGameConfig(config),
         );
-        const startGameData = await this.activeGameService.beginGame(gameId, readyGameConfig);
-        return startGameData;
+        return this.activeGameService.beginGame(gameId, readyGameConfig);
     }
 
     createMultiplayerGame(configData: GameConfigData): WaitingRoom {
