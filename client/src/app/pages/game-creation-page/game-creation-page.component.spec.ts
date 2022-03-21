@@ -28,7 +28,6 @@ import { DEFAULT_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
-import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -40,13 +39,9 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
-    let gameDispatcherSpy: SpyObj<GameDispatcherService>;
     let gameDispatcherServiceMock: GameDispatcherService;
+    let handleGameCreationSpy: jasmine.Spy;
     const EMPTY_VALUE = '';
-
-    beforeEach(() => {
-        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleCreateGame']);
-    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -71,12 +66,7 @@ describe('GameCreationPageComponent', () => {
                     { path: 'game', component: TestComponent },
                 ]),
             ],
-            providers: [
-                MatButtonToggleHarness,
-                MatButtonHarness,
-                MatButtonToggleGroupHarness,
-                { provide: GameDispatcherService, useValue: gameDispatcherSpy },
-            ],
+            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness, GameDispatcherService],
         }).compileComponents();
     });
 
@@ -87,6 +77,8 @@ describe('GameCreationPageComponent', () => {
         gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
         gameParameters = component.gameParameters;
         fixture.detectChanges();
+
+        handleGameCreationSpy = spyOn(gameDispatcherServiceMock, 'handleCreateGame');
     });
 
     const setValidFormValues = () => {
@@ -250,13 +242,13 @@ describe('GameCreationPageComponent', () => {
             const spy = spyOn<any>(component['router'], 'navigateByUrl');
             component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
             component.createGame();
-            gameDispatcherServiceMock['receivedGameIdEvent'].next();
+            component['gameDispatcherService']['receivedGameIdEvent'].next();
             expect(spy).toHaveBeenCalledWith('game');
         });
 
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component.createGame();
-            expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
+            expect(handleGameCreationSpy).toHaveBeenCalled();
         });
     });
 
