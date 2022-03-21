@@ -129,12 +129,11 @@ export default abstract class AbstractWordFinding {
         if (index === NOT_FOUND) {
             index = tiles.findIndex((tile) => tile.letter === BLANK_TILE_LETTER_VALUE);
             if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
-            const foundBlankTile = tiles.splice(index, 1);
-            return { ...foundBlankTile[0], playedLetter: letter.toUpperCase() as LetterValue };
+            const foundBlankTile = tiles.splice(index, 1)[0];
+            return { ...foundBlankTile, playedLetter: letter.toUpperCase() as LetterValue };
         }
 
-        const foundTile = tiles.splice(index, 1);
-        return foundTile[0];
+        return tiles.splice(index, 1)[0];
     }
 
     private convertTilesToLetters(tiles: Tile[]): LetterValue[] {
