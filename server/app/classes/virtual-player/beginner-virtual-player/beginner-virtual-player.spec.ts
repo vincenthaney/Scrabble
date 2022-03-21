@@ -25,6 +25,7 @@ import {
 } from '@app/constants/virtual-player-tests-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WordFindingService from '@app/services/word-finding/word-finding';
+import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
@@ -47,6 +48,42 @@ describe('BeginnerVirtualPlayer', () => {
 
     it('should create', () => {
         expect(beginnerVirtualPlayer).to.exist;
+    });
+
+    describe('playTurn', async () => {
+        let actionPassSpy: unknown;
+        let sendActionSpy: unknown;
+        beforeEach(() => {
+            spy.on(Delay, 'for', () => {
+                return;
+            });
+            spy.on(beginnerVirtualPlayer, 'findAction', () => {
+                return;
+            });
+            actionPassSpy = spy.on(ActionPass, 'createActionData');
+            sendActionSpy = spy.on(beginnerVirtualPlayer['virtualPlayerService'], 'sendAction');
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should send actionPass when no words are found', async () => {
+            await beginnerVirtualPlayer.playTurn();
+
+            expect(sendActionSpy).to.have.been.called();
+            expect(actionPassSpy).to.have.been.called();
+        });
+
+        it('should send action returned by findAction when no words are found', async () => {
+            spy.on(Promise, 'race', () => {
+                return ['testArray'];
+            });
+            await beginnerVirtualPlayer.playTurn();
+
+            expect(sendActionSpy).to.have.been.called();
+            expect(actionPassSpy).to.not.have.been.called();
+        });
     });
 
     describe('findPointRange', () => {
