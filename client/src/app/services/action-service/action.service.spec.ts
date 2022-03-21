@@ -86,10 +86,21 @@ describe('ActionService', () => {
             expect(actualData.input).toEqual('input');
         });
 
-        it('if input is NOT defined, should call createInputFromPayload', () => {
-            actualData = service.createActionData(ActionType.PASS, {});
-            expect(inputSpy).toHaveBeenCalledWith(ActionType.PASS, {});
+        it('if input is NOT defined and place action, should call createInputFromPayload', () => {
+            actualData = service.createActionData(ActionType.PLACE, {});
+            expect(inputSpy).toHaveBeenCalledWith(ActionType.PLACE, {});
             expect(actualData.input).toEqual('spyInput');
+        });
+
+        it('if input is NOT defined and exchange action, should call createInputFromPayload', () => {
+            actualData = service.createActionData(ActionType.EXCHANGE, {});
+            expect(inputSpy).toHaveBeenCalledWith(ActionType.EXCHANGE, {});
+            expect(actualData.input).toEqual('spyInput');
+        });
+
+        it('if input is NOT defined and pass action, should NOT call createInputFromPayload', () => {
+            service.createActionData(ActionType.PASS, {});
+            expect(inputSpy).not.toHaveBeenCalled();
         });
 
         it('should return ActionData with correct values', () => {
