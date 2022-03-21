@@ -29,3 +29,4 @@ export const MINIMUM_TIMER_VALUE = 30;
 export const MAXIMUM_TIMER_VALUE = 300;
 export const TIMER_VALUE_INCREMENTS = 30;
 export const DEFAULT_DICTIONARY_VALUE = 'default-dictionary';
+export const KEEP_DATA = false;

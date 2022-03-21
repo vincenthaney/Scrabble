@@ -10,6 +10,7 @@ import {
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
+    KEEP_DATA,
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
@@ -78,18 +79,13 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    confirmConvertToSoloToServer(): void {
-        this.gameDispatcherService.handleCancelGame();
+    confirmConvertToSolo(): void {
+        this.gameDispatcherService.handleCancelGame(KEEP_DATA);
         this.dialog.open(ConvertDialogComponent, {
             data: {
-                hostName: this.host.name,
-            }
-        }
-
-        // this.isStartingGame = true;
-        // if (!this.isOpponentFound) {
-        //     this.gameDispatcherService.handleConvertToSolo();
-        // }
+                hostName: this.gameDispatcherService.currentLobby?.hostName,
+            },
+        });
     }
 
     confirmOpponentToServer(): void {
