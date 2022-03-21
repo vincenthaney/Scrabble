@@ -11,6 +11,7 @@ import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { LobbyInfo } from '@app/classes/communication';
 import { GameType } from '@app/classes/game-type';
 import { Timer } from '@app/classes/timer/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
@@ -23,9 +24,9 @@ import { LobbyInfoComponent } from './lobby-info.component';
 })
 export class TestComponent {}
 
-const TEST_LOBBY = {
+const TEST_LOBBY: LobbyInfo = {
     lobbyId: 'lobbyId',
-    playerName: 'playerName',
+    hostName: 'playerName',
     gameType: GameType.Classic,
     maxRoundTime: 1,
     dictionary: '',
@@ -110,6 +111,6 @@ describe('LobbyInfoComponent', () => {
         fixture.detectChanges();
         const buttonContainer = fixture.debugElement.queryAll(By.css('.button-container'));
         const errorTooltip = buttonContainer[0].injector.get<MatTooltip>(MatTooltip);
-        expect(errorTooltip.message).toEqual(`Veuillez entrer un nom valide différent de ${component.lobby.playerName}`);
+        expect(errorTooltip.message).toEqual(`Veuillez entrer un nom valide différent de ${component.lobby.hostName}`);
     });
 });
