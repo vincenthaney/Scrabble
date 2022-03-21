@@ -100,7 +100,7 @@ describe('WordPlacement utils', () => {
                 orientation,
             };
 
-            expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('g3v xyz');
+            expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('!placer g3v xyz');
         });
     });
 });
