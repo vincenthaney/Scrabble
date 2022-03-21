@@ -26,13 +26,13 @@ export class GamePlayController {
         private readonly gamePlayService: GamePlayService,
         private readonly socketService: SocketService,
         private readonly activeGameService: ActiveGameService,
-        private virtualPlayerService: VirtualPlayerService,
+        private readonly virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
     }
 
     gameUpdate(lobbyData: LobbyData, data: GameUpdateData): void {
-        this.socketService.emitToRoom(lobbyData, 'gameUpdate', data);
+        this.socketService.emitToRoom(lobbyData.lobbyId, 'gameUpdate', data);
         if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
             this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(lobbyData.lobbyId, data.round.playerData.id));
         }
@@ -42,11 +42,11 @@ export class GamePlayController {
         this.router = Router();
 
         this.router.post('/games/:gameId/players/:playerId/action', async (req: GameRequest, res: Response) => {
-            const { lobbyData, playerId } = req.params;
+            const { gameId, playerId } = req.params;
             const data: ActionData = req.body;
 
             try {
-                await this.handlePlayAction(lobbyData, playerId, data);
+                await this.handlePlayAction(gameId, playerId, data);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
@@ -78,12 +78,12 @@ export class GamePlayController {
         });
     }
 
-    private async handlePlayAction(lobbyData: LobbyData, playerId: string, data: ActionData): Promise<void> {
+    private async handlePlayAction(gameId: string, playerId: string, data: ActionData): Promise<void> {
         if (data.type === undefined) throw new HttpException('type is required', StatusCodes.BAD_REQUEST);
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         try {
-            const [updateData, feedback] = await this.gamePlayService.playAction(lobbyData.lobbyId, playerId, data);
+            const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
@@ -92,7 +92,7 @@ export class GamePlayController {
                 });
             }
             if (updateData) {
-                this.gameUpdate(lobbyData.gameId, updateData);
+                this.gameUpdate(gameId, updateData);
             }
             if (feedback) {
                 this.handleFeedback(gameId, playerId, feedback);

@@ -1,5 +1,5 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
-import { GameConfig, ReadyGameConfig } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData, ReadyGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http-exception/http-exception';
@@ -14,13 +14,23 @@ import {
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
 
-    constructor() {
+    constructor(
+        private socketService: SocketService,
+        private createGameService: CreateGameService,
+        private activeGameService: ActiveGameService,
+        private virtualPlayerService: VirtualPlayerService,
+    ) {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
@@ -31,6 +41,31 @@ export class GameDispatcherService {
 
     getLobbiesRoom(): Room {
         return this.lobbiesRoom;
+    }
+
+    async createSoloGame(config: GameConfigData): Promise<LobbyData> {
+        const startGameData = await this.createGameService.createSoloGame(config);
+        const gameId = startGameData.gameId;
+        this.socketService.addToRoom(config.playerId, gameId);
+
+        startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
+
+        this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
+
+        if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(
+                startGameData,
+                this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
+            );
+        }
+        return 
+    }
+
+    createMultiplayerGame(config: GameConfigData): LobbyData {
+        const waitingRoom = this.createGameService.createMultiplayerGame(config);
+        this.addToWaitingRoom(waitingRoom);
+        this.socketService.addToRoom(config.playerId, waitingRoom.getId());
+        return waitingRoom.convertToLobbyData();
     }
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
