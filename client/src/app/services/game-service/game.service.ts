@@ -172,6 +172,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.isGameOver = false;
         this.gameId = '';
         this.playerContainer = undefined;
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
     }
 
     private handleGameOver(): void {
