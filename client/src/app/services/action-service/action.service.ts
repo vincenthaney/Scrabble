@@ -38,7 +38,10 @@ export class ActionService {
     }
 
     createActionData(actionType: ActionType, actionPayload: ActionPayload, input?: string): ActionData {
-        input = input ?? this.createInputFromPayload(actionType, actionPayload);
+        if (!input)
+            input =
+                actionType === ActionType.PLACE || actionType === ActionType.EXCHANGE ? this.createInputFromPayload(actionType, actionPayload) : '';
+
         return {
             type: actionType,
             input,
