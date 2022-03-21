@@ -672,6 +672,14 @@ describe('TileRackComponent', () => {
             expect(component.tiles[0].isUsed).toBeTrue();
             expect(component.tiles[1].isUsed).toBeFalse();
         });
+
+        it('should not mark any tiles if paylod is undefined', () => {
+            component.tiles = [{ letter: 'A', isUsed: false }] as RackTile[];
+
+            component['handleUsedTiles'](undefined);
+
+            expect(component.tiles[0].isUsed).toBeFalse();
+        });
     });
 
     it('resetUsedTiles should reset all used tiles to false', () => {
