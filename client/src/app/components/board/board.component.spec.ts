@@ -647,10 +647,10 @@ describe('BoardComponent', () => {
     });
 
     describe('clearCursor', () => {
-        let removeUsedTilesSpy: jasmine.Spy;
+        let resetSpy: jasmine.Spy;
 
         beforeEach(() => {
-            removeUsedTilesSpy = spyOn<any>(component, 'removeUsedTiles');
+            resetSpy = spyOn<any>(component['gameViewEventManagerService'], 'emitGameViewEvent');
             component.selectedSquare = {} as SquareView;
         });
 
@@ -660,10 +660,10 @@ describe('BoardComponent', () => {
             expect(component.selectedSquare).toBeUndefined();
         });
 
-        it('should call removeUsedTiles', () => {
+        it('should emit resetUsedTiles event', () => {
             component['clearCursor']();
 
-            expect(removeUsedTilesSpy).toHaveBeenCalled();
+            expect(resetSpy).toHaveBeenCalledWith('resetUsedTiles');
         });
     });
 
@@ -708,12 +708,12 @@ describe('BoardComponent', () => {
             component.ngOnInit();
         });
 
-        it('should call clearNotAppliedSquare', () => {
-            const spy = spyOn<any>(component, 'removeUsedTiles');
+        it('should emit resetUsedTile event', () => {
+            const spy = spyOn<any>(component['gameViewEventManagerService'], 'emitGameViewEvent');
 
             component['onLoseFocusEvent']!();
 
-            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith('resetUsedTiles');
         });
     });
 
@@ -748,12 +748,12 @@ describe('BoardComponent', () => {
             expect(spy).toHaveBeenCalledOnceWith(component);
         });
 
-        it('should call removeUsedTiles', () => {
-            const spy = spyOn<any>(component, 'removeUsedTiles');
+        it('should emit resetUsedTiles event', () => {
+            const spy = spyOn<any>(component['gameViewEventManagerService'], 'emitGameViewEvent');
 
             component.onSquareClick(squareView);
 
-            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith('resetUsedTiles');
         });
 
         it('should set selectedSquare is squareView is not selectedSquareView', () => {
@@ -950,7 +950,7 @@ describe('BoardComponent', () => {
 
             component['removeUsedTile'](tileToRemove);
 
-            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', undefined);
+            expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('resetUsedTiles');
         });
     });
 
