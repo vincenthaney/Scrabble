@@ -5,7 +5,6 @@ import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http.exception';
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
-import { IS_ID_VIRTUAL_PLAYER } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -32,7 +31,7 @@ export class GamePlayController {
     gameUpdate(gameId: string, data: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
         if (data.round) {
-            if (IS_ID_VIRTUAL_PLAYER(data.round.playerData.id)) {
+            if (VirtualPlayerService.isIdVirtualPlayer(data.round.playerData.id)) {
                 this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
             }
         }
