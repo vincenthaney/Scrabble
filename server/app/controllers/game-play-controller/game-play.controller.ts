@@ -6,6 +6,7 @@ import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Delay } from '@app/utils/delay';
@@ -87,36 +88,40 @@ export class GamePlayController {
                 this.gameUpdate(gameId, updateData);
             }
             if (feedback) {
-                if (feedback.localPlayerFeedback) {
-                    this.socketService.emitToSocket(playerId, 'newMessage', {
-                        content: feedback.localPlayerFeedback,
-                        senderId: SYSTEM_ID,
-                        gameId,
-                    });
-                }
-                if (feedback.opponentFeedback) {
-                    const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
-                    this.socketService.emitToSocket(opponentId, 'newMessage', {
-                        content: feedback.opponentFeedback,
-                        senderId: SYSTEM_ID,
-                        gameId,
-                    });
-                }
-                if (feedback.endGameFeedback) {
-                    for (const message of feedback.endGameFeedback) {
-                        this.socketService.emitToRoom(gameId, 'newMessage', {
-                            content: message,
-                            senderId: SYSTEM_ID,
-                            gameId,
-                        });
-                    }
-                }
+                this.handleFeedback(gameId, playerId, feedback);
             }
         } catch (exception) {
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
                 await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
+            }
+        }
+    }
+
+    private handleFeedback(gameId: string, playerId: string, feedback: FeedbackMessages): void {
+        if (feedback.localPlayerFeedback) {
+            this.socketService.emitToSocket(playerId, 'newMessage', {
+                content: feedback.localPlayerFeedback,
+                senderId: SYSTEM_ID,
+                gameId,
+            });
+        }
+        if (feedback.opponentFeedback) {
+            const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
+            this.socketService.emitToSocket(opponentId, 'newMessage', {
+                content: feedback.opponentFeedback,
+                senderId: SYSTEM_ID,
+                gameId,
+            });
+        }
+        if (feedback.endGameFeedback) {
+            for (const message of feedback.endGameFeedback) {
+                this.socketService.emitToRoom(gameId, 'newMessage', {
+                    content: message,
+                    senderId: SYSTEM_ID,
+                    gameId,
+                });
             }
         }
     }

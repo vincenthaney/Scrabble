@@ -8,7 +8,7 @@ export default class DatabaseService {
     private db: Db;
 
     async populateDb(collectionName: string, data: Document[]): Promise<void> {
-        const collection = await this.db.collection(collectionName);
+        const collection = this.db.collection(collectionName);
         if (await this.isCollectionEmpty(collection)) {
             await collection.insertMany(data);
         }
