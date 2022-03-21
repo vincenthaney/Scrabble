@@ -21,7 +21,3 @@ export const HIGH_SCORE_RANGE: PointRange = {
     minimum: 13,
     maximum: 18,
 };
-
-export const IS_ID_VIRTUAL_PLAYER = (id: string): boolean => {
-    return id.includes(VIRTUAL_PLAYER_ID_PREFIX);
-};
