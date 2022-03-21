@@ -540,7 +540,7 @@ describe('GameService', () => {
             const message: Message = { senderId: SYSTEM_ERROR_ID } as Message;
             service.handleNewMessage(message);
 
-            expect(spy).toHaveBeenCalledWith('usedTiles', undefined);
+            expect(spy).toHaveBeenCalledWith('resetUsedTiles');
         });
 
         it('should not call emitGameViewEvent if sender id is not system-error', () => {
