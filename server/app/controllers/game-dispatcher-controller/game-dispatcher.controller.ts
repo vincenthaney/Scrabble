@@ -206,7 +206,7 @@ export class GameDispatcherController {
         }
     }
 
-    private async handleCreateGame(config: GameConfigData): Promise<LobbyData> {
+    private async handleCreateGame(config: GameConfigData): Promise<LobbyData | void> {
         if (config.playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameType === undefined) throw new HttpException(GAME_TYPE_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.gameMode === undefined) throw new HttpException(GAME_MODE_REQUIRED, StatusCodes.BAD_REQUEST);
@@ -228,10 +228,9 @@ export class GameDispatcherController {
         return lobbyData;
     }
 
-    private async handleCreateSoloGame(config: GameConfigData): Promise<LobbyData> {
+    private async handleCreateSoloGame(config: GameConfigData): Promise<void> {
         if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
-        return this.gameDispatcherService.createSoloGame(config);
     }
 
     private handleJoinGame(gameId: string, playerId: string, playerName: string): void {

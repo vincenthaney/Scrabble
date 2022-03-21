@@ -41,6 +41,7 @@ describe('GameCreationPageComponent', () => {
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
     let gameDispatcherSpy: SpyObj<GameDispatcherService>;
+    let gameDispatcherServiceMock: GameDispatcherService;
     const EMPTY_VALUE = '';
 
     beforeEach(() => {
@@ -67,6 +68,7 @@ describe('GameCreationPageComponent', () => {
                     { path: 'waiting-room', component: TestComponent },
                     { path: 'home', component: TestComponent },
                     { path: 'game-creation', component: GameCreationPageComponent },
+                    { path: 'game', component: TestComponent },
                 ]),
             ],
             providers: [
@@ -82,6 +84,7 @@ describe('GameCreationPageComponent', () => {
         fixture = TestBed.createComponent(GameCreationPageComponent);
         loader = TestbedHarnessEnvironment.loader(fixture);
         component = fixture.componentInstance;
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
         gameParameters = component.gameParameters;
         fixture.detectChanges();
     });
@@ -246,8 +249,8 @@ describe('GameCreationPageComponent', () => {
         it('createGame should reroute to game if solo game', () => {
             const spy = spyOn<any>(component['router'], 'navigateByUrl');
             component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-
             component.createGame();
+            gameDispatcherServiceMock['receivedGameIdEvent'].next();
             expect(spy).toHaveBeenCalledWith('game');
         });
 

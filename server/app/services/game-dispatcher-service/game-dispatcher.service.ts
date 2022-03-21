@@ -44,7 +44,7 @@ export class GameDispatcherService {
         return this.lobbiesRoom;
     }
 
-    async createSoloGame(config: GameConfigData): Promise<LobbyData> {
+    async createSoloGame(config: GameConfigData): Promise<void> {
         const startGameData = await this.createGameService.createSoloGame(config);
         const gameId = startGameData.gameId;
         this.socketService.addToRoom(config.playerId, gameId);
@@ -59,12 +59,6 @@ export class GameDispatcherService {
                 this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
             );
         }
-        const startGameConfig: GameConfig = {
-            ...config,
-            player1: startGameData.player1,
-        };
-
-        return convertToLobbyData(startGameConfig, gameId);
     }
 
     createMultiplayerGame(config: GameConfigData): LobbyData {
