@@ -114,6 +114,20 @@ describe('ActionService', () => {
         });
     });
 
+    describe('actionNeedsInput', () => {
+        it('should return true if PLACE', () => {
+            expect(service['actionNeedsInput'](ActionType.PLACE)).toBeTrue();
+        });
+
+        it('should return true if EXCHANGE', () => {
+            expect(service['actionNeedsInput'](ActionType.EXCHANGE)).toBeTrue();
+        });
+
+        it('should return false if PASS', () => {
+            expect(service['actionNeedsInput'](ActionType.PASS)).toBeFalse();
+        });
+    });
+
     describe('sendAction', () => {
         let errorMessageSpy: jasmine.Spy;
         let sendActionSpy: jasmine.Spy;

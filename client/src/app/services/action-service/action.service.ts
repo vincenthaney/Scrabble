@@ -38,9 +38,7 @@ export class ActionService {
     }
 
     createActionData(actionType: ActionType, actionPayload: ActionPayload, input?: string): ActionData {
-        if (!input)
-            input =
-                actionType === ActionType.PLACE || actionType === ActionType.EXCHANGE ? this.createInputFromPayload(actionType, actionPayload) : '';
+        if (!input) input = this.actionNeedsInput(actionType) ? this.createInputFromPayload(actionType, actionPayload) : '';
 
         return {
             type: actionType,
@@ -60,6 +58,10 @@ export class ActionService {
 
         this.gamePlayController.sendAction(gameId, playerId, actionData);
         this.hasActionBeenPlayed = true;
+    }
+
+    private actionNeedsInput(actionType: ActionType): boolean {
+        return actionType === ActionType.PLACE || actionType === ActionType.EXCHANGE;
     }
 
     private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {
