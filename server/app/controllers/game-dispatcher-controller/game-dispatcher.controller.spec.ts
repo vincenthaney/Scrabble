@@ -12,10 +12,12 @@ import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http.exception';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { Square } from '@app/classes/square';
 import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
     GAME_IS_OVER,
+    GAME_MODE_REQUIRED,
     GAME_TYPE_REQUIRED,
     MAX_ROUND_TIME_REQUIRED,
     NAME_IS_INVALID,
@@ -29,7 +31,9 @@ import { getDictionaryTestService } from '@app/services/dictionary-service/dicti
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
+import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { EventEmitter } from 'events';
@@ -48,6 +52,8 @@ chai.use(chaiAsPromised);
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_NEW_PLAYER_ID = 'newPlayerId';
+const DEFAULT_DICTIONARY = 'french';
+const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_PLAYER_NAME = 'player';
 const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
@@ -57,15 +63,26 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     gameMode: GameMode.Multiplayer,
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
-    maxRoundTime: 1,
-    dictionary: 'french',
+    maxRoundTime: DEFAULT_MAX_ROUND_TIME,
+    dictionary: DEFAULT_DICTIONARY,
+};
+
+const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
+    playerName: DEFAULT_PLAYER_NAME,
+    playerId: DEFAULT_PLAYER_ID,
+    gameType: GameType.Classic,
+    gameMode: GameMode.Solo,
+    virtualPlayerLevel: VirtualPlayerLevel.Beginner,
+    virtualPlayerName: DEFAULT_PLAYER_NAME,
+    maxRoundTime: DEFAULT_MAX_ROUND_TIME,
+    dictionary: DEFAULT_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
-    maxRoundTime: 1,
-    dictionary: 'french',
+    maxRoundTime: DEFAULT_MAX_ROUND_TIME,
+    dictionary: DEFAULT_DICTIONARY,
 };
 
 const DEFAULT_ROOM = new WaitingRoom(DEFAULT_GAME_CONFIG);
@@ -73,6 +90,21 @@ const DEFAULT_EXCEPTION = 'exception';
 
 const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 const DEFAULT_JOINED_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+
+const DEFAULT_STARTING_GAME_DATA: StartGameData = {
+    ...DEFAULT_GAME_CONFIG,
+    gameId: DEFAULT_GAME_ID,
+    board: undefined as unknown as Square[][],
+    tileReserve: [],
+    round: {
+        playerData: {
+            id: DEFAULT_PLAYER_ID,
+        },
+        startTime: new Date(),
+        limitTime: new Date(),
+    },
+    player2: DEFAULT_JOINED_PLAYER,
+};
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
@@ -338,9 +370,63 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateGame', () => {
+    describe('handleCreateGame', async () => {
+        let startGameDataSpy: unknown;
+        let addToRoomSpy: unknown;
+        let sliceVirtualPlayerToPlayerSpy: unknown;
+        let socketServiceSpy: unknown;
+        let virtualPlayerServiceSpy: unknown;
+        let activeGameServiceSpy: unknown;
+
+        stub(VirtualPlayerService, 'isIdVirtualPlayer').returns(true);
+
+        beforeEach(() => {
+            startGameDataSpy = spy.on(controller['createGameService'], 'createSoloGame', () => {
+                return DEFAULT_STARTING_GAME_DATA;
+            });
+            addToRoomSpy = spy.on(controller['socketService'], 'addToRoom', () => {});
+            sliceVirtualPlayerToPlayerSpy = spy.on(controller['virtualPlayerService'], 'sliceVirtualPlayerToPlayer', () => {
+                return DEFAULT_PLAYER;
+            });
+            socketServiceSpy = spy.on(controller['socketService'], 'emitToSocket', () => {});
+            virtualPlayerServiceSpy = spy.on(controller['virtualPlayerService'], 'triggerVirtualPlayerTurn', () => {});
+            activeGameServiceSpy = spy.on(controller['activeGameService'], 'getGame', () => {});
+        });
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should call createGameService.createSoloGame', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(startGameDataSpy).to.have.been.called();
+        });
+
+        it('should call socketService.addToRoom', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(addToRoomSpy).to.have.been.called();
+        });
+
+        it('should call virtualPlayerService.sliceVirtualPlayerToPlayer', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
+        });
+
+        it('should call socketService.emitToSocket', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(socketServiceSpy).to.have.been.called();
+        });
+
+        it('should call virtualPlayerService.triggerVirtualPlayerTurn', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(virtualPlayerServiceSpy).to.have.been.called();
+        });
+
+        it('should call activeGameService.getGame', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(activeGameServiceSpy).to.have.been.called();
+        });
+
         it('should return game id', async () => {
-            chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             chai.spy.on(controller['createGameService'], 'createMultiplayerGame', () => {
                 return DEFAULT_ROOM;
             });
@@ -352,19 +438,17 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call createGameService.createMultiplayerGame', () => {
-            chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-            const spy = chai.spy.on(controller['createGameService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
+            const createGameServiceSpy = chai.spy.on(controller['createGameService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
             chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
-            expect(spy).to.have.been.called();
+            expect(createGameServiceSpy).to.have.been.called();
         });
 
         it('should call socketService.addToRoom', () => {
-            const spy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => DEFAULT_GAME_ID);
             chai.spy.on(controller, 'handleLobbiesUpdate', () => {});
             controller['handleCreateGame'](DEFAULT_GAME_CONFIG_DATA);
-            expect(spy).to.have.been.called();
+            expect(addToRoomSpy).to.have.been.called();
         });
 
         it('should throw if config.playerName is undefined', async () => {
@@ -375,6 +459,11 @@ describe('GameDispatcherController', () => {
         it('should throw if config.gameType is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, gameType: undefined };
             expect(controller['handleCreateGame'](config as unknown as GameConfigData)).to.be.rejectedWith(GAME_TYPE_REQUIRED);
+        });
+
+        it('should throw if config.gameMode is undefined', () => {
+            const config = { ...DEFAULT_GAME_CONFIG_DATA, gameMode: undefined };
+            expect(controller['handleCreateGame'](config as unknown as GameConfigData)).to.be.rejectedWith(GAME_MODE_REQUIRED);
         });
 
         it('should throw if config.maxRoundTime is undefined', () => {
@@ -573,6 +662,12 @@ describe('GameDispatcherController', () => {
 
         it('should call socketService.emitToSocket', () => {
             waitingRoomStub.joinedPlayer = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+            controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(emitToSocketSpy).to.have.been.called();
+        });
+
+        it('should not call socketService.emitToSocket', () => {
+            waitingRoomStub.joinedPlayer = undefined;
             controller['handleCancelGame'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(emitToSocketSpy).to.have.been.called();
         });
