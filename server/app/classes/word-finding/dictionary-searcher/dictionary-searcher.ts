@@ -68,10 +68,10 @@ export default class DictionarySearcher {
         return undefined;
     }
 
-    private addChildrenToStack(node: DictionaryNode, letters: string[]): void {
+    private addChildrenToStack(node: DictionaryNode, lettersLeft: string[]): void {
         if (node.getDepth() > this.boardPlacement.maxSize) return;
 
-        const [lettersToUse, shouldRemoveFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), letters);
+        const [lettersToUse, shouldRemoveFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), lettersLeft);
 
         for (const letter of lettersToUse) {
             const child = node.getNode(letter);
@@ -79,7 +79,7 @@ export default class DictionarySearcher {
             if (child) {
                 this.stack.unshift({
                     node: child,
-                    playerLetters: shouldRemoveFromLetters ? this.getLettersLeft(letters, letter) : [...letters],
+                    playerLetters: shouldRemoveFromLetters ? this.getLettersLeft(lettersLeft, letter) : [...lettersLeft],
                 });
             }
         }
