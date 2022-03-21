@@ -215,11 +215,7 @@ export class GameDispatcherController {
 
         if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
-        if (config.gameMode === GameMode.Multiplayer) {
-            return this.handleCreateMultiplayerGame(config);
-        } else {
-            return this.handleCreateSoloGame(config);
-        }
+        return config.gameMode === GameMode.Multiplayer ? this.handleCreateMultiplayerGame(config) : this.handleCreateSoloGame(config);
     }
 
     private handleCreateMultiplayerGame(config: GameConfigData): LobbyData {
