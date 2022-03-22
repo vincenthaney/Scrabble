@@ -25,6 +25,7 @@ export class GamePlayService {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getPlayer(playerId, IS_REQUESTING);
         if (player.id !== playerId) throw new Error(NOT_PLAYER_TURN);
+        if (game.gameIsOver) return [undefined, undefined];
 
         const action: Action = this.getAction(player, game, actionData);
 
