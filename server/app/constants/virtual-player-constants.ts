@@ -21,3 +21,4 @@ export const HIGH_SCORE_RANGE: PointRange = {
     minimum: 13,
     maximum: 18,
 };
+export const MINIMUM_EXCHANGE_WORD_COUNT = 7;

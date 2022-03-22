@@ -1,8 +1,11 @@
+/* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
+import Game from '@app/classes/game/game';
+import { LetterValue } from '@app/classes/tile';
 import { WordFindingUseCase } from '@app/classes/word-finding';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { HIGH_SCORE_RANGE, MEDIUM_SCORE_RANGE, LOW_SCORE_RANGE } from '@app/constants/virtual-player-constants';
@@ -34,6 +37,8 @@ import { BeginnerVirtualPlayer } from './beginner-virtual-player';
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
 ];
+
+const TEST_SELECT_COUNT = 3;
 
 describe('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
@@ -136,6 +141,9 @@ describe('BeginnerVirtualPlayer', () => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PLACE;
             });
+            spy.on(beginnerVirtualPlayer, 'isExchangeImpossible', () => {
+                return false;
+            });
         });
 
         it('findAction should call createWordFindingPlacement if random is RANDOM_VALUE_PLACE', () => {
@@ -188,6 +196,9 @@ describe('BeginnerVirtualPlayer', () => {
         it('findAction should call ActionExchange.createActionData()', () => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_EXCHANGE;
+            });
+            spy.on(beginnerVirtualPlayer, 'isExchangeImpossible', () => {
+                return false;
             });
             const actionExchangeSpy = spy.on(ActionExchange, 'createActionData', () => {
                 return;
@@ -287,6 +298,56 @@ describe('BeginnerVirtualPlayer', () => {
             beginnerVirtualPlayer.computeWordPlacement();
             expect(getGameBoardSpy).to.have.been.called();
             expect(generateWordSpy).to.have.been.called();
+        });
+    });
+
+    describe('selectRandomTiles', () => {
+        it('should send the specified tile count', () => {
+            beginnerVirtualPlayer.tiles = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+                { letter: 'C', value: 0 },
+                { letter: 'D', value: 0 },
+                { letter: 'F', value: 0 },
+            ];
+            spy.on(beginnerVirtualPlayer, 'isExchangeImpossible', () => {
+                return false;
+            });
+            spy.on(Math, 'max', () => {
+                return beginnerVirtualPlayer.tiles.length - TEST_SELECT_COUNT;
+            });
+            expect(beginnerVirtualPlayer['selectRandomTiles']().length).to.equal(TEST_SELECT_COUNT);
+        });
+    });
+
+    describe('isExchangeImpossible', () => {
+        let TEST_GAME: Game;
+        let TEST_MAP: Map<LetterValue, number>;
+        beforeEach(() => {
+            TEST_GAME = new Game();
+
+            spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
+                return TEST_GAME;
+            });
+            spy.on(TEST_GAME, 'getTilesLeftPerLetter', () => {
+                return TEST_MAP;
+            });
+        });
+        it('should return true when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            TEST_MAP = new Map<LetterValue, number>([
+                ['A', 2],
+                ['B', 2],
+            ]);
+            expect(beginnerVirtualPlayer['isExchangeImpossible']()).to.be.true;
+        });
+
+        it('should return false when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            TEST_MAP = new Map<LetterValue, number>([
+                ['A', 3],
+                ['B', 3],
+                ['C', 3],
+            ]);
+            expect(beginnerVirtualPlayer['isExchangeImpossible']()).to.be.false;
         });
     });
 });
