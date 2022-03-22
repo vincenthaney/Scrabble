@@ -138,10 +138,6 @@ describe('GameService', () => {
     });
 
     describe('Constructor', () => {
-        it('should subscribe to initialize game event from GameDispatcher', () => {
-            expect(gameDispatcherControllerSpy.subscribeToInitializeGame).toHaveBeenCalled();
-        });
-
         it('should call handleNewMessage if new message from gameController is Message', () => {
             const spy = spyOn(service, 'handleNewMessage');
             service['gameController']['newMessage$'].next(DEFAULT_MESSAGE);
@@ -198,27 +194,6 @@ describe('GameService', () => {
             };
 
             roundManagerSpy.getActivePlayer.and.returnValue({ id: DEFAULT_PLAYER_ID } as AbstractPlayer);
-        });
-
-        it('InitializeGame event of GameDispatcher should call initializeGame if payload is present', () => {
-            const initializeGameSpy = spyOn(service, 'initializeGame').and.callFake(async () => {
-                return new Promise(() => {
-                    return;
-                });
-            });
-            const initializeData: InitializeGameData = { localPlayerId: 'id', startGameData: defaultGameData };
-            gameDispatcherControllerSpy['initializeGame$'].next(initializeData);
-            expect(initializeGameSpy).toHaveBeenCalledWith(initializeData.localPlayerId, initializeData.startGameData);
-        });
-
-        it('InitializeGame event of GameDispatcher should NOT call initializeGame if payload is NOT present', () => {
-            const initializeGameSpy = spyOn(service, 'initializeGame').and.callFake(async () => {
-                return new Promise(() => {
-                    return;
-                });
-            });
-            gameDispatcherControllerSpy['initializeGame$'].next(undefined);
-            expect(initializeGameSpy).not.toHaveBeenCalled();
         });
 
         it('should set gameId', async () => {
@@ -540,7 +515,7 @@ describe('GameService', () => {
             const message: Message = { senderId: SYSTEM_ERROR_ID } as Message;
             service.handleNewMessage(message);
 
-            expect(spy).toHaveBeenCalledWith('usedTiles', undefined);
+            expect(spy).toHaveBeenCalledWith('resetUsedTiles');
         });
 
         it('should not call emitGameViewEvent if sender id is not system-error', () => {

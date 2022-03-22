@@ -82,7 +82,6 @@ export class GamePlayController {
         if (data.payload === undefined) throw new HttpException('payload is required', StatusCodes.BAD_REQUEST);
 
         try {
-            const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
             if (data.input.length > 0) {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
@@ -90,6 +89,9 @@ export class GamePlayController {
                     gameId,
                 });
             }
+
+            const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
+
             if (updateData) {
                 this.gameUpdate(gameId, updateData);
             }

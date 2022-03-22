@@ -1,7 +1,7 @@
 import { Orientation, Position } from '@app/classes/board';
 import { ActionType } from '@app/classes/communication/action-data';
 import { Tile } from '@app/classes/tile';
-import { WordPlacement } from '@app/classes/word-finding/word-placement';
+import { WordPlacement } from '@app/classes/word-finding';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
 import { ACTION_COMMAND_INDICATOR } from '@app/constants/services-constants/word-finding.const';
 
@@ -37,6 +37,12 @@ export class PlacementToString {
     }
 
     private static tileToLetterConversion(tile: Tile, inUpperCase: boolean = false): string {
-        return inUpperCase || tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
+        return inUpperCase || tile.isBlank ? this.getLetterFromBlankTile(tile) : tile.letter.toLowerCase();
+    }
+
+    private static getLetterFromBlankTile(tile: Tile): string {
+        if (!tile.isBlank) return tile.letter;
+
+        return tile.playedLetter ? tile.playedLetter.toUpperCase() : tile.letter.toUpperCase();
     }
 }

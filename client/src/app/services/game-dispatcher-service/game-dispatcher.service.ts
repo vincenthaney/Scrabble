@@ -2,11 +2,12 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LobbyData, LobbyInfo } from '@app/classes/communication/';
-import { GameConfigData } from '@app/classes/communication/game-config';
+import { GameConfigData, InitializeGameData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
+import GameService from '@app/services/game-service/game.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -24,7 +25,10 @@ export default class GameDispatcherService implements OnDestroy {
     private joinerRejectedEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
+    constructor(private gameDispatcherController: GameDispatcherController, public router: Router, private readonly gameService: GameService) {
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
+            this.currentLobby = lobbyData;
+        });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
@@ -39,9 +43,9 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.serviceDestroyed$, (lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
-        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
-            this.currentLobby = lobbyData;
-        });
+        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
+            this.gameService.handleInitializeGame(initializeValue),
+        );
     }
 
     getCurrentLobbyId(): string {

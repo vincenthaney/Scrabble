@@ -112,6 +112,14 @@ describe('GameDispatcherService', () => {
             service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
             expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
         });
+
+        it('should initialize game on initializeGame event received', () => {
+            const spy = spyOn(service['gameService'], 'handleInitializeGame').and.callFake(async () => {
+                return;
+            });
+            service['gameDispatcherController']['initializeGame$'].next(undefined);
+            expect(spy).toHaveBeenCalledWith(undefined);
+        });
     });
 
     describe('getCurrentLobbyId', () => {

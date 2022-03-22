@@ -1,21 +1,27 @@
 import {
     EXCHANGE_ACTION_THRESHOLD,
     FINAL_WAIT_TIME,
-    HIGH_SCORE_RANGE,
-    LOW_SCORE_RANGE,
+    HIGH_SCORE_RANGE_MAX,
+    HIGH_SCORE_RANGE_MIN,
+    LOW_SCORE_RANGE_MAX,
+    LOW_SCORE_RANGE_MIN,
     LOW_SCORE_THRESHOLD,
-    MEDIUM_SCORE_RANGE,
+    MEDIUM_SCORE_RANGE_MAX,
+    MEDIUM_SCORE_RANGE_MIN,
     MEDIUM_SCORE_THRESHOLD,
+    MINIMUM_EXCHANGE_WORD_COUNT,
     PASS_ACTION_THRESHOLD,
     PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { PointRange, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Board } from '@app/classes/board';
-import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { Delay } from '@app/utils/delay';
+import Range from '@app/classes/range/range';
+import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { Random } from '@app/utils/random';
+import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
@@ -33,14 +39,14 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
     }
 
-    findPointRange(): PointRange {
+    findPointRange(): Range {
         const randomPointRange = Math.random();
         if (randomPointRange <= LOW_SCORE_THRESHOLD) {
-            return LOW_SCORE_RANGE;
+            return new Range(LOW_SCORE_RANGE_MIN, LOW_SCORE_RANGE_MAX);
         } else if (randomPointRange <= MEDIUM_SCORE_THRESHOLD) {
-            return MEDIUM_SCORE_RANGE;
+            return new Range(MEDIUM_SCORE_RANGE_MIN, MEDIUM_SCORE_RANGE_MAX);
         } else {
-            return HIGH_SCORE_RANGE;
+            return new Range(HIGH_SCORE_RANGE_MIN, HIGH_SCORE_RANGE_MAX);
         }
     }
 
@@ -54,11 +60,11 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
-        if (randomAction <= PASS_ACTION_THRESHOLD) {
+        if (randomAction <= PASS_ACTION_THRESHOLD || this.isExchangeImpossible()) {
             return ActionPass.createActionData();
         }
         if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
-            return ActionExchange.createActionData(this.tiles);
+            return ActionExchange.createActionData(this.selectRandomTiles());
         }
         const scoredWordPlacement = this.computeWordPlacement();
         if (scoredWordPlacement) {
@@ -79,5 +85,20 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     computeWordPlacement(): ScoredWordPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
+    }
+
+    private isExchangeImpossible(): boolean {
+        let total = 0;
+        this.getActiveGameService()
+            .getGame(this.gameId, this.id)
+            .getTilesLeftPerLetter()
+            .forEach((value: number) => {
+                total += value;
+            });
+        return total < MINIMUM_EXCHANGE_WORD_COUNT;
+    }
+
+    private selectRandomTiles(): Tile[] {
+        return Random.getRandomElementsFromArray(this.tiles, Math.ceil(Math.random() * this.tiles.length));
     }
 }

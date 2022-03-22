@@ -8,7 +8,7 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
-import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding/word-placement';
+import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding';
 import { IN_UPPER_CASE } from '@app/constants/classes-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
@@ -46,6 +46,7 @@ export default class ActionPlace extends ActionPlay {
 
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.wordPlacement.tilesToPlace, this.player);
+
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);

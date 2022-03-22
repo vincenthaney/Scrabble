@@ -29,14 +29,6 @@ describe('ReconnectionService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('initializeControllerSockets should call configureSockets on GameDispatcherController', () => {
-        gameDispatcherSpy.configureSocket.and.callFake(() => {
-            return;
-        });
-        service.initializeControllerSockets();
-        expect(gameDispatcherSpy.configureSocket).toHaveBeenCalled();
-    });
-
     describe('reconnectGame', () => {
         it('reconnect if there is a cookie', () => {
             const getCookieSpy = spyOn(service['cookieService'], 'getCookie').and.returnValue('cookie');

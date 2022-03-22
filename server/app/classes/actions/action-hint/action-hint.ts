@@ -2,10 +2,9 @@ import ActionInfo from '@app/classes/actions/action-info';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { WordFindingUseCase } from '@app/classes/word-finding';
-import { WordPlacement } from '@app/classes/word-finding/word-placement';
+import { WordFindingUseCase, WordPlacement } from '@app/classes/word-finding';
 import { FOUND_WORDS, HINT_ACTION_NUMBER_OF_WORDS, NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import WordFindingService from '@app/services/word-finding-service/word-finding';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { Container } from 'typedi';
 

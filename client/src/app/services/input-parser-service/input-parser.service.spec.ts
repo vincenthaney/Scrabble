@@ -12,7 +12,7 @@ import { Player } from '@app/classes/player';
 import { Position } from '@app/classes/position';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
-import { DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game';
 import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { InputParserService } from '@app/services';
@@ -315,16 +315,15 @@ describe('InputParserService', () => {
 
     describe('parseLettersToTiles', () => {
         it('should return valid tiles with valid input for place actions', () => {
+            const blankTileX = new Tile(BLANK_TILE_LETTER_VALUE, 0, true);
+            blankTileX.playedLetter = 'X';
+            const blankTileK = new Tile(BLANK_TILE_LETTER_VALUE, 0, true);
+            blankTileK.playedLetter = 'K';
             const validLetters = ['abce', 'ceX', 'bKcc', 'ccee'];
             const expectedTiles: Tile[][] = [
                 [new Tile('A' as LetterValue, 1), new Tile('B' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
-                [new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1), new Tile('X' as LetterValue, 0, true)],
-                [
-                    new Tile('B' as LetterValue, 1),
-                    new Tile('K' as LetterValue, 0, true),
-                    new Tile('C' as LetterValue, 1),
-                    new Tile('C' as LetterValue, 1),
-                ],
+                [new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1), blankTileX],
+                [new Tile('B' as LetterValue, 1), blankTileK, new Tile('C' as LetterValue, 1), new Tile('C' as LetterValue, 1)],
                 [new Tile('C' as LetterValue, 1), new Tile('C' as LetterValue, 1), new Tile('E' as LetterValue, 1), new Tile('E' as LetterValue, 1)],
             ];
 
