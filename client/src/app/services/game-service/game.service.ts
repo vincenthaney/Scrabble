@@ -70,6 +70,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameId = startGameData.gameId;
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.tileReserve = startGameData.tileReserve;
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
