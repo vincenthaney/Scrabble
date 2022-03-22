@@ -11,8 +11,9 @@ import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { nextIndex } from '@app/utils/next-index';
 import { preserveArrayOrder } from '@app/utils/preserve-array-order';
-import { Subject } from 'rxjs';
+import { pipe, Subject } from 'rxjs';
 
 export type RackTile = Tile & { isUsed: boolean; isSelected: boolean };
 
@@ -142,18 +143,16 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
                 this.moveSelectedTile(Direction.Right);
                 break;
             default:
-                this.selectTileFromKey(event);
+                this.selectTileFromKey(event.key);
         }
     }
 
-    private selectTileFromKey(event: KeyboardEvent): void {
-        const tiles = this.tiles.filter((tile) => tile.letter.toLowerCase() === event.key.toLowerCase());
+    private selectTileFromKey(key: string): void {
+        const tiles = this.tiles.filter((tile) => tile.letter.toLowerCase() === key.toLowerCase());
 
         if (tiles.length === 0) return this.unselectAll();
 
-        const selectedIndex = tiles.findIndex((tile) => tile.isSelected);
-        const indexToSelect = (selectedIndex + 1) % tiles.length;
-        this.selectTileToMove(tiles[indexToSelect]);
+        pipe(this.getSelectedTileIndex, nextIndex(tiles.length), (index) => tiles[index], this.selectTileToMove.bind(this))(tiles);
     }
 
     private moveSelectedTile(direction: Direction | number): void {
@@ -198,5 +197,9 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     private resetUsedTiles(): void {
         this.tiles.forEach((tile) => (tile.isUsed = false));
+    }
+
+    private getSelectedTileIndex(tiles: RackTile[]): number {
+        return tiles.findIndex((tile) => tile.isSelected);
     }
 }
