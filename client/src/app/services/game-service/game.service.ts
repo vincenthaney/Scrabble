@@ -34,7 +34,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
-        // private gameDispatcherController: GameDispatcherController,
         private gameController: GamePlayController,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
