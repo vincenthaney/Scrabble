@@ -117,7 +117,7 @@ describe('PlayerLeavesService', () => {
             };
         });
 
-        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+        it('subscribeToJoinerLeavesGameEvent should call subscribe method on createGameEvent', () => {
             const subscriptionSpy = spyOn(service['joinerLeavesGameEvent'], 'subscribe');
             service.subscribeToJoinerLeavesGameEvent(serviceDestroyed$, callback);
             expect(subscriptionSpy).toHaveBeenCalled();

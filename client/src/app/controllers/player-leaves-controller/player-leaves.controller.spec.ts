@@ -88,13 +88,13 @@ describe('PlayerLeavesController', () => {
             };
         });
 
-        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+        it('subscribeToJoinerLeavesGameEvent should call subscribe method on createGameEvent', () => {
             const subscriptionSpy = spyOn<any>(controller['joinerLeavesGameEvent'], 'subscribe');
             controller.subscribeToJoinerLeavesGameEvent(serviceDestroyed$, callback);
             expect(subscriptionSpy).toHaveBeenCalled();
         });
 
-        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
+        it('subscribeToResetGameEvent should call subscribe method on createGameEvent', () => {
             const subscriptionSpy = spyOn<any>(controller['resetGameEvent'], 'subscribe');
             controller.subscribeToResetGameEvent(serviceDestroyed$, callback);
             expect(subscriptionSpy).toHaveBeenCalled();

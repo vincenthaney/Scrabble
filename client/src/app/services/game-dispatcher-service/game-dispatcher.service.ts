@@ -22,14 +22,9 @@ export default class GameDispatcherService implements OnDestroy {
     private lobbyFullEvent: Subject<void> = new Subject();
     private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
     private joinerRejectedEvent: Subject<string> = new Subject();
-    private receivedGameIdEvent: Subject<void> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router) {
-        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
-            this.currentLobby = lobbyData;
-            this.receivedGameIdEvent.next();
-        });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
