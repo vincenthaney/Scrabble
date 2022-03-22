@@ -59,11 +59,14 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     async findAction(): Promise<ActionData> {
-        const scoredWordPlacement = this.computeWordPlacement();
         const randomAction = Math.random();
-        if (randomAction <= PLACE_ACTION_THRESHOLD && scoredWordPlacement) {
-            this.updateHistory(scoredWordPlacement);
-            return ActionPlace.createActionData(scoredWordPlacement);
+        if (randomAction <= PLACE_ACTION_THRESHOLD) {
+            const scoredWordPlacement = this.computeWordPlacement();
+            if (scoredWordPlacement) {
+                this.updateHistory(scoredWordPlacement);
+                return ActionPlace.createActionData(scoredWordPlacement);
+            }
+            return ActionPass.createActionData();
         }
         if (randomAction <= EXCHANGE_ACTION_THRESHOLD && this.isExchangePossible()) {
             return ActionExchange.createActionData(this.selectRandomTiles());
