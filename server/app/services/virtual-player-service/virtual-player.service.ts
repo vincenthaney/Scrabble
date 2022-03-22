@@ -16,8 +16,7 @@ import { StatusCodes } from 'http-status-codes';
 export class VirtualPlayerService {
     async sendAction(gameId: string, playerId: string, action: ActionData): Promise<Response> {
         let response = this.sendFetchRequest(gameId, playerId, action);
-
-        if ((await response).status !== StatusCodes.ACCEPTED) {
+        if ((await response).status !== StatusCodes.NO_CONTENT) {
             response = this.sendFetchRequest(gameId, playerId, ActionPass.createActionData());
         }
         return response;
