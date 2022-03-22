@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Game from '@app/classes/game/game';
-import { MultiplayerGameConfig } from '@app/classes/game/game-config';
+import { ReadyGameConfig } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
@@ -21,7 +21,7 @@ chai.use(chaiAsPromised);
 const DEFAULT_PLAYER_1 = new Player('id1', 'player1');
 const DEFAULT_PLAYER_2 = new Player('id2', 'player2');
 const DEFAULT_ID = 'gameId';
-const DEFAULT_MULTIPLAYER_CONFIG: MultiplayerGameConfig = {
+const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
@@ -55,11 +55,11 @@ describe('ActiveGameService', () => {
         expect(activeGameService['activeGames']).to.be.empty;
     });
 
-    describe('beginMultiplayerGame', () => {
+    describe('beginGame', () => {
         let spy: unknown;
 
         beforeEach(() => {
-            spy = chai.spy.on(Game, 'createMultiplayerGame', async () => Promise.resolve(DEFAULT_GAME));
+            spy = chai.spy.on(Game, 'createGame', async () => Promise.resolve(DEFAULT_GAME));
         });
 
         afterEach(() => {
@@ -68,12 +68,12 @@ describe('ActiveGameService', () => {
 
         it('should add a game to activeGame list', async () => {
             expect(activeGameService['activeGames']).to.be.empty;
-            await activeGameService.beginMultiplayerGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            await activeGameService.beginGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
         });
 
-        it('should call Game.createMultiplayerGame', async () => {
-            await activeGameService.beginMultiplayerGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
+        it('should call Game.createGame', async () => {
+            await activeGameService.beginGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
             expect(spy).to.have.been.called();
         });
     });
@@ -81,7 +81,7 @@ describe('ActiveGameService', () => {
     describe('getGame', () => {
         beforeEach(async () => {
             chai.spy.on(Game, 'createMultiplayerGame', async () => Promise.resolve(DEFAULT_GAME));
-            await activeGameService.beginMultiplayerGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            await activeGameService.beginGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
         });
 
         afterEach(() => {
@@ -110,7 +110,7 @@ describe('ActiveGameService', () => {
     describe('remove', () => {
         beforeEach(async () => {
             chai.spy.on(Game, 'createMultiplayerGame', async () => Promise.resolve(DEFAULT_GAME));
-            await activeGameService.beginMultiplayerGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            await activeGameService.beginGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
         });
 
         afterEach(() => {

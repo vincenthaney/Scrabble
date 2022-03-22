@@ -28,7 +28,6 @@ import { DEFAULT_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { GameCreationPageComponent } from './game-creation-page.component';
-import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -40,12 +39,9 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
-    let gameDispatcherSpy: SpyObj<GameDispatcherService>;
+    let gameDispatcherServiceMock: GameDispatcherService;
+    let handleGameCreationSpy: jasmine.Spy;
     const EMPTY_VALUE = '';
-
-    beforeEach(() => {
-        gameDispatcherSpy = jasmine.createSpyObj('GameDispatcherService', ['handleCreateGame']);
-    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -67,14 +63,10 @@ describe('GameCreationPageComponent', () => {
                     { path: 'waiting-room', component: TestComponent },
                     { path: 'home', component: TestComponent },
                     { path: 'game-creation', component: GameCreationPageComponent },
+                    { path: 'game', component: TestComponent },
                 ]),
             ],
-            providers: [
-                MatButtonToggleHarness,
-                MatButtonHarness,
-                MatButtonToggleGroupHarness,
-                { provide: GameDispatcherService, useValue: gameDispatcherSpy },
-            ],
+            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness, GameDispatcherService],
         }).compileComponents();
     });
 
@@ -82,8 +74,11 @@ describe('GameCreationPageComponent', () => {
         fixture = TestBed.createComponent(GameCreationPageComponent);
         loader = TestbedHarnessEnvironment.loader(fixture);
         component = fixture.componentInstance;
+        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
         gameParameters = component.gameParameters;
         fixture.detectChanges();
+
+        handleGameCreationSpy = spyOn(gameDispatcherServiceMock, 'handleCreateGame');
     });
 
     const setValidFormValues = () => {
@@ -243,17 +238,16 @@ describe('GameCreationPageComponent', () => {
             expect(spy).toHaveBeenCalledWith('waiting-room');
         });
 
-        it('createGame should reroute to game if solo game', () => {
+        it('createGame should NOT reroute to game if solo game', () => {
             const spy = spyOn<any>(component['router'], 'navigateByUrl');
             component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-
             component.createGame();
-            expect(spy).toHaveBeenCalledWith('game');
+            expect(spy).not.toHaveBeenCalledWith('game');
         });
 
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component.createGame();
-            expect(gameDispatcherSpy.handleCreateGame).toHaveBeenCalled();
+            expect(handleGameCreationSpy).toHaveBeenCalled();
         });
     });
 

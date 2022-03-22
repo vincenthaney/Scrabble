@@ -10,6 +10,7 @@ import Board from '@app/classes/board/board';
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
+import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
@@ -17,6 +18,7 @@ import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
@@ -26,6 +28,7 @@ import { GamePlayService } from '@app/services/game-play-service/game-play.servi
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
+import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
@@ -60,6 +63,18 @@ const DEFAULT_BOARD: Square[][] = [
 ];
 const DEFAULT_ERROR_MESSAGE = INVALID_COMMAND;
 const DEFAULT_MESSAGE_CONTENT = 'content';
+const DEFAULT_VIRTUAL_PLAYER_ID = VIRTUAL_PLAYER_ID_PREFIX + 'ID';
+const DEFAULT_VIRTUAL_PLAYER_DATA = {
+    id: DEFAULT_VIRTUAL_PLAYER_ID,
+};
+const DEFAULT_ROUND_DATA: RoundData = {
+    playerData: DEFAULT_VIRTUAL_PLAYER_DATA,
+    startTime: new Date(),
+    limitTime: new Date(),
+};
+const DEFAULT_VIRTUAL_PLAYER_TURN_DATA: GameUpdateData = {
+    round: DEFAULT_ROUND_DATA,
+};
 
 describe('GamePlayController', () => {
     let gamePlayController: GamePlayController;
@@ -110,12 +125,12 @@ describe('GamePlayController', () => {
             });
 
             it('should call handlePlayAction', async () => {
-                const spy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
+                const handlePlayActionSpy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
                 return supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`)
                     .then(() => {
-                        expect(spy).to.have.been.called();
+                        expect(handlePlayActionSpy).to.have.been.called();
                     });
             });
         });
@@ -140,12 +155,12 @@ describe('GamePlayController', () => {
             });
 
             it('should call handleNewMessage', async () => {
-                const spy = chai.spy.on(gamePlayController, 'handleNewMessage', () => {});
+                const handleNewMessageSpy = chai.spy.on(gamePlayController, 'handleNewMessage', () => {});
 
                 return supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
                     .then(() => {
-                        expect(spy).to.have.been.called();
+                        expect(handleNewMessageSpy).to.have.been.called();
                     });
             });
         });
@@ -166,12 +181,12 @@ describe('GamePlayController', () => {
             });
 
             it('should call handleNewError', async () => {
-                const spy = chai.spy.on(gamePlayController, 'handleNewError', () => {});
+                const handleNewErrorSpy = chai.spy.on(gamePlayController, 'handleNewError', () => {});
 
                 return supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`)
                     .then(() => {
-                        expect(spy).to.have.been.called();
+                        expect(handleNewErrorSpy).to.have.been.called();
                     });
             });
         });
@@ -210,9 +225,9 @@ describe('GamePlayController', () => {
         });
 
         it('should call playAction', async () => {
-            const spy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
+            const playActionSpy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
             await gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
-            expect(spy).to.have.been.called();
+            expect(playActionSpy).to.have.been.called();
         });
 
         it('should call emitToSocket if data.input is not empty', async () => {
@@ -328,9 +343,9 @@ describe('GamePlayController', () => {
             gamePlayController['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
-            const spy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
+            const sioSpy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
             gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
-            expect(spy).to.have.been.called();
+            expect(sioSpy).to.have.been.called();
         });
 
         it('should call sio.to.emit with gameId', () => {
@@ -340,10 +355,24 @@ describe('GamePlayController', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
             const toResponse = { emit: () => {} };
-            const spy = chai.spy.on(toResponse, 'emit');
+            const toResponseSpy = chai.spy.on(toResponse, 'emit');
             chai.spy.on(sio, 'to', () => toResponse);
             gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
-            expect(spy).to.have.been.called();
+            expect(toResponseSpy).to.have.been.called();
+        });
+
+        it('should call triggerVirtualPlayerTurn if next turn is a virtual player turn', () => {
+            spy.on(gamePlayController['socketService'], 'emitToRoom', () => {
+                return;
+            });
+            spy.on(gamePlayController['activeGameService'], 'getGame', () => {
+                return;
+            });
+            const triggerVirtualPlayerSpy = spy.on(gamePlayController['virtualPlayerService'], 'triggerVirtualPlayerTurn', () => {
+                return;
+            });
+            gamePlayController.gameUpdate(DEFAULT_GAME_ID, DEFAULT_VIRTUAL_PLAYER_TURN_DATA);
+            expect(triggerVirtualPlayerSpy).to.have.been.called();
         });
     });
 

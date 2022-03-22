@@ -1,20 +1,38 @@
 import {
     EXCHANGE_ACTION_THRESHOLD,
+    FINAL_WAIT_TIME,
     HIGH_SCORE_RANGE,
     LOW_SCORE_RANGE,
     LOW_SCORE_THRESHOLD,
     MEDIUM_SCORE_RANGE,
     MEDIUM_SCORE_THRESHOLD,
     PASS_ACTION_THRESHOLD,
+    PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { PointRange } from '@app/classes/word-finding';
+import { PointRange, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Board } from '@app/classes/board';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { Delay } from '@app/utils/delay';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
+    async playTurn(): Promise<void> {
+        const waitPreliminaryTime = async (): Promise<void> => {
+            await Delay.for(PRELIMINARY_WAIT_TIME);
+        };
+        const waitFinalTime = async (): Promise<void> => {
+            await Delay.for(FINAL_WAIT_TIME);
+        };
+
+        const play = async (): Promise<[ActionData, void]> => {
+            return await Promise.all([this.findAction(), waitPreliminaryTime()]);
+        };
+        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
+        this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
+    }
+
     findPointRange(): PointRange {
         const randomPointRange = Math.random();
         if (randomPointRange <= LOW_SCORE_THRESHOLD) {
@@ -26,7 +44,15 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         }
     }
 
-    findAction(): ActionData {
+    generateWordFindingRequest(): WordFindingRequest {
+        return {
+            pointRange: this.findPointRange(),
+            useCase: WordFindingUseCase.Beginner,
+            pointHistory: this.pointHistory,
+        };
+    }
+
+    async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
         if (randomAction <= PASS_ACTION_THRESHOLD) {
             return ActionPass.createActionData();
