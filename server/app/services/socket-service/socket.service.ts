@@ -77,9 +77,9 @@ export class SocketService {
         return socket;
     }
 
-    // Required for signature overload. This restricts us to only the correct payload
-    // which corresponds to the emit which is being done and does not let us emit incorrect
-    // arguments which would cause problems on the client side
+    // Required for signature overload. This forces us to use only the correct payload
+    // for the current emit and prevents us from emitting incorrect arguments which
+    // would cause errors on the client side
     /* eslint-disable no-dupe-class-members */
     emitToRoom(id: string, ev: 'gameUpdate', ...args: GameUpdateEmitArgs[]): void;
     emitToRoom(id: string, ev: 'joinRequest', ...args: JoinRequestEmitArgs[]): void;

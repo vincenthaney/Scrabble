@@ -85,7 +85,6 @@ export default class RoundManager {
 
     private getNextPlayer(): Player {
         if (this.currentRound === undefined) {
-            // Randomly get a player
             return Math.round(Math.random()) === 0 ? this.player1 : this.player2;
         }
         return this.currentRound.player === this.player1 ? this.player2 : this.player1;

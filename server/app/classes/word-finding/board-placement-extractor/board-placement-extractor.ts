@@ -1,9 +1,11 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { LetterValue } from '@app/classes/tile';
 import Direction from '@app/classes/board/direction';
-import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from './word-finding-types';
+import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from '@app/classes/word-finding';
+import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
+import { INITIAL_POSITION } from '@app/constants/game';
 
-const PREVIOUS_EXISTS = -1;
+const HAS_TILE_IN_PREVIOUS_POSITION = -1;
 const SHOULD_BE_FILLED = true;
 
 export default class BoardPlacementsExtractor {
@@ -27,6 +29,17 @@ export default class BoardPlacementsExtractor {
                 boardPlacements = boardPlacements.concat(lineBoardPlacement);
                 this.navigator.nextLine();
             } while (this.navigator.isWithinBounds());
+        }
+
+        if (boardPlacements.length === 0 && this.isBoardEmpty()) {
+            boardPlacements.push({
+                position: new Position(INITIAL_POSITION.x, INITIAL_POSITION.y),
+                orientation: Orientation.Horizontal,
+                letters: [],
+                perpendicularLetters: [],
+                minSize: 0,
+                maxSize: MAX_TILES_PER_PLAYER,
+            });
         }
 
         return boardPlacements;
@@ -116,7 +129,7 @@ export default class BoardPlacementsExtractor {
     private getMinSize(linePlacement: LinePlacements): number {
         return Math.min(
             linePlacement.letters.find(() => true)?.distance ?? Number.POSITIVE_INFINITY,
-            linePlacement.perpendicularLetters.find(() => true)?.distance ?? Number.POSITIVE_INFINITY,
+            (linePlacement.perpendicularLetters.find(() => true)?.distance ?? Number.POSITIVE_INFINITY) + 1,
         );
     }
 
@@ -125,7 +138,7 @@ export default class BoardPlacementsExtractor {
     }
 
     private hasTileJustBefore(letters: LetterPosition[]): boolean {
-        return letters.some((letter) => letter.distance === PREVIOUS_EXISTS);
+        return letters.some((letter) => letter.distance === HAS_TILE_IN_PREVIOUS_POSITION);
     }
 
     private *moveThroughLine(navigator: BoardNavigator): Generator<number> {
@@ -135,5 +148,9 @@ export default class BoardPlacementsExtractor {
             distance++;
             navigator.forward();
         }
+    }
+
+    private isBoardEmpty(): boolean {
+        return this.board.grid.every((line) => line.every((square) => square.tile === null));
     }
 }

@@ -82,25 +82,24 @@ app-square {
             position: absolute;
             z-index: 100;
             color: $selected-color;
-            font-family: "Font Awesome 5 Pro";
-            font-weight: 900;
-            font-size: 1.15em;
+            font-size: 1.2em;
+            text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
             animation: blink-arrow;
             animation-duration: 0.8s;
             animation-iteration-count: infinite;
         }
 
         &.cursor-horizontal:after {
-            content: "\f054";
+            content: "▶";
             top: 50%;
             right: -7px;
             transform: translate(100%, -50%);
         }
 
         &.cursor-vertical:after {
-            content: "\f078";
+            content: "▼";
             left: 50%;
-            bottom: -2px;
+            bottom: -5px;
             transform: translate(-50%, 100%);
         }
     }
