@@ -227,6 +227,8 @@ export class GameDispatcherController {
     private async handleCreateSoloGame(config: GameConfigData): Promise<void> {
         if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
+
+        this.gameDispatcherService.createSoloGame(config);
     }
 
     private handleJoinGame(gameId: string, playerId: string, playerName: string): void {
