@@ -9,6 +9,7 @@ export interface EventTypes {
     reRender: void;
     newMessage: Message | null;
     usedTiles: PlaceActionPayload | undefined;
+    resetUsedTiles: void;
     gameInitialized: InitializeGameData | undefined;
 }
 

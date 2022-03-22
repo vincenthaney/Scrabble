@@ -46,6 +46,7 @@ export default class ActionPlace extends ActionPlay {
 
     execute(): void | GameUpdateData {
         const [tilesToPlace, unplayedTiles] = ActionUtils.getTilesFromPlayer(this.wordPlacement.tilesToPlace, this.player);
+
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);

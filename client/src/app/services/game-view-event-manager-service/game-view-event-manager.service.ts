@@ -26,6 +26,7 @@ export class GameViewEventManagerService {
         this.eventMap.set('reRender', new Subject<void>());
         this.eventMap.set('newMessage', new BehaviorSubject<Message | null>(null));
         this.eventMap.set('usedTiles', new BehaviorSubject<PlaceActionPayload | undefined>(undefined));
+        this.eventMap.set('resetUsedTiles', new Subject<void>());
         this.eventMap.set('gameInitialized', new BehaviorSubject<InitializeGameData | undefined>(undefined));
     }
 
