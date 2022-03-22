@@ -470,7 +470,7 @@ describe('AbstractWordFinding', () => {
         const tests: [letter: string, expected: Tile][] = [
             ['a', testTiles[0]],
             ['b', testTiles[1]],
-            ['z', { ...testTiles[3], playedLetter: 'Z' }],
+            ['z', { ...testTiles[3], letter: 'Z', isBlank: true }],
         ];
 
         let index = 0;

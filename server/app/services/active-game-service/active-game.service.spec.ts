@@ -38,7 +38,7 @@ const DEFAULT_GAME = {
     isGameOver: () => true,
 };
 
-describe.skip('ActiveGameService', () => {
+describe('ActiveGameService', () => {
     let activeGameService: ActiveGameService;
 
     beforeEach(() => {

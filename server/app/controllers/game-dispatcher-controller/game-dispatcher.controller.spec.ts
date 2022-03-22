@@ -106,7 +106,7 @@ const DEFAULT_STARTING_GAME_DATA: StartGameData = {
     player2: DEFAULT_JOINED_PLAYER,
 };
 
-describe.skip('GameDispatcherController', () => {
+describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
     let socketServiceStub: SinonStubbedInstance<SocketService>;
     let createGameServiceStub: SinonStubbedInstance<CreateGameService>;

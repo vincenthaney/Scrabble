@@ -120,7 +120,7 @@ const DEFAULT_WAITING_ROOM = new WaitingRoom(DEFAULT_MULTIPLAYER_CONFIG);
 chai.use(spies);
 chai.use(chaiAsPromised);
 
-describe.skip('GameDispatcherService', () => {
+describe('GameDispatcherService', () => {
     let gameDispatcherService: GameDispatcherService;
     let socketService: SocketService;
     let createGameService: CreateGameService;

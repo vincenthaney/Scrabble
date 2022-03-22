@@ -6,7 +6,6 @@ import BoardService from '@app/services/board-service/board.service';
 import { StatusCodes } from 'http-status-codes';
 import { EventEmitter } from 'events';
 import { Service } from 'typedi';
-import { ReadyGameConfig, StartGameData } from '@app/classes/game/game-config';
 
 @Service()
 export class ActiveGameService {

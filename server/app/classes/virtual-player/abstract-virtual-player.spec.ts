@@ -2,11 +2,12 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
-import PointRange from '@app/classes/word-finding/point-range';
 import { AbstractVirtualPlayer } from './abstract-virtual-player';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import Range from '@app/classes/range/range';
+
 class TestClass extends AbstractVirtualPlayer {
     findAction(): void {
         return;
@@ -16,7 +17,7 @@ class TestClass extends AbstractVirtualPlayer {
         return;
     }
 
-    findPointRange(): PointRange {
+    findPointRange(): Range {
         return TEST_POINT_RANGE;
     }
 }

@@ -12,6 +12,7 @@ import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { GameType } from './game-type';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
 export const LOSE = -1;

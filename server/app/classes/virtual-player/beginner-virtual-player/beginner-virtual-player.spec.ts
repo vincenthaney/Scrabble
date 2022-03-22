@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
-import { ScoredWordPlacement } from '@app/classes/word-finding';
+import { ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     HIGH_SCORE_RANGE_MAX,
     HIGH_SCORE_RANGE_MIN,
