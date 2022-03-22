@@ -151,6 +151,15 @@ export default class InputParserService {
         player.getTiles().forEach((tile: Tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
         });
+
+        const parsedTiles: Tile[] = this.fillParsedTiles(lettersToParse, playerTiles, actionType);
+
+        if (parsedTiles.length !== lettersToParse.length) throw new CommandException(CommandExceptionMessages.DontHaveTiles);
+
+        return parsedTiles;
+    }
+
+    private fillParsedTiles(lettersToParse: string, playerTiles: Tile[], actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {
         const parsedTiles: Tile[] = [];
 
         for (const letter of lettersToParse) {
@@ -167,8 +176,6 @@ export default class InputParserService {
                 }
             }
         }
-
-        if (parsedTiles.length !== lettersToParse.length) throw new CommandException(CommandExceptionMessages.DontHaveTiles);
 
         return parsedTiles;
     }
