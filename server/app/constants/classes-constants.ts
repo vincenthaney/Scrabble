@@ -7,12 +7,12 @@ interface HelpAction {
 export const HELP_ACTIONS: HelpAction[] = [
     {
         command: 'placer',
-        useCase: '<ligne><colonne>[(h|v)] <lettres>',
+        useCase: '`<ligne><colonne>`[(h|v)] <lettres>',
         description: 'jouer un mot',
     },
     {
-        command: 'echanger',
-        useCase: '<lettres>',
+        command: 'échanger',
+        useCase: '`<lettres>`',
         description: 'changer des lettres de son chevalet pour des lettres de la réserve',
     },
     {
@@ -20,8 +20,16 @@ export const HELP_ACTIONS: HelpAction[] = [
         description: 'passer son tour',
     },
     {
-        command: 'reserve',
-        description: 'affiche les lettres dans la réserve',
+        command: 'réserve',
+        description: 'afficher les lettres dans la réserve',
+    },
+    {
+        command: 'indice',
+        description: 'proposer trois placements de mots valides',
+    },
+    {
+        command: 'aide',
+        description: 'afficher la liste des commandes et leur utilisation',
     },
 ];
 
