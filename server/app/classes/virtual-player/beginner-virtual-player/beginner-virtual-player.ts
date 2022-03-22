@@ -18,6 +18,7 @@ import { Board } from '@app/classes/board';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { Delay } from '@app/utils/delay';
 import { Tile } from '@app/classes/tile';
+import { Random } from '@app/utils/random';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
@@ -95,6 +96,6 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     private selectRandomTiles(): Tile[] {
-        return this.tiles.slice(Math.max(1, Math.floor(Math.random() * this.tiles.length)));
+        return Random.getRandomElementsFromArray(this.tiles, Math.ceil(Math.random() * this.tiles.length));
     }
 }
