@@ -3,7 +3,7 @@
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 import { Orientation, Position } from '@app/classes/board';
-import { Tile } from '@app/classes/tile';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding/word-placement';
 import { IN_UPPER_CASE } from '@app/constants/classes-constants';
 import * as chai from 'chai';
@@ -12,7 +12,11 @@ import * as spies from 'chai-spies';
 import { PlacementToString } from './placement-to-string';
 chai.use(spies);
 
-describe('WordPlacement utils', () => {
+describe.only('WordPlacement utils', () => {
+    afterEach(() => {
+        chai.spy.restore();
+    });
+
     describe('positionNumberToLetter', () => {
         it('should convert 0 to a', () => {
             expect(PlacementToString.positionNumberToLetter(0)).to.equal('a');
@@ -91,25 +95,18 @@ describe('WordPlacement utils', () => {
 
     describe('getLetterFromBlankTile', () => {
         it('should return letter if not blank', () => {
-            const tile: Tile = { letter: 'A', value: 0 };
+            const tile: Tile = { letter: 'a' as LetterValue, value: 0 };
             expect(PlacementToString['getLetterFromBlankTile'](tile)).to.equal('a');
         });
 
         it('should return playedLetter to uppercase if defined', () => {
-            const tile: Tile = { letter: '*', value: 0, isBlank: true, playedLetter: 'A' };
+            const tile: Tile = { letter: '*', value: 0, isBlank: true, playedLetter: 'a' as LetterValue };
             expect(PlacementToString['getLetterFromBlankTile'](tile)).to.equal('A');
         });
 
         it('should return letter to uppercase if playedLetter is NOT defined', () => {
-            const tile: Tile = { letter: 'A', value: 0, isBlank: true };
+            const tile: Tile = { letter: 'a' as LetterValue, value: 0, isBlank: true };
             expect(PlacementToString['getLetterFromBlankTile'](tile)).to.equal('A');
-        });
-
-        it('should convert blank', () => {
-            const tile: Tile = { letter: 'B', value: 0, isBlank: true };
-            const getLetterSpy = chai.spy.on(PlacementToString, 'getLetterFromBlankTile', (t: Tile) => t.letter.toUpperCase());
-            expect(PlacementToString['tileToLetterConversion'](tile)).to.equal('B');
-            expect(getLetterSpy).to.have.been.called;
         });
     });
 
