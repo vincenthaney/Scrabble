@@ -1,7 +1,6 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
@@ -21,11 +20,7 @@ export class ConvertDialogComponent implements OnDestroy {
     gameParameters: FormGroup;
     isConverting: boolean;
 
-    constructor(
-        @Inject(MAT_DIALOG_DATA) public data: ConvertDialogParameters,
-        private router: Router,
-        private gameDispatcherService: GameDispatcherService,
-    ) {
+    constructor(@Inject(MAT_DIALOG_DATA) public data: ConvertDialogParameters, private gameDispatcherService: GameDispatcherService) {
         this.isConverting = false;
         this.playerName = data.hostName;
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -50,9 +45,6 @@ export class ConvertDialogComponent implements OnDestroy {
 
     handleConvertToSolo(): void {
         this.gameDispatcherService.handleRecreateGame(this.gameParameters);
-        this.gameDispatcherService.subscribeToReceivedGameIdEvent(this.pageDestroyed$, () => {
-            this.router.navigateByUrl('game');
-        });
     }
 
     returnToWaiting(): void {

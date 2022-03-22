@@ -161,8 +161,4 @@ export default class GameDispatcherService implements OnDestroy {
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
-
-    subscribeToReceivedGameIdEvent(componentDestroyed$: Subject<boolean>, callback: () => void): void {
-        this.receivedGameIdEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
-    }
 }

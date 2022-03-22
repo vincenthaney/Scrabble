@@ -126,18 +126,5 @@ describe('ConvertDialogComponent', () => {
             component.handleConvertToSolo();
             expect(spy).toHaveBeenCalled();
         });
-
-        it('form should call gameDispatcherService.subscribeToReceivedGameIdEvent', async () => {
-            const spy = spyOn<any>(gameDispatcherServiceMock, 'subscribeToReceivedGameIdEvent');
-            component.handleConvertToSolo();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('createGame should reroute to waiting-room if multiplayer game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.handleConvertToSolo();
-            gameDispatcherServiceMock['receivedGameIdEvent'].next();
-            expect(spy).toHaveBeenCalledWith('game');
-        });
     });
 });
