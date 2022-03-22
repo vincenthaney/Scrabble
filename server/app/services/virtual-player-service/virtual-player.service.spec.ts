@@ -14,6 +14,7 @@ import { GameType } from '@app/classes/game/game-type';
 import { Square } from '@app/classes/square';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
+import { ActionPass } from '@app/classes/actions';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';
@@ -67,17 +68,35 @@ describe('VirtualPlayerService', () => {
     });
 
     describe('sendAction', () => {
-        it('should call fetch', async () => {
+        const TEST_GAME_ID = 'coocookachoo';
+        const TEST_PLAYER_ID = 'IAmTheWalrus';
+        let TEST_ACTION: ActionData;
+        beforeEach(async () => {
             mockServer = mockttp.getLocal();
             await mockServer.start(PORT_NUMBER);
-            const TEST_GAME_ID = 'coocookachoo';
-            const TEST_PLAYER_ID = 'IAmTheWalrus';
-            const TEST_ACTION: ActionData = { type: ActionType.PLACE, input: '', payload: {} };
+        });
+
+        afterEach(() => {
+            mockServer.stop();
+        });
+
+        it('should call fetch', async () => {
+            TEST_ACTION = { type: ActionType.PLACE, input: '', payload: {} };
             const endpoint = `/api/games/${TEST_GAME_ID}/players/${TEST_PLAYER_ID}/action`;
             chai.spy.on(virtualPlayerService, 'getEndpoint', () => mockServer.url);
-            await mockServer.forPost(endpoint).thenReply(StatusCodes.NO_CONTENT);
+            await mockServer.forPost(endpoint).thenReply(StatusCodes.ACCEPTED);
             const response = await virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
-            expect(response.status).to.equal(StatusCodes.NO_CONTENT);
+            expect(response.status).to.equal(StatusCodes.ACCEPTED);
+        });
+
+        it('should call fetch, get an error then fetch with an Action Pass', async () => {
+            TEST_ACTION = { type: ActionType.PLACE, input: '', payload: {} };
+            const endpoint = `/api/games/${TEST_GAME_ID}/players/${TEST_PLAYER_ID}/action`;
+            chai.spy.on(virtualPlayerService, 'getEndpoint', () => mockServer.url);
+            await mockServer.forPost(endpoint).once().thenReply(StatusCodes.BAD_REQUEST);
+            await virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
+            const sendActionSpy = chai.spy.on(ActionPass, 'createActionData');
+            expect(sendActionSpy).to.have.been.called;
             mockServer.stop();
         });
     });
