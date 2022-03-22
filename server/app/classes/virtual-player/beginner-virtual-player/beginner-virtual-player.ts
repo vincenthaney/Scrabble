@@ -9,6 +9,7 @@ import {
     MEDIUM_SCORE_RANGE_MAX,
     MEDIUM_SCORE_RANGE_MIN,
     MEDIUM_SCORE_THRESHOLD,
+    MINIMUM_EXCHANGE_WORD_COUNT,
     PASS_ACTION_THRESHOLD,
     PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
@@ -19,6 +20,8 @@ import { Board } from '@app/classes/board';
 import { Delay } from '@app/utils/delay';
 import Range from '@app/classes/range/range';
 import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { Random } from '@app/utils/random';
+import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
@@ -57,11 +60,11 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
-        if (randomAction <= PASS_ACTION_THRESHOLD) {
+        if (randomAction <= PASS_ACTION_THRESHOLD || this.isExchangeImpossible()) {
             return ActionPass.createActionData();
         }
         if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
-            return ActionExchange.createActionData(this.tiles);
+            return ActionExchange.createActionData(this.selectRandomTiles());
         }
         const scoredWordPlacement = this.computeWordPlacement();
         if (scoredWordPlacement) {
@@ -82,5 +85,20 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     computeWordPlacement(): ScoredWordPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
+    }
+
+    private isExchangeImpossible(): boolean {
+        let total = 0;
+        this.getActiveGameService()
+            .getGame(this.gameId, this.id)
+            .getTilesLeftPerLetter()
+            .forEach((value: number) => {
+                total += value;
+            });
+        return total < MINIMUM_EXCHANGE_WORD_COUNT;
+    }
+
+    private selectRandomTiles(): Tile[] {
+        return Random.getRandomElementsFromArray(this.tiles, Math.ceil(Math.random() * this.tiles.length));
     }
 }
