@@ -325,23 +325,23 @@ describe('GameDispatcherController', () => {
             gameStub.getPlayer.returns(playerStub);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
         });
 
         it('should call activeGameService.getGame', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(getGameSpy.calledOnce);
         });
 
         it('should call isGameOver', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            chai.assert(gameStub.isGameOver.calledOnce);
+            chai.assert(gameStub.areGameOverConditionsMet.calledOnce);
         });
 
         it('should throw GAME_IS_OVER, FORBIDDEN if game isGameOver', () => {
-            gameStub.isGameOver.returns(true);
+            gameStub.areGameOverConditionsMet.returns(true);
             const result = () => controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(result).to.throw(GAME_IS_OVER);
         });
@@ -352,20 +352,20 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call addToRoom', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(addToRoomSpy).to.have.been.called();
         });
 
         it('should createStartGameData', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(gameStub.createStartGameData.calledOnce);
         });
 
         it('should call emit to socket', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(emitToSocketSpy).to.have.been.called();

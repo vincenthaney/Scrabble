@@ -6,13 +6,13 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { WINNER_MESSAGE, IS_REQUESTING } from '@app/constants/game';
+import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import { GameType } from './game-type';
 import { ReadyGameConfig, StartGameData } from './game-config';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
+import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
 export const LOSE = -1;
@@ -26,6 +26,7 @@ export default class Game {
     player1: Player;
     player2: Player;
     isAddedToDatabase: boolean;
+    gameIsOver: boolean;
     private tileReserve: TileReserve;
     private id: string;
 
@@ -51,6 +52,7 @@ export default class Game {
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
+        game.gameIsOver = false;
 
         await game.tileReserve.init();
 
@@ -97,11 +99,12 @@ export default class Game {
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
-    isGameOver(): boolean {
+    areGameOverConditionsMet(): boolean {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
 
     endOfGame(winnerName: string | undefined): [number, number] {
+        this.gameIsOver = true;
         if (winnerName) {
             if (winnerName === this.player1.name) {
                 return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());

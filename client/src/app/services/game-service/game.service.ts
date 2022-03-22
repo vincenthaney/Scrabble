@@ -87,6 +87,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     handleGameUpdate(gameUpdateData: GameUpdateData): void {
+        if (gameUpdateData.isGameOver) {
+            this.handleGameOver();
+        }
         if (gameUpdateData.player1) {
             this.handleUpdatePlayerData(gameUpdateData.player1);
         }
@@ -102,9 +105,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
         if (gameUpdateData.tileReserve) {
             this.handleTileReserveUpdate(gameUpdateData.tileReserve);
-        }
-        if (gameUpdateData.isGameOver) {
-            this.handleGameOver();
         }
     }
 

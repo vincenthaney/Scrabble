@@ -9,6 +9,7 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
@@ -18,10 +19,9 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
-import { GameType } from './game-type';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameType } from './game-type';
 
 const expect = chai.expect;
 
@@ -246,24 +246,24 @@ describe('Game', () => {
 
         it('should not be gameOver passCount lower than threshold and both players have tiles', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
-            expect(game.isGameOver()).to.be.false;
+            expect(game.areGameOverConditionsMet()).to.be.false;
         });
 
         it('should be gameOver passCount is equal to threshold', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
 
-            expect(game.isGameOver()).to.be.true;
+            expect(game.areGameOverConditionsMet()).to.be.true;
         });
 
         it('should be gameOver when player 1 has no tiles', () => {
             player1Stub.hasTilesLeft.returns(false);
-            expect(game.isGameOver()).to.be.true;
+            expect(game.areGameOverConditionsMet()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
 
         it('should gameOver when player 2 has no tiles', () => {
             player2Stub.hasTilesLeft.returns(false);
-            expect(game.isGameOver()).to.be.true;
+            expect(game.areGameOverConditionsMet()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
     });
