@@ -286,10 +286,12 @@ describe('GameDispatcherService', () => {
         const gameParametersForm: FormGroup = new FormGroup({
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl('', Validators.required),
+            gameMode: new FormControl(GameMode.Solo, Validators.required),
         });
         const formValues = {
             virtualPlayerName: 'JVname',
             level: VirtualPlayerLevel.Beginner,
+            gameMode: GameMode.Solo,
         };
         gameParametersForm.setValue(formValues);
 
@@ -449,6 +451,22 @@ describe('GameDispatcherService', () => {
         it('should call resetData', () => {
             service.handleCanceledGame(TEST_PLAYER_NAME);
             expect(resetSpy).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('isGameModeSolo', () => {
+        it('should return true ', () => {
+            expect(service.isGameModeSolo(TEST_FORM)).toBeTrue();
+        });
+
+        it('should return false if undefined', () => {
+            expect(service.isGameModeSolo()).toBeFalse();
+        });
+
+        it('should return false if multiplayer', () => {
+            TEST_FORM.patchValue({ gameMode: GameMode.Multiplayer });
+            expect(service.isGameModeSolo(TEST_FORM)).toBeFalse();
+            TEST_FORM.patchValue({ gameMode: GameMode.Solo });
         });
     });
 });

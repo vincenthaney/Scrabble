@@ -93,11 +93,11 @@ export default class GameDispatcherService implements OnDestroy {
             playerName: this.currentLobby?.hostName,
             playerId: this.gameDispatcherController.socketService.getId(),
             gameType: this.currentLobby?.gameType,
-            gameMode: gameParameters ? GameMode.Solo : GameMode.Multiplayer,
+            gameMode: this.isGameModeSolo(gameParameters) ? GameMode.Solo : GameMode.Multiplayer,
             maxRoundTime: this.currentLobby?.maxRoundTime,
             dictionary: this.currentLobby?.dictionary,
         };
-        if (gameParameters) {
+        if (gameParameters && this.isGameModeSolo(gameParameters)) {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
             gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
         }
@@ -158,5 +158,9 @@ export default class GameDispatcherService implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    isGameModeSolo(gameParameters?: FormGroup): boolean {
+        return (gameParameters && gameParameters.get('gameMode')?.value === GameMode.Solo) ?? false;
     }
 }

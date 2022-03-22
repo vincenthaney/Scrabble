@@ -82,9 +82,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     confirmConvertToSolo(): void {
         this.gameDispatcherService.handleCancelGame(KEEP_DATA);
         this.dialog.open(ConvertDialogComponent, {
-            data: {
-                hostName: this.gameDispatcherService.currentLobby?.hostName,
-            },
+            data: this.gameDispatcherService.currentLobby?.hostName,
         });
     }
 
