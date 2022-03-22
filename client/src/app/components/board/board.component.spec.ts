@@ -444,6 +444,7 @@ describe('BoardComponent', () => {
         let getGameViewEventValueSpy: jasmine.Spy;
         let getTilesSpy: jasmine.Spy;
         let squareView: SquareView;
+        let cannotPlaceSpy: jasmine.Spy;
 
         beforeEach(() => {
             tiles = ['A', 'B', 'C', '*'];
@@ -463,8 +464,7 @@ describe('BoardComponent', () => {
 
             useTileSpy = spyOn<any>(component, 'useTile');
 
-            squareView = {} as SquareView;
-            component['actionService'].hasActionBeenPlayed = false;
+            cannotPlaceSpy = spyOn<any>(component, 'cannotPlace').and.returnValue(false);
         });
 
         const tests: [letter: string, isUppercase: boolean, calls: boolean][] = [
@@ -507,15 +507,9 @@ describe('BoardComponent', () => {
             expect(useTileSpy).toHaveBeenCalled();
         });
 
-        it('should not call useTile if squareView is undefined', () => {
+        it('should not call useTile if cannotPlace', () => {
+            cannotPlaceSpy.and.returnValue(true);
             component['handlePlaceLetter'](tiles[0], false, undefined);
-
-            expect(useTileSpy).not.toHaveBeenCalled();
-        });
-
-        it('should not call useTile if action has been played', () => {
-            component['actionService'].hasActionBeenPlayed = true;
-            component['handlePlaceLetter'](tiles[0], false, squareView);
 
             expect(useTileSpy).not.toHaveBeenCalled();
         });
@@ -525,6 +519,27 @@ describe('BoardComponent', () => {
             component['handlePlaceLetter']('C', true, squareView);
 
             expect(useTileSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('cannotPlace', () => {
+        let squareView: SquareView;
+        beforeEach(() => {
+            squareView = {} as SquareView;
+            component['actionService'].hasActionBeenPlayed = false;
+        });
+
+        it('should return true if no squareView', () => {
+            expect(component['cannotPlace'](undefined)).toBeTrue();
+        });
+
+        it('should return true if no tiles are used', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            expect(component['cannotPlace'](squareView)).toBeTrue();
+        });
+
+        it('should return false if conditions are met', () => {
+            expect(component['cannotPlace'](squareView)).toBeFalse();
         });
     });
 
@@ -635,6 +650,10 @@ describe('BoardComponent', () => {
         it('should return true if action has been played', () => {
             component['actionService'].hasActionBeenPlayed = true;
             expect(component['cannotBackspace']()).toBeTrue();
+        });
+
+        it('should return false if conditions are met', () => {
+            expect(component['cannotBackspace']()).toBeFalse();
         });
     });
 
