@@ -44,6 +44,9 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.serviceDestroyed$, (lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
+            this.currentLobby = lobbyData;
+        });
     }
 
     getCurrentLobbyId(): string {

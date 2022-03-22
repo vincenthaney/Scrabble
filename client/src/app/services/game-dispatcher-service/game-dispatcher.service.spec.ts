@@ -107,6 +107,11 @@ describe('GameDispatcherService', () => {
             service['gameDispatcherController']['lobbiesUpdateEvent'].next(lobbies);
             expect(spy).toHaveBeenCalledWith(lobbies);
         });
+
+        it('should change lobbyData', () => {
+            service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
+            expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
+        });
     });
 
     describe('getCurrentLobbyId', () => {
