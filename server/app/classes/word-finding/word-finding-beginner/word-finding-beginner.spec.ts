@@ -92,38 +92,38 @@ describe('WordFindingBeginner', () => {
 
         it('should update values if acceptanceProbability is greater than found acceptance', () => {
             const acceptance = 0.75;
-            wordFinding['placementFoundAcceptance'] = 0.5;
+            wordFinding['highestAcceptanceFoundPlacement'] = 0.5;
             wordFinding['wordPlacements'] = [];
             acceptanceProbabilitiesGetStub.returns(acceptance);
 
             wordFinding['handleWordPlacement'](wordPlacement);
 
-            expect(wordFinding['placementFoundAcceptance']).to.equal(acceptance);
+            expect(wordFinding['highestAcceptanceFoundPlacement']).to.equal(acceptance);
             expect(wordFinding['wordPlacements']).to.deep.equal([wordPlacement]);
         });
 
         it('should not update values if acceptanceProbability is lower than found acceptance', () => {
             const found = 0.5;
             const acceptance = 0.25;
-            wordFinding['placementFoundAcceptance'] = found;
+            wordFinding['highestAcceptanceFoundPlacement'] = found;
             wordFinding['wordPlacements'] = [];
             acceptanceProbabilitiesGetStub.returns(acceptance);
 
             wordFinding['handleWordPlacement'](wordPlacement);
 
-            expect(wordFinding['placementFoundAcceptance']).to.equal(found);
+            expect(wordFinding['highestAcceptanceFoundPlacement']).to.equal(found);
             expect(wordFinding['wordPlacements']).to.deep.equal([]);
         });
 
         it('should not update values if acceptanceProbability is lower than found acceptance (value is undefined)', () => {
             const found = 0.5;
-            wordFinding['placementFoundAcceptance'] = found;
+            wordFinding['highestAcceptanceFoundPlacement'] = found;
             wordFinding['wordPlacements'] = [];
             acceptanceProbabilitiesGetStub.returns(undefined);
 
             wordFinding['handleWordPlacement'](wordPlacement);
 
-            expect(wordFinding['placementFoundAcceptance']).to.equal(found);
+            expect(wordFinding['highestAcceptanceFoundPlacement']).to.equal(found);
             expect(wordFinding['wordPlacements']).to.deep.equal([]);
         });
     });
@@ -143,7 +143,7 @@ describe('WordFindingBeginner', () => {
                 for (let i = 0; i < wordPlacementsLength; ++i) {
                     wordFinding['wordPlacements'].push({ ...DEFAULT_WORD_PLACEMENT });
                 }
-                wordFinding['placementFoundAcceptance'] = foundAcceptance;
+                wordFinding['highestAcceptanceFoundPlacement'] = foundAcceptance;
 
                 expect(wordFinding['isSearchCompleted']()).to.equal(expected);
             });

@@ -7,7 +7,7 @@ import { WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD } from '@app/constants/class
 import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
 
 export default class WordFindingBeginner extends AbstractWordFinding {
-    private placementFoundAcceptance: number = Number.MIN_VALUE;
+    private highestAcceptanceFoundPlacement: number = Number.MIN_VALUE;
     private acceptanceProbabilities: Map<number, number>;
 
     constructor(board: Board, tiles: Tile[], request: WordFindingRequest, dictionary: Dictionary, scoreCalculatorService: ScoreCalculatorService) {
@@ -18,15 +18,15 @@ export default class WordFindingBeginner extends AbstractWordFinding {
     protected handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
         if (this.isWithinPointRange(wordPlacement.score)) {
             const acceptanceProbability = this.acceptanceProbabilities.get(wordPlacement.score) ?? 0;
-            if (acceptanceProbability > this.placementFoundAcceptance) {
+            if (acceptanceProbability > this.highestAcceptanceFoundPlacement) {
                 this.wordPlacements = [wordPlacement];
-                this.placementFoundAcceptance = acceptanceProbability;
+                this.highestAcceptanceFoundPlacement = acceptanceProbability;
             }
         }
     }
 
     protected isSearchCompleted(): boolean {
-        return this.wordPlacements.length > 0 && this.placementFoundAcceptance >= WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD;
+        return this.wordPlacements.length > 0 && this.highestAcceptanceFoundPlacement >= WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD;
     }
 
     private calculateAcceptanceProbabilities(): void {
