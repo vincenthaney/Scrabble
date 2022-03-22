@@ -22,8 +22,8 @@ export class WordExtraction {
         for (let i = 0; i < wordPlacement.tilesToPlace.length; ) {
             if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
 
-            if (navigator.verify(HAS_TILE)) {
-                if (navigator.square.tile) newWord.push([navigator.square, navigator.square.tile]);
+            if (navigator.square.tile) {
+                newWord.push([navigator.square, navigator.square.tile]);
             } else {
                 newWord.push([navigator.square, wordPlacement.tilesToPlace[i]]);
 

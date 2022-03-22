@@ -1,7 +1,9 @@
 import { Orientation, Position } from '@app/classes/board';
+import { ActionType } from '@app/classes/communication/action-data';
 import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
+import { ACTION_COMMAND_INDICATOR } from '@app/constants/services-constants/word-finding.const';
 
 export class PlacementToString {
     static positionNumberToLetter(position: number): string {
@@ -21,17 +23,20 @@ export class PlacementToString {
         return `${this.positionNumberToLetter(position.row)}${position.column + 1}${this.orientationToLetter(orientation)}`;
     }
 
-    static tilesToString(tiles: Tile[]): string {
+    static tilesToString(tiles: Tile[], inUpperCase: boolean = false): string {
         return tiles.reduce((str, tile) => {
-            return str + this.tileToLetterConversion(tile);
+            return str + this.tileToLetterConversion(tile, inUpperCase);
         }, '');
     }
 
     static wordPlacementToCommandString(placement: WordPlacement): string {
-        return `${this.positionAndOrientationToString(placement.startPosition, placement.orientation)} ${this.tilesToString(placement.tilesToPlace)}`;
+        return `${ACTION_COMMAND_INDICATOR}${ActionType.PLACE} ${this.positionAndOrientationToString(
+            placement.startPosition,
+            placement.orientation,
+        )} ${this.tilesToString(placement.tilesToPlace)}`;
     }
 
-    private static tileToLetterConversion(tile: Tile): string {
-        return tile.isBlank ? (tile.playedLetter ? tile.playedLetter.toUpperCase() : tile.letter.toUpperCase()) : tile.letter.toLowerCase();
+    private static tileToLetterConversion(tile: Tile, inUpperCase: boolean = false): string {
+        return inUpperCase || tile.isBlank ? tile.letter.toUpperCase() : tile.letter.toLowerCase();
     }
 }

@@ -275,18 +275,6 @@ describe('CommunicationBoxComponent', () => {
             component['onReceiveNewMessage'](DEFAULT_SYSTEM_ERROR_MESSAGE);
             expect(component.messages).toEqual([DEFAULT_SYSTEM_ERROR_VISUAL_MESSAGE]);
         });
-
-        it('should set loading to false if new message is NOT from opponent', () => {
-            component.loading = true;
-            component['onReceiveNewMessage'](DEFAULT_SYSTEM_MESSAGE);
-            expect(component.loading).toBeFalse();
-        });
-
-        it('should NOT set loading to true if new message is from opponent', () => {
-            component.loading = true;
-            component['onReceiveNewMessage'](DEFAULT_PLAYER2_MESSAGE);
-            expect(component.loading).toBeTrue();
-        });
     });
 
     describe('onContainerClick', () => {

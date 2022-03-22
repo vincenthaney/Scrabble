@@ -34,8 +34,9 @@ export const END_GAME_HEADER_MESSAGE = 'Fin de partie - lettres restantes';
 
 export const ORIENTATION_HORIZONTAL_LETTER = 'h';
 export const ORIENTATION_VERTICAL_LETTER = 'v';
+export const IN_UPPER_CASE = true;
 
-export const NO_WORDS_FOUND = 'Aucun mot trouvé.';
+export const NO_WORDS_FOUND = 'Aucun mot trouvé';
 export const FOUND_WORDS = '**Mots trouvés**';
 
 export const WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD = 0.7;

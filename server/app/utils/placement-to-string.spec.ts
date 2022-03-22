@@ -3,6 +3,7 @@
 import { Orientation, Position } from '@app/classes/board';
 import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding';
+import { IN_UPPER_CASE } from '@app/constants/classes-constants';
 import { expect } from 'chai';
 import { PlacementToString } from './placement-to-string';
 
@@ -37,6 +38,15 @@ describe('WordPlacement utils', () => {
             expect(PlacementToString.tilesToString(tiles)).to.equal('abc');
         });
 
+        it('should convert', () => {
+            const tiles: Tile[] = [
+                { letter: 'A', value: 0 },
+                { letter: 'B', value: 0 },
+                { letter: 'C', value: 0 },
+            ];
+            expect(PlacementToString.tilesToString(tiles, IN_UPPER_CASE)).to.equal('ABC');
+        });
+
         it('should convert blank tile to upper case', () => {
             const tiles: Tile[] = [
                 { letter: 'A', value: 0 },
@@ -60,6 +70,20 @@ describe('WordPlacement utils', () => {
         });
     });
 
+    describe('tileToLetterConversion', () => {
+        it('should convert default', () => {
+            const tile: Tile = { letter: 'A', value: 0 };
+            // eslint-disable-next-line dot-notation
+            expect(PlacementToString['tileToLetterConversion'](tile)).to.equal('a');
+        });
+
+        it('should convert blank', () => {
+            const tile: Tile = { letter: 'B', value: 0, isBlank: true };
+            // eslint-disable-next-line dot-notation
+            expect(PlacementToString['tileToLetterConversion'](tile)).to.equal('B');
+        });
+    });
+
     describe('wordPlacementToCommandString', () => {
         it('should convert', () => {
             const tiles: Tile[] = [
@@ -76,7 +100,7 @@ describe('WordPlacement utils', () => {
                 orientation,
             };
 
-            expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('g3v xyz');
+            expect(PlacementToString.wordPlacementToCommandString(placement)).to.equal('!placer g3v xyz');
         });
     });
 });

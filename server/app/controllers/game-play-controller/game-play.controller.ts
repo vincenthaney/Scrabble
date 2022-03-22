@@ -3,14 +3,15 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { INVALID_WORD_TIMEOUT, IS_OPPONENT, IS_REQUESTING, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
-import { IS_ID_VIRTUAL_PLAYER } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { Delay } from '@app/utils/delay';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -24,19 +25,15 @@ export class GamePlayController {
         private readonly gamePlayService: GamePlayService,
         private readonly socketService: SocketService,
         private readonly activeGameService: ActiveGameService,
+        private readonly virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
     }
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
-        if (data.round) {
-            if (IS_ID_VIRTUAL_PLAYER(data.round.playerData.id)) {
-                const virtualPlayer = this.activeGameService
-                    .getGame(gameId, data.round.playerData.id)
-                    .getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
-                virtualPlayer.playTurn();
-            }
+        if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
         }
     }
 
@@ -86,7 +83,6 @@ export class GamePlayController {
 
         try {
             const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
-            const game = this.activeGameService.getGame(gameId, playerId);
             if (data.input.length > 0) {
                 this.socketService.emitToSocket(playerId, 'newMessage', {
                     content: data.input,
@@ -98,36 +94,40 @@ export class GamePlayController {
                 this.gameUpdate(gameId, updateData);
             }
             if (feedback) {
-                if (feedback.localPlayerFeedback) {
-                    this.socketService.emitToSocket(playerId, 'newMessage', {
-                        content: feedback.localPlayerFeedback,
-                        senderId: SYSTEM_ID,
-                        gameId,
-                    });
-                }
-                if (feedback.opponentFeedback) {
-                    const opponentId = game.getPlayer(playerId, IS_OPPONENT).id;
-                    this.socketService.emitToSocket(opponentId, 'newMessage', {
-                        content: feedback.opponentFeedback,
-                        senderId: SYSTEM_ID,
-                        gameId,
-                    });
-                }
-                if (feedback.endGameFeedback) {
-                    for (const message of feedback.endGameFeedback) {
-                        this.socketService.emitToRoom(gameId, 'newMessage', {
-                            content: message,
-                            senderId: SYSTEM_ID,
-                            gameId,
-                        });
-                    }
-                }
+                this.handleFeedback(gameId, playerId, feedback);
             }
         } catch (exception) {
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
                 await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
+            }
+        }
+    }
+
+    private handleFeedback(gameId: string, playerId: string, feedback: FeedbackMessages): void {
+        if (feedback.localPlayerFeedback) {
+            this.socketService.emitToSocket(playerId, 'newMessage', {
+                content: feedback.localPlayerFeedback,
+                senderId: SYSTEM_ID,
+                gameId,
+            });
+        }
+        if (feedback.opponentFeedback) {
+            const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
+            this.socketService.emitToSocket(opponentId, 'newMessage', {
+                content: feedback.opponentFeedback,
+                senderId: SYSTEM_ID,
+                gameId,
+            });
+        }
+        if (feedback.endGameFeedback) {
+            for (const message of feedback.endGameFeedback) {
+                this.socketService.emitToRoom(gameId, 'newMessage', {
+                    content: message,
+                    senderId: SYSTEM_ID,
+                    gameId,
+                });
             }
         }
     }

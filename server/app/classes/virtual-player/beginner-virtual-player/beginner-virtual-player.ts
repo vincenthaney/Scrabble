@@ -10,7 +10,7 @@ import {
     MEDIUM_SCORE_RANGE_MIN,
     MEDIUM_SCORE_THRESHOLD,
     PASS_ACTION_THRESHOLD,
-    PRELIMINARY_WAIT_TIMEOUT,
+    PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
@@ -22,17 +22,17 @@ import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@ap
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
-        const waitNaturalTime = async (): Promise<void> => {
-            await Delay.for(PRELIMINARY_WAIT_TIMEOUT);
+        const waitPreliminaryTime = async (): Promise<void> => {
+            await Delay.for(PRELIMINARY_WAIT_TIME);
         };
-        const waitTimeout = async (): Promise<void> => {
-            await Delay.for(FINAL_WAIT_TIMEOUT);
+        const waitFinalTime = async (): Promise<void> => {
+            await Delay.for(FINAL_WAIT_TIME);
         };
 
         const play = async (): Promise<[ActionData, void]> => {
-            return await Promise.all([this.findAction(), waitNaturalTime()]);
+            return await Promise.all([this.findAction(), waitPreliminaryTime()]);
         };
-        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitTimeout()]);
+        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
     }
 
@@ -72,8 +72,8 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
-        let scoreCount = this.pointHistory.get(scoredWordPlacement.score);
-        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? ++scoreCount : 1);
+        const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
+        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
     }
 
     getGameBoard(gameId: string, playerId: string): Board {

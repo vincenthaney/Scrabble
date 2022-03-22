@@ -10,7 +10,6 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { GameType } from './game-type';
 import { ReadyGameConfig, StartGameData } from './game-config';
 export const GAME_OVER_PASS_THRESHOLD = 6;

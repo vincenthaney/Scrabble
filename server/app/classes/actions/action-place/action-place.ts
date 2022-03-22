@@ -9,8 +9,10 @@ import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding';
+import { IN_UPPER_CASE } from '@app/constants/classes-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
+import { PlacementToString } from '@app/utils/placement-to-string';
 import { StringConversion } from '@app/utils/string-conversion';
 import { Container } from 'typedi';
 import { ActionErrorsMessages } from './action-errors';
@@ -68,11 +70,11 @@ export default class ActionPlace extends ActionPlay {
     }
 
     getMessage(): string {
-        return `Vous avez placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+        return `Vous avez placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
     }
 
     getOpponentMessage(): string {
-        return `${this.player.name} a placé ${this.wordPlacement.tilesToPlace.reduce((prev, tile: Tile) => (prev += tile.letter), '')}`;
+        return `${this.player.name} a placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
     }
 
     private isLegalPlacement(words: [Square, Tile][][]): boolean {
@@ -81,7 +83,7 @@ export default class ActionPlace extends ActionPlay {
     }
 
     private amountOfLettersInWords(words: [Square, Tile][][]): number {
-        return words.reduce((lettersInWords, word) => (lettersInWords += word.length), 0);
+        return words.reduce((lettersInWords, word) => lettersInWords + word.length, 0);
     }
 
     private containsCenterSquare(words: [Square, Tile][][]): boolean {

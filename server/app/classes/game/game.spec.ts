@@ -13,7 +13,7 @@ import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game'
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
-import { assert } from 'chai';
+import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -34,7 +34,8 @@ const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
 const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
-const DEFAULT_VIRTUAL_PLAYER = new BeginnerVirtualPlayer('virtualplayerid', 'virtualplayername');
+const DEFAULT_VIRTUAL_PLAYER_ID = 'virtualplayerid';
+const DEFAULT_VIRTUAL_PLAYER = new BeginnerVirtualPlayer(DEFAULT_VIRTUAL_PLAYER_ID, 'virtualplayername');
 
 const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
@@ -120,8 +121,9 @@ describe('Game', () => {
         });
 
         it('initTileReserve should call init ', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const initStub = tileReserveStub.init.callsFake(async () => {});
+            const initStub = tileReserveStub.init.callsFake(async () => {
+                return;
+            });
             await game.initTileReserve();
             assert(initStub.calledOnce);
         });
@@ -161,6 +163,18 @@ describe('Game', () => {
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
                 expect(() => game.getPlayer(invalidId, IS_REQUESTING)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+            });
+        });
+
+        describe('isPlayerReal', () => {
+            it('should return true when player is real player', () => {
+                expect(game.isPlayerReal(DEFAULT_PLAYER_1_ID)).to.equal(true);
+            });
+            it('should return false when player is virtual player', async () => {
+                spy.on(game, 'getPlayer', () => {
+                    return DEFAULT_VIRTUAL_PLAYER;
+                });
+                expect(game.isPlayerReal(DEFAULT_VIRTUAL_PLAYER_ID)).to.equal(false);
             });
         });
 
@@ -214,9 +228,6 @@ describe('Game', () => {
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
-            // game.player1 = DEFAULT_PLAYER_1;
-            // game.player2 = DEFAULT_PLAYER_2;
-
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
             game.player1.tiles = [

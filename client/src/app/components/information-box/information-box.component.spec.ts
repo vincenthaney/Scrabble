@@ -198,7 +198,7 @@ describe('InformationBoxComponent', () => {
             expect(updateBorderSpy).toHaveBeenCalled();
         });
 
-        it('ngOnInit endRoundEvent subscription should call the functions to rerender the component', () => {
+        it('ngOnInit endRoundEvent subscription should call the functions to end the round', () => {
             const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
 
@@ -211,25 +211,20 @@ describe('InformationBoxComponent', () => {
         it('ngOnInit reRender subscription should call the functions to rerender the component', () => {
             const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
+            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder');
 
             gameViewEventManagerSpy.emitGameViewEvent('reRender');
 
             expect(ngOnDestroySpy).toHaveBeenCalled();
             expect(ngOnInitSpy).toHaveBeenCalled();
+            expect(updateBorderSpy).toHaveBeenCalled();
         });
 
         it('ngOnInit gameInitialized subscription should call the right functions', async () => {
-            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder');
             const getIconSpy = spyOn<any>(component, 'getLocalPlayerIcon');
-            jasmine.clock().uninstall();
-            jasmine.clock().install();
 
             gameViewEventManagerSpy.emitGameViewEvent('gameInitialized');
 
-            Promise.resolve().then(() => {
-                jasmine.clock().tick(1);
-                expect(updateBorderSpy).toHaveBeenCalled();
-            });
             expect(getIconSpy).toHaveBeenCalled();
         });
     });

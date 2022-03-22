@@ -23,7 +23,6 @@ const DEFAULT_MAX_ROUND_TIME = 1;
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
 const DEFAULT_DATE = new Date('June 29, 2001');
-// const SECONDS_TO_MILLISECONDS = 1000;
 
 describe('RoundManager', () => {
     let roundManager: RoundManager;

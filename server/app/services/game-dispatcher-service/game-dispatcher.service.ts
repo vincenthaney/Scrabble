@@ -1,13 +1,9 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
 import { GameConfig, GameConfigData, ReadyGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
-import SoloRoom from '@app/classes/game/solo-room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -18,40 +14,58 @@ import {
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
-    private soloRooms: SoloRoom[];
     private lobbiesRoom: Room;
 
-    constructor(private readonly dictionaryService: DictionaryService) {
+    constructor(
+        private socketService: SocketService,
+        private createGameService: CreateGameService,
+        private activeGameService: ActiveGameService,
+        private virtualPlayerService: VirtualPlayerService,
+    ) {
         this.waitingRooms = [];
-        this.soloRooms = [];
         this.lobbiesRoom = new Room();
     }
 
-    createSoloGame(configData: GameConfigData): string {
-        const soloRoom = new SoloRoom(this.generateGameConfig(configData));
-        soloRoom.setReadyConfig(
-            configData.virtualPlayerLevel === VirtualPlayerLevel.Beginner
-                ? new BeginnerVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string)
-                : new ExpertVirtualPlayer(soloRoom.getId(), configData.virtualPlayerName as string),
-        );
-        this.soloRooms.push(soloRoom);
-        return soloRoom.getId();
-    }
-
-    createMultiplayerGame(configData: GameConfigData): string {
-        const config = this.generateGameConfig(configData);
-        const waitingRoom = new WaitingRoom(config);
+    addToWaitingRoom(waitingRoom: WaitingRoom): void {
         this.waitingRooms.push(waitingRoom);
-        return waitingRoom.getId();
     }
 
     getLobbiesRoom(): Room {
         return this.lobbiesRoom;
+    }
+
+    async createSoloGame(config: GameConfigData): Promise<void> {
+        const startGameData = await this.createGameService.createSoloGame(config);
+        const gameId = startGameData.gameId;
+        this.socketService.addToRoom(config.playerId, gameId);
+
+        startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
+
+        this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
+
+        if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(
+                startGameData,
+                this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
+            );
+        }
+    }
+
+    createMultiplayerGame(config: GameConfigData): LobbyData {
+        const waitingRoom = this.createGameService.createMultiplayerGame(config);
+        this.addToWaitingRoom(waitingRoom);
+        this.socketService.addToRoom(config.playerId, waitingRoom.getId());
+        return convertToLobbyData(waitingRoom.getConfig(), waitingRoom.getId());
     }
 
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
@@ -134,14 +148,7 @@ export class GameDispatcherService {
         const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
         const lobbyData: LobbyData[] = [];
         for (const room of waitingRooms) {
-            const config = room.getConfig();
-            lobbyData.push({
-                dictionary: config.dictionary,
-                playerName: config.player1.name,
-                maxRoundTime: config.maxRoundTime,
-                lobbyId: room.getId(),
-                gameType: config.gameType,
-            });
+            lobbyData.push(convertToLobbyData(room.getConfig(), room.getId()));
         }
 
         return lobbyData;
@@ -153,23 +160,8 @@ export class GameDispatcherService {
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
     }
 
-    getSoloGameFromId(soloRoomId: string): SoloRoom {
-        const filteredSoloRoom = this.soloRooms.filter((g) => g.getId() === soloRoomId);
-        if (filteredSoloRoom.length > 0) return filteredSoloRoom[0];
-        throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
-    }
-
     isGameInWaitingRooms(gameId: string): boolean {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === gameId);
         return filteredWaitingRoom.length > 0;
-    }
-
-    private generateGameConfig(configData: GameConfigData): GameConfig {
-        return {
-            player1: new Player(configData.playerId, configData.playerName),
-            gameType: configData.gameType,
-            maxRoundTime: configData.maxRoundTime,
-            dictionary: this.dictionaryService.getDictionaryTitles()[0],
-        };
     }
 }

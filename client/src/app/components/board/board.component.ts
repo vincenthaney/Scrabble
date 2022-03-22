@@ -219,7 +219,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                     (square: Square) =>
                         square.position.row === squareView.square.position.row && square.position.column === squareView.square.position.column,
                 )
-                .map((sameSquare: Square) => {
+                .forEach((sameSquare: Square) => {
                     squareView.square = sameSquare;
                     squareView.applied = true;
                 });
@@ -237,7 +237,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private removeUsedTiles(): void {
-        this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+        this.gameViewEventManagerService.emitGameViewEvent('usedTiles');
     }
 
     private handlePlaceTiles(payload: PlaceActionPayload | undefined): void {
@@ -299,7 +299,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (previousUsedTiles.tiles.length > 0) {
             this.gameViewEventManagerService.emitGameViewEvent('usedTiles', { ...previousUsedTiles });
         } else {
-            this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+            this.gameViewEventManagerService.emitGameViewEvent('usedTiles');
         }
     }
 

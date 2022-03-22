@@ -16,9 +16,9 @@ export class CookieService {
     getCookie(name: string): string {
         const nameEQ = name + '=';
         const keyValPairs = document.cookie.split(';');
-        for (let keyPair of keyValPairs) {
-            keyPair = keyPair.trim();
-            if (keyPair.includes(nameEQ)) return keyPair.substring(nameEQ.length);
+        for (const keyPair of keyValPairs) {
+            const trimmedKeyPair = keyPair.trim();
+            if (trimmedKeyPair.includes(nameEQ)) return trimmedKeyPair.substring(nameEQ.length);
         }
         return '';
     }
