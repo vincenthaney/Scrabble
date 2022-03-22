@@ -128,7 +128,7 @@ export default class InputParserService {
         const location: Location = this.createLocation(locationString, lettersToPlace.length);
 
         const placeActionPayload: PlaceActionPayload = this.actionService.createPlaceActionPayload(
-            this.parseLettersToTiles(lettersToPlace, ActionType.PLACE),
+            this.parseLettersToTiles(removeAccents(lettersToPlace), ActionType.PLACE),
             this.getStartPosition(location),
             location.orientation,
         );

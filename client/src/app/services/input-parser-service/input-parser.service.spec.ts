@@ -298,6 +298,15 @@ describe('InputParserService', () => {
             service['createPlaceActionPayload'](VALID_LOCATION_INPUT, VALID_LETTERS_INPUT_SINGLE);
             expect(actionServiceSpy.createPlaceActionPayload).toHaveBeenCalled();
         });
+
+        it('should call createPlaceActionPayload if input is a valid place command', () => {
+            service['createPlaceActionPayload'](VALID_LOCATION_INPUT, 'à');
+            expect(actionServiceSpy.createPlaceActionPayload).toHaveBeenCalledWith(
+                [DEFAULT_TILES[0]],
+                { row: 1, column: 11 },
+                Orientation.Horizontal,
+            );
+        });
     });
 
     describe('createExchangeActionPayload', () => {
