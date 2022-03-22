@@ -11,12 +11,12 @@ import { getDictionaryTestService } from '@app/services/dictionary-service/dicti
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Container } from 'typedi';
 import { Orientation, Position } from '@app/classes/board';
-import { BoardPlacement, PerpendicularWord, SearcherPerpendicularLetters, DictionarySearcherStackItem } from './word-finding-types';
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
 import { SinonStub, stub } from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
+import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 
@@ -54,10 +54,6 @@ describe('DictionarySearcher', () => {
     describe('constructor', () => {
         it('should add to stack', () => {
             expect(searcher['stack']).to.have.length(1);
-        });
-
-        it('should add node to stack', () => {
-            expect(searcher['stack'][0].node).to.equal(node);
         });
 
         it('should add letters as map', () => {
@@ -465,8 +461,12 @@ describe('DictionarySearcher', () => {
     });
 
     describe('getPerpendicularWords', () => {
-        const tests: [word: string, perpendicular: SearcherPerpendicularLetters[], expected: [word: string, distance: number][]][] = [
-            ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1]]],
+        const tests: [
+            word: string,
+            perpendicular: SearcherPerpendicularLetters[],
+            expected: [word: string, distance: number, junctionDistance: number][],
+        ][] = [
+            ['abc', [{ before: 'xy', after: 'z', distance: 1 }], [['xybz', 1, 2]]],
             ['abc', [{ before: 'xy', after: 'z', distance: 5 }], []],
             [
                 'abc',
@@ -475,8 +475,8 @@ describe('DictionarySearcher', () => {
                     { before: '', after: 'lmn', distance: 2 },
                 ],
                 [
-                    ['xybz', 1],
-                    ['clmn', 2],
+                    ['xybz', 1, 2],
+                    ['clmn', 2, 0],
                 ],
             ],
         ];
@@ -486,13 +486,15 @@ describe('DictionarySearcher', () => {
             it(`should extract perpendicular words (${index})`, () => {
                 searcher['perpendicularLetters'] = perpendicular;
 
-                expect(searcher['getPerpendicularWords'](word)).to.deep.equal(expected.map(([w, distance]) => ({ word: w, distance })));
+                expect(searcher['getPerpendicularWords'](word)).to.deep.equal(
+                    expected.map(([w, distance, junctionDistance]) => ({ word: w, distance, junctionDistance })),
+                );
             });
             index++;
         }
     });
 
-    describe('copyTiles', () => {
+    describe('convertLetterValues', () => {
         const tests: [input: LetterValue[], output: string[]][] = [
             [
                 ['A', 'B', 'C'],
@@ -504,7 +506,7 @@ describe('DictionarySearcher', () => {
         let index = 0;
         for (const [input, output] of tests) {
             it(`should copy array and set to lowercase (${index})`, () => {
-                const result = searcher['copyTiles'](input);
+                const result = searcher['convertLetterValues'](input);
 
                 expect(result).to.not.equal(output);
                 expect(result).to.deep.equal(output);
@@ -520,9 +522,9 @@ describe('DictionarySearcher', () => {
         beforeEach(() => {
             wordExistsStub = stub(searcher['rootNode'], 'wordExists').returns(true);
             words = [
-                { word: 'abc', distance: 0 },
-                { word: 'abcd', distance: 0 },
-                { word: 'abcde', distance: 0 },
+                { word: 'abc', distance: 0, junctionDistance: 0 },
+                { word: 'abcd', distance: 0, junctionDistance: 0 },
+                { word: 'abcde', distance: 0, junctionDistance: 0 },
             ];
         });
 

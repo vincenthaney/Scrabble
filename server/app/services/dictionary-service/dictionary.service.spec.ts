@@ -52,6 +52,18 @@ describe('DictionaryService', () => {
         });
     });
 
+    describe('getDefaultDictionary', () => {
+        it('should call getDictionary with first getDictionaryTitles value', () => {
+            const testTitle = 'test title';
+            stub(service, 'getDictionaryTitles').returns([testTitle]);
+            const getDictionaryStub = stub(service, 'getDictionary');
+
+            service.getDefaultDictionary();
+
+            expect(getDictionaryStub.calledWith(testTitle));
+        });
+    });
+
     describe('addAllDictionaries', () => {
         let fetchDictionaryWordsStub: SinonStub;
 

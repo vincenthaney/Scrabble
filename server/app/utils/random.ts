@@ -14,4 +14,8 @@ export class Random {
         }
         return result;
     }
+
+    static popRandom<T>(array: T[]): T | undefined {
+        return array.splice(Math.floor(Math.random() * array.length), 1).pop();
+    }
 }
