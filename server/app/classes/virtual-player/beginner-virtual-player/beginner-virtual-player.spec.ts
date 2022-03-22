@@ -39,6 +39,7 @@ import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
+import { ActionData } from '@app/classes/communication/action-data';
 
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
@@ -131,6 +132,9 @@ describe('BeginnerVirtualPlayer', () => {
 
     describe('Find Action with RANDOM_VALUE_PASS', () => {
         it('findAction should call ActionPass.createActionData() if random is RANDOM_VALUE_PASS', () => {
+            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+                return {} as unknown as ScoredWordPlacement;
+            });
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PASS;
             });
@@ -147,8 +151,8 @@ describe('BeginnerVirtualPlayer', () => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PLACE;
             });
-            spy.on(beginnerVirtualPlayer, 'isExchangeImpossible', () => {
-                return false;
+            spy.on(beginnerVirtualPlayer, 'isExchangePossible', () => {
+                return true;
             });
         });
 
@@ -165,11 +169,10 @@ describe('BeginnerVirtualPlayer', () => {
             spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
                 return testEmptyEvaluatedPlacement;
             });
-            const createActionDataPassSpy = spy.on(ActionPass, 'createActionData', () => {
-                return;
-            });
+            const createActionDataPassSpy = stub(ActionPass, 'createActionData').returns({} as unknown as ActionData);
+            const exchangeActionDataPassSpy = stub(ActionExchange, 'createActionData').returns({} as unknown as ActionData);
             beginnerVirtualPlayer.findAction();
-            expect(createActionDataPassSpy).to.have.been.called();
+            expect(createActionDataPassSpy.called || exchangeActionDataPassSpy.called).to.true;
         });
 
         it('findAction should call ActionPlace.createActionData because possible placement', () => {
@@ -200,11 +203,14 @@ describe('BeginnerVirtualPlayer', () => {
 
     describe('Find Action with RANDOM_VALUE_EXCHANGE', () => {
         it('findAction should call ActionExchange.createActionData()', () => {
+            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+                return {} as unknown as ScoredWordPlacement;
+            });
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_EXCHANGE;
             });
-            spy.on(beginnerVirtualPlayer, 'isExchangeImpossible', () => {
-                return false;
+            spy.on(beginnerVirtualPlayer, 'isExchangePossible', () => {
+                return true;
             });
             const actionExchangeSpy = spy.on(ActionExchange, 'createActionData', () => {
                 return;
@@ -317,7 +323,7 @@ describe('BeginnerVirtualPlayer', () => {
                 { letter: 'F', value: 0 },
             ];
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stub(beginnerVirtualPlayer, 'isExchangeImpossible' as any).returns(false);
+            stub(beginnerVirtualPlayer, 'isExchangePossible' as any).returns(true);
             const ceilStub = stub(Math, 'ceil').returns(TEST_SELECT_COUNT);
             expect(beginnerVirtualPlayer['selectRandomTiles']().length).to.equal(TEST_SELECT_COUNT);
             ceilStub.restore();
@@ -337,21 +343,21 @@ describe('BeginnerVirtualPlayer', () => {
                 return TEST_MAP;
             });
         });
-        it('should return true when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
+        it('should return false when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
             TEST_MAP = new Map<LetterValue, number>([
                 ['A', 2],
                 ['B', 2],
             ]);
-            expect(beginnerVirtualPlayer['isExchangeImpossible']()).to.be.true;
+            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.false;
         });
 
-        it('should return false when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
+        it('should return true when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
             TEST_MAP = new Map<LetterValue, number>([
                 ['A', 3],
                 ['B', 3],
                 ['C', 3],
             ]);
-            expect(beginnerVirtualPlayer['isExchangeImpossible']()).to.be.false;
+            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.true;
         });
     });
 });
