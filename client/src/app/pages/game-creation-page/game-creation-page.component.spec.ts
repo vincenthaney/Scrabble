@@ -238,12 +238,11 @@ describe('GameCreationPageComponent', () => {
             expect(spy).toHaveBeenCalledWith('waiting-room');
         });
 
-        it('createGame should reroute to game if solo game', () => {
+        it('createGame should NOT reroute to game if solo game', () => {
             const spy = spyOn<any>(component['router'], 'navigateByUrl');
             component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
             component.createGame();
-            component['gameDispatcherService']['receivedGameIdEvent'].next();
-            expect(spy).toHaveBeenCalledWith('game');
+            expect(spy).not.toHaveBeenCalledWith('game');
         });
 
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
