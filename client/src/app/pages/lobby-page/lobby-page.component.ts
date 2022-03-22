@@ -59,7 +59,30 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.componentDestroyed$.complete();
     }
 
-    validateName(): void {
+    onNameChange(): void {
+        this.validateName();
+        this.ref.markForCheck();
+    }
+
+    joinLobby(lobbyId: string): void {
+        this.gameDispatcherService.handleJoinLobby(
+            this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
+            this.nameField.formParameters.get('inputName')?.value,
+        );
+    }
+
+    joinRandomLobby(): void {
+        try {
+            const lobby = this.getRandomLobby();
+            this.joinLobby(lobby.lobbyId);
+        } catch (exception) {
+            this.snackBar.open((exception as Error).toString(), 'Ok', {
+                duration: 3000,
+            });
+        }
+    }
+
+    private validateName(): void {
         this.numberOfLobbiesMeetingFilter = 0;
         this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
         this.setFormAvailability(this.nameValid);
@@ -70,7 +93,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    setFormAvailability(isNameValid: boolean): void {
+    private setFormAvailability(isNameValid: boolean): void {
         if (isNameValid) {
             this.filterFormGroup.get('gameType')?.enable();
         } else {
@@ -78,24 +101,12 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    onNameChange(): void {
-        this.validateName();
-        this.ref.markForCheck();
-    }
-
-    updateLobbies(lobbies: LobbyInfo[]): void {
+    private updateLobbies(lobbies: LobbyInfo[]): void {
         this.lobbies = lobbies;
         this.validateName();
     }
 
-    joinLobby(lobbyId: string): void {
-        this.gameDispatcherService.handleJoinLobby(
-            this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
-            this.nameField.formParameters.get('inputName')?.value,
-        );
-    }
-
-    lobbyFullDialog(): void {
+    private lobbyFullDialog(): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_FULL_TITLE,
@@ -110,7 +121,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    lobbyCanceledDialog(): void {
+    private lobbyCanceledDialog(): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_CANCELED_TITLE,
@@ -125,24 +136,13 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    joinRandomLobby(): void {
-        try {
-            const lobby = this.getRandomLobby();
-            this.joinLobby(lobby.lobbyId);
-        } catch (exception) {
-            this.snackBar.open((exception as Error).toString(), 'Ok', {
-                duration: 3000,
-            });
-        }
-    }
-
-    getRandomLobby(): LobbyInfo {
+    private getRandomLobby(): LobbyInfo {
         const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters !== false);
         if (filteredLobbies.length === 0) throw new Error(NO_LOBBY_CAN_BE_JOINED);
         return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
     }
 
-    updateLobbyAttributes(lobby: LobbyInfo): void {
+    private updateLobbyAttributes(lobby: LobbyInfo): void {
         const gameType = this.filterFormGroup.get('gameType')?.value;
         lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
         lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.hostName;
