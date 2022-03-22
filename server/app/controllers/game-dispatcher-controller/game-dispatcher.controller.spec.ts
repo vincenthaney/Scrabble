@@ -440,6 +440,51 @@ describe('GameDispatcherController', () => {
         });
     });
 
+    describe('handleCreateSoloGame', async () => {
+        let createSoloGameSpy: unknown;
+        beforeEach(() => {
+            createSoloGameSpy = spy.on(controller['gameDispatcherService'], 'createSoloGame', () => {
+                return;
+            });
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should call createSoloGame', async () => {
+            await controller['handleCreateGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(createSoloGameSpy).to.have.been.called();
+        });
+    });
+
+    describe('handleCreateMultiplayerGame', async () => {
+        let createGameServiceSpy: unknown;
+        let handleLobbesUpdateSpy: unknown;
+        beforeEach(() => {
+            createGameServiceSpy = chai.spy.on(controller['gameDispatcherService'], 'createMultiplayerGame', () => {
+                return;
+            });
+            handleLobbesUpdateSpy = spy.on(controller, 'handleLobbiesUpdate', () => {
+                return;
+            });
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should call createMultiplayerGame', async () => {
+            controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(createGameServiceSpy).to.have.been.called();
+        });
+
+        it('should call handleLobbiesUpdate', async () => {
+            controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(handleLobbesUpdateSpy).to.have.been.called();
+        });
+    });
+
     describe('handleJoinGame', () => {
         let emitSpy: unknown;
         let requestSpy: unknown;
