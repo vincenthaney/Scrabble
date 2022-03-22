@@ -185,7 +185,7 @@ describe('GameDispatcherService', () => {
             });
         });
 
-        it('should call createGameService.createSoloGame', async () => {
+        it('should call appropriate methods', async () => {
             await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createSoloGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();
@@ -195,25 +195,35 @@ describe('GameDispatcherService', () => {
             expect(activeGameServiceSpy).to.have.been.called();
         });
 
-        // it('should call socketService.addToRoom', async () => {
-        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-        // });
+        it("it shouldn't call methods related to virtual player starting the game", async () => {
+            await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(createSoloGameSpy).to.have.been.called();
+            expect(addToRoomSpy).to.have.been.called();
+            expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
+            expect(socketServiceSpy).to.have.been.called();
+            expect(virtualPlayerServiceSpy).to.have.been.called();
+            expect(activeGameServiceSpy).to.have.been.called();
+        });
+    });
 
-        // it('should call virtualPlayerService.sliceVirtualPlayerToPlayer', async () => {
-        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-        // });
+    describe('createMultiplayerGame', () => {
+        let createMultiplayerGameSpy: unknown;
+        let addToRoomSpy: unknown;
 
-        // it('should call socketService.emitToSocket', async () => {
-        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-        // });
+        beforeEach(() => {
+            createMultiplayerGameSpy = chai.spy.on(createGameService, 'createMultiplayerGame', () => {
+                return DEFAULT_WAITING_ROOM;
+            });
+            addToRoomSpy = chai.spy.on(socketService, 'addToRoom', () => {
+                return;
+            });
+        });
 
-        // it('should call virtualPlayerService.triggerVirtualPlayerTurn', async () => {
-        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-        // });
-
-        // it('should call activeGameService.getGame', async () => {
-        //     await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-        // });
+        it('should call appropriate methods', async () => {
+            gameDispatcherService['createMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(createMultiplayerGameSpy).to.have.been.called();
+            expect(addToRoomSpy).to.have.been.called();
+        });
     });
 
     describe('requestJoinGame', () => {
