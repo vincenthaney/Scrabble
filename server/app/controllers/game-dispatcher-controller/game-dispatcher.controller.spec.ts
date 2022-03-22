@@ -840,7 +840,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('Disconnection should verify if game is over', () => {
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => true);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => true);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
             expect(getGameSpy.calledOnce).to.be.true;
@@ -848,7 +848,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('Disconnection should set player isConnected to false if the game is not over', () => {
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
 
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
@@ -857,7 +857,7 @@ describe('GameDispatcherController', () => {
 
         it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
             const clock = useFakeTimers();
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(handleLeaveSpy).to.not.have.been.called();
 
@@ -867,7 +867,7 @@ describe('GameDispatcherController', () => {
 
         it('Disconnection should keep player in game if they reconnect within 5 seconds', () => {
             const clock = useFakeTimers();
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(handleLeaveSpy).to.not.have.been.called();
             playerStub.isConnected = true;

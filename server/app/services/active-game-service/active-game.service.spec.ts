@@ -35,7 +35,7 @@ const DEFAULT_GAME = {
 
     getId: () => DEFAULT_ID,
     createStartGameData: () => undefined,
-    isGameOver: () => true,
+    areGameOverConditionsMet: () => true,
 };
 
 describe('ActiveGameService', () => {
