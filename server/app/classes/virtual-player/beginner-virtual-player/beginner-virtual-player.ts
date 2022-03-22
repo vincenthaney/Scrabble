@@ -6,6 +6,7 @@ import {
     LOW_SCORE_THRESHOLD,
     MEDIUM_SCORE_RANGE,
     MEDIUM_SCORE_THRESHOLD,
+    MINIMUM_EXCHANGE_WORD_COUNT,
     PASS_ACTION_THRESHOLD,
     PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
@@ -16,6 +17,7 @@ import { ActionData } from '@app/classes/communication/action-data';
 import { Board } from '@app/classes/board';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
 import { Delay } from '@app/utils/delay';
+import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     async playTurn(): Promise<void> {
@@ -54,7 +56,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
-        if (randomAction <= PASS_ACTION_THRESHOLD) {
+        if (randomAction <= PASS_ACTION_THRESHOLD || this.isExchangeImpossible()) {
             return ActionPass.createActionData();
         }
         if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
@@ -80,6 +82,18 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     computeWordPlacement(): ScoredWordPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
     }
+
+    private isExchangeImpossible(): boolean {
+        let total = 0;
+        this.getActiveGameService()
+            .getGame(this.gameId, this.id)
+            .getTilesLeftPerLetter()
+            .forEach((value: number) => {
+                total += value;
+            });
+        return total < MINIMUM_EXCHANGE_WORD_COUNT;
+    }
+
     private selectRandomTiles(): Tile[] {
         return this.tiles.slice(Math.max(1, Math.floor(Math.random() * this.tiles.length)));
     }

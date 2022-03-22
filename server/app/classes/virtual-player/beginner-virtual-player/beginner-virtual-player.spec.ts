@@ -289,4 +289,34 @@ describe('BeginnerVirtualPlayer', () => {
             expect(generateWordSpy).to.have.been.called();
         });
     });
+    describe('isExchangeImpossible', () => {
+        let TEST_GAME: Game;
+        let TEST_MAP: Map<LetterValue, number>;
+        beforeEach(() => {
+            TEST_GAME = new Game();
+
+            spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
+                return TEST_GAME;
+            });
+            spy.on(TEST_GAME, 'getTilesLeftPerLetter', () => {
+                return TEST_MAP;
+            });
+        });
+        it('should return true when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            TEST_MAP = new Map<LetterValue, number>([
+                ['A', 2],
+                ['B', 2],
+            ]);
+            expect(beginnerVirtualPlayer['isExchangeImpossible']()).to.be.true;
+        });
+
+        it('should return false when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            TEST_MAP = new Map<LetterValue, number>([
+                ['A', 3],
+                ['B', 3],
+                ['C', 3],
+            ]);
+            expect(beginnerVirtualPlayer['isExchangeImpossible']()).to.be.false;
+        });
+    });
 });
