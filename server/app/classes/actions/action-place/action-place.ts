@@ -66,7 +66,6 @@ export default class ActionPlace extends ActionPlay {
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
-
         return response;
     }
 

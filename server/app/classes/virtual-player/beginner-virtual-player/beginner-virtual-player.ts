@@ -10,7 +10,7 @@ import {
     MEDIUM_SCORE_RANGE_MIN,
     MEDIUM_SCORE_THRESHOLD,
     MINIMUM_EXCHANGE_WORD_COUNT,
-    PASS_ACTION_THRESHOLD,
+    PLACE_ACTION_THRESHOLD,
     PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
@@ -60,16 +60,16 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
-        if (randomAction <= PASS_ACTION_THRESHOLD || this.isExchangeImpossible()) {
+        if (randomAction <= PLACE_ACTION_THRESHOLD) {
+            const scoredWordPlacement = this.computeWordPlacement();
+            if (scoredWordPlacement) {
+                this.updateHistory(scoredWordPlacement);
+                return ActionPlace.createActionData(scoredWordPlacement);
+            }
             return ActionPass.createActionData();
         }
-        if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
+        if (randomAction <= EXCHANGE_ACTION_THRESHOLD && this.isExchangePossible()) {
             return ActionExchange.createActionData(this.selectRandomTiles());
-        }
-        const scoredWordPlacement = this.computeWordPlacement();
-        if (scoredWordPlacement) {
-            this.updateHistory(scoredWordPlacement);
-            return ActionPlace.createActionData(scoredWordPlacement);
         }
         return ActionPass.createActionData();
     }
@@ -87,7 +87,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
     }
 
-    private isExchangeImpossible(): boolean {
+    private isExchangePossible(): boolean {
         let total = 0;
         this.getActiveGameService()
             .getGame(this.gameId, this.id)
@@ -95,7 +95,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
             .forEach((value: number) => {
                 total += value;
             });
-        return total < MINIMUM_EXCHANGE_WORD_COUNT;
+        return total >= MINIMUM_EXCHANGE_WORD_COUNT;
     }
 
     private selectRandomTiles(): Tile[] {

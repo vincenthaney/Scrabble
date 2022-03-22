@@ -84,9 +84,9 @@ describe('VirtualPlayerService', () => {
             TEST_ACTION = { type: ActionType.PLACE, input: '', payload: {} };
             const endpoint = `/api/games/${TEST_GAME_ID}/players/${TEST_PLAYER_ID}/action`;
             chai.spy.on(virtualPlayerService, 'getEndpoint', () => mockServer.url);
-            await mockServer.forPost(endpoint).thenReply(StatusCodes.ACCEPTED);
+            await mockServer.forPost(endpoint).thenReply(StatusCodes.NO_CONTENT);
             const response = await virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
-            expect(response.status).to.equal(StatusCodes.ACCEPTED);
+            expect(response.status).to.equal(StatusCodes.NO_CONTENT);
         });
 
         it('should call fetch, get an error then fetch with an Action Pass', async () => {
