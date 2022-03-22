@@ -279,22 +279,6 @@ describe('GameCreationPageComponent', () => {
         expect(gameTypeField?.value).toEqual(component.gameTypes.Classic);
     });
 
-    // NOT YET IMPLEMENTED
-    // it('clicking on LOG2990 button should set gameType attribute to LOG2990', async () => {
-    //     const gameTypeField = component.gameParameters.get('gameType');
-    //     gameTypeField?.setValue(component.gameTypes.Classic);
-
-    //     const log2990Button = await loader.getHarness(
-    //         MatButtonToggleHarness.with({
-    //             selector: '#log2990-button',
-    //         }),
-    //     );
-
-    //     if (await log2990Button.isDisabled()) return;
-    //     await log2990Button.toggle();
-    //     expect(gameTypeField?.value).toEqual(component.gameTypes.LOG2990);
-    // });
-
     it('clicking on Solo button should set gameMode attribute to Solo', async () => {
         const gameModeField = component.gameParameters.get('gameMode');
         gameModeField?.setValue(component.gameModes.Multiplayer);
