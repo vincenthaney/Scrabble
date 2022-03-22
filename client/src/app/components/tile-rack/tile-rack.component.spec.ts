@@ -416,7 +416,7 @@ describe('TileRackComponent', () => {
 
             component['onFocusableEvent'](event);
 
-            expect(spy).toHaveBeenCalledOnceWith(event);
+            expect(spy).toHaveBeenCalledOnceWith(event.key);
         });
     });
 
@@ -441,7 +441,7 @@ describe('TileRackComponent', () => {
             const index = 0;
             const key = tiles[index].letter;
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
@@ -451,7 +451,7 @@ describe('TileRackComponent', () => {
             const index = 3;
             const key = tiles[index].letter;
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
@@ -461,7 +461,7 @@ describe('TileRackComponent', () => {
             const index = 5;
             const key = tiles[index].letter;
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
@@ -469,7 +469,7 @@ describe('TileRackComponent', () => {
         it('should not call selectTileMove if no tile matches', () => {
             const key = 'not a letter';
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).not.toHaveBeenCalled();
         });

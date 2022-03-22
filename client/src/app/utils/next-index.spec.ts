@@ -9,7 +9,7 @@ describe('NextIndex', () => {
 
     for (const [index, length, expected] of tests) {
         it(`should return ${expected} for index=${index} and length=${length}`, () => {
-            expect(nextIndex(index)(length)).toEqual(expected);
+            expect(nextIndex(length)(index)).toEqual(expected);
         });
     }
 });

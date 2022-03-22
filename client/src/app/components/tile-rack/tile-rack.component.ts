@@ -152,7 +152,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
         if (tiles.length === 0) return this.unselectAll();
 
-        pipe(this.getSelectedTileIndex, nextIndex(tiles.length), (index) => tiles[index], this.selectTileToMove);
+        pipe(this.getSelectedTileIndex, nextIndex(tiles.length), (index) => tiles[index], this.selectTileToMove)(tiles);
     }
 
     private moveSelectedTile(direction: Direction | number): void {
