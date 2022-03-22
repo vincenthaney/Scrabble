@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 import { Orientation, Position } from '@app/classes/board';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { WordPlacement } from '@app/classes/word-finding/word-placement';
+import { WordPlacement } from '@app/classes/word-finding';
 import { IN_UPPER_CASE } from '@app/constants/classes-constants';
 import * as chai from 'chai';
 import { expect } from 'chai';

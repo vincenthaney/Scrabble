@@ -14,13 +14,17 @@ export default class DictionaryService {
     }
 
     getDictionaryTitles(): string[] {
-        return [...this.dictionaries.keys()] || [];
+        return [...this.dictionaries.keys()];
     }
 
     getDictionary(title: string): Dictionary {
         const dictionary = this.dictionaries.get(title);
         if (dictionary) return dictionary;
         throw new Error(INVALID_DICTIONARY_NAME);
+    }
+
+    getDefaultDictionary(): Dictionary {
+        return this.getDictionary(this.getDictionaryTitles()[0]);
     }
 
     protected fetchDictionaryWords(path: string): Dictionary {

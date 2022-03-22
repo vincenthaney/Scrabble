@@ -4,12 +4,12 @@ import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/c
 import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import {
     BoardPlacement,
+    DictionarySearcherStackItem,
     DictionarySearchResult,
+    PerpendicularLettersPosition,
     PerpendicularWord,
     SearcherPerpendicularLetters,
-    DictionarySearcherStackItem,
-    PerpendicularLettersPosition,
-} from './word-finding-types';
+} from '@app/classes/word-finding';
 
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;
@@ -21,9 +21,11 @@ export default class DictionarySearcher {
     constructor(node: DictionaryNode, playerLetters: LetterValue[], boardPlacement: BoardPlacement) {
         this.rootNode = node;
         this.boardPlacement = boardPlacement;
-        this.stack = [{ node, playerLetters: this.copyTiles(playerLetters) }];
+        this.stack = [];
         this.alreadyPlacedLetters = new Map(boardPlacement.letters.map((letter) => [letter.distance, letter.letter.toLowerCase()]));
         this.perpendicularLetters = this.convertPerpendicularWords(boardPlacement.perpendicularLetters);
+
+        this.addChildrenToStack(node, this.convertLetterValues(playerLetters));
     }
 
     hasNext(): boolean {
@@ -45,7 +47,7 @@ export default class DictionarySearcher {
 
         try {
             while (this.hasNext()) results.push(this.next());
-        } finally {
+        } catch (e) {
             // A throw means the iterator reached its end. Nothing special to handle, only return the result
         }
 
@@ -66,10 +68,10 @@ export default class DictionarySearcher {
         return undefined;
     }
 
-    private addChildrenToStack(node: DictionaryNode, letters: string[]): void {
+    private addChildrenToStack(node: DictionaryNode, lettersLeft: string[]): void {
         if (node.getDepth() > this.boardPlacement.maxSize) return;
 
-        const [lettersToUse, removeFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), letters);
+        const [lettersToUse, shouldRemoveFromLetters] = this.getSearchLettersForNextNode(node.getDepth(), lettersLeft);
 
         for (const letter of lettersToUse) {
             const child = node.getNode(letter);
@@ -77,17 +79,17 @@ export default class DictionarySearcher {
             if (child) {
                 this.stack.unshift({
                     node: child,
-                    playerLetters: removeFromLetters ? this.getLettersLeft(letters, letter) : [...letters],
+                    playerLetters: shouldRemoveFromLetters ? this.getLettersLeft(lettersLeft, letter) : [...lettersLeft],
                 });
             }
         }
     }
 
     private isWordValid(word: string) {
-        return this.wordSizeIsWithinBounds(word) && this.nextTileIsEmpty(word);
+        return this.wordSizeIsWithinBounds(word) && this.nextTileIsEmpty(word) && this.hasAnyNewLetters(word);
     }
 
-    private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], removeFromLetters: boolean] {
+    private getSearchLettersForNextNode(index: number, letters: string[]): [lettersToUse: string[], shouldRemoveFromLetters: boolean] {
         const alreadyPlacedLetter = this.alreadyPlacedLetters.get(index + 1);
 
         if (alreadyPlacedLetter) return [[alreadyPlacedLetter], false];
@@ -111,13 +113,18 @@ export default class DictionarySearcher {
 
         for (const { before, after, distance } of this.perpendicularLetters) {
             const letter = word.charAt(distance);
-            if (letter !== '') perpendicularWords.push({ word: before + word.charAt(distance) + after, distance });
+            if (letter !== '')
+                perpendicularWords.push({
+                    word: before + word.charAt(distance) + after,
+                    distance,
+                    junctionDistance: before.length,
+                });
         }
 
         return perpendicularWords;
     }
 
-    private copyTiles(letters: LetterValue[]): string[] {
+    private convertLetterValues(letters: LetterValue[]): string[] {
         return letters.map((letter) => letter.toLowerCase());
     }
 
@@ -139,5 +146,9 @@ export default class DictionarySearcher {
             after: perpendicularLetter.after.join('').toLowerCase(),
             distance: perpendicularLetter.distance,
         }));
+    }
+
+    private hasAnyNewLetters(word: string): boolean {
+        return this.boardPlacement.letters.filter((letter) => letter.distance < word.length).length < word.length;
     }
 }
