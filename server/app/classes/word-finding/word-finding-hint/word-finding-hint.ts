@@ -1,11 +1,11 @@
-import { HINT_ACTION_NUMBER_OF_WORDS, HINT_ACTION_TRIES_NUMBER } from '@app/constants/classes-constants';
+import { HINT_ACTION_NUMBER_OF_WORDS, HINT_ACTION_ATTEMPTS_NUMBER } from '@app/constants/classes-constants';
 import { AbstractWordFinding, ScoredWordPlacement } from '@app/classes/word-finding';
 
 export default class WordFindingHint extends AbstractWordFinding {
-    private findingTries = 0;
+    private findingAttempts = 0;
 
     handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
-        this.findingTries++;
+        this.findingAttempts++;
         if (this.wordPlacements.length < HINT_ACTION_NUMBER_OF_WORDS) {
             this.wordPlacements.push(wordPlacement);
         } else {
@@ -18,6 +18,6 @@ export default class WordFindingHint extends AbstractWordFinding {
         }
     }
     isSearchCompleted(): boolean {
-        return this.wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS && this.findingTries >= HINT_ACTION_TRIES_NUMBER;
+        return this.wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS && this.findingAttempts >= HINT_ACTION_ATTEMPTS_NUMBER;
     }
 }
