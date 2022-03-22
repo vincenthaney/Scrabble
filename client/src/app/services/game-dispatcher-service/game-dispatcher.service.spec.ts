@@ -52,6 +52,7 @@ describe('GameDispatcherService', () => {
     let getCurrentLobbyIdSpy: jasmine.Spy;
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
+    let socketServiceMock: SocketService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -62,6 +63,7 @@ describe('GameDispatcherService', () => {
 
         getCurrentLobbyIdSpy = spyOn(service, 'getCurrentLobbyId').and.returnValue(BASE_GAME_ID);
         gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
+        socketServiceMock = TestBed.inject(SocketService);
     });
 
     it('should be created', () => {
@@ -270,6 +272,54 @@ describe('GameDispatcherService', () => {
             service.handleCancelGame();
             expect(resetDataSpy).toHaveBeenCalled();
         });
+
+        it('should call not call resetData if mustResetData = false', () => {
+            service.handleCancelGame(false);
+            expect(resetDataSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleRecreateGame', () => {
+        let createSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            createSpy = spyOn(service['gameDispatcherController'], 'handleGameCreation');
+            spyOn(socketServiceMock, 'getId').and.returnValue('socketid');
+        });
+
+        afterEach(() => {
+            createSpy.calls.reset();
+        });
+
+        const gameParametersForm: FormGroup = new FormGroup({
+            level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
+            virtualPlayerName: new FormControl('', Validators.required),
+            gameMode: new FormControl(GameMode.Solo, Validators.required),
+        });
+        const formValues = {
+            virtualPlayerName: 'JVname',
+            level: VirtualPlayerLevel.Beginner,
+            gameMode: GameMode.Solo,
+        };
+        gameParametersForm.setValue(formValues);
+
+        it('should call handleGameCreation if the lobby is defined and create a SoloGame', () => {
+            service.currentLobby = TEST_LOBBY_INFO;
+            service.handleRecreateGame(gameParametersForm);
+            expect(createSpy).toHaveBeenCalled();
+        });
+
+        it('should call handleGameCreation if the lobby is defined  and create a MultiplayerGame', () => {
+            service.currentLobby = TEST_LOBBY_INFO;
+            service.handleRecreateGame();
+            expect(createSpy).toHaveBeenCalled();
+        });
+
+        it('should not call handleCancelGame if gameId is undefined', () => {
+            service.currentLobby = undefined;
+            service.handleRecreateGame();
+            expect(createSpy).not.toHaveBeenCalled();
+        });
     });
 
     describe('handleConfirmation', () => {
@@ -409,6 +459,22 @@ describe('GameDispatcherService', () => {
         it('should call resetData', () => {
             service.handleCanceledGame(TEST_PLAYER_NAME);
             expect(resetSpy).toHaveBeenCalledWith();
+        });
+    });
+
+    describe('isGameModeSolo', () => {
+        it('should return true ', () => {
+            expect(service.isGameModeSolo(TEST_FORM)).toBeTrue();
+        });
+
+        it('should return false if undefined', () => {
+            expect(service.isGameModeSolo()).toBeFalse();
+        });
+
+        it('should return false if multiplayer', () => {
+            TEST_FORM.patchValue({ gameMode: GameMode.Multiplayer });
+            expect(service.isGameModeSolo(TEST_FORM)).toBeFalse();
+            TEST_FORM.patchValue({ gameMode: GameMode.Solo });
         });
     });
 });

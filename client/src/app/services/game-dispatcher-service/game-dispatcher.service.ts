@@ -90,9 +90,27 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.handleGameCreation(gameConfig);
     }
 
-    handleCancelGame(): void {
+    handleRecreateGame(gameParameters?: FormGroup): void {
+        if (!this.currentLobby) return;
+
+        const gameConfig: GameConfigData = {
+            playerName: this.currentLobby?.hostName,
+            playerId: this.gameDispatcherController.socketService.getId(),
+            gameType: this.currentLobby?.gameType,
+            gameMode: this.isGameModeSolo(gameParameters) ? GameMode.Solo : GameMode.Multiplayer,
+            maxRoundTime: this.currentLobby?.maxRoundTime,
+            dictionary: this.currentLobby?.dictionary,
+        };
+        if (gameParameters && this.isGameModeSolo(gameParameters)) {
+            gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
+            gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
+        }
+        this.gameDispatcherController.handleGameCreation(gameConfig);
+    }
+
+    handleCancelGame(mustResetData: boolean = true): void {
         if (this.getCurrentLobbyId()) this.gameDispatcherController.handleCancelGame(this.getCurrentLobbyId());
-        this.resetServiceData();
+        if (mustResetData) this.resetServiceData();
     }
 
     handleConfirmation(opponentName: string): void {
@@ -144,5 +162,9 @@ export default class GameDispatcherService implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    isGameModeSolo(gameParameters?: FormGroup): boolean {
+        return (gameParameters && gameParameters.get('gameMode')?.value === GameMode.Solo) ?? false;
     }
 }

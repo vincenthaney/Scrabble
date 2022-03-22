@@ -10,6 +10,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
@@ -45,7 +46,7 @@ describe('CreateWaitingPageComponent', () => {
     let playerLeavesServiceMock: PlayerLeavesService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent, DefaultDialogComponent],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent],
             imports: [
                 HttpClientTestingModule,
                 MatProgressSpinnerModule,
@@ -62,6 +63,10 @@ describe('CreateWaitingPageComponent', () => {
                 GameDispatcherService,
                 {
                     provide: MatDialog,
+                    useClass: MatDialogMock,
+                },
+                {
+                    provide: ConvertDialogComponent,
                     useClass: MatDialogMock,
                 },
             ],
@@ -372,14 +377,42 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     describe('convertSolo button', () => {
-        // it('should be enabled when the game is created and no opponent has joined it', () => {
-        //     const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
-        //     expect(convertSoloButton.disabled).toBeFalsy();
-        // });
+        it('should be enabled when no opponent is found', () => {
+            component.isOpponentFound = false;
+            fixture.detectChanges();
+            const convertButton = fixture.nativeElement.querySelector('#convert-solo-button');
+            expect(convertButton.disabled).toBeFalsy();
+        });
 
-        it('should be disabled as it is not yet implemented', () => {
-            const convertSoloButton = fixture.nativeElement.querySelector('#convert-solo-button');
-            expect(convertSoloButton.disabled).toBeTruthy();
+        it('should be disabled  when an opponent is found', async () => {
+            component.isOpponentFound = true;
+            fixture.detectChanges();
+            const convertButton = fixture.nativeElement.querySelector('#convert-solo-button');
+            expect(convertButton.disabled).toBeTruthy();
+        });
+
+        it('should call confirmConvertToSolo() if no opponent is found on click', () => {
+            component.isOpponentFound = false;
+            const convertButton = fixture.debugElement.nativeElement.querySelector('#convert-solo-button');
+            convertButton.disabled = false;
+            fixture.detectChanges();
+
+            const spyDisconnect = spyOn(component, 'confirmConvertToSolo').and.callThrough();
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {});
+            convertButton.click();
+
+            expect(spyDisconnect).toHaveBeenCalled();
+            expect(gameDispatcherSpy).toHaveBeenCalled();
+        });
+
+        it('should call not handleCancelGame() if an opponent is found on click', () => {
+            component.isOpponentFound = true;
+            component.confirmConvertToSolo();
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {});
+
+            expect(gameDispatcherSpy).not.toHaveBeenCalled();
         });
     });
 

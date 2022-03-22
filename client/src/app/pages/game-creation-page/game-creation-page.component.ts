@@ -31,7 +31,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.dictionaryOptions = [];
-        this.virtualPlayerNames = randomizeArray(['Victoria', 'Vladimir', 'Herménégilde']);
+        this.virtualPlayerNames = randomizeArray(['Victoria', 'Aristote', 'Herménégilde']);
         this.playerName = '';
         this.playerNameValid = false;
         this.pageDestroyed$ = new Subject();
