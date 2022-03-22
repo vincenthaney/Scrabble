@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LobbyInfo } from '@app/classes/communication/';
+import { LobbyData, LobbyInfo } from '@app/classes/communication/';
 import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -39,6 +39,9 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.subscribeToLobbiesUpdateEvent(this.serviceDestroyed$, (lobbies: LobbyInfo[]) =>
             this.handleLobbiesUpdate(lobbies),
         );
+        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
+            this.currentLobby = lobbyData;
+        });
     }
 
     getCurrentLobbyId(): string {
