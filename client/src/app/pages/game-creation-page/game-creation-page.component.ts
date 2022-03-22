@@ -6,7 +6,6 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
-import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -27,11 +26,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
 
-    constructor(
-        private router: Router,
-        private gameDispatcherService: GameDispatcherService,
-        private gameViewEventManagerService: GameViewEventManagerService,
-    ) {
+    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {
         this.gameTypes = GameType;
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -82,11 +77,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     createGame(): void {
         if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
             this.router.navigateByUrl('waiting-room');
-        } else {
-            this.gameViewEventManagerService.subscribeToGameViewEvent('gameInitialized', this.pageDestroyed$, (data) => {
-                if (!data) return;
-                // this.router.navigateByUrl('game');
-            });
         }
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
     }
