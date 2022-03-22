@@ -200,7 +200,7 @@ describe('GamePageComponent', () => {
                 return;
             });
             component.passButtonClicked();
-            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PASS, {});
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PASS, {}, '', true);
             expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
         });
     });
