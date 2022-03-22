@@ -95,7 +95,6 @@ export class GameDispatcherService {
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
 
-        // Start game
         const config: ReadyGameConfig = {
             ...waitingRoom.getConfig(),
             player2: waitingRoom.joinedPlayer,
