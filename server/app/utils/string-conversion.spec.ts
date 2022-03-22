@@ -8,7 +8,7 @@ import * as spies from 'chai-spies';
 import { StringConversion } from './string-conversion';
 chai.use(spies);
 
-describe.only('StringConversion', () => {
+describe('StringConversion', () => {
     afterEach(() => {
         chai.spy.restore();
     });

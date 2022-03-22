@@ -12,7 +12,7 @@ import * as spies from 'chai-spies';
 import { PlacementToString } from './placement-to-string';
 chai.use(spies);
 
-describe.only('WordPlacement utils', () => {
+describe('WordPlacement utils', () => {
     afterEach(() => {
         chai.spy.restore();
     });
