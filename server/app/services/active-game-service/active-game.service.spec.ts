@@ -132,6 +132,6 @@ describe('ActiveGameService', () => {
 
     it('isGameOver should return if the game with the game id provided is over', () => {
         chai.spy.on(activeGameService, 'getGame', () => DEFAULT_GAME);
-        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.be.equal(DEFAULT_GAME.isGameOver());
+        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.be.equal(DEFAULT_GAME.areGameOverConditionsMet());
     });
 });
