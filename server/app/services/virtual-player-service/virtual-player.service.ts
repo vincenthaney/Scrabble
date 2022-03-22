@@ -9,15 +9,24 @@ import { IS_REQUESTING } from '@app/constants/game';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { CONTENT_TYPE, GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
 import Player from '@app/classes/player/player';
+import { ActionPass } from '@app/classes/actions';
 
 @Service()
 export class VirtualPlayerService {
     async sendAction(gameId: string, playerId: string, action: ActionData): Promise<Response> {
-        return fetch(`${this.getEndPoint()}/games/${gameId}/players/${playerId}/action`, {
-            method: 'POST',
-            headers: { [CONTENT_TYPE]: 'application/json' },
-            body: JSON.stringify(action),
-        });
+        try {
+            return fetch(`${this.getEndPoint()}/games/${gameId}/players/${playerId}/action`, {
+                method: 'POST',
+                headers: { [CONTENT_TYPE]: 'application/json' },
+                body: JSON.stringify(action),
+            });
+        } catch {
+            return fetch(`${this.getEndPoint()}/games/${gameId}/players/${playerId}/action`, {
+                method: 'POST',
+                headers: { [CONTENT_TYPE]: 'application/json' },
+                body: JSON.stringify(ActionPass.createActionData()),
+            });
+        }
     }
 
     triggerVirtualPlayerTurn(data: StartGameData | GameUpdateData, game: Game): void {
