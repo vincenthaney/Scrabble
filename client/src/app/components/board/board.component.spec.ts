@@ -464,6 +464,7 @@ describe('BoardComponent', () => {
             useTileSpy = spyOn<any>(component, 'useTile');
 
             squareView = {} as SquareView;
+            component['actionService'].hasActionBeenPlayed = false;
         });
 
         const tests: [letter: string, isUppercase: boolean, calls: boolean][] = [
@@ -512,6 +513,13 @@ describe('BoardComponent', () => {
             expect(useTileSpy).not.toHaveBeenCalled();
         });
 
+        it('should not call useTile if action has beel played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            component['handlePlaceLetter'](tiles[0], false, squareView);
+
+            expect(useTileSpy).not.toHaveBeenCalled();
+        });
+
         it('should not call useTile if try using blank letter but has none', () => {
             getTilesSpy.and.returnValue([{ letter: 'A', isBlank: false }]);
             component['handlePlaceLetter']('C', true, squareView);
@@ -525,7 +533,7 @@ describe('BoardComponent', () => {
         let previousSquare: SquareView;
         let nextEmptySpy: jasmine.Spy;
         let removeUsedTileSpy: jasmine.Spy;
-        let usedTilesSpy: jasmine.Spy;
+        let cannotBackspaceSpy: jasmine.Spy;
 
         beforeEach(() => {
             selectedSquare = { square: { tile: {} } } as SquareView;
@@ -536,7 +544,8 @@ describe('BoardComponent', () => {
 
             nextEmptySpy = spyOn(component['navigator'], 'nextEmpty').and.returnValue(previousSquare);
             removeUsedTileSpy = spyOn<any>(component, 'removeUsedTile');
-            usedTilesSpy = spyOn<any>(component, 'areTilesUsed').and.returnValue(true);
+            spyOn<any>(component, 'areTilesUsed').and.returnValue(true);
+            cannotBackspaceSpy = spyOn<any>(component, 'cannotBackspace').and.returnValue(false);
         });
 
         it('should call nextEmpty with backward direction', () => {
@@ -566,7 +575,7 @@ describe('BoardComponent', () => {
             expect(component.notAppliedSquares).toHaveSize(expected);
         });
 
-        it('should call removeUsedTile', () => {
+        it('should call removeUsedTile if tile is defined', () => {
             const tile = previousSquare.square.tile;
             component['handleBackspace']();
 
@@ -575,6 +584,7 @@ describe('BoardComponent', () => {
 
         it('should not call removeUsedTile if previousSquare does not have a tile', () => {
             previousSquare.square.tile = null;
+            component['handleBackspace']();
 
             expect(removeUsedTileSpy).not.toHaveBeenCalled();
         });
@@ -594,19 +604,37 @@ describe('BoardComponent', () => {
             expect(component.notAppliedSquares).toHaveSize(expected);
         });
 
-        it('should not call nextEmpty if no selectedSquare', () => {
-            component.selectedSquare = undefined;
+        it('should not call nextEmpty if cannotBackspace', () => {
+            cannotBackspaceSpy.and.returnValue(true);
 
             component['handleBackspace']();
 
             expect(nextEmptySpy).not.toHaveBeenCalled();
         });
+    });
 
-        it('should not call nextEmpty if no tiles are placed', () => {
-            usedTilesSpy.and.returnValue(false);
-            component['handleBackspace']();
+    describe('cannotBackspace', () => {
+        let tileUsedSpy: jasmine.Spy;
 
-            expect(nextEmptySpy).not.toHaveBeenCalled();
+        beforeEach(() => {
+            component.selectedSquare = {} as SquareView;
+            tileUsedSpy = spyOn<any>(component, 'areTilesUsed').and.returnValue(true);
+            component['actionService'].hasActionBeenPlayed = false;
+        });
+
+        it('should return true if no selected square', () => {
+            component.selectedSquare = undefined as unknown as SquareView;
+            expect(component['cannotBackspace']()).toBeTrue();
+        });
+
+        it('should return true if no tiles are used', () => {
+            tileUsedSpy.and.returnValue(false);
+            expect(component['cannotBackspace']()).toBeTrue();
+        });
+
+        it('should return true if action has been played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            expect(component['cannotBackspace']()).toBeTrue();
         });
     });
 
@@ -615,6 +643,7 @@ describe('BoardComponent', () => {
         const fakeData = { fake: 'data' };
         let createActionDataSpy: jasmine.Spy;
         let sendAction: jasmine.Spy;
+        let clearCursorSpy: jasmine.Spy;
 
         beforeEach(() => {
             getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
@@ -623,6 +652,9 @@ describe('BoardComponent', () => {
 
             createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
             sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
+            clearCursorSpy = spyOn<any>(component, 'clearCursor').and.callFake(() => {
                 return;
             });
         });
@@ -644,6 +676,14 @@ describe('BoardComponent', () => {
 
             expect(sendAction).not.toHaveBeenCalled();
         });
+
+        it('should call clearCursor', () => {
+            getPayloadSpy.and.returnValue({} as PlaceActionPayload);
+
+            component['handleEnter']();
+
+            expect(clearCursorSpy).toHaveBeenCalled();
+        });
     });
 
     describe('clearCursor', () => {
@@ -660,10 +700,18 @@ describe('BoardComponent', () => {
             expect(component.selectedSquare).toBeUndefined();
         });
 
-        it('should emit resetUsedTiles event', () => {
+        it('should emit resetUsedTiles event if no actions are played', () => {
+            component['actionService'].hasActionBeenPlayed = false;
             component['clearCursor']();
 
             expect(resetSpy).toHaveBeenCalledWith('resetUsedTiles');
+        });
+
+        it('should NOT emit resetUsedTiles event if actions are played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            component['clearCursor']();
+
+            expect(resetSpy).not.toHaveBeenCalledWith('resetUsedTiles');
         });
     });
 
@@ -720,6 +768,7 @@ describe('BoardComponent', () => {
     describe('onSquareClick', () => {
         let squareView: SquareView;
         let isLocalPlayerPlaying: jasmine.Spy;
+        let clearCursorSpy: jasmine.Spy;
 
         beforeEach(() => {
             squareView = new SquareView(
@@ -738,6 +787,10 @@ describe('BoardComponent', () => {
 
             isLocalPlayerPlaying = spyOn(component['gameService'], 'isLocalPlayerPlaying');
             isLocalPlayerPlaying.and.returnValue(true);
+            component['actionService'].hasActionBeenPlayed = false;
+            clearCursorSpy = spyOn<any>(component, 'clearCursor').and.callFake(() => {
+                return;
+            });
         });
 
         it('should set component as active keyboard component', () => {
@@ -790,6 +843,12 @@ describe('BoardComponent', () => {
         it('should do nothing is localPlayerIsNotPlaying', () => {
             isLocalPlayerPlaying.and.returnValue(false);
             expect(component.onSquareClick(squareView)).toBeFalse();
+        });
+
+        it('should clear cursor if action has been played', () => {
+            component['actionService'].hasActionBeenPlayed = true;
+            expect(component.onSquareClick(squareView)).toBeFalse();
+            expect(clearCursorSpy).toHaveBeenCalled();
         });
     });
 
@@ -944,7 +1003,7 @@ describe('BoardComponent', () => {
             expect(emitGameViewEventSpy).toHaveBeenCalledOnceWith('usedTiles', previousUsedTiles);
         });
 
-        it('should emit with undefined if no longer have tiles', () => {
+        it('should emit resetUsed tiles if there is only one left', () => {
             const previousUsedTiles = { tiles: [{ letter: 'A' }] as Tile[] };
             const tileToRemove = previousUsedTiles.tiles[0];
 
