@@ -10,7 +10,6 @@ import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board-service/board.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
@@ -35,14 +34,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
-        private gameDispatcherController: GameDispatcherController,
         private gameController: GamePlayController,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
         this.serviceDestroyed$ = new Subject();
-        this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) => {
-            this.handleInitializeGame(initializeValue);
-        });
         this.gameController
             .observeNewMessage()
             .pipe(takeUntil(this.serviceDestroyed$))
@@ -70,6 +65,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameId = startGameData.gameId;
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.tileReserve = startGameData.tileReserve;
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
@@ -125,7 +121,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     handleNewMessage(newMessage: Message): void {
         this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
-        if (newMessage.senderId === SYSTEM_ERROR_ID) this.gameViewEventManagerService.emitGameViewEvent('usedTiles', undefined);
+        if (newMessage.senderId === SYSTEM_ERROR_ID) {
+            this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        }
     }
 
     getPlayingPlayerId(): string {
@@ -170,6 +168,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.isGameOver = false;
         this.gameId = '';
         this.playerContainer = undefined;
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
     }
 
     wake(): void {

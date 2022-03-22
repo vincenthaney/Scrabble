@@ -4,7 +4,7 @@ import { HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GameConfigData } from '@app/classes/communication/game-config';
+import { GameConfigData, StartGameData } from '@app/classes/communication/game-config';
 import PlayerName from '@app/classes/communication/player-name';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -32,7 +32,6 @@ describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
     let httpMock: HttpTestingController;
     let socketServiceMock: SocketService;
-    let gameServiceMock: GameService;
     let socketHelper: SocketTestHelper;
 
     beforeEach(async () => {
@@ -45,7 +44,6 @@ describe('GameDispatcherController', () => {
         });
         controller = TestBed.inject(GameDispatcherController);
         httpMock = TestBed.inject(HttpTestingController);
-        gameServiceMock = TestBed.inject(GameService);
     });
 
     afterEach(() => {
@@ -80,11 +78,15 @@ describe('GameDispatcherController', () => {
         });
 
         it('On start game, configureSocket should emit socket id and game data', async () => {
-            const startGameRequestSpy = spyOn(gameServiceMock, 'initializeGame').and.callFake(async () => {
+            spyOn(socketServiceMock, 'getId').and.returnValue('id');
+            const initializeEventSpy = spyOn(controller['initializeGame$'], 'next').and.callFake(() => {
                 return;
             });
             socketHelper.peerSideEmit('startGame', DEFAULT_GAME_DATA);
-            expect(startGameRequestSpy).toHaveBeenCalled();
+            expect(initializeEventSpy).toHaveBeenCalledWith({
+                localPlayerId: 'id',
+                startGameData: DEFAULT_GAME_DATA as unknown as StartGameData,
+            });
         });
 
         it('On lobbies update, configureSocket should emit hostName', () => {
