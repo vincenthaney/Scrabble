@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
 import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
@@ -205,6 +206,12 @@ describe('BoardComponent', () => {
                 expect(actualBoardSize).toEqual(expectedBoardSize);
             },
         );
+    });
+
+    it('initializeBoard should create board navigator', () => {
+        component.navigator = undefined as unknown as BoardNavigator;
+        component['initializeBoard'](createGrid(BOARD_SERVICE_GRID_SIZE));
+        expect(component.navigator).toBeTruthy();
     });
 
     it('Call to BoardService getGridSize should assign right value to gridSize', () => {

@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { BoardNavigator } from '@app/classes/board-navigator/board-navigator';
 import Direction from '@app/classes/board-navigator/direction';
+import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Square, SquareView } from '@app/classes/square';
@@ -13,7 +14,6 @@ import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES, MARGIN_COLUMN_SIZE, SQUARE_SIZE
 import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
 import { BoardService, GameService } from '@app/services/';
 import { ActionService } from '@app/services/action-service/action.service';
-import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
@@ -63,9 +63,6 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         if (!this.boardService.readInitialBoard()) return;
         this.initializeBoard(this.boardService.readInitialBoard());
-
-        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
-
         this.subscribeToFocusableEvents();
     }
 
@@ -197,6 +194,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             }
         }
         this.marginLetters = LETTER_VALUES.slice(0, this.gridSize.x);
+        this.navigator = new BoardNavigator(this.squareGrid, { row: 0, column: 0 }, Orientation.Horizontal);
     }
 
     private getSquare(board: Square[][], row: number, column: number): Square {
