@@ -41,7 +41,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
     ) {
         this.serviceDestroyed$ = new Subject();
         this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) => {
-            console.log('start game service', initializeValue);
             this.handleInitializeGame(initializeValue);
         });
         this.gameController
