@@ -196,7 +196,7 @@ describe('AbstractWordFinding', () => {
             expect(isSearchCompletedStub.callCount).to.equal(boardPlacements.length);
         });
 
-        it('should not continue if isSearchComplete is true', () => {
+        it('should not continue if isSearchCompleted is true', () => {
             validateWordPlacementStub.returns(true);
             isSearchCompletedStub.returns(true);
 
