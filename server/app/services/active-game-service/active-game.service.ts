@@ -1,8 +1,8 @@
 import Game from '@app/classes/game/game';
-import { MultiplayerGameConfig, StartMultiplayerGameData } from '@app/classes/game/game-config';
-import { HttpException } from '@app/classes/http.exception';
+import { ReadyGameConfig, StartGameData } from '@app/classes/game/game-config';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
-import BoardService from '@app/services/board/board.service';
+import BoardService from '@app/services/board-service/board.service';
 import { StatusCodes } from 'http-status-codes';
 import { EventEmitter } from 'events';
 import { Service } from 'typedi';
@@ -18,8 +18,8 @@ export class ActiveGameService {
         Game.injectServices(this.boardService);
     }
 
-    async beginMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<StartMultiplayerGameData> {
-        const game = await Game.createMultiplayerGame(id, config);
+    async beginGame(id: string, config: ReadyGameConfig): Promise<StartGameData> {
+        const game = await Game.createGame(id, config);
         this.activeGames.push(game);
         return game.createStartGameData();
     }
@@ -30,16 +30,19 @@ export class ActiveGameService {
         if (filteredGames.length === 0) throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.NOT_FOUND);
 
         const game = filteredGames[0];
-        if (game.player1.id !== playerId && game.player2.id !== playerId) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
-
-        return game;
+        if (game.player1.id === playerId || game.player2.id === playerId) return game;
+        throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
     }
 
-    removeGame(id: string, playerId: string): Game {
-        const game = this.getGame(id, playerId);
+    removeGame(id: string, playerId: string): void {
+        let game: Game;
+        try {
+            game = this.getGame(id, playerId);
+        } catch (exception) {
+            return;
+        }
         const index = this.activeGames.indexOf(game);
         this.activeGames.splice(index, 1);
-        return game;
     }
 
     isGameOver(gameId: string, playerId: string): boolean {

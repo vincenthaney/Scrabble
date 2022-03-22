@@ -1,19 +1,20 @@
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { PlayerData } from './';
 import { RoundData } from './round-data';
+import PlayerData from './player-data';
 
 export interface GameConfigData {
     playerName: string;
     playerId: string;
     gameType: GameType;
+    gameMode: GameMode;
     maxRoundTime: number;
     dictionary: string;
-}
-
-export interface SoloGameConfigData extends GameConfigData {
-    virtualPlayerName: string;
+    virtualPlayerName?: string;
+    virtualPlayerLevel?: VirtualPlayerLevel;
 }
 
 export interface GameConfig {
@@ -23,14 +24,18 @@ export interface GameConfig {
     dictionary: string;
 }
 
-export interface MultiplayerGameConfig extends GameConfig {
+export interface ReadyGameConfig extends GameConfig {
     player2: PlayerData;
 }
 
-export interface StartMultiplayerGameData extends MultiplayerGameConfig {
+export interface StartGameData extends ReadyGameConfig {
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];
-    tileReserveTotal: number;
     round: RoundData;
+}
+
+export interface InitializeGameData {
+    localPlayerId: string;
+    startGameData: StartGameData;
 }

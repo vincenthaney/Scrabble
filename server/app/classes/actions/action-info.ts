@@ -3,7 +3,7 @@ import Action from './action';
 
 export default abstract class ActionInfo extends Action {
     execute(): void | GameUpdateData {
-        /* Nothing to execute in ActionInfo */
+        return;
     }
 
     willEndTurn(): boolean {

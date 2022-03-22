@@ -1,7 +1,10 @@
-export const PLAYER_NAME_REQUIRED = 'request body must include playerName';
-export const GAME_TYPE_REQUIRED = 'request body must include gameType';
-export const MAX_ROUND_TIME_REQUIRED = 'request body must include maxRoundTime';
-export const DICTIONARY_REQUIRED = 'request body must include dictionary';
-export const NAME_IS_INVALID = 'Player name is invalid';
-export const GAME_IS_OVER = 'The game is now over and no longer joinable';
-export const PLAYER_LEFT_GAME = ' a quitté la partie.';
+export const PLAYER_NAME_REQUIRED = 'Le corps de la requête doit contenir un playerName';
+export const GAME_TYPE_REQUIRED = 'Le corps de la requête doit contenir un gameType';
+export const GAME_MODE_REQUIRED = 'Le corps de la requête doit contenir un gameMode';
+export const MAX_ROUND_TIME_REQUIRED = 'Le corps de la requête doit contenir un maxRoundTime';
+export const DICTIONARY_REQUIRED = 'Le corps de la requête doit contenir un dictionary';
+export const VIRTUAL_PLAYER_NAME_REQUIRED = 'Le corps de la requête pour une partie solo doit contenir un virtualPlayerName';
+export const VIRTUAL_PLAYER_LEVEL_REQUIRED = 'Le corps de la requête pour une partie solo doit contenir un virtualPlayerLevel';
+export const NAME_IS_INVALID = "L'identifiant du joueur est invalide";
+export const GAME_IS_OVER = 'La partie est maintenant terminée. Impossible de la joindre';
+export const PLAYER_LEFT_GAME = ' a quitté la partie';

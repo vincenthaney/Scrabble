@@ -1,8 +1,10 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionReserve } from '@app/classes/actions';
+import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
@@ -11,10 +13,13 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
-import { LetterValue, TileReserve } from '@app/classes/tile';
-import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
+import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
+import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -27,7 +32,7 @@ const INVALID_PLAYER_ID = 'invalid-id';
 const DEFAULT_PLAYER_NAME = 'player 1';
 const DEFAULT_PLAYER_SCORE = 5;
 const DEFAULT_INPUT = 'input';
-const DEFAULT_ACTION: ActionData = { type: 'exchange', payload: {}, input: DEFAULT_INPUT };
+const DEFAULT_ACTION: ActionData = { type: ActionType.EXCHANGE, payload: { tiles: [] }, input: DEFAULT_INPUT };
 const INVALID_ACTION_TYPE = 'invalid action type';
 const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['A', 1],
@@ -37,6 +42,13 @@ const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['E', 2],
 ];
 const DEFAULT_ACTION_MESSAGE = 'default action message';
+const DEFAULT_TILES: Tile[] = [
+    {
+        letter: 'A',
+        value: 1,
+        isBlank: false,
+    },
+];
 
 describe('GamePlayService', () => {
     let gamePlayService: GamePlayService;
@@ -49,13 +61,17 @@ describe('GamePlayService', () => {
     let game: Game;
 
     beforeEach(() => {
+        Container.set(DictionaryService, getDictionaryTestService());
+
         gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
         tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
-        gameStub.getRequestingPlayer.returns(gameStub.player1);
+        gameStub.player2 = new Player(INVALID_PLAYER_ID, 'JCol');
+
+        gameStub.getPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
 
@@ -63,6 +79,8 @@ describe('GamePlayService', () => {
         roundManagerStub.nextRound.returns(round);
 
         gameStub.endOfGame.returns([DEFAULT_PLAYER_SCORE, DEFAULT_PLAYER_SCORE]);
+        gameStub.endGameMessage.returns([]);
+        gameStub.getConnectedRealPlayers.returns([gameStub.player1]);
         gameStub['getTilesLeftPerLetter'].returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
         player = gameStub.player1;
@@ -73,6 +91,7 @@ describe('GamePlayService', () => {
 
     afterEach(() => {
         getGameStub.restore();
+        chai.spy.restore();
     });
 
     describe('playAction', () => {
@@ -91,108 +110,86 @@ describe('GamePlayService', () => {
             restore();
         });
 
-        it('should call getGame', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getGame', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(getGameStub.called).to.be.true;
         });
 
-        it('should call getMessage', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getMessage', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.called).to.be.true;
         });
 
-        it('should call getOpponentMessage', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getOpponentMessage', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getOpponentMessage.called).to.be.true;
         });
 
-        it('should call getAction', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getAction', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(getActionStub.called).to.be.true;
         });
 
-        it('should call execute', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call execute', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.execute.called).to.be.true;
         });
 
-        it('should call isGameOver', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call isGameOver', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(gameStub.isGameOver.called).to.be.true;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists #1)', () => {
+        it('should call handleGameOver if gameOver ', async () => {
             gameStub.isGameOver.returns(true);
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            const spy = chai.spy.on(gamePlayService, 'handleGameOver', () => {});
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(result[0]!.isGameOver).to.be.true;
+            expect(spy).to.have.been.called;
         });
 
-        it('should set isGameOver to true if gameOver (updatedData exists #2)', () => {
-            gameStub.isGameOver.returns(true);
+        it('should call next round when action ends turn', async () => {
             actionStub.willEndTurn.returns(true);
-            actionStub.execute.returns({ player1: { score: DEFAULT_PLAYER_SCORE }, player2: { score: DEFAULT_PLAYER_SCORE } } as GameUpdateData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(result).to.exist;
-            expect(result[0]!.isGameOver).to.be.true;
-        });
-
-        it("should set isGameOver to true if gameOver (updatedData doesn't exists)", () => {
-            gameStub.isGameOver.returns(true);
-            // actionStub.execute.returns(undefined);
-            // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            actionStub.willEndTurn.returns(true);
-
-            actionStub.execute.callsFake(() => {
-                return;
-            });
-
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(result).to.exist;
-            expect(result[0]!.isGameOver).to.be.true;
-        });
-
-        it('should call next round when action ends turn', () => {
-            actionStub.willEndTurn.returns(true);
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(roundManagerStub.nextRound.called).to.be.true;
         });
 
-        it('should set round action end turn (updatedData exists)', () => {
+        it('should set round action end turn (updatedData exists)', async () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({});
             // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
         });
 
-        it("should set round action end turn (updatedData doesn't exists)", () => {
+        it("should set round action end turn (updatedData doesn't exists)", async () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns(undefined);
             // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.round).to.exist;
         });
 
-        it('should not call next round when action does not ends turn', () => {
+        it('should not call next round when action does not ends turn', async () => {
             actionStub.willEndTurn.returns(false);
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(roundManagerStub.nextRound.called).to.not.be.true;
         });
 
-        it('should throw when playerId is invalid', () => {
-            expect(() => gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.throw(NOT_PLAYER_TURN);
+        it('should throw when playerId is invalid', async () => {
+            await expect(gamePlayService.playAction(DEFAULT_GAME_ID, INVALID_PLAYER_ID, DEFAULT_ACTION)).to.be.rejectedWith(Error);
         });
 
-        it('should return tileReserve if updatedData exists', () => {
+        it('should return tileReserve if updatedData exists', async () => {
             actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+            const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
             expect(result[0]!.tileReserve).to.exist;
 
@@ -201,26 +198,18 @@ describe('GamePlayService', () => {
             }
         });
 
-        it('should return tileReserveTotal if updatedData exists', () => {
-            actionStub.execute.returns({});
-            const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(result).to.exist;
-            expect(result[0]!.tileReserveTotal).to.exist;
-            expect(result[0]!.tileReserveTotal).to.equal(DEFAULT_GET_TILES_PER_LETTER_ARRAY.reduce((prev, [, amount]) => (prev += amount), 0));
-        });
-
-        it('should call getMessage from action', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getMessage from action', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getMessage.calledOnce).to.be.true;
         });
 
-        it('should call getOpponentMessage from action', () => {
-            gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should call getOpponentMessage from action', async () => {
+            await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(actionStub.getOpponentMessage.calledOnce).to.be.true;
         });
 
-        it('should return opponentFeedback equal to getOppnentMessage from action', () => {
-            const [, feedback] = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
+        it('should return opponentFeedback equal to getOppnentMessage from action', async () => {
+            const [, feedback] = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(feedback!.opponentFeedback).to.equal(DEFAULT_ACTION_MESSAGE);
         });
     });
@@ -228,14 +217,18 @@ describe('GamePlayService', () => {
     describe('getAction', () => {
         it('should fail when type is invalid', () => {
             expect(() => {
-                gamePlayService.getAction(player, game, { type: INVALID_ACTION_TYPE as unknown as ActionType, payload: {}, input: DEFAULT_INPUT });
+                gamePlayService.getAction(player, game, {
+                    type: INVALID_ACTION_TYPE as unknown as ActionType,
+                    payload: { tiles: [] },
+                    input: DEFAULT_INPUT,
+                });
             }).to.throw(INVALID_COMMAND);
         });
 
         it('should return action of type ActionPlace when type is place', () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: ActionPlacePayload = {
-                tiles: [],
+                tiles: [{} as unknown as Tile],
                 startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
@@ -244,38 +237,46 @@ describe('GamePlayService', () => {
         });
 
         it('should return action of type ActionExchange when type is exchange', () => {
-            const type = 'exchange';
+            const type = ActionType.EXCHANGE;
             const payload: ActionExchangePayload = {
-                tiles: [],
+                tiles: [{} as unknown as Tile],
             };
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
         });
 
         it('should return action of type ActionPass when type is pass', () => {
-            const type = 'pass';
+            const type = ActionType.PASS;
             const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionPass);
         });
 
         it('should return action of type ActionHelp when type is help', () => {
-            const type = 'help';
+            const type = ActionType.HELP;
             const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionHelp);
         });
 
         it('should return action of type ActionReserve when type is reserve', () => {
-            const type = 'reserve';
+            const type = ActionType.RESERVE;
             const payload = {};
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionReserve);
         });
 
+        it('should return action of type ActionReserve when type is hint', () => {
+            const type = ActionType.HINT;
+            const payload = {};
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
+            expect(action).to.be.instanceOf(ActionHint);
+        });
+
         it("should throw if place payload doesn't have tiles", () => {
-            const type = 'place';
-            const payload: Omit<ActionPlacePayload, 'tiles'> = {
+            const type = ActionType.PLACE;
+            const payload = {
+                tiles: [],
                 startPosition: { column: 0, row: 0 },
                 orientation: Orientation.Horizontal,
             };
@@ -283,26 +284,26 @@ describe('GamePlayService', () => {
         });
 
         it("should throw if place payload doesn't have startPosition", () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'startPosition'> = {
-                tiles: [],
+                tiles: DEFAULT_TILES,
                 orientation: Orientation.Horizontal,
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if place payload doesn't have orientation", () => {
-            const type = 'place';
+            const type = ActionType.PLACE;
             const payload: Omit<ActionPlacePayload, 'orientation'> = {
-                tiles: [],
+                tiles: DEFAULT_TILES,
                 startPosition: { column: 0, row: 0 },
             };
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
 
         it("should throw if exchange payload doesn't have tiles", () => {
-            const type = 'exchange';
-            const payload: Omit<ActionExchangePayload, 'tiles'> = {};
+            const type = ActionType.EXCHANGE;
+            const payload = { tiles: [] };
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
     });
@@ -310,13 +311,17 @@ describe('GamePlayService', () => {
     describe('PlayerLeftEvent', () => {
         const playerWhoLeftId = 'playerWhoLeftId';
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.playerLeftEvent = new EventEmitter();
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
 
-            gamePlayService = new GamePlayService(activeGameServiceStub as unknown as ActiveGameService);
+            gamePlayService = new GamePlayService(
+                activeGameServiceStub as unknown as ActiveGameService,
+                highScoresServiceStub as unknown as HighScoresService,
+            );
         });
 
         it('On receive player left event, should call handlePlayerLeftEvent', () => {
@@ -327,21 +332,67 @@ describe('GamePlayService', () => {
             expect(handlePlayerLeftEventSpy).to.have.been.called.with(DEFAULT_GAME_ID, playerWhoLeftId);
         });
 
-        it('handlePlayerLeftEvent should emit playerLeftFeedback', () => {
+        it('handlePlayerLeftEvent should emit playerLeftFeedback', async () => {
             gameStub.player1 = new Player(DEFAULT_PLAYER_ID, 'Cool Guy Name');
             gameStub.player2 = new Player(playerWhoLeftId, 'LeaverName');
-            const playerStillInGame: Player = gameStub.player1;
             const updatedData: GameUpdateData = {};
             const endOfGameMessages: string[] = ['test'];
 
-            const handleGameOverSpy = chai.spy.on(gamePlayService, 'handleGameOver', () => endOfGameMessages);
+            chai.spy.on(gamePlayService, 'handleGameOver', async () => endOfGameMessages);
             const emitSpy = chai.spy.on(gamePlayService['activeGameService'].playerLeftEvent, 'emit', () => {
                 return;
             });
 
-            gamePlayService.handlePlayerLeftEvent(DEFAULT_GAME_ID, playerWhoLeftId);
-            expect(handleGameOverSpy).to.have.been.called.with(playerStillInGame.name, gameStub, updatedData);
+            await gamePlayService['handlePlayerLeftEvent'](DEFAULT_GAME_ID, playerWhoLeftId);
             expect(emitSpy).to.have.been.called.with('playerLeftFeedback', DEFAULT_GAME_ID, endOfGameMessages, updatedData);
+        });
+    });
+
+    describe('handleGameOver', () => {
+        let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+        beforeEach(() => {
+            highScoresServiceStub = createStubInstance(HighScoresService);
+            highScoresServiceStub.addHighScore.resolves(true);
+            Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
+        });
+
+        it('should call end of game and endgame message', async () => {
+            gameStub.isAddedToDatabase = true;
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
+            expect(gameStub.endOfGame.calledOnce).to.be.true;
+            expect(gameStub.endGameMessage.calledOnce).to.be.true;
+        });
+
+        it('should change isAddedtoDatabase', async () => {
+            gameStub.isAddedToDatabase = false;
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
+            expect(gameStub.isAddedToDatabase).to.be.true;
+        });
+
+        it('should call getConnectedRealPlayers', async () => {
+            gameStub.isAddedToDatabase = false;
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
+            expect(gameStub.getConnectedRealPlayers.calledOnce).to.be.true;
+            expect(highScoresServiceStub.addHighScore.calledOnce).to.be.true;
+        });
+    });
+
+    describe('addMissingPlayerId', () => {
+        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+        beforeEach(() => {
+            activeGameServiceStub = createStubInstance(ActiveGameService);
+            activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
+
+            Object.defineProperty(gamePlayService, 'activeGameService', { value: activeGameServiceStub });
+        });
+
+        it('should modify both ids', async () => {
+            const result = await gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
+
+            gameStub.isAddedToDatabase = true;
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
+            expect(result.player1!.id).to.equal(gameStub.player1.id);
+            expect(result.player2!.id).to.equal(gameStub.player2.id);
         });
     });
 });

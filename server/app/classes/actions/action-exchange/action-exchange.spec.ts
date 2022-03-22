@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -6,10 +7,11 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 import * as chai from 'chai';
+import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { assert } from 'console';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import ActionExchange from './action-exchange';
 
 const expect = chai.expect;
@@ -26,6 +28,7 @@ const PLAYER_TILES: Tile[] = [
 ];
 const TILES_TO_EXCHANGE = [PLAYER_TILES[1]];
 const TILES_NOT_TO_EXCHANGE = [PLAYER_TILES[0], PLAYER_TILES[2]];
+const TEST_TILES: Tile[] = [];
 
 describe('ActionExchange', () => {
     let gameStub: SinonStubbedInstance<Game>;
@@ -45,6 +48,22 @@ describe('ActionExchange', () => {
 
     afterEach(() => {
         getTilesFromPlayerStub.restore();
+        chai.spy.restore();
+    });
+
+    describe('static calls', () => {
+        it('should call createActionPlacePayload', () => {
+            const actionExchangeSpy = spy.on(ActionExchange, 'createActionExchangePayload', () => {
+                return;
+            });
+            ActionExchange.createActionData(TEST_TILES);
+            expect(actionExchangeSpy).to.have.been.called();
+        });
+
+        it('should return payload', () => {
+            const payload = { tiles: TEST_TILES };
+            expect(ActionExchange.createActionExchangePayload(TEST_TILES)).to.deep.equal(payload);
+        });
     });
 
     describe('execute', () => {
@@ -152,12 +171,12 @@ describe('ActionExchange', () => {
         it('should return message', () => {
             action = new ActionExchange(game.player1, game, PLAYER_TILES);
 
-            expect(action.getMessage()).to.equal('Vous avez échangé les tuiles abc.');
+            expect(action.getMessage()).to.equal('Vous avez échangé les tuiles ABC');
         });
 
         it('should return message', () => {
             action = new ActionExchange(game.player1, game, [PLAYER_TILES[0]]);
-            expect(action.getMessage()).to.equal('Vous avez échangé la tuile a.');
+            expect(action.getMessage()).to.equal('Vous avez échangé la tuile A');
         });
 
         it('should call lettersToSwap', () => {
@@ -167,12 +186,12 @@ describe('ActionExchange', () => {
         });
 
         it("should have 'les tuiles' if more than one tiles to exchange", () => {
-            action.tilesToExchange = PLAYER_TILES;
+            action['tilesToExchange'] = PLAYER_TILES;
             expect(action.getMessage()).to.include('les tuiles');
         });
 
         it("should have 'la tuile' if one tile to exchange", () => {
-            action.tilesToExchange = [PLAYER_TILES[0]];
+            action['tilesToExchange'] = [PLAYER_TILES[0]];
             expect(action.getMessage()).to.include('la tuile');
         });
     });
@@ -193,12 +212,12 @@ describe('ActionExchange', () => {
         });
 
         it("should have 'tuile' plural if more than one tiles to exchange", () => {
-            action.tilesToExchange = PLAYER_TILES;
+            action['tilesToExchange'] = PLAYER_TILES;
             expect(action.getOpponentMessage()).to.include(`${PLAYER_TILES.length} tuiles`);
         });
 
         it("should have 'tuile' singular if one tile to exchange", () => {
-            action.tilesToExchange = [PLAYER_TILES[0]];
+            action['tilesToExchange'] = [PLAYER_TILES[0]];
             expect(action.getOpponentMessage()).to.include('1 tuile');
         });
     });

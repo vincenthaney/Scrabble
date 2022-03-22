@@ -1,8 +1,8 @@
 import { LobbyData } from '@app/classes/communication/lobby-data';
-import { GameConfig, GameConfigData, MultiplayerGameConfig } from '@app/classes/game/game-config';
+import { GameConfig, GameConfigData, ReadyGameConfig } from '@app/classes/game/game-config';
 import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
-import { HttpException } from '@app/classes/http.exception';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import {
     CANNOT_HAVE_SAME_NAME,
@@ -14,36 +14,62 @@ import {
 } from '@app/constants/services-errors';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
 
 @Service()
 export class GameDispatcherService {
     private waitingRooms: WaitingRoom[];
     private lobbiesRoom: Room;
 
-    constructor() {
+    constructor(
+        private socketService: SocketService,
+        private createGameService: CreateGameService,
+        private activeGameService: ActiveGameService,
+        private virtualPlayerService: VirtualPlayerService,
+    ) {
         this.waitingRooms = [];
         this.lobbiesRoom = new Room();
     }
 
-    createMultiplayerGame(configData: GameConfigData): string {
-        const config: GameConfig = {
-            player1: new Player(configData.playerId, configData.playerName),
-            gameType: configData.gameType,
-            maxRoundTime: configData.maxRoundTime,
-            dictionary: configData.dictionary,
-        };
-        const waitingRoom = new WaitingRoom(config);
+    addToWaitingRoom(waitingRoom: WaitingRoom): void {
         this.waitingRooms.push(waitingRoom);
-
-        return waitingRoom.getId();
     }
 
     getLobbiesRoom(): Room {
         return this.lobbiesRoom;
     }
 
+    async createSoloGame(config: GameConfigData): Promise<void> {
+        const startGameData = await this.createGameService.createSoloGame(config);
+        const gameId = startGameData.gameId;
+        this.socketService.addToRoom(config.playerId, gameId);
+
+        startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
+
+        this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
+
+        if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(
+                startGameData,
+                this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
+            );
+        }
+    }
+
+    createMultiplayerGame(config: GameConfigData): LobbyData {
+        const waitingRoom = this.createGameService.createMultiplayerGame(config);
+        this.addToWaitingRoom(waitingRoom);
+        this.socketService.addToRoom(config.playerId, waitingRoom.getId());
+        return convertToLobbyData(waitingRoom.getConfig(), waitingRoom.getId());
+    }
+
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {
             throw new HttpException(PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
         }
@@ -56,9 +82,8 @@ export class GameDispatcherService {
         return waitingRoom.getConfig();
     }
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<MultiplayerGameConfig> {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
-
+    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<ReadyGameConfig> {
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
         } else if (waitingRoom.joinedPlayer === undefined) {
@@ -67,12 +92,10 @@ export class GameDispatcherService {
             throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
         }
 
-        // Remove game from wait
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
 
-        // Start game
-        const config: MultiplayerGameConfig = {
+        const config: ReadyGameConfig = {
             ...waitingRoom.getConfig(),
             player2: waitingRoom.joinedPlayer,
         };
@@ -81,7 +104,7 @@ export class GameDispatcherService {
     }
 
     rejectJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): [Player, string] {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
@@ -97,7 +120,7 @@ export class GameDispatcherService {
     }
 
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
             throw new HttpException(NO_OPPONENT_IN_WAITING_GAME);
         } else if (waitingRoom.joinedPlayer.id !== playerId) {
@@ -111,13 +134,12 @@ export class GameDispatcherService {
     }
 
     cancelGame(waitingRoomId: string, playerId: string): void {
-        const waitingRoom = this.getGameFromId(waitingRoomId);
+        const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         }
 
-        // Remove game from wait
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);
     }
@@ -126,20 +148,13 @@ export class GameDispatcherService {
         const waitingRooms = this.waitingRooms.filter((g) => g.joinedPlayer === undefined);
         const lobbyData: LobbyData[] = [];
         for (const room of waitingRooms) {
-            const config = room.getConfig();
-            lobbyData.push({
-                dictionary: config.dictionary,
-                playerName: config.player1.name,
-                maxRoundTime: config.maxRoundTime,
-                lobbyId: room.getId(),
-                gameType: config.gameType,
-            });
+            lobbyData.push(convertToLobbyData(room.getConfig(), room.getId()));
         }
 
         return lobbyData;
     }
 
-    getGameFromId(waitingRoomId: string): WaitingRoom {
+    getMultiplayerGameFromId(waitingRoomId: string): WaitingRoom {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
         throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);

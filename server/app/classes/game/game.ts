@@ -7,26 +7,25 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { WINNER_MESSAGE } from '@app/constants/game';
+import { WINNER_MESSAGE, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
-import BoardService from '@app/services/board/board.service';
-import { MultiplayerGameConfig, StartMultiplayerGameData } from './game-config';
-import { GameType } from './game.type';
-
+import BoardService from '@app/services/board-service/board.service';
+import { GameType } from './game-type';
+import { ReadyGameConfig, StartGameData } from './game-config';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
-export const LOOSE = -1;
+export const LOSE = -1;
 
 export default class Game {
     private static boardService: BoardService;
     roundManager: RoundManager;
-    // Not used yet, for future features
-    wordsPlayed: string[];
     gameType: GameType;
     board: Board;
     dictionnaryName: string;
     player1: Player;
     player2: Player;
+    isAddedToDatabase: boolean;
     private tileReserve: TileReserve;
     private id: string;
 
@@ -40,18 +39,18 @@ export default class Game {
         }
     }
 
-    static async createMultiplayerGame(id: string, config: MultiplayerGameConfig): Promise<Game> {
+    static async createGame(id: string, config: ReadyGameConfig): Promise<Game> {
         const game = new Game();
 
         game.id = id;
         game.player1 = config.player1;
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
-        game.wordsPlayed = [];
         game.gameType = config.gameType;
         game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
+        game.isAddedToDatabase = false;
 
         await game.tileReserve.init();
 
@@ -61,10 +60,6 @@ export default class Game {
         game.roundManager.beginRound();
 
         return game;
-    }
-
-    static async createSoloGame(/* config: SoloGameConfig */): Promise<Game> {
-        throw new Error('Solo mode not implemented');
     }
 
     getTilesFromReserve(amount: number): Tile[] {
@@ -79,23 +74,26 @@ export default class Game {
         return this.tileReserve.getTilesLeftPerLetter();
     }
 
-    getId() {
+    getId(): string {
         return this.id;
     }
 
-    async initTileReserve() {
+    getConnectedRealPlayers(): Player[] {
+        const connectedRealPlayers: Player[] = [];
+        if (this.player1.isConnected && !(this.player1 instanceof AbstractVirtualPlayer)) connectedRealPlayers.push(this.player1);
+        if (this.player2.isConnected && !(this.player2 instanceof AbstractVirtualPlayer)) connectedRealPlayers.push(this.player2);
+        return connectedRealPlayers;
+    }
+
+    async initTileReserve(): Promise<void> {
         return this.tileReserve.init();
     }
 
-    getRequestingPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player1;
-        if (this.player2.id === playerId) return this.player2;
-        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
-    }
-
-    getOpponentPlayer(playerId: string): Player {
-        if (this.player1.id === playerId) return this.player2;
-        if (this.player2.id === playerId) return this.player1;
+    getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
+        if (this.isPlayerFromGame(playerId)) {
+            if (this.player1.id === playerId) return isRequestingPlayer ? this.player1 : this.player2;
+            if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
+        }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
@@ -105,9 +103,11 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         if (winnerName) {
-            if (winnerName === this.player1.name)
-                return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-            else return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            if (winnerName === this.player1.name) {
+                return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+            } else {
+                return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            }
         } else {
             return this.getEndOfGameScores();
         }
@@ -115,11 +115,11 @@ export default class Game {
 
     getEndOfGameScores(): [number, number] {
         if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
-            return this.computeEndOfGameScore(LOOSE, LOOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
+            return this.computeEndOfGameScore(LOSE, LOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
         } else if (!this.player1.hasTilesLeft()) {
-            return this.computeEndOfGameScore(WIN, LOOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+            return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
         } else {
-            return this.computeEndOfGameScore(LOOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+            return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         }
     }
 
@@ -153,23 +153,20 @@ export default class Game {
         return WINNER_MESSAGE(winner);
     }
 
-    isPlayer1(arg: string | Player): boolean {
-        if (arg instanceof Player) {
-            return this.player1.id === arg.id;
-        } else {
-            return this.player1.id === arg;
-        }
+    isPlayer1(player: string | Player): boolean {
+        return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
     }
 
-    createStartGameData(): StartMultiplayerGameData {
+    isPlayerReal(playerId: string): boolean {
+        return !(this.getPlayer(playerId, IS_REQUESTING) instanceof AbstractVirtualPlayer);
+    }
+
+    createStartGameData(): StartGameData {
         const tileReserve: TileReserveData[] = [];
-        this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
-            tileReserve.push({ letter, amount });
-        });
-        const tileReserveTotal = tileReserve.reduce((prev, { amount }) => (prev += amount), 0);
+        this.addTilesToReserve(tileReserve);
         const round: Round = this.roundManager.getCurrentRound();
         const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
-        const startMultiplayerGameData: StartMultiplayerGameData = {
+        const startGameData: StartGameData = {
             player1: this.player1,
             player2: this.player2,
             gameType: this.gameType,
@@ -178,9 +175,18 @@ export default class Game {
             gameId: this.getId(),
             board: this.board.grid,
             tileReserve,
-            tileReserveTotal,
             round: roundData,
         };
-        return startMultiplayerGameData;
+        return startGameData;
+    }
+
+    private addTilesToReserve(tileReserve: TileReserveData[]): void {
+        this.getTilesLeftPerLetter().forEach((amount: number, letter: LetterValue) => {
+            tileReserve.push({ letter, amount });
+        });
+    }
+
+    private isPlayerFromGame(playerId: string): boolean {
+        return this.player1.id === playerId || this.player2.id === playerId;
     }
 }

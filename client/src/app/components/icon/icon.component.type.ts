@@ -1,3 +1,7 @@
+// Must disable because the file is too big. This file comes from FontAwesome and we need it to use their icons.
+// We don't want to modify it as it comes as is and allows us to use new icons without having to modify the file
+/* eslint-disable max-lines */
+
 export interface IconInputs {
     icon: IconName;
     styling?: IconStyle;
@@ -8,7 +12,6 @@ export interface IconInputs {
 
 export type IconType = IconName | IconInputs;
 
-/* eslint-disable max-lines */
 export type IconStyle = 'solid' | 'regular' | 'light' | 'duotone';
 
 export type IconPrefix = 'far' | 'fal' | 'fas' | 'fad';

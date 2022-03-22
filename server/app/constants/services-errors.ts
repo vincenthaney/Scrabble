@@ -1,30 +1,32 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Position } from '@app/classes/board';
 
 export const NO_MULTIPLIER_MAPPED_TO_INPUT = (data: string): string => {
-    return `There is no multiplier mapped for the board configuration ${data}`;
+    return `Aucun multiplicateur ne correspond à la configuration ${data}`;
 };
 
 export const BOARD_CONFIG_UNDEFINED_AT = (position: Position): string => {
-    return `The board multiplier configuration is undefined at row: ${position.row}, column: ${position.column}`;
+    return `La configuration de plateau n'est pas définie à la ligne: ${position.row}, colonne: ${position.column}`;
 };
 
-export const PLAYER_ALREADY_TRYING_TO_JOIN = 'A player is already trying to join the game';
-export const NO_OPPONENT_IN_WAITING_GAME = 'No opponent is waiting for the game';
-export const OPPONENT_NAME_DOES_NOT_MATCH = 'Opponent name does not match. Cannot accept game';
-export const CANNOT_HAVE_SAME_NAME = 'Cannot join a game with a player with the same name';
-export const INVALID_COMMAND = 'The command is not one of the recognised commands. type !help for a list of possible commands';
-export const INVALID_PAYLOAD = 'Invalid payload for command type';
-export const NOT_PLAYER_TURN = 'It is not the turn of requesting player';
-export const SOCKET_SERVICE_NOT_INITIALIZED = 'SocketService not initialized';
-export const INVALID_ID_FOR_SOCKET = 'Invalid ID for socket';
+export const PLAYER_ALREADY_TRYING_TO_JOIN = 'Un joueur est déjà en train de rejoindre cette partie';
+export const NO_OPPONENT_IN_WAITING_GAME = "Aucun aversaire n'est en attente de la partie";
+export const OPPONENT_NAME_DOES_NOT_MATCH = "Le nom de l'adversaire ne correspond pas. Impossible d'accepter la partie";
+export const CANNOT_HAVE_SAME_NAME = "Impossible de rejoindre la partie d'un joueur portant le même nom";
+export const INVALID_COMMAND = "Cette commande n'est pas reconnue. Entrez !aide pour connaitre les commandes valides";
+export const INVALID_PAYLOAD = 'Payload invalide pour ce type de commande';
+export const NOT_PLAYER_TURN = "Ce n'est pas le tour du joueur demandeur de jouer";
+export const SOCKET_SERVICE_NOT_INITIALIZED = "SocketService n'est pas initalisé";
+export const INVALID_ID_FOR_SOCKET = 'Identifiant invalide pour le socket';
 export const MINIMUM_WORD_LENGTH = 2;
 export const INVALID_WORD = (word: string) => `Le mot **${word}** n'est pas dans le dictionnaire choisi. Vous perdez votre tour.`;
-export const WORD_TOO_SHORT = ' Word too short';
-export const WORD_CONTAINS_HYPHEN = ' Word cannot contain hyphen';
-export const WORD_CONTAINS_APOSTROPHE = ' Word cannot contain apostrophe';
-export const WORD_CONTAINS_ASTERISK = ' Word cannot contain asterisk';
-export const NO_GAME_FOUND_WITH_ID = 'No game could be found with id';
-export const INVALID_PLAYER_ID_FOR_GAME = 'Invalid player id for game';
+export const WORD_TOO_SHORT = ' Mot trop court';
+export const WORD_CONTAINS_HYPHEN = ' Le mot ne peut pas contenir de tiret';
+export const WORD_CONTAINS_APOSTROPHE = " Le mot ne peut pas contenir d'apostrophe";
+export const WORD_CONTAINS_ASTERISK = " Le mot ne peut pas contenir d'astérisque";
+export const NO_GAME_FOUND_WITH_ID = 'Aucune partie trouvée avec cet identifiant';
+export const INVALID_PLAYER_ID_FOR_GAME = 'Identifiant de joueur invalide pour cette partie';
 export const COMMAND_IS_INVALID = (command: string) => `La commande **${command}** est invalide :<br>`;
 export const OPPONENT_PLAYED_INVALID_WORD = "Votre adversaire a joué un mot qui n'est pas dans le dictionnaire. Il perd son tour.";
+export const NO_REQUEST_POINT_RANGE = 'La requête doit avoir un pointRange';
+export const INVALID_REQUEST_POINT_RANGE = 'Le minimum du pointRange de la requête doit être plus petit que le maximum';
+export const NO_REQUEST_POINT_HISTORY = 'La requête doit avoir un pointHistory';

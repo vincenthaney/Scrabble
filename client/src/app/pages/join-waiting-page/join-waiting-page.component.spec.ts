@@ -21,9 +21,9 @@ class TestComponent {}
 
 const EMPTY_LOBBY = {} as unknown as LobbyInfo;
 
-const DEFAULT_LOBBY = {
+const DEFAULT_LOBBY: LobbyInfo = {
     lobbyId: '1',
-    playerName: 'Name1',
+    hostName: 'Name1',
     gameType: GameType.Classic,
     dictionary: 'default',
     maxRoundTime: 60,
@@ -100,8 +100,8 @@ describe('JoinWaitingPageComponent', () => {
         });
 
         it('ngOnInit should call the get the gameDispatcherService lobby and playerName ', () => {
-            const spySubscribeCanceledGameEvent = spyOn(gameDispatcherServiceMock.canceledGameEvent, 'subscribe').and.returnValue(of(true) as any);
-            const spySubscribeJoinerRejectedEvent = spyOn(gameDispatcherServiceMock.joinerRejectedEvent, 'subscribe').and.returnValue(
+            const spySubscribeCanceledGameEvent = spyOn(gameDispatcherServiceMock['canceledGameEvent'], 'subscribe').and.returnValue(of(true) as any);
+            const spySubscribeJoinerRejectedEvent = spyOn(gameDispatcherServiceMock['joinerRejectedEvent'], 'subscribe').and.returnValue(
                 of(true) as any,
             );
             // Create a new component once spies have been applied
@@ -121,13 +121,9 @@ describe('JoinWaitingPageComponent', () => {
     });
 
     it('ngOnDestroy should unsubscribe all subscriptions', () => {
-        const spyUnsubscribeCancelEvent = spyOn(component.canceledGameSubscription, 'unsubscribe').and.returnValue(of(true) as any);
         const spyUnsubscribeRoutingEvent = spyOn(component.routingSubscription, 'unsubscribe').and.returnValue(of(true) as any);
-        const spyUnsubscribeJoinerRejectedEvent = spyOn(component.joinerRejectedSubscription, 'unsubscribe').and.returnValue(of(true) as any);
         component.ngOnDestroy();
-        expect(spyUnsubscribeCancelEvent).toHaveBeenCalled();
         expect(spyUnsubscribeRoutingEvent).toHaveBeenCalled();
-        expect(spyUnsubscribeJoinerRejectedEvent).toHaveBeenCalled();
     });
 
     describe('routerChangeMethod', () => {
@@ -168,7 +164,7 @@ describe('JoinWaitingPageComponent', () => {
         const spyPlayerRejected = spyOn(component, 'playerRejected').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.joinerRejectedEvent.emit(emitName);
+        gameDispatcherServiceMock['joinerRejectedEvent'].next(emitName);
         expect(spyPlayerRejected).toHaveBeenCalledWith(emitName);
     });
 
@@ -177,7 +173,7 @@ describe('JoinWaitingPageComponent', () => {
         const spyHostHasCanceled = spyOn(component, 'hostHasCanceled').and.callFake(() => {
             return;
         });
-        gameDispatcherServiceMock.canceledGameEvent.emit(emitName);
+        gameDispatcherServiceMock['canceledGameEvent'].next(emitName);
         expect(spyHostHasCanceled).toHaveBeenCalledWith(emitName);
     });
 

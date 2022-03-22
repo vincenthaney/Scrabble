@@ -11,8 +11,8 @@ import {
     DIALOG_REJECT_CONTENT,
     DIALOG_REJECT_TITLE,
 } from '@app/constants/pages-constants';
-import GameDispatcherService from '@app/services/game-dispatcher/game-dispatcher.service';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
+import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -22,19 +22,19 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./join-waiting-page.component.scss'],
 })
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
-    canceledGameSubscription: Subscription;
-    joinerRejectedSubscription: Subscription;
-    routingSubscription: Subscription;
-    componentDestroyed$: Subject<boolean> = new Subject();
     currentLobby: LobbyInfo;
     currentName: string;
+    routingSubscription: Subscription;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
         public gameDispatcherService: GameDispatcherService,
         private readonly playerLeavesService: PlayerLeavesService,
         public router: Router,
-    ) {}
+    ) {
+        this.componentDestroyed$ = new Subject();
+    }
 
     @HostListener('window:beforeunload')
     onBeforeUnload(): void {
@@ -51,12 +51,8 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.canceledGameSubscription = this.gameDispatcherService.canceledGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((hostName: string) => this.hostHasCanceled(hostName));
-        this.joinerRejectedSubscription = this.gameDispatcherService.joinerRejectedEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((hostName: string) => this.playerRejected(hostName));
+        this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, (hostName: string) => this.hostHasCanceled(hostName));
+        this.gameDispatcherService.subscribeToJoinerRejectedEvent(this.componentDestroyed$, (hostName: string) => this.playerRejected(hostName));
     }
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);

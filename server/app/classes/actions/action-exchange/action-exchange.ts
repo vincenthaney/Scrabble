@@ -1,5 +1,6 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
+import { ActionData, ActionExchangePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -7,11 +8,23 @@ import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 
 export default class ActionExchange extends ActionPlay {
-    tilesToExchange: Tile[];
+    private tilesToExchange: Tile[];
 
     constructor(player: Player, game: Game, tilesToExchange: Tile[]) {
         super(player, game);
         this.tilesToExchange = tilesToExchange;
+    }
+
+    static createActionData(tiles: Tile[]): ActionData {
+        return {
+            type: ActionType.EXCHANGE,
+            payload: this.createActionExchangePayload(tiles),
+            input: '',
+        };
+    }
+
+    static createActionExchangePayload(tiles: Tile[]): ActionExchangePayload {
+        return { tiles };
     }
 
     execute(): GameUpdateData {
@@ -20,7 +33,7 @@ export default class ActionExchange extends ActionPlay {
         const newTiles = this.game.swapTilesFromReserve(tilesToExchange);
         this.player.tiles = unusedTiles.concat(newTiles);
 
-        const playerUpdate: PlayerData = { tiles: this.player.tiles };
+        const playerUpdate: PlayerData = { id: this.player.id, tiles: this.player.tiles };
 
         const response: GameUpdateData = {};
 
@@ -35,11 +48,10 @@ export default class ActionExchange extends ActionPlay {
     }
 
     lettersToSwap(): string {
-        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter.toLowerCase()), '')}.`;
+        return `${this.tilesToExchange.reduce((prev, tile) => (prev += tile.letter), '')}`;
     }
 
     getOpponentMessage(): string {
-        const moreThanOne = this.tilesToExchange.length > 1;
-        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${moreThanOne ? 's' : ''}`;
+        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${this.tilesToExchange.length > 1 ? 's' : ''}`;
     }
 }

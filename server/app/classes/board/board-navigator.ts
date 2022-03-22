@@ -1,42 +1,94 @@
+import { Square } from '@app/classes/square';
+import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
+import { switchOrientation } from '@app/utils/switch-orientation';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 
 export default class BoardNavigator {
-    readonly position: Position;
+    orientation: Orientation;
+    position: Position;
 
-    constructor(private board: Board, position: Position) {
+    constructor(private board: Board, position: Position, orientation: Orientation) {
         this.position = position.copy();
+        this.orientation = orientation;
     }
 
-    get square() {
+    get square(): Square {
         return this.board.getSquare(this.position);
+    }
+
+    get row(): number {
+        return this.position.row;
+    }
+
+    get column(): number {
+        return this.position.column;
     }
 
     verify(shouldBeFilled: boolean): boolean {
         try {
             return this.board.verifySquare(this.position, shouldBeFilled);
-        } catch (e) {
+        } catch (exception) {
             return false;
         }
     }
 
-    verifyNeighbors(orientation: Orientation, shouldBeFilled: boolean) {
+    verifyNeighbors(orientation: Orientation, shouldBeFilled: boolean): boolean {
         return this.board.verifyNeighbors(this.position, orientation, shouldBeFilled);
     }
 
-    move(orientation: Orientation, direction: Direction, distance: number = 1): BoardNavigator {
-        this.position.move(orientation, direction, distance);
+    verifyAllNeighbors(shouldBeFilled: boolean): boolean {
+        return (
+            this.board.verifyNeighbors(this.position, Orientation.Horizontal, shouldBeFilled) ||
+            this.board.verifyNeighbors(this.position, Orientation.Vertical, shouldBeFilled)
+        );
+    }
+
+    verifyPerpendicularNeighbors(shouldBeFilled: boolean): boolean {
+        return this.verifyNeighbors(switchOrientation(this.orientation), shouldBeFilled);
+    }
+
+    move(direction: Direction, distance: number = DEFAULT_DISTANCE): BoardNavigator {
+        this.position.move(this.orientation, direction, distance);
         return this;
     }
 
-    forward(orientation: Orientation, distance: number = 1): BoardNavigator {
-        this.position.move(orientation, Direction.Forward, distance);
+    forward(distance: number = 1): BoardNavigator {
+        this.position.move(this.orientation, Direction.Forward, distance);
         return this;
     }
 
-    backward(orientation: Orientation, distance: number = 1): BoardNavigator {
-        this.position.move(orientation, Direction.Backward, distance);
+    backward(distance: number = 1): BoardNavigator {
+        this.position.move(this.orientation, Direction.Backward, distance);
         return this;
+    }
+
+    moveUntil(direction: Direction, predicate: () => boolean): number {
+        let distanceTravelled = 0;
+        while (this.isWithinBounds() && !predicate()) {
+            this.move(direction);
+            distanceTravelled++;
+        }
+        return this.isWithinBounds() ? distanceTravelled : Number.POSITIVE_INFINITY;
+    }
+
+    nextLine(): void {
+        if (this.orientation === Orientation.Horizontal) {
+            this.position.row += 1;
+            this.position.column = 0;
+        } else {
+            this.position.row = 0;
+            this.position.column += 1;
+        }
+    }
+
+    switchOrientation(): BoardNavigator {
+        this.orientation = switchOrientation(this.orientation);
+        return this;
+    }
+
+    isEmpty(): boolean {
+        return this.square.tile === null;
     }
 
     isWithinBounds(): boolean {
@@ -44,6 +96,6 @@ export default class BoardNavigator {
     }
 
     clone(): BoardNavigator {
-        return new BoardNavigator(this.board, this.position);
+        return new BoardNavigator(this.board, this.position, this.orientation);
     }
 }

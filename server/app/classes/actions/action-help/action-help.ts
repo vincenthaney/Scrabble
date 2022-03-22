@@ -3,7 +3,9 @@ import { HELP_ACTIONS } from '@app/constants/classes-constants';
 
 export default class ActionHelp extends ActionInfo {
     getMessage(): string {
-        return HELP_ACTIONS.map((action) => `!${action.command}${action.usage ? ' ' + action.usage : ''}: ${action.description}`).join('\n');
+        return HELP_ACTIONS.map((action) => `!**${action.command}**${action.useCase ? ' ' + action.useCase : ''}: ${action.description}`).join(
+            '<br>',
+        );
     }
 
     getOpponentMessage(): string | undefined {

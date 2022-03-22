@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { FontSizeChangeOperations } from '@app/classes/font-size-operations';
 import { BoardComponent } from '@app/components/board/board.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
@@ -25,12 +26,13 @@ import {
     SQUARE_TILE_MAX_FONT_SIZE,
     SQUARE_TILE_MIN_FONT_SIZE,
 } from '@app/constants/tile-font-size';
-import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
-import { FocusableComponentsService } from '@app/services/focusable-components/focusable-components.service';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ActionService } from '@app/services/action-service/action.service';
+import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { ReconnectionService } from '@app/services/reconnection-service/reconnection.service';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-game-page',
@@ -40,41 +42,79 @@ import { takeUntil } from 'rxjs/operators';
 export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
-    noActiveGameSubscription: Subscription;
-    componentDestroyed$: Subject<boolean> = new Subject();
+
+    mustDisconnectGameOnLeave: boolean;
+    componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
         public gameService: GameService,
         private focusableComponentService: FocusableComponentsService,
-        private gameDispatcher: GameDispatcherController,
+        private readonly reconnectionService: ReconnectionService,
         public surrenderDialog: MatDialog,
-        private readonly playerLeavesService: PlayerLeavesService,
-    ) {}
+        private playerLeavesService: PlayerLeavesService,
+        private gameViewEventManagerService: GameViewEventManagerService,
+        private actionService: ActionService,
+    ) {
+        this.mustDisconnectGameOnLeave = true;
+        this.componentDestroyed$ = new Subject();
+    }
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
         this.focusableComponentService.emitKeyboard(event);
     }
+    @HostListener('document:keydown.escape', ['$event'])
+    handleKeyboardEventEsc(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.backspace', ['$event'])
+    handleKeyboardEventBackspace(event: KeyboardEvent): void {
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.arrowleft', ['$event'])
+    handleKeyboardEventArrowLeft(event: KeyboardEvent): void {
+        event.preventDefault();
+        this.focusableComponentService.emitKeyboard(event);
+    }
+    @HostListener('document:keydown.arrowright', ['$event'])
+    handleKeyboardEventArrowRight(event: KeyboardEvent): void {
+        event.preventDefault();
+        this.focusableComponentService.emitKeyboard(event);
+    }
 
     @HostListener('window:beforeunload')
     ngOnDestroy(): void {
-        if (this.gameService.getGameId()) {
-            this.gameService.disconnectGame();
+        if (this.mustDisconnectGameOnLeave) {
+            this.reconnectionService.disconnectGame();
         }
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
     }
 
     ngOnInit(): void {
-        this.gameDispatcher.configureSocket();
-
-        this.noActiveGameSubscription = this.gameService.noActiveGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe(() => this.noActiveGameDialog());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
         if (!this.gameService.getGameId()) {
-            this.gameService.reconnectGame();
+            this.reconnectionService.reconnectGame();
         }
+    }
+
+    passButtonClicked(): void {
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PASS, {}, '', true),
+        );
+    }
+
+    placeButtonClicked(): void {
+        const placePayload: PlaceActionPayload | undefined = this.gameViewEventManagerService.getGameViewEventValue('usedTiles');
+        if (!placePayload) return;
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.PLACE, placePayload),
+        );
     }
 
     openDialog(title: string, content: string, buttonsContent: string[]): void {
@@ -90,7 +130,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         // We haven't been able to test that the right function is called because this
                         // arrow function creates a new instance of the function. We cannot spy on it.
                         // It totally works tho, try it!
-                        action: () => this.handlePlayerLeave(),
+                        action: () => this.handlePlayerLeaves(),
                     },
                     {
                         content: buttonsContent[1],
@@ -131,6 +171,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         closeDialog: false,
                         redirect: '/home',
                         style: 'background-color: rgb(231, 231, 231)',
+                        // We haven't been able to test that the right function is called because this
+                        // arrow function creates a new instance of the function. We cannot spy on it.
+                        // It totally works tho, try it!
+                        action: () => (this.mustDisconnectGameOnLeave = false),
                     },
                 ],
             },
@@ -147,8 +191,20 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    private handlePlayerLeave(): void {
-        this.gameService.gameId = '';
+    isLocalPlayerTurn(): boolean {
+        return this.gameService.isLocalPlayerPlaying();
+    }
+
+    canPass(): boolean {
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver && !this.actionService.hasActionBeenPlayed;
+    }
+
+    canPlaceWord(): boolean {
+        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
+    }
+
+    private handlePlayerLeaves(): void {
+        this.mustDisconnectGameOnLeave = false;
         this.playerLeavesService.handleLocalPlayerLeavesGame();
     }
 }

@@ -3,13 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 
-import { Board, Orientation, Position } from '@app/classes/board';
+import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { expect } from 'chai';
 import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { WordExtraction } from './word-extraction';
 import Direction from '@app/classes/board/direction';
+import { stub } from 'sinon';
 
 type LetterOrEmpty = LetterValue | ' ';
 
@@ -18,7 +19,7 @@ const tilesFromLetters = (letters: LetterValue[]) => letters.map(tileFromLetter)
 const gridFromLetterArray = (letters: LetterOrEmpty[][]) => {
     return letters.map<Square[]>((row, i) =>
         row.map<Square>((letter, j) => ({
-            position: new Position(j, i),
+            position: new Position(i, j),
             scoreMultiplier: null,
             wasMultiplierUsed: false,
             isCenter: false,
@@ -35,7 +36,7 @@ const DEFAULT_LETTER_ARRAY: LetterOrEmpty[][] = [
     [' ', ' ', ' ', ' ', ' ', ' '],
     [' ', ' ', ' ', ' ', ' ', ' '],
 ];
-const HAS_TILE_POSITION: Position = new Position(2, 1);
+const HAS_TILE_POSITION: Position = new Position(1, 2);
 const DEFAULT_ORIENTATION: Orientation = Orientation.Horizontal;
 
 describe('WordExtract', () => {
@@ -55,10 +56,10 @@ describe('WordExtract', () => {
 
     describe('extract', () => {
         const testWords = (letters: LetterValue[], column: number, row: number, orientation: Orientation, expected: string[]) => {
-            const tiles: Tile[] = tilesFromLetters(letters);
-            const position = new Position(column, row);
+            const tilesToPlace: Tile[] = tilesFromLetters(letters);
+            const startPosition = new Position(row, column);
 
-            const result = extraction.extract(tiles, position, orientation);
+            const result = extraction.extract({ tilesToPlace, startPosition, orientation });
             const resultWords = result.map((word) => word.reduce((prev, [, t]) => (prev += t.letter), ''));
 
             for (const word of expected) {
@@ -106,29 +107,47 @@ describe('WordExtract', () => {
         });
 
         it('should throw if square already has a tile', () => {
-            expect(() => extraction.extract([], HAS_TILE_POSITION, DEFAULT_ORIENTATION)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+            expect(() => extraction.extract({ tilesToPlace: [], startPosition: HAS_TILE_POSITION, orientation: DEFAULT_ORIENTATION })).to.throw(
+                EXTRACTION_SQUARE_ALREADY_FILLED,
+            );
         });
 
         it('should throw if tiles go outside board', () => {
-            const tiles = tilesFromLetters(['X', 'Y', 'Z']);
-            const position = new Position(4, 0);
+            const tilesToPlace = tilesFromLetters(['X', 'Y', 'Z']);
+            const startPosition = new Position(0, 4);
             const orientation = Orientation.Horizontal;
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
+            expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw(POSITION_OUT_OF_BOARD);
         });
 
         it("should throw if letters doesn't go over edge, but tiles are already there", () => {
-            const tiles = tilesFromLetters(['V', 'W', 'X', 'Y', 'Z']);
-            const position = new Position(1, 1);
+            const tilesToPlace = tilesFromLetters(['V', 'W', 'X', 'Y', 'Z']);
+            const startPosition = new Position(1, 1);
             const orientation = Orientation.Horizontal;
 
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw(POSITION_OUT_OF_BOARD);
+            expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw(POSITION_OUT_OF_BOARD);
         });
 
         it('should throw if letter is not adjacent', () => {
-            const tiles = tilesFromLetters(['X']);
-            const position = new Position(4, 4);
+            const tilesToPlace = tilesFromLetters(['X']);
+            const startPosition = new Position(4, 4);
             const orientation = Orientation.Horizontal;
-            expect(() => extraction.extract(tiles, position, orientation)).to.throw();
+            expect(() => extraction.extract({ tilesToPlace, startPosition, orientation })).to.throw();
+        });
+
+        it('should not push', () => {
+            const tilesToPlace: Tile[] = tilesFromLetters(['X', 'Y', 'Z']);
+            const startPosition = new Position(1, 3);
+
+            const result = () => extraction.extract({ tilesToPlace, startPosition, orientation: Orientation.Vertical });
+            const stubVerify = stub(BoardNavigator.prototype, 'verify');
+            stubVerify.onCall(0).returns(false);
+            stubVerify.onCall(1).returns(true);
+            stubVerify.onCall(2).callsFake(() => {
+                throw new Error();
+            });
+            expect(result).to.Throw();
+            stubVerify.reset();
+            stubVerify.restore();
         });
     });
 
@@ -136,8 +155,21 @@ describe('WordExtract', () => {
         it('should throw if tile is occupied', () => {
             const orientation = Orientation.Horizontal;
             const direction = Direction.Forward;
-            const position = new Position(2, 1);
+            const position = new Position(1, 2);
             expect(() => extraction['extractWordInDirection'](orientation, direction, position)).to.throw(EXTRACTION_SQUARE_ALREADY_FILLED);
+        });
+
+        it('should not push', () => {
+            const stubVerify = stub(BoardNavigator.prototype, 'verify');
+            stubVerify.onCall(0).returns(false);
+            stubVerify.onCall(1).returns(true);
+            stubVerify.onCall(2).returns(false);
+            const orientation = Orientation.Horizontal;
+            const direction = Direction.Forward;
+            const position = new Position(0, 0);
+            expect(extraction['extractWordInDirection'](orientation, direction, position).length).to.equal(0);
+            stubVerify.reset();
+            stubVerify.restore();
         });
     });
 });

@@ -1,5 +1,7 @@
+import { ActionType } from '@app/classes/actions/action-data';
+import { Orientation } from '@app/classes/orientation';
 import { Player } from '@app/classes/player';
-import { Square } from '@app/classes/square';
+import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { COLORS } from '@app/constants/colors';
@@ -34,6 +36,8 @@ export const LETTER_VALUES: LetterValue[] = [
     '*',
 ];
 
+export const BLANK_TILE_LETTER_VALUE: LetterValue = '*';
+
 export const SQUARE_SIZE: Vec2 = { x: 1, y: 1 };
 export const MARGIN_COLUMN_SIZE = 1;
 
@@ -48,6 +52,7 @@ export const UNDEFINED_SQUARE: Square = {
     wasMultiplierUsed: false,
     isCenter: false,
 };
+export const DEFAULT_SQUAREVIEW = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
 
 export const VALID_MULTIPLIERS: number[] = [2, 3];
 
@@ -62,24 +67,34 @@ export const MIN_COL_NUMBER = 0;
 export const MAX_COL_NUMBER = 14;
 export const MIN_ROW_NUMBER = 0;
 export const MAX_ROW_NUMBER = 14;
+export const BOARD_SIZE = 15;
 
 export const MAX_LOCATION_COMMAND_LENGTH = 3;
 export const MIN_LOCATION_COMMAND_LENGTH = 2;
 
 export const MAX_INPUT_LENGTH = 512;
+export const DEFAULT_ORIENTATION = Orientation.Horizontal;
 
-export const MAX_TILE_PER_PLAYER = 7;
+export const MAX_TILES_PER_PLAYER = 7;
 
-export const DEFAULT_PLAYER = new Player('id', 'name', []);
+export const DEFAULT_PLAYER_ID = 'id';
+export const DEFAULT_PLAYER = new Player(DEFAULT_PLAYER_ID, 'name', []);
 
 export const SYSTEM_ID = 'system';
 export const SYSTEM_ERROR_ID = 'system-error';
+export const LOCAL_PLAYER_ID = 'me';
+export const OPPONENT_ID = 'opponent';
 
-export const ON_YOUR_TURN_ACTIONS = ['placer', 'échanger', 'passer'];
+export const ON_YOUR_TURN_ACTIONS = [ActionType.PLACE, ActionType.EXCHANGE, ActionType.PASS, ActionType.HINT];
 
-export const EXPECTED_WORD_COUNT_PLACE = 3;
-export const EXPECTED_WORD_COUNT_EXCHANGE = 2;
-export const EXPECTED_WORD_COUNT_PASS = 1;
-// export const EXPECTED_WORD_COUNT_HINT = 1;
-export const EXPECTED_WORD_COUNT_HELP = 1;
-export const EXPECTED_WORD_COUNT_RESERVE = 1;
+export const EXPECTED_COMMAND_WORD_COUNT = new Map<ActionType, number>([
+    [ActionType.PLACE, 3],
+    [ActionType.EXCHANGE, 2],
+    [ActionType.PASS, 1],
+    [ActionType.HINT, 1],
+    [ActionType.HELP, 1],
+    [ActionType.RESERVE, 1],
+]);
+
+export const PLAYER_1_INDEX = 1;
+export const PLAYER_2_INDEX = 2;

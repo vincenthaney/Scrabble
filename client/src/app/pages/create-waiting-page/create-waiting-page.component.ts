@@ -2,18 +2,20 @@ import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
+import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { DEFAULT_PLAYER } from '@app/constants/game';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
     DIALOG_TITLE,
     HOST_WAITING_MESSAGE,
+    KEEP_DATA,
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
-import { PlayerLeavesService } from '@app/services/player-leaves/player-leaves.service';
-import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -21,14 +23,13 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./create-waiting-page.component.scss'],
 })
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
-    @Input() opponentName: string | undefined;
+    @Input() opponentName: string | undefined = undefined;
     isStartingGame: boolean = false;
-    joinRequestSubscription: Subscription;
-    joinerLeaveGameSubscription: Subscription;
-    componentDestroyed$: Subject<boolean> = new Subject();
-    host: AbstractPlayer;
+    isOpponentFound: boolean = false;
+    host: AbstractPlayer = DEFAULT_PLAYER;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
-    isOpponentFound: boolean;
+    componentDestroyed$: Subject<boolean> = new Subject();
+
     constructor(
         public dialog: MatDialog,
         public gameDispatcherService: GameDispatcherService,
@@ -44,12 +45,8 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.joinRequestSubscription = this.gameDispatcherService.joinRequestEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((opponentName: string) => this.setOpponent(opponentName));
-        this.joinerLeaveGameSubscription = this.playerLeavesService.joinerLeaveGameEvent
-            .pipe(takeUntil(this.componentDestroyed$))
-            .subscribe((leaverName: string) => this.opponentLeft(leaverName));
+        this.gameDispatcherService.subscribeToJoinRequestEvent(this.componentDestroyed$, (opponentName: string) => this.setOpponent(opponentName));
+        this.playerLeavesService.subscribeToJoinerLeavesGameEvent(this.componentDestroyed$, (leaverName: string) => this.opponentLeft(leaverName));
     }
 
     setOpponent(opponentName: string): void {
@@ -79,6 +76,13 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
                     },
                 ],
             },
+        });
+    }
+
+    confirmConvertToSolo(): void {
+        this.gameDispatcherService.handleCancelGame(KEEP_DATA);
+        this.dialog.open(ConvertDialogComponent, {
+            data: this.gameDispatcherService.currentLobby?.hostName,
         });
     }
 

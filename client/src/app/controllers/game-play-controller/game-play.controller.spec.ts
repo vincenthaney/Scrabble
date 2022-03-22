@@ -9,7 +9,7 @@ import { Message } from '@app/classes/communication/message';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { HTTP_ABORT_ERROR } from '@app/constants/controllers-errors';
 import { SYSTEM_ID } from '@app/constants/game';
-import SocketService from '@app/services/socket/socket.service';
+import SocketService from '@app/services/socket-service/socket.service';
 import { Observable, of, Subscription } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -46,7 +46,7 @@ describe('GamePlayController', () => {
 
     describe('Configure Socket', () => {
         it('On gameUpdate, should push new gameUpdate', () => {
-            const spy = spyOn(controller.gameUpdateValue, 'next').and.callFake(() => {
+            const spy = spyOn(controller['gameUpdate$'], 'next').and.callFake(() => {
                 return;
             });
             const gameUpdateData: GameUpdateData = {
@@ -57,12 +57,13 @@ describe('GamePlayController', () => {
         });
 
         it('On newMessage, should push new message', () => {
-            const spy = spyOn(controller.newMessageValue, 'next').and.callFake(() => {
+            const spy = spyOn(controller['newMessage$'], 'next').and.callFake(() => {
                 return;
             });
             const newMessage: Message = {
                 content: 'Allo',
                 senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             socketHelper.peerSideEmit('newMessage', newMessage);
             expect(spy).toHaveBeenCalled();
@@ -71,15 +72,16 @@ describe('GamePlayController', () => {
 
     describe('HTTP', () => {
         it('sendAction should post action to endpoint', () => {
+            const typedInput = '';
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
             const actionData: ActionData = {
                 type: ActionType.PASS,
+                input: typedInput,
                 payload: {},
             };
-            const typedInput = '';
             const endpoint = `${environment.serverUrl}/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`;
 
-            controller.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData, typedInput);
+            controller.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(httpPostSpy).toHaveBeenCalledWith(endpoint, { type: actionData.type, payload: actionData.payload, input: typedInput });
         });
 
@@ -88,6 +90,7 @@ describe('GamePlayController', () => {
             const newMessage: Message = {
                 content: 'Allo',
                 senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             const endpoint = `${environment.serverUrl}/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`;
 
@@ -100,6 +103,7 @@ describe('GamePlayController', () => {
             const newMessage: Message = {
                 content: 'error',
                 senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             };
             const endpoint = `${environment.serverUrl}/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`;
 
@@ -157,5 +161,20 @@ describe('GamePlayController', () => {
             status: HTTP_ABORT_ERROR,
         };
         expect(() => controller['handleDisconnectError'](error)).not.toThrowError(error.message);
+    });
+
+    it('observeGameUpdate should return gameUpdate$ as observable', () => {
+        const result: Observable<GameUpdateData> = controller.observeGameUpdate();
+        expect(result).toEqual(controller['gameUpdate$'].asObservable());
+    });
+
+    it('obvserveNewMessage should return newMessage$ as observable', () => {
+        const result: Observable<Message | null> = controller.observeNewMessage();
+        expect(result).toEqual(controller['newMessage$'].asObservable());
+    });
+
+    it('observeActionDone should return actionDone$ as observable', () => {
+        const result: Observable<void> = controller.observeActionDone();
+        expect(result).toEqual(controller['actionDone$'].asObservable());
     });
 });

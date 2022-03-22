@@ -1,4 +1,4 @@
-export const HOST_WAITING_MESSAGE = "En attente d'un adversaire.";
+export const HOST_WAITING_MESSAGE = "En attente d'un adversaire";
 export const OPPONENT_FOUND_MESSAGE = ' a rejoint votre partie.';
 export const DIALOG_TITLE = 'Attention!';
 export const DIALOG_CONTENT = " a quitté le salon. Veuillez patientez le temps qu'un autre joueur veuille vous affronter.";
@@ -23,3 +23,10 @@ export const DIALOG_QUIT_STAY = 'Rester dans la partie';
 export const DIALOG_NO_ACTIVE_GAME_TITLE = 'Aucune partie en cours';
 export const DIALOG_NO_ACTIVE_GAME_CONTENT = "Vous n'avez aucune partie en cours. Veuillez en joindre ou en créer une.";
 export const DIALOG_NO_ACTIVE_GAME_BUTTON = "Retour à la page d'accueil";
+
+export const DEFAULT_TIMER_VALUE = 60;
+export const MINIMUM_TIMER_VALUE = 30;
+export const MAXIMUM_TIMER_VALUE = 300;
+export const TIMER_VALUE_INCREMENTS = 30;
+export const DEFAULT_DICTIONARY_VALUE = 'default-dictionary';
+export const KEEP_DATA = false;

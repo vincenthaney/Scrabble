@@ -1,4 +1,4 @@
-import { BINGO_BONUS_POINTS, MAX_TILE_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
+import { BINGO_BONUS_POINTS, MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
@@ -8,15 +8,15 @@ import { Service } from 'typedi';
 @Service()
 export class ScoreCalculatorService {
     calculatePoints(wordsToScore: [Square, Tile][][]): number {
-        return wordsToScore.reduce((total, word) => (total += this.calculatePointsPerWord(word)), DEFAULT_SCORE);
+        return wordsToScore.reduce((total, word) => total + this.calculatePointsPerWord(word), DEFAULT_SCORE);
     }
 
     bonusPoints(tilesToPlace: Tile[]): number {
-        if (this.isABingo(tilesToPlace)) return BINGO_BONUS_POINTS;
-        else return 0;
+        return this.isABingo(tilesToPlace) ? BINGO_BONUS_POINTS : 0;
     }
+
     isABingo(tilesToPlace: Tile[]): boolean {
-        return tilesToPlace.length === MAX_TILE_PER_PLAYER;
+        return tilesToPlace.length === MAX_TILES_PER_PLAYER;
     }
 
     private calculatePointsPerWord(word: [Square, Tile][]): number {
@@ -27,22 +27,20 @@ export class ScoreCalculatorService {
             wordScore += this.letterValue(square, tile);
             wordMultiplier *= this.wordMultiplier(square);
         });
-        return (wordScore *= wordMultiplier);
+        return wordScore * wordMultiplier;
     }
 
     private letterValue(square: Square, tile: Tile): number {
         if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.LETTER && !square.wasMultiplierUsed) {
             return tile.value * square.scoreMultiplier.multiplier;
-        } else {
-            return tile.value;
         }
+        return tile.value;
     }
 
     private wordMultiplier(square: Square): number {
         if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.WORD && !square.wasMultiplierUsed) {
             return square.scoreMultiplier.multiplier;
-        } else {
-            return DEFAULT_MULTIPLIER;
         }
+        return DEFAULT_MULTIPLIER;
     }
 }
