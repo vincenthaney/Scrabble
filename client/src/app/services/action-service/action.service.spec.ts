@@ -116,15 +116,19 @@ describe('ActionService', () => {
 
     describe('actionNeedsInput', () => {
         it('should return true if PLACE', () => {
-            expect(service['actionNeedsInput'](ActionType.PLACE)).toBeTrue();
+            expect(service['actionNeedsInput'](ActionType.PLACE, false)).toBeTrue();
         });
 
         it('should return true if EXCHANGE', () => {
-            expect(service['actionNeedsInput'](ActionType.EXCHANGE)).toBeTrue();
+            expect(service['actionNeedsInput'](ActionType.EXCHANGE, false)).toBeTrue();
         });
 
-        it('should return false if PASS', () => {
-            expect(service['actionNeedsInput'](ActionType.PASS)).toBeFalse();
+        it('should return true if PASS wit needsinput true', () => {
+            expect(service['actionNeedsInput'](ActionType.PASS, true)).toBeTrue();
+        });
+
+        it('should return false if PASS wit needsinput false', () => {
+            expect(service['actionNeedsInput'](ActionType.PASS, false)).toBeFalse();
         });
     });
 
