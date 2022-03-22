@@ -5,11 +5,14 @@ import { TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants'
 import PointRange from '@app/classes/word-finding/point-range';
 import { AbstractVirtualPlayer } from './abstract-virtual-player';
 import * as chai from 'chai';
-import { expect, spy } from 'chai';
-import WordFindingUseCase from '@app/classes/word-finding/word-finding-use-case';
-
+import { expect } from 'chai';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 class TestClass extends AbstractVirtualPlayer {
     findAction(): void {
+        return;
+    }
+
+    playTurn(): void {
         return;
     }
 
@@ -18,7 +21,6 @@ class TestClass extends AbstractVirtualPlayer {
     }
 }
 
-const gameId = 'testGameId';
 const playerId = 'testPlayerId';
 const playerName = 'ElScrabblo';
 
@@ -26,7 +28,7 @@ describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
 
     beforeEach(async () => {
-        abstractPlayer = new TestClass(gameId, playerId, playerName);
+        abstractPlayer = new TestClass(playerId, playerName);
     });
 
     afterEach(() => {
@@ -47,31 +49,7 @@ describe('AbstractVirtualPlayer', () => {
         expect(abstractPlayer['activeGameService']).to.equal(activeGameServiceTest);
     });
 
-    it('playTurn should call findAction method', () => {
-        const findActionSpy = chai.spy.on(abstractPlayer, 'findAction', () => {
-            return;
-        });
-        abstractPlayer.playTurn();
-        expect(findActionSpy).to.be.called();
-    });
-
-    it('generateWordFindingRequest should call findPointRange method', () => {
-        const findPointRangeSpy = spy.on(abstractPlayer, 'findPointRange', () => {
-            return;
-        });
-        abstractPlayer.generateWordFindingRequest();
-        expect(findPointRangeSpy).to.have.been.called();
-    });
-
-    it('generateWordFindingRequest should return WordFindingRequest with correct data', () => {
-        const testWordFindingRequest = abstractPlayer.generateWordFindingRequest();
-        expect(testWordFindingRequest.useCase).to.equal(WordFindingUseCase.Beginner);
-        expect(testWordFindingRequest.pointHistory).to.deep.equal(abstractPlayer.pointHistory);
-        expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
-    });
-
-    // TODO: MODIFY WHEN SEND PAYLOAD IMPLEMENTED
-    it('should throw when sendPayload()', () => {
-        expect(abstractPlayer.sendPayload()).to.be.undefined;
+    it('should return virtualPlayerService', () => {
+        expect(abstractPlayer.getVirtualPlayerService() instanceof VirtualPlayerService).to.be.true;
     });
 });

@@ -9,7 +9,9 @@ import { ActiveGameService } from '@app/services/active-game-service/active-game
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { Delay } from '@app/utils/delay';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -23,12 +25,16 @@ export class GamePlayController {
         private readonly gamePlayService: GamePlayService,
         private readonly socketService: SocketService,
         private readonly activeGameService: ActiveGameService,
+        private readonly virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
     }
 
     gameUpdate(gameId: string, data: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
+        if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
+        }
     }
 
     private configureRouter(): void {

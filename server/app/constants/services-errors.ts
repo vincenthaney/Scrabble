@@ -17,7 +17,6 @@ export const INVALID_PAYLOAD = 'Payload invalide pour ce type de commande';
 export const NOT_PLAYER_TURN = "Ce n'est pas le tour du joueur demandeur de jouer";
 export const SOCKET_SERVICE_NOT_INITIALIZED = "SocketService n'est pas initalisé";
 export const INVALID_ID_FOR_SOCKET = 'Identifiant invalide pour le socket';
-
 export const MINIMUM_WORD_LENGTH = 2;
 export const INVALID_WORD = (word: string) => `Le mot **${word}** n'est pas dans le dictionnaire choisi. Vous perdez votre tour.`;
 export const WORD_TOO_SHORT = ' Mot trop court';
