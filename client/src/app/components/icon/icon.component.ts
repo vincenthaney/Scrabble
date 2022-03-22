@@ -18,16 +18,6 @@ export class IconComponent implements OnInit {
         this.setClassName();
     }
 
-    setClassName(): void {
-        const prefix: IconPrefix = this.getPrefix(this.styling);
-
-        this.className = `${prefix} fa-${this.icon}`;
-
-        if (this.animation) this.className += ` fa-${this.animation}`;
-        if (this.size) this.className += ` fa-${this.size}`;
-        if (this.rotation) this.className += ` fa-${this.rotation}`;
-    }
-
     getPrefix(style?: IconStyle): IconPrefix {
         switch (style) {
             case 'regular':
@@ -41,5 +31,15 @@ export class IconComponent implements OnInit {
             default:
                 return 'far';
         }
+    }
+
+    private setClassName(): void {
+        const prefix: IconPrefix = this.getPrefix(this.styling);
+
+        this.className = `${prefix} fa-${this.icon}`;
+
+        if (this.animation) this.className += ` fa-${this.animation}`;
+        if (this.size) this.className += ` fa-${this.size}`;
+        if (this.rotation) this.className += ` fa-${this.rotation}`;
     }
 }
