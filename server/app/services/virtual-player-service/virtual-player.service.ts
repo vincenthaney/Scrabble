@@ -10,23 +10,17 @@ import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virt
 import { CONTENT_TYPE, GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
 import Player from '@app/classes/player/player';
 import { ActionPass } from '@app/classes/actions';
+import { StatusCodes } from 'http-status-codes';
 
 @Service()
 export class VirtualPlayerService {
     async sendAction(gameId: string, playerId: string, action: ActionData): Promise<Response> {
-        try {
-            return fetch(`${this.getEndPoint()}/games/${gameId}/players/${playerId}/action`, {
-                method: 'POST',
-                headers: { [CONTENT_TYPE]: 'application/json' },
-                body: JSON.stringify(action),
-            });
-        } catch {
-            return fetch(`${this.getEndPoint()}/games/${gameId}/players/${playerId}/action`, {
-                method: 'POST',
-                headers: { [CONTENT_TYPE]: 'application/json' },
-                body: JSON.stringify(ActionPass.createActionData()),
-            });
+        let response = this.sendFetchRequest(gameId, playerId, action);
+
+        if ((await response).status !== StatusCodes.ACCEPTED) {
+            response = this.sendFetchRequest(gameId, playerId, ActionPass.createActionData());
         }
+        return response;
     }
 
     triggerVirtualPlayerTurn(data: StartGameData | GameUpdateData, game: Game): void {
@@ -44,5 +38,13 @@ export class VirtualPlayerService {
 
     private getEndPoint(): string {
         return environment.serverUrl;
+    }
+
+    private async sendFetchRequest(gameId: string, playerId: string, action: ActionData): Promise<Response> {
+        return fetch(`${this.getEndPoint()}/games/${gameId}/players/${playerId}/action`, {
+            method: 'POST',
+            headers: { [CONTENT_TYPE]: 'application/json' },
+            body: JSON.stringify(action),
+        });
     }
 }
