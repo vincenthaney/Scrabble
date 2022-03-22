@@ -13,6 +13,7 @@ import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import { Board } from '@app/classes/board';
 import { ScoredWordPlacement } from '@app/classes/word-finding/word-placement';
+import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     findPointRange(): PointRange {
@@ -32,7 +33,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
             return ActionPass.createActionData();
         }
         if (randomAction <= EXCHANGE_ACTION_THRESHOLD) {
-            return ActionExchange.createActionData(this.tiles);
+            return ActionExchange.createActionData(this.getRandomTiles());
         }
         const scoredWordPlacement = this.computeWordPlacement();
         if (scoredWordPlacement) {
@@ -53,5 +54,14 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
 
     computeWordPlacement(): ScoredWordPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
+    }
+
+    private getRandomTiles(): Tile[] {
+        const keepCount = Math.floor(Math.random() * this.tiles.length);
+        const tilesToSwap = this.tiles;
+        while (keepCount > 0) {
+            tilesToSwap.pop();
+        }
+        return tilesToSwap;
     }
 }
