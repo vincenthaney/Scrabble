@@ -157,9 +157,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (this.selectedSquare) {
             const index = this.notAppliedSquares.indexOf(this.selectedSquare);
             if (index >= 0) this.notAppliedSquares.splice(index, 1);
-            const tile: Tile | null = this.selectedSquare.square.tile;
-            if (tile) {
-                this.removeUsedTile(tile);
+            const selectedTile: Tile | null = this.selectedSquare.square.tile;
+            if (selectedTile) {
+                this.removeUsedTile(selectedTile);
             }
             this.selectedSquare.square.tile = null;
         }
@@ -293,7 +293,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             return;
         }
 
-        const index = previousUsedTiles.tiles.map((t) => t.letter).lastIndexOf(tile.letter);
+        const index = previousUsedTiles.tiles.map((t: Tile) => t.letter).lastIndexOf(tile.letter);
 
         if (index === NOT_FOUND) throw new Error(CANNOT_REMOVE_UNUSED_TILE);
 
