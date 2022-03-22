@@ -20,7 +20,7 @@ describe('PlayerLeavesController', () => {
         socketHelper = new SocketTestHelper();
         socketServiceMock = new SocketService();
         socketServiceMock['socket'] = socketHelper as unknown as Socket;
-        await TestBed.configureTestingModule({
+        TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
             providers: [PlayerLeavesController, { provide: SocketService, useValue: socketServiceMock }, GameService],
         });
