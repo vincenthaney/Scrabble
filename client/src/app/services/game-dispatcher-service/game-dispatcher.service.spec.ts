@@ -71,12 +71,6 @@ describe('GameDispatcherService', () => {
     });
 
     describe('Subscriptions', () => {
-        it('should set gameId on createGameEvent', () => {
-            getCurrentLobbyIdSpy.and.callThrough();
-            service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
-            expect(service.getCurrentLobbyId()).toEqual(TEST_LOBBY_DATA.lobbyId);
-        });
-
         it('should call handleJoinRequest on joinRequestEvent', () => {
             const spy = spyOn(service, 'handleJoinRequest');
             service['gameDispatcherController']['joinRequestEvent'].next(TEST_PLAYER_NAME);

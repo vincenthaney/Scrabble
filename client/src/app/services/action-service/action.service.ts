@@ -37,8 +37,8 @@ export class ActionService {
         return { tiles };
     }
 
-    createActionData(actionType: ActionType, actionPayload: ActionPayload, input?: string): ActionData {
-        if (!input) input = this.actionNeedsInput(actionType) ? this.createInputFromPayload(actionType, actionPayload) : '';
+    createActionData(actionType: ActionType, actionPayload: ActionPayload, input?: string, needsInput: boolean = false): ActionData {
+        if (!input) input = this.actionNeedsInput(actionType, needsInput) ? this.createInputFromPayload(actionType, actionPayload) : '';
 
         return {
             type: actionType,
@@ -60,8 +60,8 @@ export class ActionService {
         this.hasActionBeenPlayed = true;
     }
 
-    private actionNeedsInput(actionType: ActionType): boolean {
-        return actionType === ActionType.PLACE || actionType === ActionType.EXCHANGE;
+    private actionNeedsInput(actionType: ActionType, needsInput: boolean): boolean {
+        return actionType === ActionType.PLACE || actionType === ActionType.EXCHANGE || needsInput;
     }
 
     private createInputFromPayload(actionType: ActionType, payload: ActionPayload): string {

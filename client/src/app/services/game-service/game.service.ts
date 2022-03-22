@@ -172,6 +172,15 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.playerContainer = undefined;
     }
 
+    wake(): void {
+        // Sometimes the game service needs to listen to an event without being used before.
+        // This causes problem because the class is not being initialized before being used,
+        // which means it never subscribes to the events. When calling the wake() method, we
+        // make sure that the service is initialized before doing an action that might create
+        // an event.
+        return;
+    }
+
     private handleGameOver(): void {
         this.isGameOver = true;
         this.roundManager.resetTimerData();

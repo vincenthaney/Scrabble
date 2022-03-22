@@ -17,6 +17,7 @@ import {
     SocketEmitEvents,
     StartGameEmitArgs,
 } from './socket-types';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 
 @Service()
 export class SocketService {
@@ -107,6 +108,7 @@ export class SocketService {
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
         if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (isIdVirtualPlayer(id)) return;
         this.getSocket(id).emit(ev, ...args);
     }
 }

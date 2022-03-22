@@ -19,3 +19,5 @@ export enum CommandExceptionMessages {
     GameOver = 'La commande est impossible car la partie est terminée.',
     ExchangeRequireLowercaseLetters = 'Les lettres à échanger doivent être en minuscule.',
 }
+
+export const PLAYER_NOT_FOUND = 'Current player could not be found';

@@ -92,12 +92,12 @@ export default class GameDispatcherService implements OnDestroy {
         if (!this.currentLobby) return;
 
         const gameConfig: GameConfigData = {
-            playerName: this.currentLobby?.hostName as string,
+            playerName: this.currentLobby?.hostName,
             playerId: this.gameDispatcherController.socketService.getId(),
-            gameType: this.currentLobby?.gameType as GameType,
+            gameType: this.currentLobby?.gameType,
             gameMode: gameParameters ? GameMode.Solo : GameMode.Multiplayer,
-            maxRoundTime: this.currentLobby?.maxRoundTime as number,
-            dictionary: this.currentLobby?.dictionary as string,
+            maxRoundTime: this.currentLobby?.maxRoundTime,
+            dictionary: this.currentLobby?.dictionary,
         };
         if (gameParameters) {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
