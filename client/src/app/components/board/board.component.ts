@@ -125,7 +125,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
-        if (!squareView || this.actionService.hasActionBeenPlayed) return;
+        if (this.cannotPlace(squareView)) return;
 
         letter = removeAccents(letter.toUpperCase());
 
@@ -153,6 +153,10 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
         this.useTile(tile);
         this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
+    }
+
+    private cannotPlace(squareView: SquareView | undefined): boolean {
+        return !squareView || this.actionService.hasActionBeenPlayed;
     }
 
     private handleBackspace(): void {

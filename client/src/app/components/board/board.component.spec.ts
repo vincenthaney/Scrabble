@@ -513,7 +513,7 @@ describe('BoardComponent', () => {
             expect(useTileSpy).not.toHaveBeenCalled();
         });
 
-        it('should not call useTile if action has beel played', () => {
+        it('should not call useTile if action has been played', () => {
             component['actionService'].hasActionBeenPlayed = true;
             component['handlePlaceLetter'](tiles[0], false, squareView);
 
