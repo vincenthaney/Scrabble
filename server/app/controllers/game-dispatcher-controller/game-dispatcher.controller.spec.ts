@@ -325,23 +325,23 @@ describe('GameDispatcherController', () => {
             gameStub.getPlayer.returns(playerStub);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
         });
 
         it('should call activeGameService.getGame', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(getGameSpy.calledOnce);
         });
 
         it('should call isGameOver', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            chai.assert(gameStub.isGameOver.calledOnce);
+            chai.assert(gameStub.areGameOverConditionsMet.calledOnce);
         });
 
         it('should throw GAME_IS_OVER, FORBIDDEN if game isGameOver', () => {
-            gameStub.isGameOver.returns(true);
+            gameStub.areGameOverConditionsMet.returns(true);
             const result = () => controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(result).to.throw(GAME_IS_OVER);
         });
@@ -352,20 +352,20 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call addToRoom', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(addToRoomSpy).to.have.been.called();
         });
 
         it('should createStartGameData', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             chai.assert(gameStub.createStartGameData.calledOnce);
         });
 
         it('should call emit to socket', () => {
-            gameStub.isGameOver.returns(false);
+            gameStub.areGameOverConditionsMet.returns(false);
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
             expect(emitToSocketSpy).to.have.been.called();
@@ -840,7 +840,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('Disconnection should verify if game is over', () => {
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => true);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => true);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
             expect(getGameSpy.calledOnce).to.be.true;
@@ -848,7 +848,7 @@ describe('GameDispatcherController', () => {
         });
 
         it('Disconnection should set player isConnected to false if the game is not over', () => {
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
 
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
@@ -857,7 +857,7 @@ describe('GameDispatcherController', () => {
 
         it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
             const clock = useFakeTimers();
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(handleLeaveSpy).to.not.have.been.called();
 
@@ -867,7 +867,7 @@ describe('GameDispatcherController', () => {
 
         it('Disconnection should keep player in game if they reconnect within 5 seconds', () => {
             const clock = useFakeTimers();
-            gameIsOverSpy = chai.spy.on(gameStub, 'isGameOver', () => false);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             expect(handleLeaveSpy).to.not.have.been.called();
             playerStub.isConnected = true;

@@ -467,6 +467,7 @@ describe('GamePlayController', () => {
         });
 
         it('should call delay', async () => {
+            chai.spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
             await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
             expect(delayStub.called).to.be.true;
         });

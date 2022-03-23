@@ -137,11 +137,11 @@ describe('GamePlayService', () => {
 
         it('should call isGameOver', async () => {
             await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
-            expect(gameStub.isGameOver.called).to.be.true;
+            expect(gameStub.areGameOverConditionsMet.called).to.be.true;
         });
 
         it('should call handleGameOver if gameOver ', async () => {
-            gameStub.isGameOver.returns(true);
+            gameStub.areGameOverConditionsMet.returns(true);
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({ tileReserve: [{ letter: 'A', amount: 3 }] } as GameUpdateData);
             // eslint-disable-next-line @typescript-eslint/no-empty-function

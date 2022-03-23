@@ -132,6 +132,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
     }
 
     private handleGameUpdate(gameUpdateData: GameUpdateData): void {
+        if (gameUpdateData.isGameOver) {
+            this.handleGameOver();
+        }
         if (gameUpdateData.player1) {
             this.handleUpdatePlayerData(gameUpdateData.player1);
         }
@@ -148,16 +151,13 @@ export default class GameService implements OnDestroy, IResetServiceData {
         if (gameUpdateData.tileReserve) {
             this.handleTileReserveUpdate(gameUpdateData.tileReserve);
         }
-        if (gameUpdateData.isGameOver) {
-            this.handleGameOver();
-        }
     }
 
     private handleUpdatePlayerData(playerData: PlayerData): void {
         if (this.playerContainer) {
             this.playerContainer.updatePlayersData(playerData);
         }
-        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate', playerData.id);
     }
 
     private handleTileReserveUpdate(tileReserve: TileReserveData[]): void {
@@ -181,7 +181,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
             this.playerContainer.updatePlayersData(startGameData.player1, startGameData.player2);
         }
         this.gameViewEventManagerService.emitGameViewEvent('reRender');
-        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate', this.getLocalPlayerId());
         this.boardService.updateBoard(([] as Square[]).concat(...startGameData.board));
         this.roundManager.continueRound(this.roundManager.currentRound);
     }

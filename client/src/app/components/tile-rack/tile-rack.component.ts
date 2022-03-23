@@ -45,8 +45,10 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     ngOnInit(): void {
         this.subscribeToFocusableEvents();
-        this.updateTileRack();
-        this.gameViewEventManagerService.subscribeToGameViewEvent('tileRackUpdate', this.componentDestroyed$, () => this.updateTileRack());
+        this.updateTileRack(this.gameService.getLocalPlayerId());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('tileRackUpdate', this.componentDestroyed$, (playerId: string) =>
+            this.updateTileRack(playerId),
+        );
         this.gameViewEventManagerService.subscribeToGameViewEvent('usedTiles', this.componentDestroyed$, (payload) => this.handleUsedTiles(payload));
         this.gameViewEventManagerService.subscribeToGameViewEvent('resetUsedTiles', this.componentDestroyed$, () => this.resetUsedTiles());
     }
@@ -66,7 +68,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     unselectAll(): void {
-        this.selectedTiles.forEach((t) => (t.isSelected = false));
+        this.selectedTiles.forEach((rackTile: RackTile) => (rackTile.isSelected = false));
         this.selectedTiles = [];
     }
 
@@ -169,19 +171,19 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.tiles.splice(newIndex, 0, tile);
     }
 
-    private updateTileRack(): void {
+    private updateTileRack(playerId?: string): void {
         const player = this.gameService.getLocalPlayer();
-        if (!player) return;
+        if (!player || playerId !== this.gameService.getLocalPlayerId()) return;
 
-        const previousTiles = [...this.tiles];
-        const newTiles = [...player.getTiles()];
-
-        this.unselectAll();
-        this.tiles = preserveArrayOrder(newTiles, previousTiles, (a: Tile, b: RackTile) => a.letter === b.letter).map(this.createRackTile);
+        const previousTiles: RackTile[] = [...this.tiles];
+        const newTiles: Tile[] = [...player.getTiles()];
+        this.tiles = preserveArrayOrder(newTiles, previousTiles, (elem1: Tile, elem2: RackTile) => elem1.letter === elem2.letter).map(
+            (tile: Tile, index: number) => this.createRackTile(tile, this.tiles[index]),
+        );
     }
 
-    private createRackTile(tile: Tile): RackTile {
-        return { ...tile, isUsed: false, isSelected: false };
+    private createRackTile(tile: Tile, rackTile: RackTile): RackTile {
+        return { ...tile, isUsed: (rackTile && rackTile.isUsed) ?? false, isSelected: (rackTile && rackTile.isSelected) ?? false };
     }
 
     private handleUsedTiles(usedTilesPayload: PlaceActionPayload | undefined): void {

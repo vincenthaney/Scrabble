@@ -3,8 +3,8 @@ import { ReadyGameConfig, StartGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import { StatusCodes } from 'http-status-codes';
 import { EventEmitter } from 'events';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
 @Service()
@@ -46,6 +46,6 @@ export class ActiveGameService {
     }
 
     isGameOver(gameId: string, playerId: string): boolean {
-        return this.getGame(gameId, playerId).isGameOver();
+        return this.getGame(gameId, playerId).areGameOverConditionsMet();
     }
 }

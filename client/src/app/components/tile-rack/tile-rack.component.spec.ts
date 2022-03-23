@@ -162,7 +162,7 @@ describe('TileRackComponent', () => {
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
-        component['updateTileRack']();
+        component['updateTileRack'](undefined);
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
 
@@ -172,7 +172,7 @@ describe('TileRackComponent', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
 
-        component['updateTileRack']();
+        component['updateTileRack'](localPlayer.id);
 
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
@@ -192,7 +192,7 @@ describe('TileRackComponent', () => {
         component['tiles'] = tiles;
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
 
-        component['updateTileRack']();
+        component['updateTileRack'](localPlayer.id);
 
         expect(component.tiles[0]).toBeTruthy();
     });
