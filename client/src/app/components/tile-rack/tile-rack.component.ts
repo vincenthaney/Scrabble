@@ -12,6 +12,7 @@ import { ActionService } from '@app/services/action-service/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { nextIndex } from '@app/utils/next-index';
+import { preserveArrayOrder } from '@app/utils/preserve-array-order';
 import { pipe, Subject } from 'rxjs';
 
 export type RackTile = Tile & { isUsed: boolean; isSelected: boolean };
@@ -94,9 +95,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     unselectAll(): void {
-        this.selectedTiles.forEach((rackTile: RackTile) => {
-            rackTile.isSelected = false;
-        });
+        this.selectedTiles.forEach((rackTile: RackTile) => (rackTile.isSelected = false));
         this.selectedTiles = [];
     }
 
@@ -176,7 +175,11 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         const player = this.gameService.getLocalPlayer();
         if (!player || playerId !== this.gameService.getLocalPlayerId()) return;
 
-        this.tiles = [...player.getTiles()].map((tile: Tile, index: number) => this.createRackTile(tile, this.tiles[index]));
+        const previousTiles: RackTile[] = [...this.tiles];
+        const newTiles: Tile[] = [...player.getTiles()];
+        this.tiles = preserveArrayOrder(newTiles, previousTiles, (elem1: Tile, elem2: RackTile) => elem1.letter === elem2.letter).map(
+            (tile: Tile, index: number) => this.createRackTile(tile, this.tiles[index]),
+        );
     }
 
     private createRackTile(tile: Tile, rackTile: RackTile): RackTile {
