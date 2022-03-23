@@ -9,16 +9,6 @@ export default class DictionaryNode {
         this.depth = depth;
     }
 
-    addWord(word: string, value = '', depth = 0): void {
-        const [key, rest] = this.separateWord(word);
-
-        if (rest.length > 0) {
-            this.getOrCreateNode(key, undefined, depth).addWord(rest, value + key, depth + 1);
-        } else {
-            this.getOrCreateNode(key, value + key, depth);
-        }
-    }
-
     wordExists(word: string): boolean {
         return this.getNode(word)?.value !== undefined;
     }
@@ -38,6 +28,16 @@ export default class DictionaryNode {
         if (!node) return undefined;
         if (rest.length === 0) return node;
         return node.getNode(rest);
+    }
+
+    protected addWord(word: string, value = '', depth = 0): void {
+        const [key, rest] = this.separateWord(word);
+
+        if (rest.length > 0) {
+            this.getOrCreateNode(key, undefined, depth).addWord(rest, value + key, depth + 1);
+        } else {
+            this.getOrCreateNode(key, value + key, depth);
+        }
     }
 
     private getOrCreateNode(key: string, value?: string, depth?: number): DictionaryNode {

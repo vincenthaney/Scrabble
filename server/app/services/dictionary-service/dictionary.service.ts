@@ -27,7 +27,7 @@ export default class DictionaryService {
         return this.getDictionary(this.getDictionaryTitles()[0]);
     }
 
-    protected fetchDictionaryWords(path: string): Dictionary {
+    private fetchDictionaryWords(path: string): Dictionary {
         const buffer = readFileSync(join(__dirname, path));
         const data: DictionaryData = JSON.parse(buffer.toString());
         return new Dictionary(data);

@@ -16,6 +16,7 @@ import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
+import { SENDER_REQUIRED, CONTENT_REQUIRED } from '@app/constants/controllers-errors';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
@@ -35,7 +36,6 @@ import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import { CONTENT_REQUIRED, SENDER_REQUIRED } from './game-play-controller-errors';
 import { GamePlayController } from './game-play.controller';
 
 const expect = chai.expect;
@@ -344,7 +344,7 @@ describe('GamePlayController', () => {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
             const sioSpy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
+            gamePlayController['gameUpdate'](DEFAULT_GAME_ID, {} as GameUpdateData);
             expect(sioSpy).to.have.been.called();
         });
 
@@ -357,7 +357,7 @@ describe('GamePlayController', () => {
             const toResponse = { emit: () => {} };
             const toResponseSpy = chai.spy.on(toResponse, 'emit');
             chai.spy.on(sio, 'to', () => toResponse);
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, {} as GameUpdateData);
+            gamePlayController['gameUpdate'](DEFAULT_GAME_ID, {} as GameUpdateData);
             expect(toResponseSpy).to.have.been.called();
         });
 
@@ -371,7 +371,7 @@ describe('GamePlayController', () => {
             const triggerVirtualPlayerSpy = spy.on(gamePlayController['virtualPlayerService'], 'triggerVirtualPlayerTurn', () => {
                 return;
             });
-            gamePlayController.gameUpdate(DEFAULT_GAME_ID, DEFAULT_VIRTUAL_PLAYER_TURN_DATA);
+            gamePlayController['gameUpdate'](DEFAULT_GAME_ID, DEFAULT_VIRTUAL_PLAYER_TURN_DATA);
             expect(triggerVirtualPlayerSpy).to.have.been.called();
         });
     });

@@ -13,7 +13,7 @@ export class DatabaseServiceMock {
     async connectToServer(databaseUrl?: string): Promise<MongoClient | null> {
         try {
             this.mongoServer = await MongoMemoryServer.create();
-            const mongoUri = await this.mongoServer.getUri();
+            const mongoUri = this.mongoServer.getUri();
             this.mongoClient = await MongoClient.connect(mongoUri);
             this.db = this.mongoClient.db(MONGO_DATABASE_NAME);
         } catch (exception) {

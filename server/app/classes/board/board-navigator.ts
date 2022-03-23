@@ -37,13 +37,6 @@ export default class BoardNavigator {
         return this.board.verifyNeighbors(this.position, orientation, shouldBeFilled);
     }
 
-    verifyAllNeighbors(shouldBeFilled: boolean): boolean {
-        return (
-            this.board.verifyNeighbors(this.position, Orientation.Horizontal, shouldBeFilled) ||
-            this.board.verifyNeighbors(this.position, Orientation.Vertical, shouldBeFilled)
-        );
-    }
-
     verifyPerpendicularNeighbors(shouldBeFilled: boolean): boolean {
         return this.verifyNeighbors(switchOrientation(this.orientation), shouldBeFilled);
     }
@@ -61,15 +54,6 @@ export default class BoardNavigator {
     backward(distance: number = 1): BoardNavigator {
         this.position.move(this.orientation, Direction.Backward, distance);
         return this;
-    }
-
-    moveUntil(direction: Direction, predicate: () => boolean): number {
-        let distanceTravelled = 0;
-        while (this.isWithinBounds() && !predicate()) {
-            this.move(direction);
-            distanceTravelled++;
-        }
-        return this.isWithinBounds() ? distanceTravelled : Number.POSITIVE_INFINITY;
     }
 
     nextLine(): void {

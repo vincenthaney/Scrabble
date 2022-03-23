@@ -41,6 +41,7 @@ export class ActiveGameService {
         } catch (exception) {
             return;
         }
+
         const index = this.activeGames.indexOf(game);
         this.activeGames.splice(index, 1);
     }

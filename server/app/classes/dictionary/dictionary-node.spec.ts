@@ -17,7 +17,7 @@ describe('DictionaryNode', () => {
         it('should have word after addWord', () => {
             for (const word of WORDS) {
                 expect(node.wordExists(word)).to.be.false;
-                node.addWord(word);
+                node['addWord'](word);
                 expect(node.wordExists(word)).to.be.true;
             }
         });
@@ -27,7 +27,7 @@ describe('DictionaryNode', () => {
         const word = 'abcdefg';
 
         beforeEach(() => {
-            node.addWord(word);
+            node['addWord'](word);
         });
 
         it('should return true if word exists', () => {
@@ -63,7 +63,7 @@ describe('DictionaryNode', () => {
         const word = 'abcdefg';
 
         beforeEach(() => {
-            node.addWord(word);
+            node['addWord'](word);
         });
 
         it('should return node', () => {

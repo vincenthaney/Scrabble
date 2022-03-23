@@ -29,11 +29,11 @@ describe('WordPlacement utils', () => {
 
     describe('orientationToLetter', () => {
         it('should convert horizontal to h', () => {
-            expect(PlacementToString.orientationToLetter(Orientation.Horizontal)).to.equal('h');
+            expect(PlacementToString['orientationToLetter'](Orientation.Horizontal)).to.equal('h');
         });
 
         it('should convert vertical to v', () => {
-            expect(PlacementToString.orientationToLetter(Orientation.Vertical)).to.equal('v');
+            expect(PlacementToString['orientationToLetter'](Orientation.Vertical)).to.equal('v');
         });
     });
 
@@ -75,7 +75,7 @@ describe('WordPlacement utils', () => {
         it('should convert', () => {
             const position = new Position(3, 4);
             const orientation = Orientation.Horizontal;
-            expect(PlacementToString.positionAndOrientationToString(position, orientation)).to.equal('d5h');
+            expect(PlacementToString['positionAndOrientationToString'](position, orientation)).to.equal('d5h');
         });
     });
 

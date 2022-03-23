@@ -160,7 +160,6 @@ describe('GamePlayService', () => {
         it('should set round action end turn (updatedData exists)', async () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns({});
-            // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
             const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
@@ -170,7 +169,6 @@ describe('GamePlayService', () => {
         it("should set round action end turn (updatedData doesn't exists)", async () => {
             actionStub.willEndTurn.returns(true);
             actionStub.execute.returns(undefined);
-            // const result = gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             roundManagerStub.convertRoundToRoundData.returns({} as RoundData);
             const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
@@ -387,8 +385,7 @@ describe('GamePlayService', () => {
         });
 
         it('should modify both ids', async () => {
-            const result = await gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
-
+            const result = gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
             gameStub.isAddedToDatabase = true;
             await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(result.player1!.id).to.equal(gameStub.player1.id);

@@ -8,7 +8,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
+import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { ReadyGameConfig, StartGameData } from './game-config';
@@ -29,10 +29,6 @@ export default class Game {
     gameIsOver: boolean;
     private tileReserve: TileReserve;
     private id: string;
-
-    static getBoardService(): BoardService {
-        return Game.boardService;
-    }
 
     static injectServices(boardService: BoardService): void {
         if (!Game.getBoardService()) {
@@ -64,6 +60,10 @@ export default class Game {
         return game;
     }
 
+    private static getBoardService(): BoardService {
+        return Game.boardService;
+    }
+
     getTilesFromReserve(amount: number): Tile[] {
         return this.tileReserve.getTiles(amount);
     }
@@ -85,10 +85,6 @@ export default class Game {
         if (this.player1.isConnected && !(this.player1 instanceof AbstractVirtualPlayer)) connectedRealPlayers.push(this.player1);
         if (this.player2.isConnected && !(this.player2 instanceof AbstractVirtualPlayer)) connectedRealPlayers.push(this.player2);
         return connectedRealPlayers;
-    }
-
-    async initTileReserve(): Promise<void> {
-        return this.tileReserve.init();
     }
 
     getPlayer(playerId: string, isRequestingPlayer: boolean): Player {
@@ -116,27 +112,6 @@ export default class Game {
         }
     }
 
-    getEndOfGameScores(): [number, number] {
-        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
-            return this.computeEndOfGameScore(LOSE, LOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
-        } else if (!this.player1.hasTilesLeft()) {
-            return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-        } else {
-            return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
-        }
-    }
-
-    computeEndOfGameScore(
-        player1Win: number,
-        player2Win: number,
-        player1PointsToDeduct: number,
-        player2PointsToDeduct: number,
-    ): [player1Score: number, player2Score: number] {
-        this.player1.score += player1Win * player1PointsToDeduct;
-        this.player2.score += player2Win * player2PointsToDeduct;
-        return [this.player1.score, this.player2.score];
-    }
-
     endGameMessage(winnerName: string | undefined): string[] {
         const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
         const winnerMessage = winnerName ? WINNER_MESSAGE(winnerName) : this.congratulateWinner();
@@ -144,24 +119,8 @@ export default class Game {
         return messages;
     }
 
-    congratulateWinner(): string {
-        let winner: string;
-        if (this.player1.score > this.player2.score) {
-            winner = this.player1.name;
-        } else if (this.player1.score < this.player2.score) {
-            winner = this.player2.name;
-        } else {
-            winner = this.player1.name + ' et ' + this.player2.name;
-        }
-        return WINNER_MESSAGE(winner);
-    }
-
     isPlayer1(player: string | Player): boolean {
         return player instanceof Player ? this.player1.id === player.id : this.player1.id === player;
-    }
-
-    isPlayerReal(playerId: string): boolean {
-        return !(this.getPlayer(playerId, IS_REQUESTING) instanceof AbstractVirtualPlayer);
     }
 
     createStartGameData(): StartGameData {
@@ -181,6 +140,39 @@ export default class Game {
             round: roundData,
         };
         return startGameData;
+    }
+
+    private congratulateWinner(): string {
+        let winner: string;
+        if (this.player1.score > this.player2.score) {
+            winner = this.player1.name;
+        } else if (this.player1.score < this.player2.score) {
+            winner = this.player2.name;
+        } else {
+            winner = this.player1.name + ' et ' + this.player2.name;
+        }
+        return WINNER_MESSAGE(winner);
+    }
+
+    private computeEndOfGameScore(
+        player1Win: number,
+        player2Win: number,
+        player1PointsToDeduct: number,
+        player2PointsToDeduct: number,
+    ): [player1Score: number, player2Score: number] {
+        this.player1.score += player1Win * player1PointsToDeduct;
+        this.player2.score += player2Win * player2PointsToDeduct;
+        return [this.player1.score, this.player2.score];
+    }
+
+    private getEndOfGameScores(): [number, number] {
+        if (this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD) {
+            return this.computeEndOfGameScore(LOSE, LOSE, this.player1.getTileRackPoints(), this.player2.getTileRackPoints());
+        } else if (!this.player1.hasTilesLeft()) {
+            return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
+        } else {
+            return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
+        }
     }
 
     private addTilesToReserve(tileReserve: TileReserveData[]): void {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -67,13 +68,13 @@ describe('DictionarySearcher', () => {
         it('should return true if stack has items left', () => {
             searcher['stack'] = [{}, {}, {}] as DictionarySearcherStackItem[];
 
-            expect(searcher.hasNext()).to.be.true;
+            expect(searcher['hasNext']()).to.be.true;
         });
 
         it('should return false if stack has no item left', () => {
             searcher['stack'] = [] as DictionarySearcherStackItem[];
 
-            expect(searcher.hasNext()).to.be.false;
+            expect(searcher['hasNext']()).to.be.false;
         });
     });
 
@@ -84,7 +85,7 @@ describe('DictionarySearcher', () => {
         let getWordStub: SinonStub;
 
         beforeEach(() => {
-            nextStub = stub(searcher, 'next');
+            nextStub = stub(searcher, <any>'next');
             popStub = stub(searcher['stack'], 'pop').returns({ node, playerLetters: [] });
             addChildrenToStackStub = stub(searcher, 'addChildrenToStack' as any);
             getWordStub = stub(searcher, 'getWord' as any);
@@ -94,18 +95,18 @@ describe('DictionarySearcher', () => {
         });
 
         it('next to pop item from stack', () => {
-            searcher.next();
+            searcher['next']();
             expect(popStub.called).to.be.true;
         });
 
         it('next should throw if stack is empty', () => {
             popStub.returns(undefined);
-            expect(() => searcher.next()).to.throw(NEXT_NODE_DOES_NOT_EXISTS);
+            expect(() => searcher['next']()).to.throw(NEXT_NODE_DOES_NOT_EXISTS);
         });
 
         it('should call addChildrenToStack with node and playerTile', () => {
             popStub.returns({ node, playerLetters });
-            searcher.next();
+            searcher['next']();
             expect(addChildrenToStackStub.calledWith(node, playerLetters)).to.be.true;
         });
 
@@ -113,7 +114,7 @@ describe('DictionarySearcher', () => {
             popStub.returns({ node, playerLetters });
             getWordStub.returns({});
 
-            searcher.next();
+            searcher['next']();
 
             expect(getWordStub.calledWith(node)).to.be.true;
         });
@@ -123,7 +124,7 @@ describe('DictionarySearcher', () => {
             getWordStub.returns(undefined);
             nextStub.onCall(1).returns(expected);
 
-            const result = searcher.next();
+            const result = searcher['next']();
 
             expect(result).to.equal(expected);
         });
@@ -134,8 +135,8 @@ describe('DictionarySearcher', () => {
         let nextStub: SinonStub;
 
         beforeEach(() => {
-            hasNextStub = stub(searcher, 'hasNext').returns(false);
-            nextStub = stub(searcher, 'next').returns({ word: '', perpendicularWords: [] });
+            hasNextStub = stub(searcher, <any>'hasNext').returns(false);
+            nextStub = stub(searcher, <any>'next').returns({ word: '', perpendicularWords: [] });
         });
 
         it('should call hasNext while its value is true', () => {

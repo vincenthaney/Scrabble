@@ -11,7 +11,7 @@ import { Service } from 'typedi';
 import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GamePlayController } from './controllers/game-play-controller/game-play.controller';
 import { HighScoresController } from './controllers/high-scores-controller/high-scores.controller';
-import DatabaseService from './services/database-service/database-service';
+import DatabaseService from './services/database-service/database.service';
 
 @Service()
 export class Application {

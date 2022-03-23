@@ -39,26 +39,7 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
     }
 
-    findPointRange(): Range {
-        const randomPointRange = Math.random();
-        if (randomPointRange <= LOW_SCORE_THRESHOLD) {
-            return new Range(LOW_SCORE_RANGE_MIN, LOW_SCORE_RANGE_MAX);
-        } else if (randomPointRange <= MEDIUM_SCORE_THRESHOLD) {
-            return new Range(MEDIUM_SCORE_RANGE_MIN, MEDIUM_SCORE_RANGE_MAX);
-        } else {
-            return new Range(HIGH_SCORE_RANGE_MIN, HIGH_SCORE_RANGE_MAX);
-        }
-    }
-
-    generateWordFindingRequest(): WordFindingRequest {
-        return {
-            pointRange: this.findPointRange(),
-            useCase: WordFindingUseCase.Beginner,
-            pointHistory: this.pointHistory,
-        };
-    }
-
-    async findAction(): Promise<ActionData> {
+    protected async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
         if (randomAction <= PLACE_ACTION_THRESHOLD) {
             const scoredWordPlacement = this.computeWordPlacement();
@@ -74,17 +55,36 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return ActionPass.createActionData();
     }
 
-    updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
+    protected findPointRange(): Range {
+        const randomPointRange = Math.random();
+        if (randomPointRange <= LOW_SCORE_THRESHOLD) {
+            return new Range(LOW_SCORE_RANGE_MIN, LOW_SCORE_RANGE_MAX);
+        } else if (randomPointRange <= MEDIUM_SCORE_THRESHOLD) {
+            return new Range(MEDIUM_SCORE_RANGE_MIN, MEDIUM_SCORE_RANGE_MAX);
+        } else {
+            return new Range(HIGH_SCORE_RANGE_MIN, HIGH_SCORE_RANGE_MAX);
+        }
+    }
+
+    private updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
         const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
         this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
     }
 
-    getGameBoard(gameId: string, playerId: string): Board {
+    private getGameBoard(gameId: string, playerId: string): Board {
         return this.getActiveGameService().getGame(gameId, playerId).board;
     }
 
-    computeWordPlacement(): ScoredWordPlacement | undefined {
+    private computeWordPlacement(): ScoredWordPlacement | undefined {
         return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
+    }
+
+    private generateWordFindingRequest(): WordFindingRequest {
+        return {
+            pointRange: this.findPointRange(),
+            useCase: WordFindingUseCase.Beginner,
+            pointHistory: this.pointHistory,
+        };
     }
 
     private isExchangePossible(): boolean {

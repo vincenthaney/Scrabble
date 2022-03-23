@@ -23,7 +23,7 @@ export class ActionUtils {
         return [playedTiles, unplayedTiles];
     }
 
-    static getIndexOfTile = (tiles: Tile[], tile: Tile, allowWildcard: boolean = true): number => {
+    private static getIndexOfTile = (tiles: Tile[], tile: Tile, allowWildcard: boolean = true): number => {
         let index = tiles.findIndex((t) => t.letter === tile.letter && t.value === tile.value);
 
         if (index < 0 && allowWildcard) {
@@ -33,7 +33,7 @@ export class ActionUtils {
         return index;
     };
 
-    static isBlankTile(tile: Tile): boolean {
+    private static isBlankTile(tile: Tile): boolean {
         return tile.isBlank || tile.letter === BLANK_TILE_LETTER_VALUE;
     }
 }

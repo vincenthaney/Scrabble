@@ -50,17 +50,6 @@ const DEFAULT_ROUND_TIME = 1;
 
 const DEFAULT_OPPONENT = new Player(DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
 
-// const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
-//     playerName: DEFAULT_PLAYER_NAME,
-//     playerId: DEFAULT_PLAYER_ID,
-//     gameType: GameType.Classic,
-//     gameMode: GameMode.Multiplayer,
-//     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
-//     virtualPlayerName: DEFAULT_PLAYER_NAME,
-//     maxRoundTime: DEFAULT_ROUND_TIME,
-//     dictionary: DEFAULT_DICTIONARY,
-// };
-
 const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
     playerName: DEFAULT_PLAYER_NAME,
     playerId: DEFAULT_PLAYER_ID,
@@ -78,8 +67,6 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
     maxRoundTime: DEFAULT_ROUND_TIME,
     dictionary: DEFAULT_DICTIONARY,
 };
-
-// const DEFAULT_EXCEPTION = 'exception';
 
 const DEFAULT_PLAYER = new Player(VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
 const DEFAULT_JOINED_PLAYER = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
@@ -186,16 +173,6 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call appropriate methods', async () => {
-            await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
-            expect(createSoloGameSpy).to.have.been.called();
-            expect(addToRoomSpy).to.have.been.called();
-            expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
-            expect(socketServiceSpy).to.have.been.called();
-            expect(virtualPlayerServiceSpy).to.have.been.called();
-            expect(activeGameServiceSpy).to.have.been.called();
-        });
-
-        it("it shouldn't call methods related to virtual player starting the game", async () => {
             await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createSoloGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();

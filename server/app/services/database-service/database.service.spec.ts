@@ -10,7 +10,7 @@ import { describe } from 'mocha';
 import { MongoClient, Document } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Container } from 'typedi';
-import DatabaseService from './database-service';
+import DatabaseService from './database.service';
 chai.use(chaiAsPromised);
 
 const TEST_DOCUMENT_SMALL_ARRAY: Document[] = [{ name: 'pablito' }, { name: 'pablito' }];
@@ -34,7 +34,7 @@ describe('Database service', () => {
 
     // Remark : We don't test the case when MONGO_DB_URL is used in order to not connect to the real database
     it('should connect to the database when start is called', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.connectToServer(mongoUri);
         expect(databaseService['mongoClient']).to.not.be.undefined;
         expect(databaseService['db'].databaseName).to.equal(MONGO_DATABASE_NAME);
@@ -48,12 +48,12 @@ describe('Database service', () => {
         } catch {
             expect(databaseService['mongoClient']).to.be.undefined;
         }
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         await databaseService.connectToServer(mongoUri);
     });
 
     it('should populate the database with a helper function', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
         const client = await MongoClient.connect(mongoUri);
         databaseService['db'] = client.db(MONGO_DATABASE_NAME);
 
@@ -63,7 +63,7 @@ describe('Database service', () => {
     });
 
     it('should not populate the database with start function if it is already populated', async () => {
-        const mongoUri = await mongoServer.getUri();
+        const mongoUri = mongoServer.getUri();
 
         let client = await MongoClient.connect(mongoUri);
         databaseService['db'] = client.db(MONGO_DATABASE_NAME);

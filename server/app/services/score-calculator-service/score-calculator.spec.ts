@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Lint dot-notation must be disabled to access private element
 /* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
@@ -186,21 +188,21 @@ describe('ScoreCalculatorService', () => {
     });
 
     it('isABingo should return true with 7 tiles to place', () => {
-        expect(scoreCalculatorService.isABingo(MAX_LENGTH_TILES_TO_PLACE)).to.be.true;
+        expect(scoreCalculatorService['isABingo'](MAX_LENGTH_TILES_TO_PLACE)).to.be.true;
     });
 
     it('isABingo should return false with less than 7 tiles to place', () => {
-        expect(scoreCalculatorService.isABingo([MAX_LENGTH_TILES_TO_PLACE[0]])).to.be.false;
+        expect(scoreCalculatorService['isABingo']([MAX_LENGTH_TILES_TO_PLACE[0]])).to.be.false;
     });
 
     it('bonusPoints should return BINGO_BONUS_POINTS if isABingo returns true', () => {
-        const isABingoStub = stub(scoreCalculatorService, 'isABingo').returns(true);
+        const isABingoStub = stub(scoreCalculatorService, <any>'isABingo').returns(true);
         expect(scoreCalculatorService.bonusPoints(MAX_LENGTH_TILES_TO_PLACE)).to.equal(BINGO_BONUS_POINTS);
         assert(isABingoStub.calledOnce);
     });
 
     it('bonusPoints should return 0 if isABingo returns false', () => {
-        const isABingoStub = stub(scoreCalculatorService, 'isABingo').returns(false);
+        const isABingoStub = stub(scoreCalculatorService, <any>'isABingo').returns(false);
         expect(scoreCalculatorService.bonusPoints(MAX_LENGTH_TILES_TO_PLACE)).to.equal(0);
         assert(isABingoStub.calledOnce);
     });

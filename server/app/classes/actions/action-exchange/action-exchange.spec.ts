@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
@@ -181,7 +183,7 @@ describe('ActionExchange', () => {
 
         it('should call lettersToSwap', () => {
             action = new ActionExchange(game.player1, game, [PLAYER_TILES[0]]);
-            const stubLettersToSwap = stub(action, 'lettersToSwap').returns('a');
+            const stubLettersToSwap = stub(action, <any>'lettersToSwap').returns('a');
             assert(stubLettersToSwap.calledOnce);
         });
 
