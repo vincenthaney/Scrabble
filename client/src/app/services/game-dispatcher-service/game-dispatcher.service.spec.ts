@@ -72,13 +72,13 @@ describe('GameDispatcherService', () => {
 
     describe('Subscriptions', () => {
         it('should call handleJoinRequest on joinRequestEvent', () => {
-            const spy = spyOn(service, 'handleJoinRequest');
+            const spy = spyOn<any>(service, 'handleJoinRequest');
             service['gameDispatcherController']['joinRequestEvent'].next(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call handleLobbyFull on lobbyFullEvent', () => {
-            const spy = spyOn(service, 'handleLobbyFull');
+            const spy = spyOn<any>(service, 'handleLobbyFull');
             service['gameDispatcherController']['lobbyFullEvent'].next();
             expect(spy).toHaveBeenCalled();
         });
@@ -90,20 +90,20 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call handleCanceledGame on canceledGameEvent', () => {
-            const spy = spyOn(service, 'handleCanceledGame');
+            const spy = spyOn<any>(service, 'handleCanceledGame');
             service['gameDispatcherController']['canceledGameEvent'].next(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call handleJoinerRejected on joinerRejectedEvent', () => {
-            const spy = spyOn(service, 'handleJoinerRejected');
+            const spy = spyOn<any>(service, 'handleJoinerRejected');
             service['gameDispatcherController']['joinerRejectedEvent'].next(TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call handleJoinerRejected on lobbiesUpdateEvent', () => {
             const lobbies: LobbyInfo[] = [];
-            const spy = spyOn(service, 'handleLobbiesUpdate');
+            const spy = spyOn<any>(service, 'handleLobbiesUpdate');
             service['gameDispatcherController']['lobbiesUpdateEvent'].next(lobbies);
             expect(spy).toHaveBeenCalledWith(lobbies);
         });
@@ -373,7 +373,7 @@ describe('GameDispatcherService', () => {
     describe('handleJoinRequest', () => {
         it('should emit to joinRequestEvent', () => {
             const spy = spyOn(service['joinRequestEvent'], 'next');
-            service.handleJoinRequest(TEST_PLAYER_NAME);
+            service['handleJoinRequest'](TEST_PLAYER_NAME);
             expect(spy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
     });
@@ -393,12 +393,12 @@ describe('GameDispatcherService', () => {
         });
 
         it('should emit to joinerRejectedEvent', () => {
-            service.handleJoinerRejected(TEST_PLAYER_NAME);
+            service['handleJoinerRejected'](TEST_PLAYER_NAME);
             expect(emitSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call resetData', () => {
-            service.handleJoinerRejected(TEST_PLAYER_NAME);
+            service['handleJoinerRejected'](TEST_PLAYER_NAME);
             expect(resetSpy).toHaveBeenCalledWith();
         });
     });
@@ -407,7 +407,7 @@ describe('GameDispatcherService', () => {
         it('should emit to joinRequestEvent', () => {
             const args: LobbyInfo[] = [];
             const spy = spyOn(service['lobbiesUpdateEvent'], 'next');
-            service.handleLobbiesUpdate(args);
+            service['handleLobbiesUpdate'](args);
             expect(spy).toHaveBeenCalledWith(args);
         });
     });
@@ -427,12 +427,12 @@ describe('GameDispatcherService', () => {
         });
 
         it('should emit to lobbyFullEvent', () => {
-            service.handleLobbyFull();
+            service['handleLobbyFull']();
             expect(emitSpy).toHaveBeenCalledWith();
         });
 
         it('should call resetData', () => {
-            service.handleLobbyFull();
+            service['handleLobbyFull']();
             expect(resetSpy).toHaveBeenCalledWith();
         });
     });
@@ -452,28 +452,28 @@ describe('GameDispatcherService', () => {
         });
 
         it('should emit to canceledGameEvent', () => {
-            service.handleCanceledGame(TEST_PLAYER_NAME);
+            service['handleCanceledGame'](TEST_PLAYER_NAME);
             expect(emitSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME);
         });
 
         it('should call resetData', () => {
-            service.handleCanceledGame(TEST_PLAYER_NAME);
+            service['handleCanceledGame'](TEST_PLAYER_NAME);
             expect(resetSpy).toHaveBeenCalledWith();
         });
     });
 
     describe('isGameModeSolo', () => {
         it('should return true ', () => {
-            expect(service.isGameModeSolo(TEST_FORM)).toBeTrue();
+            expect(service['isGameModeSolo'](TEST_FORM)).toBeTrue();
         });
 
         it('should return false if undefined', () => {
-            expect(service.isGameModeSolo()).toBeFalse();
+            expect(service['isGameModeSolo']()).toBeFalse();
         });
 
         it('should return false if multiplayer', () => {
             TEST_FORM.patchValue({ gameMode: GameMode.Multiplayer });
-            expect(service.isGameModeSolo(TEST_FORM)).toBeFalse();
+            expect(service['isGameModeSolo'](TEST_FORM)).toBeFalse();
             TEST_FORM.patchValue({ gameMode: GameMode.Solo });
         });
     });

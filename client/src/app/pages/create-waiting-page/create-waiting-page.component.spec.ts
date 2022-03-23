@@ -89,7 +89,7 @@ describe('CreateWaitingPageComponent', () => {
     });
 
     it('waitingRoomMessage should change the attributes according to the opponent name', async () => {
-        component.setOpponent(testOpponentName);
+        component['setOpponent'](testOpponentName);
         expect(component.waitingRoomMessage).toEqual(testOpponentName + OPPONENT_FOUND_MESSAGE);
         expect(component.isOpponentFound).toEqual(true);
         expect(component.opponentName).toEqual(testOpponentName);
@@ -97,7 +97,7 @@ describe('CreateWaitingPageComponent', () => {
 
     it('waitingRoomMessage should change to HostWaitingMessage when an opponent leaves the lobby', async () => {
         component.isOpponentFound = true;
-        component.disconnectOpponent();
+        component['disconnectOpponent']();
         expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
         expect(component.isOpponentFound).toEqual(false);
         expect(component.opponentName).toEqual(undefined);
@@ -139,7 +139,7 @@ describe('CreateWaitingPageComponent', () => {
     describe('setOpponent', () => {
         it('should be called when joinRequestEvent is emittted', () => {
             const emitName = 'weirdName';
-            const spySetOpponent = spyOn(component, 'setOpponent').and.callFake(() => {
+            const spySetOpponent = spyOn<any>(component, 'setOpponent').and.callFake(() => {
                 return;
             });
             gameDispatcherServiceMock['joinRequestEvent'].next(emitName);
@@ -152,7 +152,7 @@ describe('CreateWaitingPageComponent', () => {
             component.isOpponentFound = false;
 
             const newOpponentName = 'New opponent name';
-            component.setOpponent(newOpponentName);
+            component['setOpponent'](newOpponentName);
 
             expect(component.opponentName).toEqual(newOpponentName);
             expect(component.waitingRoomMessage).toEqual(newOpponentName + OPPONENT_FOUND_MESSAGE);
@@ -166,7 +166,7 @@ describe('CreateWaitingPageComponent', () => {
             component.waitingRoomMessage = 'some message';
             component.isOpponentFound = false;
 
-            component.disconnectOpponent();
+            component['disconnectOpponent']();
 
             expect(component.opponentName).toBeUndefined();
             expect(component.waitingRoomMessage).toEqual(HOST_WAITING_MESSAGE);
@@ -180,7 +180,7 @@ describe('CreateWaitingPageComponent', () => {
             component.waitingRoomMessage = beforeWaitingMessage;
             component.isOpponentFound = true;
 
-            component.disconnectOpponent();
+            component['disconnectOpponent']();
 
             expect(component.opponentName).toBeUndefined();
             expect(component.waitingRoomMessage).toEqual(beforeWaitingMessage);
@@ -190,15 +190,15 @@ describe('CreateWaitingPageComponent', () => {
 
     describe('opponentLeft', () => {
         it('opponentLeft should call disconnectOpponent', () => {
-            const spy = spyOn(component, 'disconnectOpponent');
-            component.opponentLeft('leaver');
+            const spy = spyOn<any>(component, 'disconnectOpponent');
+            component['opponentLeft']('leaver');
             expect(spy).toHaveBeenCalled();
         });
 
         it('should open the dialog', () => {
             const spy = spyOn(component.dialog, 'open');
             const leaverName = 'leaver';
-            component.opponentLeft(leaverName);
+            component['opponentLeft'](leaverName);
             expect(spy).toHaveBeenCalledWith(DefaultDialogComponent, {
                 data: {
                     title: DIALOG_TITLE,
@@ -215,7 +215,7 @@ describe('CreateWaitingPageComponent', () => {
 
         it('should be called when joinerLeaveGameEvent is emittted', () => {
             const emitName = 'weirdName';
-            const spyOpponentLeft = spyOn(component, 'opponentLeft').and.callFake(() => {
+            const spyOpponentLeft = spyOn<any>(component, 'opponentLeft').and.callFake(() => {
                 return;
             });
             playerLeavesServiceMock['joinerLeavesGameEvent'].next(emitName);
@@ -259,7 +259,7 @@ describe('CreateWaitingPageComponent', () => {
             const handleConfirmationSpy = spyOn(component.gameDispatcherService, 'handleRejection').and.callFake(() => {
                 return;
             });
-            const disconnectOpponentSpy = spyOn(component, 'disconnectOpponent').and.callFake(() => {
+            const disconnectOpponentSpy = spyOn<any>(component, 'disconnectOpponent').and.callFake(() => {
                 return;
             });
 
@@ -274,7 +274,7 @@ describe('CreateWaitingPageComponent', () => {
             const handleConfirmationSpy = spyOn(component.gameDispatcherService, 'handleRejection').and.callFake(() => {
                 return;
             });
-            const disconnectOpponentSpy = spyOn(component, 'disconnectOpponent').and.callFake(() => {
+            const disconnectOpponentSpy = spyOn<any>(component, 'disconnectOpponent').and.callFake(() => {
                 return;
             });
 
@@ -346,7 +346,7 @@ describe('CreateWaitingPageComponent', () => {
             rejectButton.disabled = false;
             fixture.detectChanges();
 
-            const spyDisconnect = spyOn(component, 'disconnectOpponent').and.callFake(() => {
+            const spyDisconnect = spyOn<any>(component, 'disconnectOpponent').and.callFake(() => {
                 return;
             });
             const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection')
@@ -365,7 +365,7 @@ describe('CreateWaitingPageComponent', () => {
             rejectButton.disabled = true;
             fixture.detectChanges();
 
-            const disconnectSpy = spyOn(component, 'disconnectOpponent');
+            const disconnectSpy = spyOn<any>(component, 'disconnectOpponent');
             const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection').and.callFake(() => {
                 return;
             });

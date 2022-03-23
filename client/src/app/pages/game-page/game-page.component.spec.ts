@@ -296,7 +296,7 @@ describe('GamePageComponent', () => {
 
     describe('canPass', () => {
         it('should not be able to pass if its not the player turn', () => {
-            spyOn(component, 'isLocalPlayerTurn').and.returnValue(false);
+            spyOn<any>(component, 'isLocalPlayerTurn').and.returnValue(false);
             expect(component.canPass()).toBeFalse();
         });
 
@@ -313,7 +313,7 @@ describe('GamePageComponent', () => {
         });
 
         it('should be able to pass if the conditions are met', () => {
-            spyOn(component, 'isLocalPlayerTurn').and.returnValue(true);
+            spyOn<any>(component, 'isLocalPlayerTurn').and.returnValue(true);
             component['gameService'].isGameOver = false;
             component['actionService'].hasActionBeenPlayed = false;
             expect(component.canPass()).toBeTrue();
@@ -349,7 +349,7 @@ describe('GamePageComponent', () => {
 
     it('Clicking on quit button when the game is over should show quitting dialog', () => {
         gameServiceMock.isGameOver = true;
-        const spy = spyOn(component, 'openDialog').and.callFake(() => {
+        const spy = spyOn<any>(component, 'openDialog').and.callFake(() => {
             return;
         });
         const buttonsContent = [DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_STAY];

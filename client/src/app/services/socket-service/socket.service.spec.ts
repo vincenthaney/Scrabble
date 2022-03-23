@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
+import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { SocketService } from '@app/services/';
 import { Socket } from 'socket.io-client';
-import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 
 describe('SocketService', () => {
     let service: SocketService;
@@ -19,54 +20,24 @@ describe('SocketService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should disconnect', () => {
-        const spy = spyOn(service['socket'], 'disconnect');
-        service.disconnect();
-        expect(spy).toHaveBeenCalled();
-    });
-
-    it('should check if socket is defined on disconnect', () => {
-        (service['socket'] as unknown) = undefined;
-        const result = service.disconnect();
-        expect(result).toBeFalse();
-    });
-
     it('should call connect on initializeService', () => {
-        const spy = spyOn(service, 'connect');
+        const spy = spyOn<any>(service, 'connect');
         service.initializeService();
         expect(spy).toHaveBeenCalled();
     });
 
     it('should throw on initializeService error', async () => {
         const error = 'error';
-        spyOn(service, 'connect').and.throwError(error);
+        spyOn<any>(service, 'connect').and.throwError(error);
         await expectAsync(service.initializeService()).toBeRejectedWithError(error);
     });
 
     describe('connect', () => {
         it('should set socket on connect', () => {
             (service['socket'] as unknown) = undefined;
-            service.connect();
+            service['connect']();
             expect(service['socket']).toBeTruthy();
         });
-    });
-
-    it('isSocketAlive should return true if the socket is still connected', () => {
-        service['socket'].connected = true;
-        const isAlive = service.isSocketAlive();
-        expect(isAlive).toBeTruthy();
-    });
-
-    it('isSocketAlive should return false if the socket is no longer connected', () => {
-        service['socket'].connected = false;
-        const isAlive = service.isSocketAlive();
-        expect(isAlive).toBeFalsy();
-    });
-
-    it('isSocketAlive should return false if the socket is not defined', () => {
-        (service['socket'] as unknown) = undefined;
-        const isAlive = service.isSocketAlive();
-        expect(isAlive).toBeFalsy();
     });
 
     it('should call socket.on with an event', () => {

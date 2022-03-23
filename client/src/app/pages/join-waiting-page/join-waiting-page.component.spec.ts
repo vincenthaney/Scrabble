@@ -71,13 +71,13 @@ describe('JoinWaitingPageComponent', () => {
 
     it('playerRejected should open the rejected dialog when player is rejected', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.playerRejected(opponentName);
+        component['playerRejected'](opponentName);
         expect(spy).toHaveBeenCalled();
     });
 
     it('hostHasCanceled should open the cancel dialog when host cancels the game', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.hostHasCanceled(opponentName);
+        component['hostHasCanceled'](opponentName);
         expect(spy).toHaveBeenCalled();
     });
 
@@ -130,18 +130,18 @@ describe('JoinWaitingPageComponent', () => {
         it('routerChangeMethod should call handleLeaveLobby if the url is diffrent from /game ', () => {
             const spyHandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.returnValue(of(true) as any);
             // Create a new component once spies have been applied
-            component.routerChangeMethod('notgame');
+            component['routerChangeMethod']('notgame');
             expect(spyHandleLeaveLobby).toHaveBeenCalled();
         });
 
         it('routerChangeMethod should not call handleLeaveLobby if the url is /game ', () => {
             const spyHandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.returnValue(of(true) as any);
-            component.routerChangeMethod('/game');
+            component['routerChangeMethod']('/game');
             expect(spyHandleLeaveLobby).not.toHaveBeenCalled();
         });
 
         it('routerChangeMethod should be called if router event NavigationStart occurs', () => {
-            const routerChangeMethodSpy = spyOn(component, 'routerChangeMethod').and.callFake(() => {
+            const routerChangeMethodSpy = spyOn<any>(component, 'routerChangeMethod').and.callFake(() => {
                 return;
             });
             const event = new NavigationStart(1, '/join-waiting-page');
@@ -150,7 +150,7 @@ describe('JoinWaitingPageComponent', () => {
         });
 
         it('routerChangeMethod should be called if router event NavigationStart occurs', () => {
-            const routerChangeMethodSpy = spyOn(component, 'routerChangeMethod').and.callFake(() => {
+            const routerChangeMethodSpy = spyOn<any>(component, 'routerChangeMethod').and.callFake(() => {
                 return;
             });
             const event = new NavigationEnd(1, '/join-waiting-page', '/lobby');
@@ -161,7 +161,7 @@ describe('JoinWaitingPageComponent', () => {
 
     it('playerRejected should be called when joinerRejectedEvent is emittted', () => {
         const emitName = 'weirdName';
-        const spyPlayerRejected = spyOn(component, 'playerRejected').and.callFake(() => {
+        const spyPlayerRejected = spyOn<any>(component, 'playerRejected').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock['joinerRejectedEvent'].next(emitName);
@@ -170,7 +170,7 @@ describe('JoinWaitingPageComponent', () => {
 
     it('hostHasCanceled should be called when canceledGameEvent is emittted', () => {
         const emitName = 'weirdName';
-        const spyHostHasCanceled = spyOn(component, 'hostHasCanceled').and.callFake(() => {
+        const spyHostHasCanceled = spyOn<any>(component, 'hostHasCanceled').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock['canceledGameEvent'].next(emitName);

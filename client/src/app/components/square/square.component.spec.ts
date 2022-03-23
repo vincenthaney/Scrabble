@@ -15,9 +15,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Orientation } from '@app/classes/orientation';
 import { SquareView } from '@app/classes/square';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
-import { IconComponent } from '@app/components/icon/icon.component';
 import { SquareComponent } from './square.component';
 
 describe('SquareComponent', () => {
@@ -74,24 +74,6 @@ describe('SquareComponent', () => {
         squareWrapper.squareComponent.ngOnInit();
 
         expect(getTextSpy).toHaveBeenCalled();
-    });
-
-    describe('getSquareSize', () => {
-        it('getSquareSize should return UNDEFINED_SQUARE_SIZE if no SquareView is attached', () => {
-            const squareWrapper = new SquareTestWrapper();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            spyOnProperty<any>(squareWrapper, 'squareView', 'get').and.returnValue(null);
-            squareWrapper.createComponent();
-
-            expect(squareWrapper.squareComponent.getSquareSize()).toEqual(UNDEFINED_SQUARE_SIZE);
-        });
-
-        it('getSquareSize should return square_size if SquareView is attached', () => {
-            const squareWrapper = new SquareTestWrapper();
-            squareWrapper.createComponent();
-
-            expect(squareWrapper.squareComponent.getSquareSize()).toEqual(squareWrapper.squareView.squareSize);
-        });
     });
 
     describe('getOrientationClass', () => {
