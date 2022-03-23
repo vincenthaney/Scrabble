@@ -171,7 +171,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.tiles.splice(newIndex, 0, tile);
     }
 
-    private updateTileRack(playerId: string | undefined): void {
+    private updateTileRack(playerId?: string): void {
         const player = this.gameService.getLocalPlayer();
         if (!player || playerId !== this.gameService.getLocalPlayerId()) return;
 
