@@ -170,6 +170,29 @@ describe('GameService', () => {
         });
     });
 
+    describe('handleInitializeGame', () => {
+        let initializeGameSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            initializeGameSpy = spyOn<any>(service, 'initializeGame').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should do nothing if initializeGameData is undefined', () => {
+            service.handleInitializeGame(undefined);
+            expect(initializeGameSpy).not.toHaveBeenCalled();
+        });
+
+        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', () => {
+            service.handleInitializeGame({} as InitializeGameData);
+            Promise.resolve(() => {
+                expect(initializeGameSpy).toHaveBeenCalled();
+                expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
+            });
+        });
+    });
+
     describe('initializeGame', () => {
         let defaultGameData: StartGameData;
 
@@ -282,6 +305,7 @@ describe('GameService', () => {
         beforeEach(() => {
             emitSpy = gameViewEventManagerSpy.emitGameViewEvent;
         });
+
         it('should call playerContainer.updatePlayersData if it is defined', () => {
             service['playerContainer'] = new PlayerContainer(DEFAULT_PLAYER_1.id);
             const updatedData: PlayerData = { id: 'id', name: 'new-name' };

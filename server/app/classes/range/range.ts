@@ -9,16 +9,18 @@ export default class Range {
         return minimum <= maximum;
     }
 
-    get min() {
+    get min(): number {
         return this.minimum;
     }
-    get max() {
+
+    get max(): number {
         return this.maximum;
     }
     set min(minimum: number) {
         if (!Range.validateRangeValues(minimum, this.maximum)) throw new Error(INVALID_POINT_RANGE);
         this.minimum = minimum;
     }
+
     set max(maximum: number) {
         if (!Range.validateRangeValues(this.minimum, maximum)) throw new Error(INVALID_POINT_RANGE);
         this.maximum = maximum;

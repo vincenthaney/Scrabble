@@ -143,6 +143,38 @@ describe('Game', () => {
             assert(tileReserveStub.getTilesLeftPerLetter.calledOnce);
         });
 
+        describe('getPlayer', () => {
+            beforeEach(() => {
+                game.player1 = DEFAULT_PLAYER_1;
+                game.player2 = DEFAULT_PLAYER_2;
+            });
+
+            it('should throw INVALID_PLAYER_ID_FOR_GAME if player not from game', () => {
+                spy.on(game, 'isPlayerFromGame', () => false);
+                expect(() => game.getPlayer(DEFAULT_PLAYER_1_ID, false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+            });
+
+            it('should throw INVALID_PLAYER_ID_FOR_GAME if player is from game but id is not player1 or player2', () => {
+                expect(() => game.getPlayer('random id', false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+            });
+
+            it('should return player 1 if id is player1 and is requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_1_ID, true)).to.equal(game.player1);
+            });
+
+            it('should return player 1 if id is player1 and is NOT requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_1_ID, false)).to.equal(game.player2);
+            });
+
+            it('should return player 2 if id is player2 and is requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_2_ID, true)).to.equal(game.player2);
+            });
+
+            it('should return player 2 if id is player2 and is NOT requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_2_ID, false)).to.equal(game.player1);
+            });
+        });
+
         describe('getActivePlayer', () => {
             it('should return player with same id (player 1)', () => {
                 const player = game.getPlayer(DEFAULT_PLAYER_1.id, IS_REQUESTING);
@@ -176,6 +208,7 @@ describe('Game', () => {
                 expect(() => game.getPlayer(invalidId, IS_OPPONENT)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
+
         describe('getConnectedRealPlayers', () => {
             it('should return both players if they are both real and connected', () => {
                 game.player1.isConnected = true;
