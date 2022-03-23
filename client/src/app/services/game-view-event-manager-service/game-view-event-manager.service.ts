@@ -21,7 +21,7 @@ export class GameViewEventManagerService {
     private eventMap: Map<keyof EventTypes, Subject<any>> = new Map();
 
     constructor() {
-        this.eventMap.set('tileRackUpdate', new Subject<void>());
+        this.eventMap.set('tileRackUpdate', new Subject<string>());
         this.eventMap.set('noActiveGame', new Subject<void>());
         this.eventMap.set('reRender', new Subject<void>());
         this.eventMap.set('newMessage', new BehaviorSubject<Message | null>(null));

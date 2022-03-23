@@ -4,7 +4,7 @@ import { Message } from '@app/classes/communication/message';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface EventTypes {
-    tileRackUpdate: void;
+    tileRackUpdate: string;
     noActiveGame: void;
     reRender: void;
     newMessage: Message | null;

@@ -313,7 +313,7 @@ describe('GameService', () => {
             const updatedData: PlayerData = { id: 'id', name: 'new-name' };
 
             service.handleUpdatePlayerData(updatedData);
-            expect(emitSpy).toHaveBeenCalledWith('tileRackUpdate');
+            expect(emitSpy).toHaveBeenCalledWith('tileRackUpdate', updatedData.id);
         });
     });
 
@@ -364,7 +364,7 @@ describe('GameService', () => {
             expect(player1Spy).toHaveBeenCalled();
             expect(player2Spy).toHaveBeenCalled();
             expect(emitSpy).toHaveBeenCalledWith('reRender');
-            expect(emitSpy).toHaveBeenCalledWith('tileRackUpdate');
+            expect(emitSpy).toHaveBeenCalledWith('tileRackUpdate', DEFAULT_PLAYER_1.id);
             expect(boardServiceSpy.updateBoard).toHaveBeenCalled();
             expect(roundManagerSpy.continueRound).toHaveBeenCalled();
         });
