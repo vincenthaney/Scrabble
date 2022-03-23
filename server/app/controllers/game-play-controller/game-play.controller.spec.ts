@@ -472,7 +472,7 @@ describe('GamePlayController', () => {
             spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => true);
             const getGameSpy = spy.on(gamePlayController['activeGameService'], 'getGame');
             await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
-            expect(getGameSpy.called).to.be.false;
+            expect(getGameSpy.called).to.be.not.ok;
         });
 
         it('should call emitToSocket if game is not over', async () => {
