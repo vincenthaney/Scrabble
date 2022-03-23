@@ -152,7 +152,12 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         if (!tile) return;
 
         this.useTile(tile);
-        this.selectedSquare = this.navigator.nextEmpty(Direction.Forward, false);
+
+        const nextNavigator = this.navigator.clone();
+        if (nextNavigator.nextEmpty(Direction.Forward, false)) {
+            this.navigator = nextNavigator;
+            this.selectedSquare = nextNavigator.currentSquareView;
+        }
     }
 
     private cannotPlace(squareView: SquareView | undefined): boolean {
@@ -161,10 +166,18 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
 
     private handleBackspace(): void {
         if (this.cannotBackspace()) return;
-        this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
+
+        let index = this.notAppliedSquares.indexOf(this.navigator.currentSquareView);
+
+        if (index === NOT_FOUND) {
+            this.selectedSquare = this.navigator.nextEmpty(Direction.Backward, true);
+            if (this.selectedSquare) index = this.notAppliedSquares.indexOf(this.selectedSquare);
+        }
+
+        if (index !== NOT_FOUND) {
+            this.notAppliedSquares.splice(index, 1);
+        }
         if (this.selectedSquare) {
-            const index = this.notAppliedSquares.indexOf(this.selectedSquare);
-            if (index >= 0) this.notAppliedSquares.splice(index, 1);
             const selectedTile: Tile | null = this.selectedSquare.square.tile;
             if (selectedTile) {
                 this.removeUsedTile(selectedTile);
