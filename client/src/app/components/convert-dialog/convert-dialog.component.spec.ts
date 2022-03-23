@@ -16,9 +16,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
-import { IconComponent } from '@app/components/icon/icon.component';
 import { ConvertDialogComponent } from './convert-dialog.component';
 
 @Component({
@@ -87,7 +87,7 @@ describe('ConvertDialogComponent', () => {
 
         it('should call returnToWaiting if it is not converting ', () => {
             component.isConverting = false;
-            const spy = spyOn(component, 'returnToWaiting');
+            const spy = spyOn<any>(component, 'returnToWaiting');
 
             component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
@@ -95,7 +95,7 @@ describe('ConvertDialogComponent', () => {
 
         it('should NOT call returnToWaiting if it is not converting ', () => {
             component.isConverting = true;
-            const spy = spyOn(component, 'returnToWaiting');
+            const spy = spyOn<any>(component, 'returnToWaiting');
 
             component.ngOnDestroy();
             expect(spy).not.toHaveBeenCalled();
@@ -104,14 +104,14 @@ describe('ConvertDialogComponent', () => {
 
     describe('onSubmit', () => {
         it('form should call handleConvertToSolo on submit', async () => {
-            const spy = spyOn(component, 'handleConvertToSolo');
+            const spy = spyOn<any>(component, 'handleConvertToSolo');
             component.onSubmit();
             expect(spy).toHaveBeenCalled();
         });
 
         it('form should set isConverting to true on submit', async () => {
             component.isConverting = false;
-            spyOn(component, 'handleConvertToSolo').and.callFake(() => {
+            spyOn<any>(component, 'handleConvertToSolo').and.callFake(() => {
                 return;
             });
             component.onSubmit();
@@ -123,7 +123,7 @@ describe('ConvertDialogComponent', () => {
     describe('handleConvertToSolo', () => {
         it('form should call gameDispatcherService.handleRecreateGame', async () => {
             const spy = spyOn<any>(gameDispatcherServiceMock, 'handleRecreateGame');
-            component.handleConvertToSolo();
+            component['handleConvertToSolo']();
             expect(spy).toHaveBeenCalled();
         });
     });

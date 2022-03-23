@@ -4,7 +4,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DEFAULT_LEAVER, DEFAULT_GAME_ID } from '@app/constants/controller-test-constants';
+import { DEFAULT_GAME_ID, DEFAULT_LEAVER } from '@app/constants/controller-test-constants';
 import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
 import { Subject } from 'rxjs';
 import { SocketService } from '..';
@@ -28,7 +28,7 @@ describe('PlayerLeavesService', () => {
     });
 
     it('should call handleJoinerLeaveGame when playerLeavesController.joinerLeavesGameEvent emits', () => {
-        const createGameSpy = spyOn(service, 'handleJoinerLeaveGame').and.callFake(() => {
+        const createGameSpy = spyOn<any>(service, 'handleJoinerLeaveGame').and.callFake(() => {
             return;
         });
         // eslint-disable-next-line dot-notation
@@ -63,7 +63,7 @@ describe('PlayerLeavesService', () => {
         const joinerLeaveGameEventSpy = spyOn(service['joinerLeavesGameEvent'], 'next').and.callFake(() => {
             return;
         });
-        service.handleJoinerLeaveGame(DEFAULT_LEAVER);
+        service['handleJoinerLeaveGame'](DEFAULT_LEAVER);
         expect(joinerLeaveGameEventSpy).toHaveBeenCalled();
     });
 

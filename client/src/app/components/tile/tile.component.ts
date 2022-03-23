@@ -32,7 +32,7 @@ export class TileComponent implements OnInit {
         }
     }
 
-    getBackgroundPath(): string {
+    private getBackgroundPath(): string {
         const index = Math.floor(Math.random() * AMOUNT_OF_TILE_BACKGROUND_IMAGES) + 1;
         return `assets/img/tiles/bg_${index}.svg`;
     }

@@ -59,39 +59,12 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.componentDestroyed$.complete();
     }
 
-    selectTile(selectType: TileRackSelectType, tile: RackTile): boolean {
-        this.focus();
-
-        if (this.selectionType === selectType && tile.isSelected) {
-            this.unselectTile(tile);
-            return false;
-        }
-
-        if (this.selectionType !== selectType || selectType === TileRackSelectType.Move) {
-            this.selectionType = selectType;
-            this.unselectAll();
-        }
-
-        tile.isSelected = true;
-        this.selectedTiles.push(tile);
-
-        return false; // return false so the browser doesn't show the context menu
-    }
-
     selectTileToExchange(tile: RackTile): boolean {
         return this.selectTile(TileRackSelectType.Exchange, tile);
     }
 
     selectTileToMove(tile: RackTile): boolean {
         return this.selectTile(TileRackSelectType.Move, tile);
-    }
-
-    unselectTile(tile: RackTile): void {
-        tile.isSelected = false;
-        const index = this.selectedTiles.indexOf(tile);
-        if (index >= 0) {
-            this.selectedTiles.splice(index, 1);
-        }
     }
 
     unselectAll(): void {
@@ -146,6 +119,33 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
                 break;
             default:
                 this.selectTileFromKey(event.key);
+        }
+    }
+
+    private selectTile(selectType: TileRackSelectType, tile: RackTile): boolean {
+        this.focus();
+
+        if (this.selectionType === selectType && tile.isSelected) {
+            this.unselectTile(tile);
+            return false;
+        }
+
+        if (this.selectionType !== selectType || selectType === TileRackSelectType.Move) {
+            this.selectionType = selectType;
+            this.unselectAll();
+        }
+
+        tile.isSelected = true;
+        this.selectedTiles.push(tile);
+
+        return false; // return false so the browser doesn't show the context menu
+    }
+
+    private unselectTile(tile: RackTile): void {
+        tile.isSelected = false;
+        const index = this.selectedTiles.indexOf(tile);
+        if (index >= 0) {
+            this.selectedTiles.splice(index, 1);
         }
     }
 

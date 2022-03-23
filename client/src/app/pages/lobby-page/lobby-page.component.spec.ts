@@ -103,7 +103,7 @@ describe('LobbyPageComponent', () => {
         fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
 
-        validateNameSpy = spyOn(component, 'validateName');
+        validateNameSpy = spyOn<any>(component, 'validateName');
         spyOn<any>(component.filterFormGroup.get('gameType'), 'setValidators');
         component.filterFormGroup.setValue(DEFAULT_FILTER_VALUES);
 
@@ -131,7 +131,7 @@ describe('LobbyPageComponent', () => {
 
         it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
             component.nameField.formParameters.patchValue({ inputName: 'differentName' });
-            component.validateName();
+            component['validateName']();
             for (const lobby of component.lobbies) {
                 expect(lobby.canJoin).toBeTrue();
             }
@@ -140,7 +140,7 @@ describe('LobbyPageComponent', () => {
         it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
             component.nameField.formParameters.patchValue({ inputName: 'Name1' });
             const expected = [false, true, true];
-            component.validateName();
+            component['validateName']();
             expect(component.lobbies).toBeTruthy();
             for (let i = 0; i++; i < component.lobbies.length) {
                 expect(component.lobbies[i].canJoin).toEqual(expected[i]);
@@ -148,8 +148,8 @@ describe('LobbyPageComponent', () => {
         });
 
         it('should call setFormAvailability', () => {
-            const setFormAvailabilitySpy = spyOn(component, 'setFormAvailability');
-            component.validateName();
+            const setFormAvailabilitySpy = spyOn<any>(component, 'setFormAvailability');
+            component['validateName']();
             expect(setFormAvailabilitySpy).toHaveBeenCalled();
         });
     });
@@ -160,18 +160,18 @@ describe('LobbyPageComponent', () => {
         });
 
         it('should enable form if name is valid and form is disabled', () => {
-            component.setFormAvailability(true);
+            component['setFormAvailability'](true);
             expect(component.filterFormGroup.get('gameType')?.disabled).toBeFalse();
         });
 
         it('should not enable form if name is not valid and form is disabled', () => {
-            component.setFormAvailability(false);
+            component['setFormAvailability'](false);
             expect(component.filterFormGroup.get('gameType')?.disabled).toBeTrue();
         });
 
         it('should enable form if name is valid and form is disabled', () => {
             component.filterFormGroup.get('gameType')?.enable();
-            component.setFormAvailability(false);
+            component['setFormAvailability'](false);
             expect(component.filterFormGroup.get('gameType')?.disabled).toBeTrue();
         });
     });
@@ -193,7 +193,7 @@ describe('LobbyPageComponent', () => {
     describe('updateLobbies', () => {
         it('updateLobbies should call validateName', () => {
             const spy = validateNameSpy.and.returnValue(false);
-            component.updateLobbies(component.lobbies);
+            component['updateLobbies'](component.lobbies);
             expect(spy).toHaveBeenCalled();
         });
 
@@ -208,7 +208,7 @@ describe('LobbyPageComponent', () => {
                     canJoin: true,
                 },
             ];
-            component.updateLobbies([]);
+            component['updateLobbies']([]);
             expect(component.lobbies).toEqual([]);
         });
     });
@@ -219,7 +219,7 @@ describe('LobbyPageComponent', () => {
         let snackBarOpenSpy: jasmine.Spy;
 
         beforeEach(() => {
-            getRandomLobbySpy = spyOn(component, 'getRandomLobby');
+            getRandomLobbySpy = spyOn<any>(component, 'getRandomLobby');
             joinLobbySpy = spyOn(component, 'joinLobby');
             snackBarOpenSpy = spyOn(component['snackBar'], 'open');
         });
@@ -254,11 +254,11 @@ describe('LobbyPageComponent', () => {
                 { lobbyId: '6', canJoin: true, meetFilters: true },
             ];
 
-            let lobby = component.getRandomLobby();
+            let lobby = component['getRandomLobby']();
             let lastLobby: unknown;
             do {
                 lastLobby = lobby;
-                lobby = component.getRandomLobby();
+                lobby = component['getRandomLobby']();
                 expect(component.lobbies.includes(lobby)).toBeTrue();
             } while (lastLobby === lobby);
 
@@ -267,17 +267,17 @@ describe('LobbyPageComponent', () => {
 
         it('should throw if no lobby', () => {
             component.lobbies = [];
-            expect(() => component.getRandomLobby()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+            expect(() => component['getRandomLobby']()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
         });
 
         it('should throw if no lobby can be joined', () => {
             component.lobbies = component.lobbies.map((lobby) => ({ ...lobby, canJoin: false }));
-            expect(() => component.getRandomLobby()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+            expect(() => component['getRandomLobby']()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
         });
 
         it('should throw if no lobby fits filters', () => {
             component.lobbies = component.lobbies.map((lobby) => ({ ...lobby, meetFilters: false }));
-            expect(() => component.getRandomLobby()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+            expect(() => component['getRandomLobby']()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
         });
     });
 
@@ -311,7 +311,7 @@ describe('LobbyPageComponent', () => {
                 lobby.meetFilters = undefined;
                 lobby.gameType = gameType;
                 getGameTypeSpy.and.returnValue({ value: filter } as AbstractControl);
-                component.updateLobbyAttributes(lobby);
+                component['updateLobbyAttributes'](lobby);
                 expect<boolean | undefined>(lobby.meetFilters).toEqual(expected);
             }
         });
@@ -327,13 +327,13 @@ describe('LobbyPageComponent', () => {
 
     it('lobbyFullDialog should open the dialog component', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.lobbyFullDialog();
+        component['lobbyFullDialog']();
         expect(spy).toHaveBeenCalled();
     });
 
     it('lobbyCanceledDialog should open the dialog component', () => {
         const spy = spyOn(component.dialog, 'open');
-        component.lobbyCanceledDialog();
+        component['lobbyCanceledDialog']();
         expect(spy).toHaveBeenCalled();
     });
 
@@ -351,7 +351,7 @@ describe('LobbyPageComponent', () => {
         const emitLobbies: LobbyInfo[] = [
             { lobbyId: '1', hostName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
         ];
-        const spySetOpponent = spyOn(component, 'updateLobbies').and.callFake(() => {
+        const spySetOpponent = spyOn<any>(component, 'updateLobbies').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock['lobbiesUpdateEvent'].next(emitLobbies);
@@ -359,7 +359,7 @@ describe('LobbyPageComponent', () => {
     });
 
     it('lobbyFullDialog should be called when lobbyFullEvent is emittted', () => {
-        const spyLobbyFull = spyOn(component, 'lobbyFullDialog').and.callFake(() => {
+        const spyLobbyFull = spyOn<any>(component, 'lobbyFullDialog').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock['lobbyFullEvent'].next();
@@ -367,7 +367,7 @@ describe('LobbyPageComponent', () => {
     });
 
     it('lobbyCanceled should be called when lobbyCancelEvent is emittted', () => {
-        const spyLobbyCanceled = spyOn(component, 'lobbyCanceledDialog').and.callFake(() => {
+        const spyLobbyCanceled = spyOn<any>(component, 'lobbyCanceledDialog').and.callFake(() => {
             return;
         });
         gameDispatcherServiceMock['canceledGameEvent'].next();

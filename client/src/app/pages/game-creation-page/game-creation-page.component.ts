@@ -73,16 +73,15 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             this.createGame();
         }
     }
+    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
+        this.playerName = playerName;
+        this.playerNameValid = valid;
+    }
 
-    createGame(): void {
+    private createGame(): void {
         if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
             this.router.navigateByUrl('waiting-room');
         }
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
-    }
-
-    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
-        this.playerName = playerName;
-        this.playerNameValid = valid;
     }
 }

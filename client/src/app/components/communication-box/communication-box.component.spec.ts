@@ -253,7 +253,7 @@ describe('CommunicationBoxComponent', () => {
 
         it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
             const onReceiveSpy = spyOn<any>(component, 'onReceiveNewMessage');
-            gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
+            gameServiceMock['handleNewMessage'](DEFAULT_SYSTEM_MESSAGE);
             expect(onReceiveSpy).toHaveBeenCalled();
         });
 
@@ -261,7 +261,7 @@ describe('CommunicationBoxComponent', () => {
             const saveMessageSpy = spyOn(component['messageStorageService'], 'saveMessage');
             const messagesLengthBefore: number = component.messages.length;
 
-            gameServiceMock.handleNewMessage(DEFAULT_SYSTEM_MESSAGE);
+            gameServiceMock['handleNewMessage'](DEFAULT_SYSTEM_MESSAGE);
 
             const messagesLengthAfter: number = component.messages.length;
             expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);

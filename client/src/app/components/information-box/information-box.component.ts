@@ -56,7 +56,17 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         this.componentDestroyed$.complete();
     }
 
-    setupGame(): void {
+    getPlayer1(): AbstractPlayer {
+        const player1 = this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
+        return player1 ? player1 : new Player('', 'Player1', []);
+    }
+
+    getPlayer2(): AbstractPlayer {
+        const player2 = this.gameService.getPlayerByNumber(PLAYER_2_INDEX);
+        return player2 ? player2 : new Player('', 'Player2', []);
+    }
+
+    private setupGame(): void {
         if (this.roundManager.timer) {
             this.roundManager.timer.pipe(takeUntil(this.componentDestroyed$)).subscribe(([timer, activePlayer]) => {
                 this.startTimer(timer);
@@ -67,20 +77,20 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         this.isPlayer1 = this.checkIfIsPlayer1();
     }
 
-    startTimer(timer: Timer): void {
+    private startTimer(timer: Timer): void {
         this.timer = timer;
         this.timerSource = this.createTimer(SECONDS_TO_MILLISECONDS);
         this.timerSubscription = this.timerSource.pipe(takeUntil(this.componentDestroyed$)).subscribe(() => this.timer.decrement());
     }
 
-    endRound(): void {
+    private endRound(): void {
         this.timer = new Timer(0, 0);
         if (this.timerSubscription) {
             this.timerSubscription.unsubscribe();
         }
     }
 
-    updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
+    private updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
         const player1 = this.getPlayer1();
         const player2 = this.getPlayer2();
         if (!activePlayer) {
@@ -90,16 +100,6 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         }
         this.isPlayer1Active = player1 && activePlayer.id === player1.id;
         this.isPlayer2Active = player2 && activePlayer.id === player2.id;
-    }
-
-    getPlayer1(): AbstractPlayer {
-        const player1 = this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
-        return player1 ? player1 : new Player('', 'Player1', []);
-    }
-
-    getPlayer2(): AbstractPlayer {
-        const player2 = this.gameService.getPlayerByNumber(PLAYER_2_INDEX);
-        return player2 ? player2 : new Player('', 'Player2', []);
     }
 
     private createTimer(length: number): Observable<number> {

@@ -213,7 +213,7 @@ describe('GameCreationPageComponent', () => {
         });
 
         it('form should call createGame on submit if form is valid', async () => {
-            const spy = spyOn(component, 'createGame');
+            const spy = spyOn<any>(component, 'createGame');
             spyOn(component, 'isFormValid').and.returnValue(true);
 
             component.onSubmit();
@@ -221,7 +221,7 @@ describe('GameCreationPageComponent', () => {
         });
 
         it('should NOT call createGame on submit if form is invalid', async () => {
-            const spy = spyOn(component, 'createGame');
+            const spy = spyOn<any>(component, 'createGame');
             spyOn(component, 'isFormValid').and.returnValue(false);
 
             component.onSubmit();
@@ -234,19 +234,19 @@ describe('GameCreationPageComponent', () => {
             const spy = spyOn<any>(component['router'], 'navigateByUrl');
             component.gameParameters.patchValue({ gameMode: component.gameModes.Multiplayer });
 
-            component.createGame();
+            component['createGame']();
             expect(spy).toHaveBeenCalledWith('waiting-room');
         });
 
         it('createGame should NOT reroute to game if solo game', () => {
             const spy = spyOn<any>(component['router'], 'navigateByUrl');
             component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-            component.createGame();
+            component['createGame']();
             expect(spy).not.toHaveBeenCalledWith('game');
         });
 
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
-            component.createGame();
+            component['createGame']();
             expect(handleGameCreationSpy).toHaveBeenCalled();
         });
     });
