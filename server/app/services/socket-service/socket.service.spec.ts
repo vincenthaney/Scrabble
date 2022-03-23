@@ -9,7 +9,7 @@ import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
 import { SocketService } from './socket.service';
 
-const RESPONSE_DELAY = 200;
+const RESPONSE_DELAY = 300;
 const SERVER_URL = 'http://localhost:';
 
 const DEFAULT_ROOM = 'default_room';

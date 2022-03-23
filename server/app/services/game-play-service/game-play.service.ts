@@ -25,6 +25,7 @@ export class GamePlayService {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getPlayer(playerId, IS_REQUESTING);
         if (player.id !== playerId) throw new Error(NOT_PLAYER_TURN);
+        if (game.gameIsOver) return [undefined, undefined];
 
         const action: Action = this.getAction(player, game, actionData);
 
@@ -44,7 +45,7 @@ export class GamePlayService {
             const nextRoundData: RoundData = game.roundManager.convertRoundToRoundData(nextRound);
             if (updatedData) updatedData.round = nextRoundData;
             else updatedData = { round: nextRoundData };
-            if (game.isGameOver()) {
+            if (game.areGameOverConditionsMet()) {
                 endGameFeedback = await this.handleGameOver(undefined, game, updatedData);
             }
         }
@@ -92,6 +93,10 @@ export class GamePlayService {
         const payload = actionData.payload as ActionExchangePayload;
         if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
         return payload;
+    }
+
+    isGameOver(gameId: string, playerId: string): boolean {
+        return this.activeGameService.getGame(gameId, playerId).gameIsOver;
     }
 
     private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
