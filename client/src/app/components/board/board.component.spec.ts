@@ -489,6 +489,7 @@ describe('BoardComponent', () => {
         for (const [letter, isUppercase, calls] of tests) {
             it(`it should ${calls ? '' : 'not'} call useTile \
                 and nextEmpty with letter ${letter} as ${isUppercase ? 'uppercase' : 'lowecase'}`, () => {
+                spyOn(component['navigator'], 'clone').and.returnValue(component['navigator']);
                 component['handlePlaceLetter'](letter, isUppercase, squareView);
 
                 const spies = [useTileSpy, nextEmptySpy];
