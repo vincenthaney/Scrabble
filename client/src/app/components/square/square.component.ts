@@ -25,4 +25,8 @@ export class SquareComponent implements OnInit {
     ngOnInit(): void {
         [this.multiplierType, this.multiplierValue] = this.squareView.getText();
     }
+
+    getOrientationClass(): string {
+        return `cursor-${this.cursorOrientation === Orientation.Horizontal ? 'horizontal' : 'vertical'}`;
+    }
 }
