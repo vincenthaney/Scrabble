@@ -15,6 +15,7 @@ export default class BoardService {
         this.initialBoard = [...board];
         this.boardInitialization$.next(this.initialBoard);
     }
+
     subscribeToInitializeBoard(destroy$: Observable<boolean>, next: (board: Square[][]) => void): Subscription {
         return this.boardInitialization$.pipe(takeUntil(destroy$)).subscribe(next);
     }
@@ -22,6 +23,7 @@ export default class BoardService {
     updateBoard(squaresUpdated: Square[]): void {
         this.boardUpdateEvent$.next(squaresUpdated);
     }
+
     subscribeToBoardUpdate(destroy$: Observable<boolean>, next: (squaresToUpdate: Square[]) => void): Subscription {
         return this.boardUpdateEvent$.pipe(takeUntil(destroy$)).subscribe(next);
     }

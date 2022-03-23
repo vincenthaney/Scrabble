@@ -48,14 +48,14 @@ export default class GameDispatcherService implements OnDestroy {
         );
     }
 
-    getCurrentLobbyId(): string {
-        if (!this.currentLobby) return '';
-        return this.currentLobby.lobbyId;
-    }
-
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
         this.serviceDestroyed$.complete();
+    }
+
+    getCurrentLobbyId(): string {
+        if (!this.currentLobby) return '';
+        return this.currentLobby.lobbyId;
     }
 
     resetServiceData(): void {
@@ -121,29 +121,6 @@ export default class GameDispatcherService implements OnDestroy {
         if (this.getCurrentLobbyId()) this.gameDispatcherController.handleRejectionGameCreation(opponentName, this.getCurrentLobbyId());
     }
 
-    handleJoinRequest(opponentName: string): void {
-        this.joinRequestEvent.next(opponentName);
-    }
-
-    handleJoinerRejected(hostName: string): void {
-        this.joinerRejectedEvent.next(hostName);
-        this.resetServiceData();
-    }
-
-    handleLobbiesUpdate(lobbies: LobbyInfo[]): void {
-        this.lobbiesUpdateEvent.next(lobbies);
-    }
-
-    handleLobbyFull(): void {
-        this.lobbyFullEvent.next();
-        this.resetServiceData();
-    }
-
-    handleCanceledGame(hostName: string): void {
-        this.canceledGameEvent.next(hostName);
-        this.resetServiceData();
-    }
-
     subscribeToJoinRequestEvent(componentDestroyed$: Subject<boolean>, callback: (opponentName: string) => void): void {
         this.joinRequestEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
@@ -164,7 +141,30 @@ export default class GameDispatcherService implements OnDestroy {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 
-    isGameModeSolo(gameParameters?: FormGroup): boolean {
+    private isGameModeSolo(gameParameters?: FormGroup): boolean {
         return (gameParameters && gameParameters.get('gameMode')?.value === GameMode.Solo) ?? false;
+    }
+
+    private handleJoinRequest(opponentName: string): void {
+        this.joinRequestEvent.next(opponentName);
+    }
+
+    private handleJoinerRejected(hostName: string): void {
+        this.joinerRejectedEvent.next(hostName);
+        this.resetServiceData();
+    }
+
+    private handleLobbiesUpdate(lobbies: LobbyInfo[]): void {
+        this.lobbiesUpdateEvent.next(lobbies);
+    }
+
+    private handleLobbyFull(): void {
+        this.lobbyFullEvent.next();
+        this.resetServiceData();
+    }
+
+    private handleCanceledGame(hostName: string): void {
+        this.canceledGameEvent.next(hostName);
+        this.resetServiceData();
     }
 }

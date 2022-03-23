@@ -61,71 +61,6 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameViewEventManagerService.emitGameViewEvent('gameInitialized', initializeGameData);
     }
 
-    async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
-        this.gameId = startGameData.gameId;
-        this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
-        this.tileReserve = startGameData.tileReserve;
-        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
-
-        this.roundManager.initialize(localPlayerId, startGameData);
-        this.boardService.initializeBoard(startGameData.board);
-
-        this.isGameSetUp = true;
-        this.isGameOver = false;
-
-        await this.handleReRouteOrReconnect(startGameData);
-    }
-
-    async handleReRouteOrReconnect(startGameData: StartGameData): Promise<void> {
-        if (this.router.url !== '/game') {
-            this.roundManager.initializeEvents();
-            this.roundManager.startRound();
-            await this.router.navigateByUrl('game');
-        } else {
-            this.reconnectReinitialize(startGameData);
-        }
-    }
-
-    handleGameUpdate(gameUpdateData: GameUpdateData): void {
-        if (gameUpdateData.player1) {
-            this.handleUpdatePlayerData(gameUpdateData.player1);
-        }
-        if (gameUpdateData.player2) {
-            this.handleUpdatePlayerData(gameUpdateData.player2);
-        }
-        if (gameUpdateData.board) {
-            this.boardService.updateBoard(gameUpdateData.board);
-        }
-        if (gameUpdateData.round) {
-            const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
-            this.roundManager.updateRound(round);
-        }
-        if (gameUpdateData.tileReserve) {
-            this.handleTileReserveUpdate(gameUpdateData.tileReserve);
-        }
-        if (gameUpdateData.isGameOver) {
-            this.handleGameOver();
-        }
-    }
-
-    handleUpdatePlayerData(playerData: PlayerData): void {
-        if (this.playerContainer) {
-            this.playerContainer.updatePlayersData(playerData);
-        }
-        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
-    }
-
-    handleTileReserveUpdate(tileReserve: TileReserveData[]): void {
-        this.tileReserve = [...tileReserve];
-    }
-
-    handleNewMessage(newMessage: Message): void {
-        this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
-        if (newMessage.senderId === SYSTEM_ERROR_ID) {
-            this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
-        }
-    }
-
     getPlayingPlayerId(): string {
         return this.roundManager.getActivePlayer().id;
     }
@@ -169,6 +104,71 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameId = '';
         this.playerContainer = undefined;
         this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+    }
+
+    private async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
+        this.gameId = startGameData.gameId;
+        this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
+        this.tileReserve = startGameData.tileReserve;
+        this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+
+        this.roundManager.initialize(localPlayerId, startGameData);
+        this.boardService.initializeBoard(startGameData.board);
+
+        this.isGameSetUp = true;
+        this.isGameOver = false;
+
+        await this.handleReRouteOrReconnect(startGameData);
+    }
+
+    private async handleReRouteOrReconnect(startGameData: StartGameData): Promise<void> {
+        if (this.router.url !== '/game') {
+            this.roundManager.initializeEvents();
+            this.roundManager.startRound();
+            await this.router.navigateByUrl('game');
+        } else {
+            this.reconnectReinitialize(startGameData);
+        }
+    }
+
+    private handleGameUpdate(gameUpdateData: GameUpdateData): void {
+        if (gameUpdateData.player1) {
+            this.handleUpdatePlayerData(gameUpdateData.player1);
+        }
+        if (gameUpdateData.player2) {
+            this.handleUpdatePlayerData(gameUpdateData.player2);
+        }
+        if (gameUpdateData.board) {
+            this.boardService.updateBoard(gameUpdateData.board);
+        }
+        if (gameUpdateData.round) {
+            const round: Round = this.roundManager.convertRoundDataToRound(gameUpdateData.round);
+            this.roundManager.updateRound(round);
+        }
+        if (gameUpdateData.tileReserve) {
+            this.handleTileReserveUpdate(gameUpdateData.tileReserve);
+        }
+        if (gameUpdateData.isGameOver) {
+            this.handleGameOver();
+        }
+    }
+
+    private handleUpdatePlayerData(playerData: PlayerData): void {
+        if (this.playerContainer) {
+            this.playerContainer.updatePlayersData(playerData);
+        }
+        this.gameViewEventManagerService.emitGameViewEvent('tileRackUpdate');
+    }
+
+    private handleTileReserveUpdate(tileReserve: TileReserveData[]): void {
+        this.tileReserve = [...tileReserve];
+    }
+
+    private handleNewMessage(newMessage: Message): void {
+        this.gameViewEventManagerService.emitGameViewEvent('newMessage', newMessage);
+        if (newMessage.senderId === SYSTEM_ERROR_ID) {
+            this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        }
     }
 
     private handleGameOver(): void {
