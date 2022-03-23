@@ -162,7 +162,7 @@ describe('TileRackComponent', () => {
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
-        component['updateTileRack']();
+        component['updateTileRack'](undefined);
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
 
@@ -172,7 +172,7 @@ describe('TileRackComponent', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
 
-        component['updateTileRack']();
+        component['updateTileRack'](localPlayer.id);
 
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
@@ -192,7 +192,7 @@ describe('TileRackComponent', () => {
         component['tiles'] = tiles;
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
 
-        component['updateTileRack']();
+        component['updateTileRack'](localPlayer.id);
 
         expect(component.tiles[0]).toBeTruthy();
     });
@@ -218,7 +218,7 @@ describe('TileRackComponent', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: false } as unknown as RackTile;
 
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(tile.isSelected).toBeTrue();
         });
@@ -228,7 +228,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
 
             component.selectedTiles = [];
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(component.selectedTiles).toHaveSize(1);
             expect(component.selectedTiles).toContain(tile);
@@ -237,10 +237,10 @@ describe('TileRackComponent', () => {
         it('should call unselectTile if same tile and tile is selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
-            const spy = spyOn(component, 'unselectTile');
+            const spy = spyOn<any>(component, 'unselectTile');
 
             component['selectionType'] = type;
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).toHaveBeenCalledOnceWith(tile);
         });
@@ -249,7 +249,7 @@ describe('TileRackComponent', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: false } as unknown as RackTile;
 
-            const result = component.selectTile(type, tile);
+            const result = component['selectTile'](type, tile);
 
             expect(result).toBeFalse();
         });
@@ -259,7 +259,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'unselectAll');
 
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).toHaveBeenCalled();
         });
@@ -270,7 +270,7 @@ describe('TileRackComponent', () => {
             const spy = spyOn(component, 'unselectAll');
 
             component['selectionType'] = 'type' as TileRackSelectType;
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).toHaveBeenCalled();
         });
@@ -278,10 +278,10 @@ describe('TileRackComponent', () => {
         it('should NOT call unselectAll if type is not select and does not change', () => {
             const type: TileRackSelectType = 'exchange' as TileRackSelectType;
             const tile: RackTile = {} as unknown as RackTile;
-            const spy = spyOn(component, 'unselectAll');
+            const spy = spyOn<any>(component, 'unselectAll');
 
             component['selectionType'] = 'exchange' as TileRackSelectType;
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).not.toHaveBeenCalled();
         });
@@ -289,10 +289,10 @@ describe('TileRackComponent', () => {
         it('should return false if tile already selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
-            spyOn(component, 'unselectTile');
+            spyOn<any>(component, 'unselectTile');
 
             component['selectionType'] = type;
-            const result = component.selectTile(type, tile);
+            const result = component['selectTile'](type, tile);
 
             expect(result).toBeFalse();
         });
@@ -301,7 +301,7 @@ describe('TileRackComponent', () => {
     describe('selectTileExchange', () => {
         it('should call selectType with type exchange', () => {
             const tile: RackTile = {} as unknown as RackTile;
-            const spy = spyOn(component, 'selectTile');
+            const spy = spyOn<any>(component, 'selectTile');
 
             component.selectTileToExchange(tile);
 
@@ -312,7 +312,7 @@ describe('TileRackComponent', () => {
     describe('selectTileMove', () => {
         it('should call selectType with type move', () => {
             const tile: RackTile = {} as unknown as RackTile;
-            const spy = spyOn(component, 'selectTile');
+            const spy = spyOn<any>(component, 'selectTile');
 
             component.selectTileToMove(tile);
 
@@ -324,7 +324,7 @@ describe('TileRackComponent', () => {
         it('should set tile.selected to false', () => {
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
 
-            component.unselectTile(tile);
+            component['unselectTile'](tile);
 
             expect(tile.isSelected).toBeFalse();
         });
@@ -333,7 +333,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
 
             component.selectedTiles = [tile];
-            component.unselectTile(tile);
+            component['unselectTile'](tile);
 
             expect(component.selectedTiles).not.toContain(tile);
         });
@@ -416,7 +416,7 @@ describe('TileRackComponent', () => {
 
             component['onFocusableEvent'](event);
 
-            expect(spy).toHaveBeenCalledOnceWith(event);
+            expect(spy).toHaveBeenCalledOnceWith(event.key);
         });
     });
 
@@ -441,7 +441,7 @@ describe('TileRackComponent', () => {
             const index = 0;
             const key = tiles[index].letter;
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
@@ -451,7 +451,7 @@ describe('TileRackComponent', () => {
             const index = 3;
             const key = tiles[index].letter;
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
@@ -461,7 +461,7 @@ describe('TileRackComponent', () => {
             const index = 5;
             const key = tiles[index].letter;
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).toHaveBeenCalledOnceWith(tiles[index]);
         });
@@ -469,7 +469,7 @@ describe('TileRackComponent', () => {
         it('should not call selectTileMove if no tile matches', () => {
             const key = 'not a letter';
 
-            component['selectTileFromKey']({ key } as KeyboardEvent);
+            component['selectTileFromKey'](key);
 
             expect(selectTileMoveSpy).not.toHaveBeenCalled();
         });
@@ -698,5 +698,58 @@ describe('TileRackComponent', () => {
         for (const tile of component.tiles) {
             expect(tile.isUsed).toBeFalse();
         }
+    });
+
+    describe('updateTileRack', () => {
+        const DEFAULT_TILES: Tile[] = [
+            new Tile('A' as LetterValue, 1),
+            new Tile('B' as LetterValue, 1),
+            new Tile('C' as LetterValue, 1),
+            new Tile('C' as LetterValue, 1),
+            new Tile('E' as LetterValue, 1),
+            new Tile('E' as LetterValue, 1),
+            new Tile('*' as LetterValue, 0, true),
+        ];
+
+        it('should call right functions', () => {
+            gameServiceSpy.getLocalPlayer.and.returnValue(new Player(DEFAULT_PLAYER_ID, 'name', DEFAULT_TILES));
+            gameServiceSpy.getLocalPlayerId.and.returnValue(DEFAULT_PLAYER_ID);
+            const createRackTileSpy = spyOn<any>(component, 'createRackTile');
+
+            component['updateTileRack'](DEFAULT_PLAYER_ID);
+
+            expect(gameServiceSpy.getLocalPlayer).toHaveBeenCalled();
+            expect(gameServiceSpy.getLocalPlayerId).toHaveBeenCalled();
+            expect(createRackTileSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('createRackTile', () => {
+        const DEFAULT_TILE: Tile = new Tile('A' as LetterValue, 1);
+        const DEFAULT_RACK_TILE: RackTile = { letter: 'A', value: 1, isUsed: true, isSelected: true };
+
+        it('should set isUsed to true if rackTile is defined && rackTile.isUsed is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, DEFAULT_RACK_TILE).isUsed).toBeTrue();
+        });
+
+        it('should set isUsed to false if rackTile is undefined && rackTile.isUsed is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, undefined as unknown as RackTile).isUsed).toBeFalse();
+        });
+
+        it('should set isUsed to false if rackTile is defined && rackTile.isUsed is false', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, { ...DEFAULT_RACK_TILE, isUsed: false }).isUsed).toBeFalse();
+        });
+
+        it('should set isSelected to true if rackTile is defined && rackTile.isSelected is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, DEFAULT_RACK_TILE).isSelected).toBeTrue();
+        });
+
+        it('should set isSelected to false if rackTile is undefined && rackTile.isSelected is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, undefined as unknown as RackTile).isSelected).toBeFalse();
+        });
+
+        it('should set isSelected to false if rackTile is defined && rackTile.isSelected is false', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, { ...DEFAULT_RACK_TILE, isSelected: false }).isSelected).toBeFalse();
+        });
     });
 });

@@ -35,9 +35,9 @@ export abstract class AbstractVirtualPlayer extends Player {
         return this.activeGameService;
     }
 
-    abstract findPointRange(): Range;
-
-    abstract findAction(): void;
-
     abstract playTurn(): void;
+
+    protected abstract findAction(): void;
+
+    protected abstract findPointRange(): Range;
 }

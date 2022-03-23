@@ -14,10 +14,6 @@ export default class DatabaseService {
         }
     }
 
-    async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
-        return (await collection.find({}).toArray()).length === 0;
-    }
-
     async connectToServer(databaseUrl: string = MONGO_DB_URL): Promise<MongoClient | null> {
         try {
             const client = await MongoClient.connect(databaseUrl);
@@ -28,11 +24,16 @@ export default class DatabaseService {
         }
         return this.mongoClient;
     }
+
     async closeConnection(): Promise<void> {
         return this.mongoClient.close();
     }
 
     get database(): Db {
         return this.db;
+    }
+
+    private async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
+        return (await collection.find({}).toArray()).length === 0;
     }
 }

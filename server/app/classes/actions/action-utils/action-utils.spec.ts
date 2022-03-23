@@ -1,3 +1,6 @@
+/* eslint-disable dot-notation */
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Tile } from '@app/classes/tile';
@@ -44,7 +47,9 @@ describe('ActionUtils', () => {
             player.tiles = playerTiles;
 
             const INVALID_INDEX = -1;
-            const s = stub(ActionUtils, 'getIndexOfTile').onFirstCall().returns(INVALID_INDEX);
+            const s = stub(ActionUtils, <any>'getIndexOfTile')
+                .onFirstCall()
+                .returns(INVALID_INDEX);
 
             expect(() => ActionUtils.getTilesFromPlayer(tilesToPlay, player)).to.throw(ERROR_PLAYER_DOESNT_HAVE_TILE);
 
@@ -76,7 +81,7 @@ describe('ActionUtils', () => {
             ];
 
             const expected = 1;
-            const result = ActionUtils.getIndexOfTile(tiles, tiles[expected]);
+            const result = ActionUtils['getIndexOfTile'](tiles, tiles[expected]);
 
             expect(result).to.equal(expected);
         });
@@ -90,7 +95,7 @@ describe('ActionUtils', () => {
             const tile: Tile = { letter: 'Z', value: 0 };
 
             const expected = 2;
-            const result = ActionUtils.getIndexOfTile(tiles, tile);
+            const result = ActionUtils['getIndexOfTile'](tiles, tile);
 
             expect(result).to.equal(expected);
         });
@@ -104,7 +109,7 @@ describe('ActionUtils', () => {
             const tile: Tile = { letter: 'Z', value: 0 };
 
             const expected = -1;
-            const result = ActionUtils.getIndexOfTile(tiles, tile);
+            const result = ActionUtils['getIndexOfTile'](tiles, tile);
 
             expect(result).to.equal(expected);
         });
@@ -118,7 +123,7 @@ describe('ActionUtils', () => {
             const tile: Tile = { letter: 'Z', value: 0 };
 
             const expected = -1;
-            const result = ActionUtils.getIndexOfTile(tiles, tile, false);
+            const result = ActionUtils['getIndexOfTile'](tiles, tile, false);
 
             expect(result).to.equal(expected);
         });

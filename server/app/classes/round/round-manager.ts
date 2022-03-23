@@ -2,7 +2,6 @@ import { Action, ActionPass } from '@app/classes/actions';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
-import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;
@@ -37,16 +36,6 @@ export default class RoundManager {
         };
     }
 
-    getStartGameTime(): Date {
-        if (this.completedRounds.length !== 0) {
-            return this.completedRounds[0].startTime;
-        }
-        if (this.currentRound) {
-            return this.currentRound.startTime;
-        }
-        throw new Error(ERROR_GAME_NOT_STARTED);
-    }
-
     nextRound(actionPlayed: Action): Round {
         if (this.currentRound !== undefined) {
             this.saveCompletedRound(this.currentRound, actionPlayed);
@@ -58,11 +47,12 @@ export default class RoundManager {
         const player = this.getNextPlayer();
         const now = new Date();
         const limit = new Date(Date.now() + this.maxRoundTime * SECONDS_TO_MILLISECONDS);
-        return (this.currentRound = {
+        this.currentRound = {
             player,
             startTime: now,
             limitTime: limit,
-        });
+        };
+        return this.currentRound;
     }
 
     getCurrentRound(): Round {
@@ -85,7 +75,6 @@ export default class RoundManager {
 
     private getNextPlayer(): Player {
         if (this.currentRound === undefined) {
-            // Randomly get a player
             return Math.round(Math.random()) === 0 ? this.player1 : this.player2;
         }
         return this.currentRound.player === this.player1 ? this.player2 : this.player1;

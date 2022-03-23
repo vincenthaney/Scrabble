@@ -6,7 +6,6 @@ import * as spies from 'chai-spies';
 import * as chaiAsPromised from 'chai-as-promised';
 import Player from '@app/classes/player/player';
 import RoundManager from './round-manager';
-import { ERROR_GAME_NOT_STARTED } from '@app/constants/classes-errors';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
 import { Round } from './round';
@@ -22,7 +21,6 @@ const MAX_TRIES = 100;
 const DEFAULT_MAX_ROUND_TIME = 1;
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
-const DEFAULT_DATE = new Date('June 29, 2001');
 
 describe('RoundManager', () => {
     let roundManager: RoundManager;
@@ -77,41 +75,6 @@ describe('RoundManager', () => {
             const player = roundManager['getNextPlayer']();
 
             expect(player).to.equal(DEFAULT_PLAYER_1);
-        });
-    });
-
-    describe('getStartGameTime', () => {
-        it('should throw if no rounds completed', () => {
-            expect(() => roundManager.getStartGameTime()).to.throw(ERROR_GAME_NOT_STARTED);
-        });
-
-        it('should return start date of currentRound if completedRound is empty', () => {
-            roundManager['currentRound'] = {
-                player: DEFAULT_PLAYER_1,
-                startTime: DEFAULT_DATE,
-                limitTime: new Date(),
-            };
-
-            expect(roundManager['completedRounds']).to.be.empty;
-            expect(roundManager.getStartGameTime()).to.equal(DEFAULT_DATE);
-        });
-
-        it('should return start date of first round in completedRound', () => {
-            const nthRounds = 10;
-            for (let i = 0; i < nthRounds; ++i) {
-                const date = new Date(DEFAULT_DATE);
-                date.setMinutes(DEFAULT_DATE.getMinutes() + i);
-                roundManager['completedRounds'].push({
-                    player: DEFAULT_PLAYER_1,
-                    startTime: date,
-                    limitTime: new Date(),
-                    completedTime: new Date(),
-                    actionPlayed: action,
-                });
-            }
-
-            // Compare UTC string and not date because we want to compare the value, not the instance
-            expect(roundManager.getStartGameTime().toUTCString()).to.equal(DEFAULT_DATE.toUTCString());
         });
     });
 

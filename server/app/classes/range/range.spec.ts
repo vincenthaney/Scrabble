@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { INVALID_POINT_RANGE } from '@app/constants/classes-errors';
 import { expect } from 'chai';
@@ -14,7 +15,7 @@ describe('Range', () => {
         let index = 0;
         for (const [min, max, expected] of tests) {
             it(`should validate range (${index})`, () => {
-                expect(Range.validateRangeValues(min, max)).to.equal(expected);
+                expect(Range['validateRangeValues'](min, max)).to.equal(expected);
             });
             index++;
         }

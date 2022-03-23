@@ -57,14 +57,9 @@ $tile-size: 50px;
 
             &:after,
             &:before {
-                @include font-awesome-solid;
                 content: '';
                 position: absolute;
-                font-style: normal;
-                font-variant: normal;
-                text-rendering: auto;
-                -webkit-font-smoothing: antialiased;
-                font-size: 1.6em;
+                font-size: 1.2em;
                 color: rgb(218, 183, 126);
                 text-shadow: 0px 1px 6px rgba(0, 0, 0, 0.15);
                 top: 50%;
@@ -72,14 +67,14 @@ $tile-size: 50px;
             }
 
             &:before {
-                content: "\f0d9";
+                content: "◀";
                 left: 0;
                 transform: translate(-100%, -50%);
                 margin-left: -6px;
             }
 
             &:after {
-                content: "\f0da";
+                content: "►";
                 right: 0;
                 transform: translate(100%, -50%);
                 margin-right: -6px;

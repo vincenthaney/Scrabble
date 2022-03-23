@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 import { Square } from '@app/classes/square';
@@ -30,12 +31,12 @@ describe('StringConversion', () => {
     describe('tileToString', () => {
         it('should return playedLetter if defined', () => {
             const tile: Tile = { letter: '*', value: 0, playedLetter: 'B' };
-            expect(StringConversion.tileToString(tile)).to.deep.equal('B');
+            expect(StringConversion['tileToString'](tile)).to.deep.equal('B');
         });
 
         it('should return letter if playedLetter is not defined', () => {
             const tile: Tile = { letter: 'A', value: 0 };
-            expect(StringConversion.tileToString(tile)).to.deep.equal('A');
+            expect(StringConversion['tileToString'](tile)).to.deep.equal('A');
         });
     });
 });

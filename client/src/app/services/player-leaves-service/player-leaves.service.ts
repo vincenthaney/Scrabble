@@ -31,8 +31,9 @@ export class PlayerLeavesService implements OnDestroy {
         });
     }
 
-    handleJoinerLeaveGame(leaverName: string): void {
-        this.joinerLeavesGameEvent.next(leaverName);
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     handleLocalPlayerLeavesGame(): void {
@@ -47,12 +48,11 @@ export class PlayerLeavesService implements OnDestroy {
         this.gameDispatcherService.resetServiceData();
     }
 
-    ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
-    }
-
     subscribeToJoinerLeavesGameEvent(componentDestroyed$: Subject<boolean>, callback: (leaverName: string) => void): void {
         this.joinerLeavesGameEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    private handleJoinerLeaveGame(leaverName: string): void {
+        this.joinerLeavesGameEvent.next(leaverName);
     }
 }

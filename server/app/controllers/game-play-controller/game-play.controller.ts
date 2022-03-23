@@ -3,6 +3,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http-exception/http-exception';
+import { SENDER_REQUIRED, CONTENT_REQUIRED } from '@app/constants/controllers-errors';
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -15,7 +16,6 @@ import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import { CONTENT_REQUIRED, SENDER_REQUIRED } from './game-play-controller-errors';
 
 @Service()
 export class GamePlayController {
@@ -28,13 +28,6 @@ export class GamePlayController {
         private readonly virtualPlayerService: VirtualPlayerService,
     ) {
         this.configureRouter();
-    }
-
-    gameUpdate(gameId: string, data: GameUpdateData): void {
-        this.socketService.emitToRoom(gameId, 'gameUpdate', data);
-        if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
-            this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
-        }
     }
 
     private configureRouter(): void {
@@ -92,6 +85,8 @@ export class GamePlayController {
 
             const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
 
+            if (this.gamePlayService.isGameOver(gameId, playerId)) return;
+
             if (updateData) {
                 this.gameUpdate(gameId, updateData);
             }
@@ -104,6 +99,13 @@ export class GamePlayController {
             if (this.isWordNotInDictionaryError(exception)) {
                 await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
             }
+        }
+    }
+
+    private gameUpdate(gameId: string, data: GameUpdateData): void {
+        this.socketService.emitToRoom(gameId, 'gameUpdate', data);
+        if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));
         }
     }
 
@@ -155,6 +157,8 @@ export class GamePlayController {
     private async handleError(exception: Error, input: string, playerId: string, gameId: string): Promise<void> {
         if (this.isWordNotInDictionaryError(exception)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
+
+            if (this.gamePlayService.isGameOver(gameId, playerId)) return;
 
             const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
             this.socketService.emitToSocket(opponentId, 'newMessage', {

@@ -23,16 +23,6 @@ export class PlayerLeavesController implements OnDestroy {
         this.serviceDestroyed$.complete();
     }
 
-    configureSocket(): void {
-        this.socketService.on('joinerLeaveGame', (opponent: PlayerName) => {
-            this.joinerLeavesGameEvent.emit(opponent.name);
-        });
-
-        this.socketService.on('cleanup', () => {
-            this.resetGameEvent.emit();
-        });
-    }
-
     handleLeaveGame(gameId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/leave`;
         this.http.delete(endpoint).subscribe();
@@ -44,5 +34,15 @@ export class PlayerLeavesController implements OnDestroy {
 
     subscribeToResetGameEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
         this.resetGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    private configureSocket(): void {
+        this.socketService.on('joinerLeaveGame', (opponent: PlayerName) => {
+            this.joinerLeavesGameEvent.emit(opponent.name);
+        });
+
+        this.socketService.on('cleanup', () => {
+            this.resetGameEvent.emit();
+        });
     }
 }

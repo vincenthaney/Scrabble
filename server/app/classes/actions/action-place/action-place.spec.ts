@@ -157,7 +157,7 @@ describe('ActionPlace', () => {
             orientation: testEvaluatedPlacement.orientation,
             startPosition: testEvaluatedPlacement.startPosition,
         };
-        expect(ActionPlace.createActionPlacePayload(testEvaluatedPlacement)).to.deep.equal(payload);
+        expect(ActionPlace['createActionPlacePayload'](testEvaluatedPlacement)).to.deep.equal(payload);
     });
 
     describe('execute', () => {

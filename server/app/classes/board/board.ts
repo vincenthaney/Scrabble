@@ -13,26 +13,8 @@ export default class Board {
         this.grid = grid;
     }
 
-    verifySquare(position: Position, shouldBeFilled: boolean): boolean {
-        if (this.isWithinBounds(position)) {
-            return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
-        } else {
-            throw new Error(POSITION_OUT_OF_BOARD);
-        }
-    }
-
     getSquare(position: Position): Square {
         return this.grid[position.row][position.column];
-    }
-
-    getDesiredSquares(predicate: (square: Square) => boolean): Square[] {
-        const desiredSquares: Square[] = [];
-        for (const row of this.grid) {
-            for (const square of row) {
-                if (predicate(square)) desiredSquares.push(square);
-            }
-        }
-        return desiredSquares;
     }
 
     navigate(position: Position, orientation: Orientation): BoardNavigator {
@@ -63,32 +45,16 @@ export default class Board {
         return true;
     }
 
-    placeWord(tiles: Tile[], startPosition: Position, orientation: Orientation): boolean {
-        const actualPosition = new Position(startPosition.row, startPosition.column);
-        if (tiles.length === 0 || !this.verifySquare(startPosition, SHOULD_HAVE_NO_TILE)) return false;
-        const isVertical = orientation === Orientation.Vertical;
-        const validatedTiles = new Map<Square, Tile>();
-        let i = 0;
-        while (i < tiles.length) {
-            if (!this.isWithinBounds(actualPosition)) return false;
-            const targetSquare = this.grid[actualPosition.row][actualPosition.column];
-            if (isVertical) actualPosition.row++;
-            else actualPosition.column++;
-            if (targetSquare.tile) {
-                continue;
-            } else {
-                validatedTiles.set(targetSquare, tiles[i]);
-                i++;
-            }
-        }
-        for (const [square, tile] of validatedTiles) {
-            square.tile = tile;
-        }
-        return true;
-    }
-
     getSize(): Vec2 {
         return { x: this.grid[0].length, y: this.grid.length };
+    }
+
+    verifySquare(position: Position, shouldBeFilled: boolean): boolean {
+        if (this.isWithinBounds(position)) {
+            return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
+        } else {
+            throw new Error(POSITION_OUT_OF_BOARD);
+        }
     }
 
     private isWithinBounds(position: Position): boolean {

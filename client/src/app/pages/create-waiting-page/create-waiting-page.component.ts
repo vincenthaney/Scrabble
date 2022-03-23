@@ -49,36 +49,6 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         this.playerLeavesService.subscribeToJoinerLeavesGameEvent(this.componentDestroyed$, (leaverName: string) => this.opponentLeft(leaverName));
     }
 
-    setOpponent(opponentName: string): void {
-        this.opponentName = opponentName;
-        this.waitingRoomMessage = this.opponentName + OPPONENT_FOUND_MESSAGE;
-        this.isOpponentFound = true;
-    }
-
-    disconnectOpponent(): void {
-        if (this.opponentName) {
-            this.opponentName = undefined;
-            this.waitingRoomMessage = HOST_WAITING_MESSAGE;
-            this.isOpponentFound = false;
-        }
-    }
-
-    opponentLeft(leaverName: string): void {
-        this.disconnectOpponent();
-        this.dialog.open(DefaultDialogComponent, {
-            data: {
-                title: DIALOG_TITLE,
-                content: leaverName + DIALOG_CONTENT,
-                buttons: [
-                    {
-                        content: DIALOG_BUTTON_CONTENT_REJECTED,
-                        closeDialog: true,
-                    },
-                ],
-            },
-        });
-    }
-
     confirmConvertToSolo(): void {
         this.gameDispatcherService.handleCancelGame(KEEP_DATA);
         this.dialog.open(ConvertDialogComponent, {
@@ -98,5 +68,35 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
             this.gameDispatcherService.handleRejection(this.opponentName);
             this.disconnectOpponent();
         }
+    }
+
+    private setOpponent(opponentName: string): void {
+        this.opponentName = opponentName;
+        this.waitingRoomMessage = this.opponentName + OPPONENT_FOUND_MESSAGE;
+        this.isOpponentFound = true;
+    }
+
+    private disconnectOpponent(): void {
+        if (this.opponentName) {
+            this.opponentName = undefined;
+            this.waitingRoomMessage = HOST_WAITING_MESSAGE;
+            this.isOpponentFound = false;
+        }
+    }
+
+    private opponentLeft(leaverName: string): void {
+        this.disconnectOpponent();
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: DIALOG_TITLE,
+                content: leaverName + DIALOG_CONTENT,
+                buttons: [
+                    {
+                        content: DIALOG_BUTTON_CONTENT_REJECTED,
+                        closeDialog: true,
+                    },
+                ],
+            },
+        });
     }
 }

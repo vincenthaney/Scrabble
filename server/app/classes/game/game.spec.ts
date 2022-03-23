@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
@@ -9,19 +11,19 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
-import { assert, spy } from 'chai';
+import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
-import { GameType } from './game-type';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameType } from './game-type';
 
 const expect = chai.expect;
 
@@ -120,14 +122,6 @@ describe('Game', () => {
             expect(game.getId()).to.exist;
         });
 
-        it('initTileReserve should call init ', async () => {
-            const initStub = tileReserveStub.init.callsFake(async () => {
-                return;
-            });
-            await game.initTileReserve();
-            assert(initStub.calledOnce);
-        });
-
         it('getTiles should call tileReserve.getTiles and return it', () => {
             const expected = [DEFAULT_TILE];
             tileReserveStub.getTiles.returns([DEFAULT_TILE]);
@@ -149,6 +143,38 @@ describe('Game', () => {
             assert(tileReserveStub.getTilesLeftPerLetter.calledOnce);
         });
 
+        describe('getPlayer', () => {
+            beforeEach(() => {
+                game.player1 = DEFAULT_PLAYER_1;
+                game.player2 = DEFAULT_PLAYER_2;
+            });
+
+            it('should throw INVALID_PLAYER_ID_FOR_GAME if player not from game', () => {
+                chai.spy.on(game, 'isPlayerFromGame', () => false);
+                expect(() => game.getPlayer(DEFAULT_PLAYER_1_ID, false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+            });
+
+            it('should throw INVALID_PLAYER_ID_FOR_GAME if player is from game but id is not player1 or player2', () => {
+                expect(() => game.getPlayer('random id', false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+            });
+
+            it('should return player 1 if id is player1 and is requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_1_ID, true)).to.equal(game.player1);
+            });
+
+            it('should return player 1 if id is player1 and is NOT requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_1_ID, false)).to.equal(game.player2);
+            });
+
+            it('should return player 2 if id is player2 and is requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_2_ID, true)).to.equal(game.player2);
+            });
+
+            it('should return player 2 if id is player2 and is NOT requesting player', () => {
+                expect(game.getPlayer(DEFAULT_PLAYER_2_ID, false)).to.equal(game.player1);
+            });
+        });
+
         describe('getActivePlayer', () => {
             it('should return player with same id (player 1)', () => {
                 const player = game.getPlayer(DEFAULT_PLAYER_1.id, IS_REQUESTING);
@@ -163,18 +189,6 @@ describe('Game', () => {
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
                 expect(() => game.getPlayer(invalidId, IS_REQUESTING)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
-            });
-        });
-
-        describe('isPlayerReal', () => {
-            it('should return true when player is real player', () => {
-                expect(game.isPlayerReal(DEFAULT_PLAYER_1_ID)).to.equal(true);
-            });
-            it('should return false when player is virtual player', async () => {
-                spy.on(game, 'getPlayer', () => {
-                    return DEFAULT_VIRTUAL_PLAYER;
-                });
-                expect(game.isPlayerReal(DEFAULT_VIRTUAL_PLAYER_ID)).to.equal(false);
             });
         });
 
@@ -194,6 +208,7 @@ describe('Game', () => {
                 expect(() => game.getPlayer(invalidId, IS_OPPONENT)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
+
         describe('getConnectedRealPlayers', () => {
             it('should return both players if they are both real and connected', () => {
                 game.player1.isConnected = true;
@@ -246,24 +261,24 @@ describe('Game', () => {
 
         it('should not be gameOver passCount lower than threshold and both players have tiles', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
-            expect(game.isGameOver()).to.be.false;
+            expect(game.areGameOverConditionsMet()).to.be.false;
         });
 
         it('should be gameOver passCount is equal to threshold', () => {
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
 
-            expect(game.isGameOver()).to.be.true;
+            expect(game.areGameOverConditionsMet()).to.be.true;
         });
 
         it('should be gameOver when player 1 has no tiles', () => {
             player1Stub.hasTilesLeft.returns(false);
-            expect(game.isGameOver()).to.be.true;
+            expect(game.areGameOverConditionsMet()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
 
         it('should gameOver when player 2 has no tiles', () => {
             player2Stub.hasTilesLeft.returns(false);
-            expect(game.isGameOver()).to.be.true;
+            expect(game.areGameOverConditionsMet()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
     });
@@ -358,7 +373,7 @@ describe('Game', () => {
         let player1Stub: SinonStubbedInstance<Player>;
         let player2Stub: SinonStubbedInstance<Player>;
 
-        let congratulateStub: SinonStub<[], string>;
+        let congratulateStub: SinonStub<any[], any>;
 
         const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
         const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
@@ -373,7 +388,7 @@ describe('Game', () => {
             game.player2 = player2Stub as unknown as Player;
             player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
             player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
-            congratulateStub = stub(game, 'congratulateWinner').returns('congratulate winner');
+            congratulateStub = stub(game, <any>'congratulateWinner').returns('congratulate winner');
         });
 
         it('should call the messages', () => {
@@ -416,19 +431,19 @@ describe('Game', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = LOWER_SCORE;
             const expectedMessage = WINNER_MESSAGE(PLAYER_1_NAME);
-            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 2 if he has a higher score ', () => {
             player1Stub.score = LOWER_SCORE;
             player2Stub.score = HIGHER_SCORE;
             const expectedMessage = WINNER_MESSAGE(PLAYER_2_NAME);
-            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 1 and player 2 if they are tied ', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = HIGHER_SCORE;
             const expectedMessage = WINNER_MESSAGE(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
-            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
         });
     });
 

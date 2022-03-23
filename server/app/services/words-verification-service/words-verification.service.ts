@@ -14,14 +14,14 @@ export class WordsVerificationService {
     constructor(private readonly dictionaryService: DictionaryService) {}
 
     verifyWords(words: string[], dictionary: string): void {
-        for (let word of words) {
-            word = this.removeAccents(word).toLowerCase();
+        for (const word of words) {
+            const curatedWord = this.removeAccents(word).toLowerCase();
 
-            if (word.length < MINIMUM_WORD_LENGTH) throw new Error(word + WORD_TOO_SHORT);
-            if (word.includes('*')) throw new Error(word + WORD_CONTAINS_ASTERISK);
-            if (word.includes('-')) throw new Error(word + WORD_CONTAINS_HYPHEN);
-            if (word.includes("'")) throw new Error(word + WORD_CONTAINS_APOSTROPHE);
-            if (!this.dictionaryService.getDictionary(dictionary).wordExists(word)) throw new Error(INVALID_WORD(word.toUpperCase()));
+            if (curatedWord.length < MINIMUM_WORD_LENGTH) throw new Error(curatedWord + WORD_TOO_SHORT);
+            if (curatedWord.includes('*')) throw new Error(curatedWord + WORD_CONTAINS_ASTERISK);
+            if (curatedWord.includes('-')) throw new Error(curatedWord + WORD_CONTAINS_HYPHEN);
+            if (curatedWord.includes("'")) throw new Error(curatedWord + WORD_CONTAINS_APOSTROPHE);
+            if (!this.dictionaryService.getDictionary(dictionary).wordExists(curatedWord)) throw new Error(INVALID_WORD(word.toUpperCase()));
         }
     }
 

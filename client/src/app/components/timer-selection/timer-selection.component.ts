@@ -23,7 +23,7 @@ export class TimerSelectionComponent implements OnInit {
         this.changeTimerValue(-TIMER_VALUE_INCREMENTS);
     }
 
-    changeTimerValue(delta: number): void {
+    private changeTimerValue(delta: number): void {
         this.timerValue = Math.min(MAXIMUM_TIMER_VALUE, Math.max(MINIMUM_TIMER_VALUE, this.timerValue + delta));
         this.parentForm.patchValue({
             timer: this.timerValue,

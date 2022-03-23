@@ -15,7 +15,7 @@ export class ScoreCalculatorService {
         return this.isABingo(tilesToPlace) ? BINGO_BONUS_POINTS : 0;
     }
 
-    isABingo(tilesToPlace: Tile[]): boolean {
+    private isABingo(tilesToPlace: Tile[]): boolean {
         return tilesToPlace.length === MAX_TILES_PER_PLAYER;
     }
 

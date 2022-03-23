@@ -20,15 +20,6 @@ export class GamePlayController {
         this.configureSocket();
     }
 
-    configureSocket(): void {
-        this.socketService.on('gameUpdate', (newData: GameUpdateData) => {
-            this.gameUpdate$.next(newData);
-        });
-        this.socketService.on('newMessage', (newMessage: Message) => {
-            this.newMessage$.next(newMessage);
-        });
-    }
-
     sendAction(gameId: string, playerId: string, action: ActionData): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/action`;
         this.http.post(endpoint, action).subscribe(() => {
@@ -53,7 +44,7 @@ export class GamePlayController {
 
     handleDisconnection(gameId: string, playerId: string): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/disconnect`;
-        // When reloading the page, a the disconnect http request is fired on destruction of the game-page component.
+        // When reloading the page, a disconnect http request is fired on destruction of the game-page component.
         // In the initialization of the game-page component, a reconnect request is made which does not allow the
         // server to send a response, triggering a Abort 0  error code which is why we catch it if it this this code
         this.http.delete(endpoint, { observe: 'response' }).subscribe(this.handleDisconnectResponse, this.handleDisconnectError);
@@ -69,6 +60,15 @@ export class GamePlayController {
 
     observeActionDone(): Observable<void> {
         return this.actionDone$.asObservable();
+    }
+
+    private configureSocket(): void {
+        this.socketService.on('gameUpdate', (newData: GameUpdateData) => {
+            this.gameUpdate$.next(newData);
+        });
+        this.socketService.on('newMessage', (newMessage: Message) => {
+            this.newMessage$.next(newMessage);
+        });
     }
 
     private handleDisconnectResponse(): void {
