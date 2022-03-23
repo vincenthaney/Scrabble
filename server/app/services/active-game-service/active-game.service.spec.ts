@@ -107,7 +107,7 @@ describe('ActiveGameService', () => {
         });
     });
 
-    describe('remove', () => {
+    describe('removeGame', () => {
         beforeEach(async () => {
             chai.spy.on(Game, 'createMultiplayerGame', async () => Promise.resolve(DEFAULT_GAME));
             await activeGameService.beginGame(DEFAULT_ID, DEFAULT_MULTIPLAYER_CONFIG);
@@ -127,6 +127,21 @@ describe('ActiveGameService', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
             activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             expect(activeGameService['activeGames']).to.be.empty;
+        });
+
+        it('should remove from list with player2 ID', () => {
+            expect(activeGameService['activeGames']).to.have.lengthOf(1);
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
+            expect(activeGameService['activeGames']).to.be.empty;
+        });
+
+        it('should throw and return undefined ', () => {
+            chai.spy.on(activeGameService, 'getGame', () => {
+                throw new Error();
+            });
+            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
+            const spy = chai.spy.on(activeGameService['activeGames'], 'indexOf');
+            expect(spy).to.have.been.called;
         });
     });
 

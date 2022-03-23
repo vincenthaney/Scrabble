@@ -226,6 +226,7 @@ describe('GamePlayController', () => {
 
         it('should call playAction', async () => {
             const playActionSpy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
+            spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => true);
             await gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(playActionSpy).to.have.been.called();
         });
@@ -461,15 +462,23 @@ describe('GamePlayController', () => {
             delayStub.restore();
         });
 
-        it('should call emitToSocket', async () => {
-            await gamePlayController['handleError'](new Error(), '', '', '');
-            expect(socketServiceStub.emitToSocket.called).to.be.true;
-        });
-
         it('should call delay', async () => {
             chai.spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
             await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
             expect(delayStub.called).to.be.true;
+        });
+
+        it('should NOT call emitToSocket if game is over', async () => {
+            spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => true);
+            const getGameSpy = spy.on(gamePlayController['activeGameService'], 'getGame');
+            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
+            expect(getGameSpy.called).to.be.false;
+        });
+
+        it('should call emitToSocket if game is not over', async () => {
+            spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
+            await gamePlayController['handleError'](new Error(), '', '', '');
+            expect(socketServiceStub.emitToSocket.called).to.be.true;
         });
     });
 });
