@@ -699,4 +699,57 @@ describe('TileRackComponent', () => {
             expect(tile.isUsed).toBeFalse();
         }
     });
+
+    describe('updateTileRack', () => {
+        const DEFAULT_TILES: Tile[] = [
+            new Tile('A' as LetterValue, 1),
+            new Tile('B' as LetterValue, 1),
+            new Tile('C' as LetterValue, 1),
+            new Tile('C' as LetterValue, 1),
+            new Tile('E' as LetterValue, 1),
+            new Tile('E' as LetterValue, 1),
+            new Tile('*' as LetterValue, 0, true),
+        ];
+
+        it('should call right functions', () => {
+            gameServiceSpy.getLocalPlayer.and.returnValue(new Player(DEFAULT_PLAYER_ID, 'name', DEFAULT_TILES));
+            gameServiceSpy.getLocalPlayerId.and.returnValue(DEFAULT_PLAYER_ID);
+            const createRackTileSpy = spyOn<any>(component, 'createRackTile');
+
+            component['updateTileRack'](DEFAULT_PLAYER_ID);
+
+            expect(gameServiceSpy.getLocalPlayer).toHaveBeenCalled();
+            expect(gameServiceSpy.getLocalPlayerId).toHaveBeenCalled();
+            expect(createRackTileSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('createRackTile', () => {
+        const DEFAULT_TILE: Tile = new Tile('A' as LetterValue, 1);
+        const DEFAULT_RACK_TILE: RackTile = { letter: 'A', value: 1, isUsed: true, isSelected: true };
+
+        it('should set isUsed to true if rackTile is defined && rackTile.isUsed is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, DEFAULT_RACK_TILE).isUsed).toBeTrue();
+        });
+
+        it('should set isUsed to false if rackTile is undefined && rackTile.isUsed is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, undefined as unknown as RackTile).isUsed).toBeFalse();
+        });
+
+        it('should set isUsed to false if rackTile is defined && rackTile.isUsed is false', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, { ...DEFAULT_RACK_TILE, isUsed: false }).isUsed).toBeFalse();
+        });
+
+        it('should set isSelected to true if rackTile is defined && rackTile.isSelected is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, DEFAULT_RACK_TILE).isSelected).toBeTrue();
+        });
+
+        it('should set isSelected to false if rackTile is undefined && rackTile.isSelected is true', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, undefined as unknown as RackTile).isSelected).toBeFalse();
+        });
+
+        it('should set isSelected to false if rackTile is defined && rackTile.isSelected is false', () => {
+            expect(component['createRackTile'](DEFAULT_TILE, { ...DEFAULT_RACK_TILE, isSelected: false }).isSelected).toBeFalse();
+        });
+    });
 });
