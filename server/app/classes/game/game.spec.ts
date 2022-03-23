@@ -54,7 +54,7 @@ let DEFAULT_MAP = new Map<LetterValue, number>([
     ['B', 0],
 ]);
 
-describe.only('Game', () => {
+describe('Game', () => {
     let defaultInit: () => Promise<void>;
 
     beforeEach(() => {
