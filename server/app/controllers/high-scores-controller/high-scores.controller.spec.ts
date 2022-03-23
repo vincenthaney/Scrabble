@@ -1,12 +1,11 @@
 /* eslint-disable dot-notation */
 import { Application } from '@app/app';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { stub } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { HighScoresController } from './high-scores.controller';
@@ -22,13 +21,17 @@ const DEFAULT_EXCEPTION = 'exception';
 
 describe('HighScoresController', () => {
     let controller: HighScoresController;
-    let socketServiceStub: SinonStubbedInstance<SocketService>;
 
     beforeEach(() => {
         Container.reset();
         controller = Container.get(HighScoresController);
-        socketServiceStub = createStubInstance(SocketService);
-        controller['socketService'] = socketServiceStub as unknown as SocketService;
+
+        stub(controller['socketService'], 'removeFromRoom').callsFake(() => {
+            return;
+        });
+        stub(controller['socketService'], 'emitToSocket').callsFake(() => {
+            return;
+        });
     });
 
     it('should create', () => {
