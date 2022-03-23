@@ -233,7 +233,7 @@ describe('GameDispatcherController', () => {
             spyOn(controller['http'], 'post').and.callFake(() => {
                 return throwError('fakeError');
             });
-            const errorSpy = spyOn(controller, 'handleJoinError').and.callFake(() => {
+            const errorSpy = spyOn<any>(controller, 'handleJoinError').and.callFake(() => {
                 return;
             });
             controller.handleLobbyJoinRequest(DEFAULT_GAME_ID, DEFAULT_PLAYER_NAME);
@@ -249,7 +249,7 @@ describe('GameDispatcherController', () => {
             const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller.handleJoinError(HttpStatusCode.Unauthorized);
+            controller['handleJoinError'](HttpStatusCode.Unauthorized);
             expect(lobbyFullNextSpy).toHaveBeenCalled();
             expect(canceledGameNextSpy).not.toHaveBeenCalled();
         });
@@ -261,7 +261,7 @@ describe('GameDispatcherController', () => {
             const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller.handleJoinError(HttpStatusCode.Gone);
+            controller['handleJoinError'](HttpStatusCode.Gone);
             expect(lobbyFullNextSpy).not.toHaveBeenCalled();
             expect(canceledGameNextSpy).toHaveBeenCalled();
         });
@@ -273,7 +273,7 @@ describe('GameDispatcherController', () => {
             const canceledGameNextSpy = spyOn(controller['canceledGameEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller.handleJoinError(HttpStatusCode.BadGateway);
+            controller['handleJoinError'](HttpStatusCode.BadGateway);
             expect(lobbyFullNextSpy).not.toHaveBeenCalled();
             expect(canceledGameNextSpy).not.toHaveBeenCalled();
         });

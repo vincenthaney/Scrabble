@@ -162,7 +162,7 @@ describe('TileRackComponent', () => {
 
     it('Initializing TileRack with no Player in Game should return empty TileRack', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(undefined);
-        component['updateTileRack']();
+        component['updateTileRack'](undefined);
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
 
@@ -172,7 +172,7 @@ describe('TileRackComponent', () => {
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
 
-        component['updateTileRack']();
+        component['updateTileRack'](localPlayer.id);
 
         expect(component.tiles).toEqual(EMPTY_TILE_RACK);
     });
@@ -192,7 +192,7 @@ describe('TileRackComponent', () => {
         component['tiles'] = tiles;
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
 
-        component['updateTileRack']();
+        component['updateTileRack'](localPlayer.id);
 
         expect(component.tiles[0]).toBeTruthy();
     });
@@ -218,7 +218,7 @@ describe('TileRackComponent', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: false } as unknown as RackTile;
 
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(tile.isSelected).toBeTrue();
         });
@@ -228,7 +228,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
 
             component.selectedTiles = [];
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(component.selectedTiles).toHaveSize(1);
             expect(component.selectedTiles).toContain(tile);
@@ -237,10 +237,10 @@ describe('TileRackComponent', () => {
         it('should call unselectTile if same tile and tile is selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
-            const spy = spyOn(component, 'unselectTile');
+            const spy = spyOn<any>(component, 'unselectTile');
 
             component['selectionType'] = type;
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).toHaveBeenCalledOnceWith(tile);
         });
@@ -249,7 +249,7 @@ describe('TileRackComponent', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: false } as unknown as RackTile;
 
-            const result = component.selectTile(type, tile);
+            const result = component['selectTile'](type, tile);
 
             expect(result).toBeFalse();
         });
@@ -259,7 +259,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = {} as unknown as RackTile;
             const spy = spyOn(component, 'unselectAll');
 
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).toHaveBeenCalled();
         });
@@ -270,7 +270,7 @@ describe('TileRackComponent', () => {
             const spy = spyOn(component, 'unselectAll');
 
             component['selectionType'] = 'type' as TileRackSelectType;
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).toHaveBeenCalled();
         });
@@ -278,10 +278,10 @@ describe('TileRackComponent', () => {
         it('should NOT call unselectAll if type is not select and does not change', () => {
             const type: TileRackSelectType = 'exchange' as TileRackSelectType;
             const tile: RackTile = {} as unknown as RackTile;
-            const spy = spyOn(component, 'unselectAll');
+            const spy = spyOn<any>(component, 'unselectAll');
 
             component['selectionType'] = 'exchange' as TileRackSelectType;
-            component.selectTile(type, tile);
+            component['selectTile'](type, tile);
 
             expect(spy).not.toHaveBeenCalled();
         });
@@ -289,10 +289,10 @@ describe('TileRackComponent', () => {
         it('should return false if tile already selected', () => {
             const type: TileRackSelectType = 'type' as TileRackSelectType;
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
-            spyOn(component, 'unselectTile');
+            spyOn<any>(component, 'unselectTile');
 
             component['selectionType'] = type;
-            const result = component.selectTile(type, tile);
+            const result = component['selectTile'](type, tile);
 
             expect(result).toBeFalse();
         });
@@ -301,7 +301,7 @@ describe('TileRackComponent', () => {
     describe('selectTileExchange', () => {
         it('should call selectType with type exchange', () => {
             const tile: RackTile = {} as unknown as RackTile;
-            const spy = spyOn(component, 'selectTile');
+            const spy = spyOn<any>(component, 'selectTile');
 
             component.selectTileToExchange(tile);
 
@@ -312,7 +312,7 @@ describe('TileRackComponent', () => {
     describe('selectTileMove', () => {
         it('should call selectType with type move', () => {
             const tile: RackTile = {} as unknown as RackTile;
-            const spy = spyOn(component, 'selectTile');
+            const spy = spyOn<any>(component, 'selectTile');
 
             component.selectTileToMove(tile);
 
@@ -324,7 +324,7 @@ describe('TileRackComponent', () => {
         it('should set tile.selected to false', () => {
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
 
-            component.unselectTile(tile);
+            component['unselectTile'](tile);
 
             expect(tile.isSelected).toBeFalse();
         });
@@ -333,7 +333,7 @@ describe('TileRackComponent', () => {
             const tile: RackTile = { isSelected: true } as unknown as RackTile;
 
             component.selectedTiles = [tile];
-            component.unselectTile(tile);
+            component['unselectTile'](tile);
 
             expect(component.selectedTiles).not.toContain(tile);
         });

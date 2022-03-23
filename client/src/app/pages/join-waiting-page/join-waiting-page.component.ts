@@ -59,13 +59,13 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         this.componentDestroyed$.complete();
     }
 
-    routerChangeMethod(url: string): void {
+    private routerChangeMethod(url: string): void {
         if (url !== '/game') {
             this.playerLeavesService.handleLeaveLobby();
         }
     }
 
-    playerRejected(hostName: string): void {
+    private playerRejected(hostName: string): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_REJECT_TITLE,
@@ -81,7 +81,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    hostHasCanceled(hostName: string): void {
+    private hostHasCanceled(hostName: string): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_CANCEL_TITLE,

@@ -31,22 +31,6 @@ export class GameDispatcherController implements OnDestroy {
         this.serviceDestroyed$.complete();
     }
 
-    configureSocket(): void {
-        this.socketService.on('joinRequest', (opponent: PlayerName) => {
-            this.joinRequestEvent.next(opponent.name);
-        });
-        this.socketService.on('startGame', (startGameData: StartGameData) => {
-            this.initializeGame$.next({ localPlayerId: this.socketService.getId(), startGameData });
-        });
-        this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
-            this.lobbiesUpdateEvent.next(lobbies);
-        });
-        this.socketService.on('rejected', (hostName: PlayerName) => {
-            this.joinerRejectedEvent.next(hostName.name);
-        });
-        this.socketService.on('canceledGame', (opponent: PlayerName) => this.canceledGameEvent.next(opponent.name));
-    }
-
     handleGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
         this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig).subscribe((response) => {
@@ -86,14 +70,6 @@ export class GameDispatcherController implements OnDestroy {
         );
     }
 
-    handleJoinError(errorStatus: HttpStatusCode): void {
-        if (errorStatus === HttpStatusCode.Unauthorized) {
-            this.lobbyFullEvent.next();
-        } else if (errorStatus === HttpStatusCode.Gone) {
-            this.canceledGameEvent.next('Le créateur');
-        }
-    }
-
     subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbyData: LobbyData) => void): void {
         this.createGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
@@ -124,5 +100,29 @@ export class GameDispatcherController implements OnDestroy {
 
     subscribeToInitializeGame(serviceDestroyed$: Subject<boolean>, callback: (value: InitializeGameData | undefined) => void): void {
         this.initializeGame$.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    private handleJoinError(errorStatus: HttpStatusCode): void {
+        if (errorStatus === HttpStatusCode.Unauthorized) {
+            this.lobbyFullEvent.next();
+        } else if (errorStatus === HttpStatusCode.Gone) {
+            this.canceledGameEvent.next('Le créateur');
+        }
+    }
+
+    private configureSocket(): void {
+        this.socketService.on('joinRequest', (opponent: PlayerName) => {
+            this.joinRequestEvent.next(opponent.name);
+        });
+        this.socketService.on('startGame', (startGameData: StartGameData) => {
+            this.initializeGame$.next({ localPlayerId: this.socketService.getId(), startGameData });
+        });
+        this.socketService.on('lobbiesUpdate', (lobbies: LobbyInfo[]) => {
+            this.lobbiesUpdateEvent.next(lobbies);
+        });
+        this.socketService.on('rejected', (hostName: PlayerName) => {
+            this.joinerRejectedEvent.next(hostName.name);
+        });
+        this.socketService.on('canceledGame', (opponent: PlayerName) => this.canceledGameEvent.next(opponent.name));
     }
 }

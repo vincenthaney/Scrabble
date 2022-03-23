@@ -85,6 +85,8 @@ export class GamePlayController {
 
             const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
 
+            if (this.gamePlayService.isGameOver(gameId, playerId)) return;
+
             if (updateData) {
                 this.gameUpdate(gameId, updateData);
             }
@@ -155,6 +157,8 @@ export class GamePlayController {
     private async handleError(exception: Error, input: string, playerId: string, gameId: string): Promise<void> {
         if (this.isWordNotInDictionaryError(exception)) {
             await Delay.for(INVALID_WORD_TIMEOUT);
+
+            if (this.gamePlayService.isGameOver(gameId, playerId)) return;
 
             const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
             this.socketService.emitToSocket(opponentId, 'newMessage', {

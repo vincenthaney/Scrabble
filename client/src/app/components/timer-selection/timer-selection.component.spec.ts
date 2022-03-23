@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable dot-notation */
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -55,7 +57,7 @@ describe('TimerSelectionComponent', () => {
     });
 
     it('incrementTimerValue should call method to change timerValue with positive increment', () => {
-        const spy = spyOn(component, 'changeTimerValue').and.callFake(() => {
+        const spy = spyOn<any>(component, 'changeTimerValue').and.callFake(() => {
             return;
         });
 
@@ -64,7 +66,7 @@ describe('TimerSelectionComponent', () => {
     });
 
     it('decrementTimerValue should call method to change timerValue with negative increment', () => {
-        const spy = spyOn(component, 'changeTimerValue').and.callFake(() => {
+        const spy = spyOn<any>(component, 'changeTimerValue').and.callFake(() => {
             return;
         });
 
@@ -87,20 +89,20 @@ describe('TimerSelectionComponent', () => {
 
         it('changeTimerValue should add delta if timerValue is within the min and max', () => {
             component.timerValue = middleValue;
-            component.changeTimerValue(delta);
+            component['changeTimerValue'](delta);
             expect(component.timerValue).toEqual(middleValue + delta);
         });
 
         it('changeTimerValue should remove delta if timerValue is within the min and max', () => {
             component.timerValue = middleValue;
-            component.changeTimerValue(-delta);
+            component['changeTimerValue'](-delta);
             expect(component.timerValue).toEqual(middleValue - delta);
         });
 
         it('changeTimerValue should not set timerValue above maximum value allowed', () => {
             component.timerValue = MAXIMUM_TIMER_VALUE;
             delta = 1;
-            component.changeTimerValue(delta);
+            component['changeTimerValue'](delta);
             expect(component.timerValue).toEqual(MAXIMUM_TIMER_VALUE);
         });
 
@@ -108,13 +110,13 @@ describe('TimerSelectionComponent', () => {
             component.timerValue = MINIMUM_TIMER_VALUE;
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             delta = -1;
-            component.changeTimerValue(delta);
+            component['changeTimerValue'](delta);
             expect(component.timerValue).toEqual(MINIMUM_TIMER_VALUE);
         });
 
         it('changeTimerValue should assign new timerValue to form', () => {
             component.timerValue = middleValue;
-            component.changeTimerValue(delta);
+            component['changeTimerValue'](delta);
             expect(patchValueSpy).toHaveBeenCalledWith({ timer: middleValue + delta });
         });
     });

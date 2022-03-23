@@ -117,7 +117,43 @@ export class GamePageComponent implements OnInit, OnDestroy {
         );
     }
 
-    openDialog(title: string, content: string, buttonsContent: string[]): void {
+    quitButtonClicked(): void {
+        let title = '';
+        let content = '';
+        const buttonsContent = ['', ''];
+        if (this.gameService.isGameOver) {
+            title = DIALOG_QUIT_TITLE;
+            content = DIALOG_QUIT_CONTENT;
+            buttonsContent[0] = DIALOG_QUIT_BUTTON_CONFIRM;
+            buttonsContent[1] = DIALOG_QUIT_STAY;
+        } else {
+            title = DIALOG_ABANDON_TITLE;
+            content = DIALOG_ABANDON_CONTENT;
+            buttonsContent[0] = DIALOG_ABANDON_BUTTON_CONFIRM;
+            buttonsContent[1] = DIALOG_ABANDON_BUTTON_CONTINUE;
+        }
+        this.openDialog(title, content, buttonsContent);
+    }
+
+    changeTileFontSize(operation: FontSizeChangeOperations): void {
+        if (operation === 'smaller') {
+            if (this.tileRackComponent.tileFontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.tileFontSize -= RACK_FONT_SIZE_INCREMENT;
+            if (this.boardComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) this.boardComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
+        } else {
+            if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
+            if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
+        }
+    }
+
+    canPass(): boolean {
+        return this.isLocalPlayerTurn() && !this.gameService.isGameOver && !this.actionService.hasActionBeenPlayed;
+    }
+
+    canPlaceWord(): boolean {
+        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
+    }
+
+    private openDialog(title: string, content: string, buttonsContent: string[]): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title,
@@ -142,25 +178,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    quitButtonClicked(): void {
-        let title = '';
-        let content = '';
-        const buttonsContent = ['', ''];
-        if (this.gameService.isGameOver) {
-            title = DIALOG_QUIT_TITLE;
-            content = DIALOG_QUIT_CONTENT;
-            buttonsContent[0] = DIALOG_QUIT_BUTTON_CONFIRM;
-            buttonsContent[1] = DIALOG_QUIT_STAY;
-        } else {
-            title = DIALOG_ABANDON_TITLE;
-            content = DIALOG_ABANDON_CONTENT;
-            buttonsContent[0] = DIALOG_ABANDON_BUTTON_CONFIRM;
-            buttonsContent[1] = DIALOG_ABANDON_BUTTON_CONTINUE;
-        }
-        this.openDialog(title, content, buttonsContent);
-    }
-
-    noActiveGameDialog(): void {
+    private noActiveGameDialog(): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
                 title: DIALOG_NO_ACTIVE_GAME_TITLE,
@@ -181,26 +199,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    changeTileFontSize(operation: FontSizeChangeOperations): void {
-        if (operation === 'smaller') {
-            if (this.tileRackComponent.tileFontSize > RACK_TILE_MIN_FONT_SIZE) this.tileRackComponent.tileFontSize -= RACK_FONT_SIZE_INCREMENT;
-            if (this.boardComponent.tileFontSize > SQUARE_TILE_MIN_FONT_SIZE) this.boardComponent.tileFontSize -= SQUARE_FONT_SIZE_INCREMENT;
-        } else {
-            if (this.tileRackComponent.tileFontSize < RACK_TILE_MAX_FONT_SIZE) this.tileRackComponent.tileFontSize += RACK_FONT_SIZE_INCREMENT;
-            if (this.boardComponent.tileFontSize < SQUARE_TILE_MAX_FONT_SIZE) this.boardComponent.tileFontSize += SQUARE_FONT_SIZE_INCREMENT;
-        }
-    }
-
-    isLocalPlayerTurn(): boolean {
+    private isLocalPlayerTurn(): boolean {
         return this.gameService.isLocalPlayerPlaying();
-    }
-
-    canPass(): boolean {
-        return this.isLocalPlayerTurn() && !this.gameService.isGameOver && !this.actionService.hasActionBeenPlayed;
-    }
-
-    canPlaceWord(): boolean {
-        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
     }
 
     private handlePlayerLeaves(): void {

@@ -144,10 +144,10 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit timer subscription should call startTimer', () => {
-            const startTimerSpy = spyOn(component, 'startTimer').and.callFake(() => {
+            const startTimerSpy = spyOn<any>(component, 'startTimer').and.callFake(() => {
                 return;
             });
-            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            spyOn<any>(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
             component.ngOnInit();
@@ -157,10 +157,10 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit timer subscription should call updateActivePlayerBorder', () => {
-            spyOn(component, 'startTimer').and.callFake(() => {
+            spyOn<any>(component, 'startTimer').and.callFake(() => {
                 return;
             });
-            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            const updateBorderSpy = spyOn<any>(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
             component.ngOnInit();
@@ -183,16 +183,16 @@ describe('InformationBoxComponent', () => {
         });
 
         it('should call endRound() on round manager end round event', () => {
-            const spy = spyOn(component, 'endRound');
-            component.setupGame();
+            const spy = spyOn<any>(component, 'endRound');
+            component['setupGame']();
             mockRoundManager.endRoundEvent.next();
             expect(spy).toHaveBeenCalled();
         });
 
         it('should call startTimer and updateActivePlayerBorder on round manager timer event', () => {
-            const startTimerSpy = spyOn(component, 'startTimer');
-            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder');
-            component.setupGame();
+            const startTimerSpy = spyOn<any>(component, 'startTimer');
+            const updateBorderSpy = spyOn<any>(component, 'updateActivePlayerBorder');
+            component['setupGame']();
             mockRoundManager.timerSource.next([{} as unknown as Timer, {} as unknown as AbstractPlayer]);
             expect(startTimerSpy).toHaveBeenCalled();
             expect(updateBorderSpy).toHaveBeenCalled();
@@ -211,7 +211,7 @@ describe('InformationBoxComponent', () => {
         it('ngOnInit reRender subscription should call the functions to rerender the component', () => {
             const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
-            const updateBorderSpy = spyOn(component, 'updateActivePlayerBorder');
+            const updateBorderSpy = spyOn<any>(component, 'updateActivePlayerBorder');
 
             gameViewEventManagerSpy.emitGameViewEvent('reRender');
 
@@ -251,11 +251,11 @@ describe('InformationBoxComponent', () => {
             spyOn(observable, 'subscribe').and.callFake(() => {
                 return new Subscription();
             });
-            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            spyOn<any>(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
             const newTimer: Timer = new Timer(1, 0);
-            component.startTimer(newTimer);
+            component['startTimer'](newTimer);
             expect(component.timer).toEqual(newTimer);
         });
 
@@ -265,42 +265,42 @@ describe('InformationBoxComponent', () => {
             spyOn(observable, 'subscribe').and.callFake(() => {
                 return new Subscription();
             });
-            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            spyOn<any>(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
             const newTimer: Timer = new Timer(1, 0);
-            component.startTimer(newTimer);
+            component['startTimer'](newTimer);
             expect(component.timerSource).toEqual(observable);
         });
 
         it('StartTimer should subscribe timerSubscription to timerSource and call timer.decrement', () => {
             const newTimer: Timer = new Timer(1, 0);
-            spyOn(component, 'updateActivePlayerBorder').and.callFake(() => {
+            spyOn<any>(component, 'updateActivePlayerBorder').and.callFake(() => {
                 return false;
             });
-            component.startTimer(newTimer);
+            component['startTimer'](newTimer);
             expect(component.timerSubscription).toBeTruthy();
         });
     });
 
     describe('endRound', () => {
         it('EndRound should set Timer to 0:00', () => {
-            component.endRound();
+            component['endRound']();
             expect(component.timer).toEqual(new Timer(0, 0));
         });
 
         it('EndRound should unsubscribe from timerSubscription', () => {
-            component.startTimer(new Timer(1, 0));
+            component['startTimer'](new Timer(1, 0));
             const spy = spyOn(component.timerSubscription, 'unsubscribe');
-            component.endRound();
+            component['endRound']();
             expect(spy).toHaveBeenCalled();
         });
 
         it('EndRound should not unsubscribe if timerSubscription is not defined', () => {
-            component.startTimer(new Timer(1, 0));
+            component['startTimer'](new Timer(1, 0));
             const spy = spyOn(component.timerSubscription, 'unsubscribe');
             component.timerSubscription = undefined as unknown as Subscription;
-            component.endRound();
+            component['endRound']();
             expect(spy).not.toHaveBeenCalled();
         });
     });
@@ -317,21 +317,21 @@ describe('InformationBoxComponent', () => {
         });
 
         it('updateActivePlayerBorder should set no border if provided active player is undefined', () => {
-            component.updateActivePlayerBorder(undefined);
+            component['updateActivePlayerBorder'](undefined);
 
             expect(component.isPlayer1Active).toBeFalse();
             expect(component.isPlayer2Active).toBeFalse();
         });
 
         it('updateActivePlayerBorder should set border on player1 if player1 is active', () => {
-            component.updateActivePlayerBorder(player1);
+            component['updateActivePlayerBorder'](player1);
 
             expect(component.isPlayer1Active).toBeTrue();
             expect(component.isPlayer2Active).toBeFalse();
         });
 
         it('updateActivePlayerBorder should set border on player2 if player2 is active', () => {
-            component.updateActivePlayerBorder(player2);
+            component['updateActivePlayerBorder'](player2);
 
             expect(component.isPlayer2Active).toBeTrue();
             expect(component.isPlayer1Active).toBeFalse();

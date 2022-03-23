@@ -44,11 +44,11 @@ export class ConvertDialogComponent implements OnDestroy {
         this.handleConvertToSolo();
     }
 
-    handleConvertToSolo(): void {
+    private handleConvertToSolo(): void {
         this.gameDispatcherService.handleRecreateGame(this.gameParameters);
     }
 
-    returnToWaiting(): void {
+    private returnToWaiting(): void {
         this.gameDispatcherService.handleRecreateGame();
     }
 }

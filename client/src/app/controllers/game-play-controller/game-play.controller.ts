@@ -20,15 +20,6 @@ export class GamePlayController {
         this.configureSocket();
     }
 
-    configureSocket(): void {
-        this.socketService.on('gameUpdate', (newData: GameUpdateData) => {
-            this.gameUpdate$.next(newData);
-        });
-        this.socketService.on('newMessage', (newMessage: Message) => {
-            this.newMessage$.next(newMessage);
-        });
-    }
-
     sendAction(gameId: string, playerId: string, action: ActionData): void {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${playerId}/action`;
         this.http.post(endpoint, action).subscribe(() => {
@@ -69,6 +60,15 @@ export class GamePlayController {
 
     observeActionDone(): Observable<void> {
         return this.actionDone$.asObservable();
+    }
+
+    private configureSocket(): void {
+        this.socketService.on('gameUpdate', (newData: GameUpdateData) => {
+            this.gameUpdate$.next(newData);
+        });
+        this.socketService.on('newMessage', (newMessage: Message) => {
+            this.newMessage$.next(newMessage);
+        });
     }
 
     private handleDisconnectResponse(): void {
