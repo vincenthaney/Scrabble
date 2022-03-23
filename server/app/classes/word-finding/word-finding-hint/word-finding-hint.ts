@@ -4,7 +4,7 @@ import { AbstractWordFinding, ScoredWordPlacement } from '@app/classes/word-find
 export default class WordFindingHint extends AbstractWordFinding {
     private findingAttempts = 0;
 
-    handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
+    protected handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
         this.findingAttempts++;
         if (this.wordPlacements.length < HINT_ACTION_NUMBER_OF_WORDS) {
             this.wordPlacements.push(wordPlacement);
@@ -17,7 +17,7 @@ export default class WordFindingHint extends AbstractWordFinding {
             }
         }
     }
-    isSearchCompleted(): boolean {
+    protected isSearchCompleted(): boolean {
         return this.wordPlacements.length >= HINT_ACTION_NUMBER_OF_WORDS && this.findingAttempts >= HINT_ACTION_ATTEMPTS_NUMBER;
     }
 }

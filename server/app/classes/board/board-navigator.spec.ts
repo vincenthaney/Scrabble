@@ -164,14 +164,6 @@ describe('BoardNavigator', () => {
         });
     });
 
-    describe('verifyAllNeighbors', () => {
-        it('should call board.verifyNeighbors twice ', () => {
-            const spy = chai.spy.on(navigator['board'], 'verifyNeighbors');
-            navigator.verifyAllNeighbors(SHOULD_BE_FILLED);
-            expect(spy).to.have.been.called.twice;
-        });
-    });
-
     describe('verifyPerpendicularNeighbors', () => {
         let verifyNeighborsStub: SinonStub;
 
@@ -242,38 +234,6 @@ describe('BoardNavigator', () => {
 
             navigator.backward(distance);
             expect(spy).to.have.been.called.with(Orientation.Horizontal, Direction.Backward, distance);
-        });
-    });
-
-    describe('moveUntil', () => {
-        it('should call isWithinBounds and move ', () => {
-            const stubIsWithinBounds = stub(navigator, 'isWithinBounds');
-            stubIsWithinBounds.onCall(0).returns(true);
-            stubIsWithinBounds.onCall(1).returns(false);
-            stubIsWithinBounds.onCall(2).returns(false);
-
-            const spyMove = chai.spy.on(navigator['position'], 'move');
-
-            navigator.moveUntil(Direction.Forward, () => false);
-            expect(stubIsWithinBounds.callCount).to.equal(3);
-            expect(spyMove).to.have.been.called.once;
-        });
-
-        it('should return  POSITIVE_INFINITY if endNavigator is not WithinBounds', () => {
-            stub(navigator, 'isWithinBounds').returns(false);
-            expect(navigator.moveUntil(Direction.Forward, () => true)).to.equal(Number.POSITIVE_INFINITY);
-        });
-
-        it('should return the distance travelled (amount of loops) if endNavigator is WithinBounds', () => {
-            stub(navigator, 'isWithinBounds').returns(true);
-            const loops = 2;
-            let loopsDone = 0;
-
-            expect(
-                navigator.moveUntil(Direction.Forward, () => {
-                    return loopsDone++ >= loops;
-                }),
-            ).to.equal(loops);
         });
     });
 

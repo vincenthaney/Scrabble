@@ -28,20 +28,6 @@ export default class DictionarySearcher {
         this.addChildrenToStack(node, this.convertLetterValues(playerLetters));
     }
 
-    hasNext(): boolean {
-        return this.stack.length > 0;
-    }
-
-    next(): DictionarySearchResult {
-        const stackItem = this.stack.pop();
-
-        if (!stackItem) throw new Error(NEXT_NODE_DOES_NOT_EXISTS);
-
-        this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
-
-        return this.getWord(stackItem.node) ?? this.next();
-    }
-
     getAllWords(): DictionarySearchResult[] {
         const results: DictionarySearchResult[] = [];
 
@@ -52,6 +38,20 @@ export default class DictionarySearcher {
         }
 
         return results;
+    }
+
+    private hasNext(): boolean {
+        return this.stack.length > 0;
+    }
+
+    private next(): DictionarySearchResult {
+        const stackItem = this.stack.pop();
+
+        if (!stackItem) throw new Error(NEXT_NODE_DOES_NOT_EXISTS);
+
+        this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
+
+        return this.getWord(stackItem.node) ?? this.next();
     }
 
     private getWord(node: DictionaryNode): DictionarySearchResult | undefined {

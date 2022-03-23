@@ -12,8 +12,8 @@ import { GameType } from '@app/classes/game/game-type';
 import HighScoresService from './high-scores.service';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
-import { DatabaseServiceMock } from '@app/services/database-service/database-service.mock.spec';
-import DatabaseService from '@app/services/database-service/database-service';
+import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
+import DatabaseService from '@app/services/database-service/database.service';
 import { stub } from 'sinon';
 import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
 import { join } from 'path';
@@ -93,7 +93,7 @@ describe('HighScoresService', () => {
 
     describe('getHighScores', () => {
         it('should get all courses from DB of given gameType', async () => {
-            const highScores = await highScoresService.getHighScores(GameType.Classic);
+            const highScores = await highScoresService['getHighScores'](GameType.Classic);
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES_CLASSIC.length);
             expect(INITIAL_HIGH_SCORES_CLASSIC).to.deep.equals(highScores);
         });
@@ -110,7 +110,7 @@ describe('HighScoresService', () => {
     describe('updateHighScore', () => {
         it('should update the highScore if the name is not already on it ', async () => {
             const newName = 'new name';
-            expect(await highScoresService.updateHighScore(newName, HIGH_SCORE_CLASSIC_1)).to.be.true;
+            expect(await highScoresService['updateHighScore'](newName, HIGH_SCORE_CLASSIC_1)).to.be.true;
             const updatedHighScore = await highScoresService['collection'].findOne({
                 score: HIGH_SCORE_CLASSIC_1.score,
                 gameType: HIGH_SCORE_CLASSIC_1.gameType,
@@ -120,7 +120,7 @@ describe('HighScoresService', () => {
         });
         it('should not update the highScore if the name is already on it ', async () => {
             const newName = HIGH_SCORE_CLASSIC_1.names[0];
-            expect(await highScoresService.updateHighScore(newName, HIGH_SCORE_CLASSIC_1)).to.be.false;
+            expect(await highScoresService['updateHighScore'](newName, HIGH_SCORE_CLASSIC_1)).to.be.false;
             const updatedHighScore = await highScoresService['collection'].findOne({
                 score: HIGH_SCORE_CLASSIC_1.score,
                 gameType: HIGH_SCORE_CLASSIC_1.gameType,
@@ -133,7 +133,7 @@ describe('HighScoresService', () => {
         it('should replace the highscore ', async () => {
             const newName = 'new name';
             const newScore = 1111;
-            expect(await highScoresService.replaceHighScore(newName, newScore, HIGH_SCORE_CLASSIC_1)).to.be.true;
+            expect(await highScoresService['replaceHighScore'](newName, newScore, HIGH_SCORE_CLASSIC_1)).to.be.true;
             expect(await highScoresService['collection'].findOne({ score: HIGH_SCORE_CLASSIC_1.score, gameType: HIGH_SCORE_CLASSIC_1.gameType })).to
                 .not.be.ok;
             expect(await highScoresService['collection'].findOne({ score: newScore })).to.be.ok;
@@ -209,7 +209,7 @@ describe('HighScoresService', () => {
     describe('Error handling', async () => {
         it('should throw an error if we try to access the database on a closed connection', async () => {
             await client.close();
-            expect(highScoresService.getHighScores(GameType.Classic)).to.eventually.be.rejectedWith(Error);
+            expect(highScoresService['getHighScores'](GameType.Classic)).to.eventually.be.rejectedWith(Error);
         });
     });
 });

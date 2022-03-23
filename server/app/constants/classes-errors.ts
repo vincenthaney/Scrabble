@@ -3,7 +3,6 @@ export const ERROR_WILDCARD_IN_PLACE_ACTION =
     "Vous ne pouvez pas placer une tuile blanche ('*') sur le plateau; elle doit être la lettre en majuscule de la lettre qu'elle va représenter";
 export const ERROR_INVALID_WORD = 'Le mot est invalide';
 export const POSITION_OUT_OF_BOARD = 'La position est hors des dimensions du plateau';
-export const ERROR_GAME_NOT_STARTED = "La partie n'a pas débuté";
 export const AMOUNT_MUST_BE_GREATER_THAN_1 = 'La quantité doit être un nombre supérieur à 1';
 export const NOT_ENOUGH_TILES = "Il n'y a pas assez de tuiles dans la réserve";
 export const MUST_HAVE_7_TILES_TO_SWAP = 'La réserve doit contenir au moins 7 tuiles pour pouvoir effectuer un échange';

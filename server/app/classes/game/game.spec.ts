@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
@@ -13,7 +15,7 @@ import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game'
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
-import { assert, spy } from 'chai';
+import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
@@ -120,14 +122,6 @@ describe('Game', () => {
             expect(game.getId()).to.exist;
         });
 
-        it('initTileReserve should call init ', async () => {
-            const initStub = tileReserveStub.init.callsFake(async () => {
-                return;
-            });
-            await game.initTileReserve();
-            assert(initStub.calledOnce);
-        });
-
         it('getTiles should call tileReserve.getTiles and return it', () => {
             const expected = [DEFAULT_TILE];
             tileReserveStub.getTiles.returns([DEFAULT_TILE]);
@@ -163,18 +157,6 @@ describe('Game', () => {
             it('should throw error if invalid id', () => {
                 const invalidId = 'invalidId';
                 expect(() => game.getPlayer(invalidId, IS_REQUESTING)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
-            });
-        });
-
-        describe('isPlayerReal', () => {
-            it('should return true when player is real player', () => {
-                expect(game.isPlayerReal(DEFAULT_PLAYER_1_ID)).to.equal(true);
-            });
-            it('should return false when player is virtual player', async () => {
-                spy.on(game, 'getPlayer', () => {
-                    return DEFAULT_VIRTUAL_PLAYER;
-                });
-                expect(game.isPlayerReal(DEFAULT_VIRTUAL_PLAYER_ID)).to.equal(false);
             });
         });
 
@@ -358,7 +340,7 @@ describe('Game', () => {
         let player1Stub: SinonStubbedInstance<Player>;
         let player2Stub: SinonStubbedInstance<Player>;
 
-        let congratulateStub: SinonStub<[], string>;
+        let congratulateStub: SinonStub<any[], any>;
 
         const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
         const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
@@ -373,7 +355,7 @@ describe('Game', () => {
             game.player2 = player2Stub as unknown as Player;
             player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
             player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
-            congratulateStub = stub(game, 'congratulateWinner').returns('congratulate winner');
+            congratulateStub = stub(game, <any>'congratulateWinner').returns('congratulate winner');
         });
 
         it('should call the messages', () => {
@@ -416,19 +398,19 @@ describe('Game', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = LOWER_SCORE;
             const expectedMessage = WINNER_MESSAGE(PLAYER_1_NAME);
-            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 2 if he has a higher score ', () => {
             player1Stub.score = LOWER_SCORE;
             player2Stub.score = HIGHER_SCORE;
             const expectedMessage = WINNER_MESSAGE(PLAYER_2_NAME);
-            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
         });
         it('should congratulate player 1 and player 2 if they are tied ', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = HIGHER_SCORE;
             const expectedMessage = WINNER_MESSAGE(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
-            expect(game.congratulateWinner()).to.deep.equal(expectedMessage);
+            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
         });
     });
 

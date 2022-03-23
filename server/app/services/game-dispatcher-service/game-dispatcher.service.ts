@@ -36,10 +36,6 @@ export class GameDispatcherService {
         this.lobbiesRoom = new Room();
     }
 
-    addToWaitingRoom(waitingRoom: WaitingRoom): void {
-        this.waitingRooms.push(waitingRoom);
-    }
-
     getLobbiesRoom(): Room {
         return this.lobbiesRoom;
     }
@@ -163,5 +159,9 @@ export class GameDispatcherService {
     isGameInWaitingRooms(gameId: string): boolean {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === gameId);
         return filteredWaitingRoom.length > 0;
+    }
+
+    addToWaitingRoom(waitingRoom: WaitingRoom): void {
+        this.waitingRooms.push(waitingRoom);
     }
 }

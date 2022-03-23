@@ -63,11 +63,6 @@ export default class TileReserve {
         return tilesToReturn;
     }
 
-    getTilesLeft(): number {
-        if (!this.initialized) throw new Error(TILE_RESERVE_MUST_BE_INITIATED);
-        return this.tiles.length;
-    }
-
     getTilesLeftPerLetter(): Map<LetterValue, number> {
         if (!this.initialized) throw new Error(TILE_RESERVE_MUST_BE_INITIATED);
         const map = new Map<LetterValue, number>();

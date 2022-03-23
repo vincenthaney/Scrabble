@@ -36,7 +36,7 @@ export default class ActionPlace extends ActionPlay {
         };
     }
 
-    static createActionPlacePayload(scoredWordPlacement: ScoredWordPlacement): ActionPlacePayload {
+    private static createActionPlacePayload(scoredWordPlacement: ScoredWordPlacement): ActionPlacePayload {
         return {
             tiles: scoredWordPlacement.tilesToPlace,
             orientation: scoredWordPlacement.orientation,

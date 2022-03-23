@@ -5,7 +5,7 @@ export default class Range {
         if (!Range.validateRangeValues(minimum, maximum)) throw new Error(INVALID_POINT_RANGE);
     }
 
-    static validateRangeValues(minimum: number, maximum: number) {
+    private static validateRangeValues(minimum: number, maximum: number) {
         return minimum <= maximum;
     }
 
