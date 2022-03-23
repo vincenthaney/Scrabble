@@ -489,6 +489,7 @@ describe('BoardComponent', () => {
         for (const [letter, isUppercase, calls] of tests) {
             it(`it should ${calls ? '' : 'not'} call useTile \
                 and nextEmpty with letter ${letter} as ${isUppercase ? 'uppercase' : 'lowecase'}`, () => {
+                spyOn(component['navigator'], 'clone').and.returnValue(component['navigator']);
                 component['handlePlaceLetter'](letter, isUppercase, squareView);
 
                 const spies = [useTileSpy, nextEmptySpy];
@@ -532,7 +533,7 @@ describe('BoardComponent', () => {
     describe('cannotPlace', () => {
         let squareView: SquareView;
         beforeEach(() => {
-            squareView = {} as SquareView;
+            squareView = { square: { tile: null } } as SquareView;
             component['actionService'].hasActionBeenPlayed = false;
         });
 
@@ -542,6 +543,11 @@ describe('BoardComponent', () => {
 
         it('should return true if no tiles are used', () => {
             component['actionService'].hasActionBeenPlayed = true;
+            expect(component['cannotPlace'](squareView)).toBeTrue();
+        });
+
+        it('should return true if tile is not null', () => {
+            squareView.square.tile = 'not-null' as unknown as Tile;
             expect(component['cannotPlace'](squareView)).toBeTrue();
         });
 
