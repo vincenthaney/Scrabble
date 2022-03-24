@@ -33,7 +33,7 @@ export default class DatabaseService {
         return this.db;
     }
 
-    private async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
+    async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
         return (await collection.find({}).toArray()).length === 0;
     }
 }

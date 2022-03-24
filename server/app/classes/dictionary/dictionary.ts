@@ -17,3 +17,5 @@ export default class Dictionary extends DictionaryNode {
         }
     }
 }
+
+

@@ -1,42 +1,70 @@
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { DICTIONARY_PATHS, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
-import { readFileSync } from 'fs';
+import { DICTIONARY_PATH, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
+import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { promises, readFileSync } from 'fs';
 import { join } from 'path';
 import { Service } from 'typedi';
+import DatabaseService from '@app/services/database-service/database.service';
+import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
+import { Collection } from 'mongodb';
+
+export interface DictionaryUsage {
+    dictionary: Dictionary;
+    numberOfActiveGames: number;
+}
+
+export interface DictionarySummary {
+    title: string;
+    description: string;
+}
 
 @Service()
 export default class DictionaryService {
-    private dictionaries: Map<string, Dictionary> = new Map();
-    private dictionaryPaths: string[] = DICTIONARY_PATHS;
+    private dictionaries: Map<string, DictionaryUsage> = new Map();
 
-    constructor() {
-        this.addAllDictionaries();
+    constructor(private databaseService: DatabaseService) {
+        // this.addAllDictionaries();
     }
 
-    getDictionaryTitles(): string[] {
+    private static async fetchDefaultDictionary(): Promise<DictionaryData[]> {
+        const filePath = join(__dirname, DICTIONARY_PATH);
+        const dataBuffer = await promises.readFile(filePath, 'utf-8');
+        const defaultDictionary: DictionaryData = JSON.parse(dataBuffer);
+        return [defaultDictionary];
+    }
+
+    async resetDictionaries(): Promise<void> {
+        await this.collection.deleteMany({ isRemovable: { $exists: false } });
+        if (await ((await this.collection.find({}).toArray()).length === 0)) await this.populateDb();
+    }
+
+    getDictionarySummaryTitles(): DictionarySummary[] {
+        this.collection.find({}, { title: 1, description: 1, _id: 0 });
         return [...this.dictionaries.keys()];
     }
 
-    getDictionary(title: string): Dictionary {
+    getDictionary(id: string): Dictionary {
         const dictionary = this.dictionaries.get(title);
         if (dictionary) return dictionary;
         throw new Error(INVALID_DICTIONARY_NAME);
     }
 
-    getDefaultDictionary(): Dictionary {
-        return this.getDictionary(this.getDictionaryTitles()[0]);
+    private get collection(): Collection<DictionaryData> {
+        return this.databaseService.database.collection(DICTIONARIES_MONGO_COLLECTION_NAME);
     }
 
-    private fetchDictionaryWords(path: string): Dictionary {
-        const buffer = readFileSync(join(__dirname, path));
-        const data: DictionaryData = JSON.parse(buffer.toString());
-        return new Dictionary(data);
+    private async populateDb(): Promise<void> {
+        await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, await DictionaryService.fetchDefaultDictionary());
     }
 
-    private addAllDictionaries(): void {
-        for (const path of this.dictionaryPaths) {
-            const dictionary = this.fetchDictionaryWords(path);
-            this.dictionaries.set(dictionary.title, dictionary);
-        }
-    }
+    // getDefaultDictionary(): Dictionary {
+    //     return this.getDictionary(this.getDictionaryTitles()[0]);
+    // }
+
+    // private addAllDictionaries(): void {
+    //     for (const path of this.dictionaryPaths) {
+    //         const dictionary = this.fetchDictionaryWords(path);
+    //         this.dictionaries.set(dictionary.title, dictionary);
+    //     }
+    // }
 }
