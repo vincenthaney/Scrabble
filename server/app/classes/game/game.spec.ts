@@ -150,7 +150,7 @@ describe('Game', () => {
             });
 
             it('should throw INVALID_PLAYER_ID_FOR_GAME if player not from game', () => {
-                spy.on(game, 'isPlayerFromGame', () => false);
+                chai.spy.on(game, 'isPlayerFromGame', () => false);
                 expect(() => game.getPlayer(DEFAULT_PLAYER_1_ID, false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
 
