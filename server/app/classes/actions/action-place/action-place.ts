@@ -4,6 +4,7 @@ import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communi
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
+import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
@@ -54,6 +55,9 @@ export default class ActionPlace extends ActionPlay {
         this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionnaryName);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
+
+        // Valider objectif
+        this.game.validateObjectives(undefined as unknown as ValidationParameters);
 
         const updatedSquares = this.updateBoard(createdWords);
 
