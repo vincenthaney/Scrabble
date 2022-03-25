@@ -1,5 +1,6 @@
 import Board from '@app/classes/board/board';
 import { RoundData } from '@app/classes/communication/round-data';
+import { GameHistory } from '@app/classes/database/game-history';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -11,6 +12,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -27,6 +29,7 @@ export default class Game {
     player2: Player;
     isAddedToDatabase: boolean;
     gameIsOver: boolean;
+    gameHistory: GameHistory;
     private tileReserve: TileReserve;
     private id: string;
 
@@ -49,6 +52,7 @@ export default class Game {
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
         game.gameIsOver = false;
+        game.initializeGameHistory(config);
 
         await game.tileReserve.init();
 
@@ -62,6 +66,26 @@ export default class Game {
 
     private static getBoardService(): BoardService {
         return Game.boardService;
+    }
+
+    initializeGameHistory(gameConfig: ReadyGameConfig): void {
+        this.gameHistory = {
+            startTime: new Date(),
+            endTime: null,
+            player1Data: {
+                name: gameConfig.player1.name,
+                score: 0,
+                isVirtualPlayer: isIdVirtualPlayer(gameConfig.player1.id),
+            },
+            player2Data: {
+                name: gameConfig.player2.name,
+                score: 0,
+                isVirtualPlayer: isIdVirtualPlayer(gameConfig.player2.id),
+            },
+            gameType: gameConfig.gameType,
+            gameMode: gameConfig.gameMode,
+            hasBeenAbandonned: false,
+        };
     }
 
     getTilesFromReserve(amount: number): Tile[] {

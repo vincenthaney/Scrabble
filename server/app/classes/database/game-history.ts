@@ -3,13 +3,11 @@ import { GameType } from '@app/classes/game/game-type';
 
 export interface GameHistory {
     startTime: Date;
-    endTime: Date;
+    endTime: Date | null;
     player1Data: PlayerHistoryData;
     player2Data: PlayerHistoryData;
-    replacingPlayer: PlayerHistoryData;
     gameType: GameType;
     gameMode: GameMode;
-    isOver: boolean;
     hasBeenAbandonned: boolean;
 }
 
