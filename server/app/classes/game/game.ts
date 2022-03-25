@@ -1,5 +1,7 @@
 import Board from '@app/classes/board/board';
 import { RoundData } from '@app/classes/communication/round-data';
+import { GameObjectives } from '@app/classes/objectives/game-objectives';
+import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -11,6 +13,8 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -19,6 +23,7 @@ export const LOSE = -1;
 
 export default class Game {
     private static boardService: BoardService;
+    private static objectivesService: ObjectivesService;
     roundManager: RoundManager;
     gameType: GameType;
     board: Board;
@@ -29,10 +34,14 @@ export default class Game {
     gameIsOver: boolean;
     private tileReserve: TileReserve;
     private id: string;
+    private objectives: GameObjectives;
 
-    static injectServices(boardService: BoardService): void {
+    static injectServices(): void {
         if (!Game.getBoardService()) {
-            Game.boardService = boardService;
+            Game.boardService = Container.get(BoardService);
+        }
+        if (!Game.objectivesService) {
+            Game.objectivesService = Container.get(ObjectivesService);
         }
     }
 
@@ -44,6 +53,7 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
+        game.initializeObjectives();
         game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
@@ -95,6 +105,10 @@ export default class Game {
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
+    getObjectives(): GameObjectives {
+        return this.objectives;
+    }
+
     areGameOverConditionsMet(): boolean {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
@@ -142,6 +156,10 @@ export default class Game {
         return startGameData;
     }
 
+    validateObjectives(validationParameters: ValidationParameters): void {
+        Game.objectivesService.validateGameObjectives(this.objectives, validationParameters);
+    }
+
     private congratulateWinner(): string {
         let winner: string;
         if (this.player1.score > this.player2.score) {
@@ -183,5 +201,11 @@ export default class Game {
 
     private isPlayerFromGame(playerId: string): boolean {
         return this.player1.id === playerId || this.player2.id === playerId;
+    }
+
+    private async initializeObjectives(): Promise<void> {
+        if (this.gameType === GameType.Classic) return;
+
+        this.objectives = await Game.objectivesService.createObjectivesForGame();
     }
 }
