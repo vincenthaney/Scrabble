@@ -20,7 +20,7 @@ export interface DictionarySummary {
 
 @Service()
 export default class DictionaryService {
-    private dictionaries: Map<string, DictionaryUsage> = new Map();
+    private activeDictionaries: Map<string, DictionaryUsage> = new Map();
 
     constructor(private databaseService: DatabaseService) {
         // this.addAllDictionaries();
@@ -33,14 +33,30 @@ export default class DictionaryService {
         return [defaultDictionary];
     }
 
-    async resetDictionaries(): Promise<void> {
+    async resetDbDictionaries(): Promise<void> {
         await this.collection.deleteMany({ isRemovable: { $exists: false } });
         if (await ((await this.collection.find({}).toArray()).length === 0)) await this.populateDb();
     }
 
-    getDictionarySummaryTitles(): DictionarySummary[] {
-        this.collection.find({}, { title: 1, description: 1, _id: 0 });
-        return [...this.dictionaries.keys()];
+    async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
+        const data = await this.collection.find({}, { title: 1, description: 1, _id: 0 }).toArray();
+        const dictionarySummaries: DictionarySummary[] = [];
+        data.forEach((dictionary) => {
+            dictionarySummaries.push({ title: dictionary.title, description: dictionary.description });
+        });
+        return dictionarySummaries;
+    }
+
+    async useDictionary(id: string) {
+        const dictionary = this.activeDictionaries.get(id);
+        if (dictionary) {
+            dictionary.numberOfActiveGames++;
+            return dictionary;
+        }
+
+        const dictionaryDb = (await (await this.collection.find({ _id: id })).toArray())[0];
+        if (!dictionaryDb) throw new Error(INVALID_DICTIONARY_NAME);
+        this.activeDictionaries.set(id, { numberOfActiveGames: 1, dictionary: dictionaryDb });
     }
 
     getDictionary(id: string): Dictionary {
