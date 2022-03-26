@@ -23,6 +23,7 @@ export default class Game {
     private static boardService: BoardService;
     roundManager: RoundManager;
     gameType: GameType;
+    gameMode: GameMode;
     board: Board;
     dictionnaryName: string;
     player1: Player;
@@ -47,6 +48,7 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
+        game.gameMode = config.gameMode;
         game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
@@ -156,6 +158,7 @@ export default class Game {
             player1: this.player1,
             player2: this.player2,
             gameType: this.gameType,
+            gameMode: this.gameMode,
             maxRoundTime: this.roundManager.getMaxRoundTime(),
             dictionary: this.dictionnaryName,
             gameId: this.getId(),
