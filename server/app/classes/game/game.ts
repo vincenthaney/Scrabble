@@ -55,7 +55,6 @@ export default class Game {
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
         game.gameIsOver = false;
-        game.initializeGameHistory();
 
         await game.tileReserve.init();
 
@@ -71,34 +70,26 @@ export default class Game {
         return Game.boardService;
     }
 
-    initializeGameHistory(): void {
+    completeGameHistory(winnerName: string | undefined): void {
         this.gameHistory = {
-            startTime: new Date(),
-            endTime: null,
+            startTime: this.roundManager.getGameStartTime(),
+            endTime: new Date(),
             player1Data: {
                 name: this.player1.name,
-                score: 0,
+                score: this.player1.score,
                 isVirtualPlayer: isIdVirtualPlayer(this.player1.id),
-                isWinner: false,
+                isWinner: this.player1.name === winnerName,
             },
             player2Data: {
                 name: this.player2.name,
-                score: 0,
+                score: this.player2.score,
                 isVirtualPlayer: isIdVirtualPlayer(this.player2.id),
-                isWinner: false,
+                isWinner: this.player2.name === winnerName,
             },
             gameType: this.gameType,
             gameMode: this.gameMode,
             hasBeenAbandonned: false,
         };
-    }
-
-    completeGameHistory(winnerName: string | undefined): void {
-        this.gameHistory.endTime = new Date();
-        this.gameHistory.player1Data.isWinner = this.gameHistory.player1Data.name === winnerName;
-        this.gameHistory.player2Data.isWinner = this.gameHistory.player2Data.name === winnerName;
-        this.gameHistory.player1Data.score = this.player1.score;
-        this.gameHistory.player2Data.score = this.player2.score;
     }
 
     getTilesFromReserve(amount: number): Tile[] {
