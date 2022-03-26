@@ -3,7 +3,7 @@ import { GameType } from '@app/classes/game/game-type';
 
 export interface GameHistory {
     startTime: Date;
-    endTime: Date | null;
+    endTime: Date;
     player1Data: PlayerHistoryData;
     player2Data: PlayerHistoryData;
     gameType: GameType;
