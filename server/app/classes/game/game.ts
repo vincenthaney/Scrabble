@@ -14,6 +14,7 @@ import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameMode } from './game-mode';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
@@ -54,7 +55,7 @@ export default class Game {
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
         game.gameIsOver = false;
-        game.initializeGameHistory(config);
+        game.initializeGameHistory();
 
         await game.tileReserve.init();
 
@@ -70,24 +71,34 @@ export default class Game {
         return Game.boardService;
     }
 
-    initializeGameHistory(gameConfig: ReadyGameConfig): void {
+    initializeGameHistory(): void {
         this.gameHistory = {
             startTime: new Date(),
             endTime: null,
             player1Data: {
-                name: gameConfig.player1.name,
+                name: this.player1.name,
                 score: 0,
-                isVirtualPlayer: isIdVirtualPlayer(gameConfig.player1.id),
+                isVirtualPlayer: isIdVirtualPlayer(this.player1.id),
+                isWinner: false,
             },
             player2Data: {
-                name: gameConfig.player2.name,
+                name: this.player2.name,
                 score: 0,
-                isVirtualPlayer: isIdVirtualPlayer(gameConfig.player2.id),
+                isVirtualPlayer: isIdVirtualPlayer(this.player2.id),
+                isWinner: false,
             },
-            gameType: gameConfig.gameType,
-            gameMode: gameConfig.gameMode,
+            gameType: this.gameType,
+            gameMode: this.gameMode,
             hasBeenAbandonned: false,
         };
+    }
+
+    completeGameHistory(winnerName: string | undefined): void {
+        this.gameHistory.endTime = new Date();
+        this.gameHistory.player1Data.isWinner = this.gameHistory.player1Data.name === winnerName;
+        this.gameHistory.player2Data.isWinner = this.gameHistory.player2Data.name === winnerName;
+        this.gameHistory.player1Data.score = this.player1.score;
+        this.gameHistory.player2Data.score = this.player2.score;
     }
 
     getTilesFromReserve(amount: number): Tile[] {
@@ -127,6 +138,8 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         this.gameIsOver = true;
+        this.completeGameHistory(winnerName);
+
         if (winnerName) {
             if (winnerName === this.player1.name) {
                 return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());

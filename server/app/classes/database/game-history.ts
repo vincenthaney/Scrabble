@@ -15,4 +15,5 @@ export interface PlayerHistoryData {
     name: string;
     score: number;
     isVirtualPlayer: boolean;
+    isWinner: boolean;
 }
