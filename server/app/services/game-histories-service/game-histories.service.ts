@@ -8,7 +8,7 @@ import { Collection } from 'mongodb';
 import { Service } from 'typedi';
 
 @Service()
-export default class GameHistoryService {
+export default class GameHistoriesService {
     constructor(private databaseService: DatabaseService) {}
 
     async getAllGameHistories(): Promise<GameHistory[]> {
