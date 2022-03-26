@@ -59,6 +59,10 @@ export default class RoundManager {
         return this.currentRound;
     }
 
+    getGameStartTime(): Date {
+        return this.completedRounds[0].startTime;
+    }
+
     getMaxRoundTime(): number {
         return this.maxRoundTime;
     }
