@@ -1,5 +1,6 @@
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
 import * as io from 'socket.io';
@@ -7,6 +8,7 @@ import { Service } from 'typedi';
 import {
     CanceledGameEmitArgs,
     CleanupEmitArgs,
+    GameHistoriesEmitArgs,
     GameUpdateEmitArgs,
     HighScoresEmitArgs,
     JoinerLeaveGameEmitArgs,
@@ -17,7 +19,6 @@ import {
     SocketEmitEvents,
     StartGameEmitArgs,
 } from './socket-types';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 
 @Service()
 export class SocketService {
@@ -104,6 +105,7 @@ export class SocketService {
     emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToSocket(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
     emitToSocket(id: string, ev: 'highScoresList', ...args: HighScoresEmitArgs[]): void;
+    emitToSocket(id: string, ev: 'gameHistories', ...args: GameHistoriesEmitArgs[]): void;
     emitToSocket(id: string, ev: 'cleanup', ...args: CleanupEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
