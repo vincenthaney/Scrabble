@@ -221,7 +221,7 @@ describe('ActionPlace', () => {
 
             it('should call objective validation', () => {
                 action.execute();
-                expect(gameStub.validateObjectives).to.have.been.called();
+                assert(gameStub.validateObjectives.called);
             });
 
             it('should call board update', () => {
