@@ -15,6 +15,7 @@ import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virt
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -56,7 +57,7 @@ let DEFAULT_MAP = new Map<LetterValue, number>([
     ['B', 0],
 ]);
 
-describe('Game', () => {
+describe.only('Game', () => {
     let defaultInit: () => Promise<void>;
 
     beforeEach(() => {
@@ -491,21 +492,39 @@ describe('Game', () => {
     });
 
     describe('Game Service Injection', () => {
-        it('injectServices should set static Game BoardService', () => {
-            chai.spy.on(Game, 'getBoardService', () => null);
-            const boardService = Container.get(BoardService);
+        let getSpy: unknown;
 
-            expect(Game['getBoardService']()).to.not.exist;
-            Game.injectServices();
-            chai.spy.restore();
-            expect(Game['getBoardService']()).to.equal(boardService);
+        beforeEach(() => {
+            getSpy = chai.spy.on(Container, 'get');
         });
 
-        it('injectServices should call getBoardService()', () => {
-            const boardService = Container.get(BoardService);
-            chai.spy.on(Game, 'getBoardService', () => boardService);
+        afterEach(() => {
+            chai.spy.restore();
+        });
+        it('injectServices should set static Game BoardService if it does not exist', () => {
+            Game['boardService'] = undefined as unknown as BoardService;
+
             Game.injectServices();
-            expect(Game['getBoardService']).to.have.been.called;
+            expect(Game['boardService']).to.equal(Container.get(BoardService));
+        });
+
+        it('injectServices should NOT set BoardService if it exists', () => {
+            Game['boardService'] = Container.get(BoardService);
+            Game.injectServices();
+            expect(getSpy).not.to.have.been.called;
+        });
+
+        it('injectServices should set static Game ObjectivesService if it does not exist', () => {
+            Game['objectivesService'] = undefined as unknown as ObjectivesService;
+
+            Game.injectServices();
+            expect(Game['objectivesService']).to.equal(Container.get(ObjectivesService));
+        });
+
+        it('injectServices should  NOT set ObjectivesService if it exists', () => {
+            Game['objectivesService'] = Container.get(ObjectivesService);
+            Game.injectServices();
+            expect(getSpy).not.to.have.been.called;
         });
     });
     describe('createStartGameData', () => {

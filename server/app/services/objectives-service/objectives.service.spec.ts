@@ -9,12 +9,11 @@ import { generateGameObjectives } from '@app/constants/objectives-test.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import { describe } from 'mocha';
-import { stub } from 'sinon';
 import { Container } from 'typedi';
 import ObjectivesService from './objectives.service';
 
 const validationParameters: ValidationParameters = {
-    game: stub(Game) as unknown as Game,
+    game: undefined as unknown as Game,
     wordPlacement: undefined as unknown as WordPlacement,
     scoredPoints: 0,
     createdWords: [],

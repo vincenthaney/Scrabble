@@ -37,7 +37,7 @@ export default class Game {
     private objectives: GameObjectives;
 
     static injectServices(): void {
-        if (!Game.getBoardService()) {
+        if (!Game.boardService) {
             Game.boardService = Container.get(BoardService);
         }
         if (!Game.objectivesService) {
@@ -68,10 +68,6 @@ export default class Game {
         game.roundManager.beginRound();
 
         return game;
-    }
-
-    private static getBoardService(): BoardService {
-        return Game.boardService;
     }
 
     getTilesFromReserve(amount: number): Tile[] {
