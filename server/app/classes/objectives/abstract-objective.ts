@@ -1,10 +1,7 @@
 import { ValidationParameters } from './validation-parameters';
 
 export abstract class AbstractObjective {
-    name: string;
-    bonusPoints: number;
-    progress: number;
-    maxProgress: number;
+    constructor(public name: string, public bonusPoints: number, public progress: number, public maxProgress: number) {}
 
     isCompleted(): boolean {
         return this.progress === this.maxProgress;
