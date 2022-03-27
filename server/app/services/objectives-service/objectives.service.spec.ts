@@ -20,7 +20,7 @@ const validationParameters: ValidationParameters = {
     createdWords: [],
 };
 
-describe.only('ObjectiveService', () => {
+describe('ObjectiveService', () => {
     let service: ObjectivesService;
 
     beforeEach(() => {
