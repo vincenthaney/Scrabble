@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { WordPlacement } from '@app/classes/word-finding';
 
 export const TEST_OBJECTIVE_MAX_PROGRESS = 3;
+
+export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
+    game: undefined as unknown as Game,
+    wordPlacement: undefined as unknown as WordPlacement,
+    scoredPoints: 0,
+    createdWords: [],
+};
 
 export class TestObjective extends AbstractObjective {
     constructor(name: string, maxProgress: number) {

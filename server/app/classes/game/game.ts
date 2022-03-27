@@ -101,10 +101,6 @@ export default class Game {
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
-    getObjectives(): GameObjectives {
-        return this.objectives;
-    }
-
     areGameOverConditionsMet(): boolean {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }

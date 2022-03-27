@@ -5,6 +5,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board } from '@app/classes/board';
+import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -13,6 +14,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
+import { EMPTY_VALIDATION_PARAMETERS, generateGameObjectives } from '@app/constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
@@ -57,7 +59,7 @@ let DEFAULT_MAP = new Map<LetterValue, number>([
     ['B', 0],
 ]);
 
-describe.only('Game', () => {
+describe('Game', () => {
     let defaultInit: () => Promise<void>;
 
     beforeEach(() => {
@@ -80,9 +82,13 @@ describe.only('Game', () => {
 
     describe('createMultiplayerGame', () => {
         let game: Game;
+        let objectiveInitspy: unknown;
 
         beforeEach(async () => {
             game = await Game.createGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
+            objectiveInitspy = chai.spy.on(game, 'initializeObjectives', () => {
+                return;
+            });
         });
 
         it('should create', () => {
@@ -100,6 +106,10 @@ describe.only('Game', () => {
 
         it('should init TileReserve', () => {
             expect(game['tileReserve'].isInitialized()).to.be.true;
+        });
+
+        it('should call initializeObjectives', () => {
+            expect(objectiveInitspy).to.have.been.called;
         });
 
         it('should give players their tiles', () => {
@@ -587,6 +597,48 @@ describe.only('Game', () => {
                 round: roundManagerStub.convertRoundToRoundData(round),
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);
+        });
+    });
+
+    describe('validateObjectives', () => {
+        it('should call validateGameObjectives on Objective Service', () => {
+            const game: Game = new Game();
+            game['objectives'] = generateGameObjectives();
+            const validateSpy = chai.spy.on(Game['objectivesService'], 'validateGameObjectives', () => {
+                return;
+            });
+            game.validateObjectives(EMPTY_VALIDATION_PARAMETERS);
+            expect(validateSpy).to.have.been.called.with(game['objectives'], EMPTY_VALIDATION_PARAMETERS);
+        });
+    });
+
+    describe('initializeObjectives', () => {
+        let game: Game;
+        let objectives: GameObjectives;
+        let initSpy: unknown;
+
+        beforeEach(() => {
+            game = new Game();
+            objectives = generateGameObjectives();
+            initSpy = chai.spy.on(Game['objectivesService'], 'createObjectivesForGame', () => objectives);
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should initialize objectives if gameType is LOG2990', async () => {
+            game.gameType = GameType.LOG2990;
+            await game['initializeObjectives']();
+            expect(initSpy).to.have.been.called;
+            expect(game['objectives']).to.equal(objectives);
+        });
+
+        it('should NOT initialize objectives if gameType is CLASSIC', async () => {
+            game.gameType = GameType.Classic;
+            await game['initializeObjectives']();
+            expect(initSpy).not.to.have.been.called;
+            expect(game['objectives']).to.be.undefined;
         });
     });
 });

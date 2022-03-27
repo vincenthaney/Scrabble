@@ -1,23 +1,13 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import Game from '@app/classes/game/game';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { WordPlacement } from '@app/classes/word-finding';
-import { generateGameObjectives } from '@app/constants/objectives-test.const';
+import { EMPTY_VALIDATION_PARAMETERS, generateGameObjectives } from '@app/constants/objectives-test.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import { describe } from 'mocha';
 import { Container } from 'typedi';
 import ObjectivesService from './objectives.service';
-
-const validationParameters: ValidationParameters = {
-    game: undefined as unknown as Game,
-    wordPlacement: undefined as unknown as WordPlacement,
-    scoredPoints: 0,
-    createdWords: [],
-};
 
 describe('ObjectiveService', () => {
     let service: ObjectivesService;
@@ -49,9 +39,9 @@ describe('ObjectiveService', () => {
             isValidSpies.push(isValidSpy);
         });
 
-        service.validateGameObjectives(gameObjectives, validationParameters);
+        service.validateGameObjectives(gameObjectives, EMPTY_VALIDATION_PARAMETERS);
         isValidSpies.forEach((spy) => {
-            expect(spy).to.have.been.called.with(validationParameters);
+            expect(spy).to.have.been.called.with(EMPTY_VALIDATION_PARAMETERS);
         });
     });
 });
