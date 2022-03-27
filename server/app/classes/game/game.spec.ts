@@ -70,8 +70,7 @@ describe('Game', () => {
             return Promise.resolve();
         };
 
-        const boardService = Container.get(BoardService);
-        Game.injectServices(boardService);
+        Game.injectServices();
     });
 
     afterEach(() => {
@@ -497,7 +496,7 @@ describe('Game', () => {
             const boardService = Container.get(BoardService);
 
             expect(Game['getBoardService']()).to.not.exist;
-            Game.injectServices(boardService);
+            Game.injectServices();
             chai.spy.restore();
             expect(Game['getBoardService']()).to.equal(boardService);
         });
@@ -505,7 +504,7 @@ describe('Game', () => {
         it('injectServices should call getBoardService()', () => {
             const boardService = Container.get(BoardService);
             chai.spy.on(Game, 'getBoardService', () => boardService);
-            Game.injectServices(boardService);
+            Game.injectServices();
             expect(Game['getBoardService']).to.have.been.called;
         });
     });
