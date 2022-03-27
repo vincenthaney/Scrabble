@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from 'chai';
@@ -26,7 +27,7 @@ describe('Abstract Objective', () => {
         expect(objective.name).to.equal('Test');
         expect(objective.bonusPoints).to.equal(0);
         expect(objective.progress).to.equal(0);
-        expect(objective.maxProgress).to.equal(TEST_OBJECTIVE_MAX_PROGRESS);
+        expect(objective['maxProgress']).to.equal(TEST_OBJECTIVE_MAX_PROGRESS);
     });
 
     describe('isCompleted default implementation', () => {
