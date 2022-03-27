@@ -24,7 +24,7 @@ const generateTestObjective = (index: number) => {
     return undefined as unknown as TestObjective;
 };
 
-describe.only('Game Objectives', () => {
+describe('Game Objectives', () => {
     let gameObjectives: GameObjectives;
     let publicObjectives: Set<AbstractObjective>;
     let player1Objective: AbstractObjective;
