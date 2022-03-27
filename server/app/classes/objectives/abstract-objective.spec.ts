@@ -1,20 +1,9 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { TestObjective, TEST_OBJECTIVE_MAX_PROGRESS } from '@app/constants/objectives-test.const';
 import { expect } from 'chai';
 import { AbstractObjective } from './abstract-objective';
-import { ValidationParameters } from './validation-parameters';
-
-const TEST_OBJECTIVE_MAX_PROGRESS = 3;
-
-class TestObjective extends AbstractObjective {
-    constructor(name: string, maxProgress: number) {
-        super(name, 0, 0, maxProgress);
-    }
-    isValid(validationParameters: ValidationParameters): boolean {
-        return validationParameters === undefined;
-    }
-}
 
 describe('Abstract Objective', () => {
     let objective: AbstractObjective;
