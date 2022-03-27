@@ -124,6 +124,9 @@ describe('ActionPlace', () => {
         gameStub.player1.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.player2.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.isPlayer1.returns(true);
+        gameStub.validateObjectives.callsFake(() => {
+            return;
+        });
         boardStub.grid = BOARD.map((row) => row.map((s) => ({ ...s })));
 
         // eslint-disable-next-line dot-notation
@@ -214,6 +217,11 @@ describe('ActionPlace', () => {
             it('should call score computer', () => {
                 action.execute();
                 assert(scoreCalculatorServiceStub.calculatePoints.calledOnce);
+            });
+
+            it('should call objective validation', () => {
+                action.execute();
+                expect(gameStub.validateObjectives).to.have.been.called();
             });
 
             it('should call board update', () => {
