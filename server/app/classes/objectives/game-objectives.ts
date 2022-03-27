@@ -18,4 +18,10 @@ export class GameObjectives {
     getPlayer2Objectives(): AbstractObjective {
         return this.player2Objective;
     }
+
+    getAllObjectives(): Set<AbstractObjective> {
+        const allObjectives: Set<AbstractObjective> = new Set(this.publicObjectives);
+        [this.player1Objective, this.player2Objective].forEach((objective: AbstractObjective) => allObjectives.add(objective));
+        return new Set(allObjectives);
+    }
 }
