@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { CreateWaitingPageComponent } from '@app/pages/create-waiting-page/create-waiting-page.component';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
@@ -17,6 +18,7 @@ const routes: Routes = [
     { path: 'waiting-room', component: CreateWaitingPageComponent },
     { path: 'join-waiting-room', component: JoinWaitingPageComponent },
     { path: 'high-scores', component: HighScoresPageComponent },
+    { path: 'admin', component: AdminPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
