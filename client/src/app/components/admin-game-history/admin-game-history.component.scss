@@ -1,0 +1,24 @@
+@import '../../style/variables.scss';
+
+table {
+    width: 100%;
+    margin: 12px 0;
+    // box-shadow: none;
+}
+
+.primary {
+    color: $primary;
+}
+
+.filter-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+
+    mat-form-field {
+        margin-bottom: -8px;
+        width: 33%;
+        min-width: 300px;
+        max-width: 100%;
+    }
+}

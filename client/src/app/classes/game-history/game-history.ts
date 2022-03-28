@@ -6,7 +6,7 @@ export interface GameHistory {
     endTime: Date;
     player1Data: PlayerHistoryData;
     player2Data: PlayerHistoryData;
-    replacingPlayer: PlayerHistoryData;
+    replacingPlayer?: PlayerHistoryData;
     gameType: GameType;
     gameMode: GameMode;
     isOver: boolean;
