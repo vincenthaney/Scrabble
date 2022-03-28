@@ -35,7 +35,7 @@ export default class DictionaryService {
 
     async resetDbDictionaries(): Promise<void> {
         await this.collection.deleteMany({ isRemovable: { $exists: false } });
-        if (await ((await this.collection.find({}).toArray()).length === 0)) await this.populateDb();
+        if ((await this.collection.find({}).toArray()).length === 0) await this.populateDb();
     }
 
     async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
@@ -47,22 +47,37 @@ export default class DictionaryService {
         return dictionarySummaries;
     }
 
-    async useDictionary(id: string) {
+    async useDictionary(id: string): Promise<DictionaryUsage> {
         const dictionary = this.activeDictionaries.get(id);
         if (dictionary) {
             dictionary.numberOfActiveGames++;
             return dictionary;
         }
+        const dictionaryData = (await this.collection.find({ _id: id }).toArray())[0];
+        if (!dictionaryData) throw new Error(INVALID_DICTIONARY_NAME);
+        const addedDictionary: DictionaryUsage = { numberOfActiveGames: 1, dictionary: new Dictionary(dictionaryData) };
+        this.activeDictionaries.set(id, addedDictionary);
 
-        const dictionaryDb = (await (await this.collection.find({ _id: id })).toArray())[0];
-        if (!dictionaryDb) throw new Error(INVALID_DICTIONARY_NAME);
-        this.activeDictionaries.set(id, { numberOfActiveGames: 1, dictionary: dictionaryDb });
+        return addedDictionary;
     }
 
-    getDictionary(id: string): Dictionary {
-        const dictionary = this.dictionaries.get(title);
-        if (dictionary) return dictionary;
-        throw new Error(INVALID_DICTIONARY_NAME);
+    stopUsingDictionary(id: string): void {
+        const dictionaryUsage = this.activeDictionaries.get(id);
+        if (!dictionaryUsage) return;
+        if (--dictionaryUsage.numberOfActiveGames === 0) this.activeDictionaries.delete(id);
+    }
+
+    // getDictionary(id: string): Dictionary {
+    //     const dictionary = this.dictionaries.get(title);
+    //     if (dictionary) return dictionary;
+    //     throw new Error(INVALID_DICTIONARY_NAME);
+    // }
+
+    
+    async updateHighScore(id: string, description?: string, name?: string): Promise<boolean> {
+        if (highScore.names.find((currentName) => currentName === name)) return false;
+        await this.collection.updateOne({ score: highScore.score, gameType: highScore.gameType }, { $push: { names: name } });
+        return true;
     }
 
     private get collection(): Collection<DictionaryData> {

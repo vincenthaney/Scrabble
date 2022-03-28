@@ -1,5 +1,5 @@
 export interface DictionaryData {
-    id: string;
+    _id: string;
     title: string;
     description: string;
     words: string[];
