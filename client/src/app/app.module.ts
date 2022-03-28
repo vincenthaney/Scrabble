@@ -30,6 +30,7 @@ import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-pa
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
+import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
 
 /**
  * Main module that is used in main.ts.
@@ -62,6 +63,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
         HighScoreBoxComponent,
         ConvertDialogComponent,
         AdminPageComponent,
+        AdminGameHistoryComponent,
     ],
     imports: [
         AppMaterialModule,
