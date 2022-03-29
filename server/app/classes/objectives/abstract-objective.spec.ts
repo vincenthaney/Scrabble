@@ -19,6 +19,10 @@ describe('Abstract Objective', () => {
         objective = new TestObjective('Test', TEST_OBJECTIVE_MAX_PROGRESS);
     });
 
+    it('constructor should set state to NotCompleted', () => {
+        expect(objective.state).to.equal(ObjectiveState.NotCompleted);
+    });
+
     describe('isCompleted default implementation', () => {
         it('should return true if State is not ObjectiveState.Completed', () => {
             objective.state = ObjectiveState.Completed;

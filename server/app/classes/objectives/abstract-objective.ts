@@ -3,14 +3,17 @@ import { ObjectiveState } from './objective-state';
 import { ValidationParameters } from './validation-parameters';
 
 export abstract class AbstractObjective {
+    state: ObjectiveState;
+
     constructor(
         public name: string,
         public bonusPoints: number,
-        public state: ObjectiveState,
         readonly isPublic: boolean,
         public progress: number,
         private readonly maxProgress: number,
-    ) {}
+    ) {
+        this.state = ObjectiveState.NotCompleted;
+    }
 
     isCompleted(): boolean {
         return this.state !== ObjectiveState.NotCompleted;

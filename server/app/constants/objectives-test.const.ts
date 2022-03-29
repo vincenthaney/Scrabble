@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ObjectiveState } from '@app/classes/objectives/objective-state';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { WordPlacement } from '@app/classes/word-finding';
 
@@ -16,7 +15,7 @@ export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
 
 export class TestObjective extends AbstractObjective {
     constructor(name: string, maxProgress: number) {
-        super(name, 0, ObjectiveState.NotCompleted, false, 0, maxProgress);
+        super(name, 0, false, 0, maxProgress);
     }
     updateProgress(validationParameters: ValidationParameters): void {
         return validationParameters as unknown as void;
