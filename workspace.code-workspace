@@ -12,5 +12,8 @@
         {
             "path": "./common"
         }
-    ]
+    ],
+    "settings": {
+        "cSpell.words": ["typedi"]
+    }
 }
