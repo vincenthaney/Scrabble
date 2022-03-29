@@ -1,5 +1,4 @@
 import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
-import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
@@ -46,7 +45,7 @@ export default class Player {
         this.objectives = objectives;
     }
 
-    updateObjectives(game: Game, validationParameters: ValidationParameters): GameObjectivesData {
-        return this.objectiveService.validatePlayerObjectives(this, game, validationParameters);
+    updateObjectives(validationParameters: ValidationParameters): GameObjectivesData {
+        return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 }

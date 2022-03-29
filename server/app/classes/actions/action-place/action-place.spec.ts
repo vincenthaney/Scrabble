@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -8,6 +9,7 @@
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { ActionPlacePayload } from '@app/classes/communication/action-data';
+import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -217,8 +219,14 @@ describe('ActionPlace', () => {
             });
 
             it('should call objective validation', () => {
-                action.execute();
-                // assert(gameStub.validateObjectives.called);
+                const gameObjectives: GameObjectivesData = {
+                    player1Objectives: [],
+                    player2Objectives: [],
+                };
+                const updateSpy = chai.spy.on(action['player'], 'updateObjectives', () => gameObjectives);
+                const result: GameUpdateData = action.execute() as GameUpdateData;
+                expect(updateSpy).to.have.been.called;
+                expect(result.gameObjective).to.equal(gameObjectives);
             });
 
             it('should call board update', () => {
