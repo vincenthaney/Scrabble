@@ -38,8 +38,8 @@ export default class Player {
         return this.tiles.reduce((prev, next) => prev + next.letter.toLocaleLowerCase(), '');
     }
 
-    getObjectives(): Set<AbstractObjective> {
-        return this.objectives;
+    getObjectives(): AbstractObjective[] {
+        return [...this.objectives.values()];
     }
 
     async initializeObjectives(objectives: Set<AbstractObjective>): Promise<void> {

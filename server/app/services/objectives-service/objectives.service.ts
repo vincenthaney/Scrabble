@@ -24,7 +24,7 @@ export default class ObjectivesService {
 
     validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): GameObjectivesData {
         let updateData: GameObjectivesData = {};
-        [...player.getObjectives().values()].forEach((objective: AbstractObjective) => {
+        player.getObjectives().forEach((objective: AbstractObjective) => {
             if (objective.isCompleted()) return;
 
             const isCompleted: boolean = objective.updateProgress(validationParameters);
@@ -49,9 +49,9 @@ export default class ObjectivesService {
     }
 
     private setOpponentPublicObjectiveComplete(opponentPlayer: Player, objective: AbstractObjective): void {
-        const opponentObjective: AbstractObjective | undefined = [...opponentPlayer.getObjectives().values()].find(
-            (o: AbstractObjective) => o.isPublic && o.name === objective.name,
-        );
+        const opponentObjective: AbstractObjective | undefined = opponentPlayer
+            .getObjectives()
+            .find((o: AbstractObjective) => o.isPublic && o.name === objective.name);
         if (!opponentObjective) throw new Error(OPPONENT_HAS_NOT_OBJECTIVE);
         opponentObjective.state = ObjectiveState.CompletedByOpponent;
     }
@@ -63,7 +63,7 @@ export default class ObjectivesService {
     }
 
     private addPlayerObjectivesToUpdateData(game: Game, player: Player, updateData: GameObjectivesData): GameObjectivesData {
-        const playerObjectivesData: ObjectiveData[] = [...player.getObjectives().values()].map((o: AbstractObjective) => o.convertToData());
+        const playerObjectivesData: ObjectiveData[] = player.getObjectives().map((o: AbstractObjective) => o.convertToData());
         return game.isPlayer1(player)
             ? { ...updateData, player1Objectives: playerObjectivesData }
             : { ...updateData, player2Objectives: playerObjectivesData };
