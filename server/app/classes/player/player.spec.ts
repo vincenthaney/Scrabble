@@ -1,7 +1,15 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable dot-notation */
+import Game from '@app/classes/game/game';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import * as chai from 'chai';
 import { expect } from 'chai';
+import * as spies from 'chai-spies';
 import { assert } from 'console';
 import { stub } from 'sinon';
 import Player from './player';
+chai.use(spies);
 
 const ID = 'id';
 const DEFAULT_NAME = 'player';
@@ -48,5 +56,25 @@ describe('Player', () => {
 
     it('tilesToString should return the string of the tiles', () => {
         expect(player.tilesToString()).to.equal('abad');
+    });
+
+    it('getObjectives should return player objectives as array', () => {
+        const expected: AbstractObjective[] = [...player['objectives'].values()];
+        const actual: AbstractObjective[] = player.getObjectives();
+        expect(actual).to.deep.equal(expected);
+    });
+
+    it('initializeObjectives should set player objectives', async () => {
+        const objectives: Set<AbstractObjective> = new Set();
+        player['objectives'] = undefined as unknown as Set<AbstractObjective>;
+        await player.initializeObjectives(objectives);
+        expect(player['objectives']).to.equal(objectives);
+    });
+
+    it('updateObjectives should call objective service to update objectives', async () => {
+        const serviceSpy = chai.spy.on(player['objectiveService'], 'validatePlayerObjectives', () => {});
+        const validationParameters: ValidationParameters = { game: new Game() } as unknown as ValidationParameters;
+        player.updateObjectives(validationParameters);
+        expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
     });
 });
