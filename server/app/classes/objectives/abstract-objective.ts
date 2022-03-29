@@ -10,7 +10,7 @@ export abstract class AbstractObjective {
         public bonusPoints: number,
         readonly isPublic: boolean,
         public progress: number,
-        private readonly maxProgress: number,
+        protected readonly maxProgress: number,
     ) {
         this.state = ObjectiveState.NotCompleted;
     }
