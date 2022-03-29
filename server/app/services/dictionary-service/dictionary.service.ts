@@ -5,7 +5,7 @@ import { promises } from 'fs';
 import { join } from 'path';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
-import { Collection, FindOptions, ObjectId, WithId } from 'mongodb';
+import { Collection, ObjectId, WithId } from 'mongodb';
 import Ajv, { ValidateFunction } from 'ajv';
 import { DictionaryDataComplete } from '@app/classes/dictionary/dictionary-data';
 import { Service } from 'typedi';
@@ -24,6 +24,8 @@ export interface DictionarySummary {
 export const MAX_DICTIONARY_DESCRIPTION_LENGTH = 80;
 export const MAX_DICTIONARY_TITLE_LENGTH = 30;
 export const INVALID_DICTIONARY_FORMAT = 'the given dictionary does not respect the expected format';
+export const INVALID_DESCRIPTION_FORMAT = 'the given description does not respect the expected format';
+export const INVALID_TITLE = 'the given title does not respect the expected format or is not unique';
 
 @Service()
 export default class DictionaryService {
@@ -34,47 +36,12 @@ export default class DictionaryService {
         // this.addAllDictionaries();
     }
 
-    private static async fetchDefaultDictionary(): Promise<DictionaryData[]> {
+    private static async fetchDefaultDictionary(): Promise<DictionaryData> {
         const filePath = join(__dirname, DICTIONARY_PATH);
         const dataBuffer = await promises.readFile(filePath, 'utf-8');
         const defaultDictionary: DictionaryData = JSON.parse(dataBuffer);
         defaultDictionary.isDefault = true;
-        return [defaultDictionary];
-    }
-
-    async validateDictionary(dictionaryData: DictionaryData): Promise<boolean> {
-        if (!this.dictionaryValidator) this.createDictionaryValidator();
-        return this.dictionaryValidator(dictionaryData);
-    }
-
-    async addNewDictionary(dictionaryData: DictionaryData): Promise<void> {
-        if (!this.validateDictionary(dictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
-        // await this.collection.insertOne(dictionaryData);
-        await this.collection.updateOne(
-            {
-                title: dictionaryData.title,
-            },
-            {
-                $setOnInsert: dictionaryData,
-            },
-            { upsert: true },
-        );
-    }
-
-    async resetDbDictionaries(): Promise<void> {
-        console.log('reset');
-        await this.collection.deleteMany({ isDefault: { $exists: false } });
-        if ((await this.collection.countDocuments({})) === 0) await this.populateDb();
-    }
-
-    async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
-        const data = this.collection.find({}, { title: 1, description: 1 } as FindOptions<DictionaryData>);
-        const dictionarySummaries: DictionarySummary[] = [];
-        data.forEach((dictionary) => {
-            // eslint-disable-next-line no-underscore-dangle
-            dictionarySummaries.push({ title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() });
-        });
-        return dictionarySummaries;
+        return defaultDictionary;
     }
 
     async useDictionary(id: string): Promise<DictionaryUsage> {
@@ -103,18 +70,56 @@ export default class DictionaryService {
         if (--dictionaryUsage.numberOfActiveGames === 0) this.activeDictionaries.delete(id);
     }
 
-    async checkIfTitleNew(data: string): Promise<boolean> {
-        const result = await this.collection.findOne({ title: data });
-        return result ? true : false; // true if record is found
+    async validateDictionary(dictionaryData: DictionaryData): Promise<boolean> {
+        if (!this.dictionaryValidator) this.createDictionaryValidator();
+        return this.dictionaryValidator(dictionaryData);
     }
 
-    async updateDictionary(id: string, description?: string, title?: string): Promise<boolean> {
-        const dictionaryData = await this.getDbDictionary(id);
-        if (!dictionaryData) throw new Error(INVALID_DICTIONARY_ID);
-        if (dictionaryData.isDefault && dictionaryData.isDefault === true) throw new Error(CANNOT_MODIFY_DEFAULT_DICTIONARY);
+    async addNewDictionary(dictionaryData: DictionaryData): Promise<void> {
+        if (!this.validateDictionary(dictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
+        await this.collection.updateOne(
+            {
+                title: dictionaryData.title,
+            },
+            {
+                $setOnInsert: dictionaryData,
+            },
+            { upsert: true },
+        );
+    }
+
+    async resetDbDictionaries(): Promise<void> {
+        await this.collection.deleteMany({ isDefault: { $exists: false } });
+        if ((await this.collection.countDocuments({})) === 0) await this.populateDb();
+    }
+
+    async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
+        const data = await this.collection.find({}, { projection: { title: 1, description: 1 } }).toArray();
+        const dictionarySummaries: DictionarySummary[] = [];
+        data.forEach((dictionary) => {
+            // eslint-disable-next-line no-underscore-dangle
+            dictionarySummaries.push({ title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() });
+        });
+        return dictionarySummaries;
+    }
+
+    async updateDictionary(id: string, description?: string, title?: string): Promise<void> {
+        // const dictionaryData = await this.getDbDictionary(id);
+        // if (!dictionaryData) throw new Error(INVALID_DICTIONARY_ID);
+        // if (dictionaryData.isDefault && dictionaryData.isDefault === true) throw new Error(CANNOT_MODIFY_DEFAULT_DICTIONARY);
         // Might not work because of optional
-        await this.collection.updateOne({ id_: id }, { description, title });
-        return true;
+        if (description && !this.isDescriptionValid(description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+        if (title && !this.isTitleValid(title)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+
+        await this.collection.updateOne({ id_: id, isDefault: { $exists: true } }, { description, title });
+    }
+
+    private async isTitleValid(data: string): Promise<boolean> {
+        return (await this.collection.countDocuments({ title: data })) === 0 && data.length < MAX_DICTIONARY_TITLE_LENGTH;
+    }
+
+    private isDescriptionValid(description: string): boolean {
+        return description.length < MAX_DICTIONARY_DESCRIPTION_LENGTH;
     }
 
     private get collection(): Collection<DictionaryData> {
@@ -122,29 +127,30 @@ export default class DictionaryService {
     }
 
     private async populateDb(): Promise<void> {
-        console.log('pop');
-        await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, await DictionaryService.fetchDefaultDictionary());
+        await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, [await DictionaryService.fetchDefaultDictionary()]);
     }
 
     private async getDbDictionary(id: string): Promise<WithId<DictionaryData>> {
-        return (await this.collection.find({ _id: new ObjectId(id) }).toArray())[0];
+        const dictionaryData = await this.collection.findOne({ _id: new ObjectId(id) });
+        if (dictionaryData) return dictionaryData;
+        throw new Error(INVALID_DICTIONARY_ID);
     }
 
     private createDictionaryValidator(): void {
         const ajv = new Ajv();
 
         ajv.addKeyword({
-            keyword: 'isTitleNew',
+            keyword: 'isTitleValid',
             async: true,
             type: 'number',
-            validate: this.checkIfTitleNew,
+            validate: this.isTitleValid,
         });
 
         const schema = {
             $async: true,
             type: 'object',
             properties: {
-                title: { allOf: [{ maxLength: MAX_DICTIONARY_TITLE_LENGTH }, { type: 'string' }, { isTitleNew: {} }] },
+                title: { allOf: [{ maxLength: MAX_DICTIONARY_TITLE_LENGTH }, { type: 'string' }, { isTitleValid: {} }] },
                 description: { allOf: [{ maxLength: MAX_DICTIONARY_DESCRIPTION_LENGTH }, { type: 'string' }] },
                 words: {
                     type: 'array',
