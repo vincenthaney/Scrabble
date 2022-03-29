@@ -5,12 +5,12 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 import { DictionaryData } from '@app/classes/dictionary';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { Container } from 'typedi';
-import DictionaryService from './dictionary.service';
+import DictionaryService, { DictionaryUpdateInfo } from './dictionary.service';
 import { join } from 'path';
 import * as mock from 'mock-fs';
-import { FindOptions, MongoClient, WithId } from 'mongodb';
+import { MongoClient, WithId } from 'mongodb';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
 
@@ -19,6 +19,7 @@ import { describe } from 'mocha';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import { DICTIONARY_PATH } from '@app/constants/dictionary.const';
+import { stub } from 'sinon';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const DICTIONARY_1: DictionaryData = {
@@ -192,23 +193,43 @@ describe.only('DictionaryService', () => {
 
     describe('updateDictionary', () => {
         it('should update the dictionary if it is not a default one and legal', async () => {
-            const dictToModify: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()[0];
-            const updatedDescription = 'modifieddescription';
-            const updatedTitle = 'modifiedTitle';
-            await dictionaryService.updateDictionary(dictToModify._id.toString(), updatedDescription, updatedTitle);
-            const result: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()[0];
+            const dictToModify: WithId<DictionaryData> = await (
+                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
+            )[0];
+            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription', title: 'modifiedTitle' };
 
-            expect(result.title).to.equal(updatedTitle);
-            expect(result.description).to.equal(updatedDescription);
+            await dictionaryService.updateDictionary(updateInfo);
+
+            const result: WithId<DictionaryData> = await (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
+
+            expect(result.title).to.equal(updateInfo.title);
+            expect(result.description).to.equal(updateInfo.description);
             expect(result._id).to.deep.equal(dictToModify._id);
         });
 
-        it('should not update the dictionary if it is  a default one and legal', async () => {
-            const dictToModify: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray()[0];
-            const updatedDescription = 'modifieddescription';
-            const updatedTitle = 'modifiedTitle';
-            await dictionaryService.updateDictionary(dictToModify._id.toString(), updatedDescription, updatedTitle);
-            const result: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray()[0];
+        it('should update the dictionary if it is not a default one and legal (only new title)', async () => {
+            console.log('only new title');
+            const dictToModify: WithId<DictionaryData> = await (
+                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
+            )[0];
+            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), title: 'modifiedTitle' };
+
+            await dictionaryService.updateDictionary(updateInfo);
+            const result: WithId<DictionaryData> = await (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
+
+            expect(result.title).to.equal(updateInfo.title);
+            expect(result.description).to.equal(DICTIONARY_2.description);
+            expect(result._id).to.deep.equal(dictToModify._id);
+        });
+
+        it('should not update the dictionary if it is a default one and legal', async () => {
+            const dictToModify: WithId<DictionaryData> = await (
+                await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray()
+            )[0];
+
+            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription', title: 'modifiedTitle' };
+            await dictionaryService.updateDictionary(updateInfo);
+            const result: WithId<DictionaryData> = await (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
 
             expect(result.title).to.equal(DICTIONARY_1.title);
             expect(result.description).to.equal(DICTIONARY_1.description);
@@ -216,18 +237,74 @@ describe.only('DictionaryService', () => {
         });
 
         it('should throw if the data is invalid (description)', async () => {
-            const dictToModify: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()[0];
+            const dictToModify: WithId<DictionaryData> = await (
+                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
+            )[0];
             chai.spy.on(dictionaryService, 'isDescriptionValid', () => false);
-            expect(dictionaryService.updateDictionary(dictToModify._id.toString(), '')).to.eventually.be.rejectedWith(Error);
+            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription' };
+            expect(dictionaryService.updateDictionary(updateInfo)).to.eventually.be.rejectedWith(Error);
         });
 
-        it('should throw if the data is invalid (description)', async () => {
-            const dictToModify: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()[0];
+        it('should throw if the data is invalid (title)', async () => {
+            const dictToModify: WithId<DictionaryData> = await (
+                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
+            )[0];
             chai.spy.on(dictionaryService, 'isTitleValid', () => false);
-
-            expect(dictionaryService.updateDictionary(dictToModify._id.toString(),)).to.eventually.be.rejectedWith(Error);
+            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), title: 'modifiedTitle' };
+            expect(dictionaryService.updateDictionary(updateInfo)).to.eventually.be.rejectedWith(Error);
         });
     });
+
+    describe('isTitleValid', () => {
+        it('should return true if the title is unique and short', async () => {
+            expect(await dictionaryService['isTitleValid']('uniquetitle')).to.be.true;
+        });
+        it('should return false if the title is not unique and short', async () => {
+            expect(await dictionaryService['isTitleValid'](DICTIONARY_3.title)).to.be.false;
+        });
+
+        it('should return false if the title is unique and long', async () => {
+            expect(await dictionaryService['isTitleValid']('uniquqweqweqweqweqweqwewqqweetitle')).to.be.false;
+        });
+    });
+
+    describe('isDescriptionValid', () => {
+        it('should return true if the description is short', async () => {
+            expect(await dictionaryService['isDescriptionValid']('shortdescription')).to.be.true;
+        });
+
+        it('should return false if the description is unique and long', () => {
+            expect(
+                dictionaryService['isDescriptionValid'](
+                    `uniquqweqweqweqweqweqwewqqweedescriptionsdaofhdsfjsdhfosdhfosdfhsdohfsdhifoihsdfhiosdhiofsdihfhidsiohf
+                    hdsifhisdoihfhdsifihodsihfhisdhiofsdih`,
+                ),
+            ).to.be.false;
+        });
+    });
+
+    describe('populateDb', () => {
+        it('should call databaseService.populateDb and fetchDefaultDictionary', async () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
+            const spyFetchDefaultHighScores = stub(DictionaryService, <any>'fetchDefaultDictionary');
+            const spyPopulateDb = chai.spy.on(dictionaryService['databaseService'], 'populateDb', () => {});
+            await dictionaryService['populateDb']();
+            expect(spyPopulateDb).to.have.been.called;
+            assert(spyFetchDefaultHighScores.calledOnce);
+        });
+    });
+
+    // describe('getDbDictionary', () => {
+    //     it('should return the wanted dictionary with a valid id', async () => {
+    //         const dictToGet: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()[0];
+
+    //         const result = await dictionaryService['getDbDictionary'](dictToGet._id.toString());
+    //         expect(result._id).to.deep.equal(dictToGet._id);
+    //         expect(result._id).to.equal(DICTIONARY_2.title);
+
+    //         assert(spyFetchDefaultHighScores.calledOnce);
+    //     });
+    // });
 
     // describe('validateDictionary', () => {
     //     it('should create the dictionary validator if it was not done before', async () => {

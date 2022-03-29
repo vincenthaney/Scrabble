@@ -1,5 +1,5 @@
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { CANNOT_MODIFY_DEFAULT_DICTIONARY, DICTIONARY_PATH, INVALID_DICTIONARY_ID, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
+import { DICTIONARY_PATH, INVALID_DICTIONARY_ID, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { promises } from 'fs';
 import { join } from 'path';
@@ -21,6 +21,11 @@ export interface DictionarySummary {
     id: string;
 }
 
+export interface DictionaryUpdateInfo {
+    id: string;
+    title?: string;
+    description?: string;
+}
 export const MAX_DICTIONARY_DESCRIPTION_LENGTH = 80;
 export const MAX_DICTIONARY_TITLE_LENGTH = 30;
 export const INVALID_DICTIONARY_FORMAT = 'the given dictionary does not respect the expected format';
@@ -103,15 +108,40 @@ export default class DictionaryService {
         return dictionarySummaries;
     }
 
-    async updateDictionary(id: string, description?: string, title?: string): Promise<void> {
-        // const dictionaryData = await this.getDbDictionary(id);
-        // if (!dictionaryData) throw new Error(INVALID_DICTIONARY_ID);
-        // if (dictionaryData.isDefault && dictionaryData.isDefault === true) throw new Error(CANNOT_MODIFY_DEFAULT_DICTIONARY);
+    async updateDictionary(updateInfo: DictionaryUpdateInfo): Promise<void> {
         // Might not work because of optional
-        if (description && !this.isDescriptionValid(description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
-        if (title && !this.isTitleValid(title)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+        if (updateInfo.description && !this.isDescriptionValid(updateInfo.description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+        if (updateInfo.title && !this.isTitleValid(updateInfo.title)) throw new Error(INVALID_DESCRIPTION_FORMAT);
 
-        await this.collection.updateOne({ id_: id, isDefault: { $exists: true } }, { description, title });
+        // console.log(await (await this.collection.find({})).toArray());
+        // console.log('--------------');
+        // console.log(updateInfo);
+        // console.log('--------------');
+        // const id = new ObjectId(updateInfo.id);
+        // console.log(id);
+        // console.log(await (await this.collection.find({ _id: id })).toArray());
+
+        // console.log('--------------');
+
+        // await this.collection.updateOne(
+        //     // { id_: updateInfo.id, isDefault: { $exists: false } },
+        //     // { title: 'title2' },
+        //     { id_: id },
+        //     // { id_: updateInfo.id },
+        //     { $set: { description: updateInfo.description, title: updateInfo.title } },
+        // );
+        const toUpdate = {};
+        toUpdate
+        await this.collection.findOneAndUpdate(
+            { _id: new ObjectId(updateInfo.id), isDefault: { $exists: false } },
+            { $set: { description: updateInfo.description, title: updateInfo.title } },
+        );
+
+
+        // console.log('------modifyresult--------');
+        // console.log(modifyResult);
+
+        console.log(await (await this.collection.find({})).toArray());
     }
 
     private async isTitleValid(data: string): Promise<boolean> {
