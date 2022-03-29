@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
@@ -14,10 +15,11 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
-import { EMPTY_VALIDATION_PARAMETERS, generateGameObjectives } from '@app/constants/objectives-test.const';
+import { generateGameObjectives } from '@app/constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import * as copy from '@app/utils/deep-copy';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -59,7 +61,7 @@ let DEFAULT_MAP = new Map<LetterValue, number>([
     ['B', 0],
 ]);
 
-describe('Game', () => {
+describe.only('Game', () => {
     let defaultInit: () => Promise<void>;
 
     beforeEach(() => {
@@ -600,18 +602,6 @@ describe('Game', () => {
         });
     });
 
-    describe('validateObjectives', () => {
-        it('should call validateGameObjectives on Objective Service', () => {
-            const game: Game = new Game();
-            game['objectives'] = generateGameObjectives();
-            const validateSpy = chai.spy.on(Game['objectivesService'], 'validateGameObjectives', () => {
-                return;
-            });
-            game.validateObjectives(EMPTY_VALIDATION_PARAMETERS);
-            expect(validateSpy).to.have.been.called.with(game['objectives'], EMPTY_VALIDATION_PARAMETERS);
-        });
-    });
-
     describe('initializeObjectives', () => {
         let game: Game;
         let objectives: GameObjectives;
@@ -621,6 +611,7 @@ describe('Game', () => {
             game = new Game();
             objectives = generateGameObjectives();
             initSpy = chai.spy.on(Game['objectivesService'], 'createObjectivesForGame', () => objectives);
+            chai.spy.on(copy, 'setDeepCopy', () => new Set());
         });
 
         afterEach(() => {
@@ -629,16 +620,20 @@ describe('Game', () => {
 
         it('should initialize objectives if gameType is LOG2990', async () => {
             game.gameType = GameType.LOG2990;
+            game.player1 = DEFAULT_PLAYER_1;
+            game.player2 = DEFAULT_PLAYER_2;
+            const player1Spy = chai.spy.on(game.player1, 'initializeObjectives', () => {});
+            const player2Spy = chai.spy.on(game.player2, 'initializeObjectives', () => {});
             await game['initializeObjectives']();
             expect(initSpy).to.have.been.called;
-            expect(game['objectives']).to.equal(objectives);
+            expect(player1Spy).to.have.been.called;
+            expect(player2Spy).to.have.been.called;
         });
 
         it('should NOT initialize objectives if gameType is CLASSIC', async () => {
             game.gameType = GameType.Classic;
             await game['initializeObjectives']();
             expect(initSpy).not.to.have.been.called;
-            expect(game['objectives']).to.be.undefined;
         });
     });
 });
