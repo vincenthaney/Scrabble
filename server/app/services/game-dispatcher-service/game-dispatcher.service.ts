@@ -20,6 +20,7 @@ import { VirtualPlayerService } from '@app/services/virtual-player-service/virtu
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 @Service()
 export class GameDispatcherService {
@@ -30,6 +31,7 @@ export class GameDispatcherService {
         private socketService: SocketService,
         private createGameService: CreateGameService,
         private activeGameService: ActiveGameService,
+        private dictionaryService: DictionaryService,
         private virtualPlayerService: VirtualPlayerService,
     ) {
         this.waitingRooms = [];
@@ -57,8 +59,10 @@ export class GameDispatcherService {
         }
     }
 
-    createMultiplayerGame(config: GameConfigData): LobbyData {
+    async createMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
         const waitingRoom = this.createGameService.createMultiplayerGame(config);
+        await this.dictionaryService.useDictionary(config.dictionary.id);
+
         this.addToWaitingRoom(waitingRoom);
         this.socketService.addToRoom(config.playerId, waitingRoom.getId());
         return convertToLobbyData(waitingRoom.getConfig(), waitingRoom.getId());
@@ -135,6 +139,7 @@ export class GameDispatcherService {
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         }
+        this.dictionaryService.stopUsingDictionary(waitingRoom.getConfig().dictionary.id);
 
         const index = this.waitingRooms.indexOf(waitingRoom);
         this.waitingRooms.splice(index, 1);

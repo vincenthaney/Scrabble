@@ -19,7 +19,7 @@ export default class ActionHint extends ActionInfo {
     }
 
     execute(): GameUpdateData | void {
-        this.hintResult = this.wordFindingService.findWords(this.game.board, this.player.tiles, {
+        this.hintResult = this.wordFindingService.findWords(this.game.board, this.player.tiles, this.game.dictionarySummary.id, {
             useCase: WordFindingUseCase.Hint,
         });
     }

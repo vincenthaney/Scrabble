@@ -1,17 +1,14 @@
-import { DictionaryData } from './dictionary-data';
+import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
+import { DictionaryDataComplete } from './dictionary-data';
 import DictionaryNode from './dictionary-node';
 
 export default class Dictionary extends DictionaryNode {
-    title: string;
-    description: string;
-    id: string;
+    summary: DictionarySummary;
 
-    constructor(dictionaryData: DictionaryData) {
+    constructor(dictionaryData: DictionaryDataComplete) {
         super();
 
-        this.title = dictionaryData.title;
-        this.id = dictionaryData._id;
-        this.description = dictionaryData.description;
+        this.summary = { title: dictionaryData.title, id: dictionaryData.id, description: dictionaryData.description };
         this.depth = -1;
 
         for (const word of dictionaryData.words) {
@@ -19,5 +16,3 @@ export default class Dictionary extends DictionaryNode {
         }
     }
 }
-
-
