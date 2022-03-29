@@ -1,7 +1,6 @@
 import Board from '@app/classes/board/board';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -14,6 +13,7 @@ import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import { setDeepCopy } from '@app/utils/deep-copy';
 import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
@@ -34,7 +34,6 @@ export default class Game {
     gameIsOver: boolean;
     private tileReserve: TileReserve;
     private id: string;
-    private objectives: GameObjectives;
 
     static injectServices(): void {
         if (!Game.boardService) {
@@ -148,10 +147,6 @@ export default class Game {
         return startGameData;
     }
 
-    validateObjectives(validationParameters: ValidationParameters): void {
-        Game.objectivesService.validateGameObjectives(this.objectives, validationParameters);
-    }
-
     private congratulateWinner(): string {
         let winner: string;
         if (this.player1.score > this.player2.score) {
@@ -198,6 +193,8 @@ export default class Game {
     private async initializeObjectives(): Promise<void> {
         if (this.gameType === GameType.Classic) return;
 
-        this.objectives = await Game.objectivesService.createObjectivesForGame();
+        const gameObjectives: GameObjectives = await Game.objectivesService.createObjectivesForGame();
+        await this.player1.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player1Objective));
+        await this.player2.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player2Objective));
     }
 }

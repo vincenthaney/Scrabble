@@ -39,7 +39,7 @@ describe('ObjectiveService', () => {
             isValidSpies.push(isValidSpy);
         });
 
-        service.validateGameObjectives(gameObjectives, EMPTY_VALIDATION_PARAMETERS);
+        service.validatePlayerObjectives(gameObjectives, EMPTY_VALIDATION_PARAMETERS);
         isValidSpies.forEach((spy) => {
             expect(spy).to.have.been.called.with(EMPTY_VALIDATION_PARAMETERS);
         });

@@ -1,6 +1,7 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -56,7 +57,7 @@ export default class ActionPlace extends ActionPlay {
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
         // Valider objectif
-        this.game.validateObjectives({
+        const gameObjectivesData: GameObjectivesData = this.player.updateObjectives(this.game, {
             wordPlacement: this.wordPlacement,
             game: this.game,
             scoredPoints,
@@ -70,7 +71,7 @@ export default class ActionPlace extends ActionPlay {
 
         const playerData: PlayerData = { id: this.player.id, tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedSquares };
+        const response: GameUpdateData = { board: updatedSquares, gameObjective: gameObjectivesData };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
