@@ -45,13 +45,13 @@ describe('WordFindingService', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const getWordFindingInstanceStub = stub(service, 'getWordFindingInstance' as any).callThrough();
 
-            service.findWords(boardStub as unknown as Board, tiles, request);
+            service.findWords(boardStub as unknown as Board, tiles, 'id', request);
 
             expect(getWordFindingInstanceStub.called).to.be.true;
         });
 
         it('should call findWords', () => {
-            service.findWords(boardStub as unknown as Board, tiles, request);
+            service.findWords(boardStub as unknown as Board, tiles, 'id', request);
 
             expect(findWordsStub.called).to.be.true;
         });
@@ -65,7 +65,7 @@ describe('WordFindingService', () => {
                 boardStub as unknown as Board,
                 tiles,
                 request,
-                new Dictionary({ title: '', description: '', words: [] }),
+                new Dictionary({ title: '', description: '', words: [], id: 'id' }),
                 undefined as unknown as ScoreCalculatorService,
             ];
         });

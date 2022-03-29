@@ -26,7 +26,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: 'francais',
+    dictionary: { title: 'french', description: 'desc', id: 'frenchid' },
 };
 const DEFAULT_GAME = {
     player1: DEFAULT_PLAYER_1,
@@ -120,12 +120,6 @@ describe('ActiveGameService', () => {
         it('should remove from list with player1 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
             activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_1.id);
-            expect(activeGameService['activeGames']).to.be.empty;
-        });
-
-        it('should remove from list with player2 ID', () => {
-            expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
 

@@ -62,8 +62,9 @@ export default class DictionaryService {
     }
 
     async resetDbDictionaries(): Promise<void> {
+        console.log('reset');
         await this.collection.deleteMany({ isDefault: { $exists: false } });
-        if ((await this.collection.find({}).toArray()).length === 0) await this.populateDb();
+        if ((await this.collection.countDocuments({})) === 0) await this.populateDb();
     }
 
     async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {

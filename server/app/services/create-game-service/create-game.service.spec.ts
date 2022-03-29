@@ -6,7 +6,7 @@ import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
@@ -14,7 +14,8 @@ import { Container } from 'typedi';
 import { CreateGameService } from './create-game.service';
 chai.use(spies);
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DICTIONARY = 'french';
+const DEFAULT_DICTIONARY: DictionarySummary = { title: 'french', description: 'desc', id: 'frenchid' };
+
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_PLAYER_NAME = 'player';
@@ -41,8 +42,7 @@ describe('CreateGameService', async () => {
     let activeGameService: ActiveGameService;
     beforeEach(() => {
         activeGameService = Container.get(ActiveGameService);
-        const dictionaryService = Container.get(DictionaryService);
-        createGameService = new CreateGameService(dictionaryService, activeGameService);
+        createGameService = new CreateGameService(activeGameService);
     });
 
     afterEach(() => {

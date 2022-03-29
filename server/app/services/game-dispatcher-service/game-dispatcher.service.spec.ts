@@ -25,7 +25,7 @@ import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constant
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import DictionaryService, { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
@@ -45,7 +45,7 @@ const DEFAULT_OPPONENT_ID = 'opponent_id';
 const DEFAULT_OPPONENT_NAME = 'opponent';
 const DEFAULT_OPPONENT_ID_2 = 'opponent_id_2';
 const DEFAULT_OPPONENT_NAME_2 = 'opponent 2';
-const DEFAULT_DICTIONARY = 'francais';
+const DEFAULT_DICTIONARY: DictionarySummary = { title: 'french', description: 'desc', id: 'frenchid' };
 const DEFAULT_ROUND_TIME = 1;
 
 const DEFAULT_OPPONENT = new Player(DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
@@ -457,7 +457,7 @@ describe('GameDispatcherService', () => {
             player1: stubPlayer as unknown as Player,
             gameType: GameType.Classic,
             maxRoundTime: 60,
-            dictionary: 'francais',
+            dictionary: { title: 'french', description: 'desc', id: 'frenchid' },
         };
         let waitingRooms: WaitingRoom[];
 

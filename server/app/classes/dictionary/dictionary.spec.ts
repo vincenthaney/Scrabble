@@ -3,13 +3,14 @@
 /* eslint-disable dot-notation */
 import { expect } from 'chai';
 import Dictionary from './dictionary';
-import { DictionaryData } from './dictionary-data';
+import { DictionaryDataComplete } from './dictionary-data';
 
 const TEST_WORDS = ['ab', 'abc', 'abcd', 'abcde'];
-const DICTIONARY_DATA: DictionaryData = {
+const DICTIONARY_DATA: DictionaryDataComplete = {
     title: 'Test dictionary',
     description: 'Dictionary for testing',
     words: TEST_WORDS,
+    id: 'id',
 };
 
 describe('DictionaryNode', () => {

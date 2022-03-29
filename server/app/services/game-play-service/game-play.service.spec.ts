@@ -310,6 +310,7 @@ describe('GamePlayService', () => {
         const playerWhoLeftId = 'playerWhoLeftId';
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+        let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
@@ -319,6 +320,7 @@ describe('GamePlayService', () => {
             gamePlayService = new GamePlayService(
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
+                dictionaryServiceStub as unknown as DictionaryService,
             );
         });
 

@@ -23,7 +23,6 @@ describe('WordsVerificationService', () => {
         Container.reset();
         Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordsVerificationService);
-        dictionaryTitle = service['dictionaryService'].getDictionaryTitles()[0];
     });
 
     it('should create', () => {

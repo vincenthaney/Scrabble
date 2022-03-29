@@ -30,8 +30,7 @@ describe('DictionarySearcher', () => {
     beforeEach(() => {
         Container.set(DictionaryService, getDictionaryTestService());
         const dictionaryService = Container.get(DictionaryService);
-
-        node = dictionaryService.getDictionary(dictionaryService.getDictionaryTitles()[0]);
+        node = dictionaryService.getDictionary('test');
         playerLetters = ['A', 'B', 'C', '*'];
         boardPlacement = {
             letters: [

@@ -65,13 +65,13 @@ mockPaths[join(__dirname, DICTIONARY_RELATIVE_PATH)] = JSON.stringify(INITIAL_DI
 //     mockPaths[join(__dirname, path)] = JSON.stringify(TEST_DICTIONARY);
 // }
 
-describe('DictionaryService', () => {
+describe.only('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
     let client: MongoClient;
 
     beforeEach(async () => {
-        databaseService = Container.get(DatabaseServiceMock);
+        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
         client = (await databaseService.connectToServer()) as MongoClient;
         dictionaryService = Container.get(DictionaryService);
         dictionaryService['databaseService'] = databaseService;
@@ -93,6 +93,20 @@ describe('DictionaryService', () => {
     });
 
     describe('validateDictionary', () => {
+        it('should create the dictionary validator if it was not done before', async () => {
+            dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {
+                dictionaryService['dictionaryValidator'] = ((x: string) => {
+                    return x;
+                }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            });
+
+            const spyValidator = chai.spy.on(dictionaryService, 'dictionaryValidator', () => {});
+            await dictionaryService.validateDictionary(DICTIONARY_1);
+            expect(spyCreate).to.have.been.called;
+            expect(spyValidator).to.have.been.called;
+        });
+
         it('should create the dictionary validator if it was not done before', async () => {
             dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
             const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {

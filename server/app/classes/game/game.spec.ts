@@ -15,6 +15,7 @@ import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virt
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -44,7 +45,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: 'francais',
+    dictionary: { title: 'francais', description: 'desc', id: 'id' },
 };
 const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_2: Tile = { letter: 'B', value: 5 };
@@ -517,7 +518,7 @@ describe('Game', () => {
         const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
         const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
         const DEFAULT_TIME = 60;
-        const DEFAULT_DICTIONARY = 'dict';
+        const DEFAULT_DICTIONARY: DictionarySummary = { title: 'dict', description: 'desc', id: 'id' };
         DEFAULT_MAP = new Map<LetterValue, number>([
             ['A', 1],
             ['B', 2],
@@ -545,7 +546,7 @@ describe('Game', () => {
             game.player2 = PLAYER_2;
             chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
             game.gameType = GameType.Classic;
-            game.dictionnaryName = DEFAULT_DICTIONARY;
+            game.dictionarySummary = DEFAULT_DICTIONARY;
             chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
             game.board = board;
             chai.spy.on(game.board, ['isWithinBounds'], () => true);
