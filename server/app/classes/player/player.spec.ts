@@ -14,7 +14,7 @@ chai.use(spies);
 const ID = 'id';
 const DEFAULT_NAME = 'player';
 
-describe('Player', () => {
+describe.only('Player', () => {
     let player: Player;
 
     beforeEach(() => {
@@ -25,6 +25,7 @@ describe('Player', () => {
             { value: 2, letter: 'A' },
             { value: 4, letter: 'D' },
         ];
+        player['objectives'] = new Set([undefined as unknown as AbstractObjective]);
     });
 
     it('should create', () => {

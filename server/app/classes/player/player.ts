@@ -3,6 +3,7 @@ import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import { Container } from 'typedi';
 
 export default class Player {
     name: string;
@@ -19,6 +20,7 @@ export default class Player {
         this.score = 0;
         this.tiles = [];
         this.isConnected = true;
+        this.objectiveService = Container.get(ObjectivesService);
     }
 
     getTileRackPoints(): number {
