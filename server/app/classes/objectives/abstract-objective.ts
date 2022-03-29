@@ -24,5 +24,11 @@ export abstract class AbstractObjective {
         };
     }
 
-    abstract updateProgress(validationParameters: ValidationParameters): boolean;
+    updateObjective(validationParameters: ValidationParameters): void {
+        this.updateProgress(validationParameters);
+
+        if (this.progress >= this.maxProgress) this.state = ObjectiveState.Completed;
+    }
+
+    abstract updateProgress(validationParameters: ValidationParameters): void;
 }

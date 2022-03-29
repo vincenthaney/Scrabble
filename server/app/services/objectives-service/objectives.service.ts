@@ -27,9 +27,9 @@ export default class ObjectivesService {
         player.getObjectives().forEach((objective: AbstractObjective) => {
             if (objective.isCompleted()) return;
 
-            const isCompleted: boolean = objective.updateProgress(validationParameters);
+            objective.updateObjective(validationParameters);
 
-            if (isCompleted) {
+            if (objective.isCompleted()) {
                 this.handleObjectiveComplete(objective, player, game);
             }
         });
@@ -41,7 +41,6 @@ export default class ObjectivesService {
     private handleObjectiveComplete(objective: AbstractObjective, player: Player, game: Game): void {
         // Envoyer le message de complétion
 
-        objective.state = ObjectiveState.Completed;
         if (objective.isPublic) {
             const opponentPlayer = this.findOpponent(game, player);
             this.setOpponentPublicObjectiveComplete(opponentPlayer, objective);

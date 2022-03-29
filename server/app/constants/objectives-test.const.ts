@@ -18,8 +18,8 @@ export class TestObjective extends AbstractObjective {
     constructor(name: string, maxProgress: number) {
         super(name, 0, ObjectiveState.NotCompleted, false, 0, maxProgress);
     }
-    updateProgress(validationParameters: ValidationParameters): boolean {
-        return validationParameters === undefined;
+    updateProgress(validationParameters: ValidationParameters): void {
+        return validationParameters as unknown as void;
     }
 }
 
