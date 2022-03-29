@@ -1,13 +1,14 @@
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { DICTIONARY_PATH, INVALID_DICTIONARY_ID, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
+import { CANNOT_MODIFY_DEFAULT_DICTIONARY, DICTIONARY_PATH, INVALID_DICTIONARY_ID, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { promises } from 'fs';
 import { join } from 'path';
-import { Service } from 'typedi';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
 import { Collection, FindOptions, ObjectId, WithId } from 'mongodb';
 import Ajv, { ValidateFunction } from 'ajv';
+import { DictionaryDataComplete } from '@app/classes/dictionary/dictionary-data';
+import { Service } from 'typedi';
 
 export interface DictionaryUsage {
     dictionary: Dictionary;
@@ -17,6 +18,7 @@ export interface DictionaryUsage {
 export interface DictionarySummary {
     title: string;
     description: string;
+    id: string;
 }
 
 export const MAX_DICTIONARY_DESCRIPTION_LENGTH = 80;
@@ -29,7 +31,6 @@ export default class DictionaryService {
     private activeDictionaries: Map<string, DictionaryUsage> = new Map();
 
     constructor(private databaseService: DatabaseService) {
-        this.collection.createIndex({ title: 1 });
         // this.addAllDictionaries();
     }
 
@@ -43,12 +44,21 @@ export default class DictionaryService {
 
     async validateDictionary(dictionaryData: DictionaryData): Promise<boolean> {
         if (!this.dictionaryValidator) this.createDictionaryValidator();
-        return await this.dictionaryValidator(dictionaryData);
+        return this.dictionaryValidator(dictionaryData);
     }
 
     async addNewDictionary(dictionaryData: DictionaryData): Promise<void> {
         if (!this.validateDictionary(dictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
-        await this.collection.insertOne(dictionaryData);
+        // await this.collection.insertOne(dictionaryData);
+        await this.collection.updateOne(
+            {
+                title: dictionaryData.title,
+            },
+            {
+                $setOnInsert: dictionaryData,
+            },
+            { upsert: true },
+        );
     }
 
     async resetDbDictionaries(): Promise<void> {
@@ -57,10 +67,11 @@ export default class DictionaryService {
     }
 
     async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
-        const data = this.collection.find({}, { _id: 0, title: 1, description: 1 } as FindOptions<DictionaryData>);
+        const data = this.collection.find({}, { title: 1, description: 1 } as FindOptions<DictionaryData>);
         const dictionarySummaries: DictionarySummary[] = [];
         data.forEach((dictionary) => {
-            dictionarySummaries.push({ title: dictionary.title, description: dictionary.description });
+            // eslint-disable-next-line no-underscore-dangle
+            dictionarySummaries.push({ title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() });
         });
         return dictionarySummaries;
     }
@@ -71,12 +82,18 @@ export default class DictionaryService {
             dictionary.numberOfActiveGames++;
             return dictionary;
         }
-        const dictionaryData = await this.getDbDictionary(id);
+        const dictionaryData: DictionaryDataComplete = { ...(await this.getDbDictionary(id)), id };
         if (!dictionaryData) throw new Error(INVALID_DICTIONARY_NAME);
         const addedDictionary: DictionaryUsage = { numberOfActiveGames: 1, dictionary: new Dictionary(dictionaryData) };
         this.activeDictionaries.set(id, addedDictionary);
 
         return addedDictionary;
+    }
+
+    getDictionary(id: string): Dictionary {
+        const dictionaryUsage = this.activeDictionaries.get(id);
+        if (dictionaryUsage) return dictionaryUsage.dictionary;
+        throw new Error(INVALID_DICTIONARY_ID);
     }
 
     stopUsingDictionary(id: string): void {
@@ -93,7 +110,7 @@ export default class DictionaryService {
     async updateDictionary(id: string, description?: string, title?: string): Promise<boolean> {
         const dictionaryData = await this.getDbDictionary(id);
         if (!dictionaryData) throw new Error(INVALID_DICTIONARY_ID);
-
+        if (dictionaryData.isDefault && dictionaryData.isDefault === true) throw new Error(CANNOT_MODIFY_DEFAULT_DICTIONARY);
         // Might not work because of optional
         await this.collection.updateOne({ id_: id }, { description, title });
         return true;
@@ -104,6 +121,7 @@ export default class DictionaryService {
     }
 
     private async populateDb(): Promise<void> {
+        console.log('pop');
         await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, await DictionaryService.fetchDefaultDictionary());
     }
 

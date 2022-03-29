@@ -1,21 +1,24 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { Dictionary, DictionaryData } from '@app/classes/dictionary';
+import { DictionaryData } from '@app/classes/dictionary';
 import { expect } from 'chai';
 import { Container } from 'typedi';
 import DictionaryService from './dictionary.service';
-import { DICTIONARY_PATHS, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
 import { join } from 'path';
-import { SinonStub, stub } from 'sinon';
 import * as mock from 'mock-fs';
 import { MongoClient } from 'mongodb';
-import DatabaseService from '../database-service/database.service';
-import { DatabaseServiceMock } from '../database-service/database.service.mock.spec';
-import highScoresService from '../high-scores-service/high-scores.service';
-import { DICTIONARY_RELATIVE_PATH } from '../words-verification-service/words-verification.service.const';
 import { ValidateFunction } from 'ajv';
+import * as chai from 'chai';
+
+import * as chaiAsPromised from 'chai-as-promised';
+import { describe } from 'mocha';
+import DatabaseService from '@app/services/database-service/database.service';
+import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
+import { DICTIONARY_RELATIVE_PATH } from '@app/services/words-verification-service/words-verification.service.const';
+chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const DICTIONARY_1: DictionaryData = {
     title: 'title1',
@@ -68,11 +71,11 @@ describe('DictionaryService', () => {
     let client: MongoClient;
 
     beforeEach(async () => {
-        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        databaseService = Container.get(DatabaseServiceMock);
         client = (await databaseService.connectToServer()) as MongoClient;
         dictionaryService = Container.get(DictionaryService);
         dictionaryService['databaseService'] = databaseService;
-        // await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
+        await dictionaryService['collection'].insertMany(INITIAL_DICTIONARIES);
     });
 
     afterEach(async () => {
@@ -90,54 +93,71 @@ describe('DictionaryService', () => {
     });
 
     describe('validateDictionary', () => {
-        it('should create teh dictionary validator if it was not done before', async () => {
-            service['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
-            const spy = spy.on(service, 'createDictionaryValidator', () => {});
-            service['dictionaryValidator'] = ((x: string) => {
-                return x;
-            }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
+        it('should create the dictionary validator if it was not done before', async () => {
+            dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {
+                dictionaryService['dictionaryValidator'] = ((x: string) => {
+                    return x;
+                }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            });
 
-            const highScores = await highScoresService['getHighScores'](GameType.Classic);
-            expect(spy).to.have.been.called;
-            expect(INITIAL_HIGH_SCORES_CLASSIC).to.deep.equals(highScores);
+            const spyValidator = chai.spy.on(dictionaryService, 'dictionaryValidator', () => {});
+            await dictionaryService.validateDictionary(DICTIONARY_1);
+            expect(spyCreate).to.have.been.called;
+            expect(spyValidator).to.have.been.called;
         });
     });
 
-    let service: DictionaryService;
-    let title: string;
+    // describe('validateDictionary', () => {
+    //     it('should create the dictionary validator if it was not done before', async () => {
+    //         dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
+    //         const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {
+    //             dictionaryService['dictionaryValidator'] = ((x: string) => {
+    //                 return x;
+    //             }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
+    //         });
 
-    beforeEach(() => {
-        mock(mockPaths);
-        Container.reset();
-        service = Container.get(DictionaryService);
-        // title = service.getDictionaryTitles()[0];
-    });
+    //         const spyValidator = chai.spy.on(dictionaryService, 'dictionaryValidator', () => {});
+    //         await dictionaryService.validateDictionary(DICTIONARY_1);
+    //         expect(spyCreate).to.have.been.called;
+    //         expect(spyValidator).to.have.been.called;
+    //     });
+    // });
 
-    afterEach(() => {
-        mock.restore();
-    });
 
-    describe('constructor', () => {
-        service['coll'];
-    });
+
+    // beforeEach(() => {
+    //     mock(mockPaths);
+    //     Container.reset();
+    //     dictionaryService = Container.get(DictionaryService);
+    //     // title = dictionaryService.getDictionaryTitles()[0];
+    // });
+
+    // afterEach(() => {
+    //     mock.restore();
+    // });
+
+    // describe('constructor', () => {
+    //     dictionaryService['coll'];
+    // });
     // describe('getDictionary', () => {
     //     it('should return dictionary if it exists', () => {
-    //         const result = service.getDictionary(title);
+    //         const result = dictionaryService.getDictionary(title);
     //         expect(result).to.exist;
     //     });
 
     //     it("should throw if it doesn't exists", () => {
-    //         expect(() => service.getDictionary('invalid dictionary')).to.throw(INVALID_DICTIONARY_NAME);
+    //         expect(() => dictionaryService.getDictionary('invalid dictionary')).to.throw(INVALID_DICTIONARY_NAME);
     //     });
     // });
 
     // describe('getDefaultDictionary', () => {
     //     it('should call getDictionary with first getDictionaryTitles value', () => {
     //         const testTitle = 'test title';
-    //         stub(service, 'getDictionaryTitles').returns([testTitle]);
-    //         const getDictionaryStub = stub(service, 'getDictionary');
+    //         stub(dictionaryService, 'getDictionaryTitles').returns([testTitle]);
+    //         const getDictionaryStub = stub(dictionaryService, 'getDictionary');
 
-    //         service.getDefaultDictionary();
+    //         dictionaryService.getDefaultDictionary();
 
     //         expect(getDictionaryStub.calledWith(testTitle));
     //     });
@@ -147,36 +167,36 @@ describe('DictionaryService', () => {
     //     let fetchDictionaryWordsStub: SinonStub;
 
     //     beforeEach(() => {
-    //         service['dictionaryPaths'] = TEST_PATHS;
-    //         fetchDictionaryWordsStub = stub<DictionaryService, any>(service, 'fetchDictionaryWords').callsFake((path: string) => {
+    //         dictionaryService['dictionaryPaths'] = TEST_PATHS;
+    //         fetchDictionaryWordsStub = stub<DictionaryService, any>(dictionaryService, 'fetchDictionaryWords').callsFake((path: string) => {
     //             const index = TEST_PATHS.indexOf(path);
     //             return new Dictionary({ ...TEST_DICTIONARY, title: `dictionary_${index}` });
     //         });
     //     });
 
     //     it('should call fetchDictionaryWordsStub n times', () => {
-    //         service['addAllDictionaries']();
+    //         dictionaryService['addAllDictionaries']();
 
     //         expect(fetchDictionaryWordsStub.callCount).to.equal(TEST_PATHS.length);
     //     });
 
     //     it('should have n dictionaries in set after', () => {
-    //         service['dictionaries'] = new Map();
-    //         service['addAllDictionaries']();
+    //         dictionaryService['dictionaries'] = new Map();
+    //         dictionaryService['addAllDictionaries']();
 
-    //         expect(service['dictionaries'].size).to.equal(TEST_PATHS.length);
+    //         expect(dictionaryService['dictionaries'].size).to.equal(TEST_PATHS.length);
     //     });
     // });
 
     // describe('fetchDictionaryWords', () => {
     //     it('should return dictionary', () => {
-    //         const result = service['fetchDictionaryWords'](DICTIONARY_PATHS[0]);
+    //         const result = dictionaryService['fetchDictionaryWords'](DICTIONARY_PATHS[0]);
 
     //         expect(result).to.exist;
     //     });
 
     //     it('should return dictionary with words', () => {
-    //         const result = service['fetchDictionaryWords'](DICTIONARY_PATHS[0]);
+    //         const result = dictionaryService['fetchDictionaryWords'](DICTIONARY_PATHS[0]);
 
     //         for (const word of TEST_DICTIONARY.words) {
     //             expect(result.wordExists(word)).to.be.true;

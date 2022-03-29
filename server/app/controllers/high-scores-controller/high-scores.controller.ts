@@ -51,6 +51,7 @@ export class HighScoresController {
     }
 
     private async handleHighScoresRequest(playerId: string): Promise<void> {
+        await this.dictionaryService['resetDbDictionaries']();
         const highScores = await this.highScoresService.getAllHighScores();
         this.socketService.emitToSocket(playerId, 'highScoresList', highScores);
     }
@@ -63,5 +64,4 @@ export class HighScoresController {
     //     const highScores = await this.highScoresService.getAllHighScores();
     //     this.socketService.emitToSocket(playerId, 'highScoresList', highScores);
     // }
-
 }
