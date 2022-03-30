@@ -174,6 +174,7 @@ describe('ActionPlace', () => {
 
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
+                chai.spy.on(game.player1, 'updateObjectives', () => {});
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
 
                 action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
@@ -219,6 +220,7 @@ describe('ActionPlace', () => {
             });
 
             it('should call objective validation', () => {
+                chai.spy.restore();
                 const gameObjectives: GameObjectivesData = {
                     player1Objectives: [],
                     player2Objectives: [],
