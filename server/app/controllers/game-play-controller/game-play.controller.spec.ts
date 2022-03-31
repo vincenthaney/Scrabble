@@ -226,7 +226,6 @@ describe('GamePlayController', () => {
 
         it('should call playAction', async () => {
             const playActionSpy = chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, undefined]);
-            spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => true);
             await gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(playActionSpy).to.have.been.called();
         });
@@ -317,23 +316,38 @@ describe('GamePlayController', () => {
             });
         });
 
-        it('should call PASS when playAction throw word not in dictionary', async () => {
-            const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
-            (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
-            gamePlayServiceStub.playAction.throws('error');
+        describe('Word not in dictionnary error', () => {
+            let handlePlayActionStub: SinonStub;
+            beforeEach(() => {
+                const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
+                (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
+                gamePlayServiceStub.playAction.throws('error');
 
-            const handleErrorStub = stub<GamePlayController, any>(gamePlayController, 'handleError');
-            handleErrorStub.callsFake(async () => Promise.resolve());
+                const handleErrorStub = stub<GamePlayController, any>(gamePlayController, 'handleError');
+                handleErrorStub.callsFake(async () => Promise.resolve());
 
-            const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
-            isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
+                const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
+                isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
 
-            const handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
-            handlePlayActionStub.callThrough();
+                handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
+            });
+            it('should call PASS when playAction throw word not in dictionary', async () => {
+                chai.spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
+                handlePlayActionStub.callThrough();
 
-            await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
+                await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
-            expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PASS, payload: {}, input: '' })).to.be.true;
+                expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PASS, payload: {}, input: '' })).to.be.true;
+            });
+
+            it('should NOT call PASS if game is OVER', async () => {
+                chai.spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => true);
+                handlePlayActionStub.callThrough();
+
+                await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
+
+                expect(handlePlayActionStub.calledWith('', '', { type: ActionType.PASS, payload: {}, input: '' })).to.be.false;
+            });
         });
     });
 
