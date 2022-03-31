@@ -3,5 +3,5 @@ export const arrayDeepCopy = <T>(originalArray: T[]): T[] => {
 };
 
 export const setDeepCopy = <T>(originalSet: Set<T>): Set<T> => {
-    return JSON.parse(JSON.stringify(originalSet));
+    return new Set<T>(JSON.parse(JSON.stringify(Array.from(originalSet))));
 };
