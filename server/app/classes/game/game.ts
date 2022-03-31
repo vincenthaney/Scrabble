@@ -129,17 +129,20 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         this.gameIsOver = true;
-        this.completeGameHistory(winnerName);
+        let player1Score: number;
+        let player2Score: number;
 
         if (winnerName) {
-            if (winnerName === this.player1.name) {
-                return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-            } else {
-                return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
-            }
+            [player1Score, player2Score] =
+                winnerName === this.player1.name
+                    ? this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints())
+                    : this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         } else {
-            return this.getEndOfGameScores();
+            [player1Score, player2Score] = this.getEndOfGameScores();
         }
+
+        this.completeGameHistory(winnerName);
+        return [player1Score, player2Score];
     }
 
     endGameMessage(winnerName: string | undefined): string[] {
