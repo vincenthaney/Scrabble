@@ -15,7 +15,14 @@ export class LobbyInfoComponent implements OnInit {
 
     constructor() {
         this.joinLobbyId = new EventEmitter<string>();
-        this.lobby = { lobbyId: '0', dictionary: '', hostName: '', gameType: GameType.Classic, maxRoundTime: 0, canJoin: false };
+        this.lobby = {
+            lobbyId: '0',
+            dictionary: { title: '', description: '', id: '' },
+            hostName: '',
+            gameType: GameType.Classic,
+            maxRoundTime: 0,
+            canJoin: false,
+        };
         this.roundTime = Timer.convertTime(this.lobby.maxRoundTime);
     }
 

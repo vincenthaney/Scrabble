@@ -6,7 +6,6 @@ export default class Dictionary extends DictionaryNode {
 
     constructor(dictionaryData: DictionaryDataComplete) {
         super();
-
         this.summary = { title: dictionaryData.title, id: dictionaryData.id, description: dictionaryData.description };
         this.depth = -1;
 

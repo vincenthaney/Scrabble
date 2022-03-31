@@ -1,9 +1,12 @@
 import { Dictionary } from '.';
 
-export interface DictionaryData {
+export interface DictionaryDataBasic {
     title: string;
     description: string;
     words: string[];
+}
+
+export interface DictionaryData extends DictionaryDataBasic {
     isDefault?: boolean;
 }
 

@@ -113,6 +113,13 @@ export default class DictionaryService {
         await this.collection.findOneAndDelete({ _id: new ObjectId(dictionaryId), isDefault: { $exists: false } });
     }
 
+    async getDbDictionary(id: string): Promise<DictionaryData> {
+        const dictionaryData: DictionaryData | null = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
+        if (dictionaryData) return dictionaryData;
+
+        throw new Error(INVALID_DICTIONARY_ID);
+    }
+
     private async isTitleValid(title: string): Promise<boolean> {
         return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
@@ -127,13 +134,6 @@ export default class DictionaryService {
 
     private async populateDb(): Promise<void> {
         await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, [await DictionaryService.fetchDefaultDictionary()]);
-    }
-
-    private async getDbDictionary(id: string): Promise<DictionaryData> {
-        const dictionaryData: DictionaryData | null = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
-        if (dictionaryData) return dictionaryData;
-
-        throw new Error(INVALID_DICTIONARY_ID);
     }
 
     private createDictionaryValidator(): void {

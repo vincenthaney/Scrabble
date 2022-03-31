@@ -51,10 +51,25 @@ export class DictionaryController {
             }
         });
 
-        this.router.get('/dictionary', async (req: DictionaryRequest, res: Response) => {
+        this.router.get('/dictionary/summary', async (req: DictionaryRequest, res: Response) => {
             try {
                 const dictionarySummaries: DictionarySummary[] = await this.dictionaryService.getDictionarySummaryTitles();
                 res.status(StatusCodes.OK).send(dictionarySummaries);
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+
+        this.router.get('/dictionary', async (req: DictionaryRequest, res: Response) => {
+            const body: string = req.body;
+
+            try {
+                const dictionaryData: DictionaryData = await this.dictionaryService.getDbDictionary(body);
+                res.status(StatusCodes.OK).send({
+                    title: dictionaryData.title,
+                    description: dictionaryData.description,
+                    words: dictionaryData.words,
+                });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }

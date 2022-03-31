@@ -96,9 +96,25 @@ describe('DictionaryController', () => {
 
         describe('GET /dictionary', () => {
             it('should return OK', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDictionarySummaryTitles', () => {});
+                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {});
 
                 return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.OK);
+            });
+
+            it('should return BAD_REQUEST on throw httpException', async () => {
+                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
+                });
+
+                return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('GET /dictionary/summary', () => {
+            it('should return OK', async () => {
+                chai.spy.on(controller['dictionaryService'], 'getDictionarySummaryTitles', () => {});
+
+                return supertest(expressApp).get('/api/dictionary/summary').expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -106,7 +122,7 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).get('/api/dictionary/summary').expect(StatusCodes.BAD_REQUEST);
             });
         });
 
