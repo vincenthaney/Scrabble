@@ -82,12 +82,14 @@ export default class DictionaryService {
     }
 
     async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
-        const data = await this.collection.find({}, { projection: { title: 1, description: 1 } }).toArray();
+        const data = await this.collection.find({}, { projection: { title: 1, description: 1, isDefault: 1 } }).toArray();
         const dictionarySummaries: DictionarySummary[] = [];
         data.forEach((dictionary) => {
-            // It is necessary to access the ObjectId of the mongodb document which
+            // It is necessary to access the ObjectId of the mongodb document which is written '_id'
             // eslint-disable-next-line no-underscore-dangle
-            dictionarySummaries.push({ title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() });
+            const summary: DictionarySummary = { title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() };
+            if (dictionary.isDefault) summary.isDefault = dictionary.isDefault;
+            dictionarySummaries.push(summary);
         });
         return dictionarySummaries;
     }
