@@ -1,83 +1,124 @@
-// /* eslint-disable dot-notation */
-// import { Application } from '@app/app';
-// import { HttpException } from '@app/classes/http-exception/http-exception';
-// import * as chai from 'chai';
-// import * as chaiAsPromised from 'chai-as-promised';
-// import * as spies from 'chai-spies';
-// import { StatusCodes } from 'http-status-codes';
-// import { stub } from 'sinon';
-// import * as supertest from 'supertest';
-// import { Container } from 'typedi';
-// import { HighScoresController } from './high-scores.controller';
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable dot-notation */
+import { Application } from '@app/app';
+import { GameHistory, PlayerHistoryData } from '@app/classes/database/game-history';
+import { GameMode } from '@app/classes/game/game-mode';
+import { GameType } from '@app/classes/game/game-type';
+import { HttpException } from '@app/classes/http-exception/http-exception';
+import { GameHistoriesController } from '@app/controllers/game-histories-controller/game-histories.controller';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { StatusCodes } from 'http-status-codes';
+import * as supertest from 'supertest';
+import { Container } from 'typedi';
 
-// const expect = chai.expect;
+const expect = chai.expect;
 
-// chai.use(spies);
-// chai.use(chaiAsPromised);
+chai.use(spies);
+chai.use(chaiAsPromised);
 
-// const DEFAULT_PLAYER_ID = 'playerId';
+const DEFAULT_EXCEPTION = 'exception';
 
-// const DEFAULT_EXCEPTION = 'exception';
+const DEFAULT_WINNER_DATA: PlayerHistoryData = {
+    name: 'Matildd Broussaux',
+    score: 569,
+    isVirtualPlayer: false,
+    isWinner: true,
+};
 
-// describe('HighScoresController', () => {
-//     let controller: HighScoresController;
+const DEFAULT_LOSER_DATA: PlayerHistoryData = {
+    name: 'RaphaitLaVaisselle',
+    score: 420,
+    isVirtualPlayer: false,
+    isWinner: false,
+};
 
-//     beforeEach(() => {
-//         Container.reset();
-//         controller = Container.get(HighScoresController);
+const DEFAULT_GAME_HISTORY: GameHistory = {
+    startTime: new Date(),
+    endTime: new Date(),
+    player1Data: DEFAULT_WINNER_DATA,
+    player2Data: DEFAULT_LOSER_DATA,
+    gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
+    hasBeenAbandonned: false,
+};
 
-//         stub(controller['socketService'], 'removeFromRoom').callsFake(() => {
-//             return;
-//         });
-//         stub(controller['socketService'], 'emitToSocket').callsFake(() => {
-//             return;
-//         });
-//     });
+describe('GameHistoriesController', () => {
+    let controller: GameHistoriesController;
 
-//     it('should create', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-//         expect(controller).to.exist;
-//     });
+    beforeEach(() => {
+        Container.reset();
+        controller = Container.get(GameHistoriesController);
+    });
 
-//     it('router should be created', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-//         expect(controller.router).to.exist;
-//     });
+    it('controller should create', () => {
+        expect(controller).to.exist;
+    });
 
-//     describe('configureRouter', () => {
-//         let expressApp: Express.Application;
+    it('router should be created', () => {
+        expect(controller.router).to.exist;
+    });
 
-//         beforeEach(() => {
-//             const app = Container.get(Application);
-//             expressApp = app.app;
-//         });
+    describe('configureRouter', () => {
+        let expressApp: Express.Application;
 
-//         describe('GET /highScores/:playerId', () => {
-//             it('should return NO_CONTENT', async () => {
-//                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-//                 chai.spy.on(controller, 'handleHighScoresRequest', () => {});
+        beforeEach(() => {
+            const app = Container.get(Application);
+            expressApp = app.app;
+        });
 
-//                 return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
-//             });
+        describe('GET /gameHistories/:playerId', () => {
+            it('should return OK', async () => {
+                chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
+                    return undefined;
+                });
 
-//             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-//                 chai.spy.on(controller, 'handleHighScoresRequest', () => {
-//                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
-//                 });
+                return supertest(expressApp).get('/api/gameHistories').expect(StatusCodes.OK);
+            });
 
-//                 return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
-//             });
-//         });
-//     });
+            it('should return have gameHistories attribute in body', async () => {
+                chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
+                    return [DEFAULT_GAME_HISTORY];
+                });
 
-//     describe('handleHighScoresRequest', () => {
-//         it('should call socketService.emitToSocket', async () => {
-//             // eslint-disable-next-line @typescript-eslint/no-empty-function
-//             const spyEmitToSocket = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
-//             const spyGetAllHighScores = chai.spy.on(controller['highScoresService'], 'getAllHighScores', () => []);
-//             await controller['handleHighScoresRequest'](DEFAULT_PLAYER_ID);
-//             expect(spyEmitToSocket).to.have.been.called();
-//             expect(spyGetAllHighScores).to.have.been.called();
-//         });
-//     });
-// });
+                return expect((await supertest(expressApp).get('/api/gameHistories')).body).to.have.property('gameHistories');
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).get('/api/gameHistories').expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
+        describe('DELETE /gameHistories', () => {
+            it('should return NO_CONTENT', async () => {
+                chai.spy.on(controller, 'handleGameHistoriesReset', () => {
+                    return;
+                });
+
+                return supertest(expressApp).delete('/api/gameHistories').expect(StatusCodes.NO_CONTENT);
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller, 'handleGameHistoriesReset', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).delete('/api/gameHistories').expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+    });
+
+    describe('handleGameHistoriesReset', () => {
+        it('should call socketService.emitToSocket', async () => {
+            const spyResetHistories = chai.spy.on(controller['gameHistoriesService'], 'resetGameHistories', () => []);
+            await controller['handleGameHistoriesReset']();
+            expect(spyResetHistories).to.have.been.called();
+        });
+    });
+});

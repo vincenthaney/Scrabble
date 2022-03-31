@@ -1,7 +1,7 @@
 import { GameHistoriesRequest } from '@app/classes/communication/request';
+import { GameHistory } from '@app/classes/database/game-history';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
-import { SocketService } from '@app/services/socket-service/socket.service';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -10,18 +10,17 @@ import { Service } from 'typedi';
 export class GameHistoriesController {
     router: Router;
 
-    constructor(private gameHistoriesService: GameHistoriesService, private socketService: SocketService) {
+    constructor(private gameHistoriesService: GameHistoriesService) {
         this.configureRouter();
     }
 
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/gameHistories/:playerId', async (req: GameHistoriesRequest, res: Response) => {
-            const { playerId } = req.body.playerId;
+        this.router.get('/gameHistories', async (req: GameHistoriesRequest, res: Response) => {
             try {
-                await this.handleGameHistoriesRequest(playerId);
-                res.status(StatusCodes.OK).send();
+                const gameHistories: GameHistory[] = await this.gameHistoriesService.getAllGameHistories();
+                res.status(StatusCodes.OK).send({ gameHistories: gameHistories ?? [] });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
@@ -35,11 +34,6 @@ export class GameHistoriesController {
                 HttpException.sendError(exception, res);
             }
         });
-    }
-
-    private async handleGameHistoriesRequest(playerId: string): Promise<void> {
-        const gameHistories = await this.gameHistoriesService.getAllGameHistories();
-        this.socketService.emitToSocket(playerId, 'gameHistoriesList', gameHistories);
     }
 
     private async handleGameHistoriesReset(): Promise<void> {
