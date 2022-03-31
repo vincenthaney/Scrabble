@@ -18,6 +18,7 @@ import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
@@ -310,6 +311,7 @@ describe('GamePlayService', () => {
         const playerWhoLeftId = 'playerWhoLeftId';
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+        let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
@@ -319,6 +321,7 @@ describe('GamePlayService', () => {
             gamePlayService = new GamePlayService(
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
+                gameHistoriesServiceStub as unknown as GameHistoriesService,
             );
         });
 

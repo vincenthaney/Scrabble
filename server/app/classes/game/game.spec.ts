@@ -23,6 +23,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameMode } from './game-mode';
 import { GameType } from './game-type';
 
 const expect = chai.expect;
@@ -43,6 +44,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: 'francais',
 };
@@ -561,6 +563,7 @@ describe('Game', () => {
                 player1: game.player1,
                 player2: game.player2,
                 gameType: game.gameType,
+                gameMode: game.gameMode,
                 maxRoundTime: DEFAULT_TIME,
                 dictionary: DEFAULT_DICTIONARY,
                 gameId: DEFAULT_GAME_ID,

@@ -15,6 +15,7 @@ export class HighScoresController {
     constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();
     }
+
     handleGetHighScores(): void {
         const endpoint = `${environment.serverUrl}/highScores/${this.socketService.getId()}`;
         this.http.get(endpoint).subscribe();

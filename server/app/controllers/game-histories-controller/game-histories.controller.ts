@@ -38,7 +38,7 @@ export class GameHistoriesController {
     }
 
     private async handleGameHistoriesRequest(playerId: string): Promise<void> {
-        const gameHistories = await this.gameHistoriesService.getGameHistories();
+        const gameHistories = await this.gameHistoriesService.getAllGameHistories();
         this.socketService.emitToSocket(playerId, 'gameHistoriesList', gameHistories);
     }
 
