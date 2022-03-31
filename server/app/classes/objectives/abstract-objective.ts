@@ -10,7 +10,7 @@ export abstract class AbstractObjective {
         public name: string,
         public description: string,
         public bonusPoints: number,
-        readonly isPublic: boolean,
+        public isPublic: boolean,
         protected readonly maxProgress: number,
     ) {}
 
