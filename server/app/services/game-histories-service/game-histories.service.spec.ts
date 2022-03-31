@@ -12,7 +12,7 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
-import { Collection, MongoClient } from 'mongodb';
+import { MongoClient } from 'mongodb';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 chai.use(chaiAsPromised); // this allows us to test for rejection
@@ -45,7 +45,7 @@ const OTHER_GAME_HISTORY: GameHistory = { ...DEFAULT_GAME_HISTORY, gameType: Gam
 
 const INITIAL_GAME_HISTORIES: GameHistory[] = [{ ...DEFAULT_GAME_HISTORY }, { ...DEFAULT_GAME_HISTORY }, { ...DEFAULT_GAME_HISTORY }];
 
-describe.only('GameHistoriesService', () => {
+describe('GameHistoriesService', () => {
     let gameHistoriesService: GameHistoriesService;
     let databaseService: DatabaseService;
     let client: MongoClient;
@@ -77,15 +77,6 @@ describe.only('GameHistoriesService', () => {
             await gameHistoriesService.addGameHistory(DEFAULT_GAME_HISTORY);
             const finalLength: number = (await gameHistoriesService.getAllGameHistories()).length;
             expect(finalLength).to.equal(initialLength + 1);
-        });
-
-        it('should throw Error if insertOne throws', async () => {
-            chai.spy.on(Collection, 'insertOne', () => {
-                throw new Error('erreur');
-            });
-            expect(async () => {
-                await gameHistoriesService.addGameHistory(DEFAULT_GAME_HISTORY);
-            }).to.throw;
         });
 
         it('last gameHistory should be the one we just added', async () => {

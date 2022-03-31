@@ -53,11 +53,11 @@ describe('HighScoresController', () => {
         });
 
         describe('GET /highScores/:playerId', () => {
-            it('should return NO_CONTENT', async () => {
+            it('should return OK', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 chai.spy.on(controller, 'handleHighScoresRequest', () => {});
 
-                return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.OK);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
