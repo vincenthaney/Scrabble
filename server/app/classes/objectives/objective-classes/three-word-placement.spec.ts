@@ -9,7 +9,7 @@ import { DEFAULT_SQUARE } from '@app/classes/word-finding/helper.spec';
 import { expect } from 'chai';
 import { ThreeWordsPlacement } from './three-word-placement';
 
-describe.only('Three words created Objective', () => {
+describe('Three words created Objective', () => {
     let objective: ThreeWordsPlacement;
 
     beforeEach(() => {
