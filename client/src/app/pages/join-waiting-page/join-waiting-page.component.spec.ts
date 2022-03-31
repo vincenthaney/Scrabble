@@ -25,7 +25,7 @@ const DEFAULT_LOBBY: LobbyInfo = {
     lobbyId: '1',
     hostName: 'Name1',
     gameType: GameType.Classic,
-    dictionary: 'default',
+    dictionary: { id: 'id', title: 'title', description: 'description' },
     maxRoundTime: 60,
     canJoin: false,
 };

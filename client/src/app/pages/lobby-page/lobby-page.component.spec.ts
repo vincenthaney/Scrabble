@@ -112,9 +112,30 @@ describe('LobbyPageComponent', () => {
 
     beforeEach(() => {
         component.lobbies = [
-            { lobbyId: '1', hostName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
-            { lobbyId: '2', hostName: 'Name2', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: true },
-            { lobbyId: '3', hostName: 'Name3', gameType: GameType.LOG2990, dictionary: 'default', maxRoundTime: 90, canJoin: false },
+            {
+                lobbyId: '1',
+                hostName: 'Name1',
+                gameType: GameType.Classic,
+                dictionary: { id: 'id', title: 'title', description: 'description' },
+                maxRoundTime: 60,
+                canJoin: false,
+            },
+            {
+                lobbyId: '2',
+                hostName: 'Name2',
+                gameType: GameType.Classic,
+                dictionary: { id: 'id', title: 'title', description: 'description' },
+                maxRoundTime: 60,
+                canJoin: true,
+            },
+            {
+                lobbyId: '3',
+                hostName: 'Name3',
+                gameType: GameType.LOG2990,
+                dictionary: { id: 'id', title: 'title', description: 'description' },
+                maxRoundTime: 90,
+                canJoin: false,
+            },
         ];
 
         component.nameField = new NameFieldComponent();
@@ -204,7 +225,7 @@ describe('LobbyPageComponent', () => {
                     hostName: 'name',
                     gameType: GameType.Classic,
                     maxRoundTime: 60,
-                    dictionary: 'dictionary',
+                    dictionary: { id: 'id', title: 'title', description: 'description' },
                     canJoin: true,
                 },
             ];
@@ -291,7 +312,7 @@ describe('LobbyPageComponent', () => {
                 hostName: 'player',
                 gameType: GameType.Classic,
                 maxRoundTime: 0,
-                dictionary: 'default',
+                dictionary: { id: 'id', title: 'title', description: 'description' },
             };
 
             getGameTypeSpy = spyOn(component.filterFormGroup, 'get').and.returnValue({ value: 'all' } as AbstractControl);
@@ -349,7 +370,14 @@ describe('LobbyPageComponent', () => {
 
     it('updateLobbies should be called when lobbiesUpdateEvent is emittted', () => {
         const emitLobbies: LobbyInfo[] = [
-            { lobbyId: '1', hostName: 'Name1', gameType: GameType.Classic, dictionary: 'default', maxRoundTime: 60, canJoin: false },
+            {
+                lobbyId: '1',
+                hostName: 'Name1',
+                gameType: GameType.Classic,
+                dictionary: { id: 'id', title: 'title', description: 'description' },
+                maxRoundTime: 60,
+                canJoin: false,
+            },
         ];
         const spySetOpponent = spyOn<any>(component, 'updateLobbies').and.callFake(() => {
             return;

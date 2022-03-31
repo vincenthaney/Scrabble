@@ -202,7 +202,7 @@ describe('GameService', () => {
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
                 maxRoundTime: 1,
-                dictionary: 'default',
+                dictionary: { id: 'id', title: 'title', description: 'description' },
                 gameId: 'game-id',
                 board: new Array(DEFAULT_GRID_SIZE).map((_, y) => {
                     return new Array(DEFAULT_GRID_SIZE).map((__, x) => ({ ...DEFAULT_SQUARE, position: { row: y, column: x } }));
@@ -364,7 +364,7 @@ describe('GameService', () => {
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
                 maxRoundTime: 1,
-                dictionary: 'default',
+                dictionary: { id: 'id', title: 'title', description: 'description' },
                 gameId: 'game-id',
                 board: new Array(DEFAULT_GRID_SIZE).map((_, y) => {
                     return new Array(DEFAULT_GRID_SIZE).map((__, x) => ({ ...DEFAULT_SQUARE, position: { row: y, column: x } }));

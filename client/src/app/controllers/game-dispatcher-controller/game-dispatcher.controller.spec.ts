@@ -26,7 +26,7 @@ const DEFAULT_GAME_DATA: GameConfigData = {
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
     maxRoundTime: 0,
-    dictionary: '',
+    dictionary: { id: 'id', title: 'title', description: 'description' },
 };
 
 describe('GameDispatcherController', () => {

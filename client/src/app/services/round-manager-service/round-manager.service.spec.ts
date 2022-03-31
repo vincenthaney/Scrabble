@@ -116,7 +116,7 @@ describe('RoundManagerService', () => {
             player2: player2Data,
             gameType: GameType.Classic,
             maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-            dictionary: 'default',
+            dictionary: { id: 'id', title: 'title', description: 'description' },
             gameId,
             board: [],
             tileReserve: [],

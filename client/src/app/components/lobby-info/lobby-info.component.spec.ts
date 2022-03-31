@@ -29,7 +29,7 @@ const TEST_LOBBY: LobbyInfo = {
     hostName: 'playerName',
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: '',
+    dictionary: { id: 'id', title: 'title', description: 'description' },
     canJoin: false,
 };
 

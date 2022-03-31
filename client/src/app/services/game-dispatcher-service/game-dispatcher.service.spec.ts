@@ -22,7 +22,7 @@ const TEST_LOBBY_DATA: LobbyData = {
     hostName: '',
     gameType: GameType.Classic,
     maxRoundTime: 0,
-    dictionary: '',
+    dictionary: { id: 'id', title: 'title', description: 'description' },
 };
 const TEST_LOBBY_INFO: LobbyInfo = {
     ...TEST_LOBBY_DATA,
@@ -35,7 +35,7 @@ const TEST_GAME_PARAMETERS = {
     virtualPlayerName: 'Victoria',
     level: VirtualPlayerLevel.Beginner,
     timer: '60',
-    dictionary: 'français',
+    dictionary: { id: 'id', title: 'title', description: 'description' },
 };
 const TEST_FORM_CONTENT = {
     gameType: new FormControl(GameType.Classic, Validators.required),
@@ -213,7 +213,8 @@ describe('GameDispatcherService', () => {
             virtualPlayerName: TEST_GAME_PARAMETERS.virtualPlayerName,
             virtualPlayerLevel: TEST_GAME_PARAMETERS.level,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            dictionary: TEST_GAME_PARAMETERS.dictionary,
+            // TODO: VINCENT DOIT LE CHANGER
+            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4' },
         };
 
         service.handleCreateGame(TEST_PLAYER_NAME, TEST_FORM);
@@ -233,7 +234,8 @@ describe('GameDispatcherService', () => {
             gameType: TEST_GAME_PARAMETERS.gameType,
             gameMode: GameMode.Multiplayer,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            dictionary: TEST_GAME_PARAMETERS.dictionary,
+            // TODO: VINCENT DOIT LE CHANGER
+            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4' },
         };
 
         TEST_FORM.controls.gameMode.patchValue(GameMode.Multiplayer);

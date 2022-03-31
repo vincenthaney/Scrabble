@@ -62,7 +62,7 @@ const DEFAULT_START_GAME_DATA: InitializeGameData = {
         player2: undefined as unknown as PlayerData,
         gameType: GameType.Classic,
         maxRoundTime: 0,
-        dictionary: '',
+        dictionary: { id: 'id', title: 'title', description: 'description' },
         gameId: DEFAULT_GAME_ID,
         board: [[]],
         tileReserve: [],
