@@ -85,8 +85,6 @@ export class GamePlayController {
 
             const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
 
-            if (this.gamePlayService.isGameOver(gameId, playerId)) return;
-
             if (updateData) {
                 this.gameUpdate(gameId, updateData);
             }
@@ -97,6 +95,8 @@ export class GamePlayController {
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
+                if (this.gamePlayService.isGameOver(gameId, playerId)) return;
+
                 await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
             }
         }

@@ -29,6 +29,7 @@ import { SocketService } from './services';
 import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-page.component';
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
+import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -60,6 +61,7 @@ import { ConvertDialogComponent } from './components/convert-dialog/convert-dial
         HighScoresPageComponent,
         HighScoreBoxComponent,
         ConvertDialogComponent,
+        AdminPageComponent,
     ],
     imports: [
         AppMaterialModule,
