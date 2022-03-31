@@ -100,6 +100,7 @@ export default class DictionaryService {
         const data = await this.collection.find({}, { projection: { title: 1, description: 1 } }).toArray();
         const dictionarySummaries: DictionarySummary[] = [];
         data.forEach((dictionary) => {
+            // It is necessary to access the ObjectId of the mongodb document which 
             // eslint-disable-next-line no-underscore-dangle
             dictionarySummaries.push({ title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() });
         });
@@ -138,8 +139,13 @@ export default class DictionaryService {
     }
 
     private async getDbDictionary(id: string): Promise<DictionaryData> {
-        const dictionaryData = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
+        const dictionaryData: DictionaryData | null = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
+        console.log('---');
+        console.log(dictionaryData);
+        console.log('---');
         if (dictionaryData) return dictionaryData;
+        console.log('throw');
+
         throw new Error(INVALID_DICTIONARY_ID);
     }
 

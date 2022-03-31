@@ -11,7 +11,7 @@ import { Container } from 'typedi';
 import DictionaryService, { DictionaryUpdateInfo, DictionaryUsage } from './dictionary.service';
 import { join } from 'path';
 import * as mock from 'mock-fs';
-import { MongoClient, WithId } from 'mongodb';
+import { MongoClient, ObjectId, WithId } from 'mongodb';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
 
@@ -189,6 +189,18 @@ describe.only('DictionaryService', () => {
             expect(result._id).to.deep.equal(dictToModify._id);
         });
 
+        it('should update the dictionary if it is not a default one and legal (only new description)', async () => {
+            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
+            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifiedDescription' };
+
+            await dictionaryService.updateDictionary(updateInfo);
+            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
+
+            expect(result.title).to.equal(DICTIONARY_2.title);
+            expect(result.description).to.equal(updateInfo.description);
+            expect(result._id).to.deep.equal(dictToModify._id);
+        });
+
         it('should not update the dictionary if it is a default one and legal', async () => {
             const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray())[0];
 
@@ -255,7 +267,7 @@ describe.only('DictionaryService', () => {
         });
     });
 
-    describe('getDbDictionary', () => {
+    describe('getDbDictionary', async () => {
         it('should return the wanted dictionary with a valid id', async () => {
             const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
 
@@ -265,11 +277,11 @@ describe.only('DictionaryService', () => {
         });
 
         it('should throw with a invalid id', async () => {
-            expect(dictionaryService['getDbDictionary']('badid')).to.eventually.be.rejectedWith(Error);
+            expect(dictionaryService['getDbDictionary'](new ObjectId().toString())).to.eventually.be.rejectedWith(Error);
         });
     });
 
-    describe('createDictionaryValidator', () => {
+    describe('createDictionaryValidator', async () => {
         const dictionariesToTest: [DictionaryData, boolean, string][] = [
             [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
             [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
@@ -308,7 +320,7 @@ describe.only('DictionaryService', () => {
                 return {} as unknown as DictionaryData;
             });
 
-            expect(dictionaryService.useDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE);
+            expect(await dictionaryService.useDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE);
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
             expect(dictionaryService['activeDictionaries'].size).to.equal(1);
             expect(spy).not.to.have.called();
@@ -331,22 +343,23 @@ describe.only('DictionaryService', () => {
         });
     });
 
-    describe('getDictionary', async () => {
+    describe('getDictionary', () => {
         const BASE_DICTIONARY_ID = 'id1';
         const BASE_DICTIONARY_USAGE: DictionaryUsage = {
             dictionary: { summary: { id: BASE_DICTIONARY_ID } } as unknown as Dictionary,
             numberOfActiveGames: 1,
         };
-        beforeEach(async () => {
+        beforeEach(() => {
             dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
-        it('should return the dictionary if it exists', async () => {
+        it('should return the dictionary if it exists', () => {
             expect(dictionaryService.getDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE.dictionary);
         });
 
-        it('should throw if the dictionaryId is not a key of the map', async () => {
-            expect(() => dictionaryService.getDictionary(BASE_DICTIONARY_ID)).to.throw(INVALID_DICTIONARY_ID);
+        it('should throw if the dictionaryId is not a key of the map', () => {
+            const result = () => dictionaryService.getDictionary('allo');
+            expect(result).to.throw(INVALID_DICTIONARY_ID);
         });
     });
 
@@ -357,6 +370,7 @@ describe.only('DictionaryService', () => {
             numberOfActiveGames: 1,
         };
         beforeEach(async () => {
+            dictionaryService['activeDictionaries'].clear();
             dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
