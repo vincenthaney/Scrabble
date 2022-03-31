@@ -17,11 +17,11 @@ export class GameHistoriesController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/gameHistories', async (req: GameHistoriesRequest, res: Response) => {
-            const playerId = req.body.playerId;
+        this.router.get('/gameHistories/:playerId', async (req: GameHistoriesRequest, res: Response) => {
+            const { playerId } = req.body.playerId;
             try {
                 await this.handleGameHistoriesRequest(playerId);
-                res.status(StatusCodes.NO_CONTENT).send();
+                res.status(StatusCodes.OK).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
