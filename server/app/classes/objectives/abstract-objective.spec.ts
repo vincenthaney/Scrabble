@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { TestObjective, TEST_OBJECTIVE_MAX_PROGRESS } from '@app/constants/objectives-test.const';
+import { TestObjective, TEST_OBJECTIVE_MAX_PROGRESS } from '@app/constants/services-constants/objectives-test.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';

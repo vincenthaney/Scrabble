@@ -6,6 +6,7 @@ import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import { ObjectiveState } from '@app/classes/objectives/objective-state';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
+import { NUMBER_OF_OBJECTIVES_PER_PLAYER, NUMBER_OF_PUBLIC_OBJECTIVES } from '@app/constants/services-constants/objective.const';
 import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import { Service } from 'typedi';
@@ -16,9 +17,9 @@ export default class ObjectivesService {
     // Actually créer les objectifs
     async createObjectivesForGame(): Promise<GameObjectives> {
         const objectivesPool: Set<AbstractObjective> = await this.createObjectivesPool();
-        const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, 2));
-        const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, 1)[0];
-        const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, 1)[0];
+        const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PUBLIC_OBJECTIVES));
+        const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
+        const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
         return { publicObjectives, player1Objective, player2Objective };
     }
 
@@ -74,7 +75,7 @@ export default class ObjectivesService {
         return new Set();
     }
 
-    private popRandomObjectiveFromPool(pool: Set<AbstractObjective>, numberOfObjectives: number): AbstractObjective[] {
+    private popRandomObjectiveFromPool(pool: Set<AbstractObjective>, numberOfObjectives: number = 1): AbstractObjective[] {
         const objectives: AbstractObjective[] = Random.getRandomElementsFromArray([...pool.values()], numberOfObjectives);
         objectives.forEach((o: AbstractObjective) => pool.delete(o));
         return objectives;

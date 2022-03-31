@@ -1,0 +1,2 @@
+export const NUMBER_OF_PUBLIC_OBJECTIVES = 2;
+export const NUMBER_OF_OBJECTIVES_PER_PLAYER = 1;
