@@ -190,11 +190,11 @@ export default class Game {
         return this.player1.id === playerId || this.player2.id === playerId;
     }
 
-    private async initializeObjectives(): Promise<void> {
+    private initializeObjectives(): void {
         if (this.gameType === GameType.Classic) return;
 
-        const gameObjectives: GameObjectives = await Game.objectivesService.createObjectivesForGame();
-        await this.player1.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player1Objective));
-        await this.player2.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player2Objective));
+        const gameObjectives: GameObjectives = Game.objectivesService.createObjectivesForGame();
+        this.player1.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player1Objective));
+        this.player2.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player2Objective));
     }
 }

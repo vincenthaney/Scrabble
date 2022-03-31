@@ -43,7 +43,7 @@ export default class Player {
         return [...this.objectives.values()];
     }
 
-    async initializeObjectives(objectives: Set<AbstractObjective>): Promise<void> {
+    initializeObjectives(objectives: Set<AbstractObjective>): void {
         this.objectives = objectives;
     }
 

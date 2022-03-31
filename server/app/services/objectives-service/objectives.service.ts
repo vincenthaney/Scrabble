@@ -19,8 +19,8 @@ import { Service } from 'typedi';
 @Service()
 export default class ObjectivesService {
     // Actually créer les objectifs
-    async createObjectivesForGame(): Promise<GameObjectives> {
-        const objectivesPool: Set<AbstractObjective> = await this.createObjectivesPool();
+    createObjectivesForGame(): GameObjectives {
+        const objectivesPool: Set<AbstractObjective> = this.createObjectivesPool();
         const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PUBLIC_OBJECTIVES));
         const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
         const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
@@ -75,7 +75,7 @@ export default class ObjectivesService {
             : { ...updateData, player2Objectives: playerObjectivesData };
     }
 
-    private async createObjectivesPool(): Promise<Set<AbstractObjective>> {
+    private createObjectivesPool(): Set<AbstractObjective> {
         return new Set();
     }
 
