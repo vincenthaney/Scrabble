@@ -16,7 +16,7 @@ import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
-import { SENDER_REQUIRED, CONTENT_REQUIRED } from '@app/constants/controllers-errors';
+import { CONTENT_REQUIRED, SENDER_REQUIRED } from '@app/constants/controllers-errors';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
@@ -442,6 +442,7 @@ describe('GamePlayController', () => {
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;
+        let resetStub: SinonStub;
 
         beforeEach(() => {
             socketServiceStub = createStubInstance(SocketService);
@@ -456,6 +457,7 @@ describe('GamePlayController', () => {
             (gamePlayController['activeGameService'] as unknown) = activeGameServiceStub;
 
             delayStub = stub(Delay, 'for');
+            resetStub = stub(gamePlayController['gamePlayService'], 'handleResetObjectives').callsFake(() => {});
         });
 
         afterEach(() => {
@@ -473,6 +475,12 @@ describe('GamePlayController', () => {
             const getGameSpy = spy.on(gamePlayController['activeGameService'], 'getGame');
             await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
             expect(getGameSpy.called).to.be.not.ok;
+        });
+
+        it('should call handleResetObjectives if game is not over', async () => {
+            spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
+            await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
+            expect(resetStub.called).to.be.true;
         });
 
         it('should call emitToSocket if game is not over', async () => {
