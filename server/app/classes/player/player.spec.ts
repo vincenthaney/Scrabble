@@ -3,6 +3,7 @@
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { generateTestObjective } from '@app/constants/services-constants/objectives-test.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
@@ -14,7 +15,7 @@ chai.use(spies);
 const ID = 'id';
 const DEFAULT_NAME = 'player';
 
-describe('Player', () => {
+describe.only('Player', () => {
     let player: Player;
 
     beforeEach(() => {
@@ -25,7 +26,11 @@ describe('Player', () => {
             { value: 2, letter: 'A' },
             { value: 4, letter: 'D' },
         ];
-        player['objectives'] = new Set([undefined as unknown as AbstractObjective]);
+        player['objectives'] = new Set([generateTestObjective(1)]);
+    });
+
+    afterEach(() => {
+        chai.spy.restore();
     });
 
     it('should create', () => {
@@ -68,8 +73,14 @@ describe('Player', () => {
     it('initializeObjectives should set player objectives', async () => {
         const objectives: Set<AbstractObjective> = new Set();
         player['objectives'] = undefined as unknown as Set<AbstractObjective>;
-        await player.initializeObjectives(objectives);
+        player.initializeObjectives(objectives);
         expect(player['objectives']).to.equal(objectives);
+    });
+
+    it('resetObjectivesProgression should reset progression on player objectives', async () => {
+        player.getObjectives()[0].progress = 1;
+        player.resetObjectivesProgression();
+        expect(player.getObjectives()[0].progress).to.equal(0);
     });
 
     it('updateObjectives should call objective service to update objectives', async () => {
