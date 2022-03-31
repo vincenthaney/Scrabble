@@ -22,11 +22,13 @@ export default class ActionPlace extends ActionPlay {
     wordPlacement: WordPlacement;
     private scoreCalculator: ScoreCalculatorService;
     private wordValidator: WordsVerificationService;
+    private objectivesCompletedMessages: string[];
     constructor(player: Player, game: Game, wordPlacement: WordPlacement) {
         super(player, game);
         this.wordPlacement = wordPlacement;
         this.scoreCalculator = Container.get(ScoreCalculatorService);
         this.wordValidator = Container.get(WordsVerificationService);
+        this.objectivesCompletedMessages = [];
     }
 
     static createActionData(scoredWordPlacement: ScoredWordPlacement): ActionData {
@@ -57,12 +59,13 @@ export default class ActionPlace extends ActionPlay {
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
         // Valider objectif
-        const gameObjectivesData: GameObjectivesData = this.player.updateObjectives({
+        const objectiveUpdateResult: [GameObjectivesData, string[]] = this.player.updateObjectives({
             wordPlacement: this.wordPlacement,
             game: this.game,
             scoredPoints,
             createdWords,
         });
+        this.objectivesCompletedMessages = objectiveUpdateResult[1];
 
         const updatedSquares = this.updateBoard(createdWords);
 
@@ -71,7 +74,7 @@ export default class ActionPlace extends ActionPlay {
 
         const playerData: PlayerData = { id: this.player.id, tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedSquares, gameObjective: gameObjectivesData };
+        const response: GameUpdateData = { board: updatedSquares, gameObjective: objectiveUpdateResult[0] };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
@@ -79,11 +82,21 @@ export default class ActionPlace extends ActionPlay {
     }
 
     getMessage(): string {
-        return `Vous avez placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
+        let placeMessage = `Vous avez placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
+        if (!this.objectivesCompletedMessages) return placeMessage;
+        this.objectivesCompletedMessages.forEach((message: string) => {
+            placeMessage = `${placeMessage}\n Vous avez ${message}`;
+        });
+        return placeMessage;
     }
 
     getOpponentMessage(): string {
-        return `${this.player.name} a placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
+        let placeMessage = `${this.player.name} a placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
+        if (!this.objectivesCompletedMessages) return placeMessage;
+        this.objectivesCompletedMessages.forEach((message: string) => {
+            placeMessage = `${placeMessage}\n ${this.player.name} a ${message}`;
+        });
+        return placeMessage;
     }
 
     private isLegalPlacement(words: [Square, Tile][][]): boolean {

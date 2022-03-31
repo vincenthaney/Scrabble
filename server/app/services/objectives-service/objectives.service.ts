@@ -6,7 +6,11 @@ import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import { ObjectiveState } from '@app/classes/objectives/objective-state';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
-import { NUMBER_OF_OBJECTIVES_PER_PLAYER, NUMBER_OF_PUBLIC_OBJECTIVES } from '@app/constants/services-constants/objective.const';
+import {
+    NUMBER_OF_OBJECTIVES_PER_PLAYER,
+    NUMBER_OF_PUBLIC_OBJECTIVES,
+    OBJECTIVE_COMPLETE_MESSAGE,
+} from '@app/constants/services-constants/objective.const';
 import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import { Service } from 'typedi';
@@ -25,29 +29,29 @@ export default class ObjectivesService {
 
     // Voir comment envoyer du feedback lors de la complétion
 
-    validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): GameObjectivesData {
+    validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): [GameObjectivesData, string[]] {
         let updateData: GameObjectivesData = {};
+        const objectivesCompleted: string[] = [];
         player.getObjectives().forEach((objective: AbstractObjective) => {
             if (objective.isCompleted()) return;
 
             objective.updateObjective(validationParameters);
 
             if (objective.isCompleted()) {
-                this.handleObjectiveComplete(objective, player, game);
+                objectivesCompleted.push(this.handleObjectiveComplete(objective, player, game));
             }
         });
         updateData = this.addPlayerObjectivesToUpdateData(game, player, updateData);
         updateData = this.addPlayerObjectivesToUpdateData(game, this.findOpponent(game, player), updateData);
-        return updateData;
+        return [updateData, objectivesCompleted];
     }
 
-    private handleObjectiveComplete(objective: AbstractObjective, player: Player, game: Game): void {
-        // Envoyer le message de complétion
-
+    private handleObjectiveComplete(objective: AbstractObjective, player: Player, game: Game): string {
         if (objective.isPublic) {
             const opponentPlayer = this.findOpponent(game, player);
             this.setOpponentPublicObjectiveComplete(opponentPlayer, objective);
         }
+        return OBJECTIVE_COMPLETE_MESSAGE(objective.name, objective.bonusPoints);
     }
 
     private setOpponentPublicObjectiveComplete(opponentPlayer: Player, objective: AbstractObjective): void {

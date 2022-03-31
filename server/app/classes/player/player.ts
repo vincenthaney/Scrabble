@@ -47,7 +47,7 @@ export default class Player {
         this.objectives = objectives;
     }
 
-    updateObjectives(validationParameters: ValidationParameters): GameObjectivesData {
+    updateObjectives(validationParameters: ValidationParameters): [GameObjectivesData, string[]] {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 }
