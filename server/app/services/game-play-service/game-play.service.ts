@@ -99,6 +99,12 @@ export class GamePlayService {
         return this.activeGameService.getGame(gameId, playerId).gameIsOver;
     }
 
+    handleResetObjectives(gameId: string, playerId: string): void {
+        const game: Game = this.activeGameService.getGame(gameId, playerId);
+        const player: Player = game.getPlayer(playerId, IS_REQUESTING);
+        player.resetObjectivesProgression();
+    }
+
     private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (!game.isAddedToDatabase) {

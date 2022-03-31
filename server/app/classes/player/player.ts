@@ -43,6 +43,12 @@ export default class Player {
         return [...this.objectives.values()];
     }
 
+    resetObjectivesProgression(): void {
+        this.getObjectives().forEach((objective: AbstractObjective) => {
+            objective.progress = 0;
+        });
+    }
+
     initializeObjectives(objectives: Set<AbstractObjective>): void {
         this.objectives = objectives;
     }
