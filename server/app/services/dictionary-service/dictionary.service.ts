@@ -1,5 +1,5 @@
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { DICTIONARY_PATH, INVALID_DICTIONARY_ID, INVALID_DICTIONARY_NAME } from '@app/constants/dictionary.const';
+import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { promises } from 'fs';
 import { join } from 'path';
@@ -48,17 +48,17 @@ export default class DictionaryService {
     }
 
     async useDictionary(id: string): Promise<DictionaryUsage> {
-        const dictionary = this.activeDictionaries.get(id);
+        let dictionary = this.activeDictionaries.get(id);
         if (dictionary) {
             dictionary.numberOfActiveGames++;
             return dictionary;
         }
         const dictionaryData: DictionaryDataComplete = { ...(await this.getDbDictionary(id)), id };
-        if (!dictionaryData) throw new Error(INVALID_DICTIONARY_NAME);
-        const addedDictionary: DictionaryUsage = { numberOfActiveGames: 1, dictionary: new Dictionary(dictionaryData) };
-        this.activeDictionaries.set(id, addedDictionary);
 
-        return addedDictionary;
+        dictionary = { numberOfActiveGames: 1, dictionary: new Dictionary(dictionaryData) };
+        this.activeDictionaries.set(id, dictionary);
+
+        return dictionary;
     }
 
     getDictionary(id: string): Dictionary {
@@ -121,7 +121,7 @@ export default class DictionaryService {
         await this.collection.findOneAndUpdate({ _id: new ObjectId(updateInfo.id), isDefault: { $exists: false } }, { $set: infoToUpdate });
     }
 
-    async isTitleValid(title: string): Promise<boolean> {
+    private async isTitleValid(title: string): Promise<boolean> {
         return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
@@ -166,15 +166,4 @@ export default class DictionaryService {
 
         this.dictionaryValidator = ajv.compile(schema);
     }
-
-    // getDefaultDictionary(): Dictionary {
-    //     return this.getDictionary(this.getDictionaryTitles()[0]);
-    // }
-
-    // private addAllDictionaries(): void {
-    //     for (const path of this.dictionaryPaths) {
-    //         const dictionary = this.fetchDictionaryWords(path);
-    //         this.dictionaries.set(dictionary.title, dictionary);
-    //     }
-    // }
 }

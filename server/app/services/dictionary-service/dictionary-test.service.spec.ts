@@ -28,6 +28,8 @@ export const DICTIONARY_1: DictionaryData = {
     isDefault: true,
 };
 
+export const DICTIONARY_1_ID = 'id-dictionary1';
+
 export const DICTIONARY_2: DictionaryData = {
     title: 'title2',
     description: 'description2',

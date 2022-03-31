@@ -19,11 +19,12 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
-import { DICTIONARY_PATH } from '@app/constants/dictionary.const';
+import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
 import { stub } from 'sinon';
 import {
     ADDITIONNAL_PROPERTY_DICTIONARY,
     DICTIONARY_1,
+    DICTIONARY_1_ID,
     DICTIONARY_2,
     DICTIONARY_3,
     INITIAL_DICTIONARIES,
@@ -269,7 +270,7 @@ describe.only('DictionaryService', () => {
     });
 
     describe('createDictionaryValidator', () => {
-        const dictionaryToTest: [DictionaryData, boolean, string][] = [
+        const dictionariesToTest: [DictionaryData, boolean, string][] = [
             [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
             [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
             [LONG_TITLE_DICTIONARY, false, 'LONG_TITLE_DICTIONARY'],
@@ -284,10 +285,13 @@ describe.only('DictionaryService', () => {
             [INVALID_WORDS_DICTIONARY_5, false, 'INVALID_WORDS_DICTIONARY_5'],
             [INVALID_WORDS_DICTIONARY_6, false, 'INVALID_WORDS_DICTIONARY_6'],
         ];
+        const DICTIONARY = 0;
+        const EXPECTED = 1;
+        const TEST_DESCRIPTION = 2;
 
-        for (const test of dictionaryToTest) {
-            it(`should return ${test[1]} for a ${test[2]}`, async () => {
-                expect(await dictionaryService['validateDictionary'](test[0])).to.equal(test[1]);
+        for (const test of dictionariesToTest) {
+            it(`should return ${test[EXPECTED]} for a ${test[TEST_DESCRIPTION]}`, async () => {
+                expect(await dictionaryService['validateDictionary'](test[DICTIONARY])).to.equal(test[EXPECTED]);
             });
         }
     });
@@ -299,14 +303,79 @@ describe.only('DictionaryService', () => {
             dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
-        it('should create the dictionary validator if it was not done before', async () => {
+        it('should increment the number of active games and return the correct dictionary', async () => {
             const spy = chai.spy.on(dictionaryService, 'getDbDictionary', () => {
                 return {} as unknown as DictionaryData;
             });
 
             expect(dictionaryService.useDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE);
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
+            expect(dictionaryService['activeDictionaries'].size).to.equal(1);
+            expect(spy).not.to.have.called();
+        });
+
+        it('should create a new dictionary and add it to the map ', async () => {
+            const spy = chai.spy.on(dictionaryService, 'getDbDictionary', () => {
+                return DICTIONARY_1;
+            });
+
+            const result = await dictionaryService.useDictionary(DICTIONARY_1_ID);
+
+            expect(result.dictionary.summary.id).to.equal(DICTIONARY_1_ID);
+            expect(result.dictionary.summary.title).to.equal(DICTIONARY_1.title);
+            expect(result.numberOfActiveGames).to.equal(1);
+            expect(dictionaryService['activeDictionaries'].size).to.equal(2);
+            expect(dictionaryService['activeDictionaries'].get(DICTIONARY_1_ID)).to.deep.equal(result);
+
             expect(spy).to.have.called();
+        });
+    });
+
+    describe('getDictionary', async () => {
+        const BASE_DICTIONARY_ID = 'id1';
+        const BASE_DICTIONARY_USAGE: DictionaryUsage = {
+            dictionary: { summary: { id: BASE_DICTIONARY_ID } } as unknown as Dictionary,
+            numberOfActiveGames: 1,
+        };
+        beforeEach(async () => {
+            dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
+        });
+
+        it('should return the dictionary if it exists', async () => {
+            expect(dictionaryService.getDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE.dictionary);
+        });
+
+        it('should throw if the dictionaryId is not a key of the map', async () => {
+            expect(() => dictionaryService.getDictionary(BASE_DICTIONARY_ID)).to.throw(INVALID_DICTIONARY_ID);
+        });
+    });
+
+    describe('stopUsingDictionary', async () => {
+        const BASE_DICTIONARY_ID = 'id1';
+        const BASE_DICTIONARY_USAGE: DictionaryUsage = {
+            dictionary: { summary: { id: BASE_DICTIONARY_ID } } as unknown as Dictionary,
+            numberOfActiveGames: 1,
+        };
+        beforeEach(async () => {
+            dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
+        });
+
+        it('should delete a dictionary that had 1 active game', async () => {
+            dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
+            expect(dictionaryService['activeDictionaries'].size).to.equal(0);
+        });
+
+        it('should decrement a dictionary that had more than 1 active game', async () => {
+            BASE_DICTIONARY_USAGE.numberOfActiveGames = 3;
+            dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
+            expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
+            dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
+            expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
+        });
+
+        it('should not do anything if the dictionaryId is not a key of the map', async () => {
+            dictionaryService.stopUsingDictionary('BASE_DICTIONARY_ID');
+            expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
         });
     });
 
