@@ -3,6 +3,7 @@ import { ObjectiveData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
+import { ThreeWordsPlacement } from '@app/classes/objectives/objective-classes/three-word-placement';
 import { ObjectiveState } from '@app/classes/objectives/objective-state';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
@@ -80,7 +81,7 @@ export default class ObjectivesService {
     }
 
     private createObjectivesPool(): Set<AbstractObjective> {
-        return new Set();
+        return new Set([new ThreeWordsPlacement()]);
     }
 
     private popRandomObjectiveFromPool(pool: Set<AbstractObjective>, numberOfObjectives: number = 1): AbstractObjective[] {
