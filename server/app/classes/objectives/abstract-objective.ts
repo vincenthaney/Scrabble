@@ -21,6 +21,7 @@ export abstract class AbstractObjective {
 
     convertToData(): ObjectiveData {
         return {
+            name: this.name,
             state: this.state,
             progress: this.progress,
             maxProgress: this.maxProgress,

@@ -36,6 +36,7 @@ describe('Abstract Objective', () => {
 
     it('convertToData should return ObjectiveData with right values', () => {
         const expected: ObjectiveData = {
+            name: objective.name,
             state: objective.state,
             progress: objective.progress,
             maxProgress: objective['maxProgress'],
