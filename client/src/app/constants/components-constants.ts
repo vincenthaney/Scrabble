@@ -13,3 +13,8 @@ export const KEYDOWN = 'keydown';
 export const DEFAULT_HIGH_SCORE: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0 };
 
 export const NOT_FOUND = -1;
+
+export const YOU_COMPLETED_THIS_OBJECTIVE = 'Vous avez complété cet objectif!';
+export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété cet objectif avant vous';
+
+export const PERCENT = 100;
