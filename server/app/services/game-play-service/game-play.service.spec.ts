@@ -9,6 +9,7 @@ import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
@@ -74,6 +75,7 @@ describe('GamePlayService', () => {
         gameStub.getPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
+        gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
 
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
@@ -354,6 +356,9 @@ describe('GamePlayService', () => {
             highScoresServiceStub = createStubInstance(HighScoresService);
             highScoresServiceStub.addHighScore.resolves(true);
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
+            chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
+                return;
+            });
         });
 
         it('should call end of game and endgame message', async () => {
@@ -382,13 +387,16 @@ describe('GamePlayService', () => {
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
-
+            chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
+                return;
+            });
             Object.defineProperty(gamePlayService, 'activeGameService', { value: activeGameServiceStub });
         });
 
         it('should modify both ids', async () => {
             const result = gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
             gameStub.isAddedToDatabase = true;
+            gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
             await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(result.player1!.id).to.equal(gameStub.player1.id);
             expect(result.player2!.id).to.equal(gameStub.player2.id);

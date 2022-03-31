@@ -290,6 +290,9 @@ describe('BeginnerVirtualPlayer', () => {
             spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
                 return;
             });
+            spy.on(beginnerVirtualPlayer, 'getDictionaryId', () => {
+                return;
+            });
             spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
             });
@@ -302,6 +305,9 @@ describe('BeginnerVirtualPlayer', () => {
                 return [];
             });
             const getGameBoardSpy = spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
+                return;
+            });
+            spy.on(beginnerVirtualPlayer, 'getDictionaryId', () => {
                 return;
             });
             const generateWordSpy = spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {

@@ -13,6 +13,7 @@ import { Container } from 'typedi';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -27,6 +28,7 @@ describe('ActionHint', () => {
 
         gameStub = createStubInstance(Game);
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
+        gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
 
         wordFindingServiceStub = createStubInstance(WordFindingService, {
             findWords: [],

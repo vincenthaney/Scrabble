@@ -198,7 +198,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call appropriate methods', async () => {
-            gameDispatcherService['createMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            await gameDispatcherService['createMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createMultiplayerGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();
         });

@@ -476,12 +476,12 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call createMultiplayerGame', async () => {
-            controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            await controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createGameServiceSpy).to.have.been.called();
         });
 
         it('should call handleLobbiesUpdate', async () => {
-            controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            await controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(handleLobbesUpdateSpy).to.have.been.called();
         });
     });
