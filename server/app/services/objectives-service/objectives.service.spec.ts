@@ -216,18 +216,19 @@ describe('ObjectiveService', () => {
     });
 
     it('createObjectivesPool should return set with objectives', async () => {
-        expect(await service['createObjectivesPool']()).to.exist;
+        expect(service['createObjectivesPool']()).to.exist;
     });
 
     it('popRandomObjectiveFromPool should pop objectives out of the pool', () => {
         const poppedObjective: AbstractObjective = generateTestObjective(1);
         const objectives: Set<AbstractObjective> = new Set([poppedObjective, generateTestObjective(2)]);
-        stub(Random, 'getRandomElementsFromArray').returns([poppedObjective]);
+        const randomStub = stub(Random, 'getRandomElementsFromArray').returns([poppedObjective]);
 
         const actualObjectives: AbstractObjective[] = service['popRandomObjectiveFromPool'](objectives, 1);
         const expectedObjectives: AbstractObjective[] = [poppedObjective];
 
         expect(actualObjectives).to.deep.equal(expectedObjectives);
         expect(objectives.has(actualObjectives[0])).to.be.false;
+        randomStub.restore();
     });
 });

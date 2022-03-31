@@ -172,9 +172,10 @@ describe('ActionPlace', () => {
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
             let wordsToStringSpy: unknown;
 
+            let updateObjectiveStub: SinonStub;
+
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
-                chai.spy.on(game.player1, 'updateObjectives', () => {});
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
 
                 action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
@@ -192,11 +193,14 @@ describe('ActionPlace', () => {
                 >;
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
+
+                updateObjectiveStub = stub(game.player1, 'updateObjectives').returns([undefined as unknown as GameObjectivesData, []]);
             });
 
             afterEach(() => {
                 chai.spy.restore();
                 isLegalPlacementStub.restore();
+                updateObjectiveStub.restore();
             });
 
             it('should call getTilesFromPlayer', () => {
@@ -220,14 +224,13 @@ describe('ActionPlace', () => {
             });
 
             it('should call objective validation', () => {
-                chai.spy.restore();
                 const gameObjectives: GameObjectivesData = {
                     player1Objectives: [],
                     player2Objectives: [],
                 };
-                const updateSpy = chai.spy.on(action['player'], 'updateObjectives', () => gameObjectives);
+                updateObjectiveStub.returns([gameObjectives, []]);
                 const result: GameUpdateData = action.execute() as GameUpdateData;
-                expect(updateSpy).to.have.been.called;
+                expect(updateObjectiveStub.called).to.be.true;
                 expect(result.gameObjective).to.equal(gameObjectives);
             });
 
