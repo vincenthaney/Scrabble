@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
@@ -391,5 +392,11 @@ describe('GamePlayService', () => {
             expect(result.player1!.id).to.equal(gameStub.player1.id);
             expect(result.player2!.id).to.equal(gameStub.player2.id);
         });
+    });
+
+    it('handleResetObjectives', () => {
+        const resetSpy = chai.spy.on(player, 'resetObjectivesProgression', () => {});
+        gamePlayService.handleResetObjectives(game.getId(), player.id);
+        expect(resetSpy).to.have.been.called();
     });
 });

@@ -15,7 +15,7 @@ chai.use(spies);
 const ID = 'id';
 const DEFAULT_NAME = 'player';
 
-describe.only('Player', () => {
+describe('Player', () => {
     let player: Player;
 
     beforeEach(() => {
