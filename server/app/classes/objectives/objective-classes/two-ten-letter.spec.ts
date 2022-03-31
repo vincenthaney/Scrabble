@@ -14,7 +14,7 @@ import * as spies from 'chai-spies';
 import { LETTERS_WITH_TEN_POINTS_VALUE, TwoTenLetter } from './two-ten-letter';
 chai.use(spies);
 
-describe.only('Vowel Objective', () => {
+describe('Two ten points letters Objective', () => {
     let objective: TwoTenLetter;
 
     beforeEach(() => {
