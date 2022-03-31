@@ -15,10 +15,8 @@ import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/con
 import { Random } from '@app/utils/random';
 import { Service } from 'typedi';
 
-// Laisser les commentaires pour pouvoir se repérer lors de l'utilisation des objectifs
 @Service()
 export default class ObjectivesService {
-    // Actually créer les objectifs
     createObjectivesForGame(): GameObjectives {
         const objectivesPool: Set<AbstractObjective> = this.createObjectivesPool();
         const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PUBLIC_OBJECTIVES));
@@ -26,8 +24,6 @@ export default class ObjectivesService {
         const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
         return { publicObjectives, player1Objective, player2Objective };
     }
-
-    // Voir comment envoyer du feedback lors de la complétion
 
     validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): [GameObjectivesData, string[]] {
         let updateData: GameObjectivesData = {};
