@@ -23,6 +23,7 @@ export abstract class AbstractObjective {
         return {
             name: this.name,
             state: this.state,
+            isPublic: this.isPublic,
             progress: this.progress,
             maxProgress: this.maxProgress,
         };

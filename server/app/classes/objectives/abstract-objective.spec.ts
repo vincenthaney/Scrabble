@@ -38,6 +38,7 @@ describe('Abstract Objective', () => {
         const expected: ObjectiveData = {
             name: objective.name,
             state: objective.state,
+            isPublic: objective.isPublic,
             progress: objective.progress,
             maxProgress: objective['maxProgress'],
         };
