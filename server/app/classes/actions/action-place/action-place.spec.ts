@@ -376,8 +376,14 @@ describe('ActionPlace', () => {
             });
         });
 
-        it('should return message', () => {
-            expect(action.getMessage()).to.exist;
+        it('should return simple place message if no objectives were completed', () => {
+            action['objectivesCompletedMessages'] = [];
+            expect(action.getMessage().includes('\n')).to.be.false;
+        });
+
+        it('should return place message with completed objectives if they exist', () => {
+            action['objectivesCompletedMessages'] = ['test'];
+            expect(action.getMessage().includes('test')).to.be.true;
         });
     });
 
@@ -388,8 +394,14 @@ describe('ActionPlace', () => {
             action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         });
 
-        it('should return OpponentMessage', () => {
-            expect(action.getOpponentMessage()).to.exist;
+        it('should return simple place message if no objectives were completed', () => {
+            action['objectivesCompletedMessages'] = [];
+            expect(action.getOpponentMessage().includes('\n')).to.be.false;
+        });
+
+        it('should return place message with completed objectives if they exist', () => {
+            action['objectivesCompletedMessages'] = ['test'];
+            expect(action.getOpponentMessage().includes('test')).to.be.true;
         });
     });
 
