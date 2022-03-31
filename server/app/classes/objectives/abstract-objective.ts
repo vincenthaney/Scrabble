@@ -22,6 +22,7 @@ export abstract class AbstractObjective {
     convertToData(): ObjectiveData {
         return {
             name: this.name,
+            bonusPoints: this.bonusPoints,
             state: this.state,
             isPublic: this.isPublic,
             progress: this.progress,
