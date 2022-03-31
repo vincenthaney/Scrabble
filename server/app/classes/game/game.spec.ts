@@ -15,13 +15,13 @@ import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virt
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';

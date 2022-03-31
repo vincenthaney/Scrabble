@@ -1,5 +1,12 @@
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
+import {
+    DICTIONARY_PATH,
+    INVALID_DESCRIPTION_FORMAT,
+    INVALID_DICTIONARY_FORMAT,
+    INVALID_DICTIONARY_ID,
+    MAX_DICTIONARY_DESCRIPTION_LENGTH,
+    MAX_DICTIONARY_TITLE_LENGTH,
+} from '@app/constants/dictionary.const';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { promises } from 'fs';
 import { join } from 'path';
@@ -7,30 +14,8 @@ import DatabaseService from '@app/services/database-service/database.service';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
 import { Collection, ObjectId } from 'mongodb';
 import Ajv, { ValidateFunction } from 'ajv';
-import { DictionaryDataComplete } from '@app/classes/dictionary/dictionary-data';
+import { DictionaryDataComplete, DictionarySummary, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/dictionary/dictionary-data';
 import { Service } from 'typedi';
-
-export interface DictionaryUsage {
-    dictionary: Dictionary;
-    numberOfActiveGames: number;
-}
-
-export interface DictionarySummary {
-    title: string;
-    description: string;
-    id: string;
-}
-
-export interface DictionaryUpdateInfo {
-    id: string;
-    title?: string;
-    description?: string;
-}
-export const MAX_DICTIONARY_DESCRIPTION_LENGTH = 80;
-export const MAX_DICTIONARY_TITLE_LENGTH = 30;
-export const INVALID_DICTIONARY_FORMAT = 'the given dictionary does not respect the expected format';
-export const INVALID_DESCRIPTION_FORMAT = 'the given description does not respect the expected format';
-export const INVALID_TITLE = 'the given title does not respect the expected format or is not unique';
 
 @Service()
 export default class DictionaryService {
@@ -75,7 +60,7 @@ export default class DictionaryService {
 
     async validateDictionary(dictionaryData: DictionaryData): Promise<boolean> {
         if (!this.dictionaryValidator) this.createDictionaryValidator();
-        return this.dictionaryValidator(dictionaryData) && this.isTitleValid(dictionaryData.title);
+        return this.dictionaryValidator(dictionaryData) && (await this.isTitleValid(dictionaryData.title));
     }
 
     async addNewDictionary(dictionaryData: DictionaryData): Promise<void> {
@@ -100,7 +85,7 @@ export default class DictionaryService {
         const data = await this.collection.find({}, { projection: { title: 1, description: 1 } }).toArray();
         const dictionarySummaries: DictionarySummary[] = [];
         data.forEach((dictionary) => {
-            // It is necessary to access the ObjectId of the mongodb document which 
+            // It is necessary to access the ObjectId of the mongodb document which
             // eslint-disable-next-line no-underscore-dangle
             dictionarySummaries.push({ title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() });
         });
@@ -140,11 +125,7 @@ export default class DictionaryService {
 
     private async getDbDictionary(id: string): Promise<DictionaryData> {
         const dictionaryData: DictionaryData | null = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
-        console.log('---');
-        console.log(dictionaryData);
-        console.log('---');
         if (dictionaryData) return dictionaryData;
-        console.log('throw');
 
         throw new Error(INVALID_DICTIONARY_ID);
     }

@@ -5,7 +5,7 @@ import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 
 export interface GameConfigData {
     playerName: string;

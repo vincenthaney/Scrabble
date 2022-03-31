@@ -6,7 +6,7 @@ import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';

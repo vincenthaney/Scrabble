@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Application } from '@app/app';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -30,7 +31,7 @@ import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constant
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService, { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';

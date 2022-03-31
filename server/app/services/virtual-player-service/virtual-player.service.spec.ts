@@ -15,7 +15,7 @@ import { Square } from '@app/classes/square';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { ActionPass } from '@app/classes/actions';
-import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';

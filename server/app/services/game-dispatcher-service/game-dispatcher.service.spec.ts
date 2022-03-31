@@ -4,6 +4,7 @@
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -25,7 +26,6 @@ import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constant
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService, { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
@@ -34,6 +34,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
 
 const expect = chai.expect;

@@ -11,7 +11,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
+import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;

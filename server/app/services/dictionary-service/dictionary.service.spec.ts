@@ -8,7 +8,6 @@
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import { assert, expect } from 'chai';
 import { Container } from 'typedi';
-import DictionaryService, { DictionaryUpdateInfo, DictionaryUsage } from './dictionary.service';
 import { join } from 'path';
 import * as mock from 'mock-fs';
 import { MongoClient, ObjectId, WithId } from 'mongodb';
@@ -43,6 +42,8 @@ import {
     SAME_TITLE_DICTIONARY,
     VALID_DICTIONARY,
 } from './dictionary-test.service.spec';
+import { DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/dictionary/dictionary-data';
+import DictionaryService from './dictionary.service';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 // mockPaths must be of type any because keys must be dynamic
@@ -50,7 +51,7 @@ chai.use(chaiAsPromised); // this allows us to test for rejection
 const mockPaths: any = [];
 mockPaths[join(__dirname, DICTIONARY_PATH)] = JSON.stringify(DICTIONARY_1);
 
-describe.only('DictionaryService', () => {
+describe('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
     let client: MongoClient;

@@ -1,5 +1,4 @@
-import { DictionarySummary } from '@app/services/dictionary-service/dictionary.service';
-import { DictionaryDataComplete } from './dictionary-data';
+import { DictionaryDataComplete, DictionarySummary } from './dictionary-data';
 import DictionaryNode from './dictionary-node';
 
 export default class Dictionary extends DictionaryNode {
