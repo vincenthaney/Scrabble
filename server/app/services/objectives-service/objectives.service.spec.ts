@@ -24,7 +24,7 @@ chai.use(spies);
 const DEFAULT_PLAYER: Player = new Player('id', 'name');
 const OPPONENT: Player = new Player('op', 'opponent');
 
-describe.only('ObjectiveService', () => {
+describe('ObjectiveService', () => {
     let service: ObjectivesService;
     let findOpponentSpy: unknown;
     let player: Player;
