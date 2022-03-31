@@ -3,7 +3,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { SENDER_REQUIRED, CONTENT_REQUIRED } from '@app/constants/controllers-errors';
+import { CONTENT_REQUIRED, SENDER_REQUIRED } from '@app/constants/controllers-errors';
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
@@ -85,8 +85,6 @@ export class GamePlayController {
 
             const [updateData, feedback] = await this.gamePlayService.playAction(gameId, playerId, data);
 
-            if (this.gamePlayService.isGameOver(gameId, playerId)) return;
-
             if (updateData) {
                 this.gameUpdate(gameId, updateData);
             }
@@ -97,6 +95,8 @@ export class GamePlayController {
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
+                if (this.gamePlayService.isGameOver(gameId, playerId)) return;
+
                 await this.handlePlayAction(gameId, playerId, { type: ActionType.PASS, payload: {}, input: '' });
             }
         }
