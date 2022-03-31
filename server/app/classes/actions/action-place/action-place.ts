@@ -58,7 +58,6 @@ export default class ActionPlace extends ActionPlay {
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        // Valider objectif
         const objectiveUpdateResult: [GameObjectivesData, string[]] = this.player.updateObjectives({
             wordPlacement: this.wordPlacement,
             game: this.game,

@@ -443,6 +443,7 @@ describe('GamePlayController', () => {
         let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;
         let resetStub: SinonStub;
+        let gameUpdateSpy: unknown;
 
         beforeEach(() => {
             socketServiceStub = createStubInstance(SocketService);
@@ -457,7 +458,8 @@ describe('GamePlayController', () => {
             (gamePlayController['activeGameService'] as unknown) = activeGameServiceStub;
 
             delayStub = stub(Delay, 'for');
-            resetStub = stub(gamePlayController['gamePlayService'], 'handleResetObjectives').callsFake(() => {});
+            gameUpdateSpy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
+            resetStub = stub(gamePlayController['gamePlayService'], 'handleResetObjectives').callsFake(() => undefined as unknown as GameUpdateData);
         });
 
         afterEach(() => {
@@ -477,10 +479,11 @@ describe('GamePlayController', () => {
             expect(getGameSpy.called).to.be.not.ok;
         });
 
-        it('should call handleResetObjectives if game is not over', async () => {
+        it('should call update game handleResetObjectives if game is not over', async () => {
             spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
             await gamePlayController['handleError'](new Error(INVALID_WORD('word')), '', '', '');
             expect(resetStub.called).to.be.true;
+            expect(gameUpdateSpy).to.have.been.called();
         });
 
         it('should call emitToSocket if game is not over', async () => {

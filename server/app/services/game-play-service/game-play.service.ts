@@ -2,6 +2,7 @@ import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionRese
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
@@ -99,10 +100,10 @@ export class GamePlayService {
         return this.activeGameService.getGame(gameId, playerId).gameIsOver;
     }
 
-    handleResetObjectives(gameId: string, playerId: string): void {
+    handleResetObjectives(gameId: string, playerId: string): GameUpdateData {
         const game: Game = this.activeGameService.getGame(gameId, playerId);
-        const player: Player = game.getPlayer(playerId, IS_REQUESTING);
-        player.resetObjectivesProgression();
+        const objectiveData: GameObjectivesData = game.resetPlayerObjectiveProgression(playerId);
+        return { gameObjective: objectiveData };
     }
 
     private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {

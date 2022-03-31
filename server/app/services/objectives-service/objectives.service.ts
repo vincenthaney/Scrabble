@@ -42,6 +42,11 @@ export default class ObjectivesService {
         return [updateData, objectivesCompleted];
     }
 
+    resetPlayerObjectiveProgression(game: Game, player: Player): GameObjectivesData {
+        player.resetObjectivesProgression();
+        return this.addPlayerObjectivesToUpdateData(game, player, {});
+    }
+
     private handleObjectiveComplete(objective: AbstractObjective, player: Player, game: Game): string {
         if (objective.isPublic) {
             const opponentPlayer = this.findOpponent(game, player);

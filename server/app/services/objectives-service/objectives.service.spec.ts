@@ -231,4 +231,24 @@ describe('ObjectiveService', () => {
         expect(objectives.has(actualObjectives[0])).to.be.false;
         randomStub.restore();
     });
+
+    describe('resetPlayerObjectiveProgression', () => {
+        let resetSpy: unknown;
+        let updateSpy: unknown;
+
+        beforeEach(() => {
+            resetSpy = chai.spy.on(player, 'resetObjectivesProgression', () => {});
+            updateSpy = chai.spy.on(service, 'addPlayerObjectivesToUpdateData', () => undefined as unknown as GameObjectivesData);
+        });
+
+        it('should call reset on player', () => {
+            service.resetPlayerObjectiveProgression(game, player);
+            expect(resetSpy).to.have.been.called();
+        });
+
+        it('should add objectives to update', () => {
+            service.resetPlayerObjectiveProgression(game, player);
+            expect(updateSpy).to.have.been.called.with(game, player, {});
+        });
+    });
 });

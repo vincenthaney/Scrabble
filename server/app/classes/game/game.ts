@@ -1,4 +1,5 @@
 import Board from '@app/classes/board/board';
+import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import Player from '@app/classes/player/player';
@@ -9,7 +10,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { WINNER_MESSAGE } from '@app/constants/game';
+import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
@@ -145,6 +146,10 @@ export default class Game {
             round: roundData,
         };
         return startGameData;
+    }
+
+    resetPlayerObjectiveProgression(playerId: string): GameObjectivesData {
+        return Game.objectivesService.resetPlayerObjectiveProgression(this, this.getPlayer(playerId, IS_REQUESTING));
     }
 
     private congratulateWinner(): string {

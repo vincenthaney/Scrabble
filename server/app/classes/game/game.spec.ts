@@ -6,6 +6,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board } from '@app/classes/board';
+import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
@@ -24,6 +25,7 @@ import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
@@ -80,6 +82,7 @@ describe('Game', () => {
 
     afterEach(() => {
         TileReserve.prototype.init = defaultInit;
+        sinon.restore();
     });
 
     describe('createMultiplayerGame', () => {
@@ -624,7 +627,7 @@ describe('Game', () => {
             game.player2 = DEFAULT_PLAYER_2;
             const player1Spy = chai.spy.on(game.player1, 'initializeObjectives', () => {});
             const player2Spy = chai.spy.on(game.player2, 'initializeObjectives', () => {});
-            await game['initializeObjectives']();
+            game['initializeObjectives']();
             expect(initSpy).to.have.been.called;
             expect(player1Spy).to.have.been.called;
             expect(player2Spy).to.have.been.called;
@@ -632,8 +635,21 @@ describe('Game', () => {
 
         it('should NOT initialize objectives if gameType is CLASSIC', async () => {
             game.gameType = GameType.Classic;
-            await game['initializeObjectives']();
+            game['initializeObjectives']();
             expect(initSpy).not.to.have.been.called;
         });
+    });
+
+    it('resetPlayerObjectiveProgression should call reset on ObjectiveService', () => {
+        const updateData: GameObjectivesData = {
+            player1Objectives: [],
+            player2Objectives: [],
+        };
+        const game = new Game();
+        chai.spy.on(game, 'getPlayer', () => DEFAULT_PLAYER_1);
+        const resetStub = stub(Game['objectivesService'], 'resetPlayerObjectiveProgression').returns(updateData);
+        const result = game.resetPlayerObjectiveProgression(DEFAULT_PLAYER_1.id);
+        expect(resetStub.called).to.be.true;
+        expect(result).to.equal(updateData);
     });
 });
