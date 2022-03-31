@@ -1,8 +1,10 @@
-<div>
+<div matSort>
     <div class="filter-container">
-        <mat-form-field appearance="outline">
+        <button mat-flat-button color="primary" (click)="resetHistory()" [disabled]="state !== 'ready'">Réinitialiser les historiques de parties</button>
+
+        <mat-form-field appearance="outline" id="column-select">
             <mat-label>Colonnes du tableau</mat-label>
-            <mat-select [formControl]="columnsControl" [(value)]="selectedColumnsItems" multiple>
+            <mat-select #select [formControl]="columnsControl" [(value)]="selectedColumnsItems" multiple>
                 <mat-option *ngFor="let column of columnsItems" [value]="column">{{column.label}}</mat-option>
             </mat-select>
         </mat-form-field>
@@ -10,92 +12,135 @@
 
     <mat-divider></mat-divider>
 
-    <table mat-table matSort [dataSource]="dataSource">
-        <ng-container matColumnDef="startTime">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.startTime}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.startTime | date: 'd/MM/yyyy à h:mm a'}} </td>
+    <ng-container [ngSwitch]="state">
+        <ng-container *ngSwitchCase="'ready'">
+            <table mat-table [dataSource]="dataSource">
+                <ng-container matColumnDef="startDate">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.startDate}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.startTime | date: 'd MMMM yyyy'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="startTime">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.startTime}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.startTime | date: 'h:mm a'}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="endDate">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.endDate}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.endTime | date: 'd MMMM yyyy'}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="endTime">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.endTime}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.endTime | date: 'h:mm a'}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="player1Name">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Name}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="player1Score">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Score}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="player1Data">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Data}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} ({{element.player1Data.score}} points)
+                    </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="player2Name">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Name}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="player2Score">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Score}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player2Data.score}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="player2Data">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Data}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} ({{element.player2Data.score}} points)
+                    </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="playerWinName">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.playerWinName}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score > element.player2Data.score ? element.player1Data.name : element.player2Data.name}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="playerWinScore">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.playerWinScore}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score > element.player2Data.score ? element.player1Data.score : element.player2Data.score}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="playerWinData">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.playerWinData}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score > element.player2Data.score ? element.player1Data.name : element.player2Data.name}} ({{element.player1Data.score > element.player2Data.score ? element.player1Data.score : element.player2Data.score}} points)
+                    </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="gameType">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.gameType}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.gameType}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="gameMode">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.gameMode}} </th>
+                    <td mat-cell *matCellDef="let element"> {{element.gameMode}} </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="isOver">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.isOver}} </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.isOver" class="primary">
+                            <app-icon icon="check"></app-icon>
+                        </span>
+                        <span *ngIf="!element.isOver" class="secondary">
+                            <app-icon icon="times"></app-icon>
+                        </span>
+                    </td>
+                </ng-container>
+        
+                <ng-container matColumnDef="hasBeenAbandoned">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.hasBeenAbandoned}} </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span *ngIf="element.hasBeenAbandoned" class="primary">
+                            <app-icon icon="check"></app-icon>
+                        </span>
+                        <span *ngIf="!element.hasBeenAbandoned" class="secondary">
+                            <app-icon icon="times"></app-icon>
+                        </span>
+                </ng-container>
+        
+                <ng-container matColumnDef="replacingPlayer">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.replacingPlayer}} </th>
+                    <td mat-cell *matCellDef="let element"> 
+                        <ng-container *ngIf="element.replacingPlayer">{{element.replacingPlayer?.name}} ({{element.replacingPlayer?.score}} points)</ng-container>
+                    </td>
+                </ng-container>
+        
+                <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
+                <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
+            </table>
         </ng-container>
 
-        <ng-container matColumnDef="endTime">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.endTime}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.endTime | date: 'd/MM/yyyy à h:mm a'}} </td>
+        <ng-container *ngSwitchCase="'loading'">
+            <div class="loading-container">
+                <mat-spinner></mat-spinner>
+                <p>Chargement de l'historique des parties...</p>
+            </div>
         </ng-container>
 
-        <ng-container matColumnDef="player1Name">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Name}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} </td>
+        <ng-container *ngSwitchCase="'error'">
+            <div class="loading-container">
+                <p class="error">{{ error }}</p>
+            </div>
         </ng-container>
+    </ng-container>
 
-        <ng-container matColumnDef="player1Score">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Score}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.player1Data.score}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="player1Data">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Data}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} ({{element.player1Data.score}} points)
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="player2Name">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Name}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="player2Score">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Score}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.player2Data.score}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="player2Data">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Data}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} ({{element.player2Data.score}} points)
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="gameType">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.gameType}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.gameType}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="gameMode">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.gameMode}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.gameMode}} </td>
-        </ng-container>
-
-        <ng-container matColumnDef="isOver">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.isOver}} </th>
-            <td mat-cell *matCellDef="let element">
-                <span *ngIf="element.isOver">
-                    <app-icon icon="check"></app-icon>
-                </span>
-                <span *ngIf="!element.isOver" class="primary">
-                    <app-icon icon="times"></app-icon>
-                </span>
-            </td>
-        </ng-container>
-
-        <ng-container matColumnDef="hasBeenAbandoned">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.hasBeenAbandoned}} </th>
-            <td mat-cell *matCellDef="let element">
-                <span *ngIf="element.hasBeenAbandoned" class="primary">
-                    <app-icon icon="check"></app-icon>
-                </span>
-                <span *ngIf="!element.hasBeenAbandoned">
-                    <app-icon icon="times"></app-icon>
-                </span>
-        </ng-container>
-
-        <ng-container matColumnDef="replacingPlayer">
-            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.replacingPlayer}} </th>
-            <td mat-cell *matCellDef="let element"> {{element.replacingPlayer?.name}}
-                ({{element.replacingPlayer?.score}} points) </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
-        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
-    </table>
-
-    <mat-paginator [pageSizeOptions]="[15, 25, 50]" showFirstLastButtons>
-    </mat-paginator>
+    <mat-paginator [pageSizeOptions]="[15, 25, 50]" [ngClass]="{ visible: state === 'ready' }" showFirstLastButtons></mat-paginator>
 </div>

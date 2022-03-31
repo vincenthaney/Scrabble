@@ -1,86 +1,47 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { DisplayGameHistoryColumnsIteratorItem, DisplayGameHistoryKeys, GameHistoryState } from '@app/classes/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-
-export type DisplayGameHistoryKeys = keyof GameHistory | 'player1Name' | 'player1Score' | 'player2Name' | 'player2Score';
-export type DisplayGameHistoryColumns = {
-    [Property in DisplayGameHistoryKeys]: string;
-};
-export type DisplayGameHistoryColumnsIteratorItem = { key: DisplayGameHistoryKeys; label: string };
-
-const COLUMNS: DisplayGameHistoryColumns = {
-    startTime: 'Date de début',
-    endTime: 'Date de fin',
-    isOver: 'Partie terminée',
-    hasBeenAbandoned: 'Partie abandonnée',
-    gameType: 'Type de jeu',
-    gameMode: 'Mode de jeu',
-    player1Data: 'Joueur 1',
-    player1Name: 'Nom joueur 1',
-    player1Score: 'Points joueur 1',
-    player2Data: 'Joueur 2',
-    player2Name: 'Nom joueur 2',
-    player2Score: 'Points joueur 2',
-    replacingPlayer: 'Joueur de remplacement',
-};
-
-const DEFAULT_COLUMNS: DisplayGameHistoryKeys[] = [
-    'startTime',
-    'isOver',
-    'gameType',
-    'gameMode',
-    'player1Name',
-    'player1Score',
-    'player2Name',
-    'player2Score',
-];
+import { COLUMNS, DEFAULT_COLUMNS } from '@app/constants/components-constants';
+import { isKey } from '@app/utils/is-key';
 
 @Component({
     selector: 'app-admin-game-history',
     templateUrl: './admin-game-history.component.html',
     styleUrls: ['./admin-game-history.component.scss'],
 })
-export class AdminGameHistoryComponent implements AfterViewInit {
+export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     columns = COLUMNS;
-    columnsItems: DisplayGameHistoryColumnsIteratorItem[];
+    columnsItems: DisplayGameHistoryColumnsIteratorItem[] = [];
     selectedColumnsItems: DisplayGameHistoryColumnsIteratorItem[] = [];
     columnsControl = new FormControl();
-    dataSource: MatTableDataSource<GameHistory>;
+    dataSource: MatTableDataSource<GameHistory> = new MatTableDataSource(new Array());
+    state: GameHistoryState = GameHistoryState.Loading;
+    error: string | undefined = undefined;
 
     constructor() {
-        this.dataSource = new MatTableDataSource(this.getRandomData());
-        this.dataSource.sortingDataAccessor = (item, property) => {
-            switch (property) {
-                case 'player1Name':
-                    return item.player1Data.name;
-                case 'player1Score':
-                    return item.player1Data.score;
-                case 'player1Data':
-                    return item.player1Data.name;
-                case 'player2Name':
-                    return item.player2Data.name;
-                case 'player2Score':
-                    return item.player2Data.score;
-                case 'player2Data':
-                    return item.player2Data.name;
-                default:
-                    return this.isObjKey(property, item) ? (item[property] as string) : '';
-            }
-        };
+        this.dataSource.sortingDataAccessor = this.sortGameHistory;
 
         this.columnsItems = this.getColumnIterator();
-        this.selectedColumnsItems = DEFAULT_COLUMNS.map<DisplayGameHistoryColumnsIteratorItem>(
-            (key) => this.columnsItems.find((item) => item.key === key) || { key, label: this.columns[key] },
-        );
+        this.selectedColumnsItems = this.getSelectedColumns();
         this.columnsControl.setValue(this.selectedColumnsItems);
+    }
+
+    ngOnInit(): void {
+        this.setHistoryData()
+            .then(() => (this.state = GameHistoryState.Ready))
+            .catch((error) => {
+                this.error = error.toString();
+                this.state = GameHistoryState.Error;
+            });
     }
 
     ngAfterViewInit(): void {
@@ -88,8 +49,20 @@ export class AdminGameHistoryComponent implements AfterViewInit {
         this.dataSource.paginator = this.paginator;
     }
 
-    isObjKey<T>(key: PropertyKey, obj: T): key is keyof T {
-        return key in obj;
+    resetHistory() {
+        // call service
+        this.dataSource.data = [];
+    }
+
+    async setHistoryData() {
+        // call service
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                this.dataSource.data = this.getRandomData();
+                resolve();
+                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            }, 1000);
+        });
     }
 
     getColumnIterator(): DisplayGameHistoryColumnsIteratorItem[] {
@@ -101,6 +74,37 @@ export class AdminGameHistoryComponent implements AfterViewInit {
 
     getDisplayedColumns(): DisplayGameHistoryKeys[] {
         return this.selectedColumnsItems.map(({ key }) => key);
+    }
+
+    getSelectedColumns(): DisplayGameHistoryColumnsIteratorItem[] {
+        return DEFAULT_COLUMNS.map<DisplayGameHistoryColumnsIteratorItem>(
+            (key) => this.columnsItems.find((item) => item.key === key) || { key, label: this.columns[key] },
+        );
+    }
+
+    sortGameHistory(item: GameHistory, property: string): string | number {
+        switch (property) {
+            case 'player1Name':
+                return item.player1Data.name;
+            case 'player1Score':
+                return item.player1Data.score;
+            case 'player1Data':
+                return item.player1Data.name;
+            case 'player2Name':
+                return item.player2Data.name;
+            case 'player2Score':
+                return item.player2Data.score;
+            case 'player2Data':
+                return item.player2Data.name;
+            case 'playerWinName':
+                return item.player1Data.score > item.player2Data.score ? item.player1Data.name : item.player2Data.name;
+            case 'playerWinScore':
+                return item.player1Data.score > item.player2Data.score ? item.player1Data.score : item.player2Data.score;
+            case 'playerWinData':
+                return item.player1Data.score > item.player2Data.score ? item.player1Data.name : item.player2Data.name;
+            default:
+                return isKey(property, item) ? (item[property] as string) : '';
+        }
     }
 
     getRandomData(): GameHistory[] {

@@ -1,6 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -31,6 +31,10 @@ import { HighScoreBoxComponent } from './components/high-score-box/high-score-bo
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+
+registerLocaleData(localeFr);
 
 /**
  * Main module that is used in main.ts.
@@ -82,6 +86,10 @@ import { AdminGameHistoryComponent } from './components/admin-game-history/admin
             useFactory: (socketService: SocketService) => async () => socketService.initializeService(),
             deps: [SocketService],
             multi: true,
+        },
+        {
+            provide: LOCALE_ID,
+            useValue: 'fr-CA',
         },
     ],
     bootstrap: [AppComponent],
