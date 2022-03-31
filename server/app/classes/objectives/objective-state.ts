@@ -1,5 +1,5 @@
 export enum ObjectiveState {
-    NotCompleted,
-    Completed,
-    CompletedByOpponent,
+    NotCompleted = 'NotCompleted',
+    Completed = 'Completed',
+    CompletedByOpponent = 'CompletedByOpponent',
 }
