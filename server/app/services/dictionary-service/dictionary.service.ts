@@ -107,6 +107,10 @@ export default class DictionaryService {
         await this.collection.findOneAndUpdate({ _id: new ObjectId(updateInfo.id), isDefault: { $exists: false } }, { $set: infoToUpdate });
     }
 
+    async deleteDictionary(dictionaryId: string): Promise<void> {
+        await this.collection.findOneAndDelete({ _id: new ObjectId(dictionaryId), isDefault: { $exists: false } });
+    }
+
     private async isTitleValid(title: string): Promise<boolean> {
         return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }

@@ -164,6 +164,24 @@ describe('DictionaryService', () => {
         });
     });
 
+    describe('deleteDictionary', () => {
+        it('should delete the dictionary if it is not the default one', async () => {
+            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
+
+            await dictionaryService.deleteDictionary(dictToGet._id.toString());
+            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(2);
+            expect((await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()).length).to.equal(0);
+        });
+
+        it('should not delete the dictionary if it is the default one', async () => {
+            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray())[0];
+
+            await dictionaryService.deleteDictionary(dictToGet._id.toString());
+            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(3);
+            expect((await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray()).length).to.equal(1);
+        });
+    });
+
     describe('updateDictionary', () => {
         it('should update the dictionary if it is not a default one and legal', async () => {
             const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];

@@ -1,5 +1,6 @@
 import { DictionaryRequest } from '@app/classes/communication/request';
 import { DictionaryData } from '@app/classes/dictionary';
+import { DictionarySummary, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Response, Router } from 'express';
@@ -21,7 +22,7 @@ export class DictionaryController {
             const body: DictionaryData = req.body;
 
             try {
-                await this.handleAddDictionary(body);
+                await this.dictionaryService.addNewDictionary(body);
                 res.status(StatusCodes.CREATED).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
@@ -29,54 +30,43 @@ export class DictionaryController {
         });
 
         this.router.patch('/dictionary', async (req: DictionaryRequest, res: Response) => {
-            const body: DictionaryData = req.body;
+            const body: DictionaryUpdateInfo = req.body;
 
             try {
-                await this.handleAddDictionary(body);
-                res.status(StatusCodes.CREATED).send();
+                await this.dictionaryService.updateDictionary(body);
+                res.status(StatusCodes.OK).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
         });
 
         this.router.delete('/dictionary', async (req: DictionaryRequest, res: Response) => {
-            const body: DictionaryData = req.body;
+            const body: string = req.body;
 
             try {
-                await this.handleAddDictionary(body);
-                res.status(StatusCodes.CREATED).send();
+                await this.dictionaryService.deleteDictionary(body);
+                res.status(StatusCodes.OK).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
         });
 
         this.router.get('/dictionary', async (req: DictionaryRequest, res: Response) => {
-            const body: DictionaryData = req.body;
-
             try {
-                await this.handleAddDictionary(body);
-                res.status(StatusCodes.CREATED).send();
+                const dictionarySummaries: DictionarySummary[] = await this.dictionaryService.getDictionarySummaryTitles();
+                res.status(StatusCodes.OK).send(dictionarySummaries);
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
         });
 
-        // this.router.patch('/dictionary', async (req: DictionaryRequest, res: Response) => {
-        //     try {
-        //         await this.handleAddDictionary();
-        //         res.status(StatusCodes.CREATED).send();
-        //     } catch (exception) {
-        //         HttpException.sendError(exception, res);
-        //     }
-        // });
+        this.router.delete('/dictionary/reset', async (req: DictionaryRequest, res: Response) => {
+            try {
+                await this.dictionaryService.resetDbDictionaries();
+                res.status(StatusCodes.OK).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
     }
-
-    private async handleAddDictionary(dictionaryData: DictionaryData): Promise<void> {
-        await this.dictionaryService.addNewDictionary(dictionaryData);
-    }
-
-    // private async handleHighScoresRequest(playerId: string): Promise<void> {
-    //     const highScores = await this.highScoresService.getAllHighScores();
-    //     this.socketService.emitToSocket(playerId, 'highScoresList', highScores);
-    // }
 }

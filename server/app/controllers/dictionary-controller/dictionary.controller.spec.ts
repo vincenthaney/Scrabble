@@ -1,83 +1,129 @@
 /* eslint-disable dot-notation */
-// import { Application } from '@app/app';
-// import { HttpException } from '@app/classes/http-exception/http-exception';
-// import * as chai from 'chai';
-// import * as chaiAsPromised from 'chai-as-promised';
-// import * as spies from 'chai-spies';
-// import { StatusCodes } from 'http-status-codes';
-// import { stub } from 'sinon';
-// import * as supertest from 'supertest';
-// import { Container } from 'typedi';
-// import { DictionaryController } from './dictionary.controller';
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { Application } from '@app/app';
+import { HttpException } from '@app/classes/http-exception/http-exception';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { StatusCodes } from 'http-status-codes';
+import * as supertest from 'supertest';
+import { Container } from 'typedi';
+import { DictionaryController } from './dictionary.controller';
 
-// const expect = chai.expect;
+const expect = chai.expect;
 
-// chai.use(spies);
-// chai.use(chaiAsPromised);
+chai.use(spies);
+chai.use(chaiAsPromised);
 
-// const DEFAULT_PLAYER_ID = 'playerId';
+const DEFAULT_EXCEPTION = 'exception';
 
-// const DEFAULT_EXCEPTION = 'exception';
+describe('DictionaryController', () => {
+    let controller: DictionaryController;
 
-// describe('DictionaryController', () => {
-//     let controller: DictionaryController;
+    beforeEach(() => {
+        Container.reset();
+        Container.set(DictionaryService, getDictionaryTestService());
+        controller = Container.get(DictionaryController);
+    });
 
-//     beforeEach(() => {
-//         Container.reset();
-//         controller = Container.get(DictionaryController);
+    it('should create', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
+        expect(controller).to.exist;
+    });
 
-//         stub(controller['socketService'], 'removeFromRoom').callsFake(() => {
-//             return;
-//         });
-//         stub(controller['socketService'], 'emitToSocket').callsFake(() => {
-//             return;
-//         });
-//     });
+    it('router should be created', () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
+        expect(controller.router).to.exist;
+    });
 
-//     it('should create', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-//         expect(controller).to.exist;
-//     });
+    describe('configureRouter', () => {
+        let expressApp: Express.Application;
 
-//     it('router should be created', () => {
-//         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-//         expect(controller.router).to.exist;
-//     });
+        beforeEach(() => {
+            const app = Container.get(Application);
+            expressApp = app.app;
+        });
 
-//     describe('configureRouter', () => {
-//         let expressApp: Express.Application;
+        describe('POST /dictionary', () => {
+            it('should return CREATED', async () => {
+                chai.spy.on(controller['dictionaryService'], 'addNewDictionary', () => {});
 
-//         beforeEach(() => {
-//             const app = Container.get(Application);
-//             expressApp = app.app;
-//         });
+                return supertest(expressApp).post('/api/dictionary').expect(StatusCodes.CREATED);
+            });
 
-//         describe('GET /highScores/:playerId', () => {
-//             it('should return NO_CONTENT', async () => {
-//                 // eslint-disable-next-line @typescript-eslint/no-empty-function
-//                 chai.spy.on(controller, 'handleHighScoresRequest', () => {});
+            it('should return BAD_REQUEST on throw httpException', async () => {
+                chai.spy.on(controller['dictionaryService'], 'addNewDictionary', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
+                });
 
-//                 return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
-//             });
+                return supertest(expressApp).post('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+            });
+        });
 
-//             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-//                 chai.spy.on(controller, 'handleHighScoresRequest', () => {
-//                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
-//                 });
+        describe('PATCH /dictionary', () => {
+            it('should return OK', async () => {
+                chai.spy.on(controller['dictionaryService'], 'updateDictionary', () => {});
 
-//                 return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
-//             });
-//         });
-//     });
+                return supertest(expressApp).patch('/api/dictionary').expect(StatusCodes.OK);
+            });
 
-//     describe('handleHighScoresRequest', () => {
-//         it('should call socketService.emitToSocket', async () => {
-//             // eslint-disable-next-line @typescript-eslint/no-empty-function
-//             const spyEmitToSocket = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
-//             const spyGetAllHighScores = chai.spy.on(controller['highScoresService'], 'getAllHighScores', () => []);
-//             await controller['handleHighScoresRequest'](DEFAULT_PLAYER_ID);
-//             expect(spyEmitToSocket).to.have.been.called();
-//             expect(spyGetAllHighScores).to.have.been.called();
-//         });
-//     });
-// });
+            it('should return BAD_REQUEST on throw httpException', async () => {
+                chai.spy.on(controller['dictionaryService'], 'updateDictionary', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
+                });
+
+                return supertest(expressApp).patch('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('DELETE /dictionary', () => {
+            it('should return OK', async () => {
+                chai.spy.on(controller['dictionaryService'], 'deleteDictionary', () => {});
+
+                return supertest(expressApp).delete('/api/dictionary').expect(StatusCodes.OK);
+            });
+
+            it('should return BAD_REQUEST on throw httpException', async () => {
+                chai.spy.on(controller['dictionaryService'], 'deleteDictionary', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
+                });
+
+                return supertest(expressApp).delete('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('GET /dictionary', () => {
+            it('should return OK', async () => {
+                chai.spy.on(controller['dictionaryService'], 'getDictionarySummaryTitles', () => {});
+
+                return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.OK);
+            });
+
+            it('should return BAD_REQUEST on throw httpException', async () => {
+                chai.spy.on(controller['dictionaryService'], 'getDictionarySummaryTitles', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
+                });
+
+                return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+
+        describe('DELETE /dictionary/reset', () => {
+            it('should return OK', async () => {
+                chai.spy.on(controller['dictionaryService'], 'resetDbDictionaries', () => {});
+
+                return supertest(expressApp).delete('/api/dictionary/reset').expect(StatusCodes.OK);
+            });
+
+            it('should return BAD_REQUEST on throw httpException', async () => {
+                chai.spy.on(controller['dictionaryService'], 'resetDbDictionaries', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
+                });
+
+                return supertest(expressApp).delete('/api/dictionary/reset').expect(StatusCodes.BAD_REQUEST);
+            });
+        });
+    });
+});
