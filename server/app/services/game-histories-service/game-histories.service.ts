@@ -11,7 +11,7 @@ import { Service } from 'typedi';
 export default class GameHistoriesService {
     constructor(private databaseService: DatabaseService) {}
 
-    async getGameHistories(): Promise<GameHistory[]> {
+    async getAllGameHistories(): Promise<GameHistory[]> {
         return (await this.collection.find({}).toArray()).sort((previous, current) => previous.endTime.getTime() - current.endTime.getTime());
     }
 
