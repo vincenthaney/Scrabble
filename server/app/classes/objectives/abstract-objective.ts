@@ -5,14 +5,9 @@ import { ValidationParameters } from './validation-parameters';
 export abstract class AbstractObjective {
     progress: number = 0;
     state: ObjectiveState = ObjectiveState.NotCompleted;
+    isPublic: boolean = false;
 
-    constructor(
-        public name: string,
-        public description: string,
-        public bonusPoints: number,
-        readonly isPublic: boolean,
-        protected readonly maxProgress: number,
-    ) {}
+    constructor(public name: string, public description: string, public bonusPoints: number, protected readonly maxProgress: number) {}
 
     isCompleted(): boolean {
         return this.state !== ObjectiveState.NotCompleted;

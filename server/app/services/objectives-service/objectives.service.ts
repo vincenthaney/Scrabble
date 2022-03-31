@@ -22,6 +22,9 @@ export default class ObjectivesService {
         const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PUBLIC_OBJECTIVES));
         const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
         const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
+        publicObjectives.forEach((objective: AbstractObjective) => {
+            objective.isPublic = true;
+        });
         return { publicObjectives, player1Objective, player2Objective };
     }
 
