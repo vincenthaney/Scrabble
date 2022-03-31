@@ -1,10 +1,10 @@
 <div id="outer-container" (click)="onContainerClick()">
     <section id="objectives-container">
         <mat-accordion multi>
-            <!-- <mat-expansion-panel>
+            <mat-expansion-panel *ngIf="gameType === 'LOG2990'">
                 <mat-expansion-panel-header>Objectifs</mat-expansion-panel-header>
                 <div *ngFor="let obj of objectives">{{obj}}</div>
-            </mat-expansion-panel> -->
+            </mat-expansion-panel>
             <mat-expansion-panel id="tile-map" [expanded]="false" [disabled]="getNumberOfTilesLeft() === 0">
                 <mat-expansion-panel-header>Tuiles restantes : {{ getNumberOfTilesLeft() }}</mat-expansion-panel-header>
                 <div class="tile-map-content">
