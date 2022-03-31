@@ -300,8 +300,10 @@ describe('Game', () => {
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
-            player1Stub.name = 'Luck Luke';
+            player1Stub.name = 'Lucky Luke';
             player2Stub.name = 'Dalton';
+            player1Stub.id = DEFAULT_PLAYER_1_ID;
+            player2Stub.id = DEFAULT_PLAYER_2_ID;
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
 
