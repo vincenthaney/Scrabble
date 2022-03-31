@@ -15,7 +15,7 @@ export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
 
 export class TestObjective extends AbstractObjective {
     constructor(name: string, maxProgress: number, isPublic: boolean = false) {
-        super(name, 0, isPublic, 0, maxProgress);
+        super(name, '', 0, isPublic, maxProgress);
     }
     updateProgress(validationParameters: ValidationParameters): void {
         return validationParameters as unknown as void;

@@ -37,6 +37,7 @@ describe('Abstract Objective', () => {
     it('convertToData should return ObjectiveData with right values', () => {
         const expected: ObjectiveData = {
             name: objective.name,
+            description: objective.description,
             bonusPoints: objective.bonusPoints,
             state: objective.state,
             isPublic: objective.isPublic,

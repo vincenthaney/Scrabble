@@ -3,17 +3,16 @@ import { ObjectiveState } from './objective-state';
 import { ValidationParameters } from './validation-parameters';
 
 export abstract class AbstractObjective {
-    state: ObjectiveState;
+    progress: number = 0;
+    state: ObjectiveState = ObjectiveState.NotCompleted;
 
     constructor(
         public name: string,
+        public description: string,
         public bonusPoints: number,
         readonly isPublic: boolean,
-        public progress: number,
         protected readonly maxProgress: number,
-    ) {
-        this.state = ObjectiveState.NotCompleted;
-    }
+    ) {}
 
     isCompleted(): boolean {
         return this.state !== ObjectiveState.NotCompleted;
@@ -22,6 +21,7 @@ export abstract class AbstractObjective {
     convertToData(): ObjectiveData {
         return {
             name: this.name,
+            description: this.description,
             bonusPoints: this.bonusPoints,
             state: this.state,
             isPublic: this.isPublic,
