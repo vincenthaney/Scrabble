@@ -5,7 +5,7 @@ import { promises } from 'fs';
 import { join } from 'path';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
-import { Collection, ObjectId, WithId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import Ajv, { ValidateFunction } from 'ajv';
 import { DictionaryDataComplete } from '@app/classes/dictionary/dictionary-data';
 import { Service } from 'typedi';
@@ -37,9 +37,7 @@ export default class DictionaryService {
     private dictionaryValidator: ValidateFunction<{ [x: string]: unknown }>;
     private activeDictionaries: Map<string, DictionaryUsage> = new Map();
 
-    constructor(private databaseService: DatabaseService) {
-        // this.addAllDictionaries();
-    }
+    constructor(private databaseService: DatabaseService) {}
 
     private static async fetchDefaultDictionary(): Promise<DictionaryData> {
         const filePath = join(__dirname, DICTIONARY_PATH);
@@ -77,7 +75,7 @@ export default class DictionaryService {
 
     async validateDictionary(dictionaryData: DictionaryData): Promise<boolean> {
         if (!this.dictionaryValidator) this.createDictionaryValidator();
-        return this.dictionaryValidator(dictionaryData);
+        return this.dictionaryValidator(dictionaryData) && this.isTitleValid(dictionaryData.title);
     }
 
     async addNewDictionary(dictionaryData: DictionaryData): Promise<void> {
@@ -109,43 +107,22 @@ export default class DictionaryService {
     }
 
     async updateDictionary(updateInfo: DictionaryUpdateInfo): Promise<void> {
-        // Might not work because of optional
-        if (updateInfo.description && !this.isDescriptionValid(updateInfo.description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
-        if (updateInfo.title && !this.isTitleValid(updateInfo.title)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+        const infoToUpdate: { description?: string; title?: string } = {};
 
-        // console.log(await (await this.collection.find({})).toArray());
-        // console.log('--------------');
-        // console.log(updateInfo);
-        // console.log('--------------');
-        // const id = new ObjectId(updateInfo.id);
-        // console.log(id);
-        // console.log(await (await this.collection.find({ _id: id })).toArray());
+        if (updateInfo.description) {
+            if (!this.isDescriptionValid(updateInfo.description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+            infoToUpdate.description = updateInfo.description;
+        }
+        if (updateInfo.title) {
+            if (!this.isTitleValid(updateInfo.title)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+            infoToUpdate.title = updateInfo.title;
+        }
 
-        // console.log('--------------');
-
-        // await this.collection.updateOne(
-        //     // { id_: updateInfo.id, isDefault: { $exists: false } },
-        //     // { title: 'title2' },
-        //     { id_: id },
-        //     // { id_: updateInfo.id },
-        //     { $set: { description: updateInfo.description, title: updateInfo.title } },
-        // );
-        const toUpdate = {};
-        toUpdate
-        await this.collection.findOneAndUpdate(
-            { _id: new ObjectId(updateInfo.id), isDefault: { $exists: false } },
-            { $set: { description: updateInfo.description, title: updateInfo.title } },
-        );
-
-
-        // console.log('------modifyresult--------');
-        // console.log(modifyResult);
-
-        console.log(await (await this.collection.find({})).toArray());
+        await this.collection.findOneAndUpdate({ _id: new ObjectId(updateInfo.id), isDefault: { $exists: false } }, { $set: infoToUpdate });
     }
 
-    private async isTitleValid(data: string): Promise<boolean> {
-        return (await this.collection.countDocuments({ title: data })) === 0 && data.length < MAX_DICTIONARY_TITLE_LENGTH;
+    async isTitleValid(title: string): Promise<boolean> {
+        return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
     private isDescriptionValid(description: string): boolean {
@@ -160,8 +137,8 @@ export default class DictionaryService {
         await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, [await DictionaryService.fetchDefaultDictionary()]);
     }
 
-    private async getDbDictionary(id: string): Promise<WithId<DictionaryData>> {
-        const dictionaryData = await this.collection.findOne({ _id: new ObjectId(id) });
+    private async getDbDictionary(id: string): Promise<DictionaryData> {
+        const dictionaryData = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
         if (dictionaryData) return dictionaryData;
         throw new Error(INVALID_DICTIONARY_ID);
     }
@@ -169,24 +146,17 @@ export default class DictionaryService {
     private createDictionaryValidator(): void {
         const ajv = new Ajv();
 
-        ajv.addKeyword({
-            keyword: 'isTitleValid',
-            async: true,
-            type: 'number',
-            validate: this.isTitleValid,
-        });
-
         const schema = {
-            $async: true,
             type: 'object',
             properties: {
-                title: { allOf: [{ maxLength: MAX_DICTIONARY_TITLE_LENGTH }, { type: 'string' }, { isTitleValid: {} }] },
-                description: { allOf: [{ maxLength: MAX_DICTIONARY_DESCRIPTION_LENGTH }, { type: 'string' }] },
+                title: { type: 'string', maxLength: MAX_DICTIONARY_TITLE_LENGTH },
+                description: { type: 'string', maxLength: MAX_DICTIONARY_DESCRIPTION_LENGTH },
                 words: {
                     type: 'array',
+                    minItems: 1,
                     items: {
                         type: 'string',
-                        transform: ['trim', 'toLowerCase'],
+                        pattern: '^[a-z]{2,15}$',
                     },
                 },
             },

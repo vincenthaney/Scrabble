@@ -1,13 +1,14 @@
+/* eslint-disable max-lines */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { DictionaryData } from '@app/classes/dictionary';
+import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import { assert, expect } from 'chai';
 import { Container } from 'typedi';
-import DictionaryService, { DictionaryUpdateInfo } from './dictionary.service';
+import DictionaryService, { DictionaryUpdateInfo, DictionaryUsage } from './dictionary.service';
 import { join } from 'path';
 import * as mock from 'mock-fs';
 import { MongoClient, WithId } from 'mongodb';
@@ -20,63 +21,33 @@ import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import { DICTIONARY_PATH } from '@app/constants/dictionary.const';
 import { stub } from 'sinon';
+import {
+    ADDITIONNAL_PROPERTY_DICTIONARY,
+    DICTIONARY_1,
+    DICTIONARY_2,
+    DICTIONARY_3,
+    INITIAL_DICTIONARIES,
+    INVALID_ARRAY_TYPES_DICTIONARY,
+    INVALID_TYPES_DICTIONARY,
+    INVALID_WORDS_DICTIONARY_1,
+    INVALID_WORDS_DICTIONARY_2,
+    INVALID_WORDS_DICTIONARY_3,
+    INVALID_WORDS_DICTIONARY_4,
+    INVALID_WORDS_DICTIONARY_5,
+    INVALID_WORDS_DICTIONARY_6,
+    LONG_TITLE_DICTIONARY,
+    MISSING_PROPERTY_DICTIONARY,
+    NEW_INVALID_DICTIONARY,
+    NEW_VALID_DICTIONARY,
+    SAME_TITLE_DICTIONARY,
+    VALID_DICTIONARY,
+} from './dictionary-test.service.spec';
 chai.use(chaiAsPromised); // this allows us to test for rejection
-
-const DICTIONARY_1: DictionaryData = {
-    title: 'title1',
-    description: 'description1',
-    words: ['word11', 'word12'],
-    isDefault: true,
-};
-
-const DICTIONARY_2: DictionaryData = {
-    title: 'title2',
-    description: 'description2',
-    words: ['word21', 'word22'],
-};
-
-const DICTIONARY_3: DictionaryData = {
-    title: 'title3',
-    description: 'description3',
-    words: ['word31', 'word32'],
-};
-
-const INITIAL_DICTIONARIES: DictionaryData[] = [DICTIONARY_1, DICTIONARY_2, DICTIONARY_3];
-
-const NEW_VALID_DICTIONARY: DictionaryData = {
-    title: 'newtitle',
-    description: 'newdescription',
-    words: ['newword1', 'newword2'],
-};
-
-const NEW_INVALID_DICTIONARY: DictionaryData = {
-    title: DICTIONARY_2.title,
-    description: 'newdescription',
-    words: ['newword1', 'newword2'],
-};
-// const mockInitialDictionaries: DictionaryData = {
-//     highScores: INITIAL_DICTIONARIES,
-// };
 
 // mockPaths must be of type any because keys must be dynamic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockPaths: any = [];
 mockPaths[join(__dirname, DICTIONARY_PATH)] = JSON.stringify(DICTIONARY_1);
-
-// const TEST_DICTIONARY_NAME = 'TEST_DICTIONARY';
-// const TEST_DICTIONARY: DictionaryData = {
-//     title: TEST_DICTIONARY_NAME,
-//     description: '',
-//     words: ['abc', 'abcd', 'abcde'],
-// };
-// const TEST_PATHS = ['../data/dictionary-french.json', '../data/dictionary-english.json', '../data/dictionary-spanish.json'];
-
-// mockPaths must be of type any because keys must be dynamic
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-// const mockPaths: any = [];
-// for (const path of DICTIONARY_PATHS) {
-//     mockPaths[join(__dirname, path)] = JSON.stringify(TEST_DICTIONARY);
-// }
 
 describe.only('DictionaryService', () => {
     let dictionaryService: DictionaryService;
@@ -193,14 +164,12 @@ describe.only('DictionaryService', () => {
 
     describe('updateDictionary', () => {
         it('should update the dictionary if it is not a default one and legal', async () => {
-            const dictToModify: WithId<DictionaryData> = await (
-                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
-            )[0];
+            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
             const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription', title: 'modifiedTitle' };
 
             await dictionaryService.updateDictionary(updateInfo);
 
-            const result: WithId<DictionaryData> = await (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
+            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
 
             expect(result.title).to.equal(updateInfo.title);
             expect(result.description).to.equal(updateInfo.description);
@@ -208,14 +177,11 @@ describe.only('DictionaryService', () => {
         });
 
         it('should update the dictionary if it is not a default one and legal (only new title)', async () => {
-            console.log('only new title');
-            const dictToModify: WithId<DictionaryData> = await (
-                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
-            )[0];
+            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
             const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), title: 'modifiedTitle' };
 
             await dictionaryService.updateDictionary(updateInfo);
-            const result: WithId<DictionaryData> = await (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
+            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
 
             expect(result.title).to.equal(updateInfo.title);
             expect(result.description).to.equal(DICTIONARY_2.description);
@@ -223,13 +189,11 @@ describe.only('DictionaryService', () => {
         });
 
         it('should not update the dictionary if it is a default one and legal', async () => {
-            const dictToModify: WithId<DictionaryData> = await (
-                await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray()
-            )[0];
+            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray())[0];
 
             const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription', title: 'modifiedTitle' };
             await dictionaryService.updateDictionary(updateInfo);
-            const result: WithId<DictionaryData> = await (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
+            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
 
             expect(result.title).to.equal(DICTIONARY_1.title);
             expect(result.description).to.equal(DICTIONARY_1.description);
@@ -237,18 +201,14 @@ describe.only('DictionaryService', () => {
         });
 
         it('should throw if the data is invalid (description)', async () => {
-            const dictToModify: WithId<DictionaryData> = await (
-                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
-            )[0];
+            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
             chai.spy.on(dictionaryService, 'isDescriptionValid', () => false);
             const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription' };
             expect(dictionaryService.updateDictionary(updateInfo)).to.eventually.be.rejectedWith(Error);
         });
 
         it('should throw if the data is invalid (title)', async () => {
-            const dictToModify: WithId<DictionaryData> = await (
-                await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()
-            )[0];
+            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
             chai.spy.on(dictionaryService, 'isTitleValid', () => false);
             const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), title: 'modifiedTitle' };
             expect(dictionaryService.updateDictionary(updateInfo)).to.eventually.be.rejectedWith(Error);
@@ -270,7 +230,7 @@ describe.only('DictionaryService', () => {
 
     describe('isDescriptionValid', () => {
         it('should return true if the description is short', async () => {
-            expect(await dictionaryService['isDescriptionValid']('shortdescription')).to.be.true;
+            expect(dictionaryService['isDescriptionValid']('shortdescription')).to.be.true;
         });
 
         it('should return false if the description is unique and long', () => {
@@ -294,33 +254,61 @@ describe.only('DictionaryService', () => {
         });
     });
 
-    // describe('getDbDictionary', () => {
-    //     it('should return the wanted dictionary with a valid id', async () => {
-    //         const dictToGet: WithId<DictionaryData> = await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()[0];
+    describe('getDbDictionary', () => {
+        it('should return the wanted dictionary with a valid id', async () => {
+            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
 
-    //         const result = await dictionaryService['getDbDictionary'](dictToGet._id.toString());
-    //         expect(result._id).to.deep.equal(dictToGet._id);
-    //         expect(result._id).to.equal(DICTIONARY_2.title);
+            const result = await dictionaryService['getDbDictionary'](dictToGet._id.toString());
+            expect(result.title).to.equal(DICTIONARY_2.title);
+            expect(result.description).to.equal(DICTIONARY_2.description);
+        });
 
-    //         assert(spyFetchDefaultHighScores.calledOnce);
-    //     });
-    // });
+        it('should throw with a invalid id', async () => {
+            expect(dictionaryService['getDbDictionary']('badid')).to.eventually.be.rejectedWith(Error);
+        });
+    });
 
-    // describe('validateDictionary', () => {
-    //     it('should create the dictionary validator if it was not done before', async () => {
-    //         dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
-    //         const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {
-    //             dictionaryService['dictionaryValidator'] = ((x: string) => {
-    //                 return x;
-    //             }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
-    //         });
+    describe('createDictionaryValidator', () => {
+        const dictionaryToTest: [DictionaryData, boolean, string][] = [
+            [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
+            [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
+            [LONG_TITLE_DICTIONARY, false, 'LONG_TITLE_DICTIONARY'],
+            [MISSING_PROPERTY_DICTIONARY, false, 'MISSING_PROPERTY_DICTIONARY'],
+            [SAME_TITLE_DICTIONARY, false, 'SAME_TITLE_DICTIONARY'],
+            [INVALID_ARRAY_TYPES_DICTIONARY, false, 'INVALID_ARRAY_TYPES_DICTIONARY'],
+            [ADDITIONNAL_PROPERTY_DICTIONARY, false, 'ADDITIONNAL_PROPERTY_DICTIONARY'],
+            [INVALID_WORDS_DICTIONARY_1, false, 'INVALID_WORDS_DICTIONARY_1'],
+            [INVALID_WORDS_DICTIONARY_2, false, 'INVALID_WORDS_DICTIONARY_2'],
+            [INVALID_WORDS_DICTIONARY_3, false, 'INVALID_WORDS_DICTIONARY_3'],
+            [INVALID_WORDS_DICTIONARY_4, false, 'INVALID_WORDS_DICTIONARY_4'],
+            [INVALID_WORDS_DICTIONARY_5, false, 'INVALID_WORDS_DICTIONARY_5'],
+            [INVALID_WORDS_DICTIONARY_6, false, 'INVALID_WORDS_DICTIONARY_6'],
+        ];
 
-    //         const spyValidator = chai.spy.on(dictionaryService, 'dictionaryValidator', () => {});
-    //         await dictionaryService.validateDictionary(DICTIONARY_1);
-    //         expect(spyCreate).to.have.been.called;
-    //         expect(spyValidator).to.have.been.called;
-    //     });
-    // });
+        for (const test of dictionaryToTest) {
+            it(`should return ${test[1]} for a ${test[2]}`, async () => {
+                expect(await dictionaryService['validateDictionary'](test[0])).to.equal(test[1]);
+            });
+        }
+    });
+
+    describe('useDictionary', async () => {
+        const BASE_DICTIONARY_USAGE: DictionaryUsage = { dictionary: {} as unknown as Dictionary, numberOfActiveGames: 1 };
+        const BASE_DICTIONARY_ID = 'id1';
+        beforeEach(async () => {
+            dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
+        });
+
+        it('should create the dictionary validator if it was not done before', async () => {
+            const spy = chai.spy.on(dictionaryService, 'getDbDictionary', () => {
+                return {} as unknown as DictionaryData;
+            });
+
+            expect(dictionaryService.useDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE);
+            expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
+            expect(spy).to.have.called();
+        });
+    });
 
     // beforeEach(() => {
     //     mock(mockPaths);
