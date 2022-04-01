@@ -45,7 +45,7 @@ const DEFAULT_GAME_HISTORY: GameHistory = {
     hasBeenAbandonned: false,
 };
 
-describe.only('GameHistoriesController', () => {
+describe('GameHistoriesController', () => {
     let controller: GameHistoriesController;
 
     beforeEach(() => {

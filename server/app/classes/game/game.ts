@@ -88,7 +88,7 @@ export default class Game {
             },
             gameType: this.gameType,
             gameMode: this.gameMode,
-            hasBeenAbandonned: false,
+            hasBeenAbandonned: !this.player1.isConnected || !this.player2.isConnected,
         };
     }
 
