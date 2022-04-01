@@ -50,7 +50,7 @@ describe('DictionaryController', () => {
             it('should return CREATED', async () => {
                 chai.spy.on(controller['dictionaryService'], 'addNewDictionary', () => {});
 
-                return supertest(expressApp).post('/api/dictionary').expect(StatusCodes.CREATED);
+                return supertest(expressApp).post('/api/dictionaries').expect(StatusCodes.CREATED);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -58,7 +58,7 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).post('/api/dictionaries').expect(StatusCodes.BAD_REQUEST);
             });
         });
 
@@ -66,7 +66,7 @@ describe('DictionaryController', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'updateDictionary', () => {});
 
-                return supertest(expressApp).patch('/api/dictionary').expect(StatusCodes.OK);
+                return supertest(expressApp).patch('/api/dictionaries').expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -74,7 +74,7 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).patch('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).patch('/api/dictionaries').expect(StatusCodes.BAD_REQUEST);
             });
         });
 
@@ -82,7 +82,7 @@ describe('DictionaryController', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'deleteDictionary', () => {});
 
-                return supertest(expressApp).delete('/api/dictionary').expect(StatusCodes.OK);
+                return supertest(expressApp).delete('/api/dictionaries').expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -90,15 +90,21 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).delete('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).delete('/api/dictionaries').expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('GET /dictionary', () => {
+        describe('GET /dictionaries', () => {
             it('should return OK', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {});
+                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
+                    return {
+                        title: 'dictionaryData.title',
+                        description: 'dictionaryData.description',
+                        words: 'dictionaryData.words',
+                    };
+                });
 
-                return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.OK);
+                return supertest(expressApp).get('/api/dictionaries').expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -106,31 +112,31 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).get('/api/dictionary').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).get('/api/dictionaries').expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('GET /dictionary/summary', () => {
+        describe('GET /dictionaries/summary', () => {
             it('should return OK', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDictionarySummaryTitles', () => {});
+                chai.spy.on(controller['dictionaryService'], 'getAllDictionarySummaries', () => {});
 
-                return supertest(expressApp).get('/api/dictionary/summary').expect(StatusCodes.OK);
+                return supertest(expressApp).get('/api/dictionaries/summary').expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDictionarySummaryTitles', () => {
+                chai.spy.on(controller['dictionaryService'], 'getAllDictionarySummaries', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).get('/api/dictionary/summary').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).get('/api/dictionaries/summary').expect(StatusCodes.BAD_REQUEST);
             });
         });
 
-        describe('DELETE /dictionary/reset', () => {
+        describe('DELETE /dictionaries/reset', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'resetDbDictionaries', () => {});
 
-                return supertest(expressApp).delete('/api/dictionary/reset').expect(StatusCodes.OK);
+                return supertest(expressApp).delete('/api/dictionaries/reset').expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -138,7 +144,7 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).delete('/api/dictionary/reset').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).delete('/api/dictionaries/reset').expect(StatusCodes.BAD_REQUEST);
             });
         });
     });
