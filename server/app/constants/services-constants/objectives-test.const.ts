@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { WordPlacement } from '@app/classes/word-finding';
 
 export const TEST_OBJECTIVE_MAX_PROGRESS = 3;
 
-export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
+export const EMPTY_VALIDATION_PARAMETERS: ObjectiveValidationParameters = {
     game: undefined as unknown as Game,
     wordPlacement: undefined as unknown as WordPlacement,
     scoredPoints: 0,
@@ -18,7 +18,7 @@ export class TestObjective extends AbstractObjective {
         super(name, '', 0, shouldReset, TEST_OBJECTIVE_MAX_PROGRESS);
     }
     // eslint-disable-next-line no-unused-vars
-    updateProgress(validationParameters: ValidationParameters): void {
+    updateProgress(validationParameters: ObjectiveValidationParameters): void {
         this.progress = this.maxProgress;
     }
     clone(): AbstractObjective {

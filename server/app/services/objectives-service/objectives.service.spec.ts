@@ -7,7 +7,7 @@ import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveState } from '@app/classes/objectives/objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
@@ -75,7 +75,7 @@ describe('ObjectiveService', () => {
     });
 
     describe('validatePlayerObjectives', () => {
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
         let objectiveUpdateSpies: unknown[];
         let objectiveCompleteSpies: SinonStub[];
         let addToUpdateSpy: unknown;
@@ -87,7 +87,7 @@ describe('ObjectiveService', () => {
             chai.spy.on(player, 'getObjectives', () => objectives);
             validationParameters = {
                 game: game as unknown as Game,
-            } as unknown as ValidationParameters;
+            } as unknown as ObjectiveValidationParameters;
             objectiveUpdateSpies = objectives.map((o: AbstractObjective) => chai.spy.on(o, 'updateObjective', () => {}));
             objectiveCompleteSpies = objectives.map((o: AbstractObjective) => stub(o, 'isCompleted').returns(false));
             addToUpdateSpy = chai.spy.on(service, 'addPlayerObjectivesToUpdateData', () => {

@@ -2,7 +2,7 @@ import { GameObjectivesData, ObjectiveData } from '@app/classes/communication/ob
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import {
     NUMBER_OF_OBJECTIVES_PER_PLAYER,
@@ -26,7 +26,7 @@ export default class ObjectivesService {
         return { publicObjectives, player1Objective, player2Objective };
     }
 
-    validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): ObjectiveUpdate {
+    validatePlayerObjectives(player: Player, game: Game, validationParameters: ObjectiveValidationParameters): ObjectiveUpdate {
         const objectiveUpdate: ObjectiveUpdate = {
             updateData: {},
             completionMessages: [],

@@ -5,7 +5,7 @@
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import {
     generateGameObjectives,
     generateResetableTestObjective,
@@ -129,7 +129,7 @@ describe('Player', () => {
 
     it('updateObjectives should call objective service to update objectives', async () => {
         const serviceSpy = chai.spy.on(player['objectiveService'], 'validatePlayerObjectives', () => {});
-        const validationParameters: ValidationParameters = { game: new Game() } as unknown as ValidationParameters;
+        const validationParameters: ObjectiveValidationParameters = { game: new Game() } as unknown as ObjectiveValidationParameters;
         player.updateObjectives(validationParameters);
         expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
     });

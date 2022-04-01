@@ -1,6 +1,6 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ObjectiveUpdate } from '@app/classes/objectives/objective-update';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { Container } from 'typedi';
@@ -56,7 +56,7 @@ export default class Player {
         this.objectives = new Set(clonesPublicObjectives).add(privateObjective);
     }
 
-    updateObjectives(validationParameters: ValidationParameters): ObjectiveUpdate {
+    updateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 }

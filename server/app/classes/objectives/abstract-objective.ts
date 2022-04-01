@@ -1,6 +1,6 @@
 import { ObjectiveData } from '@app/classes/communication/objective-data';
 import { ObjectiveState } from './objective';
-import { ValidationParameters } from './validation-parameters';
+import { ObjectiveValidationParameters } from './validation-parameters';
 
 export abstract class AbstractObjective {
     progress: number = 0;
@@ -31,7 +31,7 @@ export abstract class AbstractObjective {
         };
     }
 
-    updateObjective(validationParameters: ValidationParameters): boolean {
+    updateObjective(validationParameters: ObjectiveValidationParameters): boolean {
         if (this.isCompleted()) return false;
 
         this.updateProgress(validationParameters);
@@ -40,6 +40,6 @@ export abstract class AbstractObjective {
         return true;
     }
 
-    abstract updateProgress(validationParameters: ValidationParameters): void;
+    abstract updateProgress(validationParameters: ObjectiveValidationParameters): void;
     abstract clone(): AbstractObjective;
 }

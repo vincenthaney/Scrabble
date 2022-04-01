@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { AbstractObjective } from './abstract-objective';
 import { ObjectiveState } from './objective';
-import { ValidationParameters } from './validation-parameters';
+import { ObjectiveValidationParameters } from './validation-parameters';
 chai.use(spies);
 
 describe('Abstract Objective', () => {
@@ -56,10 +56,10 @@ describe('Abstract Objective', () => {
 
     describe('updateObjective', () => {
         let updateProgressSpy: unknown;
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
 
         beforeEach(() => {
-            validationParameters = {} as unknown as ValidationParameters;
+            validationParameters = {} as unknown as ObjectiveValidationParameters;
             updateProgressSpy = chai.spy.on(objective, 'updateProgress', () => {});
         });
         it('should call updateProgress', () => {
