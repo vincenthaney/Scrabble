@@ -21,10 +21,10 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
+import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 const expect = chai.expect;
 
@@ -45,7 +45,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: { title: 'francais', description: 'desc', id: 'id' },
+    dictionary: DEFAULT_DICTIONARY,
 };
 const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_2: Tile = { letter: 'B', value: 5 };
@@ -518,7 +518,6 @@ describe('Game', () => {
         const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
         const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
         const DEFAULT_TIME = 60;
-        const DEFAULT_DICTIONARY: DictionarySummary = { title: 'dict', description: 'desc', id: 'id' };
         DEFAULT_MAP = new Map<LetterValue, number>([
             ['A', 1],
             ['B', 2],

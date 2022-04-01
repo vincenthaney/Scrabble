@@ -10,6 +10,7 @@ import { NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/ro
 import { RouterTestingModule } from '@angular/router/testing';
 import { LobbyInfo } from '@app/classes/communication';
 import { GameType } from '@app/classes/game-type';
+import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherService } from '@app/services/';
 import { of, Subject } from 'rxjs';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
@@ -25,7 +26,7 @@ const DEFAULT_LOBBY: LobbyInfo = {
     lobbyId: '1',
     hostName: 'Name1',
     gameType: GameType.Classic,
-    dictionary: { id: 'id', title: 'title', description: 'description' },
+    dictionary: DEFAULT_DICTIONARY,
     maxRoundTime: 60,
     canJoin: false,
 };

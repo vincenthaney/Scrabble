@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { LobbyInfo } from '@app/classes/communication/';
 import { GameType } from '@app/classes/game-type';
 import { Timer } from '@app/classes/timer/timer';
+import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
 
 @Component({
     selector: 'app-lobby-info',
@@ -17,7 +18,7 @@ export class LobbyInfoComponent implements OnInit {
         this.joinLobbyId = new EventEmitter<string>();
         this.lobby = {
             lobbyId: '0',
-            dictionary: { title: '', description: '', id: '' },
+            dictionary: DEFAULT_DICTIONARY,
             hostName: '',
             gameType: GameType.Classic,
             maxRoundTime: 0,

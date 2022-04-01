@@ -1,10 +1,7 @@
 /* eslint-disable max-lines */
-// Lint dot-notation must be disabled to access private element
 /* eslint-disable dot-notation */
-// Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -36,6 +33,7 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
+import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 const expect = chai.expect;
 
@@ -46,7 +44,6 @@ const DEFAULT_OPPONENT_ID = 'opponent_id';
 const DEFAULT_OPPONENT_NAME = 'opponent';
 const DEFAULT_OPPONENT_ID_2 = 'opponent_id_2';
 const DEFAULT_OPPONENT_NAME_2 = 'opponent 2';
-const DEFAULT_DICTIONARY: DictionarySummary = { title: 'french', description: 'desc', id: 'frenchid' };
 const DEFAULT_ROUND_TIME = 1;
 
 const DEFAULT_OPPONENT = new Player(DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
@@ -458,7 +455,7 @@ describe('GameDispatcherService', () => {
             player1: stubPlayer as unknown as Player,
             gameType: GameType.Classic,
             maxRoundTime: 60,
-            dictionary: { title: 'french', description: 'desc', id: 'frenchid' },
+            dictionary: DEFAULT_DICTIONARY,
         };
         let waitingRooms: WaitingRoom[];
 

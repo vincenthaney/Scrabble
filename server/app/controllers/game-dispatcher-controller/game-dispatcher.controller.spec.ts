@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Application } from '@app/app';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, GameConfigData, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -45,6 +44,7 @@ import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
+import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 const expect = chai.expect;
 
@@ -54,7 +54,6 @@ chai.use(chaiAsPromised);
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_NEW_PLAYER_ID = 'newPlayerId';
-const DEFAULT_DICTIONARY: DictionarySummary = { title: 'french', description: 'desc', id: 'frenchid' };
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_PLAYER_NAME = 'player';

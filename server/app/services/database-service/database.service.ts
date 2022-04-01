@@ -34,6 +34,6 @@ export default class DatabaseService {
     }
 
     async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
-        return (await collection.find({}).toArray()).length === 0;
+        return (await collection.countDocuments({})) === 0;
     }
 }

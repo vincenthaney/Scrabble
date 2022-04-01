@@ -291,7 +291,7 @@ describe('BeginnerVirtualPlayer', () => {
                 return;
             });
             spy.on(beginnerVirtualPlayer, 'getDictionaryId', () => {
-                return;
+                return 'id';
             });
             spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
@@ -308,7 +308,7 @@ describe('BeginnerVirtualPlayer', () => {
                 return;
             });
             spy.on(beginnerVirtualPlayer, 'getDictionaryId', () => {
-                return;
+                return 'id';
             });
             const generateWordSpy = spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;

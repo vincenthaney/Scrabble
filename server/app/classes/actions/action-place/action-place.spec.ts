@@ -10,7 +10,7 @@ import { Board, Orientation, Position } from '@app/classes/board';
 import { ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';

@@ -15,7 +15,7 @@ import { Square } from '@app/classes/square';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { ActionPass } from '@app/classes/actions';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
+import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';
@@ -23,7 +23,6 @@ const DEFAULT_PLAYER1_ID = 'id1';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER1_NAME, DEFAULT_PLAYER1_ID);
 const DEFAULT_PLAYER_2 = new Player('2', 'p2');
 const DEFAULT_GAME_ID = 'grossePartie';
-const DEFAULT_DICTIONARY: DictionarySummary = { title: 'french', description: 'desc', id: 'frenchid' };
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_GAME_CONFIG: GameConfig = {

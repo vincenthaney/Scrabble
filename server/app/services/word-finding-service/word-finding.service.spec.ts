@@ -65,7 +65,7 @@ describe('WordFindingService', () => {
                 boardStub as unknown as Board,
                 tiles,
                 request,
-                new Dictionary({ title: '', description: '', words: [], id: 'id' }),
+                new Dictionary({ title: '', description: '', words: [], id: 'id', isDefault: false }),
                 undefined as unknown as ScoreCalculatorService,
             ];
         });

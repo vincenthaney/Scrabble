@@ -1,5 +1,5 @@
 import { GameType } from '@app/classes/game/game-type';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 
 export interface LobbyData {
     lobbyId: string;

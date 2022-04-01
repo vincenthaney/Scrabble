@@ -1,16 +1,16 @@
-import { Dictionary } from '.';
+import { Dictionary } from '@app/classes/dictionary';
 
-export interface DictionaryDataBasic {
+export interface BasicDictionaryData {
     title: string;
     description: string;
     words: string[];
 }
 
-export interface DictionaryData extends DictionaryDataBasic {
-    isDefault?: boolean;
+export interface DictionaryData extends BasicDictionaryData {
+    isDefault: boolean;
 }
 
-export interface DictionaryDataComplete extends DictionaryData {
+export interface CompleteDictionaryData extends DictionaryData {
     id: string;
 }
 
@@ -23,7 +23,7 @@ export interface DictionarySummary {
     title: string;
     description: string;
     id: string;
-    isDefault?: boolean;
+    isDefault: boolean;
 }
 
 export interface DictionaryUpdateInfo {

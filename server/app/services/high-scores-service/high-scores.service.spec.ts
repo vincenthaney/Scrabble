@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -142,14 +143,12 @@ describe('HighScoresService', () => {
 
     describe('resetHighScores', () => {
         it('should call populateDb', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
             expect(spy).to.have.been.called;
         });
 
         it('should delete all documents of the array', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
             expect((await highScoresService['collection'].find({}).toArray()).length).to.equal(0);
@@ -160,7 +159,6 @@ describe('HighScoresService', () => {
         it('should call databaseService.populateDb and fetchDefaultHighScores', async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
             const spyFetchDefaultHighScores = stub(HighScoresService, <any>'fetchDefaultHighScores');
-            // eslint-disable-next-line dot-notation, @typescript-eslint/no-empty-function
             const spyPopulateDb = chai.spy.on(highScoresService['databaseService'], 'populateDb', () => {});
             await highScoresService['populateDb']();
             expect(spyPopulateDb).to.have.been.called;

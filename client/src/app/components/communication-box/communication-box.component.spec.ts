@@ -20,6 +20,7 @@ import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
 import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
@@ -62,7 +63,7 @@ const DEFAULT_START_GAME_DATA: InitializeGameData = {
         player2: undefined as unknown as PlayerData,
         gameType: GameType.Classic,
         maxRoundTime: 0,
-        dictionary: { id: 'id', title: 'title', description: 'description' },
+        dictionary: DEFAULT_DICTIONARY,
         gameId: DEFAULT_GAME_ID,
         board: [[]],
         tileReserve: [],

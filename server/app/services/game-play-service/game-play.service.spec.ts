@@ -9,7 +9,7 @@ import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';

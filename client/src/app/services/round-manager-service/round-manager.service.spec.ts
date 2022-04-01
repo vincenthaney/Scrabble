@@ -17,6 +17,7 @@ import { Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
 import { Tile } from '@app/classes/tile';
 import { Timer } from '@app/classes/timer/timer';
+import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
 import { ActionService } from '@app/services/action-service/action.service';
@@ -116,7 +117,7 @@ describe('RoundManagerService', () => {
             player2: player2Data,
             gameType: GameType.Classic,
             maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-            dictionary: { id: 'id', title: 'title', description: 'description' },
+            dictionary: DEFAULT_DICTIONARY,
             gameId,
             board: [],
             tileReserve: [],

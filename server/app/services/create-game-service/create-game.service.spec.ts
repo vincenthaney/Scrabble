@@ -5,8 +5,8 @@ import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { DictionarySummary } from '@app/classes/dictionary/dictionary-data';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
@@ -14,7 +14,6 @@ import { Container } from 'typedi';
 import { CreateGameService } from './create-game.service';
 chai.use(spies);
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DICTIONARY: DictionarySummary = { title: 'french', description: 'desc', id: 'frenchid' };
 
 const DEFAULT_MAX_ROUND_TIME = 1;
 
