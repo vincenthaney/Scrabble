@@ -133,17 +133,17 @@ describe('ObjectiveService', () => {
         let spy: unknown;
 
         beforeEach(() => {
-            spy = chai.spy.on(service, 'setOpponentPublicObjectiveComplete', () => {});
+            spy = chai.spy.on(service, 'completeOpponentObjective', () => {});
         });
 
-        it('should call setOpponentPublicObjectiveComplete if objective is public', () => {
+        it('should call completeOpponentObjective if objective is public', () => {
             const objective = new TestObjective('name');
             objective.isPublic = true;
             service['handleObjectiveCompletion'](objective, player, game);
             expect(spy).to.have.been.called.with(OPPONENT, objective);
         });
 
-        it('should NOT call setOpponentPublicObjectiveComplete if objective is private', () => {
+        it('should NOT call completeOpponentObjective if objective is private', () => {
             const objective = new TestObjective('name');
             objective.isPublic = false;
             service['handleObjectiveCompletion'](objective, player, game);
@@ -151,7 +151,7 @@ describe('ObjectiveService', () => {
         });
     });
 
-    describe('setOpponentPublicObjectiveComplete', () => {
+    describe('completeOpponentObjective', () => {
         let objective: AbstractObjective;
 
         beforeEach(() => {
@@ -163,7 +163,7 @@ describe('ObjectiveService', () => {
             const opponentObjective: AbstractObjective = new TestObjective('test');
             opponentObjective.isPublic = true;
             chai.spy.on(OPPONENT, 'getObjectives', () => [opponentObjective]);
-            service['setOpponentPublicObjectiveComplete'](OPPONENT, objective);
+            service['completeOpponentObjective'](OPPONENT, objective);
             expect(opponentObjective.state).to.equal(ObjectiveState.CompletedByOpponent);
         });
 
@@ -171,7 +171,7 @@ describe('ObjectiveService', () => {
             const opponentObjective: AbstractObjective = new TestObjective('differentName');
             opponentObjective.isPublic = true;
             chai.spy.on(OPPONENT, 'getObjectives', () => [opponentObjective]);
-            expect(() => service['setOpponentPublicObjectiveComplete'](OPPONENT, objective)).to.throw(OPPONENT_HAS_NOT_OBJECTIVE);
+            expect(() => service['completeOpponentObjective'](OPPONENT, objective)).to.throw(OPPONENT_HAS_NOT_OBJECTIVE);
             expect(opponentObjective.state).not.to.equal(ObjectiveState.CompletedByOpponent);
         });
     });

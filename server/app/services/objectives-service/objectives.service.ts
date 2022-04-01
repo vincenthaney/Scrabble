@@ -53,12 +53,12 @@ export default class ObjectivesService {
     private handleObjectiveCompletion(objective: AbstractObjective, player: Player, game: Game): string {
         if (objective.isPublic) {
             const opponentPlayer = this.findOpponent(game, player);
-            this.setOpponentPublicObjectiveComplete(opponentPlayer, objective);
+            this.completeOpponentObjective(opponentPlayer, objective);
         }
         return OBJECTIVE_COMPLETE_MESSAGE(objective.name, objective.bonusPoints);
     }
 
-    private setOpponentPublicObjectiveComplete(opponentPlayer: Player, playerObjective: AbstractObjective): void {
+    private completeOpponentObjective(opponentPlayer: Player, playerObjective: AbstractObjective): void {
         const opponentObjective: AbstractObjective | undefined = opponentPlayer
             .getObjectives()
             .find((objective: AbstractObjective) => objective.isPublic && objective.name === playerObjective.name);
