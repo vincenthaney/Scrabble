@@ -63,12 +63,12 @@ describe('ObjectiveService', () => {
         });
 
         it('should call createObjectivesPool', async () => {
-            await service.createObjectivesForGame();
+            service.createObjectivesForGame();
             expect(createSpy).to.have.been.called();
         });
 
         it('should call popRandomObjectiveFromPool', async () => {
-            await service.createObjectivesForGame();
+            service.createObjectivesForGame();
             expect(randomPopSpy).to.have.been.called.with(objectives, 2);
             expect(randomPopSpy).to.have.been.called.with(objectives, 1);
         });
@@ -76,8 +76,8 @@ describe('ObjectiveService', () => {
 
     describe('validatePlayerObjectives', () => {
         let validationParameters: ObjectiveValidationParameters;
-        let objectiveUpdateSpies: unknown[];
-        let objectiveCompleteSpies: SinonStub[];
+        let objectiveUpdateStubs: unknown[];
+        let objectiveCompleteStubs: SinonStub[];
         let addToUpdateSpy: unknown;
         let handleCompleteSpy: unknown;
         let objectives: AbstractObjective[];
@@ -88,8 +88,8 @@ describe('ObjectiveService', () => {
             validationParameters = {
                 game: game as unknown as Game,
             } as unknown as ObjectiveValidationParameters;
-            objectiveUpdateSpies = objectives.map((o: AbstractObjective) => chai.spy.on(o, 'updateObjective', () => {}));
-            objectiveCompleteSpies = objectives.map((o: AbstractObjective) => stub(o, 'isCompleted').returns(false));
+            objectiveUpdateStubs = objectives.map((o: AbstractObjective) => stub(o, 'updateObjective').returns(true));
+            objectiveCompleteStubs = objectives.map((o: AbstractObjective) => stub(o, 'isCompleted').returns(false));
             addToUpdateSpy = chai.spy.on(service, 'addPlayerObjectivesToUpdateData', () => {
                 return {};
             });
@@ -97,22 +97,26 @@ describe('ObjectiveService', () => {
         });
 
         afterEach(() => {
-            objectiveCompleteSpies.forEach((s: SinonStub) => s.restore());
+            objectiveUpdateStubs.forEach((s: SinonStub) => s.restore());
+            objectiveCompleteStubs.forEach((s: SinonStub) => s.restore());
         });
 
         it('should call updateObjective on each objective of player', () => {
             service.validatePlayerObjectives(player, game, validationParameters);
-            objectiveUpdateSpies.forEach((spy: unknown) => expect(spy).to.have.been.called.with(validationParameters));
+            objectiveUpdateStubs.forEach((s: SinonStub) => expect(s.calledWith(validationParameters)).to.be.true);
         });
 
-        it('should NOT call updateObjective if objective is COMPLETE', () => {
-            objectiveCompleteSpies.forEach((s: SinonStub) => s.returns(true));
+        it('should not call handleObjectiveComplete if objective is already completed', () => {
+            objectiveUpdateStubs.forEach((s: SinonStub) => s.returns(false));
+            objectiveCompleteStubs.forEach((s: SinonStub) => s.returns(true));
+
             service.validatePlayerObjectives(player, game, validationParameters);
-            objectiveUpdateSpies.forEach((spy: unknown) => expect(spy).not.to.have.been.called());
+            objectives.forEach(() => {
+                expect(handleCompleteSpy).not.to.have.been.called();
+            });
         });
-
         it('should call handleObjectiveComplete if objective is completed by update', () => {
-            objectiveCompleteSpies.forEach((s: SinonStub) => s.onFirstCall().returns(false).returns(true));
+            objectiveCompleteStubs.forEach((s: SinonStub) => s.returns(true));
             service.validatePlayerObjectives(player, game, validationParameters);
             objectives.forEach((o: AbstractObjective) => {
                 expect(handleCompleteSpy).to.have.been.called.with(o, player, game);
