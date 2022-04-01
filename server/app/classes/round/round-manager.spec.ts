@@ -1,16 +1,16 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import * as chaiAsPromised from 'chai-as-promised';
-import Player from '@app/classes/player/player';
-import RoundManager from './round-manager';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
-import { Round } from './round';
-import Game from '@app/classes/game/game';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
+import Game from '@app/classes/game/game';
+import Player from '@app/classes/player/player';
+import * as chai from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import * as spies from 'chai-spies';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { Round } from './round';
+import RoundManager from './round-manager';
 
 const expect = chai.expect;
 
@@ -106,7 +106,20 @@ describe('RoundManager', () => {
         });
     });
 
-    describe('getMaxRoundTimer', () => {
+    describe('getGameStartTime', () => {
+        beforeEach(() => {
+            roundManager['currentRound'] = { startTime: new Date() } as unknown as Round;
+            roundManager['completedRound'] = [{ startTime: new Date() } as unknown as Round];
+        });
+
+        it('should return startTime of current round if no completedRounds yet', () => {
+            const expected = 8008135;
+            roundManager['maxRoundTime'] = expected;
+            expect(roundManager.getMaxRoundTime()).to.equal(expected);
+        });
+    });
+
+    describe('getMaxRoundTime', () => {
         it('should return passCounter', () => {
             const expected = 8008135;
             roundManager['maxRoundTime'] = expected;
