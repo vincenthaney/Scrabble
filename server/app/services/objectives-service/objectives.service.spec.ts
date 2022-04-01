@@ -3,10 +3,10 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ObjectiveState } from '@app/classes/objectives/objective-state';
+import { ObjectiveState } from '@app/classes/objectives/objective';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test.const';

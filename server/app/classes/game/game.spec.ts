@@ -6,8 +6,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board } from '@app/classes/board';
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
-import { GameObjectives } from '@app/classes/objectives/game-objectives';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
+import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';

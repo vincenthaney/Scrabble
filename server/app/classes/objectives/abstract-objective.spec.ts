@@ -8,7 +8,7 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { AbstractObjective } from './abstract-objective';
-import { ObjectiveState } from './objective-state';
+import { ObjectiveState } from './objective';
 import { ValidationParameters } from './validation-parameters';
 chai.use(spies);
 
@@ -23,11 +23,17 @@ describe('Abstract Objective', () => {
         expect(objective.state).to.equal(ObjectiveState.NotCompleted);
     });
 
-    describe('isCompleted default implementation', () => {
+    describe('isCompleted', () => {
         it('should return true if State is not ObjectiveState.Completed', () => {
             objective.state = ObjectiveState.Completed;
             expect(objective.isCompleted()).to.be.true;
         });
+
+        it('should return true if State is not ObjectiveState.CompletedByOpponent', () => {
+            objective.state = ObjectiveState.CompletedByOpponent;
+            expect(objective.isCompleted()).to.be.true;
+        });
+
         it('should return false if state is ObjectiveState.NotCompleted', () => {
             objective.state = ObjectiveState.NotCompleted;
             expect(objective.isCompleted()).to.be.false;

@@ -1,7 +1,7 @@
 import Board from '@app/classes/board/board';
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
-import { GameObjectives } from '@app/classes/objectives/game-objectives';
+import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';

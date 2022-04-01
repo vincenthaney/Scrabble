@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { GameObjectives } from '@app/classes/objectives/game-objectives';
+import { GameObjectives } from '@app/classes/objectives/objective';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import {
     generateGameObjectives,
