@@ -1,7 +1,9 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { VowelObjective } from '@app/classes/objectives/objective-classes/vowel-objective';
 
-export const LIST_OF_ALL_OBJECTIVES: AbstractObjective[] = [new VowelObjective()];
+export const GENERATE_LIST_OF_ALL_OBJECTIVES = (): AbstractObjective[] => {
+    return [new VowelObjective()];
+};
 
 export const NUMBER_OF_OBJECTIVES_IN_GAME = 4;
 
