@@ -30,7 +30,7 @@ describe('Vowel Objective', () => {
         expect(objective.name).to.equal(NAME);
         expect(objective.description).to.equal(DESCRIPTION);
         expect(objective.bonusPoints).to.equal(BONUS_POINTS);
-        expect(objective['maxProgress']).to.equal(VOWELS.length);
+        expect(objective['maxProgress']).to.equal(VOWELS().length);
     });
 
     describe('updateProgress', () => {
@@ -55,6 +55,20 @@ describe('Vowel Objective', () => {
         });
 
         it('should update progress according to vowels played', () => {
+            objective.progress = 0;
+            objective.updateProgress(validationParameters);
+            expect(objective.progress).to.equal(1);
+        });
+
+        it('should not update progress twice if played two times same letter', () => {
+            validationParameters = {
+                wordPlacement: {
+                    tilesToPlace: [
+                        { letter: 'A', value: 0 },
+                        { letter: 'A', value: 0 },
+                    ],
+                },
+            } as ObjectiveValidationParameters;
             objective.progress = 0;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(1);

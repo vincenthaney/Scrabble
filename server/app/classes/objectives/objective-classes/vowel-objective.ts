@@ -1,19 +1,30 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { LetterValue, Tile } from '@app/classes/tile';
+import { LetterValue } from '@app/classes/tile';
+import { StringConversion } from '@app/utils/string-conversion';
 
 export const NAME = 'Vowel Objective';
 export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les lettres blanches)';
 export const BONUS_POINTS = 30;
-export const VOWELS: LetterValue[] = ['A', 'E', 'I', 'O', 'U', 'Y'];
+export const VOWELS = (): LetterValue[] => ['A', 'E', 'I', 'O', 'U', 'Y'];
 
 export class VowelObjective extends AbstractObjective {
+    private availableVowels: LetterValue[];
+
     constructor() {
-        super(NAME, DESCRIPTION, BONUS_POINTS, false, VOWELS.length);
+        super(NAME, DESCRIPTION, BONUS_POINTS, false, VOWELS().length);
+        this.availableVowels = VOWELS();
     }
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
-        const letterPlayed: LetterValue[] = validationParameters.wordPlacement.tilesToPlace.map((t) => this.getTileLetter(t));
-        this.progress += letterPlayed.filter((letter: LetterValue) => VOWELS.includes(letter)).length;
+        const letterPlayed: LetterValue[] = validationParameters.wordPlacement.tilesToPlace.map(
+            (t) => StringConversion.tileToString(t) as LetterValue,
+        );
+        letterPlayed.forEach((letter: LetterValue) => {
+            if (this.availableVowels.includes(letter)) {
+                this.progress++;
+                this.availableVowels.splice(this.availableVowels.indexOf(letter), 1);
+            }
+        });
     }
 
     clone(): AbstractObjective {
@@ -22,9 +33,5 @@ export class VowelObjective extends AbstractObjective {
         clone.state = this.state;
         clone.isPublic = this.isPublic;
         return clone;
-    }
-
-    private getTileLetter(tile: Tile): LetterValue {
-        return tile.playedLetter ? tile.playedLetter : tile.letter;
     }
 }

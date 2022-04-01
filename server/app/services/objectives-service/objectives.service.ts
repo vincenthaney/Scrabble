@@ -9,7 +9,7 @@ import {
     NUMBER_OF_OBJECTIVES_IN_GAME,
     OBJECTIVE_COMPLETE_MESSAGE,
 } from '@app/constants/services-constants/objective.const';
-import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import { Service } from 'typedi';
 
@@ -60,6 +60,7 @@ export default class ObjectivesService {
     }
 
     private handleObjectiveCompletion(objective: AbstractObjective, player: Player, game: Game): string {
+        player.score += objective.bonusPoints;
         if (objective.isPublic) {
             const opponentPlayer = this.findOpponent(game, player);
             this.completeOpponentObjective(opponentPlayer, objective);
@@ -68,11 +69,10 @@ export default class ObjectivesService {
     }
 
     private completeOpponentObjective(opponentPlayer: Player, playerObjective: AbstractObjective): void {
-        const opponentObjective: AbstractObjective | undefined = opponentPlayer
+        opponentPlayer
             .getObjectives()
-            .find((objective: AbstractObjective) => objective.isPublic && objective.name === playerObjective.name);
-        if (!opponentObjective) throw new Error(OPPONENT_HAS_NOT_OBJECTIVE);
-        opponentObjective.state = ObjectiveState.CompletedByOpponent;
+            .filter((objective: AbstractObjective) => objective.isPublic && objective.name === playerObjective.name)
+            .map((objective: AbstractObjective) => (objective.state = ObjectiveState.CompletedByOpponent));
     }
 
     private findOpponent(game: Game, originalPlayer: Player): Player {
