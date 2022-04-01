@@ -3,14 +3,15 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ObjectiveState } from '@app/classes/objectives/objective-state';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
+import { LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME } from '@app/constants/services-constants/objective.const';
 import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test.const';
-import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -46,38 +47,31 @@ describe('ObjectiveService', () => {
     });
 
     describe('createObjectivesForGame', () => {
-        let objectives: Set<AbstractObjective>;
+        let objectives: AbstractObjective[];
         let createSpy: unknown;
         let randomPopSpy: unknown;
 
         beforeEach(() => {
-            objectives = new Set([generateTestObjective(1), generateTestObjective(2), generateTestObjective(3), generateTestObjective(4)]);
-            createSpy = chai.spy.on(service, 'createObjectivesPool', () => {
-                return objectives;
-            });
-            randomPopSpy = chai.spy.on(service, 'popRandomObjectiveFromPool', (pool: Set<AbstractObjective>, n: number) => {
-                const result = [...pool.values()].slice(0, n);
-                result.forEach((objective: AbstractObjective) => pool.delete(objective));
-                return result;
-            });
+            objectives = [generateTestObjective(1), generateTestObjective(2), generateTestObjective(3), generateTestObjective(4)];
+            createSpy = chai.spy.on(service, 'createObjectivesPool', () => objectives);
+            randomPopSpy = chai.spy.on(service, 'popObjectiveFromPool', () => objectives.pop());
         });
 
         it('should call createObjectivesPool', async () => {
-            await service.createObjectivesForGame();
+            service.createObjectivesForGame();
             expect(createSpy).to.have.been.called();
         });
 
-        it('should call popRandomObjectiveFromPool', async () => {
-            await service.createObjectivesForGame();
-            expect(randomPopSpy).to.have.been.called.with(objectives, 2);
-            expect(randomPopSpy).to.have.been.called.with(objectives, 1);
+        it('should call popObjectiveFromPool', async () => {
+            service.createObjectivesForGame();
+            expect(randomPopSpy).to.have.been.called.with(objectives);
         });
     });
 
     describe('validatePlayerObjectives', () => {
-        let validationParameters: ValidationParameters;
-        let objectiveUpdateSpies: unknown[];
-        let objectiveCompleteSpies: SinonStub[];
+        let validationParameters: ObjectiveValidationParameters;
+        let objectiveUpdateStubs: unknown[];
+        let objectiveCompleteStubs: SinonStub[];
         let addToUpdateSpy: unknown;
         let handleCompleteSpy: unknown;
         let objectives: AbstractObjective[];
@@ -87,32 +81,36 @@ describe('ObjectiveService', () => {
             chai.spy.on(player, 'getObjectives', () => objectives);
             validationParameters = {
                 game: game as unknown as Game,
-            } as unknown as ValidationParameters;
-            objectiveUpdateSpies = objectives.map((o: AbstractObjective) => chai.spy.on(o, 'updateObjective', () => {}));
-            objectiveCompleteSpies = objectives.map((o: AbstractObjective) => stub(o, 'isCompleted').returns(false));
+            } as unknown as ObjectiveValidationParameters;
+            objectiveUpdateStubs = objectives.map((o: AbstractObjective) => stub(o, 'updateObjective').returns(true));
+            objectiveCompleteStubs = objectives.map((o: AbstractObjective) => stub(o, 'isCompleted').returns(false));
             addToUpdateSpy = chai.spy.on(service, 'addPlayerObjectivesToUpdateData', () => {
                 return {};
             });
-            handleCompleteSpy = chai.spy.on(service, 'handleObjectiveComplete', () => {});
+            handleCompleteSpy = chai.spy.on(service, 'handleObjectiveCompletion', () => {});
         });
 
         afterEach(() => {
-            objectiveCompleteSpies.forEach((s: SinonStub) => s.restore());
+            objectiveUpdateStubs.forEach((s: SinonStub) => s.restore());
+            objectiveCompleteStubs.forEach((s: SinonStub) => s.restore());
         });
 
         it('should call updateObjective on each objective of player', () => {
             service.validatePlayerObjectives(player, game, validationParameters);
-            objectiveUpdateSpies.forEach((spy: unknown) => expect(spy).to.have.been.called.with(validationParameters));
+            objectiveUpdateStubs.forEach((s: SinonStub) => expect(s.calledWith(validationParameters)).to.be.true);
         });
 
-        it('should NOT call updateObjective if objective is COMPLETE', () => {
-            objectiveCompleteSpies.forEach((s: SinonStub) => s.returns(true));
+        it('should not call handleObjectiveCompletion if objective is already completed', () => {
+            objectiveUpdateStubs.forEach((s: SinonStub) => s.returns(false));
+            objectiveCompleteStubs.forEach((s: SinonStub) => s.returns(true));
+
             service.validatePlayerObjectives(player, game, validationParameters);
-            objectiveUpdateSpies.forEach((spy: unknown) => expect(spy).not.to.have.been.called());
+            objectives.forEach(() => {
+                expect(handleCompleteSpy).not.to.have.been.called();
+            });
         });
-
-        it('should call handleObjectiveComplete if objective is completed by update', () => {
-            objectiveCompleteSpies.forEach((s: SinonStub) => s.onFirstCall().returns(false).returns(true));
+        it('should call handleObjectiveCompletion if objective is completed by update', () => {
+            objectiveCompleteStubs.forEach((s: SinonStub) => s.returns(true));
             service.validatePlayerObjectives(player, game, validationParameters);
             objectives.forEach((o: AbstractObjective) => {
                 expect(handleCompleteSpy).to.have.been.called.with(o, player, game);
@@ -131,49 +129,58 @@ describe('ObjectiveService', () => {
         });
     });
 
-    describe('handleObjectiveComplete', () => {
+    it('validatePlayerObjectives should return undefined if no objectives were updated', () => {
+        chai.spy.on(player, 'getObjectives', () => []);
+        const validationParameters: ObjectiveValidationParameters = {
+            game: game as unknown as Game,
+        } as unknown as ObjectiveValidationParameters;
+        const result = service.validatePlayerObjectives(player, game, validationParameters);
+        expect(result).to.be.undefined;
+    });
+
+    describe('handleObjectiveCompletion', () => {
         let spy: unknown;
 
         beforeEach(() => {
-            spy = chai.spy.on(service, 'setOpponentPublicObjectiveComplete', () => {});
+            spy = chai.spy.on(service, 'completeOpponentObjective', () => {});
         });
 
-        it('should call setOpponentPublicObjectiveComplete if objective is public', () => {
-            const objective = new TestObjective('name', 3);
+        it('should call completeOpponentObjective if objective is public', () => {
+            const objective = new TestObjective('name');
             objective.isPublic = true;
-            service['handleObjectiveComplete'](objective, player, game);
+            service['handleObjectiveCompletion'](objective, player, game);
             expect(spy).to.have.been.called.with(OPPONENT, objective);
         });
 
-        it('should NOT call setOpponentPublicObjectiveComplete if objective is private', () => {
-            const objective = new TestObjective('name', 3);
+        it('should NOT call completeOpponentObjective if objective is private', () => {
+            const objective = new TestObjective('name');
             objective.isPublic = false;
-            service['handleObjectiveComplete'](objective, player, game);
+            service['handleObjectiveCompletion'](objective, player, game);
             expect(spy).not.to.have.been.called();
         });
     });
 
-    describe('setOpponentPublicObjectiveComplete', () => {
+    describe('completeOpponentObjective', () => {
         let objective: AbstractObjective;
 
         beforeEach(() => {
-            objective = new TestObjective('test', 3);
+            objective = new TestObjective('test');
             objective.isPublic = true;
         });
 
         it('should set identical objective on opponent to CompletedByOpponent', () => {
-            const opponentObjective: AbstractObjective = new TestObjective('test', 3);
+            const opponentObjective: AbstractObjective = new TestObjective('test');
             opponentObjective.isPublic = true;
             chai.spy.on(OPPONENT, 'getObjectives', () => [opponentObjective]);
-            service['setOpponentPublicObjectiveComplete'](OPPONENT, objective);
+            service['completeOpponentObjective'](OPPONENT, objective);
             expect(opponentObjective.state).to.equal(ObjectiveState.CompletedByOpponent);
         });
 
         it('should throw if no identical objective is found on opponent', () => {
-            const opponentObjective: AbstractObjective = new TestObjective('differentName', 3);
+            const opponentObjective: AbstractObjective = new TestObjective('differentName');
             opponentObjective.isPublic = true;
             chai.spy.on(OPPONENT, 'getObjectives', () => [opponentObjective]);
-            expect(() => service['setOpponentPublicObjectiveComplete'](OPPONENT, objective)).to.throw(OPPONENT_HAS_NOT_OBJECTIVE);
+            expect(() => service['completeOpponentObjective'](OPPONENT, objective)).to.throw(OPPONENT_HAS_NOT_OBJECTIVE);
             expect(opponentObjective.state).not.to.equal(ObjectiveState.CompletedByOpponent);
         });
     });
@@ -220,21 +227,27 @@ describe('ObjectiveService', () => {
         });
     });
 
-    it('createObjectivesPool should return set with objectives', async () => {
-        expect(service['createObjectivesPool']()).to.exist;
+    it('createObjectivesPool should call getRandomElementsFromArray for 4 elements', async () => {
+        const randomSpy = chai.spy.on(Random, 'getRandomElementsFromArray', () => {});
+        service['createObjectivesPool']();
+        expect(randomSpy).to.have.been.called.with(LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME);
     });
 
-    it('popRandomObjectiveFromPool should pop objectives out of the pool', () => {
-        const poppedObjective: AbstractObjective = generateTestObjective(1);
-        const objectives: Set<AbstractObjective> = new Set([poppedObjective, generateTestObjective(2)]);
-        const randomStub = stub(Random, 'getRandomElementsFromArray').returns([poppedObjective]);
+    describe('popObjectiveFromPool', () => {
+        it('should return objective if pool is not empty', () => {
+            const poppedObjective: AbstractObjective = generateTestObjective(1);
+            const objectives: AbstractObjective[] = [poppedObjective];
 
-        const actualObjectives: AbstractObjective[] = service['popRandomObjectiveFromPool'](objectives, 1);
-        const expectedObjectives: AbstractObjective[] = [poppedObjective];
+            const actualObjectives: AbstractObjective = service['popObjectiveFromPool'](objectives);
+            const expectedObjectives: AbstractObjective = poppedObjective;
 
-        expect(actualObjectives).to.deep.equal(expectedObjectives);
-        expect(objectives.has(actualObjectives[0])).to.be.false;
-        randomStub.restore();
+            expect(actualObjectives).to.deep.equal(expectedObjectives);
+            expect(objectives.includes(actualObjectives)).to.be.false;
+        });
+
+        it('should throw error if pool is empty', () => {
+            expect(() => service['popObjectiveFromPool']([])).to.throw(NO_OBJECTIVE_LEFT_IN_POOL);
+        });
     });
 
     describe('resetPlayerObjectiveProgression', () => {
