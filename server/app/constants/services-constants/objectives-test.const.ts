@@ -14,16 +14,27 @@ export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
 };
 
 export class TestObjective extends AbstractObjective {
-    constructor(name: string, maxProgress: number) {
-        super(name, '', 0, maxProgress);
+    constructor(name: string) {
+        super(name, '', 0, TEST_OBJECTIVE_MAX_PROGRESS);
     }
+    // eslint-disable-next-line no-unused-vars
     updateProgress(validationParameters: ValidationParameters): void {
-        return validationParameters as unknown as void;
+        this.progress = this.maxProgress;
+    }
+    clone(): AbstractObjective {
+        const clone = new TestObjective(this.name);
+        clone.description = this.description;
+        clone.bonusPoints = this.bonusPoints;
+        clone.progress = this.progress;
+        clone.state = this.state;
+        clone.isPublic = this.isPublic;
+        return clone;
     }
 }
 
 export const generateTestObjective = (index: number) => {
-    return new TestObjective(String(index), TEST_OBJECTIVE_MAX_PROGRESS);
+    const objective = new TestObjective(String(index));
+    return objective;
 };
 
 export const generateGameObjectives = () => {

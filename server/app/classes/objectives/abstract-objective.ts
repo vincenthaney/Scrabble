@@ -32,4 +32,5 @@ export abstract class AbstractObjective {
     }
 
     abstract updateProgress(validationParameters: ValidationParameters): void;
+    abstract clone(): AbstractObjective;
 }
