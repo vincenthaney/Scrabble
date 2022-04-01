@@ -129,6 +129,15 @@ describe('ObjectiveService', () => {
         });
     });
 
+    it('validatePlayerObjectives should return undefined if no objectives were updated', () => {
+        chai.spy.on(player, 'getObjectives', () => []);
+        const validationParameters: ObjectiveValidationParameters = {
+            game: game as unknown as Game,
+        } as unknown as ObjectiveValidationParameters;
+        const result = service.validatePlayerObjectives(player, game, validationParameters);
+        expect(result).to.be.undefined;
+    });
+
     describe('handleObjectiveCompletion', () => {
         let spy: unknown;
 
