@@ -15,7 +15,6 @@ import * as supertest from 'supertest';
 import { Container } from 'typedi';
 
 const expect = chai.expect;
-
 chai.use(spies);
 chai.use(chaiAsPromised);
 
