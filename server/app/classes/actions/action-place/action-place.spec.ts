@@ -194,7 +194,7 @@ describe('ActionPlace', () => {
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
 
-                updateObjectiveStub = stub(game.player1, 'updateObjectives').returns({ updateData: {}, completionMessages: [] });
+                updateObjectiveStub = stub(game.player1, 'validateObjectives').returns({ updateData: {}, completionMessages: [] });
             });
 
             afterEach(() => {
@@ -228,7 +228,7 @@ describe('ActionPlace', () => {
                     player1Objectives: [],
                     player2Objectives: [],
                 };
-                updateObjectiveStub.returns([gameObjectives, []]);
+                updateObjectiveStub.returns({ updateData: gameObjectives, completionMessages: [] });
                 const result: GameUpdateData = action.execute() as GameUpdateData;
                 expect(updateObjectiveStub.called).to.be.true;
                 expect(result.gameObjective).to.equal(gameObjectives);

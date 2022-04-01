@@ -83,7 +83,7 @@ export default class ActionPlace extends ActionPlay {
     getMessage(): string {
         let placeMessage = `Vous avez placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
         this.objectivesCompletedMessages.forEach((message: string) => {
-            placeMessage += `<br>Vous avez ${message}`;
+            placeMessage += `<br>Vous avez${message}`;
         });
         return placeMessage;
     }
@@ -91,7 +91,7 @@ export default class ActionPlace extends ActionPlay {
     getOpponentMessage(): string {
         let placeMessage = `${this.player.name} a placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
         this.objectivesCompletedMessages.forEach((message: string) => {
-            placeMessage += `<br>${this.player.name} a ${message}`;
+            placeMessage += `<br>${this.player.name} a${message}`;
         });
         return placeMessage;
     }
