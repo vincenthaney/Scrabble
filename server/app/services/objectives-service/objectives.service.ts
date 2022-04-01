@@ -32,9 +32,8 @@ export default class ObjectivesService {
             completionMessages: [],
         };
         player.getObjectives().forEach((objective: AbstractObjective) => {
-            if (objective.isCompleted()) return;
-
-            objective.updateObjective(validationParameters);
+            const hasBeenUpdated: boolean = objective.updateObjective(validationParameters);
+            if (!hasBeenUpdated) return;
 
             if (objective.isCompleted()) {
                 objectiveUpdate.completionMessages.push(this.handleObjectiveComplete(objective, player, game));

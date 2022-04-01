@@ -31,10 +31,13 @@ export abstract class AbstractObjective {
         };
     }
 
-    updateObjective(validationParameters: ValidationParameters): void {
+    updateObjective(validationParameters: ValidationParameters): boolean {
+        if (this.isCompleted()) return false;
+
         this.updateProgress(validationParameters);
 
         if (this.progress >= this.maxProgress) this.state = ObjectiveState.Completed;
+        return true;
     }
 
     abstract updateProgress(validationParameters: ValidationParameters): void;
