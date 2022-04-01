@@ -93,7 +93,7 @@ describe('ObjectiveService', () => {
             addToUpdateSpy = chai.spy.on(service, 'addPlayerObjectivesToUpdateData', () => {
                 return {};
             });
-            handleCompleteSpy = chai.spy.on(service, 'handleObjectiveComplete', () => {});
+            handleCompleteSpy = chai.spy.on(service, 'handleObjectiveCompletion', () => {});
         });
 
         afterEach(() => {
@@ -106,7 +106,7 @@ describe('ObjectiveService', () => {
             objectiveUpdateStubs.forEach((s: SinonStub) => expect(s.calledWith(validationParameters)).to.be.true);
         });
 
-        it('should not call handleObjectiveComplete if objective is already completed', () => {
+        it('should not call handleObjectiveCompletion if objective is already completed', () => {
             objectiveUpdateStubs.forEach((s: SinonStub) => s.returns(false));
             objectiveCompleteStubs.forEach((s: SinonStub) => s.returns(true));
 
@@ -115,7 +115,7 @@ describe('ObjectiveService', () => {
                 expect(handleCompleteSpy).not.to.have.been.called();
             });
         });
-        it('should call handleObjectiveComplete if objective is completed by update', () => {
+        it('should call handleObjectiveCompletion if objective is completed by update', () => {
             objectiveCompleteStubs.forEach((s: SinonStub) => s.returns(true));
             service.validatePlayerObjectives(player, game, validationParameters);
             objectives.forEach((o: AbstractObjective) => {
@@ -135,7 +135,7 @@ describe('ObjectiveService', () => {
         });
     });
 
-    describe('handleObjectiveComplete', () => {
+    describe('handleObjectiveCompletion', () => {
         let spy: unknown;
 
         beforeEach(() => {
@@ -145,14 +145,14 @@ describe('ObjectiveService', () => {
         it('should call setOpponentPublicObjectiveComplete if objective is public', () => {
             const objective = new TestObjective('name');
             objective.isPublic = true;
-            service['handleObjectiveComplete'](objective, player, game);
+            service['handleObjectiveCompletion'](objective, player, game);
             expect(spy).to.have.been.called.with(OPPONENT, objective);
         });
 
         it('should NOT call setOpponentPublicObjectiveComplete if objective is private', () => {
             const objective = new TestObjective('name');
             objective.isPublic = false;
-            service['handleObjectiveComplete'](objective, player, game);
+            service['handleObjectiveCompletion'](objective, player, game);
             expect(spy).not.to.have.been.called();
         });
     });

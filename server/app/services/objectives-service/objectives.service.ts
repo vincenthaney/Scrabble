@@ -36,7 +36,7 @@ export default class ObjectivesService {
             if (!hasBeenUpdated) return;
 
             if (objective.isCompleted()) {
-                objectiveUpdate.completionMessages.push(this.handleObjectiveComplete(objective, player, game));
+                objectiveUpdate.completionMessages.push(this.handleObjectiveCompletion(objective, player, game));
             }
         });
         objectiveUpdate.updateData = this.addPlayerObjectivesToUpdateData(game, player, objectiveUpdate.updateData);
@@ -49,7 +49,7 @@ export default class ObjectivesService {
         return this.addPlayerObjectivesToUpdateData(game, player, {});
     }
 
-    private handleObjectiveComplete(objective: AbstractObjective, player: Player, game: Game): string {
+    private handleObjectiveCompletion(objective: AbstractObjective, player: Player, game: Game): string {
         if (objective.isPublic) {
             const opponentPlayer = this.findOpponent(game, player);
             this.setOpponentPublicObjectiveComplete(opponentPlayer, objective);
