@@ -2,8 +2,9 @@
 /* eslint-disable dot-notation */
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { generateTestObjective } from '@app/constants/services-constants/objectives-test.const';
+import { generateGameObjectives, generateTestObjective } from '@app/constants/services-constants/objectives-test.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
@@ -71,10 +72,10 @@ describe('Player', () => {
     });
 
     it('initializeObjectives should set player objectives', async () => {
-        const objectives: Set<AbstractObjective> = new Set();
+        const objectives: GameObjectives = generateGameObjectives();
         player['objectives'] = undefined as unknown as Set<AbstractObjective>;
-        player.initializeObjectives(objectives);
-        expect(player['objectives']).to.equal(objectives);
+        player.initializeObjectives(objectives.publicObjectives, objectives.player1Objective);
+        expect(player['objectives']).to.deep.equal(objectives.publicObjectives.add(objectives.player1Objective));
     });
 
     it('resetObjectivesProgression should reset progression on player objectives', async () => {
