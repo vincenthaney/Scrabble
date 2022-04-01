@@ -205,7 +205,5 @@ export default class Game {
         this.player2.initializeObjectives(
             new Set([...gameObjectives.publicObjectives.values()].map((o: AbstractObjective) => o.clone())).add(gameObjectives.player2Objective),
         );
-        console.log(this.player1.getObjectives());
-        console.log(this.player2.getObjectives());
     }
 }
