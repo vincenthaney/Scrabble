@@ -49,8 +49,9 @@ export default class Player {
         });
     }
 
-    initializeObjectives(objectives: Set<AbstractObjective>): void {
-        this.objectives = objectives;
+    initializeObjectives(publicObjectives: Set<AbstractObjective>, privateObjective: AbstractObjective): void {
+        const clonesPublicObjectives = [...publicObjectives.values()].map((objective: AbstractObjective) => objective.clone());
+        this.objectives = new Set(clonesPublicObjectives).add(privateObjective);
     }
 
     updateObjectives(validationParameters: ValidationParameters): [GameObjectivesData, string[]] {

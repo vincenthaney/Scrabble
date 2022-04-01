@@ -1,7 +1,6 @@
 import Board from '@app/classes/board/board';
 import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { RoundData } from '@app/classes/communication/round-data';
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
@@ -199,11 +198,7 @@ export default class Game {
         if (this.gameType === GameType.Classic) return;
 
         const gameObjectives: GameObjectives = Game.objectivesService.createObjectivesForGame();
-        this.player1.initializeObjectives(
-            new Set([...gameObjectives.publicObjectives.values()].map((o: AbstractObjective) => o.clone())).add(gameObjectives.player1Objective),
-        );
-        this.player2.initializeObjectives(
-            new Set([...gameObjectives.publicObjectives.values()].map((o: AbstractObjective) => o.clone())).add(gameObjectives.player2Objective),
-        );
+        this.player1.initializeObjectives(gameObjectives.publicObjectives, gameObjectives.player1Objective);
+        this.player2.initializeObjectives(gameObjectives.publicObjectives, gameObjectives.player2Objective);
     }
 }
