@@ -1,10 +1,10 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective-update';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
@@ -58,13 +58,13 @@ export default class ActionPlace extends ActionPlay {
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        const objectiveUpdateResult: [GameObjectivesData, string[]] = this.player.updateObjectives({
+        const objectiveUpdateResult: ObjectiveUpdate = this.player.updateObjectives({
             wordPlacement: this.wordPlacement,
             game: this.game,
             scoredPoints,
             createdWords,
         });
-        this.objectivesCompletedMessages = objectiveUpdateResult[1];
+        this.objectivesCompletedMessages = objectiveUpdateResult.completionMessages;
 
         const updatedSquares = this.updateBoard(createdWords);
 
@@ -73,7 +73,7 @@ export default class ActionPlace extends ActionPlay {
 
         const playerData: PlayerData = { id: this.player.id, tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedSquares, gameObjective: objectiveUpdateResult[0] };
+        const response: GameUpdateData = { board: updatedSquares, gameObjective: objectiveUpdateResult.updateData };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;

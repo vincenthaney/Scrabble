@@ -1,5 +1,5 @@
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective-update';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
@@ -54,7 +54,7 @@ export default class Player {
         this.objectives = new Set(clonesPublicObjectives).add(privateObjective);
     }
 
-    updateObjectives(validationParameters: ValidationParameters): [GameObjectivesData, string[]] {
+    updateObjectives(validationParameters: ValidationParameters): ObjectiveUpdate {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 }

@@ -4,6 +4,7 @@ import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/game-objectives';
 import { ObjectiveState } from '@app/classes/objectives/objective-state';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective-update';
 import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import {
@@ -28,21 +29,23 @@ export default class ObjectivesService {
         return { publicObjectives, player1Objective, player2Objective };
     }
 
-    validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): [GameObjectivesData, string[]] {
-        let updateData: GameObjectivesData = {};
-        const objectivesCompleted: string[] = [];
+    validatePlayerObjectives(player: Player, game: Game, validationParameters: ValidationParameters): ObjectiveUpdate {
+        const objectiveUpdate: ObjectiveUpdate = {
+            updateData: {},
+            completionMessages: [],
+        };
         player.getObjectives().forEach((objective: AbstractObjective) => {
             if (objective.isCompleted()) return;
 
             objective.updateObjective(validationParameters);
 
             if (objective.isCompleted()) {
-                objectivesCompleted.push(this.handleObjectiveComplete(objective, player, game));
+                objectiveUpdate.completionMessages.push(this.handleObjectiveComplete(objective, player, game));
             }
         });
-        updateData = this.addPlayerObjectivesToUpdateData(game, player, updateData);
-        updateData = this.addPlayerObjectivesToUpdateData(game, this.findOpponent(game, player), updateData);
-        return [updateData, objectivesCompleted];
+        objectiveUpdate.updateData = this.addPlayerObjectivesToUpdateData(game, player, objectiveUpdate.updateData);
+        objectiveUpdate.updateData = this.addPlayerObjectivesToUpdateData(game, this.findOpponent(game, player), objectiveUpdate.updateData);
+        return objectiveUpdate;
     }
 
     resetPlayerObjectiveProgression(game: Game, player: Player): GameObjectivesData {
