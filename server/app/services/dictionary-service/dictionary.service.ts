@@ -4,6 +4,7 @@ import {
     INVALID_DESCRIPTION_FORMAT,
     INVALID_DICTIONARY_FORMAT,
     INVALID_DICTIONARY_ID,
+    INVALID_TITLE_FORMAT,
     MAX_DICTIONARY_DESCRIPTION_LENGTH,
     MAX_DICTIONARY_TITLE_LENGTH,
 } from '@app/constants/dictionary.const';
@@ -14,7 +15,13 @@ import DatabaseService from '@app/services/database-service/database.service';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
 import { Collection, ObjectId } from 'mongodb';
 import Ajv, { ValidateFunction } from 'ajv';
-import { DictionaryDataComplete, DictionarySummary, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/dictionary/dictionary-data';
+import {
+    BasicDictionaryData,
+    CompleteDictionaryData,
+    DictionarySummary,
+    DictionaryUpdateInfo,
+    DictionaryUsage,
+} from '@app/classes/communication/dictionary-data';
 import { Service } from 'typedi';
 
 @Service()
@@ -38,7 +45,7 @@ export default class DictionaryService {
             dictionary.numberOfActiveGames++;
             return dictionary;
         }
-        const dictionaryData: DictionaryDataComplete = { ...(await this.getDbDictionary(id)), id };
+        const dictionaryData: CompleteDictionaryData = { ...(await this.getDbDictionary(id)), id };
 
         dictionary = { numberOfActiveGames: 1, dictionary: new Dictionary(dictionaryData) };
         this.activeDictionaries.set(id, dictionary);
@@ -58,13 +65,14 @@ export default class DictionaryService {
         if (--dictionaryUsage.numberOfActiveGames === 0) this.activeDictionaries.delete(id);
     }
 
-    async validateDictionary(dictionaryData: DictionaryData): Promise<boolean> {
+    async validateDictionary(dictionaryData: BasicDictionaryData): Promise<boolean> {
         if (!this.dictionaryValidator) this.createDictionaryValidator();
         return this.dictionaryValidator(dictionaryData) && (await this.isTitleValid(dictionaryData.title));
     }
 
-    async addNewDictionary(dictionaryData: DictionaryData): Promise<void> {
-        if (!this.validateDictionary(dictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
+    async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
+        if (!this.validateDictionary(basicDictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
+        const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
         await this.collection.updateOne(
             {
                 title: dictionaryData.title,
@@ -77,18 +85,22 @@ export default class DictionaryService {
     }
 
     async resetDbDictionaries(): Promise<void> {
-        await this.collection.deleteMany({ isDefault: { $exists: false } });
-        if ((await this.collection.countDocuments({})) === 0) await this.populateDb();
+        await this.collection.deleteMany({ isDefault: false });
+        await this.populateDb();
     }
 
-    async getDictionarySummaryTitles(): Promise<DictionarySummary[]> {
+    async getAllDictionarySummaries(): Promise<DictionarySummary[]> {
         const data = await this.collection.find({}, { projection: { title: 1, description: 1, isDefault: 1 } }).toArray();
         const dictionarySummaries: DictionarySummary[] = [];
         data.forEach((dictionary) => {
-            // It is necessary to access the ObjectId of the mongodb document which is written '_id'
-            // eslint-disable-next-line no-underscore-dangle
-            const summary: DictionarySummary = { title: dictionary.title, description: dictionary.description, id: dictionary._id.toString() };
-            if (dictionary.isDefault) summary.isDefault = dictionary.isDefault;
+            const summary: DictionarySummary = {
+                title: dictionary.title,
+                description: dictionary.description,
+                // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
+                // eslint-disable-next-line no-underscore-dangle
+                id: dictionary._id.toString(),
+                isDefault: dictionary.isDefault,
+            };
             dictionarySummaries.push(summary);
         });
         return dictionarySummaries;
@@ -102,15 +114,15 @@ export default class DictionaryService {
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
-            if (!this.isTitleValid(updateInfo.title)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+            if (!this.isTitleValid(updateInfo.title)) throw new Error(INVALID_TITLE_FORMAT);
             infoToUpdate.title = updateInfo.title;
         }
 
-        await this.collection.findOneAndUpdate({ _id: new ObjectId(updateInfo.id), isDefault: { $exists: false } }, { $set: infoToUpdate });
+        await this.collection.findOneAndUpdate({ _id: new ObjectId(updateInfo.id), isDefault: false }, { $set: infoToUpdate });
     }
 
     async deleteDictionary(dictionaryId: string): Promise<void> {
-        await this.collection.findOneAndDelete({ _id: new ObjectId(dictionaryId), isDefault: { $exists: false } });
+        await this.collection.findOneAndDelete({ _id: new ObjectId(dictionaryId), isDefault: false });
     }
 
     async getDbDictionary(id: string): Promise<DictionaryData> {

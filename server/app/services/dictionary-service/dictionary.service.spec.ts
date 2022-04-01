@@ -42,7 +42,7 @@ import {
     SAME_TITLE_DICTIONARY,
     VALID_DICTIONARY,
 } from './dictionary-test.service.spec';
-import { DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/dictionary/dictionary-data';
+import { BasicDictionaryData, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import DictionaryService from './dictionary.service';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
@@ -70,7 +70,7 @@ describe('DictionaryService', () => {
     });
 
     describe('fetchDefaultDictionary', () => {
-        it('should get all courses from JSON', async () => {
+        it('should get the default dictionary from JSON', async () => {
             mock(mockPaths);
             const dictionaries = await DictionaryService['fetchDefaultDictionary']();
             mock.restore();
@@ -91,7 +91,7 @@ describe('DictionaryService', () => {
             expect(spyCreate).to.have.been.called;
         });
 
-        it('should not create the dictionary validator if was not done before', async () => {
+        it('should not create the dictionary validator if was done before', async () => {
             dictionaryService['dictionaryValidator'] = dictionaryService['dictionaryValidator'] = ((x: string) => {
                 return x;
             }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
@@ -133,7 +133,6 @@ describe('DictionaryService', () => {
 
     describe('resetDbDictionaries', () => {
         it('should call populateDb if the collection has no default dictionaries ', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(dictionaryService, 'populateDb', () => {});
             await dictionaryService['collection'].deleteMany({ isDefault: { $exists: true } });
             await dictionaryService.resetDbDictionaries();
@@ -141,14 +140,12 @@ describe('DictionaryService', () => {
         });
 
         it('should not call populateDb if the collection has a default dictionary ', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(dictionaryService, 'populateDb', () => {});
             await dictionaryService.resetDbDictionaries();
             expect(spy).not.to.have.been.called;
         });
 
         it('should only leave the default dictionary', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             chai.spy.on(dictionaryService, 'populateDb', () => {});
             await dictionaryService.resetDbDictionaries();
             expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(1);
@@ -156,9 +153,9 @@ describe('DictionaryService', () => {
         });
     });
 
-    describe('getDictionarySummaryTitles', () => {
+    describe('getAllDictionarySummaries', () => {
         it('should return the list with only the wanted attributes', async () => {
-            const result = await dictionaryService.getDictionarySummaryTitles();
+            const result = await dictionaryService.getAllDictionarySummaries();
             expect(result.length).to.equal(INITIAL_DICTIONARIES.length);
             expect(result[0].description).to.equal(INITIAL_DICTIONARIES[0].description);
         });
@@ -295,13 +292,13 @@ describe('DictionaryService', () => {
             expect(result.description).to.equal(DICTIONARY_2.description);
         });
 
-        it('should throw with a invalid id', async () => {
+        it('should throw with am invalid id', async () => {
             expect(dictionaryService['getDbDictionary'](new ObjectId().toString())).to.eventually.be.rejectedWith(Error);
         });
     });
 
     describe('createDictionaryValidator', async () => {
-        const dictionariesToTest: [DictionaryData, boolean, string][] = [
+        const dictionariesToTest: [BasicDictionaryData, boolean, string][] = [
             [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
             [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
             [LONG_TITLE_DICTIONARY, false, 'LONG_TITLE_DICTIONARY'],
@@ -415,7 +412,7 @@ describe('DictionaryService', () => {
     describe('Error handling', async () => {
         it('should throw an error if we try to access the database on a closed connection', async () => {
             await client.close();
-            expect(dictionaryService['getDictionarySummaryTitles']()).to.eventually.be.rejectedWith(Error);
+            expect(dictionaryService['getAllDictionarySummaries']()).to.eventually.be.rejectedWith(Error);
         });
     });
 });
