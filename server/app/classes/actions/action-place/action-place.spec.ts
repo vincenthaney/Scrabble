@@ -194,7 +194,7 @@ describe('ActionPlace', () => {
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
 
-                updateObjectiveStub = stub(game.player1, 'updateObjectives').returns([undefined as unknown as GameObjectivesData, []]);
+                updateObjectiveStub = stub(game.player1, 'updateObjectives').returns({ updateData: {}, completionMessages: [] });
             });
 
             afterEach(() => {
