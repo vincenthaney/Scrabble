@@ -130,7 +130,7 @@ describe('Player', () => {
     it('updateObjectives should call objective service to update objectives', async () => {
         const serviceSpy = chai.spy.on(player['objectiveService'], 'validatePlayerObjectives', () => {});
         const validationParameters: ObjectiveValidationParameters = { game: new Game() } as unknown as ObjectiveValidationParameters;
-        player.updateObjectives(validationParameters);
+        player.validateObjectives(validationParameters);
         expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
     });
 });

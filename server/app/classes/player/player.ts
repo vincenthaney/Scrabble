@@ -56,7 +56,7 @@ export default class Player {
         this.objectives = new Set(clonesPublicObjectives).add(privateObjective);
     }
 
-    updateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate {
+    validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 }
