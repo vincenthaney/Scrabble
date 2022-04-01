@@ -10,6 +10,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -201,6 +202,7 @@ describe('GameService', () => {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 1,
                 dictionary: 'default',
                 gameId: 'game-id',
@@ -363,6 +365,7 @@ describe('GameService', () => {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 1,
                 dictionary: 'default',
                 gameId: 'game-id',

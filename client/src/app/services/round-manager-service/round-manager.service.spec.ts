@@ -12,6 +12,7 @@ import { ActionData, ActionType } from '@app/classes/actions/action-data';
 import { PlayerData } from '@app/classes/communication';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { Player } from '@app/classes/player';
 import { Round } from '@app/classes/round';
@@ -115,6 +116,7 @@ describe('RoundManagerService', () => {
             player1: DEFAULT_PLAYER_DATA,
             player2: player2Data,
             gameType: GameType.Classic,
+            gameMode: GameMode.Multiplayer,
             maxRoundTime: DEFAULT_MAX_ROUND_TIME,
             dictionary: 'default',
             gameId,
