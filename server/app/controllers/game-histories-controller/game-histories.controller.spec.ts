@@ -45,7 +45,7 @@ const DEFAULT_GAME_HISTORY: GameHistory = {
     hasBeenAbandonned: false,
 };
 
-describe('GameHistoriesController', () => {
+describe.only('GameHistoriesController', () => {
     let controller: GameHistoriesController;
 
     beforeEach(() => {
@@ -72,7 +72,7 @@ describe('GameHistoriesController', () => {
         describe('GET /gameHistories/:playerId', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
-                    return undefined;
+                    return [];
                 });
 
                 return supertest(expressApp).get('/api/gameHistories').expect(StatusCodes.OK);

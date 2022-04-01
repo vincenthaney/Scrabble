@@ -20,7 +20,7 @@ export class GameHistoriesController {
         this.router.get('/gameHistories', async (req: GameHistoriesRequest, res: Response) => {
             try {
                 const gameHistories: GameHistory[] = await this.gameHistoriesService.getAllGameHistories();
-                res.status(StatusCodes.OK).send({ gameHistories: gameHistories ?? [] });
+                res.status(StatusCodes.OK).send({ gameHistories });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
