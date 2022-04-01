@@ -27,7 +27,8 @@ export default class ObjectivesService {
         return { publicObjectives, player1Objective, player2Objective };
     }
 
-    validatePlayerObjectives(player: Player, game: Game, validationParameters: ObjectiveValidationParameters): ObjectiveUpdate {
+    validatePlayerObjectives(player: Player, game: Game, validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
+        let noObjectivesWereUpdated = true;
         const objectiveUpdate: ObjectiveUpdate = {
             updateData: {},
             completionMessages: [],
@@ -36,12 +37,16 @@ export default class ObjectivesService {
             const hasBeenUpdated: boolean = objective.updateObjective(validationParameters);
             if (!hasBeenUpdated) return;
 
+            noObjectivesWereUpdated = false;
             if (objective.isCompleted()) {
                 objectiveUpdate.completionMessages.push(this.handleObjectiveCompletion(objective, player, game));
             }
         });
+        if (noObjectivesWereUpdated) return undefined;
+
         objectiveUpdate.updateData = this.addPlayerObjectivesToUpdateData(game, player, objectiveUpdate.updateData);
         objectiveUpdate.updateData = this.addPlayerObjectivesToUpdateData(game, this.findOpponent(game, player), objectiveUpdate.updateData);
+
         return objectiveUpdate;
     }
 

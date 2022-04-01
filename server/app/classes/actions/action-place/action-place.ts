@@ -58,13 +58,13 @@ export default class ActionPlace extends ActionPlay {
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        const objectiveUpdateResult: ObjectiveUpdate = this.player.validateObjectives({
+        const objectiveUpdateResult: ObjectiveUpdate | undefined = this.player.validateObjectives({
             wordPlacement: this.wordPlacement,
             game: this.game,
             scoredPoints,
             createdWords,
         });
-        this.objectivesCompletedMessages = objectiveUpdateResult.completionMessages;
+        this.objectivesCompletedMessages = objectiveUpdateResult ? objectiveUpdateResult.completionMessages : [];
 
         const updatedSquares = this.updateBoard(createdWords);
 
@@ -73,7 +73,10 @@ export default class ActionPlace extends ActionPlay {
 
         const playerData: PlayerData = { id: this.player.id, tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedSquares, gameObjective: objectiveUpdateResult.updateData };
+        const response: GameUpdateData = {
+            board: updatedSquares,
+            gameObjective: objectiveUpdateResult ? objectiveUpdateResult.updateData : undefined,
+        };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
