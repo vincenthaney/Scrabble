@@ -44,9 +44,11 @@ export default class Player {
     }
 
     resetObjectivesProgression(): void {
-        this.getObjectives().forEach((objective: AbstractObjective) => {
-            objective.progress = 0;
-        });
+        this.getObjectives()
+            .filter((objective: AbstractObjective) => !objective.isCompleted() && objective.shouldResetOnInvalidWord)
+            .forEach((objective: AbstractObjective) => {
+                objective.progress = 0;
+            });
     }
 
     initializeObjectives(publicObjectives: Set<AbstractObjective>, privateObjective: AbstractObjective): void {

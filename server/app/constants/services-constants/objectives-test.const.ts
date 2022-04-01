@@ -14,15 +14,15 @@ export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
 };
 
 export class TestObjective extends AbstractObjective {
-    constructor(name: string) {
-        super(name, '', 0, TEST_OBJECTIVE_MAX_PROGRESS);
+    constructor(name: string, shouldReset: boolean = false) {
+        super(name, '', 0, shouldReset, TEST_OBJECTIVE_MAX_PROGRESS);
     }
     // eslint-disable-next-line no-unused-vars
     updateProgress(validationParameters: ValidationParameters): void {
         this.progress = this.maxProgress;
     }
     clone(): AbstractObjective {
-        const clone = new TestObjective(this.name);
+        const clone = new TestObjective(this.name, this.shouldResetOnInvalidWord);
         clone.description = this.description;
         clone.bonusPoints = this.bonusPoints;
         clone.progress = this.progress;
@@ -34,6 +34,11 @@ export class TestObjective extends AbstractObjective {
 
 export const generateTestObjective = (index: number) => {
     const objective = new TestObjective(String(index));
+    return objective;
+};
+
+export const generateResetableTestObjective = (index: number) => {
+    const objective = new TestObjective(String(index), true);
     return objective;
 };
 

@@ -7,7 +7,13 @@ export abstract class AbstractObjective {
     state: ObjectiveState = ObjectiveState.NotCompleted;
     isPublic: boolean = false;
 
-    constructor(public name: string, public description: string, public bonusPoints: number, protected readonly maxProgress: number) {}
+    constructor(
+        public name: string,
+        public description: string,
+        public bonusPoints: number,
+        readonly shouldResetOnInvalidWord: boolean,
+        protected readonly maxProgress: number,
+    ) {}
 
     isCompleted(): boolean {
         return this.state !== ObjectiveState.NotCompleted;
