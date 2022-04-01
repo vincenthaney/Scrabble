@@ -5,7 +5,7 @@ import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/ob
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import {
-    NUMBER_OF_OBJECTIVES_PER_PLAYER,
+    NUMBER_OF_PRIVATE_OBJECTIVES_PER_PLAYER,
     NUMBER_OF_PUBLIC_OBJECTIVES,
     OBJECTIVE_COMPLETE_MESSAGE,
 } from '@app/constants/services-constants/objective.const';
@@ -18,8 +18,8 @@ export default class ObjectivesService {
     createObjectivesForGame(): GameObjectives {
         const objectivesPool: Set<AbstractObjective> = this.createObjectivesPool();
         const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PUBLIC_OBJECTIVES));
-        const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
-        const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_OBJECTIVES_PER_PLAYER)[0];
+        const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PRIVATE_OBJECTIVES_PER_PLAYER)[0];
+        const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PRIVATE_OBJECTIVES_PER_PLAYER)[0];
         publicObjectives.forEach((objective: AbstractObjective) => {
             objective.isPublic = true;
         });
