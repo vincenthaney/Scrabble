@@ -127,7 +127,7 @@ describe('Player', () => {
         });
     });
 
-    it('updateObjectives should call objective service to update objectives', async () => {
+    it('validateObjectives should call objective service to validate objectives', async () => {
         const serviceSpy = chai.spy.on(player['objectiveService'], 'validatePlayerObjectives', () => {});
         const validationParameters: ObjectiveValidationParameters = { game: new Game() } as unknown as ObjectiveValidationParameters;
         player.validateObjectives(validationParameters);
