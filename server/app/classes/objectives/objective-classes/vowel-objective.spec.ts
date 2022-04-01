@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -34,7 +34,7 @@ describe('Vowel Objective', () => {
     });
 
     describe('updateProgress', () => {
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
         let getLetterStub: SinonStub;
 
         beforeEach(() => {
@@ -45,7 +45,7 @@ describe('Vowel Objective', () => {
                         { letter: 'B', value: 0 },
                     ],
                 },
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             getLetterStub = stub(objective, <any>'getTileLetter').callsFake((tile: Tile) => tile.letter);
         });
 
@@ -69,5 +69,11 @@ describe('Vowel Objective', () => {
     it('getTileLetter should return letter if no playedLetter', () => {
         const tile: Tile = { letter: 'A', value: 0 };
         expect(objective['getTileLetter'](tile)).to.equal('A');
+    });
+
+    it('clone should do deep copy of object', () => {
+        const clone = objective.clone();
+        expect(clone).to.deep.equal(objective);
+        expect(clone).not.to.equal(objective);
     });
 });
