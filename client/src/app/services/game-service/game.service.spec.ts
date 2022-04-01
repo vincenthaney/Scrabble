@@ -180,17 +180,16 @@ describe('GameService', () => {
             });
         });
 
-        it('should do nothing if initializeGameData is undefined', () => {
-            service.handleInitializeGame(undefined);
+        it('should do nothing if initializeGameData is undefined', async () => {
+            await service.handleInitializeGame(undefined);
             expect(initializeGameSpy).not.toHaveBeenCalled();
         });
 
-        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', () => {
-            service.handleInitializeGame({} as InitializeGameData);
-            Promise.resolve(() => {
-                expect(initializeGameSpy).toHaveBeenCalled();
-                expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
-            });
+        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', async () => {
+            await service.handleInitializeGame({} as InitializeGameData);
+
+            expect(initializeGameSpy).toHaveBeenCalled();
+            expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
         });
     });
 
