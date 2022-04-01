@@ -9,8 +9,9 @@ import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveState } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
+import { LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME } from '@app/constants/services-constants/objective.const';
 import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test.const';
-import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -46,20 +47,14 @@ describe('ObjectiveService', () => {
     });
 
     describe('createObjectivesForGame', () => {
-        let objectives: Set<AbstractObjective>;
+        let objectives: AbstractObjective[];
         let createSpy: unknown;
         let randomPopSpy: unknown;
 
         beforeEach(() => {
-            objectives = new Set([generateTestObjective(1), generateTestObjective(2), generateTestObjective(3), generateTestObjective(4)]);
-            createSpy = chai.spy.on(service, 'createObjectivesPool', () => {
-                return objectives;
-            });
-            randomPopSpy = chai.spy.on(service, 'popRandomObjectiveFromPool', (pool: Set<AbstractObjective>, n: number) => {
-                const result = [...pool.values()].slice(0, n);
-                result.forEach((objective: AbstractObjective) => pool.delete(objective));
-                return result;
-            });
+            objectives = [generateTestObjective(1), generateTestObjective(2), generateTestObjective(3), generateTestObjective(4)];
+            createSpy = chai.spy.on(service, 'createObjectivesPool', () => objectives);
+            randomPopSpy = chai.spy.on(service, 'popObjectiveFromPool', () => objectives.pop());
         });
 
         it('should call createObjectivesPool', async () => {
@@ -67,10 +62,9 @@ describe('ObjectiveService', () => {
             expect(createSpy).to.have.been.called();
         });
 
-        it('should call popRandomObjectiveFromPool', async () => {
+        it('should call popObjectiveFromPool', async () => {
             service.createObjectivesForGame();
-            expect(randomPopSpy).to.have.been.called.with(objectives, 2);
-            expect(randomPopSpy).to.have.been.called.with(objectives, 1);
+            expect(randomPopSpy).to.have.been.called.with(objectives);
         });
     });
 
@@ -224,21 +218,27 @@ describe('ObjectiveService', () => {
         });
     });
 
-    it('createObjectivesPool should return set with objectives', async () => {
-        expect(service['createObjectivesPool']()).to.exist;
+    it('createObjectivesPool should call getRandomElementsFromArray for 4 elements', async () => {
+        const randomSpy = chai.spy.on(Random, 'getRandomElementsFromArray', () => {});
+        service['createObjectivesPool']();
+        expect(randomSpy).to.have.been.called.with(LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME);
     });
 
-    it('popRandomObjectiveFromPool should pop objectives out of the pool', () => {
-        const poppedObjective: AbstractObjective = generateTestObjective(1);
-        const objectives: Set<AbstractObjective> = new Set([poppedObjective, generateTestObjective(2)]);
-        const randomStub = stub(Random, 'getRandomElementsFromArray').returns([poppedObjective]);
+    describe('popObjectiveFromPool', () => {
+        it('should return objective if pool is not empty', () => {
+            const poppedObjective: AbstractObjective = generateTestObjective(1);
+            const objectives: AbstractObjective[] = [poppedObjective];
 
-        const actualObjectives: AbstractObjective[] = service['popRandomObjectiveFromPool'](objectives, 1);
-        const expectedObjectives: AbstractObjective[] = [poppedObjective];
+            const actualObjectives: AbstractObjective = service['popObjectiveFromPool'](objectives);
+            const expectedObjectives: AbstractObjective = poppedObjective;
 
-        expect(actualObjectives).to.deep.equal(expectedObjectives);
-        expect(objectives.has(actualObjectives[0])).to.be.false;
-        randomStub.restore();
+            expect(actualObjectives).to.deep.equal(expectedObjectives);
+            expect(objectives.includes(actualObjectives)).to.be.false;
+        });
+
+        it('should throw error if pool is empty', () => {
+            expect(() => service['popObjectiveFromPool']([])).to.throw(NO_OBJECTIVE_LEFT_IN_POOL);
+        });
     });
 
     describe('resetPlayerObjectiveProgression', () => {

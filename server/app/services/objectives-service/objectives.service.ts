@@ -4,25 +4,26 @@ import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
-import {
-    NUMBER_OF_PRIVATE_OBJECTIVES_PER_PLAYER,
-    NUMBER_OF_PUBLIC_OBJECTIVES,
-    OBJECTIVE_COMPLETE_MESSAGE,
-} from '@app/constants/services-constants/objective.const';
-import { INVALID_PLAYER_ID_FOR_GAME, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
+import { LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME, OBJECTIVE_COMPLETE_MESSAGE } from '@app/constants/services-constants/objective.const';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import { Service } from 'typedi';
 
 @Service()
 export default class ObjectivesService {
     createObjectivesForGame(): GameObjectives {
-        const objectivesPool: Set<AbstractObjective> = this.createObjectivesPool();
-        const publicObjectives: Set<AbstractObjective> = new Set(this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PUBLIC_OBJECTIVES));
-        const player1Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PRIVATE_OBJECTIVES_PER_PLAYER)[0];
-        const player2Objective: AbstractObjective = this.popRandomObjectiveFromPool(objectivesPool, NUMBER_OF_PRIVATE_OBJECTIVES_PER_PLAYER)[0];
+        const objectivesPool: AbstractObjective[] = this.createObjectivesPool();
+        const publicObjectives: Set<AbstractObjective> = new Set([
+            this.popObjectiveFromPool(objectivesPool),
+            this.popObjectiveFromPool(objectivesPool),
+        ]);
         publicObjectives.forEach((objective: AbstractObjective) => {
             objective.isPublic = true;
         });
+
+        const player1Objective: AbstractObjective = this.popObjectiveFromPool(objectivesPool);
+        const player2Objective: AbstractObjective = this.popObjectiveFromPool(objectivesPool);
+
         return { publicObjectives, player1Objective, player2Objective };
     }
 
@@ -78,13 +79,13 @@ export default class ObjectivesService {
             : { ...updateData, player2Objectives: playerObjectivesData };
     }
 
-    private createObjectivesPool(): Set<AbstractObjective> {
-        return new Set();
+    private createObjectivesPool(): AbstractObjective[] {
+        return Random.getRandomElementsFromArray(LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME);
     }
 
-    private popRandomObjectiveFromPool(objectivePool: Set<AbstractObjective>, numberOfObjectives: number = 1): AbstractObjective[] {
-        const objectives: AbstractObjective[] = Random.getRandomElementsFromArray([...objectivePool.values()], numberOfObjectives);
-        objectives.forEach((objective: AbstractObjective) => objectivePool.delete(objective));
-        return objectives;
+    private popObjectiveFromPool(objectivePool: AbstractObjective[]): AbstractObjective {
+        const objective: AbstractObjective | undefined = objectivePool.pop();
+        if (!objective) throw new Error(NO_OBJECTIVE_LEFT_IN_POOL);
+        return objective;
     }
 }
