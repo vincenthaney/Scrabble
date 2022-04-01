@@ -9,7 +9,7 @@ import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveState } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
-import { LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME } from '@app/constants/services-constants/objective.const';
+import { GENERATE_LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME } from '@app/constants/services-constants/objective.const';
 import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
@@ -227,10 +227,10 @@ describe('ObjectiveService', () => {
         });
     });
 
-    it('createObjectivesPool should call getRandomElementsFromArray for 4 elements', async () => {
+    it.only('createObjectivesPool should call getRandomElementsFromArray for 4 elements', async () => {
         const randomSpy = chai.spy.on(Random, 'getRandomElementsFromArray', () => {});
         service['createObjectivesPool']();
-        expect(randomSpy).to.have.been.called.with(LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME);
+        expect(randomSpy).to.have.been.called.with(GENERATE_LIST_OF_ALL_OBJECTIVES(), NUMBER_OF_OBJECTIVES_IN_GAME);
     });
 
     describe('popObjectiveFromPool', () => {

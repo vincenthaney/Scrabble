@@ -4,7 +4,11 @@ import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
-import { LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME, OBJECTIVE_COMPLETE_MESSAGE } from '@app/constants/services-constants/objective.const';
+import {
+    GENERATE_LIST_OF_ALL_OBJECTIVES,
+    NUMBER_OF_OBJECTIVES_IN_GAME,
+    OBJECTIVE_COMPLETE_MESSAGE,
+} from '@app/constants/services-constants/objective.const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import { Service } from 'typedi';
@@ -85,7 +89,7 @@ export default class ObjectivesService {
     }
 
     private createObjectivesPool(): AbstractObjective[] {
-        return Random.getRandomElementsFromArray(LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME);
+        return Random.getRandomElementsFromArray(GENERATE_LIST_OF_ALL_OBJECTIVES(), NUMBER_OF_OBJECTIVES_IN_GAME);
     }
 
     private popObjectiveFromPool(objectivePool: AbstractObjective[]): AbstractObjective {
