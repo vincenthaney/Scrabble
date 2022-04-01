@@ -25,7 +25,6 @@ import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
-
 const expect = chai.expect;
 
 chai.use(spies);
@@ -304,22 +303,19 @@ describe('Game', () => {
             player2Stub.name = 'Dalton';
             player1Stub.id = DEFAULT_PLAYER_1_ID;
             player2Stub.id = DEFAULT_PLAYER_2_ID;
+            player1Stub.tiles = [{ letter: 'A', value: 2 } as Tile, { letter: 'B', value: 4 } as Tile];
+            player2Stub.tiles = [{ letter: 'A', value: 6 } as Tile, { letter: 'B', value: 8 } as Tile];
+            player1Stub.score = PLAYER_1_SCORE;
+            player2Stub.score = PLAYER_2_SCORE;
+            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
+            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
 
-            game.player1.tiles = [
-                { letter: 'A', value: 2 },
-                { letter: 'B', value: 4 },
-            ];
-            game.player2.tiles = [
-                { letter: 'A', value: 6 },
-                { letter: 'B', value: 8 },
-            ];
-
-            game.player1.score = PLAYER_1_SCORE;
-            game.player2.score = PLAYER_2_SCORE;
-            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
-            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+            chai.spy.on(game, 'completeGameHistory', () => {
+                return;
+            });
         });
 
         it('should deduct points from both player if the getPassCounter is exceeded', () => {
@@ -353,9 +349,7 @@ describe('Game', () => {
 
         it('should call computeEndOfGameScore with player1Win if winnerName is player1.name', () => {
             roundManagerStub.getPassCounter.returns(0);
-            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScore', () => {
-                return;
-            });
+            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScore');
             game.endOfGame(game.player1.name);
 
             expect(player1WinSpy).to.have.been.called.with(WIN, LOSE);
@@ -363,12 +357,115 @@ describe('Game', () => {
 
         it('should call computeEndOfGameScore with player2Win if winnerName is player2.name', () => {
             roundManagerStub.getPassCounter.returns(0);
-            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScore', () => {
-                return;
-            });
+            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScore');
             game.endOfGame(game.player2.name);
 
             expect(player2WinSpy).to.have.been.called.with(LOSE, WIN);
+        });
+    });
+
+    describe('completeGameHistory', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        const PLAYER_1_SCORE = 20;
+        const PLAYER_2_SCORE = 40;
+        const PLAYER_1_NAME = 'Lucky Luke';
+        const PLAYER_2_NAME = 'Joe Dalton';
+        const PLAYER_1_TILE_SCORE = 6;
+        const PLAYER_2_TILE_SCORE = 14;
+
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            player1Stub.name = PLAYER_1_NAME;
+            player2Stub.name = PLAYER_2_NAME;
+            player1Stub.id = DEFAULT_PLAYER_1_ID;
+            player2Stub.id = DEFAULT_PLAYER_2_ID;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+
+            game.player1.tiles = [
+                { letter: 'A', value: 2 },
+                { letter: 'B', value: 4 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 6 },
+                { letter: 'B', value: 8 },
+            ];
+            game.player1.score = PLAYER_1_SCORE;
+            game.player2.score = PLAYER_2_SCORE;
+            game.player1.isConnected = true;
+            game.player2.isConnected = true;
+            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
+            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+        });
+
+        it('should set hasBeenAbandonned to false if no player is disconnected', () => {
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.hasBeenAbandonned).to.be.false;
+        });
+
+        it('should set hasBeenAbandonned to true if player1 is disconnected', () => {
+            game.player1.isConnected = false;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.hasBeenAbandonned).to.be.true;
+        });
+
+        it('should set hasBeenAbandonned to true if player2 is disconnected', () => {
+            game.player2.isConnected = false;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.hasBeenAbandonned).to.be.true;
+        });
+
+        it('should set player1Data.isWinner to true if player1 is winner', () => {
+            game.completeGameHistory(PLAYER_1_NAME);
+            expect(game.gameHistory.player1Data.isWinner).to.be.true;
+        });
+
+        it('should set player1Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
+            game.player1.score = 100;
+            game.player2.score = 90;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.player1Data.isWinner).to.be.true;
+        });
+
+        it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
+            game.player1.score = 90;
+            game.player2.score = 100;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.player1Data.isWinner).to.be.false;
+        });
+
+        it('should set player2Data.isWinner to true if player1 is winner', () => {
+            game.completeGameHistory(PLAYER_2_NAME);
+            expect(game.gameHistory.player2Data.isWinner).to.be.true;
+        });
+
+        it('should set player2Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
+            game.player2.score = 100;
+            game.player1.score = 90;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.player2Data.isWinner).to.be.true;
+        });
+
+        it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
+            game.player2.score = 90;
+            game.player1.score = 100;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.player2Data.isWinner).to.be.false;
+        });
+
+        it('should set both playerData.isWinner to true if winnerName is undefined and players have equal scores', () => {
+            game.player1.score = 100;
+            game.player2.score = 100;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.player1Data.isWinner).to.be.true;
+            expect(game.gameHistory.player2Data.isWinner).to.be.true;
         });
     });
 
@@ -513,6 +610,7 @@ describe('Game', () => {
             expect(Game['getBoardService']).to.have.been.called;
         });
     });
+
     describe('createStartGameData', () => {
         const PLAYER_1_ID = 'player1Id';
         const PLAYER_2_ID = 'player2Id';
