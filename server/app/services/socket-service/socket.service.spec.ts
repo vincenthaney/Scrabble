@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
+import { INVALID_ID_FOR_SOCKET } from '@app/constants/services-errors';
 import { Delay } from '@app/utils/delay';
 import { Server } from 'app/server';
 import { expect } from 'chai';
@@ -13,9 +13,6 @@ const RESPONSE_DELAY = 300;
 const SERVER_URL = 'http://localhost:';
 
 const DEFAULT_ROOM = 'default_room';
-const INVALID_ROOM_NAME = 'invalid_room';
-const INVALID_ID = 'invalid-id';
-const DEFAULT_ARGS = 'data';
 
 const getSocketId = async (socket: Socket) => {
     const DELAY = 5;
@@ -132,150 +129,6 @@ describe('SocketService', () => {
                 service.deleteRoom(DEFAULT_ROOM);
                 expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
                 expect(service['sio']?.sockets.adapter.rooms.has(DEFAULT_ROOM)).to.be.false;
-            });
-        });
-
-        describe('removeFromRoom', () => {
-            let id: string;
-            beforeEach(async () => {
-                clientSocket.connect();
-                id = await getSocketId(clientSocket);
-                service.addToRoom(id, DEFAULT_ROOM);
-            });
-
-            afterEach(() => {
-                clientSocket.disconnect();
-            });
-
-            it('should remove socketId from room', () => {
-                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
-                service.removeFromRoom(id, DEFAULT_ROOM);
-                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.false;
-            });
-        });
-
-        describe('doesRoomExist', () => {
-            let id: string;
-            beforeEach(async () => {
-                clientSocket.connect();
-                id = await getSocketId(clientSocket);
-            });
-
-            afterEach(() => {
-                clientSocket.disconnect();
-            });
-
-            it('should return true if room has socket in it', () => {
-                service.addToRoom(id, DEFAULT_ROOM);
-                expect(service.getSocket(id).rooms.has(DEFAULT_ROOM)).to.be.true;
-                expect(service.doesRoomExist(DEFAULT_ROOM)).to.be.true;
-            });
-
-            it('should return false if room has no socket in it', () => {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                service['sio']!.sockets.adapter.rooms.get(DEFAULT_ROOM)?.clear();
-                expect(service.doesRoomExist(DEFAULT_ROOM)).to.be.false;
-            });
-        });
-
-        describe('emitToRoom', () => {
-            let id: string;
-
-            beforeEach(async () => {
-                clientSocket.connect();
-                id = await getSocketId(clientSocket);
-            });
-
-            afterEach(() => {
-                clientSocket.disconnect();
-            });
-
-            it('should emit to room', async () => {
-                return new Promise((resolve) => {
-                    service.addToRoom(id, DEFAULT_ROOM);
-
-                    clientSocket.on('_test_event', (args: unknown[]) => {
-                        expect(args).to.equal(DEFAULT_ARGS);
-                        resolve();
-                    });
-
-                    service.emitToRoom(DEFAULT_ROOM, '_test_event', DEFAULT_ARGS);
-                });
-            });
-
-            it('should throw if sio is undefined', () => {
-                const sio = service['sio'];
-                service['sio'] = undefined;
-                expect(() => service.emitToRoom(DEFAULT_ROOM, '_test_event', DEFAULT_ARGS)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
-                service['sio'] = sio;
-            });
-        });
-
-        describe('emitToSocket', () => {
-            let id: string;
-
-            beforeEach(async () => {
-                clientSocket.connect();
-                id = await getSocketId(clientSocket);
-            });
-
-            afterEach(() => {
-                clientSocket.disconnect();
-            });
-
-            it('should emit to socket', async () => {
-                return new Promise((resolve) => {
-                    clientSocket.on('_test_event', (args: unknown[]) => {
-                        expect(args).to.equal(DEFAULT_ARGS);
-                        resolve();
-                    });
-                    service.emitToSocket(id, '_test_event', DEFAULT_ARGS);
-                });
-            });
-
-            it('should throw if sio is undefined', () => {
-                const sio = service['sio'];
-                service['sio'] = undefined;
-                expect(() => service.emitToSocket(id, '_test_event', DEFAULT_ARGS)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
-                service['sio'] = sio;
-            });
-        });
-    });
-
-    describe('Not initialized', () => {
-        let service: SocketService;
-
-        beforeEach(async () => {
-            service = new SocketService();
-        });
-
-        describe('handleSockets', () => {
-            it('should throw', () => {
-                expect(() => service.handleSockets()).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
-            });
-        });
-
-        describe('addToRoom', () => {
-            it('should throw if ID is invalid', () => {
-                expect(() => service.addToRoom(INVALID_ID, DEFAULT_ROOM)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
-            });
-        });
-
-        describe('deleteRoom', () => {
-            it('should throw if ID is invalid', () => {
-                expect(() => service.deleteRoom(INVALID_ID)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
-            });
-        });
-
-        describe('removeFromRoom', () => {
-            it('should throw if ID is invalid', () => {
-                expect(() => service.removeFromRoom(INVALID_ID, INVALID_ROOM_NAME)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
-            });
-        });
-
-        describe('doesRoomExist', () => {
-            it('should throw if ID is invalid', () => {
-                expect(() => service.doesRoomExist(INVALID_ROOM_NAME)).to.throw(SOCKET_SERVICE_NOT_INITIALIZED);
             });
         });
     });
