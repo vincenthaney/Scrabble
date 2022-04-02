@@ -22,6 +22,7 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
@@ -92,8 +93,8 @@ describe('GamePlayService', () => {
     });
 
     afterEach(() => {
-        getGameStub.restore();
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('playAction', () => {

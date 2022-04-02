@@ -15,6 +15,7 @@ import { Orientation, Position } from '@app/classes/board';
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
 import { SinonStub, stub } from 'sinon';
+import * as sinon from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
@@ -49,6 +50,7 @@ describe('DictionarySearcher', () => {
 
     afterEach(() => {
         Container.reset();
+        sinon.restore();
     });
 
     describe('constructor', () => {

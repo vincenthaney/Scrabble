@@ -13,6 +13,7 @@ import { Tile } from '@app/classes/tile';
 import Range from '@app/classes/range/range';
 import { Dictionary } from '@app/classes/dictionary';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import * as sinon from 'sinon';
 
 describe('WordFindingService', () => {
     let findWordsStub: SinonStub;
@@ -22,6 +23,7 @@ describe('WordFindingService', () => {
     let request: WordFindingRequest;
 
     beforeEach(() => {
+        sinon.restore();
         Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
         findWordsStub = stub(AbstractWordFinding.prototype, 'findWords');
@@ -36,6 +38,7 @@ describe('WordFindingService', () => {
     });
 
     afterEach(() => {
+        sinon.restore();
         Container.reset();
         findWordsStub.restore();
     });

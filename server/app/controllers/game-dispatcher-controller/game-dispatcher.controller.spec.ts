@@ -42,6 +42,7 @@ import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
+import * as sinon from 'sinon';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
@@ -118,6 +119,10 @@ describe('GameDispatcherController', () => {
         socketServiceStub = createStubInstance(SocketService);
         createGameServiceStub = createStubInstance(CreateGameService);
         controller['socketService'] = socketServiceStub as unknown as SocketService;
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create', () => {

@@ -13,6 +13,7 @@ import * as mock from 'mock-fs';
 import { MongoClient, ObjectId, WithId } from 'mongodb';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
@@ -44,7 +45,6 @@ import {
 } from './dictionary-test.service.spec';
 import { BasicDictionaryData, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import DictionaryService from './dictionary.service';
-import * as sinon from 'sinon';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 // mockPaths must be of type any because keys must be dynamic
@@ -68,6 +68,7 @@ describe('DictionaryService', () => {
     afterEach(async () => {
         await databaseService.closeConnection();
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('fetchDefaultDictionary', () => {

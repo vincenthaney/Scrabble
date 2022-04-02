@@ -37,6 +37,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GamePlayController } from './game-play.controller';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -89,6 +90,10 @@ describe('GamePlayController', () => {
         stub(gamePlayController['socketService'], 'emitToSocket').callsFake(() => {
             return;
         });
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create', () => {

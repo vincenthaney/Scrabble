@@ -26,6 +26,7 @@ import { getDictionaryTestService } from '@app/services/dictionary-service/dicti
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -124,6 +125,7 @@ describe('GameDispatcherService', () => {
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {

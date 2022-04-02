@@ -40,6 +40,7 @@ import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
 import { ActionData } from '@app/classes/communication/action-data';
+import * as sinon from 'sinon';
 
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
@@ -56,6 +57,7 @@ describe('BeginnerVirtualPlayer', () => {
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {
