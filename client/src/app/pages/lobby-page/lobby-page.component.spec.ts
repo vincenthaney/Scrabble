@@ -23,7 +23,7 @@ import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.compon
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { NO_LOBBY_CAN_BE_JOINED } from '@app/constants/component-errors';
-import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
+import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherService } from '@app/services/';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
@@ -117,7 +117,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '1',
                 hostName: 'Name1',
                 gameType: GameType.Classic,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
                 maxRoundTime: 60,
                 canJoin: false,
             },
@@ -125,7 +125,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '2',
                 hostName: 'Name2',
                 gameType: GameType.Classic,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
                 maxRoundTime: 60,
                 canJoin: true,
             },
@@ -133,7 +133,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '3',
                 hostName: 'Name3',
                 gameType: GameType.LOG2990,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
                 maxRoundTime: 90,
                 canJoin: false,
             },
@@ -226,7 +226,7 @@ describe('LobbyPageComponent', () => {
                     hostName: 'name',
                     gameType: GameType.Classic,
                     maxRoundTime: 60,
-                    dictionary: DEFAULT_DICTIONARY,
+                    dictionary: TEST_DICTIONARY,
                     canJoin: true,
                 },
             ];
@@ -313,7 +313,7 @@ describe('LobbyPageComponent', () => {
                 hostName: 'player',
                 gameType: GameType.Classic,
                 maxRoundTime: 0,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
             };
 
             getGameTypeSpy = spyOn(component.filterFormGroup, 'get').and.returnValue({ value: 'all' } as AbstractControl);
@@ -375,7 +375,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '1',
                 hostName: 'Name1',
                 gameType: GameType.Classic,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
                 maxRoundTime: 60,
                 canJoin: false,
             },

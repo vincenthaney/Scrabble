@@ -5,7 +5,7 @@ import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
@@ -26,14 +26,14 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 describe('CreateGameService', async () => {

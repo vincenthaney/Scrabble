@@ -15,7 +15,7 @@ import { LobbyInfo } from '@app/classes/communication';
 import { GameType } from '@app/classes/game-type';
 import { Timer } from '@app/classes/timer/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
-import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
+import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { LobbyInfoComponent } from './lobby-info.component';
@@ -30,7 +30,7 @@ const TEST_LOBBY: LobbyInfo = {
     hostName: 'playerName',
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
     canJoin: false,
 };
 

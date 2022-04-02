@@ -1,9 +1,9 @@
 export const DICTIONARY_PATH = '../../../assets/dictionaries/dictionnary.json';
 export const INVALID_DICTIONARY_NAME = 'Le nom du dictionnaire est invalide';
 export const INVALID_DICTIONARY_ID = "L'identificateur (ID) du dictionanaire est invalide";
-export const CANNOT_MODIFY_DEFAULT_DICTIONARY = 'Le dictionnaire par défaut ne peut pas être modifié';
+export const CANNOT_MODIFY_TEST_DICTIONARY = 'Le dictionnaire par défaut ne peut pas être modifié';
 export const MAX_DICTIONARY_DESCRIPTION_LENGTH = 80;
 export const MAX_DICTIONARY_TITLE_LENGTH = 30;
-export const INVALID_DICTIONARY_FORMAT = 'Le dictionnaire new respecte pas le format attendu';
+export const INVALID_DICTIONARY_FORMAT = 'Le dictionnaire ne respecte pas le format attendu';
 export const INVALID_DESCRIPTION_FORMAT = 'La description donnée ne respecte pas le format attendu';
-export const INVALID_TITLE_FORMAT = 'La titre donné ne respecte pas le format attendu';
+export const INVALID_TITLE_FORMAT = 'Le titre donné ne respecte pas le format attendu';

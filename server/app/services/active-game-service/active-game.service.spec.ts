@@ -5,7 +5,7 @@ import Game from '@app/classes/game/game';
 import { ReadyGameConfig } from '@app/classes/game/game-config';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
-import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
@@ -27,7 +27,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 const DEFAULT_GAME = {
     player1: DEFAULT_PLAYER_1,

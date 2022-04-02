@@ -10,7 +10,7 @@ import PlayerName from '@app/classes/communication/player-name';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
-import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
+import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameService } from '@app/services';
 import SocketService from '@app/services/socket-service/socket.service';
@@ -27,7 +27,7 @@ const DEFAULT_GAME_DATA: GameConfigData = {
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
     maxRoundTime: 0,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 describe('GameDispatcherController', () => {

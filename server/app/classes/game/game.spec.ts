@@ -24,7 +24,7 @@ import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
-import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 const expect = chai.expect;
 
@@ -45,7 +45,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
     maxRoundTime: 1,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_2: Tile = { letter: 'B', value: 5 };
@@ -545,7 +545,7 @@ describe('Game', () => {
             game.player2 = PLAYER_2;
             chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
             game.gameType = GameType.Classic;
-            game.dictionarySummary = DEFAULT_DICTIONARY;
+            game.dictionarySummary = TEST_DICTIONARY;
             chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
             game.board = board;
             chai.spy.on(game.board, ['isWithinBounds'], () => true);
@@ -562,7 +562,7 @@ describe('Game', () => {
                 player2: game.player2,
                 gameType: game.gameType,
                 maxRoundTime: DEFAULT_TIME,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
                 gameId: DEFAULT_GAME_ID,
                 board: game.board.grid,
                 tileReserve: TILE_RESERVE_DATA,

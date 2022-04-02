@@ -66,7 +66,7 @@ describe('DictionaryController', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'updateDictionary', () => {});
 
-                return supertest(expressApp).patch('/api/dictionaries').expect(StatusCodes.OK);
+                return supertest(expressApp).patch('/api/dictionaries').expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -82,7 +82,7 @@ describe('DictionaryController', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'deleteDictionary', () => {});
 
-                return supertest(expressApp).delete('/api/dictionaries').expect(StatusCodes.OK);
+                return supertest(expressApp).delete('/api/dictionaries').expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -136,7 +136,7 @@ describe('DictionaryController', () => {
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'resetDbDictionaries', () => {});
 
-                return supertest(expressApp).delete('/api/dictionaries/reset').expect(StatusCodes.OK);
+                return supertest(expressApp).delete('/api/dictionaries/reset').expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {

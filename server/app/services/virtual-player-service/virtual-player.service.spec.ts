@@ -15,7 +15,7 @@ import { Square } from '@app/classes/square';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { ActionPass } from '@app/classes/actions';
-import { DEFAULT_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';
@@ -29,7 +29,7 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER1_ID, DEFAULT_PLAYER1_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_STARTING_GAME_DATA: StartGameData = {

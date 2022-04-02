@@ -34,7 +34,7 @@ export class DictionaryController {
 
             try {
                 await this.dictionaryService.updateDictionary(dictionaryUpdateInfo);
-                res.status(StatusCodes.OK).send();
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
@@ -45,7 +45,7 @@ export class DictionaryController {
 
             try {
                 await this.dictionaryService.deleteDictionary(dictionaryId);
-                res.status(StatusCodes.OK).send();
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
@@ -80,7 +80,7 @@ export class DictionaryController {
         this.router.delete('/dictionaries/reset', async (req: DictionaryRequest, res: Response) => {
             try {
                 await this.dictionaryService.resetDbDictionaries();
-                res.status(StatusCodes.OK).send();
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }

@@ -5,7 +5,7 @@ import DictionaryService from './dictionary.service';
 
 const TEST_TITLE = 'Test dictionary';
 const TEST_WORDS = ['ab', 'abc', 'abcd', 'abcde'];
-const DEFAULT_DICTIONARY: CompleteDictionaryData = {
+const TEST_DICTIONARY: CompleteDictionaryData = {
     title: TEST_TITLE,
     description: 'Dictionary for testing',
     words: TEST_WORDS,
@@ -15,7 +15,7 @@ const DEFAULT_DICTIONARY: CompleteDictionaryData = {
 
 const getDictionaryTestService = () =>
     createStubInstance(DictionaryService, {
-        getDictionary: new Dictionary(DEFAULT_DICTIONARY),
+        getDictionary: new Dictionary(TEST_DICTIONARY),
     }) as unknown as DictionaryService;
 
 export { getDictionaryTestService };

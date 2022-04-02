@@ -10,7 +10,7 @@ import { GameConfigData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { DEFAULT_DICTIONARY } from '@app/constants/controller-test-constants';
+import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameDispatcherService, SocketService } from '@app/services/';
 
@@ -23,7 +23,7 @@ const TEST_LOBBY_DATA: LobbyData = {
     hostName: '',
     gameType: GameType.Classic,
     maxRoundTime: 0,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 const TEST_LOBBY_INFO: LobbyInfo = {
     ...TEST_LOBBY_DATA,
@@ -36,7 +36,7 @@ const TEST_GAME_PARAMETERS = {
     virtualPlayerName: 'Victoria',
     level: VirtualPlayerLevel.Beginner,
     timer: '60',
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 const TEST_FORM_CONTENT = {
     gameType: new FormControl(GameType.Classic, Validators.required),
