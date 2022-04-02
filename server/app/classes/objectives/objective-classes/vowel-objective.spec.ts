@@ -5,16 +5,14 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { Tile } from '@app/classes/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
-import { SinonStub, stub } from 'sinon';
 import { BONUS_POINTS, DESCRIPTION, NAME, VowelObjective, VOWELS } from './vowel-objective';
 chai.use(spies);
 
-describe('Vowel Objective', () => {
+describe.only('Vowel Objective', () => {
     let objective: VowelObjective;
 
     beforeEach(() => {
@@ -35,7 +33,6 @@ describe('Vowel Objective', () => {
 
     describe('updateProgress', () => {
         let validationParameters: ObjectiveValidationParameters;
-        let getLetterStub: SinonStub;
 
         beforeEach(() => {
             validationParameters = {
@@ -46,12 +43,6 @@ describe('Vowel Objective', () => {
                     ],
                 },
             } as ObjectiveValidationParameters;
-            getLetterStub = stub(objective, <any>'getTileLetter').callsFake((tile: Tile) => tile.letter);
-        });
-
-        it('should call getTileLetter as many times as there are letters', () => {
-            objective.updateProgress(validationParameters);
-            expect(getLetterStub.callCount).to.equal(validationParameters.wordPlacement.tilesToPlace.length);
         });
 
         it('should update progress according to vowels played', () => {
@@ -73,16 +64,6 @@ describe('Vowel Objective', () => {
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(1);
         });
-    });
-
-    it('getTileLetter should return playedLetter if it exists', () => {
-        const tile: Tile = { letter: '*', value: 0, playedLetter: 'E' };
-        expect(objective['getTileLetter'](tile)).to.equal('E');
-    });
-
-    it('getTileLetter should return letter if no playedLetter', () => {
-        const tile: Tile = { letter: 'A', value: 0 };
-        expect(objective['getTileLetter'](tile)).to.equal('A');
     });
 
     it('clone should do deep copy of object', () => {
