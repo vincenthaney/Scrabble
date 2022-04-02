@@ -26,7 +26,7 @@ describe('WordFindingService', () => {
         sinon.restore();
         Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
-        findWordsStub = stub(AbstractWordFinding.prototype, 'findWords');
+        findWordsStub = stub(AbstractWordFinding.prototype, 'findWords').callsFake(() => []);
 
         boardStub = createStubInstance(Board);
         tiles = [];
@@ -46,8 +46,18 @@ describe('WordFindingService', () => {
     describe('findWords', () => {
         it('should call getWordFindingInstance', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const getWordFindingInstanceStub = stub(service, 'getWordFindingInstance' as any).callThrough();
-
+            const getWordFindingInstanceStub = stub(service, 'getWordFindingInstance' as any).callsFake(() => {
+                return new WordFindingHint(
+                    boardStub as unknown as Board,
+                    tiles,
+                    request,
+                    {} as unknown as Dictionary,
+                    {} as unknown as ScoreCalculatorService,
+                );
+            });
+            stub(service['dictionaryService'], 'getDictionary').callsFake(() => {
+                return {} as unknown as Dictionary;
+            });
             service.findWords(boardStub as unknown as Board, tiles, 'id', request);
 
             expect(getWordFindingInstanceStub.called).to.be.true;
