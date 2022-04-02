@@ -36,7 +36,7 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
     dictionary: TEST_DICTIONARY,
 };
 
-describe('CreateGameService', async () => {
+describe('CreateGameService', () => {
     let createGameService: CreateGameService;
     let activeGameService: ActiveGameService;
     beforeEach(() => {

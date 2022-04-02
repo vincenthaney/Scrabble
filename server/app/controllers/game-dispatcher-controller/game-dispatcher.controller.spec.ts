@@ -38,13 +38,14 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { EventEmitter } from 'events';
 import { StatusCodes } from 'http-status-codes';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
 import * as sinon from 'sinon';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TIME_TO_RECONNECT, SECONDS_TO_MILLISECONDS } from '@app/constants/controllers-constants';
 
 const expect = chai.expect;
 
@@ -376,7 +377,7 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateGame', async () => {
+    describe('handleCreateGame', () => {
         beforeEach(() => {
             controller['createGameService'] = createGameServiceStub as unknown as CreateGameService;
             spy.on(controller['createGameService'], 'createSoloGame', () => {
@@ -402,7 +403,7 @@ describe('GameDispatcherController', () => {
             expect(createGameServiceSpy).to.have.been.called();
         });
 
-        it('should throw if config.playerName is undefined', async () => {
+        it('should throw if config.playerName is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined, virtualPlayerLevel: VirtualPlayerLevel.Expert };
             expect(controller['handleCreateGame'](config as unknown as GameConfigData)).to.be.rejectedWith(PLAYER_NAME_REQUIRED);
         });
@@ -444,7 +445,7 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateSoloGame', async () => {
+    describe('handleCreateSoloGame', () => {
         let createSoloGameSpy: unknown;
         beforeEach(() => {
             createSoloGameSpy = spy.on(controller['gameDispatcherService'], 'createSoloGame', () => {
@@ -462,7 +463,7 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateMultiplayerGame', async () => {
+    describe('handleCreateMultiplayerGame', () => {
         let createGameServiceSpy: unknown;
         let handleLobbesUpdateSpy: unknown;
         beforeEach(() => {
@@ -828,64 +829,64 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    // describe('handleDisconnection', () => {
-    //     let gameStub: SinonStubbedInstance<Game>;
-    //     let getGameSpy: SinonStub;
-    //     let gameIsOverSpy: unknown;
-    //     let playerStub: SinonStubbedInstance<Player>;
-    //     let handleLeaveSpy: unknown;
+    describe('handleDisconnection', () => {
+        let gameStub: SinonStubbedInstance<Game>;
+        let getGameSpy: SinonStub;
+        let gameIsOverSpy: unknown;
+        let playerStub: SinonStubbedInstance<Player>;
+        let handleLeaveSpy: unknown;
 
-    //     beforeEach(() => {
-    //         gameStub = createStubInstance(Game);
-    //         getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
-    //         playerStub = createStubInstance(Player);
-    //         gameStub.getPlayer.returns(playerStub);
-    //         handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
-    //     });
+        beforeEach(() => {
+            gameStub = createStubInstance(Game);
+            getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
+            playerStub = createStubInstance(Player);
+            gameStub.getPlayer.returns(playerStub);
+            handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
+        });
 
-    //     it('Disconnection should verify if game is over', () => {
-    //         gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => true);
-    //         controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-    //         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-    //         expect(getGameSpy.calledOnce).to.be.true;
-    //         expect(gameIsOverSpy).to.have.been.called();
-    //     });
+        it('Disconnection should verify if game is over', () => {
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => true);
+            controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
+            expect(getGameSpy.calledOnce).to.be.true;
+            expect(gameIsOverSpy).to.have.been.called();
+        });
 
-    //     it('Disconnection should set player isConnected to false if the game is not over', () => {
-    //         const clock = useFakeTimers();
+        it('Disconnection should set player isConnected to false if the game is not over', () => {
+            const clock = useFakeTimers();
 
-    //         gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
-    //         controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
+            controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
 
-    //         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
-    //         expect(playerStub.isConnected).to.be.false;
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
+            expect(playerStub.isConnected).to.be.false;
 
-    //         clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
-    //         clock.restore();
-    //     });
+            clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            clock.restore();
+        });
 
-    //     it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
-    //         const clock = useFakeTimers();
-    //         gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
-    //         controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-    //         expect(handleLeaveSpy).to.not.have.been.called();
+        it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {
+            const clock = useFakeTimers();
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
+            controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(handleLeaveSpy).to.not.have.been.called();
 
-    //         clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
-    //         clock.restore();
-    //     });
+            clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            clock.restore();
+        });
 
-    //     it('Disconnection should keep player in game if they reconnect within 5 seconds', () => {
-    //         const clock = useFakeTimers();
-    //         gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
-    //         controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-    //         expect(handleLeaveSpy).to.not.have.been.called();
-    //         playerStub.isConnected = true;
+        it('Disconnection should keep player in game if they reconnect within 5 seconds', () => {
+            const clock = useFakeTimers();
+            gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
+            controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            expect(handleLeaveSpy).to.not.have.been.called();
+            playerStub.isConnected = true;
 
-    //         clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
-    //         expect(handleLeaveSpy).to.not.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
-    //         clock.restore();
-    //     });
-    // });
+            clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            expect(handleLeaveSpy).to.not.have.been.called.with(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
+            clock.restore();
+        });
+    });
 
     describe('PlayerLeftFeedback', () => {
         it('On receive player feedback, should call handlePlayerFeedback method', () => {

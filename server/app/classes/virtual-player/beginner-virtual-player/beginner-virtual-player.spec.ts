@@ -51,7 +51,7 @@ const TEST_SELECT_COUNT = 3;
 describe('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         beginnerVirtualPlayer = new BeginnerVirtualPlayer(PLAYER_ID, PLAYER_NAME);
     });
 
@@ -64,7 +64,7 @@ describe('BeginnerVirtualPlayer', () => {
         expect(beginnerVirtualPlayer).to.exist;
     });
 
-    describe('playTurn', async () => {
+    describe('playTurn', () => {
         let actionPassSpy: unknown;
         let sendActionSpy: unknown;
         beforeEach(() => {
@@ -149,7 +149,7 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     describe('Find Action with RANDOM_VALUE_PLACE', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PLACE;
             });
@@ -276,7 +276,7 @@ describe('BeginnerVirtualPlayer', () => {
     describe('createWordFindingPlacement', () => {
         let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
 
-        beforeEach(async () => {
+        beforeEach(() => {
             wordFindingServiceStub = createStubInstance(WordFindingService);
             beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
         });

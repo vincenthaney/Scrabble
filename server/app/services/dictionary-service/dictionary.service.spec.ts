@@ -286,7 +286,7 @@ describe('DictionaryService', () => {
         });
     });
 
-    describe('getDbDictionary', async () => {
+    describe('getDbDictionary', () => {
         it('should return the wanted dictionary with a valid id', async () => {
             const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
 
@@ -300,7 +300,7 @@ describe('DictionaryService', () => {
         });
     });
 
-    describe('createDictionaryValidator', async () => {
+    describe('createDictionaryValidator', () => {
         const dictionariesToTest: [BasicDictionaryData, boolean, string][] = [
             [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
             [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
@@ -327,10 +327,10 @@ describe('DictionaryService', () => {
         }
     });
 
-    describe('useDictionary', async () => {
+    describe('useDictionary', () => {
         const BASE_DICTIONARY_USAGE: DictionaryUsage = { dictionary: {} as unknown as Dictionary, numberOfActiveGames: 1 };
         const BASE_DICTIONARY_ID = 'id1';
-        beforeEach(async () => {
+        beforeEach(() => {
             dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
@@ -382,13 +382,13 @@ describe('DictionaryService', () => {
         });
     });
 
-    describe('stopUsingDictionary', async () => {
+    describe('stopUsingDictionary', () => {
         const BASE_DICTIONARY_ID = 'id1';
         const BASE_DICTIONARY_USAGE: DictionaryUsage = {
             dictionary: { summary: { id: BASE_DICTIONARY_ID } } as unknown as Dictionary,
             numberOfActiveGames: 1,
         };
-        beforeEach(async () => {
+        beforeEach(() => {
             dictionaryService['activeDictionaries'].clear();
             dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
@@ -412,7 +412,7 @@ describe('DictionaryService', () => {
         });
     });
 
-    describe('Error handling', async () => {
+    describe('Error handling', () => {
         it('should throw an error if we try to access the database on a closed connection', async () => {
             await client.close();
             expect(dictionaryService['getAllDictionarySummaries']()).to.eventually.be.rejectedWith(Error);

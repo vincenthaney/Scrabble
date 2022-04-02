@@ -207,7 +207,7 @@ describe('HighScoresService', () => {
         });
     });
 
-    describe('Error handling', async () => {
+    describe('Error handling', () => {
         it('should throw an error if we try to access the database on a closed connection', async () => {
             await client.close();
             expect(highScoresService['getHighScores'](GameType.Classic)).to.eventually.be.rejectedWith(Error);

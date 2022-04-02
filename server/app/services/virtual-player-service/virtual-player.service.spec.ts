@@ -63,7 +63,7 @@ describe('VirtualPlayerService', () => {
     let virtualPlayerService: VirtualPlayerService;
     let mockServer: mockttp.Mockttp;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         virtualPlayerService = new VirtualPlayerService();
     });
 

@@ -114,7 +114,7 @@ describe('ActionPlace', () => {
     let scoreCalculatorServiceStub: SinonStubbedInstance<ScoreCalculatorService>;
     let game: Game;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         gameStub = createStubInstance(Game);
         tileReserveStub = createStubInstance(TileReserve);
         boardStub = createStubInstance(Board);

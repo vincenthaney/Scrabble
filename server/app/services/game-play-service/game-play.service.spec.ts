@@ -391,7 +391,7 @@ describe('GamePlayService', () => {
             chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
                 return;
             });
-            Object.defineProperty(gamePlayService, 'activeGameService', { value: activeGameServiceStub });
+            (gamePlayService['activeGameService'] as unknown) = activeGameServiceStub;
         });
 
         it('should modify both ids', async () => {
