@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { assert } from 'console';
 import { stub } from 'sinon';
 import Player from './player';
+import * as sinon from 'sinon';
 
 const ID = 'id';
 const DEFAULT_NAME = 'player';
@@ -17,6 +18,10 @@ describe('Player', () => {
             { value: 2, letter: 'A' },
             { value: 4, letter: 'D' },
         ];
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create', () => {

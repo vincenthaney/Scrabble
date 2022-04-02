@@ -24,7 +24,7 @@ import HighScoresService from '@app/services/high-scores-service/high-scores.ser
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 import { EventEmitter } from 'events';
-import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 const expect = chai.expect;
 
@@ -110,7 +110,7 @@ describe('GamePlayService', () => {
         });
 
         afterEach(() => {
-            restore();
+            sinon.restore();
         });
 
         it('should call getGame', async () => {

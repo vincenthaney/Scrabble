@@ -25,6 +25,7 @@ import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -77,6 +78,7 @@ describe('Game', () => {
 
     afterEach(() => {
         TileReserve.prototype.init = defaultInit;
+        sinon.restore();
     });
 
     describe('createMultiplayerGame', () => {

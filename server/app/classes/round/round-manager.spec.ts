@@ -11,6 +11,7 @@ import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
 import { Round } from './round';
 import Game from '@app/classes/game/game';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -33,6 +34,11 @@ describe('RoundManager', () => {
         actionStub = createStubInstance(ActionPass);
         action = actionStub as unknown as Action;
         gameStub = createStubInstance(Game);
+    });
+
+    afterEach(() => {
+        chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {

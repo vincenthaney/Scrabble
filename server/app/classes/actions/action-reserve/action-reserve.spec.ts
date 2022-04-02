@@ -6,6 +6,7 @@ import Player from '@app/classes/player/player';
 import { LetterValue, TileReserve } from '@app/classes/tile';
 import { ActionReserve } from '..';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -31,6 +32,10 @@ describe('ActionReserve', () => {
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
 
         action = new ActionReserve(gameStub.player1, gameStub as unknown as Game);
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe('getMessage', () => {

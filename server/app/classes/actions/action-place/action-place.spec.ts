@@ -28,6 +28,7 @@ import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
 import { ActionErrorsMessages } from './action-errors';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -138,6 +139,7 @@ describe('ActionPlace', () => {
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {

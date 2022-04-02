@@ -14,6 +14,7 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import * as sinon from 'sinon';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -36,6 +37,10 @@ describe('ActionHint', () => {
 
         action = new ActionHint(gameStub.player1, gameStub as unknown as Game);
         (action['wordFindingService'] as unknown) = wordFindingServiceStub;
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe('execute', () => {
