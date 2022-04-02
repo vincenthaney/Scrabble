@@ -44,6 +44,8 @@ export class GameDispatcherService {
 
     async createSoloGame(config: GameConfigData): Promise<void> {
         const startGameData = await this.createGameService.createSoloGame(config);
+        await this.dictionaryService.useDictionary(config.dictionary.id);
+
         const gameId = startGameData.gameId;
         this.socketService.addToRoom(config.playerId, gameId);
 
