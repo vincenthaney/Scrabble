@@ -11,4 +11,6 @@ export type CreateGameRequest = Request & { params: { playerId: string } };
 
 export type HighScoresRequest = Request & { params: { playerId: string } };
 
+export type DictionaryRequest = Request;
+
 export type LobbiesRequest = Request & { params: { playerId: string } };
