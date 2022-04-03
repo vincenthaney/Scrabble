@@ -8,7 +8,9 @@ import { DisplayDictionariesColumnsIteratorItem, DisplayDictionariesKeys, Dictio
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { DEFAULT_DICTIONARIES_COLUMNS, DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
 import { isKey } from '@app/utils/is-key';
-import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
+import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
+import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -26,8 +28,14 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
     dataSource: MatTableDataSource<DictionarySummary> = new MatTableDataSource(new Array());
     state: DictionariesState = DictionariesState.Loading;
     error: string | undefined = undefined;
+    displayPopupDictionary = false;
 
-    constructor(public dialog: MatDialog) {
+    // Variable to store shortLink from api response
+    shortLink: string = '';
+    loading: boolean = false; // Flag variable
+    file: File; // Variable to store file
+
+    constructor(public dialog: MatDialog, private dictionariesService: DictionariesService) {
         this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
@@ -63,43 +71,23 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
         });
     }
 
-    modifyDictionary(): void {
-        const buttonsContent = ['Modify', 'Close'];
-        this.openDialog('Modify Dictionary', 'test', buttonsContent);
-        return;
+    modifyDictionary(element: DictionarySummary): void {
+        this.displayPopupDictionary = true;
+        const elementData: DictionaryDialogParameters = {
+            title: element.title,
+            dictionarytoModifyDescription: element.description,
+            dictionaryToModifyName: element.title,
+            dictionaryId: element.id,
+        };
+        this.dialog.open(ModifyDictionaryComponent, { data: elementData });
     }
 
-    async downloadDictionary(): Promise<void> {
-        // this.dictionaryService.downloadDictionary();
-        return;
+    async downloadDictionary(id: string): Promise<void> {
+        this.dictionariesService.downloadDictionary(id);
     }
 
-    async deleteDictionary(): Promise<void> {
-        return;
-    }
-
-    openDialog(title: string, content: string, buttonsContent: string[]): void {
-        this.dialog.open(DefaultDialogComponent, {
-            data: {
-                title,
-                content,
-                buttons: [
-                    {
-                        content: buttonsContent[0],
-                        style: 'background-color: #FA6B84; color: rgb(0, 0, 0)',
-                        // action: () => this.dictionaryService.modifyDictionary(),
-                        // eslint-disable-next-line @typescript-eslint/no-empty-function
-                        action: () => {},
-                        closeDialog: true,
-                    },
-                    {
-                        content: buttonsContent[1],
-                        closeDialog: true,
-                        style: 'background-color: rgb(231, 231, 231)',
-                    },
-                ],
-            },
-        });
+    async deleteDictionary(id: string): Promise<void> {
+        this.dictionariesService.deleteDictionary(id);
     }
 
     sortDictionaries(item: DictionarySummary, property: string): string | number {
@@ -141,4 +129,11 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
             };
         });
     }
+
+    isDefault(dictionarySummary: DictionarySummary): boolean {
+        return dictionarySummary.isDefault ? true : false;
+    }
+
+    // addDictionary(): void {
+    // }
 }
