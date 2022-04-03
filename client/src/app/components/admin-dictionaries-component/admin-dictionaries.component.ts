@@ -11,6 +11,8 @@ import { isKey } from '@app/utils/is-key';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DICTIONARIES_ADDED } from '@app/constants/dictionary-service-constants';
+import { Dictionary } from '@app/classes/dictionary';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -43,12 +45,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.setDictionariesData()
-            .then(() => (this.state = DictionariesState.Ready))
-            .catch((error) => {
-                this.error = error.toString();
-                this.state = DictionariesState.Error;
-            });
+        this.setDictionariesData();
     }
 
     ngAfterViewInit(): void {
@@ -60,15 +57,19 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
         this.dataSource.data = [];
     }
 
-    async setDictionariesData() {
-        return new Promise<void>((resolve) => {
-            setTimeout(() => {
-                // this.dataSource.data = this.dictionaryService.getDictionariesData();
-                this.dataSource = new MatTableDataSource(this.getRandomData());
-                resolve();
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            }, 1000);
-        });
+    // new Promise<void>((resolve) => {
+    //     setTimeout(() => {
+    //         // this.dataSource.data = this.dictionaryService.getDictionariesData();
+    //         this.dataSource = new MatTableDataSource(this.getRandomData());
+    //         resolve();
+    //         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    //     }, 1000);
+    async setDictionariesData(): Promise<string | DictionarySummary[]> {
+        const response = await this.dictionariesService.getDictionaries();
+        if (response === DICTIONARIES_ADDED) {
+            return this.convertDictionariesToSummary(this.dictionariesService.dictionaries);
+        }
+        return response;
     }
 
     modifyDictionary(element: DictionarySummary): void {
@@ -134,6 +135,15 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
         return dictionarySummary.isDefault ? true : false;
     }
 
-    // addDictionary(): void {
-    // }
+    private convertDictionariesToSummary(dictionaries: Map<string, Dictionary>): DictionarySummary[] {
+        const dictionariesSummary: DictionarySummary[] = [];
+        dictionaries.forEach((dictionary: Dictionary, key: string) => {
+            dictionariesSummary.push({
+                id: key,
+                title: dictionary.title,
+                description: dictionary.description,
+            });
+        });
+        return dictionariesSummary;
+    }
 }
