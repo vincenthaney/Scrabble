@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -13,13 +13,14 @@ import { DictionaryDialogParameters } from '@app/components/modify-dictionary-di
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { DICTIONARIES_ADDED } from '@app/constants/dictionary-service-constants';
 import { Dictionary } from '@app/classes/dictionary';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-admin-dictionaries',
     templateUrl: './admin-dictionaries.component.html',
     styleUrls: ['./admin-dictionaries.component.scss'],
 })
-export class AdminDictionariesComponent implements OnInit, AfterViewInit {
+export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -37,11 +38,21 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
     loading: boolean = false; // Flag variable
     file: File; // Variable to store file
 
+    private serviceDestroyed$: Subject<boolean> = new Subject();
     constructor(public dialog: MatDialog, private dictionariesService: DictionariesService) {
         this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
         this.columnsControl.setValue(this.selectedColumnsItems);
+        this.dictionariesService.subscribeToDictionariesDataUpdateEvent(this.serviceDestroyed$, (dictionaries) => {
+            // vérifier que le component s'actualise avec son contenu en live. sinon, il faudrait lui faire un event d'update
+            this.convertDictionariesToMatDataSource(dictionaries);
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     ngOnInit(): void {
@@ -64,10 +75,10 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
     //         resolve();
     //         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     //     }, 1000);
-    async setDictionariesData(): Promise<string | DictionarySummary[]> {
+    async setDictionariesData(): Promise<string | void> {
         const response = await this.dictionariesService.getDictionaries();
         if (response === DICTIONARIES_ADDED) {
-            return this.convertDictionariesToSummary(this.dictionariesService.dictionaries);
+            this.convertDictionariesToMatDataSource(this.dictionariesService.dictionaries);
         }
         return response;
     }
@@ -119,23 +130,27 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
         );
     }
 
-    getRandomData(): DictionarySummary[] {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return new Array(35).fill({}).map<DictionarySummary>(() => {
-            return {
-                title: 'Multidictionnaire',
-                description: 'Meilleur dictionnaire ever',
-                id: '69420',
-                isDefault: true,
-            };
-        });
-    }
+    // getRandomData(): DictionarySummary[] {
+    //     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    //     return new Array(35).fill({}).map<DictionarySummary>(() => {
+    //         return {
+    //             title: 'Multidictionnaire',
+    //             description: 'Meilleur dictionnaire ever',
+    //             id: '69420',
+    //             isDefault: true,
+    //         };
+    //     });
+    // }
 
     isDefault(dictionarySummary: DictionarySummary): boolean {
         return dictionarySummary.isDefault ? true : false;
     }
 
-    private convertDictionariesToSummary(dictionaries: Map<string, Dictionary>): DictionarySummary[] {
+    updateDictionaryData(): void {
+        return;
+    }
+
+    private convertDictionariesToMatDataSource(dictionaries: Map<string, Dictionary>) {
         const dictionariesSummary: DictionarySummary[] = [];
         dictionaries.forEach((dictionary: Dictionary, key: string) => {
             dictionariesSummary.push({
@@ -144,6 +159,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit {
                 description: dictionary.description,
             });
         });
-        return dictionariesSummary;
+        this.dataSource = new MatTableDataSource(dictionariesSummary);
     }
 }
