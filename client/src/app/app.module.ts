@@ -31,6 +31,8 @@ import { HighScoreBoxComponent } from './components/high-score-box/high-score-bo
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { AdminDictionariesComponent } from './components/admin-dictionaries-component/admin-dictionaries.component';
+import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog/modify-dictionary-dialog.component';
+import { FileUploadComponent } from './components/file-upload-dialog/file-upload.component';
 
 /**
  * Main module that is used in main.ts.
@@ -64,6 +66,8 @@ import { AdminDictionariesComponent } from './components/admin-dictionaries-comp
         ConvertDialogComponent,
         AdminPageComponent,
         AdminDictionariesComponent,
+        ModifyDictionaryComponent,
+        FileUploadComponent,
     ],
     imports: [
         AppMaterialModule,
