@@ -11,7 +11,7 @@ export class FileUploadComponent {
     shortLink: string = '';
     loading: boolean = false; // Flag variable
     file: File; // Variable to store file
-
+}
 //     // Inject service
 //     constructor(private fileUploadService: FileUploadService) {}
 
@@ -32,4 +32,3 @@ export class FileUploadComponent {
 //             }
 //         });
 //     }
-}
