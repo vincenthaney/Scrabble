@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { DictionarySummary } from '@app/classes/communication/dictionary';
 import Dictionary from '@app/classes/dictionary/dictionary';
-import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
+import { DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import {
     DICTIONARIES_ADDED,
     DICTIONARIES_NOT_ADDED,
@@ -56,7 +55,7 @@ export class DictionariesService {
         this.dictionariesDataUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    async updateDictionary(id: string, name: string, description: string): Promise<DictionarySummary | string> {
+    async updateDictionary(id: string, name: string, description: string): Promise<DictionaryUpdateInfo | string> {
         this.dictionariesController.handleUpdateDictionary({ title: name, description, id });
         if (this.updateRequestResponse) {
             this.getDictionaries();

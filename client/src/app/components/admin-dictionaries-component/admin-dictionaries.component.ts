@@ -146,10 +146,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         return dictionarySummary.isDefault ? true : false;
     }
 
-    updateDictionaryData(): void {
-        return;
-    }
-
     private convertDictionariesToMatDataSource(dictionaries: Map<string, Dictionary>) {
         const dictionariesSummary: DictionarySummary[] = [];
         dictionaries.forEach((dictionary: Dictionary, key: string) => {
