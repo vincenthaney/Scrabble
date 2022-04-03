@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
-import { Dictionary } from '@app/classes/dictionary';
+import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { BasicDictionaryData, DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import SocketService from '@app/services/socket-service/socket.service';
 import { Subject } from 'rxjs';
@@ -15,7 +15,7 @@ export class DictionariesController implements OnDestroy {
     private dictionaryDownloadEvent: Subject<BasicDictionaryData> = new Subject();
     private dictionaryDeleteEvent: Subject<string> = new Subject();
     private dictionaryUploadEvent: Subject<string> = new Subject();
-    private getAllDictionariesEvent: Subject<Map<string, Dictionary>> = new Subject();
+    private getAllDictionariesEvent: Subject<DictionarySummary[]> = new Subject();
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
@@ -59,7 +59,7 @@ export class DictionariesController implements OnDestroy {
 
     handleGetAllDictionariesEvent(): void {
         const endpoint = `${environment.serverUrl}/dictionaries`;
-        this.http.post<Map<string, Dictionary>>(endpoint, {}).subscribe((dictionaries) => {
+        this.http.post<DictionarySummary[]>(endpoint, {}).subscribe((dictionaries) => {
             this.getAllDictionariesEvent.next(dictionaries);
         });
     }
@@ -80,7 +80,7 @@ export class DictionariesController implements OnDestroy {
         this.dictionaryUploadEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToGetAllDictionariesEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: Map<string, Dictionary>) => void): void {
+    subscribeToGetAllDictionariesEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void): void {
         this.getAllDictionariesEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 

@@ -12,7 +12,6 @@ import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dia
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { DICTIONARIES_ADDED } from '@app/constants/dictionary-service-constants';
-import { Dictionary } from '@app/classes/dictionary';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -68,21 +67,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dataSource.data = [];
     }
 
-    // new Promise<void>((resolve) => {
-    //     setTimeout(() => {
-    //         // this.dataSource.data = this.dictionaryService.getDictionariesData();
-    //         this.dataSource = new MatTableDataSource(this.getRandomData());
-    //         resolve();
-    //         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    //     }, 1000);
-    async setDictionariesData(): Promise<string | void> {
-        const response = await this.dictionariesService.getDictionaries();
-        if (response === DICTIONARIES_ADDED) {
-            this.convertDictionariesToMatDataSource(this.dictionariesService.dictionaries);
-        }
-        return response;
-    }
-
     modifyDictionary(element: DictionarySummary): void {
         this.displayPopupDictionary = true;
         const elementData: DictionaryDialogParameters = {
@@ -92,6 +76,14 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
             dictionaryId: element.id,
         };
         this.dialog.open(ModifyDictionaryComponent, { data: elementData });
+    }
+
+    async setDictionariesData(): Promise<string | void> {
+        const response = await this.dictionariesService.getDictionaries();
+        if (response === DICTIONARIES_ADDED) {
+            this.convertDictionariesToMatDataSource(this.dictionariesService.dictionaries);
+        }
+        return response;
     }
 
     async downloadDictionary(id: string): Promise<void> {
@@ -130,29 +122,18 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         );
     }
 
-    // getRandomData(): DictionarySummary[] {
-    //     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    //     return new Array(35).fill({}).map<DictionarySummary>(() => {
-    //         return {
-    //             title: 'Multidictionnaire',
-    //             description: 'Meilleur dictionnaire ever',
-    //             id: '69420',
-    //             isDefault: true,
-    //         };
-    //     });
-    // }
-
     isDefault(dictionarySummary: DictionarySummary): boolean {
         return dictionarySummary.isDefault ? true : false;
     }
 
-    private convertDictionariesToMatDataSource(dictionaries: Map<string, Dictionary>) {
+    private convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
         const dictionariesSummary: DictionarySummary[] = [];
-        dictionaries.forEach((dictionary: Dictionary, key: string) => {
+        dictionaries.forEach((dictionary) => {
             dictionariesSummary.push({
-                id: key,
+                id: dictionary.id,
                 title: dictionary.title,
                 description: dictionary.description,
+                isDefault: dictionary.isDefault,
             });
         });
         this.dataSource = new MatTableDataSource(dictionariesSummary);

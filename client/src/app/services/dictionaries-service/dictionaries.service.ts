@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import Dictionary from '@app/classes/dictionary/dictionary';
+import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import {
     DICTIONARIES_ADDED,
@@ -21,11 +21,11 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class DictionariesService {
     dictionaryData: DictionaryData;
-    dictionaries: Map<string, Dictionary>;
+    dictionaries: DictionarySummary[];
     updateRequestResponse: string;
     deleteRequestResponse: string;
     uploadRequestResponse: string;
-    private dictionariesDataUpdateEvent: Subject<Map<string, Dictionary>> = new Subject();
+    private dictionariesDataUpdateEvent: Subject<DictionarySummary[]> = new Subject();
 
     constructor(private dictionariesController: DictionariesController, private serviceDestroyed$: Subject<boolean> = new Subject()) {
         this.dictionariesController.subscribeToDictionaryUpdateEvent(this.serviceDestroyed$, (dictionarySummary) => {
@@ -51,7 +51,7 @@ export class DictionariesService {
         this.dictionariesDataUpdateEvent.next(this.dictionaries);
     }
 
-    subscribeToDictionariesDataUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (response: Map<string, Dictionary>) => void): void {
+    subscribeToDictionariesDataUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (response: DictionarySummary[]) => void): void {
         this.dictionariesDataUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
