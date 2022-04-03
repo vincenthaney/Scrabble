@@ -1,6 +1,8 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Component, Inject, OnChanges } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
+import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { DictionaryDialogParameters } from './modify-dictionary-dialog.component.types';
 
 @Component({
@@ -8,11 +10,75 @@ import { DictionaryDialogParameters } from './modify-dictionary-dialog.component
     templateUrl: './modify-dictionary-dialog.component.html',
     styleUrls: ['./modify-dictionary-dialog.component.scss'],
 })
-export class DefaultDialogComponent {
+export class ModifyDictionaryComponent implements OnChanges {
     title: string;
-    content: string | undefined;
+    dictionaryToModifyName: string;
+    dictionarytoModifyDescription: string;
+    dictionaryId: string;
+    formParameters: FormGroup;
+    isDictionaryNameValid: boolean;
+    isDictionaryDescriptionValid: boolean;
+    isNewInformationValid: boolean;
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters, private router: Router) {
-        this.data = data;
+    constructor(
+        private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
+        private dictionariesService: DictionariesService,
+        @Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters,
+    ) {
+        this.title = data.title;
+        this.dictionaryToModifyName = data.dictionaryToModifyName;
+        this.dictionarytoModifyDescription = data.dictionarytoModifyDescription;
+        this.dictionaryId = data.dictionaryId;
+        this.isDictionaryNameValid = true;
+        this.isDictionaryDescriptionValid = true;
+        this.isNewInformationValid = false;
+        this.formParameters = new FormGroup({
+            inputDictionaryName: new FormControl('', [
+                Validators.required,
+                Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
+                Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
+                Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
+            ]),
+            inputDictionaryDescription: new FormControl('', [
+                Validators.required,
+                Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
+                Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
+                Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
+            ]),
+        });
+    }
+
+    ngOnChanges(): void {
+        this.onChange();
+    }
+
+    onChange(): void {
+        if (this.formParameters.controls.inputDictionaryName?.dirty) this.formParameters.controls.inputName?.markAsTouched();
+        this.formParameters.controls.inputName?.updateValueAndValidity();
+        this.isDictionaryNameValid = this.formParameters.get('inputDictionaryName')?.valid ?? false;
+        this.isDictionaryDescriptionValid = this.formParameters.get('inputDictionaryDescription')?.valid ?? false;
+        this.isNewInformationValid = this.isInformationValid();
+    }
+
+    updateDictionary(): void {
+        this.dictionariesService.updateDictionary(
+            this.dictionaryId,
+            this.formParameters.get('inputDictionaryName')?.value,
+            this.formParameters.get('inputDictionaryDescription')?.value,
+        );
+        this.dialogRef.close();
+    }
+
+    closeDialog(): void {
+        this.dialogRef.close();
+    }
+
+    isInformationValid(): boolean {
+        return (
+            this.isDictionaryNameValid &&
+            this.isDictionaryDescriptionValid &&
+            this.formParameters.controls.inputDictionaryName?.dirty &&
+            this.formParameters.controls.inputDictionaryDescription?.dirty
+        );
     }
 }
