@@ -25,12 +25,12 @@ describe('Abstract Objective', () => {
     });
 
     describe('isCompleted', () => {
-        it('should return true if State is not ObjectiveState.Completed', () => {
+        it('should return true if State is ObjectiveState.Completed', () => {
             objective.state = ObjectiveState.Completed;
             expect(objective.isCompleted()).to.be.true;
         });
 
-        it('should return true if State is not ObjectiveState.CompletedByOpponent', () => {
+        it('should return true if State is ObjectiveState.CompletedByOpponent', () => {
             objective.state = ObjectiveState.CompletedByOpponent;
             expect(objective.isCompleted()).to.be.true;
         });
