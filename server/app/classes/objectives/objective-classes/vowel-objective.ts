@@ -8,30 +8,33 @@ export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les l
 export const BONUS_POINTS = 30;
 export const VOWELS = (): LetterValue[] => ['A', 'E', 'I', 'O', 'U', 'Y'];
 
-export class VowelObjective extends AbstractObjective {
-    private availableVowels: LetterValue[];
+const SHOULD_RESET = false;
+
+export class VowelsObjective extends AbstractObjective {
+    private vowelsLeftToPlay: LetterValue[];
 
     constructor() {
-        super(NAME, DESCRIPTION, BONUS_POINTS, false, VOWELS().length);
-        this.availableVowels = VOWELS();
+        super(NAME, DESCRIPTION, BONUS_POINTS, SHOULD_RESET, VOWELS().length);
+        this.vowelsLeftToPlay = VOWELS();
     }
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
         const letterPlayed: LetterValue[] = validationParameters.wordPlacement.tilesToPlace.map(
             (t) => StringConversion.tileToString(t) as LetterValue,
         );
         letterPlayed.forEach((letter: LetterValue) => {
-            if (this.availableVowels.includes(letter)) {
+            if (this.vowelsLeftToPlay.includes(letter)) {
                 this.progress++;
-                this.availableVowels.splice(this.availableVowels.indexOf(letter), 1);
+                this.vowelsLeftToPlay.splice(this.vowelsLeftToPlay.indexOf(letter), 1);
             }
         });
     }
 
-    clone(): AbstractObjective {
-        const clone = new VowelObjective();
+    clone(): VowelsObjective {
+        const clone = new VowelsObjective();
         clone.progress = this.progress;
         clone.state = this.state;
         clone.isPublic = this.isPublic;
+        clone.vowelsLeftToPlay = this.vowelsLeftToPlay;
         return clone;
     }
 }
