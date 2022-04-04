@@ -11,8 +11,8 @@ import { isKey } from '@app/utils/is-key';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
-import { DICTIONARIES_ADDED } from '@app/constants/dictionary-service-constants';
 import { Subject } from 'rxjs';
+import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -30,12 +30,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     dataSource: MatTableDataSource<DictionarySummary> = new MatTableDataSource(new Array());
     state: DictionariesState = DictionariesState.Loading;
     error: string | undefined = undefined;
-    displayPopupDictionary = false;
-
-    // Variable to store shortLink from api response
-    shortLink: string = '';
-    loading: boolean = false; // Flag variable
-    file: File; // Variable to store file
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
     constructor(public dialog: MatDialog, private dictionariesService: DictionariesService) {
@@ -43,10 +37,9 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
         this.columnsControl.setValue(this.selectedColumnsItems);
-        this.dictionariesService.subscribeToDictionariesDataUpdateEvent(this.serviceDestroyed$, (dictionaries) => {
-            // vérifier que le component s'actualise avec son contenu en live. sinon, il faudrait lui faire un event d'update
-            this.convertDictionariesToMatDataSource(dictionaries);
-        });
+        // this.dictionariesService.subscribeToDictionariesDataUpdateEvent(this.serviceDestroyed$, () => {
+        //     this.setDictionariesData();
+        // });
     }
 
     ngOnDestroy(): void {
@@ -63,12 +56,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dataSource.paginator = this.paginator;
     }
 
-    resetDictionaries() {
-        this.dataSource.data = [];
-    }
-
     modifyDictionary(element: DictionarySummary): void {
-        this.displayPopupDictionary = true;
         const elementData: DictionaryDialogParameters = {
             title: element.title,
             dictionarytoModifyDescription: element.description,
@@ -78,20 +66,24 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dialog.open(ModifyDictionaryComponent, { data: elementData });
     }
 
-    async setDictionariesData(): Promise<string | void> {
-        const response = await this.dictionariesService.getDictionaries();
-        if (response === DICTIONARIES_ADDED) {
-            this.convertDictionariesToMatDataSource(this.dictionariesService.dictionaries);
-        }
-        return response;
+    uploadDictionary(): void {
+        this.dialog.open(UploadDictionaryComponent);
+    }
+
+    async setDictionariesData(): Promise<void> {
+        this.convertDictionariesToMatDataSource(await this.dictionariesService.getDictionaries());
     }
 
     async downloadDictionary(id: string): Promise<void> {
-        this.dictionariesService.downloadDictionary(id);
+        await this.dictionariesService.downloadDictionary(id);
     }
 
     async deleteDictionary(id: string): Promise<void> {
-        this.dictionariesService.deleteDictionary(id);
+        await this.dictionariesService.deleteDictionary(id);
+    }
+
+    async resetDictionaries() {
+        await this.dictionariesService.deleteAllDictionaries();
     }
 
     sortDictionaries(item: DictionarySummary, property: string): string | number {
@@ -122,11 +114,11 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         );
     }
 
-    isDefault(dictionarySummary: DictionarySummary): boolean {
-        return dictionarySummary.isDefault ? true : false;
-    }
+    // isDefault(dictionarySummary: DictionarySummary): boolean {
+    //     return dictionarySummary.isDefault ? true : false;
+    // }
 
-    private convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
+    private async convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
         const dictionariesSummary: DictionarySummary[] = [];
         dictionaries.forEach((dictionary) => {
             dictionariesSummary.push({
