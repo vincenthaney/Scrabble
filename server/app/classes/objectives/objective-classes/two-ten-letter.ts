@@ -20,7 +20,7 @@ export class TwoTenLetter extends AbstractObjective {
             return createdWord.map(([, tile]) => tile).filter((tile: Tile) => this.isTileValueTenPoints(tile)).length >= NUMBER_OF_LETTERS_TO_USE;
         })
             ? this.maxProgress
-            : 0;
+            : this.progress;
     }
 
     clone(): TwoTenLetter {
