@@ -64,7 +64,7 @@ describe('GameHistoriesService', () => {
     });
 
     describe('getAllGameHistories', () => {
-        it('should get all highScores from DB', async () => {
+        it('should get all gameHistories from DB', async () => {
             const gameHistories = await gameHistoriesService['getAllGameHistories']();
             expect(gameHistories.length).to.equal(INITIAL_GAME_HISTORIES.length);
             expect(INITIAL_GAME_HISTORIES).to.deep.equals(gameHistories);
@@ -86,7 +86,7 @@ describe('GameHistoriesService', () => {
         });
     });
 
-    describe('resetHighScores', () => {
+    describe('resetGameHistories', () => {
         it('should delete all documents of the array', async () => {
             await gameHistoriesService.resetGameHistories();
             const gameHistories = await gameHistoriesService.getAllGameHistories();

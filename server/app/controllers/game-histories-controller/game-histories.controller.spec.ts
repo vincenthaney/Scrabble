@@ -114,7 +114,7 @@ describe('GameHistoriesController', () => {
     });
 
     describe('handleGameHistoriesReset', () => {
-        it('should call socketService.emitToSocket', async () => {
+        it('should call gameHistoriesService.resetGameHistories', async () => {
             const spyResetHistories = chai.spy.on(controller['gameHistoriesService'], 'resetGameHistories', () => []);
             await controller['handleGameHistoriesReset']();
             expect(spyResetHistories).to.have.been.called();
