@@ -12,7 +12,7 @@ import * as sinon from 'sinon';
 import { BONUS_POINTS, DESCRIPTION, NAME, VOWELS, VowelsObjective } from './vowel-objective';
 chai.use(spies);
 
-describe('Vowel Objective', () => {
+describe('Vowels Objective', () => {
     let objective: VowelsObjective;
 
     beforeEach(() => {
@@ -51,6 +51,13 @@ describe('Vowel Objective', () => {
             expect(objective.progress).to.equal(1);
         });
 
+        it('should remove vowels from vowelsLeftToPlay', () => {
+            objective.progress = 0;
+            objective.updateProgress(validationParameters);
+            expect(objective['vowelsLeftToPlay'].includes('A')).to.be.false;
+            expect(objective['vowelsLeftToPlay'].length).to.equal(VOWELS().length - 1);
+        });
+
         it('should not update progress twice if played two times same letter', () => {
             validationParameters = {
                 wordPlacement: {
@@ -61,6 +68,18 @@ describe('Vowel Objective', () => {
                 },
             } as ObjectiveValidationParameters;
             objective.progress = 0;
+            objective.updateProgress(validationParameters);
+            expect(objective.progress).to.equal(1);
+        });
+
+        it('should not update progress if played vowel already played', () => {
+            validationParameters = {
+                wordPlacement: {
+                    tilesToPlace: [{ letter: 'A', value: 0 }],
+                },
+            } as ObjectiveValidationParameters;
+            objective.progress = 0;
+            objective.updateProgress(validationParameters);
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(1);
         });
