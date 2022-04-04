@@ -12,7 +12,7 @@ export enum ModifyDictionaryComponentStates {
 }
 
 export enum ModifyDictionaryComponentIcons {
-    SuccessIcon = 'ready',
-    ErrorIcon = 'error',
+    SuccessIcon = 'check',
+    ErrorIcon = 'close',
     NoIcon = '',
 }

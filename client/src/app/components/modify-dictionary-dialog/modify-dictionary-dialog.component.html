@@ -40,12 +40,29 @@
     />
     </mat-form-field>
 </mat-dialog-actions>
+<mat-dialog-actions>
+    <mat-progress-bar *ngIf="state==='loading'" mode="indeterminate"></mat-progress-bar>
+    <p *ngIf="state==='message'">{{message}}</p>
+</mat-dialog-actions>
+<div *ngIf="state!=='message'">
+   <button mat-button color = "primary" (click)="updateDictionary()" [disabled]="!isNewInformationValid">
+        <app-icon icon="pencil"></app-icon>
+        Modifier
+    </button>
+    <button mat flat button mat-button color = "primary" (click)="closeDialog()">
+        <app-icon icon="ban"></app-icon>
+        Annuler
+    </button> 
+</div>
+<div>
+    <button mat-button *ngIf="icon==='check' && state==='message'" color = "primary" (click)="closeDialog()">
+        <app-icon icon="check"></app-icon>
+        OK
+    </button>
+    <button mat-button *ngIf="icon==='close' && state==='message'" color = "primary" (click)="cleanupDialogStates()">
+        <app-icon *icon="icon"></app-icon>
+        Réessayer
+    </button>
+</div>
+    
 
-<button mat-button color = "primary" (click)="updateDictionary()" [disabled]="!isNewInformationValid">
-    <app-icon icon="pencil"></app-icon>
-    Modifier
-</button>
-<button mat flat button mat-button color = "primary" (click)="closeDialog()">
-    <app-icon icon="ban"></app-icon>
-    Annuler
-</button>

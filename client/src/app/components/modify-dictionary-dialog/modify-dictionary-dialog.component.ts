@@ -95,20 +95,20 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
 
     closeDialog(): void {
         this.dialogRef.close();
-        this.cleanupDialog();
+        this.cleanupDialogStates();
     }
 
     isInformationValid(): boolean {
         return this.isDictionaryNameValid && this.isDictionaryDescriptionValid;
     }
 
+    cleanupDialogStates(): void {
+        this.icon = ModifyDictionaryComponentIcons.NoIcon;
+        this.message = '';
+    }
+
     private updateMessage(message: string): void {
         this.state = ModifyDictionaryComponentStates.Message;
         this.message = message;
-    }
-
-    private cleanupDialog(): void {
-        this.icon = ModifyDictionaryComponentIcons.NoIcon;
-        this.message = '';
     }
 }
