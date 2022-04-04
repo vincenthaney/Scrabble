@@ -20,6 +20,7 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
         };
         const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
+        // Si tu as pas fini l'analyse
     }
 
     protected async findAction(): Promise<ActionData> {
