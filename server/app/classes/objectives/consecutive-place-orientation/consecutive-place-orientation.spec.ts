@@ -2,65 +2,49 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { TestObjective } from '@app/constants/services-constants/objectives-test.const';
+import { Orientation } from '@app/classes/board';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
-import { SinonStub, stub } from 'sinon';
-import { AbstractObjective } from './abstract-objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { ConsecutivePlaceOrientation } from './consecutive-place-orientation';
-import { ObjectiveState } from './objective';
-import { ObjectiveValidationParameters } from './validation-parameters';
 chai.use(spies);
 
-describe('Abstract Objective', () => {
-    let objective: AbstractObjective;
+describe.only('Abstract Objective', () => {
+    let objective: ConsecutivePlaceOrientation;
 
     beforeEach(() => {
         objective = new ConsecutivePlaceOrientation();
+        objective.progress = 2;
+        objective.progressOrientation = Orientation.Vertical;
     });
 
-    describe('updateObjective', () => {
-        let isCompletedStub: SinonStub;
-        let updateProgressSpy: unknown;
-        let validationParameters: ObjectiveValidationParameters;
-
-        beforeEach(() => {
-            isCompletedStub = stub(objective, 'isCompleted').returns(false);
-            validationParameters = {} as unknown as ObjectiveValidationParameters;
-            updateProgressSpy = chai.spy.on(objective, 'updateProgress', () => {});
+    describe('updateProgress', () => {
+        it('should increment the progress if it is the same orientation', () => {
+            const validationParameters = { wordPlacement: { orientation: Orientation.Vertical } } as unknown as ObjectiveValidationParameters;
+            objective.updateProgress(validationParameters);
+            expect(objective.progress).to.equal(3);
+            expect(objective.progressOrientation).to.equal(Orientation.Vertical);
         });
 
-        afterEach(() => {
-            isCompletedStub.restore();
+        it('should set to 1 the progress if it is the other orientation', () => {
+            const validationParameters = { wordPlacement: { orientation: Orientation.Horizontal } } as unknown as ObjectiveValidationParameters;
+            objective.updateProgress(validationParameters);
+            expect(objective.progress).to.equal(1);
+            expect(objective.progressOrientation).to.equal(Orientation.Horizontal);
+        });
+    });
+
+    describe('clone', () => {
+        it('should return a ConsecutivePlaceOrientation', () => {
+            const clone = objective.clone();
+            expect(clone).to.be.instanceOf(ConsecutivePlaceOrientation);
         });
 
-        it('should call updateProgress', () => {
-            objective.updateObjective(validationParameters);
-            expect(updateProgressSpy).to.have.been.called.with(validationParameters);
-        });
-
-        it('if progress exceeded maxProgress, should set state to Completed', () => {
-            objective.progress = objective['maxProgress'] + 1;
-            objective.updateObjective(validationParameters);
-            expect(objective.state).to.equal(ObjectiveState.Completed);
-        });
-
-        it('if progress does NOT exceed maxProgress, should NOT set state to Completed', () => {
-            objective.progress = objective['maxProgress'] - 1;
-            objective.updateObjective(validationParameters);
-            expect(objective.state).to.equal(ObjectiveState.NotCompleted);
-        });
-
-        it('should return false if objective is already completed', () => {
-            isCompletedStub.returns(true);
-            expect(objective.updateObjective(validationParameters)).to.be.false;
-        });
-
-        it('should return true if objective is NOT completed', () => {
-            isCompletedStub.returns(false);
-            expect(objective.updateObjective(validationParameters)).to.be.true;
+        it('should make a new instance of a ConsecutivePlaceOrientation', () => {
+            const clone = objective.clone();
+            expect(clone).to.deep.equal(objective);
+            expect(clone).not.to.equal(objective);
         });
     });
 });

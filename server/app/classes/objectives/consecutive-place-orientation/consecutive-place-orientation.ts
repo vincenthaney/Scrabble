@@ -9,20 +9,23 @@ export const SHOULD_RESET = true;
 export const MAX_PROGRESS = 5;
 
 export class ConsecutivePlaceOrientation extends AbstractObjective {
-    currentOrientation: Orientation;
+    progressOrientation: Orientation;
     constructor() {
         super(NAME, DESCRIPTION, BONUS_POINTS, SHOULD_RESET, MAX_PROGRESS);
-        this.currentOrientation = Orientation.Horizontal;
+        this.progressOrientation = Orientation.Horizontal;
     }
 
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
-        if (this.currentOrientation === validationParameters.wordPlacement.orientation) this.progress++;
-        else this.progress = 1;
+        if (this.progressOrientation === validationParameters.wordPlacement.orientation) this.progress++;
+        else {
+            this.progress = 1;
+            this.progressOrientation = validationParameters.wordPlacement.orientation;
+        }
     }
     clone(): AbstractObjective {
         const clone = new ConsecutivePlaceOrientation();
         clone.progress = this.progress;
-        clone.currentOrientation = this.currentOrientation;
+        clone.progressOrientation = this.progressOrientation;
         return clone;
     }
 }
