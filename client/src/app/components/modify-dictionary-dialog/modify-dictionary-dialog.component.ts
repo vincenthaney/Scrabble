@@ -31,15 +31,15 @@ export class ModifyDictionaryComponent implements OnChanges {
         this.dictionaryId = data.dictionaryId;
         this.isDictionaryNameValid = true;
         this.isDictionaryDescriptionValid = true;
-        this.isNewInformationValid = false;
+        this.isNewInformationValid = true;
         this.formParameters = new FormGroup({
-            inputDictionaryName: new FormControl('', [
+            inputDictionaryName: new FormControl(data.dictionaryToModifyName, [
                 Validators.required,
                 Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
             ]),
-            inputDictionaryDescription: new FormControl('', [
+            inputDictionaryDescription: new FormControl(data.dictionarytoModifyDescription, [
                 Validators.required,
                 Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
@@ -53,7 +53,6 @@ export class ModifyDictionaryComponent implements OnChanges {
     }
 
     onChange(): void {
-        if (this.formParameters.controls.inputDictionaryName?.dirty) this.formParameters.controls.inputName?.markAsTouched();
         this.formParameters.controls.inputName?.updateValueAndValidity();
         this.isDictionaryNameValid = this.formParameters.get('inputDictionaryName')?.valid ?? false;
         this.isDictionaryDescriptionValid = this.formParameters.get('inputDictionaryDescription')?.valid ?? false;
@@ -74,11 +73,6 @@ export class ModifyDictionaryComponent implements OnChanges {
     }
 
     isInformationValid(): boolean {
-        return (
-            this.isDictionaryNameValid &&
-            this.isDictionaryDescriptionValid &&
-            this.formParameters.controls.inputDictionaryName?.dirty &&
-            this.formParameters.controls.inputDictionaryDescription?.dirty
-        );
+        return this.isDictionaryNameValid && this.isDictionaryDescriptionValid;
     }
 }
