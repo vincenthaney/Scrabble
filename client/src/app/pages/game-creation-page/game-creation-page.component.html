@@ -76,7 +76,7 @@
                 <mat-form-field appearance="outline" class="margin-top">
                     <mat-label floatLabel="always"><app-icon icon="book"></app-icon> Choisissez le dictionnaire à utiliser</mat-label>
                     <mat-select formControlName="dictionary">
-                        <mat-option *ngFor="let dictionary of dictionaryOptions" value="{{ dictionary.id }}">
+                        <mat-option *ngFor="let dictionary of dictionaryOptions" [value]="dictionary">
                             <span class="dictionary-title">{{ dictionary.title }}</span>
                             <span> - </span>
                             <span class="dictionary-description">{{ dictionary.description }}</span>
