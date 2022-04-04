@@ -49,7 +49,7 @@ describe('CreateGameService', () => {
     });
 
     describe('createSoloGame', () => {
-        it('should call activeGameService.beginGame', () => {
+        it('should call activeGameService.beginGame', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return;
             });
@@ -59,11 +59,11 @@ describe('CreateGameService', () => {
             const beginGameSpy = spy.on(activeGameService, 'beginGame', () => {
                 return;
             });
-            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
+            await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(beginGameSpy).to.have.been.called();
         });
 
-        it('should call generateReadyGameConfig', () => {
+        it('should call generateReadyGameConfig', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return DEFAULT_GAME_CONFIG;
             });
@@ -73,7 +73,7 @@ describe('CreateGameService', () => {
             const generateReadyGameConfigSpy = spy.on(createGameService, 'generateReadyGameConfig', () => {
                 return;
             });
-            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
+            await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(generateReadyGameConfigSpy).to.have.been.called();
         });
     });

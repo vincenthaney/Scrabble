@@ -6,9 +6,9 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
 import { afterEach } from 'mocha';
+import * as sinon from 'sinon';
 import { stub } from 'sinon';
 import * as supertest from 'supertest';
-import * as sinon from 'sinon';
 import { Container } from 'typedi';
 import { HighScoresController } from './high-scores.controller';
 
@@ -64,7 +64,7 @@ describe('HighScoresController', () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 chai.spy.on(controller, 'handleHighScoresRequest', () => {});
 
-                return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
+                return await supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
@@ -72,7 +72,7 @@ describe('HighScoresController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
-                return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
+                return await supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
     });
