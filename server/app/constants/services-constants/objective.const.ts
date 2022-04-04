@@ -1,9 +1,10 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { ThreeWordsPlacement } from '@app/classes/objectives/objective-classes/three-word-placement';
 import { VowelsObjective } from '@app/classes/objectives/objective-classes/vowel-objective';
 
 export const GENERATE_LIST_OF_ALL_OBJECTIVES = (): AbstractObjective[] => {
-    return [new VowelsObjective()];
-};
+    return [new ThreeWordsPlacement(), new VowelsObjective()];
+}
 
 export const NUMBER_OF_OBJECTIVES_IN_GAME = 4;
 
