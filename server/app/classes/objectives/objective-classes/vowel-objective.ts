@@ -3,7 +3,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import { LetterValue } from '@app/classes/tile';
 import { StringConversion } from '@app/utils/string-conversion';
 
-export const NAME = 'Vowel Objective';
+export const NAME = 'Les bases';
 export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les lettres blanches)';
 export const BONUS_POINTS = 30;
 export const VOWELS = (): LetterValue[] => ['A', 'E', 'I', 'O', 'U', 'Y'];
