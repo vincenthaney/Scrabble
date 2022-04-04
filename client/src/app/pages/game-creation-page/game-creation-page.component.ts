@@ -1,11 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
+import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -19,14 +21,18 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameTypes: typeof GameType;
     gameModes: typeof GameMode;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
-    dictionaryOptions: string[];
+    dictionaryOptions: DictionarySummary[];
     virtualPlayerNames: string[];
     playerName: string;
     playerNameValid: boolean;
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
 
-    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {
+    constructor(
+        private router: Router,
+        private gameDispatcherService: GameDispatcherService,
+        private readonly dictionaryService: DictionariesService,
+    ) {
         this.gameTypes = GameType;
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -41,12 +47,16 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
             timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-            // TODO: A changer avec la portion de vincent
-            dictionary: new FormControl('Mon dictionnaire', Validators.required),
+            dictionary: new FormControl('', Validators.required),
+        });
+
+        this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
+            this.dictionaryOptions = this.dictionaryService.getDictionaries();
+            if (!this.gameParameters.get('dictionary')) this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
         });
     }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         this.gameParameters
             .get('gameMode')
             ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
@@ -58,6 +68,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
                 }
                 this.gameParameters?.get('level')?.updateValueAndValidity();
             });
+        await this.dictionaryService.updateAllDictionaries();
     }
 
     ngOnDestroy(): void {
