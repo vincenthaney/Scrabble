@@ -1,5 +1,7 @@
 import Board from '@app/classes/board/board';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
+import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -8,10 +10,12 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { WINNER_MESSAGE } from '@app/constants/game';
+import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -20,6 +24,7 @@ export const LOSE = -1;
 
 export default class Game {
     private static boardService: BoardService;
+    private static objectivesService: ObjectivesService;
     roundManager: RoundManager;
     gameType: GameType;
     board: Board;
@@ -31,9 +36,12 @@ export default class Game {
     private tileReserve: TileReserve;
     private id: string;
 
-    static injectServices(boardService: BoardService): void {
-        if (!Game.getBoardService()) {
-            Game.boardService = boardService;
+    static injectServices(): void {
+        if (!Game.boardService) {
+            Game.boardService = Container.get(BoardService);
+        }
+        if (!Game.objectivesService) {
+            Game.objectivesService = Container.get(ObjectivesService);
         }
     }
 
@@ -46,6 +54,7 @@ export default class Game {
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
         game.dictionarySummary = config.dictionary;
+        game.initializeObjectives();
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
@@ -59,10 +68,6 @@ export default class Game {
         game.roundManager.beginRound();
 
         return game;
-    }
-
-    private static getBoardService(): BoardService {
-        return Game.boardService;
     }
 
     getTilesFromReserve(amount: number): Tile[] {
@@ -143,6 +148,10 @@ export default class Game {
         return startGameData;
     }
 
+    resetPlayerObjectiveProgression(playerId: string): GameObjectivesData {
+        return Game.objectivesService.resetPlayerObjectiveProgression(this, this.getPlayer(playerId, IS_REQUESTING));
+    }
+
     private congratulateWinner(): string {
         let winner: string;
         if (this.player1.score > this.player2.score) {
@@ -184,5 +193,13 @@ export default class Game {
 
     private isPlayerFromGame(playerId: string): boolean {
         return this.player1.id === playerId || this.player2.id === playerId;
+    }
+
+    private initializeObjectives(): void {
+        if (this.gameType === GameType.Classic) return;
+
+        const gameObjectives: GameObjectives = Game.objectivesService.createObjectivesForGame();
+        this.player1.initializeObjectives(gameObjectives.publicObjectives, gameObjectives.player1Objective);
+        this.player2.initializeObjectives(gameObjectives.publicObjectives, gameObjectives.player2Objective);
     }
 }

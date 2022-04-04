@@ -411,4 +411,10 @@ describe('GamePlayService', () => {
             expect(result.player2!.id).to.equal(gameStub.player2.id);
         });
     });
+
+    it('handleResetObjectives', () => {
+        const resetSpy = chai.spy.on(gameStub, 'resetPlayerObjectiveProgression', () => {});
+        gamePlayService.handleResetObjectives(gameStub.getId(), player.id);
+        expect(resetSpy).to.have.been.called();
+    });
 });

@@ -2,7 +2,6 @@ import Game from '@app/classes/game/game';
 import { ReadyGameConfig, StartGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
-import BoardService from '@app/services/board-service/board.service';
 import { EventEmitter } from 'events';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -12,10 +11,10 @@ export class ActiveGameService {
     playerLeftEvent: EventEmitter;
     private activeGames: Game[];
 
-    constructor(private boardService: BoardService) {
+    constructor() {
         this.playerLeftEvent = new EventEmitter();
         this.activeGames = [];
-        Game.injectServices(this.boardService);
+        Game.injectServices();
     }
 
     async beginGame(id: string, config: ReadyGameConfig): Promise<StartGameData> {
