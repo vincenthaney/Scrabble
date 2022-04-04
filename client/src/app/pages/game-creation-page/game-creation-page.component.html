@@ -77,13 +77,10 @@
                     <mat-label floatLabel="always"><app-icon icon="book"></app-icon> Choisissez le dictionnaire à utiliser</mat-label>
                     <mat-select formControlName="dictionary">
                         <mat-option *ngFor="let dictionary of dictionaryOptions" value="{{ dictionary.id }}">
-                            {{ dictionary.title }}
+                            <span class="dictionary-title">{{ dictionary.title }}</span>
+                            <span> - </span>
+                            <span class="dictionary-description">{{ dictionary.description }}</span>
                         </mat-option>
-                        <!-- ><mat-card>
-                                <mat-card-title>{{ dictionary.title }}</mat-card-title>
-                                <mat-card-subtitle>{{ dictionary.description }}</mat-card-subtitle>
-                            </mat-card> -->
-                        <!-- </mat-option> -->
                     </mat-select>
                 </mat-form-field>
 

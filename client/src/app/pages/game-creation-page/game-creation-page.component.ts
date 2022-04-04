@@ -47,12 +47,11 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
             timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-            dictionary: new FormControl('', Validators.required),
+            dictionary: new FormControl(undefined, Validators.required),
         });
 
         this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
-            if (!this.gameParameters.get('dictionary')) this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
         });
     }
 
