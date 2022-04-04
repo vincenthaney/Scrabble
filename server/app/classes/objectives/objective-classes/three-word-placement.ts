@@ -12,7 +12,7 @@ export class ThreeWordsPlacement extends AbstractObjective {
     }
 
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
-        this.progress = validationParameters.createdWords.length >= NUMBER_OF_WORDS_TO_CREATE ? this.maxProgress : 0;
+        this.progress = validationParameters.createdWords.length >= NUMBER_OF_WORDS_TO_CREATE ? this.maxProgress : this.progress;
     }
 
     clone(): ThreeWordsPlacement {
