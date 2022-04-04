@@ -11,6 +11,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
@@ -22,7 +23,7 @@ export default class Game {
     roundManager: RoundManager;
     gameType: GameType;
     board: Board;
-    dictionnaryName: string;
+    dictionarySummary: DictionarySummary;
     player1: Player;
     player2: Player;
     isAddedToDatabase: boolean;
@@ -44,7 +45,7 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
-        game.dictionnaryName = config.dictionary;
+        game.dictionarySummary = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
@@ -133,7 +134,7 @@ export default class Game {
             player2: this.player2,
             gameType: this.gameType,
             maxRoundTime: this.roundManager.getMaxRoundTime(),
-            dictionary: this.dictionnaryName,
+            dictionary: this.dictionarySummary,
             gameId: this.getId(),
             board: this.board.grid,
             tileReserve,

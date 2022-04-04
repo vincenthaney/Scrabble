@@ -13,7 +13,6 @@ import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
-import { SECONDS_TO_MILLISECONDS, TIME_TO_RECONNECT } from '@app/constants/controllers-constants';
 import {
     DICTIONARY_REQUIRED,
     GAME_IS_OVER,
@@ -42,8 +41,11 @@ import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub, useFakeTimers } from 'sinon';
 import { Socket } from 'socket.io';
 import * as supertest from 'supertest';
+import * as sinon from 'sinon';
 import { Container } from 'typedi';
 import { GameDispatcherController } from './game-dispatcher.controller';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TIME_TO_RECONNECT, SECONDS_TO_MILLISECONDS } from '@app/constants/controllers-constants';
 
 const expect = chai.expect;
 
@@ -53,7 +55,6 @@ chai.use(chaiAsPromised);
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_NEW_PLAYER_ID = 'newPlayerId';
-const DEFAULT_DICTIONARY = 'french';
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_PLAYER_NAME = 'player';
@@ -65,7 +66,7 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
@@ -76,14 +77,14 @@ const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_EXCEPTION = 'exception';
@@ -118,6 +119,10 @@ describe('GameDispatcherController', () => {
         socketServiceStub = createStubInstance(SocketService);
         createGameServiceStub = createStubInstance(CreateGameService);
         controller['socketService'] = socketServiceStub as unknown as SocketService;
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create', () => {
@@ -372,7 +377,7 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateGame', async () => {
+    describe('handleCreateGame', () => {
         beforeEach(() => {
             controller['createGameService'] = createGameServiceStub as unknown as CreateGameService;
             spy.on(controller['createGameService'], 'createSoloGame', () => {
@@ -398,7 +403,7 @@ describe('GameDispatcherController', () => {
             expect(createGameServiceSpy).to.have.been.called();
         });
 
-        it('should throw if config.playerName is undefined', async () => {
+        it('should throw if config.playerName is undefined', () => {
             const config = { ...DEFAULT_GAME_CONFIG_DATA, playerName: undefined, virtualPlayerLevel: VirtualPlayerLevel.Expert };
             expect(controller['handleCreateGame'](config as unknown as GameConfigData)).to.be.rejectedWith(PLAYER_NAME_REQUIRED);
         });
@@ -440,7 +445,7 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateSoloGame', async () => {
+    describe('handleCreateSoloGame', () => {
         let createSoloGameSpy: unknown;
         beforeEach(() => {
             createSoloGameSpy = spy.on(controller['gameDispatcherService'], 'createSoloGame', () => {
@@ -458,7 +463,7 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleCreateMultiplayerGame', async () => {
+    describe('handleCreateMultiplayerGame', () => {
         let createGameServiceSpy: unknown;
         let handleLobbesUpdateSpy: unknown;
         beforeEach(() => {
@@ -475,12 +480,12 @@ describe('GameDispatcherController', () => {
         });
 
         it('should call createMultiplayerGame', async () => {
-            controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            await controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createGameServiceSpy).to.have.been.called();
         });
 
         it('should call handleLobbiesUpdate', async () => {
-            controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            await controller['handleCreateMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(handleLobbesUpdateSpy).to.have.been.called();
         });
     });
@@ -848,11 +853,16 @@ describe('GameDispatcherController', () => {
         });
 
         it('Disconnection should set player isConnected to false if the game is not over', () => {
+            const clock = useFakeTimers();
+
             gameIsOverSpy = chai.spy.on(gameStub, 'areGameOverConditionsMet', () => false);
             controller['handleDisconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
 
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
             expect(playerStub.isConnected).to.be.false;
+
+            clock.tick(TIME_TO_RECONNECT * SECONDS_TO_MILLISECONDS);
+            clock.restore();
         });
 
         it('Disconnection should force player to leave if they are not reconnected after 5 seconds', () => {

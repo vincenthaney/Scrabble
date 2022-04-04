@@ -5,8 +5,10 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
+import { afterEach } from 'mocha';
 import { stub } from 'sinon';
 import * as supertest from 'supertest';
+import * as sinon from 'sinon';
 import { Container } from 'typedi';
 import { HighScoresController } from './high-scores.controller';
 
@@ -23,6 +25,7 @@ describe('HighScoresController', () => {
     let controller: HighScoresController;
 
     beforeEach(() => {
+        sinon.restore();
         Container.reset();
         controller = Container.get(HighScoresController);
 
@@ -32,6 +35,10 @@ describe('HighScoresController', () => {
         stub(controller['socketService'], 'emitToSocket').callsFake(() => {
             return;
         });
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create', () => {

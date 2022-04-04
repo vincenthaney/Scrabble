@@ -1,7 +1,5 @@
 /* eslint-disable max-lines */
-// Lint dot-notation must be disabled to access private element
 /* eslint-disable dot-notation */
-// Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
 
 import Game from '@app/classes/game/game';
@@ -25,16 +23,18 @@ import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constant
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 const expect = chai.expect;
 
@@ -45,7 +45,6 @@ const DEFAULT_OPPONENT_ID = 'opponent_id';
 const DEFAULT_OPPONENT_NAME = 'opponent';
 const DEFAULT_OPPONENT_ID_2 = 'opponent_id_2';
 const DEFAULT_OPPONENT_NAME_2 = 'opponent 2';
-const DEFAULT_DICTIONARY = 'francais';
 const DEFAULT_ROUND_TIME = 1;
 
 const DEFAULT_OPPONENT = new Player(DEFAULT_OPPONENT_ID, DEFAULT_OPPONENT_NAME);
@@ -58,14 +57,14 @@ const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_PLAYER = new Player(VIRTUAL_PLAYER_ID_PREFIX + DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
@@ -92,14 +91,14 @@ const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_MULTIPLAYER_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_WAITING_ROOM = new WaitingRoom(DEFAULT_MULTIPLAYER_CONFIG);
@@ -126,6 +125,7 @@ describe('GameDispatcherService', () => {
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {
@@ -197,7 +197,7 @@ describe('GameDispatcherService', () => {
         });
 
         it('should call appropriate methods', async () => {
-            gameDispatcherService['createMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            await gameDispatcherService['createMultiplayerGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
             expect(createMultiplayerGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();
         });
@@ -457,7 +457,7 @@ describe('GameDispatcherService', () => {
             player1: stubPlayer as unknown as Player,
             gameType: GameType.Classic,
             maxRoundTime: 60,
-            dictionary: 'francais',
+            dictionary: TEST_DICTIONARY,
         };
         let waitingRooms: WaitingRoom[];
 

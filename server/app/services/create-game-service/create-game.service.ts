@@ -2,14 +2,13 @@ import { GameConfig, GameConfigData, ReadyGameConfig, StartGameData } from '@app
 import Player from '@app/classes/player/player';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { Service } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { v4 as uuidv4 } from 'uuid';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WaitingRoom from '@app/classes/game/waiting-room';
 
 @Service()
 export class CreateGameService {
-    constructor(private dictionaryService: DictionaryService, private activeGameService: ActiveGameService) {}
+    constructor(private activeGameService: ActiveGameService) {}
     async createSoloGame(config: GameConfigData): Promise<StartGameData> {
         const gameId = uuidv4();
         const readyGameConfig = this.generateReadyGameConfig(
@@ -29,7 +28,7 @@ export class CreateGameService {
             player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
             maxRoundTime: configData.maxRoundTime,
-            dictionary: this.dictionaryService.getDictionaryTitles()[0],
+            dictionary: configData.dictionary,
         };
     }
 

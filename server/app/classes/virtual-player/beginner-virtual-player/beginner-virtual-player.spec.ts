@@ -40,6 +40,7 @@ import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
 import { ActionData } from '@app/classes/communication/action-data';
+import * as sinon from 'sinon';
 
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
@@ -50,19 +51,20 @@ const TEST_SELECT_COUNT = 3;
 describe('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         beginnerVirtualPlayer = new BeginnerVirtualPlayer(PLAYER_ID, PLAYER_NAME);
     });
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {
         expect(beginnerVirtualPlayer).to.exist;
     });
 
-    describe('playTurn', async () => {
+    describe('playTurn', () => {
         let actionPassSpy: unknown;
         let sendActionSpy: unknown;
         beforeEach(() => {
@@ -147,7 +149,7 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     describe('Find Action with RANDOM_VALUE_PLACE', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PLACE;
             });
@@ -274,7 +276,7 @@ describe('BeginnerVirtualPlayer', () => {
     describe('createWordFindingPlacement', () => {
         let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
 
-        beforeEach(async () => {
+        beforeEach(() => {
             wordFindingServiceStub = createStubInstance(WordFindingService);
             beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
         });
@@ -290,6 +292,9 @@ describe('BeginnerVirtualPlayer', () => {
             spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
                 return;
             });
+            spy.on(beginnerVirtualPlayer, 'getDictionaryId', () => {
+                return 'id';
+            });
             spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
             });
@@ -303,6 +308,9 @@ describe('BeginnerVirtualPlayer', () => {
             });
             const getGameBoardSpy = spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
                 return;
+            });
+            spy.on(beginnerVirtualPlayer, 'getDictionaryId', () => {
+                return 'id';
             });
             const generateWordSpy = spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;

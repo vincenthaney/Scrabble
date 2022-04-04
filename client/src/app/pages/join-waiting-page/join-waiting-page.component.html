@@ -11,7 +11,7 @@
         <div id="cell" class="align-left">Temps par tour:</div>
         <div id="cell" class="align-right">{{ currentLobby.maxRoundTime }}</div>
         <div id="cell" class="align-left">Dictionnaire:</div>
-        <div id="cell" class="align-right">{{ currentLobby.dictionary }}</div>
+        <div id="cell" class="align-right">{{ currentLobby.dictionary.title }}</div>
     </div>
     <button id="cancel-button" mat-flat-button color="primary" [routerLink]="'/lobby'">Annuler</button>
 

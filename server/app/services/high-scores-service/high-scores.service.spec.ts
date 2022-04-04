@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -15,6 +16,8 @@ import Container from 'typedi';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import DatabaseService from '@app/services/database-service/database.service';
 import { stub } from 'sinon';
+import * as sinon from 'sinon';
+
 import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
 import { join } from 'path';
 chai.use(chaiAsPromised); // this allows us to test for rejection
@@ -80,6 +83,7 @@ describe('HighScoresService', () => {
     afterEach(async () => {
         await databaseService.closeConnection();
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('fetchDefaultHighScores', () => {
@@ -100,7 +104,7 @@ describe('HighScoresService', () => {
     });
 
     describe('getAllHighScores', () => {
-        it('should get all courses from DB', async () => {
+        it('should get all highScores from DB', async () => {
             const highScores = await highScoresService.getAllHighScores();
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES.length);
             expect(INITIAL_HIGH_SCORES).to.deep.equals(highScores);
@@ -142,14 +146,12 @@ describe('HighScoresService', () => {
 
     describe('resetHighScores', () => {
         it('should call populateDb', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
             expect(spy).to.have.been.called;
         });
 
         it('should delete all documents of the array', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
             expect((await highScoresService['collection'].find({}).toArray()).length).to.equal(0);
@@ -160,7 +162,6 @@ describe('HighScoresService', () => {
         it('should call databaseService.populateDb and fetchDefaultHighScores', async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
             const spyFetchDefaultHighScores = stub(HighScoresService, <any>'fetchDefaultHighScores');
-            // eslint-disable-next-line dot-notation, @typescript-eslint/no-empty-function
             const spyPopulateDb = chai.spy.on(highScoresService['databaseService'], 'populateDb', () => {});
             await highScoresService['populateDb']();
             expect(spyPopulateDb).to.have.been.called;
@@ -206,7 +207,7 @@ describe('HighScoresService', () => {
         });
     });
 
-    describe('Error handling', async () => {
+    describe('Error handling', () => {
         it('should throw an error if we try to access the database on a closed connection', async () => {
             await client.close();
             expect(highScoresService['getHighScores'](GameType.Classic)).to.eventually.be.rejectedWith(Error);

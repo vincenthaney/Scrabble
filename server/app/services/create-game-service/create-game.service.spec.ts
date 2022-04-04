@@ -5,8 +5,8 @@ import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
@@ -14,7 +14,7 @@ import { Container } from 'typedi';
 import { CreateGameService } from './create-game.service';
 chai.use(spies);
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DICTIONARY = 'french';
+
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_PLAYER_NAME = 'player';
@@ -26,23 +26,22 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
-describe('CreateGameService', async () => {
+describe('CreateGameService', () => {
     let createGameService: CreateGameService;
     let activeGameService: ActiveGameService;
     beforeEach(() => {
         activeGameService = Container.get(ActiveGameService);
-        const dictionaryService = Container.get(DictionaryService);
-        createGameService = new CreateGameService(dictionaryService, activeGameService);
+        createGameService = new CreateGameService(activeGameService);
     });
 
     afterEach(() => {

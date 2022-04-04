@@ -75,8 +75,19 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return this.getActiveGameService().getGame(gameId, playerId).board;
     }
 
+    private getDictionaryId(gameId: string, playerId: string): string {
+        return this.getActiveGameService().getGame(gameId, playerId).dictionarySummary.id;
+    }
+
     private computeWordPlacement(): ScoredWordPlacement | undefined {
-        return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
+        return this.getWordFindingService()
+            .findWords(
+                this.getGameBoard(this.gameId, this.id),
+                this.tiles,
+                this.getDictionaryId(this.gameId, this.id),
+                this.generateWordFindingRequest(),
+            )
+            .pop();
     }
 
     private generateWordFindingRequest(): WordFindingRequest {

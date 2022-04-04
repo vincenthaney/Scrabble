@@ -15,12 +15,12 @@ export type WordFindingParameters = [Board, Tile[], WordFindingRequest, Dictiona
 export default class WordFindingService {
     constructor(private readonly dictionaryService: DictionaryService, private readonly scoreCalculatorService: ScoreCalculatorService) {}
 
-    findWords(board: Board, tiles: Tile[], request: WordFindingRequest): ScoredWordPlacement[] {
+    findWords(board: Board, tiles: Tile[], dictionaryId: string, request: WordFindingRequest): ScoredWordPlacement[] {
         return this.getWordFindingInstance(request.useCase, [
             board,
             tiles,
             request,
-            this.dictionaryService.getDefaultDictionary(),
+            this.dictionaryService.getDictionary(dictionaryId),
             this.scoreCalculatorService,
         ]).findWords();
     }

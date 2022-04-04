@@ -13,6 +13,7 @@ import { Tile } from '@app/classes/tile';
 import Range from '@app/classes/range/range';
 import { Dictionary } from '@app/classes/dictionary';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import * as sinon from 'sinon';
 
 describe('WordFindingService', () => {
     let findWordsStub: SinonStub;
@@ -22,9 +23,10 @@ describe('WordFindingService', () => {
     let request: WordFindingRequest;
 
     beforeEach(() => {
+        sinon.restore();
         Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
-        findWordsStub = stub(AbstractWordFinding.prototype, 'findWords');
+        findWordsStub = stub(AbstractWordFinding.prototype, 'findWords').callsFake(() => []);
 
         boardStub = createStubInstance(Board);
         tiles = [];
@@ -36,6 +38,7 @@ describe('WordFindingService', () => {
     });
 
     afterEach(() => {
+        sinon.restore();
         Container.reset();
         findWordsStub.restore();
     });
@@ -43,15 +46,25 @@ describe('WordFindingService', () => {
     describe('findWords', () => {
         it('should call getWordFindingInstance', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const getWordFindingInstanceStub = stub(service, 'getWordFindingInstance' as any).callThrough();
-
-            service.findWords(boardStub as unknown as Board, tiles, request);
+            const getWordFindingInstanceStub = stub(service, 'getWordFindingInstance' as any).callsFake(() => {
+                return new WordFindingHint(
+                    boardStub as unknown as Board,
+                    tiles,
+                    request,
+                    {} as unknown as Dictionary,
+                    {} as unknown as ScoreCalculatorService,
+                );
+            });
+            stub(service['dictionaryService'], 'getDictionary').callsFake(() => {
+                return {} as unknown as Dictionary;
+            });
+            service.findWords(boardStub as unknown as Board, tiles, 'id', request);
 
             expect(getWordFindingInstanceStub.called).to.be.true;
         });
 
         it('should call findWords', () => {
-            service.findWords(boardStub as unknown as Board, tiles, request);
+            service.findWords(boardStub as unknown as Board, tiles, 'id', request);
 
             expect(findWordsStub.called).to.be.true;
         });
@@ -65,7 +78,7 @@ describe('WordFindingService', () => {
                 boardStub as unknown as Board,
                 tiles,
                 request,
-                new Dictionary({ title: '', description: '', words: [] }),
+                new Dictionary({ title: '', description: '', words: [], id: 'id', isDefault: false }),
                 undefined as unknown as ScoreCalculatorService,
             ];
         });

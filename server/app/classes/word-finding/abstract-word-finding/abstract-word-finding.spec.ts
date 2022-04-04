@@ -37,6 +37,7 @@ import {
     lettersToTiles,
     LetterValues,
 } from '@app/classes/word-finding/helper.spec';
+import * as sinon from 'sinon';
 
 const GRID: LetterValues = [
     // 0   1    2    3    4
@@ -85,6 +86,10 @@ describe('AbstractWordFinding', () => {
             dictionaryStub as unknown as Dictionary,
             scoreCalculatorStub as unknown as ScoreCalculatorService,
         );
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create copy of tiles', () => {

@@ -10,6 +10,7 @@ import { expect } from 'chai';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { WordFindingRequest, WordFindingUseCase } from '..';
 import WordFindingHint from './word-finding-hint';
+import * as sinon from 'sinon';
 
 const GRID: LetterValues = [
     // 0   1    2    3    4
@@ -47,6 +48,10 @@ describe('WordFindingHint', () => {
             dictionaryStub as unknown as Dictionary,
             scoreCalculatorStub as unknown as ScoreCalculatorService,
         );
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe('handleWordPlacement', () => {

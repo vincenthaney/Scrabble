@@ -37,6 +37,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GamePlayController } from './game-play.controller';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -77,18 +78,20 @@ const DEFAULT_VIRTUAL_PLAYER_TURN_DATA: GameUpdateData = {
 };
 
 describe('GamePlayController', () => {
+    let socketServiceStub: SinonStubbedInstance<SocketService>;
     let gamePlayController: GamePlayController;
 
     beforeEach(() => {
         Container.reset();
         Container.set(DictionaryService, getDictionaryTestService());
         gamePlayController = Container.get(GamePlayController);
-        stub(gamePlayController['socketService'], 'removeFromRoom').callsFake(() => {
-            return;
-        });
-        stub(gamePlayController['socketService'], 'emitToSocket').callsFake(() => {
-            return;
-        });
+        socketServiceStub = createStubInstance(SocketService);
+        (gamePlayController['socketService'] as unknown) = socketServiceStub;
+    });
+
+    afterEach(() => {
+        sinon.restore();
+        chai.spy.restore();
     });
 
     it('should create', () => {
@@ -355,6 +358,7 @@ describe('GamePlayController', () => {
         it('should call sio.to with gameId', () => {
             const appServer = Container.get(Server);
             const server = appServer['server'];
+            (gamePlayController['socketService'] as unknown) = Container.get(SocketService);
             gamePlayController['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
@@ -366,6 +370,7 @@ describe('GamePlayController', () => {
         it('should call sio.to.emit with gameId', () => {
             const appServer = Container.get(Server);
             const server = appServer['server'];
+            (gamePlayController['socketService'] as unknown) = Container.get(SocketService);
             gamePlayController['socketService'].initialize(server);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const sio = gamePlayController['socketService']['sio']!;
@@ -377,6 +382,7 @@ describe('GamePlayController', () => {
         });
 
         it('should call triggerVirtualPlayerTurn if next turn is a virtual player turn', () => {
+            (gamePlayController['socketService'] as unknown) = Container.get(SocketService);
             spy.on(gamePlayController['socketService'], 'emitToRoom', () => {
                 return;
             });
@@ -452,7 +458,7 @@ describe('GamePlayController', () => {
     });
 
     describe('handleError', () => {
-        let socketServiceStub: SinonStubbedInstance<SocketService>;
+        // let socketServiceStub: SinonStubbedInstance<SocketService>;
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;

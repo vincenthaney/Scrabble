@@ -28,7 +28,7 @@ const playerName = 'ElScrabblo';
 describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         abstractPlayer = new TestClass(playerId, playerName);
     });
 

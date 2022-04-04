@@ -15,6 +15,7 @@ import * as spies from 'chai-spies';
 import { assert } from 'console';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import ActionExchange from './action-exchange';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -51,6 +52,7 @@ describe('ActionExchange', () => {
     afterEach(() => {
         getTilesFromPlayerStub.restore();
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('static calls', () => {

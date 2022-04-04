@@ -15,6 +15,7 @@ import { Square } from '@app/classes/square';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { ActionPass } from '@app/classes/actions';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';
@@ -22,14 +23,13 @@ const DEFAULT_PLAYER1_ID = 'id1';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER1_NAME, DEFAULT_PLAYER1_ID);
 const DEFAULT_PLAYER_2 = new Player('2', 'p2');
 const DEFAULT_GAME_ID = 'grossePartie';
-const DEFAULT_DICTIONARY = 'french';
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER1_ID, DEFAULT_PLAYER1_NAME),
     gameType: GameType.Classic,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_STARTING_GAME_DATA: StartGameData = {
@@ -63,7 +63,7 @@ describe('VirtualPlayerService', () => {
     let virtualPlayerService: VirtualPlayerService;
     let mockServer: mockttp.Mockttp;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         virtualPlayerService = new VirtualPlayerService();
     });
 

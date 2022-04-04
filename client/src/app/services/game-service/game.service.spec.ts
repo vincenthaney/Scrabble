@@ -17,6 +17,7 @@ import { Round } from '@app/classes/round';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
+import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { BoardService, GameService } from '@app/services';
@@ -202,7 +203,7 @@ describe('GameService', () => {
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
                 maxRoundTime: 1,
-                dictionary: 'default',
+                dictionary: TEST_DICTIONARY,
                 gameId: 'game-id',
                 board: new Array(DEFAULT_GRID_SIZE).map((_, y) => {
                     return new Array(DEFAULT_GRID_SIZE).map((__, x) => ({ ...DEFAULT_SQUARE, position: { row: y, column: x } }));
@@ -364,7 +365,7 @@ describe('GameService', () => {
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
                 maxRoundTime: 1,
-                dictionary: 'default',
+                dictionary: TEST_DICTIONARY,
                 gameId: 'game-id',
                 board: new Array(DEFAULT_GRID_SIZE).map((_, y) => {
                     return new Array(DEFAULT_GRID_SIZE).map((__, x) => ({ ...DEFAULT_SQUARE, position: { row: y, column: x } }));

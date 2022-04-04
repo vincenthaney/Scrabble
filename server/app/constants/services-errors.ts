@@ -18,6 +18,7 @@ export const NOT_PLAYER_TURN = "Ce n'est pas le tour du joueur demandeur de joue
 export const SOCKET_SERVICE_NOT_INITIALIZED = "SocketService n'est pas initalisé";
 export const INVALID_ID_FOR_SOCKET = 'Identifiant invalide pour le socket';
 export const MINIMUM_WORD_LENGTH = 2;
+export const MAXIMUM_WORD_LENGTH = 15;
 export const INVALID_WORD = (word: string) => `Le mot **${word}** n'est pas dans le dictionnaire choisi. Vous perdez votre tour.`;
 export const WORD_TOO_SHORT = ' Mot trop court';
 export const WORD_CONTAINS_HYPHEN = ' Le mot ne peut pas contenir de tiret';
