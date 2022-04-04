@@ -16,7 +16,6 @@ export type SocketEmitEvents =
     | 'joinerLeaveGame'
     | 'playerLeft'
     | 'highScoresList'
-    | 'gameHistoriesList'
     | 'newMessage'
     | 'cleanup'
     | '_test_event';

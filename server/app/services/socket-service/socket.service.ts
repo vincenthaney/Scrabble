@@ -8,7 +8,6 @@ import { Service } from 'typedi';
 import {
     CanceledGameEmitArgs,
     CleanupEmitArgs,
-    GameHistoriesEmitArgs,
     GameUpdateEmitArgs,
     HighScoresEmitArgs,
     JoinerLeaveGameEmitArgs,
@@ -105,7 +104,6 @@ export class SocketService {
     emitToSocket(id: string, ev: 'lobbiesUpdate', ...args: LobbiesUpdateEmitArgs[]): void;
     emitToSocket(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
     emitToSocket(id: string, ev: 'highScoresList', ...args: HighScoresEmitArgs[]): void;
-    emitToSocket(id: string, ev: 'gameHistoriesList', ...args: GameHistoriesEmitArgs[]): void;
     emitToSocket(id: string, ev: 'cleanup', ...args: CleanupEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
