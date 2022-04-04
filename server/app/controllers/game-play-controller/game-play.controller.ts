@@ -160,6 +160,8 @@ export class GamePlayController {
 
             if (this.gamePlayService.isGameOver(gameId, playerId)) return;
 
+            this.gameUpdate(gameId, this.gamePlayService.handleResetObjectives(gameId, playerId));
+
             const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
             this.socketService.emitToSocket(opponentId, 'newMessage', {
                 content: OPPONENT_PLAYED_INVALID_WORD,

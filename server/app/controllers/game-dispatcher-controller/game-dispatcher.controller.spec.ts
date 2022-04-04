@@ -323,7 +323,7 @@ describe('GameDispatcherController', () => {
             gameStub.createStartGameData.callsFake(() => undefined as unknown as StartGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
-            gameStub.getPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub as unknown as Player);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             gameStub.areGameOverConditionsMet.returns(false);
@@ -836,7 +836,7 @@ describe('GameDispatcherController', () => {
             gameStub = createStubInstance(Game);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             playerStub = createStubInstance(Player);
-            gameStub.getPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub as unknown as Player);
             handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
         });
 
