@@ -8,7 +8,7 @@ export const BONUS_POINTS = 70;
 export const SHOULD_RESET = true;
 export const MAX_PROGRESS = 5;
 
-export class ConsecutivePlaceOrientation extends AbstractObjective {
+export class ConsecutivePlaceOrientationObjective extends AbstractObjective {
     progressOrientation: Orientation;
     constructor() {
         super(NAME, DESCRIPTION, BONUS_POINTS, SHOULD_RESET, MAX_PROGRESS);
@@ -23,7 +23,7 @@ export class ConsecutivePlaceOrientation extends AbstractObjective {
         }
     }
     clone(): AbstractObjective {
-        const clone = new ConsecutivePlaceOrientation();
+        const clone = new ConsecutivePlaceOrientationObjective();
         clone.progress = this.progress;
         clone.state = this.state;
         clone.isPublic = this.isPublic;

@@ -7,15 +7,15 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { ConsecutivePlaceOrientation } from './consecutive-place-orientation';
+import { ConsecutivePlaceOrientationObjective } from './consecutive-place-orientation';
 import { ObjectiveState } from '@app/classes/objectives/objective';
 chai.use(spies);
 
 describe('Abstract Objective', () => {
-    let objective: ConsecutivePlaceOrientation;
+    let objective: ConsecutivePlaceOrientationObjective;
 
     beforeEach(() => {
-        objective = new ConsecutivePlaceOrientation();
+        objective = new ConsecutivePlaceOrientationObjective();
         objective.progress = 2;
         objective.progressOrientation = Orientation.Vertical;
         objective.isPublic = true;
@@ -39,12 +39,12 @@ describe('Abstract Objective', () => {
     });
 
     describe('clone', () => {
-        it('should return a ConsecutivePlaceOrientation', () => {
+        it('should return a ConsecutivePlaceOrientationObjective', () => {
             const clone = objective.clone();
-            expect(clone).to.be.instanceOf(ConsecutivePlaceOrientation);
+            expect(clone).to.be.instanceOf(ConsecutivePlaceOrientationObjective);
         });
 
-        it('should make a new instance of a ConsecutivePlaceOrientation', () => {
+        it('should make a new instance of a ConsecutivePlaceOrientationObjective', () => {
             const clone = objective.clone();
             expect(clone).to.deep.equal(objective);
             expect(clone).not.to.equal(objective);
