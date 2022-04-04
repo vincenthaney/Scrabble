@@ -24,6 +24,10 @@ class TestClass extends AbstractVirtualPlayer {
     findPointRange(): Range {
         return TEST_POINT_RANGE;
     }
+
+    alternativeMove(): ActionData {
+        return ActionPass.createActionData();
+    }
 }
 
 const playerId = 'testPlayerId';

@@ -46,6 +46,10 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         }
     }
 
+    protected alternativeMove(): ActionData {
+        return ActionPass.createActionData();
+    }
+
     private updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
         const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
         this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);

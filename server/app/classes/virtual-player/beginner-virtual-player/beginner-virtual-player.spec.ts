@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
@@ -271,6 +272,14 @@ describe('BeginnerVirtualPlayer', () => {
             const ceilStub = stub(Math, 'ceil').returns(TEST_SELECT_COUNT);
             expect(beginnerVirtualPlayer['selectRandomTiles']().length).to.equal(TEST_SELECT_COUNT);
             ceilStub.restore();
+        });
+    });
+
+    describe('alternativeMove', () => {
+        it('should ActionPass.createActionData', () => {
+            const createActionDataSpy = chai.spy.on(ActionPass, 'createActionData', () => {});
+            beginnerVirtualPlayer['alternativeMove']();
+            expect(createActionDataSpy).to.have.been.called();
         });
     });
 });

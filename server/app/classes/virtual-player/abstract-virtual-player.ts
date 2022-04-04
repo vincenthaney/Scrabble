@@ -12,7 +12,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Range from '@app/classes/range/range';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { Delay } from '@app/utils/delay';
-import { ActionPass } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
 import { ActionData } from '@app/classes/communication/action-data';
 
@@ -60,7 +59,7 @@ export abstract class AbstractVirtualPlayer extends Player {
             return Promise.all([this.findAction(), waitPreliminaryTime()]);
         };
         const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
-        this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
+        this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : this.alternativeMove());
     }
 
     protected isExchangePossible(): boolean {
@@ -77,4 +76,6 @@ export abstract class AbstractVirtualPlayer extends Player {
     protected abstract findAction(): Promise<ActionData>;
 
     protected abstract findPointRange(): Range;
+
+    protected abstract alternativeMove(): ActionData;
 }

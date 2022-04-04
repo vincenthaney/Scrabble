@@ -10,11 +10,15 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
         if (scoredWordPlacement) {
             return ActionPlace.createActionData(scoredWordPlacement);
         }
-        return this.isExchangePossible() ? ActionExchange.createActionData(this.tiles) : ActionPass.createActionData();
+        return this.alternativeMove();
     }
 
     protected findPointRange(): Range {
         return new Range(0, Number.MAX_SAFE_INTEGER);
+    }
+
+    protected alternativeMove(): ActionData {
+        return this.isExchangePossible() ? ActionExchange.createActionData(this.tiles) : ActionPass.createActionData();
     }
 
     private computeWordPlacement(): ScoredWordPlacement | undefined {
