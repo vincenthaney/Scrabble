@@ -464,7 +464,6 @@ describe('GamePlayController', () => {
     });
 
     describe('handleError', () => {
-        // let socketServiceStub: SinonStubbedInstance<SocketService>;
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;

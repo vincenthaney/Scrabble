@@ -295,7 +295,7 @@ describe('DictionaryService', () => {
             expect(result.description).to.equal(DICTIONARY_2.description);
         });
 
-        it('should throw with am invalid id', async () => {
+        it('should throw with an invalid id', async () => {
             expect(dictionaryService['getDbDictionary'](new ObjectId().toString())).to.eventually.be.rejectedWith(Error);
         });
     });
