@@ -1,5 +1,5 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { StringConversion } from '@app/utils/string-conversion';
@@ -12,15 +12,23 @@ export const NUMBER_OF_LETTERS_TO_USE = 2;
 
 export class TwoTenLetter extends AbstractObjective {
     constructor() {
-        super(NAME, DESCRIPTION, BONUS_POINTS, 1);
+        super(NAME, DESCRIPTION, BONUS_POINTS, false, 1);
     }
 
-    updateProgress(validationParameters: ValidationParameters): void {
+    updateProgress(validationParameters: ObjectiveValidationParameters): void {
         this.progress = validationParameters.createdWords.find((createdWord: [Square, Tile][]) => {
             return createdWord.map(([, tile]) => tile).filter((tile: Tile) => this.isTileValueTenPoints(tile)).length >= NUMBER_OF_LETTERS_TO_USE;
         })
             ? this.maxProgress
             : 0;
+    }
+
+    clone(): TwoTenLetter {
+        const clone: TwoTenLetter = new TwoTenLetter();
+        clone.isPublic = this.isPublic;
+        clone.state = this.state;
+        clone.progress = this.progress;
+        return clone;
     }
 
     private isTileValueTenPoints(tile: Tile): boolean {

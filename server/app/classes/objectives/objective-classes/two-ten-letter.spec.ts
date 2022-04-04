@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_SQUARE } from '@app/classes/word-finding/helper.spec';
 import { StringConversion } from '@app/utils/string-conversion';
@@ -26,7 +26,7 @@ describe('Two ten points letters Objective', () => {
     });
 
     describe('updateProgress', () => {
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
 
         it('should set progress to maxProgress if created words contain two ten points letters', () => {
             validationParameters = {
@@ -37,7 +37,7 @@ describe('Two ten points letters Objective', () => {
                         [DEFAULT_SQUARE, { letter: LETTERS_WITH_TEN_POINTS_VALUE[1], value: 10 }],
                     ],
                 ],
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(objective['maxProgress']);
         });
@@ -51,7 +51,7 @@ describe('Two ten points letters Objective', () => {
                         [DEFAULT_SQUARE, { letter: 'L', value: 1 }],
                     ],
                 ],
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(0);
         });
