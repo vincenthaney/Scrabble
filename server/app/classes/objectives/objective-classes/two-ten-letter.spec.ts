@@ -28,7 +28,7 @@ describe('Two ten points letters Objective', () => {
     describe('updateProgress', () => {
         let validationParameters: ObjectiveValidationParameters;
 
-        it('should set progress to maxProgress if created words contain two ten points letters', () => {
+        it('should set progress to maxProgress if created words contains two ten points letters', () => {
             validationParameters = {
                 createdWords: [
                     [
@@ -42,7 +42,24 @@ describe('Two ten points letters Objective', () => {
             expect(objective.progress).to.equal(objective['maxProgress']);
         });
 
-        it('should set progress to 0 if created words DO NOT contain two ten points letters', () => {
+        it('should NOT complete objective if played two words with 1 ten point letter each', () => {
+            validationParameters = {
+                createdWords: [
+                    [
+                        [DEFAULT_SQUARE, { letter: 'O', value: 1 }],
+                        [DEFAULT_SQUARE, { letter: LETTERS_WITH_TEN_POINTS_VALUE[1], value: 10 }],
+                    ],
+                    [
+                        [DEFAULT_SQUARE, { letter: 'H', value: 1 }],
+                        [DEFAULT_SQUARE, { letter: LETTERS_WITH_TEN_POINTS_VALUE[0], value: 10 }],
+                    ],
+                ],
+            } as ObjectiveValidationParameters;
+            objective.updateProgress(validationParameters);
+            expect(objective.progress).to.equal(objective.progress);
+        });
+
+        it('should keep progress to the same value if created words DO NOT contain two ten points letters', () => {
             validationParameters = {
                 createdWords: [
                     [
@@ -53,7 +70,26 @@ describe('Two ten points letters Objective', () => {
                 ],
             } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
-            expect(objective.progress).to.equal(0);
+            expect(objective.progress).to.equal(objective.progress);
+        });
+
+        it('should NOT uncomplete objective if play with no letter of ten points after it is completed', () => {
+            validationParameters = {
+                createdWords: [
+                    [
+                        [DEFAULT_SQUARE, { letter: LETTERS_WITH_TEN_POINTS_VALUE[0], value: 10 }],
+                        [DEFAULT_SQUARE, { letter: 'O', value: 1 }],
+                        [DEFAULT_SQUARE, { letter: LETTERS_WITH_TEN_POINTS_VALUE[1], value: 10 }],
+                    ],
+                ],
+            } as ObjectiveValidationParameters;
+            objective.updateProgress(validationParameters);
+
+            validationParameters = {
+                createdWords: [[[DEFAULT_SQUARE, { letter: 'O', value: 1 }]]],
+            } as ObjectiveValidationParameters;
+            objective.updateProgress(validationParameters);
+            expect(objective.progress).to.equal(objective['maxProgress']);
         });
     });
 
