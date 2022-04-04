@@ -20,6 +20,7 @@ export class DictionariesService {
     private componentUpdateEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
     private dictionariesUpdatedEvent: Subject<DictionarySummary[]> = new Subject();
+    private downloadLoadingEvent: Subject<undefined> = new Subject();
 
     constructor(private dictionariesController: DictionariesController) {
         this.dictionariesController.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, (message) => {
@@ -29,6 +30,7 @@ export class DictionariesService {
         });
 
         this.dictionariesController.subscribeToDictionaryDownloadEvent(this.serviceDestroyed$, (dictionaryData) => {
+            this.downloadLoadingEvent.next();
             this.startDownload(dictionaryData);
         });
 
@@ -40,6 +42,10 @@ export class DictionariesService {
             this.dictionaries = dictionaries;
             this.dictionariesUpdatedEvent.next(dictionaries);
         });
+    }
+
+    subscribeToDownloadLoadingEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.downloadLoadingEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     subscribeToDictionariestUpdateDataEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void): void {

@@ -31,6 +31,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     dataSource: MatTableDataSource<DictionarySummary> = new MatTableDataSource(new Array());
     state: DictionariesState = DictionariesState.Loading;
     error: string | undefined = undefined;
+    isDownloadLoading: boolean;
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
     constructor(public dialog: MatDialog, private dictionariesService: DictionariesService) {
@@ -44,6 +45,9 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
             this.state = DictionariesState.Ready;
+        });
+        this.dictionariesService.subscribeToDownloadLoadingEvent(this.serviceDestroyed$, () => {
+            this.isDownloadLoading = false;
         });
     }
 
@@ -80,6 +84,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     async downloadDictionary(id: string): Promise<void> {
+        this.isDownloadLoading = true;
         await this.dictionariesService.downloadDictionary(id);
     }
 
