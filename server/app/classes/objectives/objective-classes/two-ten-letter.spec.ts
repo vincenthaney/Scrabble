@@ -68,4 +68,10 @@ describe('Two ten points letters Objective', () => {
         chai.spy.on(StringConversion, 'tileToString', (t: Tile) => t.letter);
         expect(objective['isTileValueTenPoints'](tile)).to.be.false;
     });
+
+    it('clone should do deep copy of object', () => {
+        const clone = objective.clone();
+        expect(clone).to.deep.equal(objective);
+        expect(clone).not.to.equal(objective);
+    });
 });

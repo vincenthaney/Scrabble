@@ -4,7 +4,7 @@ import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { StringConversion } from '@app/utils/string-conversion';
 
-export const NAME = 'Two ten points letter Objective';
+export const NAME = 'Extravagant';
 export const DESCRIPTION = 'Former un mot contenant 2 lettres ou plus de 10 points';
 export const BONUS_POINTS = 50;
 export const LETTERS_WITH_TEN_POINTS_VALUE: LetterValue[] = ['K', 'W', 'X', 'Y', 'Z'];
