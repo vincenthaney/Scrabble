@@ -91,7 +91,6 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries/reset`;
         this.http.delete<string>(endpoint, {}).subscribe(
             () => {
-                console.log('HERE');
                 this.dictionariesUpdateMessageEvent.next(DICTIONARIES_DELETED);
             },
             (error) => {
