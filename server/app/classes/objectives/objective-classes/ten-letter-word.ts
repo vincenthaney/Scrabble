@@ -16,7 +16,7 @@ export class TenLetterWord extends AbstractObjective {
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
         this.progress = validationParameters.createdWords.find((createdWord: [Square, Tile][]) => createdWord.length >= NUMBER_OF_LETTERS_TO_COMPLETE)
             ? this.maxProgress
-            : 0;
+            : this.progress;
     }
 
     clone(): TenLetterWord {
