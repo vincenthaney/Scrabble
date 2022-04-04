@@ -1,0 +1,103 @@
+@import '../../style/variables.scss';
+
+$border-radius: 6px;
+
+::ng-deep body {
+    background: $page-background;
+}
+
+.center {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.page {
+    margin: 0 auto;
+    padding-top: 20px;
+    text-align: right;
+
+    .container {
+        display: flex;
+        flex-direction: row;
+        padding-top: 20px;
+        gap: 20px;
+        justify-content: center;
+        text-align: center;
+
+        .title {
+            font-size: x-large;
+            font-weight: bolder;
+        }
+
+        .high-scores-box {
+            width: 500px;
+            border: solid 4px rgb(34, 34, 34);
+            border-radius: 4px;
+
+            #high-scores-header {
+                display: grid;
+                grid-template-columns: 2fr 5fr 2fr;
+                justify-self: center;
+                width: 100%;
+                vertical-align: middle;
+                height: 50px;
+                font-weight: bold;
+
+                box-sizing: border-box;
+                border-bottom: solid 4px rgb(34, 34, 34);
+
+                .rank,
+                .score,
+                .name {
+                    display: flex;
+                    align-items: center;
+                    font-size: larger;
+                    text-align: right;
+                    justify-content: center;
+                    box-sizing: border-box;
+                }
+            }
+
+            .high-score {
+                display: grid;
+                grid-template-columns: 2fr 5fr 2fr;
+                align-self: center;
+                justify-content: center;
+                align-items: center;
+                height: 50px;
+                font-family: Roboto, 'Helvetica Neue', sans-serif;
+
+                .rank,
+                .score,
+                .name {
+                    display: flex;
+                    align-items: center;
+                    font-size: larger;
+                    text-align: right;
+                    justify-content: center;
+                    box-sizing: border-box;
+                }
+
+                .name {
+                    text-align: left;
+                }
+            }
+
+            .high-score:nth-child(2n) {
+                background-color: rgba($primary, 0.15);
+            }
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: right;
+
+            button {
+                font-size: 1.2em;
+                padding: 6px 16px;
+            }
+        }
+    }
+}
