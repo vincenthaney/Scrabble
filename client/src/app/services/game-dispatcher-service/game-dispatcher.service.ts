@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LobbyData, LobbyInfo } from '@app/classes/communication/';
+import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameConfigData, InitializeGameData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -81,8 +82,7 @@ export default class GameDispatcherService implements OnDestroy {
             gameType: gameParameters.get('gameType')?.value as GameType,
             gameMode,
             maxRoundTime: gameParameters.get('timer')?.value as number,
-            // TODO: MUST BE CHANGED BY VINCENT
-            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4', isDefault: true },
+            dictionary: gameParameters.get('dictionary')?.value as DictionarySummary,
         };
         if (gameMode === GameMode.Solo) {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
