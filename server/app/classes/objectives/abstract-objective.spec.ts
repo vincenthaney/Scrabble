@@ -81,6 +81,12 @@ describe('Abstract Objective', () => {
             expect(objective.state).to.equal(ObjectiveState.Completed);
         });
 
+        it('if progress is maxProgress, should set state to Completed', () => {
+            objective.progress = objective['maxProgress'];
+            objective.updateObjective(validationParameters);
+            expect(objective.state).to.equal(ObjectiveState.Completed);
+        });
+
         it('if progress does NOT exceed maxProgress, should NOT set state to Completed', () => {
             objective.progress = objective['maxProgress'] - 1;
             objective.updateObjective(validationParameters);
