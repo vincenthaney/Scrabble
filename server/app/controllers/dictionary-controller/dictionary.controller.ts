@@ -60,8 +60,8 @@ export class DictionaryController {
             }
         });
 
-        this.router.get('/dictionaries', async (req: DictionaryRequest, res: Response) => {
-            const dictionaryId: string = req.body;
+        this.router.get('/dictionaries/:dictionaryId', async (req: DictionaryRequest, res: Response) => {
+            const { dictionaryId } = req.params;
 
             try {
                 const dictionaryData: DictionaryData = await this.dictionaryService.getDbDictionary(dictionaryId);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-unused-expressions */
@@ -228,6 +229,9 @@ describe('GamePlayService', () => {
 
         it('should return action of type ActionPlace when type is place', () => {
             const type = ActionType.PLACE;
+            chai.spy.on(gamePlayService, 'getActionPlacePayload', () => {
+                return { startPosition: { column: 0, row: 0 } };
+            });
             const payload: ActionPlacePayload = {
                 tiles: [{} as unknown as Tile],
                 startPosition: { column: 0, row: 0 },
@@ -242,6 +246,10 @@ describe('GamePlayService', () => {
             const payload: ActionExchangePayload = {
                 tiles: [{} as unknown as Tile],
             };
+            chai.spy.on(gamePlayService, 'getActionExchangePayload', () => {
+                return { tiles: [{} as unknown as Tile] };
+            });
+
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
         });

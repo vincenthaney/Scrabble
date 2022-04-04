@@ -18,7 +18,7 @@ chai.use(spies);
 chai.use(chaiAsPromised);
 
 const DEFAULT_EXCEPTION = 'exception';
-
+const DEFAULT_DICTIONARY_ID = 'dictionaryId';
 describe('DictionaryController', () => {
     let controller: DictionaryController;
 
@@ -104,7 +104,7 @@ describe('DictionaryController', () => {
                     };
                 });
 
-                return supertest(expressApp).get('/api/dictionaries').expect(StatusCodes.OK);
+                return supertest(expressApp).get(`/api/dictionaries/${DEFAULT_DICTIONARY_ID}`).expect(StatusCodes.OK);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
@@ -112,7 +112,7 @@ describe('DictionaryController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).get('/api/dictionaries').expect(StatusCodes.BAD_REQUEST);
+                return supertest(expressApp).get(`/api/dictionaries/${DEFAULT_DICTIONARY_ID}`).expect(StatusCodes.BAD_REQUEST);
             });
         });
 

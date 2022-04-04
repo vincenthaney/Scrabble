@@ -104,7 +104,7 @@ describe('HighScoresService', () => {
     });
 
     describe('getAllHighScores', () => {
-        it('should get all courses from DB', async () => {
+        it('should get all highScores from DB', async () => {
             const highScores = await highScoresService.getAllHighScores();
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES.length);
             expect(INITIAL_HIGH_SCORES).to.deep.equals(highScores);

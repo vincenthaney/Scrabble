@@ -165,7 +165,7 @@ describe('DictionaryService', () => {
     });
 
     describe('isDescriptionValid', () => {
-        it('should return true if the description is short', async () => {
+        it('should return true if the description is short', () => {
             expect(dictionaryService['isDescriptionValid']('shortdescription')).to.be.true;
         });
 
@@ -182,7 +182,7 @@ describe('DictionaryService', () => {
     describe('populateDb', () => {
         it('should call databaseService.populateDb and fetchDefaultDictionary', async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
-            const spyFetchDefaultHighScores = stub(DictionaryService, <any>'fetchDefaultDictionary');
+            const spyFetchDefaultHighScores = stub(DictionaryService, <any>'fetchDefaultDictionary').callsFake(() => {});
             const spyPopulateDb = chai.spy.on(dictionaryService['databaseService'], 'populateDb', () => {});
             await dictionaryService['populateDb']();
             expect(spyPopulateDb).to.have.been.called;
@@ -298,12 +298,12 @@ describe('DictionaryService', () => {
             dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
-        it('should delete a dictionary that had 1 active game', async () => {
+        it('should delete a dictionary that had 1 active game', () => {
             dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
             expect(dictionaryService['activeDictionaries'].size).to.equal(0);
         });
 
-        it('should decrement a dictionary that had more than 1 active game', async () => {
+        it('should decrement a dictionary that had more than 1 active game', () => {
             BASE_DICTIONARY_USAGE.numberOfActiveGames = 3;
             dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
@@ -311,7 +311,7 @@ describe('DictionaryService', () => {
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
         });
 
-        it('should not do anything if the dictionaryId is not a key of the map', async () => {
+        it('should not do anything if the dictionaryId is not a key of the map', () => {
             dictionaryService.stopUsingDictionary('BASE_DICTIONARY_ID');
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
         });
