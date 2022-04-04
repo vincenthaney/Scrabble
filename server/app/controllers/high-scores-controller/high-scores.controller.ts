@@ -21,7 +21,7 @@ export class HighScoresController {
             const { playerId } = req.params;
             try {
                 await this.handleHighScoresRequest(playerId);
-                res.status(StatusCodes.OK).send();
+                res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
