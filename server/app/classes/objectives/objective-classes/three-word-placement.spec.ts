@@ -40,7 +40,7 @@ describe('Three words created Objective', () => {
             expect(objective.progress).to.equal(objective['maxProgress']);
         });
 
-        it('should set progress to 0 if created words less than 3 words', () => {
+        it('should keep same progress if created words less than 3 words', () => {
             validationParameters = {
                 createdWords: [
                     [
@@ -51,7 +51,7 @@ describe('Three words created Objective', () => {
                 ],
             } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
-            expect(objective.progress).to.equal(0);
+            expect(objective.progress).to.equal(objective.progress);
         });
     });
 

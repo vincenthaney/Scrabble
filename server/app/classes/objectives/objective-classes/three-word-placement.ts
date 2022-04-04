@@ -6,9 +6,11 @@ export const DESCRIPTION = 'Former 3 mots en un seul placement';
 export const BONUS_POINTS = 30;
 export const NUMBER_OF_WORDS_TO_CREATE = 3;
 
+const SHOULD_RESET = false;
+
 export class ThreeWordsPlacement extends AbstractObjective {
     constructor() {
-        super(NAME, DESCRIPTION, BONUS_POINTS, false, 1);
+        super(NAME, DESCRIPTION, BONUS_POINTS, SHOULD_RESET, 1);
     }
 
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
