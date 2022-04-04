@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { Application } from '@app/app';
+import { BasicDictionaryData, DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
@@ -19,6 +20,9 @@ chai.use(chaiAsPromised);
 
 const DEFAULT_EXCEPTION = 'exception';
 const DEFAULT_DICTIONARY_ID = 'dictionaryId';
+const TEST_DICTIONARY_1: DictionarySummary = { id: 'id1', title: 'title1', description: 'description1', isDefault: false };
+const TEST_DICTIONARY_2: DictionarySummary = { id: 'id2', title: 'title2', description: 'description2', isDefault: true };
+
 describe('DictionaryController', () => {
     let controller: DictionaryController;
 
@@ -94,14 +98,15 @@ describe('DictionaryController', () => {
             });
         });
 
-        describe('GET /dictionaries', () => {
+        describe('GET /dictionaries/:dictionaryId', () => {
+            const expected: BasicDictionaryData = {
+                title: 'dictionaryData.title',
+                description: 'dictionaryData.description',
+                words: ['dictionaryData.words', 'word2'],
+            };
             it('should return OK', async () => {
                 chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
-                    return {
-                        title: 'dictionaryData.title',
-                        description: 'dictionaryData.description',
-                        words: 'dictionaryData.words',
-                    };
+                    return { ...expected, isDefault: true };
                 });
 
                 return supertest(expressApp).get(`/api/dictionaries/${DEFAULT_DICTIONARY_ID}`).expect(StatusCodes.OK);
@@ -113,6 +118,13 @@ describe('DictionaryController', () => {
                 });
 
                 return supertest(expressApp).get(`/api/dictionaries/${DEFAULT_DICTIONARY_ID}`).expect(StatusCodes.BAD_REQUEST);
+            });
+
+            it('should have the dictionary in the response body', async () => {
+                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
+                    return { ...expected, isDefault: true };
+                });
+                return expect((await supertest(expressApp).get('/api/dictionaries/${DEFAULT_DICTIONARY_ID}')).body).to.deep.equal(expected);
             });
         });
 
@@ -129,6 +141,14 @@ describe('DictionaryController', () => {
                 });
 
                 return supertest(expressApp).get('/api/dictionaries/summary').expect(StatusCodes.BAD_REQUEST);
+            });
+
+            it('should have the summary in the response body', async () => {
+                const expected: DictionarySummary[] = [TEST_DICTIONARY_1, TEST_DICTIONARY_2];
+                chai.spy.on(controller['dictionaryService'], 'getAllDictionarySummaries', () => {
+                    return expected;
+                });
+                return expect((await supertest(expressApp).get('/api/dictionaries/summary')).body).to.deep.equal(expected);
             });
         });
 
