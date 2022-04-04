@@ -3,10 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { Board } from '@app/classes/board';
 import { ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
-import Game from '@app/classes/game/game';
-import { LetterValue } from '@app/classes/tile';
 import {
     HIGH_SCORE_RANGE_MAX,
     HIGH_SCORE_RANGE_MIN,
@@ -17,7 +14,6 @@ import {
 } from '@app/constants/virtual-player-constants';
 import {
     EXPECTED_INCREMENT_VALUE,
-    GAME_ID,
     PLAYER_ID,
     PLAYER_NAME,
     RANDOM_VALUE_EXCHANGE,
@@ -32,9 +28,7 @@ import {
     TEST_SCORE,
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
-import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
@@ -60,42 +54,6 @@ describe('BeginnerVirtualPlayer', () => {
 
     it('should create', () => {
         expect(beginnerVirtualPlayer).to.exist;
-    });
-
-    describe('playTurn', async () => {
-        let actionPassSpy: unknown;
-        let sendActionSpy: unknown;
-        beforeEach(() => {
-            spy.on(Delay, 'for', () => {
-                return;
-            });
-            spy.on(beginnerVirtualPlayer, 'findAction', () => {
-                return;
-            });
-            actionPassSpy = spy.on(ActionPass, 'createActionData');
-            sendActionSpy = spy.on(beginnerVirtualPlayer['virtualPlayerService'], 'sendAction');
-        });
-
-        afterEach(() => {
-            chai.spy.restore();
-        });
-
-        it('should send actionPass when no words are found', async () => {
-            await beginnerVirtualPlayer.playTurn();
-
-            expect(sendActionSpy).to.have.been.called();
-            expect(actionPassSpy).to.have.been.called();
-        });
-
-        it('should send action returned by findAction when no words are found', async () => {
-            spy.on(Promise, 'race', () => {
-                return ['testArray'];
-            });
-            await beginnerVirtualPlayer.playTurn();
-
-            expect(sendActionSpy).to.have.been.called();
-            expect(actionPassSpy).to.not.have.been.called();
-        });
     });
 
     describe('findPointRange', () => {
@@ -239,20 +197,6 @@ describe('BeginnerVirtualPlayer', () => {
         });
     });
 
-    describe('getGameBoard', () => {
-        it('should call getGame', () => {
-            const activeGameServiceStub = createStubInstance(ActiveGameService);
-            beginnerVirtualPlayer['activeGameService'] = activeGameServiceStub as unknown as ActiveGameService;
-
-            const testBoard = {} as unknown as Board;
-            const getGameSpy = spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
-                return testBoard;
-            });
-            beginnerVirtualPlayer['getGameBoard'](GAME_ID, PLAYER_ID);
-            expect(getGameSpy).to.have.been.called();
-        });
-    });
-
     it('generateWordFindingRequest should call findPointRange method', () => {
         const findPointRangeSpy = spy.on(beginnerVirtualPlayer, 'findPointRange', () => {
             return;
@@ -271,7 +215,7 @@ describe('BeginnerVirtualPlayer', () => {
         expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
     });
 
-    describe('createWordFindingPlacement', () => {
+    describe('computeWordPlacement', () => {
         let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
 
         beforeEach(async () => {
@@ -327,37 +271,6 @@ describe('BeginnerVirtualPlayer', () => {
             const ceilStub = stub(Math, 'ceil').returns(TEST_SELECT_COUNT);
             expect(beginnerVirtualPlayer['selectRandomTiles']().length).to.equal(TEST_SELECT_COUNT);
             ceilStub.restore();
-        });
-    });
-
-    describe('isExchangeImpossible', () => {
-        let TEST_GAME: Game;
-        let TEST_MAP: Map<LetterValue, number>;
-        beforeEach(() => {
-            TEST_GAME = new Game();
-
-            spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
-                return TEST_GAME;
-            });
-            spy.on(TEST_GAME, 'getTilesLeftPerLetter', () => {
-                return TEST_MAP;
-            });
-        });
-        it('should return false when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
-            TEST_MAP = new Map<LetterValue, number>([
-                ['A', 2],
-                ['B', 2],
-            ]);
-            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.false;
-        });
-
-        it('should return true when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
-            TEST_MAP = new Map<LetterValue, number>([
-                ['A', 3],
-                ['B', 3],
-                ['C', 3],
-            ]);
-            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.true;
         });
     });
 });

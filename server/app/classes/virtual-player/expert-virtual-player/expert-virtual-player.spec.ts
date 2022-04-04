@@ -3,10 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { Board } from '@app/classes/board';
 import { ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
-import Game from '@app/classes/game/game';
-import { LetterValue } from '@app/classes/tile';
 import {
     HIGH_SCORE_RANGE_MAX,
     HIGH_SCORE_RANGE_MIN,
@@ -17,7 +14,6 @@ import {
 } from '@app/constants/virtual-player-constants';
 import {
     EXPECTED_INCREMENT_VALUE,
-    GAME_ID,
     PLAYER_ID,
     PLAYER_NAME,
     RANDOM_VALUE_EXCHANGE,
@@ -32,13 +28,11 @@ import {
     TEST_SCORE,
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
-import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
-import { BeginnerVirtualPlayer } from './expert-virtual-player';
+import { ExpertVirtualPlayer } from './expert-virtual-player';
 import { ActionData } from '@app/classes/communication/action-data';
 
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
@@ -47,11 +41,11 @@ const testEvaluatedPlacements: ScoredWordPlacement[] = [
 
 const TEST_SELECT_COUNT = 3;
 
-describe('BeginnerVirtualPlayer', () => {
-    let beginnerVirtualPlayer: BeginnerVirtualPlayer;
+describe('ExpertVirtualPlayer', () => {
+    let expertVirtualPlayer: ExpertVirtualPlayer;
 
     beforeEach(async () => {
-        beginnerVirtualPlayer = new BeginnerVirtualPlayer(PLAYER_ID, PLAYER_NAME);
+        expertVirtualPlayer = new ExpertVirtualPlayer(PLAYER_ID, PLAYER_NAME);
     });
 
     afterEach(() => {
@@ -59,80 +53,20 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     it('should create', () => {
-        expect(beginnerVirtualPlayer).to.exist;
-    });
-
-    describe('playTurn', async () => {
-        let actionPassSpy: unknown;
-        let sendActionSpy: unknown;
-        beforeEach(() => {
-            spy.on(Delay, 'for', () => {
-                return;
-            });
-            spy.on(beginnerVirtualPlayer, 'findAction', () => {
-                return;
-            });
-            actionPassSpy = spy.on(ActionPass, 'createActionData');
-            sendActionSpy = spy.on(beginnerVirtualPlayer['virtualPlayerService'], 'sendAction');
-        });
-
-        afterEach(() => {
-            chai.spy.restore();
-        });
-
-        it('should send actionPass when no words are found', async () => {
-            await beginnerVirtualPlayer.playTurn();
-
-            expect(sendActionSpy).to.have.been.called();
-            expect(actionPassSpy).to.have.been.called();
-        });
-
-        it('should send action returned by findAction when no words are found', async () => {
-            spy.on(Promise, 'race', () => {
-                return ['testArray'];
-            });
-            await beginnerVirtualPlayer.playTurn();
-
-            expect(sendActionSpy).to.have.been.called();
-            expect(actionPassSpy).to.not.have.been.called();
-        });
+        expect(expertVirtualPlayer).to.exist;
     });
 
     describe('findPointRange', () => {
-        it('findPointRange should return low range values', () => {
-            spy.on(Math, 'random', () => {
-                return RANDOM_VALUE_LOW;
-            });
-
-            const testPointRange = beginnerVirtualPlayer['findPointRange']();
-            expect(testPointRange.min).to.equal(LOW_SCORE_RANGE_MIN);
-            expect(testPointRange.max).to.equal(LOW_SCORE_RANGE_MAX);
-        });
-
-        it('findPointRange should return medium range values', () => {
-            spy.on(Math, 'random', () => {
-                return RANDOM_VALUE_MEDIUM;
-            });
-
-            const testPointRange = beginnerVirtualPlayer['findPointRange']();
-            expect(testPointRange.min).to.equal(MEDIUM_SCORE_RANGE_MIN);
-            expect(testPointRange.max).to.equal(MEDIUM_SCORE_RANGE_MAX);
-        });
-
-        it('findPointRange should return high range values', () => {
-            spy.on(Math, 'random', () => {
-                return RANDOM_VALUE_HIGH;
-            });
-
-            const testPointRange = beginnerVirtualPlayer['findPointRange']();
-            expect(testPointRange.min).to.equal(HIGH_SCORE_RANGE_MIN);
-            expect(testPointRange.max).to.equal(HIGH_SCORE_RANGE_MAX);
+        it('findPointRange should return the whole positive range', () => {
+            const testPointRange = expertVirtualPlayer['findPointRange']();
+            expect(testPointRange.min).to.equal(0);
+            expect(testPointRange.max).to.equal(Number.MAX_SAFE_INTEGER);
         });
     });
 
     describe('Find Action with RANDOM_VALUE_PASS', () => {
         it('findAction should call ActionPass.createActionData() if random is RANDOM_VALUE_PASS', () => {
-            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+            spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return {} as unknown as ScoredWordPlacement;
             });
             spy.on(Math, 'random', () => {
@@ -141,81 +75,76 @@ describe('BeginnerVirtualPlayer', () => {
             const createActionDataPassSpy = spy.on(ActionPass, 'createActionData', () => {
                 return;
             });
-            beginnerVirtualPlayer['findAction']();
+            expertVirtualPlayer['findAction']();
             expect(createActionDataPassSpy).to.have.been.called();
         });
     });
 
-    describe('Find Action with RANDOM_VALUE_PLACE', () => {
-        beforeEach(async () => {
-            spy.on(Math, 'random', () => {
-                return RANDOM_VALUE_PLACE;
-            });
-            spy.on(beginnerVirtualPlayer, 'isExchangePossible', () => {
-                return true;
-            });
-        });
-
-        it('findAction should call createWordFindingPlacement if random is RANDOM_VALUE_PLACE', () => {
-            const createWordSpy = spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+    describe('findAction', () => {
+        it('should call computeWordPlacement', () => {
+            const createWordSpy = spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return;
             });
-            beginnerVirtualPlayer['findAction']();
+
+            spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
+                return true;
+            });
+            expertVirtualPlayer['findAction']();
             expect(createWordSpy).to.have.been.called();
         });
 
         it('findAction should call ActionPass.createActionData if no possible placements are found', () => {
             const testEmptyEvaluatedPlacement = undefined;
-            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+            spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return testEmptyEvaluatedPlacement;
             });
             const createActionDataPassSpy = stub(ActionPass, 'createActionData').returns({} as unknown as ActionData);
             const exchangeActionDataPassSpy = stub(ActionExchange, 'createActionData').returns({} as unknown as ActionData);
-            beginnerVirtualPlayer['findAction']();
+            expertVirtualPlayer['findAction']();
             expect(createActionDataPassSpy.called || exchangeActionDataPassSpy.called).to.true;
         });
 
         it('findAction should call ActionPlace.createActionData because possible placement', () => {
-            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+            spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return testEvaluatedPlacements;
             });
             const createActionDataPlaceSpy = spy.on(ActionPlace, 'createActionData', () => {
                 return;
             });
-            beginnerVirtualPlayer['findAction']();
+            expertVirtualPlayer['findAction']();
             expect(createActionDataPlaceSpy).to.have.been.called();
         });
 
         it('findAction should call updateHistory', () => {
-            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+            spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return testEvaluatedPlacements;
             });
             spy.on(ActionPlace, 'createActionData', () => {
                 return;
             });
-            const updateHistorySpy = spy.on(beginnerVirtualPlayer, 'updateHistory', () => {
+            const updateHistorySpy = spy.on(expertVirtualPlayer, 'updateHistory', () => {
                 return;
             });
-            beginnerVirtualPlayer['findAction']();
+            expertVirtualPlayer['findAction']();
             expect(updateHistorySpy).to.have.been.called();
         });
     });
 
     describe('Find Action with RANDOM_VALUE_EXCHANGE', () => {
         it('findAction should call ActionExchange.createActionData()', () => {
-            spy.on(beginnerVirtualPlayer, 'computeWordPlacement', () => {
+            spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return {} as unknown as ScoredWordPlacement;
             });
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_EXCHANGE;
             });
-            spy.on(beginnerVirtualPlayer, 'isExchangePossible', () => {
+            spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
                 return true;
             });
             const actionExchangeSpy = spy.on(ActionExchange, 'createActionData', () => {
                 return;
             });
-            beginnerVirtualPlayer['findAction']();
+            expertVirtualPlayer['findAction']();
             expect(actionExchangeSpy).to.have.been.called();
         });
     });
@@ -227,56 +156,42 @@ describe('BeginnerVirtualPlayer', () => {
 
         it('should increment value', () => {
             const testEvaluatedPlacement = { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE };
-            beginnerVirtualPlayer.pointHistory.set(TEST_SCORE, TEST_COUNT_VALUE);
-            beginnerVirtualPlayer['updateHistory'](testEvaluatedPlacement);
-            expect(beginnerVirtualPlayer.pointHistory.get(TEST_SCORE)).to.deep.equal(TEST_COUNT_VALUE + EXPECTED_INCREMENT_VALUE);
+            expertVirtualPlayer.pointHistory.set(TEST_SCORE, TEST_COUNT_VALUE);
+            expertVirtualPlayer['updateHistory'](testEvaluatedPlacement);
+            expect(expertVirtualPlayer.pointHistory.get(TEST_SCORE)).to.deep.equal(TEST_COUNT_VALUE + EXPECTED_INCREMENT_VALUE);
         });
 
         it('should set value to 1', () => {
             const testEvaluatedPlacement = { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE };
-            beginnerVirtualPlayer['updateHistory'](testEvaluatedPlacement);
-            expect(beginnerVirtualPlayer.pointHistory.get(TEST_SCORE)).to.deep.equal(EXPECTED_INCREMENT_VALUE);
-        });
-    });
-
-    describe('getGameBoard', () => {
-        it('should call getGame', () => {
-            const activeGameServiceStub = createStubInstance(ActiveGameService);
-            beginnerVirtualPlayer['activeGameService'] = activeGameServiceStub as unknown as ActiveGameService;
-
-            const testBoard = {} as unknown as Board;
-            const getGameSpy = spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
-                return testBoard;
-            });
-            beginnerVirtualPlayer['getGameBoard'](GAME_ID, PLAYER_ID);
-            expect(getGameSpy).to.have.been.called();
+            expertVirtualPlayer['updateHistory'](testEvaluatedPlacement);
+            expect(expertVirtualPlayer.pointHistory.get(TEST_SCORE)).to.deep.equal(EXPECTED_INCREMENT_VALUE);
         });
     });
 
     it('generateWordFindingRequest should call findPointRange method', () => {
-        const findPointRangeSpy = spy.on(beginnerVirtualPlayer, 'findPointRange', () => {
+        const findPointRangeSpy = spy.on(expertVirtualPlayer, 'findPointRange', () => {
             return;
         });
-        beginnerVirtualPlayer['generateWordFindingRequest']();
+        expertVirtualPlayer['generateWordFindingRequest']();
         expect(findPointRangeSpy).to.have.been.called();
     });
 
     it('generateWordFindingRequest should return WordFindingRequest with correct data', () => {
-        spy.on(beginnerVirtualPlayer, 'findPointRange', () => {
+        spy.on(expertVirtualPlayer, 'findPointRange', () => {
             return TEST_POINT_RANGE;
         });
-        const testWordFindingRequest = beginnerVirtualPlayer['generateWordFindingRequest']();
+        const testWordFindingRequest = expertVirtualPlayer['generateWordFindingRequest']();
         expect(testWordFindingRequest.useCase).to.equal(WordFindingUseCase.Beginner);
-        expect(testWordFindingRequest.pointHistory).to.deep.equal(beginnerVirtualPlayer.pointHistory);
+        expect(testWordFindingRequest.pointHistory).to.deep.equal(expertVirtualPlayer.pointHistory);
         expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
     });
 
-    describe('createWordFindingPlacement', () => {
+    describe('computeWordPlacement', () => {
         let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
 
         beforeEach(async () => {
             wordFindingServiceStub = createStubInstance(WordFindingService);
-            beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
+            expertVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
         });
 
         afterEach(() => {
@@ -284,30 +199,30 @@ describe('BeginnerVirtualPlayer', () => {
         });
 
         it('should call findWords', () => {
-            const findWordsSpy = spy.on(beginnerVirtualPlayer['wordFindingService'], 'findWords', () => {
+            const findWordsSpy = spy.on(expertVirtualPlayer['wordFindingService'], 'findWords', () => {
                 return [];
             });
-            spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
+            spy.on(expertVirtualPlayer, 'getGameBoard', () => {
                 return;
             });
-            spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
+            spy.on(expertVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
             });
-            beginnerVirtualPlayer['computeWordPlacement']();
+            expertVirtualPlayer['computeWordPlacement']();
             expect(findWordsSpy).to.have.been.called();
         });
 
         it('should call getGameBoard and generateWord', () => {
-            chai.spy.on(beginnerVirtualPlayer['wordFindingService'], 'findWords', () => {
+            chai.spy.on(expertVirtualPlayer['wordFindingService'], 'findWords', () => {
                 return [];
             });
-            const getGameBoardSpy = spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
+            const getGameBoardSpy = spy.on(expertVirtualPlayer, 'getGameBoard', () => {
                 return;
             });
-            const generateWordSpy = spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
+            const generateWordSpy = spy.on(expertVirtualPlayer, 'generateWordFindingRequest', () => {
                 return;
             });
-            beginnerVirtualPlayer['computeWordPlacement']();
+            expertVirtualPlayer['computeWordPlacement']();
             expect(getGameBoardSpy).to.have.been.called();
             expect(generateWordSpy).to.have.been.called();
         });
@@ -315,7 +230,7 @@ describe('BeginnerVirtualPlayer', () => {
 
     describe('selectRandomTiles', () => {
         it('should send the specified tile count', () => {
-            beginnerVirtualPlayer.tiles = [
+            expertVirtualPlayer.tiles = [
                 { letter: 'A', value: 0 },
                 { letter: 'B', value: 0 },
                 { letter: 'C', value: 0 },
@@ -323,41 +238,10 @@ describe('BeginnerVirtualPlayer', () => {
                 { letter: 'F', value: 0 },
             ];
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stub(beginnerVirtualPlayer, 'isExchangePossible' as any).returns(true);
+            stub(expertVirtualPlayer, 'isExchangePossible' as any).returns(true);
             const ceilStub = stub(Math, 'ceil').returns(TEST_SELECT_COUNT);
-            expect(beginnerVirtualPlayer['selectRandomTiles']().length).to.equal(TEST_SELECT_COUNT);
+            expect(expertVirtualPlayer['selectRandomTiles']().length).to.equal(TEST_SELECT_COUNT);
             ceilStub.restore();
-        });
-    });
-
-    describe('isExchangeImpossible', () => {
-        let TEST_GAME: Game;
-        let TEST_MAP: Map<LetterValue, number>;
-        beforeEach(() => {
-            TEST_GAME = new Game();
-
-            spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
-                return TEST_GAME;
-            });
-            spy.on(TEST_GAME, 'getTilesLeftPerLetter', () => {
-                return TEST_MAP;
-            });
-        });
-        it('should return false when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
-            TEST_MAP = new Map<LetterValue, number>([
-                ['A', 2],
-                ['B', 2],
-            ]);
-            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.false;
-        });
-
-        it('should return true when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
-            TEST_MAP = new Map<LetterValue, number>([
-                ['A', 3],
-                ['B', 3],
-                ['C', 3],
-            ]);
-            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.true;
         });
     });
 });
