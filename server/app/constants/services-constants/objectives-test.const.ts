@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { WordPlacement } from '@app/classes/word-finding';
 
 export const TEST_OBJECTIVE_MAX_PROGRESS = 3;
 
-export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
+export const EMPTY_VALIDATION_PARAMETERS: ObjectiveValidationParameters = {
     game: undefined as unknown as Game,
     wordPlacement: undefined as unknown as WordPlacement,
     scoredPoints: 0,
@@ -14,16 +14,32 @@ export const EMPTY_VALIDATION_PARAMETERS: ValidationParameters = {
 };
 
 export class TestObjective extends AbstractObjective {
-    constructor(name: string, maxProgress: number) {
-        super(name, '', 0, maxProgress);
+    constructor(name: string, shouldReset: boolean = false) {
+        super(name, '', 0, shouldReset, TEST_OBJECTIVE_MAX_PROGRESS);
     }
-    updateProgress(validationParameters: ValidationParameters): void {
-        return validationParameters as unknown as void;
+    // eslint-disable-next-line no-unused-vars
+    updateProgress(validationParameters: ObjectiveValidationParameters): void {
+        this.progress = this.maxProgress;
+    }
+    clone(): AbstractObjective {
+        const clone = new TestObjective(this.name, this.shouldResetOnInvalidWord);
+        clone.description = this.description;
+        clone.bonusPoints = this.bonusPoints;
+        clone.progress = this.progress;
+        clone.state = this.state;
+        clone.isPublic = this.isPublic;
+        return clone;
     }
 }
 
 export const generateTestObjective = (index: number) => {
-    return new TestObjective(String(index), TEST_OBJECTIVE_MAX_PROGRESS);
+    const objective = new TestObjective(String(index));
+    return objective;
+};
+
+export const generateResetableTestObjective = (index: number) => {
+    const objective = new TestObjective(String(index), true);
+    return objective;
 };
 
 export const generateGameObjectives = () => {
