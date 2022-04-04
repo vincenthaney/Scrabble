@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -5,6 +6,7 @@ import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
@@ -27,7 +29,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     playerNameValid: boolean;
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
-
     constructor(
         private router: Router,
         private gameDispatcherService: GameDispatcherService,
@@ -50,6 +51,14 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             dictionary: new FormControl(undefined, Validators.required),
         });
 
+        this.gameDispatcherService
+            .observeGameCreationFailed()
+            .pipe(takeUntil(this.pageDestroyed$))
+            .subscribe(async (error: HttpErrorResponse) => {
+                if (error.error.message === INVALID_DICTIONARY_ID) {
+                    await this.dictionaryService.updateAllDictionaries();
+                }
+            });
         this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
         });

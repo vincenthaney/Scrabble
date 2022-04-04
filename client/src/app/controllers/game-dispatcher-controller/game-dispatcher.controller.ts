@@ -1,9 +1,9 @@
-import { HttpClient, HttpStatusCode } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { LobbyData, LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import SocketService from '@app/services/socket-service/socket.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
 })
 export class GameDispatcherController implements OnDestroy {
     private createGameEvent: Subject<LobbyData> = new Subject();
+    private gameCreationFailed$: Subject<HttpErrorResponse> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
@@ -33,9 +34,14 @@ export class GameDispatcherController implements OnDestroy {
 
     handleGameCreation(gameConfig: GameConfigData): void {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
-        this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig).subscribe((response) => {
-            this.createGameEvent.next(response.lobbyData);
-        });
+        this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig).subscribe(
+            (response) => {
+                this.createGameEvent.next(response.lobbyData);
+            },
+            (error: HttpErrorResponse) => {
+                this.gameCreationFailed$.next(error);
+            },
+        );
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
@@ -100,6 +106,10 @@ export class GameDispatcherController implements OnDestroy {
 
     subscribeToInitializeGame(serviceDestroyed$: Subject<boolean>, callback: (value: InitializeGameData | undefined) => void): void {
         this.initializeGame$.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+
+    observeGameCreationFailed(): Observable<HttpErrorResponse> {
+        return this.gameCreationFailed$.asObservable();
     }
 
     private handleJoinError(errorStatus: HttpStatusCode): void {

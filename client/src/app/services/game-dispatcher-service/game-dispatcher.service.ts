@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,7 +10,7 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import GameService from '@app/services/game-service/game.service';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
@@ -19,6 +20,7 @@ export default class GameDispatcherService implements OnDestroy {
     currentName: string = '';
     currentLobby: LobbyInfo | undefined = undefined;
 
+    private gameCreationFailed$: Subject<HttpErrorResponse> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
@@ -47,6 +49,10 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
             this.gameService.handleInitializeGame(initializeValue),
         );
+        this.gameDispatcherController
+            .observeGameCreationFailed()
+            .pipe(takeUntil(this.serviceDestroyed$))
+            .subscribe((error: HttpErrorResponse) => this.gameCreationFailed$.next(error));
     }
 
     ngOnDestroy(): void {
@@ -140,6 +146,10 @@ export default class GameDispatcherService implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    observeGameCreationFailed(): Observable<HttpErrorResponse> {
+        return this.gameCreationFailed$.asObservable();
     }
 
     private isGameModeSolo(gameParameters?: FormGroup): boolean {
