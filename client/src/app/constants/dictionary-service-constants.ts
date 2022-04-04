@@ -1,0 +1,12 @@
+export const DICTIONARY_NOT_UPDATED = 'Une dictionnaire a déjà le nom spécifié. Choisissez un autre nom.';
+export const DICTIONARY_NOT_DOWNLOADED = "Une erreur s'est produite au moment du téléchargement";
+export const DICTIONARY_NOT_DELETED = "Une erreur s'est produite lors de la suppression du dictionnaire.";
+export const DICTIONARY_ADDED = 'Le dictionnaire a été ajouté avec succès.';
+export const DICTIONARY_DELETED = 'Le dictionnaire a été supprimé avec succès.';
+export const DICTIONARY_DOWNLOADING = 'Le dictionnaire est en cours de téléchargement';
+export const DICTIONARY_UPDATED = 'Le dictionnaire a été mis à jour.';
+export const DICTIONARIES_ADDED = 'Les dictionnaires ont été ajoutés avec succès';
+export const DICTIONARIES_NOT_ADDED = "Une erreur est survenue lors de l'acquisition des dictionaires";
+export const DICTIONARIES_DELETED = 'Les dictionnaires ont été supprimés avec succès.';
+export const DICTIONARIES_NOT_DELETED = 'Une erreur est survenue lors de la supression des dictionaires';
+export const DOWNLOAD_ELEMENT = 'a';

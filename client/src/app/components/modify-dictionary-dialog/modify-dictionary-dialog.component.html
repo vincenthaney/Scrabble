@@ -1,0 +1,68 @@
+<h2 mat-dialog-title>{{title}}</h2>
+<mat-dialog-content>
+    
+</mat-dialog-content>
+<mat-dialog-actions align='end'>
+    <mat-form-field
+        appearance="outline"
+        [formGroup]="formParameters"
+        matTooltip="Le nom du dictionnaire doit être entre 2 et 30 caractères sans caractères spéciaux"
+        matTooltipPosition="above"
+    >
+        <mat-label><app-icon icon="pencil"></app-icon> Renommer le dictionnaire</mat-label>
+        <input
+            matInput
+            id="dictionaryNameValidator"
+            type="text"
+            formControlName="inputDictionaryName"
+            autocomplete="off"
+            (ngModelChange)="onChange()"
+            (valueChanges)="onChange()"
+        />
+    </mat-form-field>
+</mat-dialog-actions>
+<mat-dialog-actions align='end'>
+    <mat-form-field
+    appearance="outline"
+    [formGroup]="formParameters"
+    matTooltip="La description doit être entre 2 et 30 caractères sans caractères spéciaux"
+    matTooltipPosition="above"
+    >
+    <mat-label><app-icon icon="pencil"></app-icon> Nouvelle description du dictionnaire</mat-label>
+    <input
+        matInput
+        id="dictionaryDescriptionValidator"
+        type="text"
+        formControlName="inputDictionaryDescription"
+        autocomplete="off"
+        (ngModelChange)="onChange()"
+        (valueChanges)="onChange()"
+    />
+    </mat-form-field>
+</mat-dialog-actions>
+<mat-dialog-actions>
+    <mat-progress-bar *ngIf="state==='loading'" mode="indeterminate"></mat-progress-bar>
+    <p *ngIf="state==='message'">{{message}}</p>
+</mat-dialog-actions>
+<div *ngIf="state!=='message'">
+   <button mat-button color = "primary" (click)="updateDictionary()" [disabled]="!isNewInformationValid">
+        <app-icon icon="pencil"></app-icon>
+        Modifier
+    </button>
+    <button mat flat button mat-button color = "primary" (click)="closeDialog()">
+        <app-icon icon="ban"></app-icon>
+        Annuler
+    </button> 
+</div>
+<div>
+    <button mat-button *ngIf="icon==='check' && state==='message'" color = "primary" (click)="closeDialog()">
+        <app-icon icon="check"></app-icon>
+        OK
+    </button>
+    <button mat-button *ngIf="icon==='close' && state==='message'" color = "primary" (click)="cleanupDialogStates()">
+        <app-icon *icon="icon"></app-icon>
+        Réessayer
+    </button>
+</div>
+    
+
