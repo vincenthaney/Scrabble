@@ -1,6 +1,6 @@
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { Container } from 'typedi';
@@ -44,16 +44,19 @@ export default class Player {
     }
 
     resetObjectivesProgression(): void {
-        this.getObjectives().forEach((objective: AbstractObjective) => {
-            objective.progress = 0;
-        });
+        this.getObjectives()
+            .filter((objective: AbstractObjective) => !objective.isCompleted() && objective.shouldResetOnInvalidWord)
+            .forEach((objective: AbstractObjective) => {
+                objective.progress = 0;
+            });
     }
 
-    initializeObjectives(objectives: Set<AbstractObjective>): void {
-        this.objectives = objectives;
+    initializeObjectives(publicObjectives: Set<AbstractObjective>, privateObjective: AbstractObjective): void {
+        const publicObjectiveClones: AbstractObjective[] = [...publicObjectives.values()].map((objective: AbstractObjective) => objective.clone());
+        this.objectives = new Set(publicObjectiveClones).add(privateObjective);
     }
 
-    updateObjectives(validationParameters: ValidationParameters): [GameObjectivesData, string[]] {
+    validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 }

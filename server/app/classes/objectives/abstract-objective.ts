@@ -1,13 +1,19 @@
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { ObjectiveState } from './objective-state';
-import { ValidationParameters } from './validation-parameters';
+import { ObjectiveState } from './objective';
+import { ObjectiveValidationParameters } from './validation-parameters';
 
 export abstract class AbstractObjective {
     progress: number = 0;
     state: ObjectiveState = ObjectiveState.NotCompleted;
     isPublic: boolean = false;
 
-    constructor(public name: string, public description: string, public bonusPoints: number, protected readonly maxProgress: number) {}
+    constructor(
+        public name: string,
+        public description: string,
+        public bonusPoints: number,
+        readonly shouldResetOnInvalidWord: boolean,
+        protected readonly maxProgress: number,
+    ) {}
 
     isCompleted(): boolean {
         return this.state !== ObjectiveState.NotCompleted;
@@ -25,11 +31,15 @@ export abstract class AbstractObjective {
         };
     }
 
-    updateObjective(validationParameters: ValidationParameters): void {
+    updateObjective(validationParameters: ObjectiveValidationParameters): boolean {
+        if (this.isCompleted()) return false;
+
         this.updateProgress(validationParameters);
 
         if (this.progress >= this.maxProgress) this.state = ObjectiveState.Completed;
+        return true;
     }
 
-    abstract updateProgress(validationParameters: ValidationParameters): void;
+    abstract updateProgress(validationParameters: ObjectiveValidationParameters): void;
+    abstract clone(): AbstractObjective;
 }

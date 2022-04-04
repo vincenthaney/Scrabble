@@ -1,7 +1,7 @@
 import Board from '@app/classes/board/board';
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
-import { GameObjectives } from '@app/classes/objectives/game-objectives';
+import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -14,7 +14,6 @@ import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
-import { setDeepCopy } from '@app/utils/deep-copy';
 import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameType } from './game-type';
@@ -199,7 +198,7 @@ export default class Game {
         if (this.gameType === GameType.Classic) return;
 
         const gameObjectives: GameObjectives = Game.objectivesService.createObjectivesForGame();
-        this.player1.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player1Objective));
-        this.player2.initializeObjectives(setDeepCopy(gameObjectives.publicObjectives).add(gameObjectives.player2Objective));
+        this.player1.initializeObjectives(gameObjectives.publicObjectives, gameObjectives.player1Objective);
+        this.player2.initializeObjectives(gameObjectives.publicObjectives, gameObjectives.player2Objective);
     }
 }
