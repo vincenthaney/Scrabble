@@ -1,14 +1,11 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
-import {
-    PLAYER_ID,
-    PLAYER_NAME,
-    TEST_POINT_RANGE,
-} from '@app/constants/virtual-player-tests-constants';
+import { PLAYER_ID, PLAYER_NAME, TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
@@ -38,20 +35,17 @@ describe('ExpertVirtualPlayer', () => {
         });
     });
 
-
     describe('findAction', () => {
         it('should call computeWordPlacement and ActionPlace.createActionData if there is a placement found', () => {
             const computeWordPlacementSpy = spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return {} as unknown as ScoredWordPlacement;
             });
 
-            const createActionDataSpy = spy.on(ActionPlace, 'createActionData', () => {})
+            const createActionDataSpy = spy.on(ActionPlace, 'createActionData', () => {});
             expertVirtualPlayer['findAction']();
             expect(computeWordPlacementSpy).to.have.been.called();
             expect(createActionDataSpy).to.have.been.called();
         });
-
-
 
         it('should ActionExchange if no moves are found and exchange is possible', () => {
             const computeWordPlacementSpy = spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
@@ -61,7 +55,7 @@ describe('ExpertVirtualPlayer', () => {
             spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
                 return true;
             });
-            const createActionDataSpy = spy.on(ActionExchange, 'createActionData', () => {})
+            const createActionDataSpy = spy.on(ActionExchange, 'createActionData', () => {});
 
             expertVirtualPlayer['findAction']();
             expect(computeWordPlacementSpy).to.have.been.called();
@@ -76,7 +70,7 @@ describe('ExpertVirtualPlayer', () => {
             spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
                 return false;
             });
-            const createActionDataSpy = spy.on(ActionPass, 'createActionData', () => {})
+            const createActionDataSpy = spy.on(ActionPass, 'createActionData', () => {});
 
             expertVirtualPlayer['findAction']();
             expect(computeWordPlacementSpy).to.have.been.called();
