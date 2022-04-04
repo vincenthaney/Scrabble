@@ -13,6 +13,7 @@ import { Tile } from '@app/classes/tile';
 import Range from '@app/classes/range/range';
 import { Dictionary } from '@app/classes/dictionary';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 
 describe('WordFindingService', () => {
     let findWordsStub: SinonStub;
@@ -80,8 +81,9 @@ describe('WordFindingService', () => {
             expect(result).to.be.instanceOf(WordFindingBeginner);
         });
 
-        it('should throw if useCase is expert', () => {
-            expect(() => service['getWordFindingInstance'](WordFindingUseCase.Expert, params)).to.throw();
+        it('should return WordFindingExpert if useCase is expert', () => {
+            const result = service['getWordFindingInstance'](WordFindingUseCase.Expert, params);
+            expect(result).to.be.instanceOf(WordFindingExpert);
         });
     });
 });

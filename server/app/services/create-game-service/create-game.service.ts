@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 
 @Service()
 export class CreateGameService {
@@ -14,11 +15,12 @@ export class CreateGameService {
     async createSoloGame(config: GameConfigData): Promise<StartGameData> {
         const gameId = uuidv4();
 
-        const virtualPlayer =
+        const readyGameConfig = this.generateReadyGameConfig(
             config.virtualPlayerLevel === VirtualPlayerLevel.Beginner
                 ? new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string)
-                : new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string);
-        const readyGameConfig = this.generateReadyGameConfig(virtualPlayer, this.generateGameConfig(config));
+                : new ExpertVirtualPlayer(gameId, config.virtualPlayerName as string),
+            this.generateGameConfig(config),
+        );
         return this.activeGameService.beginGame(gameId, readyGameConfig);
     }
 

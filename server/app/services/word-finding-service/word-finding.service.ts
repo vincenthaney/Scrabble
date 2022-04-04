@@ -8,6 +8,7 @@ import WordFindingHint from '@app/classes/word-finding/word-finding-hint/word-fi
 import WordFindingBeginner from '@app/classes/word-finding/word-finding-beginner/word-finding-beginner';
 import { Dictionary } from '@app/classes/dictionary';
 import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 
 export type WordFindingParameters = [Board, Tile[], WordFindingRequest, Dictionary, ScoreCalculatorService];
 
@@ -32,7 +33,7 @@ export default class WordFindingService {
             case WordFindingUseCase.Beginner:
                 return new WordFindingBeginner(...params);
             case WordFindingUseCase.Expert:
-                throw new Error('Not implemented');
+                return new WordFindingExpert(...params);
         }
     }
 }
