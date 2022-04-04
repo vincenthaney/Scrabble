@@ -26,7 +26,7 @@ export class DictionariesService {
         this.dictionariesController.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, (message) => {
             this.dictionariesUpdateMessageEvent.next(message);
             this.componentUpdateEvent.next(message);
-            this.getDictionaries();
+            this.updateAllDictionaries();
         });
 
         this.dictionariesController.subscribeToDictionaryDownloadEvent(this.serviceDestroyed$, (dictionaryData) => {
@@ -35,7 +35,7 @@ export class DictionariesService {
         });
 
         this.dictionariesController.subscribeToDictionaryErrorEvent(this.serviceDestroyed$, (response) => {
-            this.componentUpdateEvent.next(response);
+            this.componentUpdateEvent.next(response.message);
         });
 
         this.dictionariesController.subscribeToGetAllDictionariesEvent(this.serviceDestroyed$, (dictionaries: DictionarySummary[]) => {
@@ -68,7 +68,7 @@ export class DictionariesService {
         await this.dictionariesController.handleDownloadDictionary(id);
     }
 
-    async deleteDictionary(id: string): Promise<void | string> {
+    async deleteDictionary(id: string): Promise<void> {
         await this.dictionariesController.handleDeleteDictionary(id);
     }
 

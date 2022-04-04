@@ -41,8 +41,7 @@ export class DictionaryController {
         });
 
         this.router.delete('/dictionaries', async (req: DictionaryRequest, res: Response) => {
-            const dictionaryId: string = req.body;
-
+            const dictionaryId: string = req.query.dictionaryId as string;
             try {
                 await this.dictionaryService.deleteDictionary(dictionaryId);
                 res.status(StatusCodes.NO_CONTENT).send();
