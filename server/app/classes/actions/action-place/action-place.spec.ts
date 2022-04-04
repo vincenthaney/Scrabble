@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -9,6 +10,7 @@ import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
@@ -170,6 +172,8 @@ describe('ActionPlace', () => {
             let isLegalPlacementStub: SinonStub<[words: [Square, Tile][][]], boolean>;
             let wordsToStringSpy: unknown;
 
+            let updateObjectiveStub: SinonStub;
+
             beforeEach(() => {
                 action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
@@ -189,11 +193,14 @@ describe('ActionPlace', () => {
                 >;
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
+
+                updateObjectiveStub = stub(game.player1, 'validateObjectives').returns({ updateData: {}, completionMessages: [] });
             });
 
             afterEach(() => {
                 chai.spy.restore();
                 isLegalPlacementStub.restore();
+                updateObjectiveStub.restore();
             });
 
             it('should call getTilesFromPlayer', () => {
@@ -214,6 +221,17 @@ describe('ActionPlace', () => {
             it('should call score computer', () => {
                 action.execute();
                 assert(scoreCalculatorServiceStub.calculatePoints.calledOnce);
+            });
+
+            it('should call objective validation', () => {
+                const gameObjectives: GameObjectivesData = {
+                    player1Objectives: [],
+                    player2Objectives: [],
+                };
+                updateObjectiveStub.returns({ updateData: gameObjectives, completionMessages: [] });
+                const result: GameUpdateData = action.execute() as GameUpdateData;
+                expect(updateObjectiveStub.called).to.be.true;
+                expect(result.gameObjective).to.equal(gameObjectives);
             });
 
             it('should call board update', () => {
@@ -358,8 +376,15 @@ describe('ActionPlace', () => {
             });
         });
 
-        it('should return message', () => {
-            expect(action.getMessage()).to.exist;
+        it('should return simple place message if no objectives were completed', () => {
+            const lineSkip = '<br>';
+            action['objectivesCompletedMessages'] = [];
+            expect(action.getMessage().includes(lineSkip)).to.be.false;
+        });
+
+        it('should return place message with completed objectives if they exist', () => {
+            action['objectivesCompletedMessages'] = ['test'];
+            expect(action.getMessage().includes('test')).to.be.true;
         });
     });
 
@@ -370,8 +395,15 @@ describe('ActionPlace', () => {
             action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
         });
 
-        it('should return OpponentMessage', () => {
-            expect(action.getOpponentMessage()).to.exist;
+        it('should return simple place message if no objectives were completed', () => {
+            const lineSkip = '<br>';
+            action['objectivesCompletedMessages'] = [];
+            expect(action.getOpponentMessage().includes(lineSkip)).to.be.false;
+        });
+
+        it('should return place message with completed objectives if they exist', () => {
+            action['objectivesCompletedMessages'] = ['test'];
+            expect(action.getOpponentMessage().includes('test')).to.be.true;
         });
     });
 
