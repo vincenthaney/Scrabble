@@ -1,4 +1,9 @@
-export const NUMBER_OF_PUBLIC_OBJECTIVES = 2;
-export const NUMBER_OF_OBJECTIVES_PER_PLAYER = 1;
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 
-export const OBJECTIVE_COMPLETE_MESSAGE = (name: string, bonusPoints: number) => `complété l'objectif ${name} pour ${bonusPoints} points`;
+export const GENERATE_LIST_OF_ALL_OBJECTIVES = (): AbstractObjective[] => {
+    return [];
+};
+
+export const NUMBER_OF_OBJECTIVES_IN_GAME = 4;
+
+export const OBJECTIVE_COMPLETE_MESSAGE = (name: string, bonusPoints: number) => ` complété l'objectif ${name} pour ${bonusPoints} points`;

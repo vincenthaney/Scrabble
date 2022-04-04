@@ -1,4 +1,9 @@
-import { ObjectiveState } from '@app/classes/objectives/objective-state';
+import { ObjectiveState } from '@app/classes/objectives/objective';
+
+export interface GameObjectivesData {
+    player1Objectives?: ObjectiveData[];
+    player2Objectives?: ObjectiveData[];
+}
 
 export interface ObjectiveData {
     name: string;

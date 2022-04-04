@@ -3,31 +3,38 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { TestObjective, TEST_OBJECTIVE_MAX_PROGRESS } from '@app/constants/services-constants/objectives-test.const';
+import { TestObjective } from '@app/constants/services-constants/objectives-test.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
+import { SinonStub, stub } from 'sinon';
 import { AbstractObjective } from './abstract-objective';
-import { ObjectiveState } from './objective-state';
-import { ValidationParameters } from './validation-parameters';
+import { ObjectiveState } from './objective';
+import { ObjectiveValidationParameters } from './validation-parameters';
 chai.use(spies);
 
 describe('Abstract Objective', () => {
     let objective: AbstractObjective;
 
     beforeEach(() => {
-        objective = new TestObjective('Test', TEST_OBJECTIVE_MAX_PROGRESS);
+        objective = new TestObjective('Test');
     });
 
     it('constructor should set state to NotCompleted', () => {
         expect(objective.state).to.equal(ObjectiveState.NotCompleted);
     });
 
-    describe('isCompleted default implementation', () => {
-        it('should return true if State is not ObjectiveState.Completed', () => {
+    describe('isCompleted', () => {
+        it('should return true if State is ObjectiveState.Completed', () => {
             objective.state = ObjectiveState.Completed;
             expect(objective.isCompleted()).to.be.true;
         });
+
+        it('should return true if State is ObjectiveState.CompletedByOpponent', () => {
+            objective.state = ObjectiveState.CompletedByOpponent;
+            expect(objective.isCompleted()).to.be.true;
+        });
+
         it('should return false if state is ObjectiveState.NotCompleted', () => {
             objective.state = ObjectiveState.NotCompleted;
             expect(objective.isCompleted()).to.be.false;
@@ -49,13 +56,20 @@ describe('Abstract Objective', () => {
     });
 
     describe('updateObjective', () => {
+        let isCompletedStub: SinonStub;
         let updateProgressSpy: unknown;
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
 
         beforeEach(() => {
-            validationParameters = {} as unknown as ValidationParameters;
+            isCompletedStub = stub(objective, 'isCompleted').returns(false);
+            validationParameters = {} as unknown as ObjectiveValidationParameters;
             updateProgressSpy = chai.spy.on(objective, 'updateProgress', () => {});
         });
+
+        afterEach(() => {
+            isCompletedStub.restore();
+        });
+
         it('should call updateProgress', () => {
             objective.updateObjective(validationParameters);
             expect(updateProgressSpy).to.have.been.called.with(validationParameters);
@@ -67,10 +81,26 @@ describe('Abstract Objective', () => {
             expect(objective.state).to.equal(ObjectiveState.Completed);
         });
 
+        it('if progress is maxProgress, should set state to Completed', () => {
+            objective.progress = objective['maxProgress'];
+            objective.updateObjective(validationParameters);
+            expect(objective.state).to.equal(ObjectiveState.Completed);
+        });
+
         it('if progress does NOT exceed maxProgress, should NOT set state to Completed', () => {
             objective.progress = objective['maxProgress'] - 1;
             objective.updateObjective(validationParameters);
             expect(objective.state).to.equal(ObjectiveState.NotCompleted);
+        });
+
+        it('should return false if objective is already completed', () => {
+            isCompletedStub.returns(true);
+            expect(objective.updateObjective(validationParameters)).to.be.false;
+        });
+
+        it('should return true if objective is NOT completed', () => {
+            isCompletedStub.returns(false);
+            expect(objective.updateObjective(validationParameters)).to.be.true;
         });
     });
 });

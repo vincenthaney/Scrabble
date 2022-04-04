@@ -9,8 +9,8 @@
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { ActionPlacePayload } from '@app/classes/communication/action-data';
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
@@ -194,7 +194,7 @@ describe('ActionPlace', () => {
                 wordExtractSpy = chai.spy.on(WordExtraction.prototype, 'extract', () => [...EXTRACT_RETURN]);
                 wordsToStringSpy = chai.spy.on(StringConversion, 'wordsToString', () => []);
 
-                updateObjectiveStub = stub(game.player1, 'updateObjectives').returns([undefined as unknown as GameObjectivesData, []]);
+                updateObjectiveStub = stub(game.player1, 'validateObjectives').returns({ updateData: {}, completionMessages: [] });
             });
 
             afterEach(() => {
@@ -228,7 +228,7 @@ describe('ActionPlace', () => {
                     player1Objectives: [],
                     player2Objectives: [],
                 };
-                updateObjectiveStub.returns([gameObjectives, []]);
+                updateObjectiveStub.returns({ updateData: gameObjectives, completionMessages: [] });
                 const result: GameUpdateData = action.execute() as GameUpdateData;
                 expect(updateObjectiveStub.called).to.be.true;
                 expect(result.gameObjective).to.equal(gameObjectives);
@@ -377,8 +377,9 @@ describe('ActionPlace', () => {
         });
 
         it('should return simple place message if no objectives were completed', () => {
+            const lineSkip = '<br>';
             action['objectivesCompletedMessages'] = [];
-            expect(action.getMessage().includes('\n')).to.be.false;
+            expect(action.getMessage().includes(lineSkip)).to.be.false;
         });
 
         it('should return place message with completed objectives if they exist', () => {
@@ -395,8 +396,9 @@ describe('ActionPlace', () => {
         });
 
         it('should return simple place message if no objectives were completed', () => {
+            const lineSkip = '<br>';
             action['objectivesCompletedMessages'] = [];
-            expect(action.getOpponentMessage().includes('\n')).to.be.false;
+            expect(action.getOpponentMessage().includes(lineSkip)).to.be.false;
         });
 
         it('should return place message with completed objectives if they exist', () => {

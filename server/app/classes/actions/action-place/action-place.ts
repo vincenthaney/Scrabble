@@ -1,10 +1,10 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
-import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
@@ -58,13 +58,13 @@ export default class ActionPlace extends ActionPlay {
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        const objectiveUpdateResult: [GameObjectivesData, string[]] = this.player.updateObjectives({
+        const objectiveUpdateResult: ObjectiveUpdate | undefined = this.player.validateObjectives({
             wordPlacement: this.wordPlacement,
             game: this.game,
             scoredPoints,
             createdWords,
         });
-        this.objectivesCompletedMessages = objectiveUpdateResult[1];
+        this.objectivesCompletedMessages = objectiveUpdateResult ? objectiveUpdateResult.completionMessages : [];
 
         const updatedSquares = this.updateBoard(createdWords);
 
@@ -73,7 +73,10 @@ export default class ActionPlace extends ActionPlay {
 
         const playerData: PlayerData = { id: this.player.id, tiles: this.player.tiles, score: this.player.score };
 
-        const response: GameUpdateData = { board: updatedSquares, gameObjective: objectiveUpdateResult[0] };
+        const response: GameUpdateData = {
+            board: updatedSquares,
+            gameObjective: objectiveUpdateResult ? objectiveUpdateResult.updateData : undefined,
+        };
 
         if (this.game.isPlayer1(this.player)) response.player1 = playerData;
         else response.player2 = playerData;
@@ -83,7 +86,7 @@ export default class ActionPlace extends ActionPlay {
     getMessage(): string {
         let placeMessage = `Vous avez placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
         this.objectivesCompletedMessages.forEach((message: string) => {
-            placeMessage = `${placeMessage}\n Vous avez ${message}`;
+            placeMessage += `<br>Vous avez${message}`;
         });
         return placeMessage;
     }
@@ -91,7 +94,7 @@ export default class ActionPlace extends ActionPlay {
     getOpponentMessage(): string {
         let placeMessage = `${this.player.name} a placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)}`;
         this.objectivesCompletedMessages.forEach((message: string) => {
-            placeMessage = `${placeMessage}\n ${this.player.name} a ${message}`;
+            placeMessage += `<br>${this.player.name} a${message}`;
         });
         return placeMessage;
     }

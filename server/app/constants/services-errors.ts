@@ -30,4 +30,4 @@ export const OPPONENT_PLAYED_INVALID_WORD = "Votre adversaire a joué un mot qui
 export const NO_REQUEST_POINT_RANGE = 'La requête doit avoir un pointRange';
 export const INVALID_REQUEST_POINT_RANGE = 'Le minimum du pointRange de la requête doit être plus petit que le maximum';
 export const NO_REQUEST_POINT_HISTORY = 'La requête doit avoir un pointHistory';
-export const OPPONENT_HAS_NOT_OBJECTIVE = "Le joueur adverse n'a pas l'objectif public demandé";
+export const NO_OBJECTIVE_LEFT_IN_POOL = "Il n'y a plus d'objectifs disponibles pour la partie";
