@@ -27,6 +27,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     columnsItems: DisplayDictionariesColumnsIteratorItem[] = [];
     selectedColumnsItems: DisplayDictionariesColumnsIteratorItem[] = [];
     columnsControl = new FormControl();
+    dictionaries: DictionarySummary[];
     dataSource: MatTableDataSource<DictionarySummary> = new MatTableDataSource(new Array());
     state: DictionariesState = DictionariesState.Loading;
     error: string | undefined = undefined;
@@ -37,9 +38,13 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
         this.columnsControl.setValue(this.selectedColumnsItems);
-        // this.dictionariesService.subscribeToDictionariesDataUpdateEvent(this.serviceDestroyed$, () => {
-        //     this.setDictionariesData();
-        // });
+        this.dictionariesService.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, () => {
+            this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
+        });
+        this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
+            this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
+            this.state = DictionariesState.Ready;
+        });
     }
 
     ngOnDestroy(): void {
@@ -71,7 +76,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     async setDictionariesData(): Promise<void> {
-        this.convertDictionariesToMatDataSource(await this.dictionariesService.getDictionaries());
+        await this.dictionariesService.updateAllDictionaries();
     }
 
     async downloadDictionary(id: string): Promise<void> {
@@ -113,10 +118,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
             (key) => this.columnsItems.find((item) => item.key === key) || { key, label: this.columns[key] },
         );
     }
-
-    // isDefault(dictionarySummary: DictionarySummary): boolean {
-    //     return dictionarySummary.isDefault ? true : false;
-    // }
 
     private async convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
         const dictionariesSummary: DictionarySummary[] = [];

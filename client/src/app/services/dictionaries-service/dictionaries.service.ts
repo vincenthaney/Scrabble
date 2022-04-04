@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
+import { DOWNLOAD_ELEMENT } from '@app/constants/dictionary-service-constants';
 import { DictionariesController } from '@app/controllers/dictionaries-controller/dictionaries-controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -15,35 +16,42 @@ export class DictionariesService {
     deleteRequestResponse: string;
     deleteAllRequestResponse: string;
     uploadRequestResponse: string;
-    private dictionariesDataUpdateEvent: Subject<string> = new Subject();
+    private dictionariesUpdateMessageEvent: Subject<string> = new Subject();
     private componentUpdateEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
+    private dictionariesUpdatedEvent: Subject<DictionarySummary[]> = new Subject();
 
     constructor(private dictionariesController: DictionariesController) {
-        this.dictionariesController.subscribeToDictionaryUpdateEvent(this.serviceDestroyed$, (message) => {
-            this.dictionariesDataUpdateEvent.next(message);
+        this.dictionariesController.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, (message) => {
+            this.dictionariesUpdateMessageEvent.next(message);
             this.componentUpdateEvent.next(message);
+            this.getDictionaries();
         });
 
         this.dictionariesController.subscribeToDictionaryDownloadEvent(this.serviceDestroyed$, (dictionaryData) => {
-            this.dictionaryData = dictionaryData;
+            this.startDownload(dictionaryData);
         });
 
         this.dictionariesController.subscribeToDictionaryErrorEvent(this.serviceDestroyed$, (response) => {
-            this.dictionariesDataUpdateEvent.next(response);
+            this.componentUpdateEvent.next(response);
         });
 
-        this.dictionariesController.subscribeToGetAllDictionariesEvent(this.serviceDestroyed$, (dictionaries) => {
+        this.dictionariesController.subscribeToGetAllDictionariesEvent(this.serviceDestroyed$, (dictionaries: DictionarySummary[]) => {
             this.dictionaries = dictionaries;
+            this.dictionariesUpdatedEvent.next(dictionaries);
         });
+    }
+
+    subscribeToDictionariestUpdateDataEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void): void {
+        this.dictionariesUpdatedEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     subscribeToComponentUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
         this.componentUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToDictionariesDataUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
-        this.dictionariesDataUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    subscribeToDictionariesUpdateMessageEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
+        this.dictionariesUpdateMessageEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     async updateDictionary(id: string, title: string, description: string): Promise<void> {
@@ -66,8 +74,21 @@ export class DictionariesService {
         await this.dictionariesController.handleUploadDictionary(dictionaryData);
     }
 
-    async getDictionaries(): Promise<DictionarySummary[]> {
+    async updateAllDictionaries(): Promise<void> {
         await this.dictionariesController.handleGetAllDictionariesEvent();
+    }
+
+    getDictionaries(): DictionarySummary[] {
         return this.dictionaries;
+    }
+
+    private startDownload(dictionaryData: DictionaryData): void {
+        const title = dictionaryData.title;
+        const downloadProcess = window.document.createElement(DOWNLOAD_ELEMENT);
+        downloadProcess.href = window.URL.createObjectURL(new Blob([JSON.stringify(dictionaryData)], { type: 'application/json' }));
+        downloadProcess.download = title;
+        document.body.appendChild(downloadProcess);
+        downloadProcess.click();
+        document.body.removeChild(downloadProcess);
     }
 }

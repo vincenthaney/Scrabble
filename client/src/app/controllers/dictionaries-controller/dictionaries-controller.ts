@@ -12,9 +12,9 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class DictionariesController implements OnDestroy {
-    private dictionaryUpdateEvent: Subject<string> = new Subject();
-    private dictionaryErrorEvent: Subject<string> = new Subject();
-    private dictionaryDownloadEvent: Subject<BasicDictionaryData> = new Subject();
+    private dictionariesUpdateMessageEvent: Subject<string> = new Subject();
+    private dictionariesErrorEvent: Subject<string> = new Subject();
+    private dictionariesDownloadEvent: Subject<BasicDictionaryData> = new Subject();
     private getAllDictionariesEvent: Subject<DictionarySummary[]> = new Subject();
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
@@ -32,10 +32,10 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries`;
         this.http.patch<string>(endpoint, { dictionaryUpdateInfo }).subscribe(
             () => {
-                this.dictionaryUpdateEvent.next(DICTIONARY_UPDATED);
+                this.dictionariesUpdateMessageEvent.next(DICTIONARY_UPDATED);
             },
             (error) => {
-                this.dictionaryErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }
@@ -44,10 +44,10 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries/${dictionaryId}`;
         this.http.get<BasicDictionaryData>(endpoint, { observe: 'body' }).subscribe(
             (dictionary) => {
-                this.dictionaryDownloadEvent.next(dictionary);
+                this.dictionariesDownloadEvent.next(dictionary);
             },
             (error) => {
-                this.dictionaryErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }
@@ -56,10 +56,10 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries`;
         this.http.delete<string>(endpoint, { body: dictionaryId }).subscribe(
             () => {
-                this.dictionaryUpdateEvent.next(DICTIONARY_DELETED);
+                this.dictionariesUpdateMessageEvent.next(DICTIONARY_DELETED);
             },
             (error) => {
-                this.dictionaryErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }
@@ -68,22 +68,22 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries`;
         this.http.post<string>(endpoint, { dictionaryData }).subscribe(
             () => {
-                this.dictionaryUpdateEvent.next(DICTIONARY_ADDED);
+                this.dictionariesUpdateMessageEvent.next(DICTIONARY_ADDED);
             },
             (error) => {
-                this.dictionaryErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }
 
     async handleGetAllDictionariesEvent(): Promise<void> {
-        const endpoint = `${environment.serverUrl}/dictionaries`;
-        this.http.get<{ dictionaries: DictionarySummary[] }>(endpoint, { observe: 'body' }).subscribe(
+        const endpoint = `${environment.serverUrl}/dictionaries/summary`;
+        this.http.get<DictionarySummary[]>(endpoint, { observe: 'body' }).subscribe(
             (body) => {
-                this.getAllDictionariesEvent.next(body.dictionaries);
+                this.getAllDictionariesEvent.next(body);
             },
             (error) => {
-                this.dictionaryErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }
@@ -92,24 +92,24 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries`;
         this.http.delete<string>(endpoint, {}).subscribe(
             () => {
-                this.dictionaryUpdateEvent.next(DICTIONARIES_DELETED);
+                this.dictionariesUpdateMessageEvent.next(DICTIONARIES_DELETED);
             },
             (error) => {
-                this.dictionaryErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }
 
-    subscribeToDictionaryUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
-        this.dictionaryUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    subscribeToDictionariesUpdateMessageEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
+        this.dictionariesUpdateMessageEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     subscribeToDictionaryDownloadEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaryData: BasicDictionaryData) => void): void {
-        this.dictionaryDownloadEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+        this.dictionariesDownloadEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     subscribeToDictionaryErrorEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
-        this.dictionaryErrorEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+        this.dictionariesErrorEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     // subscribeToDictionaryUploadEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
@@ -122,10 +122,10 @@ export class DictionariesController implements OnDestroy {
 
     private configureSocket(): void {
         this.socketService.on('dictionaryUpdate', (response: string) => {
-            this.dictionaryUpdateEvent.next(response);
+            this.dictionariesUpdateMessageEvent.next(response);
         });
         this.socketService.on('dictionaryDownload', (dictionaryData: DictionaryData) => {
-            this.dictionaryDownloadEvent.next(dictionaryData);
+            this.dictionariesDownloadEvent.next(dictionaryData);
         });
         // this.socketService.on('dictionaryDelete', (response: string) => {
         //     this.dictionaryDeleteEvent.next(response);

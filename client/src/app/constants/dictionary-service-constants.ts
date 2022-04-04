@@ -9,3 +9,4 @@ export const DICTIONARIES_ADDED = 'Les dictionnaires ont été ajoutés avec suc
 export const DICTIONARIES_NOT_ADDED = "Une erreur est survenue lors de l'acquisition des dictionaires";
 export const DICTIONARIES_DELETED = 'Les dictionnaires ont été supprimés avec succès.';
 export const DICTIONARIES_NOT_DELETED = 'Une erreur est survenue lors de la supression des dictionaires';
+export const DOWNLOAD_ELEMENT = 'a';
