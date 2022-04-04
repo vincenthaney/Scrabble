@@ -32,7 +32,7 @@ import { ConvertDialogComponent } from './components/convert-dialog/convert-dial
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { AdminDictionariesComponent } from './components/admin-dictionaries-component/admin-dictionaries.component';
 import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog/modify-dictionary-dialog.component';
-import { FileUploadComponent } from './components/file-upload-dialog/file-upload.component';
+import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
 
 /**
  * Main module that is used in main.ts.
@@ -67,7 +67,7 @@ import { FileUploadComponent } from './components/file-upload-dialog/file-upload
         AdminPageComponent,
         AdminDictionariesComponent,
         ModifyDictionaryComponent,
-        FileUploadComponent,
+        UploadDictionaryComponent,
     ],
     imports: [
         AppMaterialModule,
