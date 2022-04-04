@@ -227,7 +227,7 @@ describe('ObjectiveService', () => {
         });
     });
 
-    it.only('createObjectivesPool should call getRandomElementsFromArray for 4 elements', async () => {
+    it('createObjectivesPool should call getRandomElementsFromArray for 4 elements', async () => {
         const randomSpy = chai.spy.on(Random, 'getRandomElementsFromArray', () => {});
         service['createObjectivesPool']();
         expect(randomSpy).to.have.been.called.with(GENERATE_LIST_OF_ALL_OBJECTIVES(), NUMBER_OF_OBJECTIVES_IN_GAME);
