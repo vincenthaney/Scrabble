@@ -12,7 +12,7 @@ import * as sinon from 'sinon';
 import { BONUS_POINTS, DESCRIPTION, NAME, VowelObjective, VOWELS } from './vowel-objective';
 chai.use(spies);
 
-describe.only('Vowel Objective', () => {
+describe('Vowel Objective', () => {
     let objective: VowelObjective;
 
     beforeEach(() => {
