@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { DEFAULT_SQUARE } from '@app/classes/word-finding/helper.spec';
 import { expect } from 'chai';
 import { ThreeWordsPlacement } from './three-word-placement';
@@ -17,7 +17,7 @@ describe('Three words created Objective', () => {
     });
 
     describe('updateProgress', () => {
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
 
         it('should set progress to maxProgress if created 3 words', () => {
             validationParameters = {
@@ -35,7 +35,7 @@ describe('Three words created Objective', () => {
                         [DEFAULT_SQUARE, { letter: 'A', value: 1 }],
                     ],
                 ],
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(objective['maxProgress']);
         });
@@ -49,9 +49,15 @@ describe('Three words created Objective', () => {
                         [DEFAULT_SQUARE, { letter: 'L', value: 1 }],
                     ],
                 ],
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(0);
         });
+    });
+
+    it('clone should do deep copy of object', () => {
+        const clone = objective.clone();
+        expect(clone).to.deep.equal(objective);
+        expect(clone).not.to.equal(objective);
     });
 });

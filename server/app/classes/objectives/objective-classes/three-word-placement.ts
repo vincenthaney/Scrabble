@@ -1,17 +1,25 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 
-export const NAME = 'Three words placement Objective';
-export const DESCRIPTION = 'Créer 3 mots en 1 placement';
+export const NAME = 'Éloquent';
+export const DESCRIPTION = 'Former 3 mots en un seul placement';
 export const BONUS_POINTS = 30;
 export const NUMBER_OF_WORDS_TO_CREATE = 3;
 
 export class ThreeWordsPlacement extends AbstractObjective {
     constructor() {
-        super(NAME, DESCRIPTION, BONUS_POINTS, 1);
+        super(NAME, DESCRIPTION, BONUS_POINTS, false, 1);
     }
 
-    updateProgress(validationParameters: ValidationParameters): void {
+    updateProgress(validationParameters: ObjectiveValidationParameters): void {
         this.progress = validationParameters.createdWords.length >= NUMBER_OF_WORDS_TO_CREATE ? this.maxProgress : 0;
+    }
+
+    clone(): ThreeWordsPlacement {
+        const clone = new ThreeWordsPlacement();
+        clone.progress = this.progress;
+        clone.state = this.state;
+        clone.isPublic = this.isPublic;
+        return clone;
     }
 }
