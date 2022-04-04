@@ -2,6 +2,7 @@ import { Action, ActionPass } from '@app/classes/actions';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
+import { NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
 import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;
@@ -60,7 +61,8 @@ export default class RoundManager {
     }
 
     getGameStartTime(): Date {
-        return this.completedRounds.length > 0 ? this.completedRounds[0].startTime : this.currentRound.startTime;
+        if (!this.completedRounds[0] && !this.currentRound) throw new Error(NO_FIRST_ROUND_EXISTS);
+        return this.completedRounds[0] !== undefined ? this.completedRounds[0].startTime : this.currentRound.startTime;
     }
 
     getMaxRoundTime(): number {
