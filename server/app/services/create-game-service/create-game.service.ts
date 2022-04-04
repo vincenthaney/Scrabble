@@ -6,16 +6,19 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import { v4 as uuidv4 } from 'uuid';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import WaitingRoom from '@app/classes/game/waiting-room';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 @Service()
 export class CreateGameService {
     constructor(private dictionaryService: DictionaryService, private activeGameService: ActiveGameService) {}
     async createSoloGame(config: GameConfigData): Promise<StartGameData> {
         const gameId = uuidv4();
-        const readyGameConfig = this.generateReadyGameConfig(
-            new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string),
-            this.generateGameConfig(config),
-        );
+
+        const virtualPlayer =
+            config.virtualPlayerLevel === VirtualPlayerLevel.Beginner
+                ? new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string)
+                : new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string);
+        const readyGameConfig = this.generateReadyGameConfig(virtualPlayer, this.generateGameConfig(config));
         return this.activeGameService.beginGame(gameId, readyGameConfig);
     }
 
