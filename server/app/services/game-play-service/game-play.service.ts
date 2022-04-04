@@ -6,12 +6,13 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { Service } from 'typedi';
 import { FeedbackMessages } from './feedback-messages';
 
@@ -107,6 +108,7 @@ export class GamePlayService {
 
     handleResetObjectives(gameId: string, playerId: string): GameUpdateData {
         const game: Game = this.activeGameService.getGame(gameId, playerId);
+        if (game.gameType !== GameType.LOG2990) return {};
         const objectiveData: GameObjectivesData = game.resetPlayerObjectiveProgression(playerId);
         return { gameObjective: objectiveData };
     }
