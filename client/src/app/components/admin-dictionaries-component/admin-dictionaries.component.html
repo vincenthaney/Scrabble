@@ -41,7 +41,7 @@
                         <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="downloadDictionary(element.id)">
                             <app-icon *ngIf="!isDownloadLoading" icon="download"></app-icon>
                         </button>
-                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element.id)" [disabled] = "element.isDefault">
+                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element)" [disabled] = "element.isDefault">
                             <app-icon icon="trash"></app-icon>
                         </button> 
                     </td>

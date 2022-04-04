@@ -13,6 +13,8 @@ import { DictionaryDialogParameters } from '@app/components/modify-dictionary-di
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { Subject } from 'rxjs';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
+import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component';
+import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -79,6 +81,14 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dialog.open(UploadDictionaryComponent);
     }
 
+    deleteDictionary(element: DictionarySummary): void {
+        const elementId: DeleteDictionaryDialogParameters = {
+            title: element.title,
+            dictionaryId: element.id,
+        };
+        this.dialog.open(DeleteDictionaryDialogComponent, { data: elementId });
+    }
+
     async setDictionariesData(): Promise<void> {
         await this.dictionariesService.updateAllDictionaries();
     }
@@ -86,10 +96,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     async downloadDictionary(id: string): Promise<void> {
         this.isDownloadLoading = true;
         await this.dictionariesService.downloadDictionary(id);
-    }
-
-    async deleteDictionary(id: string): Promise<void> {
-        await this.dictionariesService.deleteDictionary(id);
     }
 
     async resetDictionaries() {
