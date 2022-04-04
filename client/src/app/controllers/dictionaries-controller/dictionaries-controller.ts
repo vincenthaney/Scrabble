@@ -3,7 +3,6 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { BasicDictionaryData, DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import { DICTIONARIES_DELETED, DICTIONARY_ADDED, DICTIONARY_DELETED, DICTIONARY_UPDATED } from '@app/constants/dictionary-service-constants';
-import SocketService from '@app/services/socket-service/socket.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -19,9 +18,7 @@ export class DictionariesController implements OnDestroy {
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(private http: HttpClient, public socketService: SocketService) {
-        this.configureSocket();
-    }
+    constructor(private http: HttpClient) {}
 
     ngOnDestroy(): void {
         this.serviceDestroyed$.next(true);
@@ -30,7 +27,7 @@ export class DictionariesController implements OnDestroy {
 
     async handleUpdateDictionary(dictionaryUpdateInfo: DictionaryUpdateInfo): Promise<void> {
         const endpoint = `${environment.serverUrl}/dictionaries`;
-        this.http.patch<string>(endpoint, { dictionaryUpdateInfo }).subscribe(
+        this.http.patch(endpoint, { dictionaryUpdateInfo }).subscribe(
             () => {
                 this.dictionariesUpdateMessageEvent.next(DICTIONARY_UPDATED);
             },
@@ -118,20 +115,5 @@ export class DictionariesController implements OnDestroy {
 
     subscribeToGetAllDictionariesEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void): void {
         this.getAllDictionariesEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
-    }
-
-    private configureSocket(): void {
-        this.socketService.on('dictionaryUpdate', (response: string) => {
-            this.dictionariesUpdateMessageEvent.next(response);
-        });
-        this.socketService.on('dictionaryDownload', (dictionaryData: DictionaryData) => {
-            this.dictionariesDownloadEvent.next(dictionaryData);
-        });
-        // this.socketService.on('dictionaryDelete', (response: string) => {
-        //     this.dictionaryDeleteEvent.next(response);
-        // });
-        // this.socketService.on('dictionaryUpload', (response: string) => {
-        //     this.dictionaryUploadEvent.next(response);
-        // });
     }
 }
