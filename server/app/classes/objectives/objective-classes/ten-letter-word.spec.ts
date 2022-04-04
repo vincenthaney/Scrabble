@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { DEFAULT_SQUARE } from '@app/classes/word-finding/helper.spec';
 import { expect } from 'chai';
 import { TenLetterWord } from './ten-letter-word';
@@ -17,7 +17,7 @@ describe('Ten letter word Objective', () => {
     });
 
     describe('updateProgress', () => {
-        let validationParameters: ValidationParameters;
+        let validationParameters: ObjectiveValidationParameters;
 
         it('should set progress to maxProgress if created words contain ten letter word', () => {
             validationParameters = {
@@ -35,7 +35,7 @@ describe('Ten letter word Objective', () => {
                         [DEFAULT_SQUARE, { letter: 'O', value: 10 }],
                     ],
                 ],
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(objective['maxProgress']);
         });
@@ -49,9 +49,15 @@ describe('Ten letter word Objective', () => {
                         [DEFAULT_SQUARE, { letter: 'L', value: 1 }],
                     ],
                 ],
-            } as ValidationParameters;
+            } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
             expect(objective.progress).to.equal(0);
         });
+    });
+
+    it('clone should do deep copy of object', () => {
+        const clone = objective.clone();
+        expect(clone).to.deep.equal(objective);
+        expect(clone).not.to.equal(objective);
     });
 });
