@@ -10,7 +10,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import { ConsecutivePlaceOrientation } from './consecutive-place-orientation';
 chai.use(spies);
 
-describe.only('Abstract Objective', () => {
+describe('Abstract Objective', () => {
     let objective: ConsecutivePlaceOrientation;
 
     beforeEach(() => {
