@@ -83,18 +83,22 @@ export default class Game {
                 name: this.player1.name,
                 score: this.player1.score,
                 isVirtualPlayer: isIdVirtualPlayer(this.player1.id),
-                isWinner: this.player1.name === winnerName || (!winnerName && this.player1.score >= this.player2.score),
+                isWinner: this.isPlayerWinner(winnerName, this.player1, this.player2),
             },
             player2Data: {
                 name: this.player2.name,
                 score: this.player2.score,
                 isVirtualPlayer: isIdVirtualPlayer(this.player2.id),
-                isWinner: this.player2.name === winnerName || (!winnerName && this.player2.score >= this.player1.score),
+                isWinner: this.isPlayerWinner(winnerName, this.player2, this.player1),
             },
             gameType: this.gameType,
             gameMode: this.gameMode,
             hasBeenAbandonned: !this.player1.isConnected || !this.player2.isConnected,
         };
+    }
+
+    isPlayerWinner(winnerName: string | undefined, currentPlayer: Player, opponent: Player): boolean {
+        return currentPlayer.name === winnerName || (!winnerName && currentPlayer.score >= opponent.score);
     }
 
     getTilesFromReserve(amount: number): Tile[] {

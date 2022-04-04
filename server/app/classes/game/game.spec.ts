@@ -437,50 +437,46 @@ describe('Game', () => {
             expect(game.gameHistory.hasBeenAbandonned).to.be.true;
         });
 
-        it('should set player1Data.isWinner to true if player1 is winner', () => {
-            game.completeGameHistory(PLAYER_1_NAME);
-            expect(game.gameHistory.player1Data.isWinner).to.be.true;
-        });
+        describe('isPlayerWinner', () => {
+            it('should set player1Data.isWinner to true if player1 is winner', () => {
+                expect(game.isPlayerWinner(PLAYER_1_NAME, game.player1, game.player2)).to.be.true;
+            });
 
-        it('should set player1Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
-            game.player1.score = 100;
-            game.player2.score = 90;
-            game.completeGameHistory(undefined);
-            expect(game.gameHistory.player1Data.isWinner).to.be.true;
-        });
+            it('should set player1Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
+                game.player1.score = 100;
+                game.player2.score = 90;
+                expect(game.isPlayerWinner(undefined, game.player1, game.player2)).to.be.true;
+            });
 
-        it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
-            game.player1.score = 90;
-            game.player2.score = 100;
-            game.completeGameHistory(undefined);
-            expect(game.gameHistory.player1Data.isWinner).to.be.false;
-        });
+            it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
+                game.player1.score = 90;
+                game.player2.score = 100;
+                expect(game.isPlayerWinner(undefined, game.player1, game.player2)).to.be.false;
+            });
 
-        it('should set player2Data.isWinner to true if player1 is winner', () => {
-            game.completeGameHistory(PLAYER_2_NAME);
-            expect(game.gameHistory.player2Data.isWinner).to.be.true;
-        });
+            it('should set player2Data.isWinner to true if player1 is winner', () => {
+                expect(game.isPlayerWinner(PLAYER_2_NAME, game.player2, game.player1)).to.be.true;
+            });
 
-        it('should set player2Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
-            game.player2.score = 100;
-            game.player1.score = 90;
-            game.completeGameHistory(undefined);
-            expect(game.gameHistory.player2Data.isWinner).to.be.true;
-        });
+            it('should set player2Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
+                game.player2.score = 100;
+                game.player1.score = 90;
+                expect(game.isPlayerWinner(undefined, game.player2, game.player1)).to.be.true;
+            });
 
-        it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
-            game.player2.score = 90;
-            game.player1.score = 100;
-            game.completeGameHistory(undefined);
-            expect(game.gameHistory.player2Data.isWinner).to.be.false;
-        });
+            it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
+                game.player2.score = 90;
+                game.player1.score = 100;
+                expect(game.isPlayerWinner(undefined, game.player2, game.player1)).to.be.false;
+            });
 
-        it('should set both playerData.isWinner to true if winnerName is undefined and players have equal scores', () => {
-            game.player1.score = 100;
-            game.player2.score = 100;
-            game.completeGameHistory(undefined);
-            expect(game.gameHistory.player1Data.isWinner).to.be.true;
-            expect(game.gameHistory.player2Data.isWinner).to.be.true;
+            it('should set both playerData.isWinner to true if winnerName is undefined and players have equal scores', () => {
+                game.player1.score = 100;
+                game.player2.score = 100;
+                game.completeGameHistory(undefined);
+                expect(game.gameHistory.player1Data.isWinner).to.be.true;
+                expect(game.gameHistory.player2Data.isWinner).to.be.true;
+            });
         });
     });
 
