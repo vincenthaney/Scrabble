@@ -25,12 +25,12 @@ describe('Abstract Objective', () => {
     });
 
     describe('isCompleted', () => {
-        it('should return true if State is not ObjectiveState.Completed', () => {
+        it('should return true if State is ObjectiveState.Completed', () => {
             objective.state = ObjectiveState.Completed;
             expect(objective.isCompleted()).to.be.true;
         });
 
-        it('should return true if State is not ObjectiveState.CompletedByOpponent', () => {
+        it('should return true if State is ObjectiveState.CompletedByOpponent', () => {
             objective.state = ObjectiveState.CompletedByOpponent;
             expect(objective.isCompleted()).to.be.true;
         });
@@ -77,6 +77,12 @@ describe('Abstract Objective', () => {
 
         it('if progress exceeded maxProgress, should set state to Completed', () => {
             objective.progress = objective['maxProgress'] + 1;
+            objective.updateObjective(validationParameters);
+            expect(objective.state).to.equal(ObjectiveState.Completed);
+        });
+
+        it('if progress is maxProgress, should set state to Completed', () => {
+            objective.progress = objective['maxProgress'];
             objective.updateObjective(validationParameters);
             expect(objective.state).to.equal(ObjectiveState.Completed);
         });

@@ -11,7 +11,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import Player from '@app/classes/player/player';
 import { GENERATE_LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME } from '@app/constants/services-constants/objective.const';
 import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test.const';
-import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL, OPPONENT_HAS_NOT_OBJECTIVE } from '@app/constants/services-errors';
+import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -174,14 +174,6 @@ describe('ObjectiveService', () => {
             chai.spy.on(OPPONENT, 'getObjectives', () => [opponentObjective]);
             service['completeOpponentObjective'](OPPONENT, objective);
             expect(opponentObjective.state).to.equal(ObjectiveState.CompletedByOpponent);
-        });
-
-        it('should throw if no identical objective is found on opponent', () => {
-            const opponentObjective: AbstractObjective = new TestObjective('differentName');
-            opponentObjective.isPublic = true;
-            chai.spy.on(OPPONENT, 'getObjectives', () => [opponentObjective]);
-            expect(() => service['completeOpponentObjective'](OPPONENT, objective)).to.throw(OPPONENT_HAS_NOT_OBJECTIVE);
-            expect(opponentObjective.state).not.to.equal(ObjectiveState.CompletedByOpponent);
         });
     });
 

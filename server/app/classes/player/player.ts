@@ -52,8 +52,8 @@ export default class Player {
     }
 
     initializeObjectives(publicObjectives: Set<AbstractObjective>, privateObjective: AbstractObjective): void {
-        const clonesPublicObjectives = [...publicObjectives.values()].map((objective: AbstractObjective) => objective.clone());
-        this.objectives = new Set(clonesPublicObjectives).add(privateObjective);
+        const publicObjectiveClones: AbstractObjective[] = [...publicObjectives.values()].map((objective: AbstractObjective) => objective.clone());
+        this.objectives = new Set(publicObjectiveClones).add(privateObjective);
     }
 
     validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
