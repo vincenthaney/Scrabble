@@ -8,6 +8,7 @@ import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { ConsecutivePlaceOrientation } from './consecutive-place-orientation';
+import { ObjectiveState } from '@app/classes/objectives/objective';
 chai.use(spies);
 
 describe('Abstract Objective', () => {
@@ -17,6 +18,8 @@ describe('Abstract Objective', () => {
         objective = new ConsecutivePlaceOrientation();
         objective.progress = 2;
         objective.progressOrientation = Orientation.Vertical;
+        objective.isPublic = true;
+        objective.state = ObjectiveState.Completed;
     });
 
     describe('updateProgress', () => {

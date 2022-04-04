@@ -25,6 +25,8 @@ export class ConsecutivePlaceOrientation extends AbstractObjective {
     clone(): AbstractObjective {
         const clone = new ConsecutivePlaceOrientation();
         clone.progress = this.progress;
+        clone.state = this.state;
+        clone.isPublic = this.isPublic;
         clone.progressOrientation = this.progressOrientation;
         return clone;
     }
