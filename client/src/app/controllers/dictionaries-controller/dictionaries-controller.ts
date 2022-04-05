@@ -65,6 +65,7 @@ export class DictionariesController implements OnDestroy {
 
     async handleUploadDictionary(dictionaryData: DictionaryData): Promise<void> {
         const endpoint = `${environment.serverUrl}/dictionaries`;
+
         this.http.post<string>(endpoint, { dictionaryData }).subscribe(
             () => {
                 this.dictionariesUpdateMessageEvent.next(DICTIONARY_ADDED);

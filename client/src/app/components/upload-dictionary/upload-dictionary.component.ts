@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DictionaryData } from '@app/classes/dictionary';
-import { FILE_NOT_DICTIONARY, WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
+import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
+import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 
 @Component({
     selector: 'app-upload-dictionary',
@@ -12,8 +13,8 @@ export class UploadDictionaryComponent {
     errorMessage: string = '';
     isUploadableFile: boolean = false;
     selectedFile: File;
-    jsonFile: DictionaryData;
-    constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>) {}
+    newDictionary: DictionaryData;
+    constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionariesService) {}
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onFileChanged(event: any) {
@@ -22,12 +23,7 @@ export class UploadDictionaryComponent {
         fileReader.readAsText(this.selectedFile, 'UTF-8');
         fileReader.onload = () => {
             try {
-                const readFile: DictionaryData = JSON.parse(fileReader.result as string);
-                if (this.isDictionaryDataInterface(readFile)) {
-                    this.jsonFile = readFile;
-                } else {
-                    this.errorMessage = FILE_NOT_DICTIONARY;
-                }
+                this.newDictionary = JSON.parse(fileReader.result as string) as unknown as DictionaryData;
             } catch (error) {
                 const newError = error as SyntaxError;
                 this.errorMessage = newError.message;
@@ -39,20 +35,10 @@ export class UploadDictionaryComponent {
     }
     onUpload() {
         // upload code goes here
+        console.log(this.newDictionary);
+        this.dictionariesService.uploadDictionary(this.newDictionary);
     }
     closeDialog(): void {
         this.dialogRef.close();
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    isJSONDictionaryFile(fileJSON: any): boolean {
-        console.log(fileJSON);
-        return fileJSON.title && fileJSON.description && fileJSON.words;
-    }
-
-    isDictionaryDataInterface(data: DictionaryData): boolean {
-        return (
-            data instanceof Object && 'title' in data && data instanceof Object && 'description' in data && data instanceof Object && 'words' in data
-        );
     }
 }

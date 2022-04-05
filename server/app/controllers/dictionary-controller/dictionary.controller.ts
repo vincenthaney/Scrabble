@@ -20,7 +20,7 @@ export class DictionaryController {
 
         this.router.post('/dictionaries', async (req: DictionaryRequest, res: Response) => {
             const dictionaryData: DictionaryData = req.body;
-
+            console.log(dictionaryData);
             try {
                 await this.dictionaryService.addNewDictionary(dictionaryData);
                 res.status(StatusCodes.CREATED).send();
