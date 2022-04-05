@@ -96,12 +96,6 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
                 return item.player2Data.score;
             case 'player2Data':
                 return item.player2Data.name;
-            case 'playerWinName':
-                return item.player1Data.score > item.player2Data.score ? item.player1Data.name : item.player2Data.name;
-            case 'playerWinScore':
-                return item.player1Data.score > item.player2Data.score ? item.player1Data.score : item.player2Data.score;
-            case 'playerWinData':
-                return item.player1Data.score > item.player2Data.score ? item.player1Data.name : item.player2Data.name;
             default:
                 return isKey(property, item) ? (item[property] as string) : '';
         }
@@ -122,13 +116,20 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             endTime.setMinutes(Math.random() * 60);
 
+            const player1Wins = Math.floor(Math.random() * 2) === 0;
+
             return {
                 startTime,
                 endTime,
                 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                player1Data: { name: 'Player 1', score: Math.floor(Math.random() * 300), isVirtualPlayer: false },
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                player2Data: { name: 'Player 2', score: Math.floor(Math.random() * 300), isVirtualPlayer: Math.floor(Math.random() * 2) === 0 },
+                player1Data: { name: 'Player 1', score: Math.floor(Math.random() * 300), isVirtualPlayer: false, isWinner: player1Wins },
+                player2Data: {
+                    name: 'Player 2',
+                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                    score: Math.floor(Math.random() * 300),
+                    isVirtualPlayer: Math.floor(Math.random() * 2) === 0,
+                    isWinner: !player1Wins,
+                },
                 gameType: Math.floor(Math.random() * 2) === 0 ? GameType.LOG2990 : GameType.Classic,
                 gameMode: Math.floor(Math.random() * 2) === 0 ? GameMode.Solo : GameMode.Multiplayer,
                 isOver: Math.floor(Math.random() * 2) === 0,
