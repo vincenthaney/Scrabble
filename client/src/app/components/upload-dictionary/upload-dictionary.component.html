@@ -6,7 +6,7 @@
   #fileInput>
 </mat-dialog-actions>
 <button mat-button color="primary" (click)="fileInput.click()">Sélectionner le fichier</button>
-<div>{{this.selectedFile.name}}</div>
+<div *ngIf="selectedFile">{{this.selectedFile.name}}</div>
 <mat-dialog-actions align='end'>
   <button mat-button (click)="onUpload()" [disabled]="isUploadableFile">Télécharger</button>
   <button mat-button (click)="closeDialog()">Annuler</button>
