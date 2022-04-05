@@ -1,15 +1,13 @@
+<h3 mat-dialog-title>{{title}}</h3>
 <mat-dialog-actions align='end'>
   <input
   style="display: none"
   type="file" (change)="onFileChanged($event)"
   #fileInput>
 </mat-dialog-actions>
-<button (click)="fileInput.click()">Select File</button>
-<button (click)="onUpload()">Upload!</button>
+<button mat-button color="primary" (click)="fileInput.click()">Sélectionner le fichier</button>
+<div>{{this.selectedFile.name}}</div>
 <mat-dialog-actions align='end'>
-  <!-- <button mat-button (click)="fileUpload.click()" [disabled]="isUploadableFile">Télécharger</button> -->
+  <button mat-button (click)="onUpload()" [disabled]="isUploadableFile">Télécharger</button>
   <button mat-button (click)="closeDialog()">Annuler</button>
 </mat-dialog-actions>
-
-
-

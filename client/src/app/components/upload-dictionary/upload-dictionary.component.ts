@@ -10,6 +10,7 @@ import { DictionariesService } from '@app/services/dictionaries-service/dictiona
     styleUrls: ['upload-dictionary.component.scss'],
 })
 export class UploadDictionaryComponent {
+    title: string = "Téléchargement d'un nouveau dictionaire";
     errorMessage: string = '';
     isUploadableFile: boolean = false;
     selectedFile: File;
@@ -23,7 +24,7 @@ export class UploadDictionaryComponent {
         fileReader.readAsText(this.selectedFile, 'UTF-8');
         fileReader.onload = () => {
             try {
-                this.newDictionary = JSON.parse(fileReader.result as string) as unknown as DictionaryData;
+                this.newDictionary = JSON.parse(fileReader.result as string) as DictionaryData;
             } catch (error) {
                 const newError = error as SyntaxError;
                 this.errorMessage = newError.message;
