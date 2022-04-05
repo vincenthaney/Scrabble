@@ -19,19 +19,24 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    columns = GAME_HISTORY_COLUMNS;
-    columnsItems: DisplayGameHistoryColumnsIteratorItem[] = [];
-    selectedColumnsItems: DisplayGameHistoryColumnsIteratorItem[] = [];
-    columnsControl = new FormControl();
-    dataSource: MatTableDataSource<GameHistory> = new MatTableDataSource(new Array());
-    state: GameHistoryState = GameHistoryState.Loading;
-    error: string | undefined = undefined;
+    columns;
+    columnsItems: DisplayGameHistoryColumnsIteratorItem[];
+    selectedColumnsItems: DisplayGameHistoryColumnsIteratorItem[];
+    columnsControl: FormControl;
+    dataSource: MatTableDataSource<GameHistory>;
+    state: GameHistoryState;
+    error: string | undefined;
 
     constructor() {
-        this.dataSource.sortingDataAccessor = this.sortGameHistory;
-
+        this.columns = GAME_HISTORY_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
+        this.columnsControl = new FormControl();
+        this.dataSource = new MatTableDataSource(new Array());
+        this.state = GameHistoryState.Loading;
+        this.error = undefined;
+
+        this.dataSource.sortingDataAccessor = this.sortGameHistory;
         this.columnsControl.setValue(this.selectedColumnsItems);
     }
 
