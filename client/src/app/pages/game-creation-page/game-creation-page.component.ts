@@ -132,5 +132,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         await this.dictionaryService.updateAllDictionaries();
         this.gameParameters.controls.dictionary?.setValue(undefined);
         this.gameParameters.controls.dictionary?.markAsTouched();
+        this.isCreatingGame = false;
     }
 }

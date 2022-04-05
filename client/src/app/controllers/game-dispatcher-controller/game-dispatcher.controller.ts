@@ -11,7 +11,6 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameDispatcherController implements OnDestroy {
-    private createGameEvent: Subject<LobbyData> = new Subject();
     private gameCreationFailed$: Subject<HttpErrorResponse> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
@@ -32,16 +31,9 @@ export class GameDispatcherController implements OnDestroy {
         this.serviceDestroyed$.complete();
     }
 
-    handleGameCreation(gameConfig: GameConfigData): void {
+    handleGameCreation(gameConfig: GameConfigData): Observable<{ lobbyData: LobbyData }> {
         const endpoint = `${environment.serverUrl}/games/${this.socketService.getId()}`;
-        this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig).subscribe(
-            (response) => {
-                this.createGameEvent.next(response.lobbyData);
-            },
-            (error: HttpErrorResponse) => {
-                this.gameCreationFailed$.next(error);
-            },
-        );
+        return this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig);
     }
 
     handleConfirmationGameCreation(opponentName: string, gameId: string): void {
@@ -74,10 +66,6 @@ export class GameDispatcherController implements OnDestroy {
                 this.handleJoinError(error.status as HttpStatusCode);
             },
         );
-    }
-
-    subscribeToCreateGameEvent(serviceDestroyed$: Subject<boolean>, callback: (lobbyData: LobbyData) => void): void {
-        this.createGameEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
     subscribeToJoinRequestEvent(serviceDestroyed$: Subject<boolean>, callback: (opponentName: string) => void): void {

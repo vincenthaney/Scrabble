@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LobbyData, LobbyInfo } from '@app/classes/communication/';
+import { LobbyInfo } from '@app/classes/communication/';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameConfigData, InitializeGameData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
@@ -19,6 +19,7 @@ import { takeUntil } from 'rxjs/operators';
 export default class GameDispatcherService implements OnDestroy {
     currentName: string = '';
     currentLobby: LobbyInfo | undefined = undefined;
+    isConverting = false;
 
     private gameCreationFailed$: Subject<HttpErrorResponse> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
@@ -29,12 +30,6 @@ export default class GameDispatcherService implements OnDestroy {
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router, private readonly gameService: GameService) {
-        this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
-            this.currentLobby = lobbyData;
-            if (this.currentLobby.gameMode === GameMode.Multiplayer) {
-                this.router.navigateByUrl('waiting-room');
-            }
-        });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
@@ -97,11 +92,12 @@ export default class GameDispatcherService implements OnDestroy {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
             gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
         }
-        this.gameDispatcherController.handleGameCreation(gameConfig);
+        this.handleGameCreation(gameConfig);
     }
 
     handleRecreateGame(gameParameters?: FormGroup): void {
         if (!this.currentLobby) return;
+        this.isConverting = gameParameters !== undefined;
 
         const gameConfig: GameConfigData = {
             playerName: this.currentLobby?.hostName,
@@ -115,7 +111,21 @@ export default class GameDispatcherService implements OnDestroy {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
             gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;
         }
-        this.gameDispatcherController.handleGameCreation(gameConfig);
+        this.handleGameCreation(gameConfig);
+    }
+
+    handleGameCreation(gameConfig: GameConfigData): void {
+        this.gameDispatcherController.handleGameCreation(gameConfig).subscribe(
+            (response) => {
+                this.currentLobby = response.lobbyData;
+                if (this.currentLobby && this.currentLobby.gameMode === GameMode.Multiplayer) {
+                    this.router.navigateByUrl('waiting-room');
+                }
+            },
+            (error: HttpErrorResponse) => {
+                this.gameCreationFailed$.next(error);
+            },
+        );
     }
 
     handleCancelGame(mustResetData: boolean = true): void {

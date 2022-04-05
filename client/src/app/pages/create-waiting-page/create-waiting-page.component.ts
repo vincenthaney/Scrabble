@@ -41,7 +41,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
-        if (!this.isStartingGame) this.gameDispatcherService.handleCancelGame();
+        if (!this.isStartingGame && !this.gameDispatcherService.isConverting) this.gameDispatcherService.handleCancelGame();
     }
 
     ngOnInit(): void {
