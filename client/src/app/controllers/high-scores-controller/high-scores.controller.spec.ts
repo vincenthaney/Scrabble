@@ -64,14 +64,16 @@ describe('HighScoresController', () => {
             expect(httpGetSpy).toHaveBeenCalledWith(endpoint);
         });
 
-        it('resetHighScores should delete highScores with right endpoint', () => {
+        it('resetHighScores should delete highScores with right endpoint and then call get highscores', () => {
             spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_PLAYER_ID);
 
+            const httpGetSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
             const httpResetSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
-            const endpoint = `${environment.serverUrl}/highScores/${DEFAULT_PLAYER_ID}`;
+            const endpoint = `${environment.serverUrl}/highScores`;
 
             controller.resetHighScores();
             expect(httpResetSpy).toHaveBeenCalledWith(endpoint);
+            expect(httpGetSpy).toHaveBeenCalled();
         });
     });
 

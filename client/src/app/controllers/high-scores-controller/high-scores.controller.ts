@@ -22,8 +22,8 @@ export class HighScoresController {
     }
 
     resetHighScores(): void {
-        const endpoint = `${environment.serverUrl}/highScores/${this.socketService.getId()}`;
-        this.http.delete(endpoint).subscribe();
+        const endpoint = `${environment.serverUrl}/highScores`;
+        this.http.delete(endpoint).subscribe(() => this.handleGetHighScores());
     }
 
     subscribeToHighScoresListEvent(serviceDestroyed$: Subject<boolean>, callback: (highScores: HighScore[]) => void): void {

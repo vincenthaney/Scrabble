@@ -69,12 +69,12 @@ describe('HighScoresController', () => {
             });
         });
 
-        describe('DELETE /highScores/:playerId', () => {
+        describe('DELETE /highScores', () => {
             it('should return NO_CONTENT', async () => {
                 // eslint-disable-next-line @typescript-eslint/no-empty-function
                 chai.spy.on(controller, 'handleHighScoresReset', () => {});
 
-                return supertest(expressApp).delete(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
+                return supertest(expressApp).delete('/api/highScores').expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
@@ -82,7 +82,7 @@ describe('HighScoresController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
-                return supertest(expressApp).delete(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
+                return supertest(expressApp).delete('/api/highScores').expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
     });
@@ -101,12 +101,8 @@ describe('HighScoresController', () => {
     describe('handleHighScoresReset', () => {
         it('should call socketService.emitToSocket, highScoresService.resetHighScores and highScoresService.getAllHighScores()', async () => {
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const spyEmitToSocket = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
-            const spyGetAllHighScores = chai.spy.on(controller['highScoresService'], 'getAllHighScores', () => []);
             const spyResetHighScores = chai.spy.on(controller['highScoresService'], 'resetHighScores', () => []);
-            await controller['handleHighScoresReset'](DEFAULT_PLAYER_ID);
-            expect(spyEmitToSocket).to.have.been.called();
-            expect(spyGetAllHighScores).to.have.been.called();
+            await controller['handleHighScoresReset']();
             expect(spyResetHighScores).to.have.been.called();
         });
     });
