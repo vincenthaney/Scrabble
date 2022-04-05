@@ -15,9 +15,15 @@ export class HighScoresController {
     constructor(private http: HttpClient, public socketService: SocketService) {
         this.configureSocket();
     }
+
     handleGetHighScores(): void {
         const endpoint = `${environment.serverUrl}/highScores/${this.socketService.getId()}`;
         this.http.get(endpoint).subscribe();
+    }
+
+    resetHighScores(): void {
+        const endpoint = `${environment.serverUrl}/highScores/${this.socketService.getId()}`;
+        this.http.delete(endpoint).subscribe();
     }
 
     subscribeToHighScoresListEvent(serviceDestroyed$: Subject<boolean>, callback: (highScores: HighScore[]) => void): void {

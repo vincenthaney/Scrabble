@@ -10,8 +10,6 @@ import { Subject } from 'rxjs';
     styleUrls: ['./admin-high-scores.component.scss'],
 })
 export class AdminHighScoresComponent implements OnInit, OnDestroy {
-    classicHighScores: SingleHighScore[];
-    log2990HighScores: SingleHighScore[];
     isInitialized: boolean = false;
     componentDestroyed$: Subject<boolean> = new Subject();
 
@@ -22,7 +20,6 @@ export class AdminHighScoresComponent implements OnInit, OnDestroy {
         this.highScoresService.subscribeToInitializedHighScoresListEvent(this.componentDestroyed$, () => {
             this.isInitialized = true;
         });
-        this.updateHighScores();
     }
 
     ngOnDestroy(): void {
@@ -38,10 +35,7 @@ export class AdminHighScoresComponent implements OnInit, OnDestroy {
         return this.highScoresService.getHighScores(GameType.LOG2990);
     }
 
-    resetHighScores(): void {}
-
-    private updateHighScores(): void {
-        this.classicHighScores = this.highScoresService.getHighScores(GameType.Classic);
-        this.log2990HighScores = this.highScoresService.getHighScores(GameType.LOG2990);
+    resetHighScores(): void {
+        this.highScoresService.resetHighScores();
     }
 }
