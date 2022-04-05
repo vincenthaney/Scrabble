@@ -509,4 +509,8 @@ describe('GameDispatcherService', () => {
             TEST_FORM.patchValue({ gameMode: GameMode.Solo });
         });
     });
+
+    it('observeGameCreationFailed should return observable of gameCreationFailed$', () => {
+        expect(service.observeGameCreationFailed()).toEqual(service['gameCreationFailed$'].asObservable());
+    });
 });
