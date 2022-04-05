@@ -123,10 +123,14 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     private async handleGameCreationFail(error: HttpErrorResponse): Promise<void> {
         if (error.error.message === INVALID_DICTIONARY_ID) {
-            this.wasDictionaryDeleted = true;
-            await this.dictionaryService.updateAllDictionaries();
-            this.gameParameters.controls.dictionary?.setValue(undefined);
-            this.gameParameters.controls.dictionary?.markAsTouched();
+            await this.handleDictionaryDeleted();
         }
+    }
+
+    private async handleDictionaryDeleted(): Promise<void> {
+        this.wasDictionaryDeleted = true;
+        await this.dictionaryService.updateAllDictionaries();
+        this.gameParameters.controls.dictionary?.setValue(undefined);
+        this.gameParameters.controls.dictionary?.markAsTouched();
     }
 }

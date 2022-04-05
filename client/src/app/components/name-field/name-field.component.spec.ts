@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -119,5 +120,24 @@ describe('NameFieldComponent', () => {
         const errorMessage = fixture.debugElement.query(By.css('.alert'));
         expect(errorMessage).toBeTruthy();
         expect(errorMessage.nativeElement.innerHTML).toBe(' ' + NAME_SAME_AS_VIRTUAL_PLAYER + ' ');
+    });
+
+    describe('onFormInvalidClick', () => {
+        let markSpy: unknown;
+        let onChangeSpy: unknown;
+
+        beforeEach(() => {
+            markSpy = spyOn(component.formParameters.controls.inputName, 'markAsTouched').and.callFake(() => {});
+            onChangeSpy = spyOn(component, 'onChange').and.callFake(() => {});
+            component.onFormInvalidClick();
+        });
+
+        it('should mark inputName field as touched so it looks invalid', () => {
+            expect(markSpy).toHaveBeenCalled();
+        });
+
+        it('should call onChange method', () => {
+            expect(onChangeSpy).toHaveBeenCalled();
+        });
     });
 });
