@@ -3,9 +3,10 @@ import { ConsecutivePlaceOrientationObjective } from '@app/classes/objectives/co
 import { TenLetterWord } from '@app/classes/objectives/objective-classes/ten-letter-word';
 import { ThreeWordsPlacement } from '@app/classes/objectives/objective-classes/three-word-placement';
 import { VowelsObjective } from '@app/classes/objectives/objective-classes/vowel-objective';
+import { TwoTenLetter } from '@app/classes/objectives/objective-classes/two-ten-letter';
 
 export const GENERATE_LIST_OF_ALL_OBJECTIVES = (): AbstractObjective[] => {
-    return [new ThreeWordsPlacement(), new VowelsObjective(), new TenLetterWord(), new ConsecutivePlaceOrientationObjective()];
+    return [new ThreeWordsPlacement(), new VowelsObjective(), new TenLetterWord(), new ConsecutivePlaceOrientationObjective(), new TwoTenLetter()];
 };
 
 export const NUMBER_OF_OBJECTIVES_IN_GAME = 4;
