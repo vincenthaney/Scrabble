@@ -2,6 +2,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -13,6 +14,11 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameDispatcherService, SocketService } from '@app/services/';
+
+@Component({
+    template: '',
+})
+export class TestComponent {}
 
 const BASE_GAME_ID = 'baseGameId';
 const TEST_PLAYER_ID = 'playerId';
@@ -58,7 +64,13 @@ describe('GameDispatcherService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, RouterTestingModule],
+            imports: [
+                HttpClientModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'waiting-room', component: TestComponent },
+                    { path: 'join-waiting-room', component: TestComponent },
+                ]),
+            ],
             providers: [GameDispatcherController, SocketService],
         });
         service = TestBed.inject(GameDispatcherService);
@@ -215,8 +227,7 @@ describe('GameDispatcherService', () => {
             virtualPlayerName: TEST_GAME_PARAMETERS.virtualPlayerName,
             virtualPlayerLevel: TEST_GAME_PARAMETERS.level,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            // TODO: VINCENT DOIT LE CHANGER
-            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4', isDefault: true },
+            dictionary: TEST_DICTIONARY,
         };
 
         service.handleCreateGame(TEST_PLAYER_NAME, TEST_FORM);
@@ -236,8 +247,7 @@ describe('GameDispatcherService', () => {
             gameType: TEST_GAME_PARAMETERS.gameType,
             gameMode: GameMode.Multiplayer,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            // TODO: VINCENT DOIT LE CHANGER
-            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4', isDefault: true },
+            dictionary: TEST_DICTIONARY,
         };
 
         TEST_FORM.controls.gameMode.patchValue(GameMode.Multiplayer);
