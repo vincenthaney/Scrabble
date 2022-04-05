@@ -29,7 +29,7 @@ export class HighScoresController {
 
         this.router.delete('/highScores', async (req: HighScoresRequest, res: Response) => {
             try {
-                await this.handleHighScoresReset();
+                await this.highScoresService.resetHighScores();
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
@@ -40,9 +40,5 @@ export class HighScoresController {
     private async handleHighScoresRequest(playerId: string): Promise<void> {
         const highScores = await this.highScoresService.getAllHighScores();
         this.socketService.emitToSocket(playerId, 'highScoresList', highScores);
-    }
-
-    private async handleHighScoresReset(): Promise<void> {
-        await this.highScoresService.resetHighScores();
     }
 }
