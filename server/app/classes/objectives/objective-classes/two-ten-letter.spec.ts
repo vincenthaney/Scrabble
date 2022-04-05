@@ -56,7 +56,7 @@ describe('Two ten points letters Objective', () => {
                 ],
             } as ObjectiveValidationParameters;
             objective.updateProgress(validationParameters);
-            expect(objective.progress).to.equal(objective.progress);
+            expect(objective.progress).to.equal(0);
         });
 
         it('should keep progress to the same value if created words DO NOT contain two ten points letters', () => {
