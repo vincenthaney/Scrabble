@@ -20,7 +20,6 @@ export const COLUMNS: DisplayGameHistoryColumns = {
     startTime: 'Heure de début',
     endDate: 'Date de fin',
     endTime: 'Heure de fin',
-    isOver: 'Partie terminée',
     hasBeenAbandoned: 'Partie abandonnée',
     gameType: 'Type de jeu',
     gameMode: 'Mode de jeu',
@@ -33,13 +32,11 @@ export const COLUMNS: DisplayGameHistoryColumns = {
     playerWinData: 'Joueur gagnant',
     playerWinName: 'Nom joueur gagnant',
     playerWinScore: 'Points joueur gagant',
-    replacingPlayer: 'Joueur de remplacement',
 };
 
 export const DEFAULT_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
     'startTime',
-    'isOver',
     'gameType',
     'gameMode',
     'player1Name',
