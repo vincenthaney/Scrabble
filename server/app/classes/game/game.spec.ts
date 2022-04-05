@@ -422,19 +422,19 @@ describe('Game', () => {
 
         it('should set hasBeenAbandonned to false if no player is disconnected', () => {
             game.completeGameHistory(undefined);
-            expect(game.gameHistory.hasBeenAbandonned).to.be.false;
+            expect(game.gameHistory.hasBeenAbandoned).to.be.false;
         });
 
         it('should set hasBeenAbandonned to true if player1 is disconnected', () => {
             game.player1.isConnected = false;
             game.completeGameHistory(undefined);
-            expect(game.gameHistory.hasBeenAbandonned).to.be.true;
+            expect(game.gameHistory.hasBeenAbandoned).to.be.true;
         });
 
         it('should set hasBeenAbandonned to true if player2 is disconnected', () => {
             game.player2.isConnected = false;
             game.completeGameHistory(undefined);
-            expect(game.gameHistory.hasBeenAbandonned).to.be.true;
+            expect(game.gameHistory.hasBeenAbandoned).to.be.true;
         });
 
         describe('isPlayerWinner', () => {

@@ -38,10 +38,10 @@ const DEFAULT_GAME_HISTORY: GameHistory = {
     player2Data: DEFAULT_LOSER_DATA,
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
-    hasBeenAbandonned: false,
+    hasBeenAbandoned: false,
 };
 
-const OTHER_GAME_HISTORY: GameHistory = { ...DEFAULT_GAME_HISTORY, gameType: GameType.LOG2990, hasBeenAbandonned: true };
+const OTHER_GAME_HISTORY: GameHistory = { ...DEFAULT_GAME_HISTORY, gameType: GameType.LOG2990, hasBeenAbandoned: true };
 
 const INITIAL_GAME_HISTORIES: GameHistory[] = [{ ...DEFAULT_GAME_HISTORY }, { ...DEFAULT_GAME_HISTORY }, { ...DEFAULT_GAME_HISTORY }];
 

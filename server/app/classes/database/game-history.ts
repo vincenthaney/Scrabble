@@ -8,7 +8,7 @@ export interface GameHistory {
     player2Data: PlayerHistoryData;
     gameType: GameType;
     gameMode: GameMode;
-    hasBeenAbandonned: boolean;
+    hasBeenAbandoned: boolean;
 }
 
 export interface PlayerHistoryData {

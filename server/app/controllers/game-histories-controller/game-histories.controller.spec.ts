@@ -41,7 +41,7 @@ const DEFAULT_GAME_HISTORY: GameHistory = {
     player2Data: DEFAULT_LOSER_DATA,
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
-    hasBeenAbandonned: false,
+    hasBeenAbandoned: false,
 };
 
 describe('GameHistoriesController', () => {
