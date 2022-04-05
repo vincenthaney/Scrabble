@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Game from '@app/classes/game/game';
 import { ReadyGameConfig } from '@app/classes/game/game-config';
+import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
@@ -24,6 +25,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: TEST_DICTIONARY,
 };

@@ -32,6 +32,7 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
     dictionary: TEST_DICTIONARY,
 };

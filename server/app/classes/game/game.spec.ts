@@ -15,6 +15,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { generateGameObjectives } from '@app/constants/services-constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
@@ -25,13 +26,13 @@ import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameMode } from './game-mode';
 import { GameType } from './game-type';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -51,6 +52,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: TEST_DICTIONARY,
 };
@@ -594,6 +596,7 @@ describe('Game', () => {
                 player1: game.player1,
                 player2: game.player2,
                 gameType: game.gameType,
+                gameMode: game.gameMode,
                 maxRoundTime: DEFAULT_TIME,
                 dictionary: TEST_DICTIONARY,
                 gameId: DEFAULT_GAME_ID,
