@@ -1,16 +1,6 @@
 import { GameHistory } from './game-history/game-history';
 
-export type DisplayGameHistoryKeys =
-    | keyof GameHistory
-    | 'player1Name'
-    | 'player1Score'
-    | 'player2Name'
-    | 'player2Score'
-    | 'startDate'
-    | 'endDate'
-    | 'playerWinData'
-    | 'playerWinName'
-    | 'playerWinScore';
+export type DisplayGameHistoryKeys = keyof GameHistory | 'player1Name' | 'player1Score' | 'player2Name' | 'player2Score' | 'startDate' | 'endDate';
 
 export type DisplayGameHistoryColumns = {
     [Property in DisplayGameHistoryKeys]: string;

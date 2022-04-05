@@ -21,17 +21,14 @@ export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
     endDate: 'Date de fin',
     endTime: 'Heure de fin',
     hasBeenAbandoned: 'Partie abandonnée',
-    gameType: 'Type de jeu',
-    gameMode: 'Mode de jeu',
+    gameType: 'Type de partie',
+    gameMode: 'Mode de partie',
     player1Data: 'Joueur 1',
     player1Name: 'Nom joueur 1',
     player1Score: 'Points joueur 1',
     player2Data: 'Joueur 2',
     player2Name: 'Nom joueur 2',
     player2Score: 'Points joueur 2',
-    playerWinData: 'Joueur gagnant',
-    playerWinName: 'Nom joueur gagnant',
-    playerWinScore: 'Points joueur gagant',
 };
 
 export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
