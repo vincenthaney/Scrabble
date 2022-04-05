@@ -81,7 +81,7 @@ describe('CreateGameService', async () => {
             expect(beginGameSpy).to.have.been.called();
         });
 
-        it('should add a Beginner player if it is the selected AI', () => {
+        it('should add a Beginner player if it is the selected virtual player level', () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return;
             });
@@ -98,7 +98,7 @@ describe('CreateGameService', async () => {
             expect(stub.called).to.be.true;
         });
 
-        it('should add a Expert player if it is the selected AI', () => {
+        it('should add an Expert player if it is the selected virtual player level', () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return;
             });

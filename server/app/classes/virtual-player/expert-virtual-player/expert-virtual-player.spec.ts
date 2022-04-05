@@ -47,7 +47,7 @@ describe('ExpertVirtualPlayer', () => {
             expect(createActionDataSpy).to.have.been.called();
         });
 
-        it('should ActionExchange if no moves are found and exchange is possible', () => {
+        it('should call ActionExchange if no moves are found and exchange is possible', () => {
             const computeWordPlacementSpy = spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return undefined;
             });
@@ -62,7 +62,7 @@ describe('ExpertVirtualPlayer', () => {
             expect(createActionDataSpy).to.have.been.called();
         });
 
-        it('should ActionPass if no moves are found and exchange is not possible', () => {
+        it('should call ActionPass if no moves are found and exchange is not possible', () => {
             const computeWordPlacementSpy = spy.on(expertVirtualPlayer, 'computeWordPlacement', () => {
                 return undefined;
             });
