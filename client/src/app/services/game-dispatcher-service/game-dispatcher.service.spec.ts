@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -14,6 +14,7 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameDispatcherService, SocketService } from '@app/services/';
+import { Subject } from 'rxjs';
 
 @Component({
     template: '',
@@ -62,6 +63,8 @@ describe('GameDispatcherService', () => {
     let gameDispatcherControllerMock: GameDispatcherController;
     let socketServiceMock: SocketService;
 
+    let gameCreationFailedSubjectMock: Subject<HttpErrorResponse>;
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -73,10 +76,14 @@ describe('GameDispatcherService', () => {
             ],
             providers: [GameDispatcherController, SocketService],
         });
+
+        gameCreationFailedSubjectMock = new Subject<HttpErrorResponse>();
+        gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
+        spyOn(gameDispatcherControllerMock, 'observeGameCreationFailed').and.returnValue(gameCreationFailedSubjectMock);
+
         service = TestBed.inject(GameDispatcherService);
 
         getCurrentLobbyIdSpy = spyOn(service, 'getCurrentLobbyId').and.returnValue(BASE_GAME_ID);
-        gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
         socketServiceMock = TestBed.inject(SocketService);
     });
 
@@ -133,6 +140,17 @@ describe('GameDispatcherService', () => {
             });
             service['gameDispatcherController']['initializeGame$'].next(undefined);
             expect(spy).toHaveBeenCalledWith(undefined);
+        });
+
+        it('should send gameCreationFail update when receiving it', () => {
+            const spy = spyOn(service['gameCreationFailed$'], 'next').and.callFake(() => {
+                return;
+            });
+
+            const error: HttpErrorResponse = { error: { message: 'Test' } } as HttpErrorResponse;
+            gameCreationFailedSubjectMock.next(error);
+
+            expect(spy).toHaveBeenCalledWith(error);
         });
     });
 
