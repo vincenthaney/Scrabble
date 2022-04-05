@@ -1,11 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
@@ -20,6 +21,8 @@ import { takeUntil } from 'rxjs/operators';
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent implements OnInit, OnDestroy {
+    @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
+
     gameTypes: typeof GameType;
     gameModes: typeof GameMode;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
@@ -61,7 +64,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             });
         this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
-            this.gameParameters.get('dictionary')?.setValue(this.dictionaryOptions[0]);
         });
     }
 
@@ -97,6 +99,11 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
         this.playerName = playerName;
         this.playerNameValid = valid;
+    }
+
+    onFormInvalidClick(): void {
+        this.gameParameters.controls.dictionary?.markAsTouched();
+        this.nameField.onFormInvalidClick();
     }
 
     private createGame(): void {
