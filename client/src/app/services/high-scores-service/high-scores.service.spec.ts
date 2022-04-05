@@ -6,8 +6,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import HighScore, { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
 import { HighScoresController } from '@app/controllers/high-scores-controller/high-scores.controller';
-import { Subject } from 'rxjs';
 import SocketService from '@app/services/socket-service/socket.service';
+import { Subject } from 'rxjs';
 import HighScoresService from './high-scores.service';
 
 const DEFAULT_CLASSIC_HIGH_SCORES: SingleHighScore[] = [
@@ -76,9 +76,25 @@ describe('HighScoresService', () => {
                 return;
             });
         });
+
         it('should call highScoresController.handleGetHighScores', () => {
             service.handleHighScoresRequest();
             expect(spyHandleGetHighScores).toHaveBeenCalled();
+        });
+    });
+
+    describe('resetHighScores', () => {
+        let spyResetHighScores: jasmine.Spy;
+
+        beforeEach(() => {
+            spyResetHighScores = spyOn(highScoresControllerMock, 'resetHighScores').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should call highScoresController.resetHighScores', () => {
+            service.resetHighScores();
+            expect(spyResetHighScores).toHaveBeenCalled();
         });
     });
 

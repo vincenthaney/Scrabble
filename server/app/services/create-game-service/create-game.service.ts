@@ -1,11 +1,11 @@
 import { GameConfig, GameConfigData, ReadyGameConfig, StartGameData } from '@app/classes/game/game-config';
+import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import { Service } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { v4 as uuidv4 } from 'uuid';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import WaitingRoom from '@app/classes/game/waiting-room';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { Service } from 'typedi';
+import { v4 as uuidv4 } from 'uuid';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 
@@ -33,6 +33,7 @@ export class CreateGameService {
         return {
             player1: new Player(configData.playerId, configData.playerName),
             gameType: configData.gameType,
+            gameMode: configData.gameMode,
             maxRoundTime: configData.maxRoundTime,
             dictionary: this.dictionaryService.getDictionaryTitles()[0],
         };

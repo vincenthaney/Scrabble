@@ -1,6 +1,5 @@
 @import '../../style/variables.scss';
 
-
 $border-radius: 6px;
 
 ::ng-deep body {
@@ -35,7 +34,6 @@ $border-radius: 6px;
     align-items: center;
     justify-content: center;
     width: 100%;
-    
 }
 
 .page {
@@ -116,7 +114,7 @@ $border-radius: 6px;
         }
 
         #high-scores-container {
-            border: solid 4px rgb(34, 34, 34);
+            border: solid 1px rgb(133, 133, 133);
             border-radius: 4px;
 
             #high-scores-header {
@@ -129,22 +127,23 @@ $border-radius: 6px;
                 height: 50px;
 
                 box-sizing: border-box;
-                border-bottom: solid 4px rgb(34, 34, 34);
+                border-bottom: solid 1px rgb(133, 133, 133);
 
-                .rank, .score, .name {
+                .rank,
+                .score,
+                .name {
                     display: flex;
                     align-items: center;
                     font-size: larger;
                     text-align: right;
                     justify-items: right;
                 }
-                
+
                 .score {
                     padding-right: 20px;
                     margin-left: auto;
                     text-align: right;
-                box-sizing: border-box;
-
+                    box-sizing: border-box;
                 }
             }
 
@@ -155,20 +154,14 @@ $border-radius: 6px;
                 align-items: center;
                 height: 50px;
                 font-size: larger;
-                font-family: Roboto, "Helvetica Neue", sans-serif;
+                font-family: Roboto, 'Helvetica Neue', sans-serif;
             }
-            
+
             .high-score:nth-child(2n) {
                 background-color: rgba($primary, 0.15);
-                // color: white;
-            }
-            
-            .high-score:nth-child(2n+1) {
-                // background-color: lightgray;
             }
         }
 
-        
         .buttons {
             display: flex;
             justify-content: flex-end;
