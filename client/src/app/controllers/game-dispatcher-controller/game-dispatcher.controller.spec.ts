@@ -16,6 +16,7 @@ import { GameService } from '@app/services';
 import SocketService from '@app/services/socket-service/socket.service';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { Socket } from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 const DEFAULT_SOCKET_ID = 'testSocketID';
 const DEFAULT_PLAYER_NAME = 'grogars';
@@ -110,19 +111,34 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleMultiplayerGameCreation', () => {
-        it('handleMultiplayerGameCreation should  make an HTTP post request', () => {
+    describe('handleGameCreation', () => {
+        it('should  make an HTTP post request', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
             controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(httpPostSpy).toHaveBeenCalled();
         });
 
-        it('handleMultiplayerGameCreation should emit to createGameEvent', () => {
+        it('should emit to createGameEvent', () => {
             const fakeObservable = of<string>('fakeResponse');
             spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
             const createGameSpy = spyOn(controller['createGameEvent'], 'next').and.callThrough();
             controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(createGameSpy).toHaveBeenCalled();
+        });
+
+        it('should send gameCreationFail update on error', () => {
+            const creationFailSpy = spyOn(controller['gameCreationFailed$'], 'next').and.callFake(() => {
+                return;
+            });
+
+            spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
+            controller.handleGameCreation(DEFAULT_GAME_DATA);
+
+            const testRequest = httpMock.expectOne(`${environment.serverUrl}/games/${DEFAULT_SOCKET_ID}`);
+            const error = { status: 404, statusText: 'Dictionary not found' };
+            testRequest.flush('', error);
+
+            expect(creationFailSpy).toHaveBeenCalled();
         });
     });
 
