@@ -10,6 +10,7 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { PlaceFiveLettersFiveTimesObjective } from './place-five-letters-five-times';
+
 chai.use(spies);
 
 const DEFAULT_TILE: Tile = {
