@@ -35,6 +35,7 @@ export class UploadDictionaryComponent {
     }
     onUpload() {
         this.dictionariesService.uploadDictionary(this.newDictionary);
+        this.dialogRef.close();
     }
     closeDialog(): void {
         this.dialogRef.close();
