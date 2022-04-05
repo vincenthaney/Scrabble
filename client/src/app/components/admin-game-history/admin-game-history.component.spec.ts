@@ -190,10 +190,6 @@ describe('AdminGameHistoryComponent', () => {
             ['player2Name', 'player2Data.name'],
             ['player2Score', 'player2Data.score'],
             ['player2Data', 'player2Data.name'],
-            ['playerWinName', 'player2Data.name'],
-            ['playerWinScore', 'player2Data.score'],
-            ['playerWinData', 'player2Data.name'],
-            ['isOver', 'isOver'],
             ['startTime', 'startTime'],
         ];
 
