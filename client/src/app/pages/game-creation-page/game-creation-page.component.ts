@@ -61,6 +61,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             });
         this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
+            this.gameParameters.get('dictionary')?.setValue(this.dictionaryOptions[0]);
         });
     }
 
