@@ -1,12 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
+import { DICTIONARY_DELETED, DICTIONARY_REQUIRED } from '@app/constants/component-errors';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
@@ -32,11 +32,14 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     playerNameValid: boolean;
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
-    constructor(
-        private router: Router,
-        private gameDispatcherService: GameDispatcherService,
-        private readonly dictionaryService: DictionariesService,
-    ) {
+
+    dictionaryRequiredError: string;
+    dictionaryDeletedError: string;
+    wasDictionaryDeleted: boolean;
+
+    isCreatingGame: boolean;
+
+    constructor(private gameDispatcherService: GameDispatcherService, private readonly dictionaryService: DictionariesService) {
         this.gameTypes = GameType;
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -51,15 +54,24 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
             timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-            dictionary: new FormControl(undefined, Validators.required),
+            dictionary: new FormControl(undefined, [Validators.required]),
         });
+
+        this.dictionaryRequiredError = DICTIONARY_REQUIRED;
+        this.dictionaryDeletedError = DICTIONARY_DELETED;
+        this.wasDictionaryDeleted = false;
+
+        this.isCreatingGame = false;
 
         this.gameDispatcherService
             .observeGameCreationFailed()
             .pipe(takeUntil(this.pageDestroyed$))
             .subscribe(async (error: HttpErrorResponse) => {
                 if (error.error.message === INVALID_DICTIONARY_ID) {
+                    this.wasDictionaryDeleted = true;
                     await this.dictionaryService.updateAllDictionaries();
+                    this.gameParameters.controls.dictionary?.setValue(undefined);
+                    this.gameParameters.controls.dictionary?.markAsTouched();
                 }
             });
         this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
@@ -103,13 +115,16 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     onFormInvalidClick(): void {
         this.gameParameters.controls.dictionary?.markAsTouched();
+        this.onDictionaryChange();
         this.nameField.onFormInvalidClick();
     }
 
+    onDictionaryChange(): void {
+        this.wasDictionaryDeleted = false;
+    }
+
     private createGame(): void {
-        if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
-            this.router.navigateByUrl('waiting-room');
-        }
+        this.isCreatingGame = true;
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
     }
 }
