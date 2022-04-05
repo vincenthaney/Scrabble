@@ -22,6 +22,7 @@ const TEST_LOBBY_DATA: LobbyData = {
     lobbyId: BASE_GAME_ID,
     hostName: '',
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 0,
     dictionary: TEST_DICTIONARY,
 };
