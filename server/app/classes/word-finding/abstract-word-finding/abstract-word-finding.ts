@@ -31,8 +31,6 @@ export default abstract class AbstractWordFinding {
     }
 
     findWords(): ScoredWordPlacement[] {
-        console.log(`abstractWordFinding.findWords`);
-
         const playerLetters = this.convertTilesToLetters(this.tiles);
 
         for (const boardPlacement of this.randomBoardPlacements()) {
@@ -48,7 +46,6 @@ export default abstract class AbstractWordFinding {
                 }
             }
         }
-        console.log(`abstractWordFinding.findWords FINI`);
 
         return this.wordPlacements;
     }

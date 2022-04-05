@@ -48,7 +48,6 @@ export abstract class AbstractVirtualPlayer extends Player {
     }
 
     async playTurn(): Promise<void> {
-        console.log('playTurn');
         const waitPreliminaryTime = async (): Promise<void> => {
             await Delay.for(PRELIMINARY_WAIT_TIME);
         };
@@ -60,7 +59,6 @@ export abstract class AbstractVirtualPlayer extends Player {
             return Promise.all([this.findAction(), waitPreliminaryTime()]);
         };
         const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
-        console.log(`actionResult: ${actionResult}`);
 
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : this.alternativeMove());
     }
