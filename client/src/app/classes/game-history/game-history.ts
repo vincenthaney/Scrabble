@@ -6,10 +6,8 @@ export interface GameHistory {
     endTime: Date;
     player1Data: PlayerHistoryData;
     player2Data: PlayerHistoryData;
-    replacingPlayer?: PlayerHistoryData;
     gameType: GameType;
     gameMode: GameMode;
-    isOver: boolean;
     hasBeenAbandoned: boolean;
 }
 
@@ -17,4 +15,5 @@ export interface PlayerHistoryData {
     name: string;
     score: number;
     isVirtualPlayer: boolean;
+    isWinner: boolean;
 }
