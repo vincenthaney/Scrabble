@@ -2,15 +2,14 @@ import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virt
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import Range from '@app/classes/range/range';
-import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
+    private wordFindingInstance: AbstractWordFinding;
+
     protected async findAction(): Promise<ActionData> {
         const scoredWordPlacement = this.computeWordPlacement();
-        if (scoredWordPlacement) {
-            return ActionPlace.createActionData(scoredWordPlacement);
-        }
-        return this.alternativeMove();
+        return scoredWordPlacement ? ActionPlace.createActionData(scoredWordPlacement) : this.alternativeMove();
     }
 
     protected findPointRange(): Range {
@@ -18,11 +17,21 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     protected alternativeMove(): ActionData {
+        if (this.wordFindingInstance) {
+            const bestMove = this.wordFindingInstance.wordPlacements.pop();
+            if (bestMove) return ActionPlace.createActionData(bestMove);
+        }
         return this.isExchangePossible() ? ActionExchange.createActionData(this.tiles) : ActionPass.createActionData();
     }
 
     private computeWordPlacement(): ScoredWordPlacement | undefined {
-        return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
+        const request = this.generateWordFindingRequest();
+        this.wordFindingInstance = this.getWordFindingService().getWordFindingInstance(request.useCase, [
+            this.getGameBoard(this.gameId, this.id),
+            this.tiles,
+            request,
+        ]);
+        return this.wordFindingInstance.findWords().pop();
     }
 
     private generateWordFindingRequest(): WordFindingRequest {

@@ -14,11 +14,13 @@ import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virt
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import Range from '@app/classes/range/range';
-import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { Random } from '@app/utils/random';
 import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
+    private wordFindingInstance: AbstractWordFinding;
+
     protected async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
         if (randomAction <= PLACE_ACTION_THRESHOLD) {
@@ -47,6 +49,13 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     protected alternativeMove(): ActionData {
+        if (this.wordFindingInstance) {
+            const bestMove = this.wordFindingInstance.wordPlacements.pop();
+            if (bestMove) {
+                this.updateHistory(bestMove);
+                return ActionPlace.createActionData(bestMove);
+            }
+        }
         return ActionPass.createActionData();
     }
 
