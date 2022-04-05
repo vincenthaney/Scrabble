@@ -127,7 +127,7 @@ describe('NameFieldComponent', () => {
         let onChangeSpy: unknown;
 
         beforeEach(() => {
-            markSpy = spyOn(component.formParameters.controls.inputName, 'markAsTouched').and.callFake(() => {});
+            markSpy = spyOn(component.formParameters.controls.inputName, 'markAsDirty').and.callFake(() => {});
             onChangeSpy = spyOn(component, 'onChange').and.callFake(() => {});
             component.onFormInvalidClick();
         });

@@ -20,6 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { GameMode } from '@app/classes/game-mode';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
@@ -39,7 +40,7 @@ import SpyObj = jasmine.SpyObj;
 })
 class TestComponent {}
 
-fdescribe('GameCreationPageComponent', () => {
+describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
@@ -47,6 +48,7 @@ fdescribe('GameCreationPageComponent', () => {
     let gameDispatcherServiceSpy: SpyObj<GameDispatcherService>;
     let dictionaryServiceSpy: SpyObj<DictionariesService>;
     let gameDispatcherCreationSubject: Subject<HttpErrorResponse>;
+    let dictionaryUpdateSubject: Subject<DictionarySummary[]>;
 
     const EMPTY_VALUE = '';
 
@@ -56,8 +58,13 @@ fdescribe('GameCreationPageComponent', () => {
             'updateAllDictionaries',
             'subscribeToDictionariestUpdateDataEvent',
         ]);
-        dictionaryServiceSpy.getDictionaries.and.callFake(() => []);
+        dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
         dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
+        dictionaryUpdateSubject = new Subject();
+        dictionaryServiceSpy.subscribeToDictionariestUpdateDataEvent.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void) =>
+                dictionaryUpdateSubject.subscribe(callback),
+        );
 
         gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['observeGameCreationFailed', 'handleCreateGame']);
         gameDispatcherCreationSubject = new Subject();
@@ -134,8 +141,10 @@ fdescribe('GameCreationPageComponent', () => {
             expect(handleSpy).toHaveBeenCalledWith(error);
         });
 
-        it('should subscribe to subscribeToDictionariestUpdateDataEvent', () => {
-            expect(dictionaryServiceSpy.subscribeToDictionariestUpdateDataEvent).toHaveBeenCalled();
+        it('should update dictionaryOptions when dictionary service updates list', () => {
+            dictionaryUpdateSubject.next();
+            expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
+            expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
         });
     });
 
