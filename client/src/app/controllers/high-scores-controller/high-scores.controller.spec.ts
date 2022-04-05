@@ -25,11 +25,11 @@ describe('HighScoresController', () => {
     let socketServiceMock: SocketService;
     let socketHelper: SocketTestHelper;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         socketHelper = new SocketTestHelper();
         socketServiceMock = new SocketService();
         socketServiceMock['socket'] = socketHelper as unknown as Socket;
-        await TestBed.configureTestingModule({
+        TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
             providers: [{ provide: SocketService, useValue: socketServiceMock }],
         });
@@ -54,14 +54,24 @@ describe('HighScoresController', () => {
     });
 
     describe('HTTP', () => {
-        it('handleGetHighScores should get highScores to endpoint', () => {
+        it('handleGetHighScores should get highScores with right endpoint', () => {
             spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_PLAYER_ID);
 
-            const httpPostSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
+            const httpGetSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
             const endpoint = `${environment.serverUrl}/highScores/${DEFAULT_PLAYER_ID}`;
 
             controller.handleGetHighScores();
-            expect(httpPostSpy).toHaveBeenCalledWith(endpoint);
+            expect(httpGetSpy).toHaveBeenCalledWith(endpoint);
+        });
+
+        it('resetHighScores should delete highScores with right endpoint', () => {
+            spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_PLAYER_ID);
+
+            const httpResetSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+            const endpoint = `${environment.serverUrl}/highScores/${DEFAULT_PLAYER_ID}`;
+
+            controller.resetHighScores();
+            expect(httpResetSpy).toHaveBeenCalledWith(endpoint);
         });
     });
 
