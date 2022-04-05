@@ -4,6 +4,7 @@ import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communi
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import { ObjectiveUpdate } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
@@ -58,13 +59,16 @@ export default class ActionPlace extends ActionPlay {
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 
-        const objectiveUpdateResult: ObjectiveUpdate | undefined = this.player.validateObjectives({
-            wordPlacement: this.wordPlacement,
-            game: this.game,
-            scoredPoints,
-            createdWords,
-        });
-        this.objectivesCompletedMessages = objectiveUpdateResult ? objectiveUpdateResult.completionMessages : [];
+        let objectiveUpdateResult: ObjectiveUpdate | undefined;
+        if (this.game.gameType === GameType.LOG2990) {
+            objectiveUpdateResult = this.player.validateObjectives({
+                wordPlacement: this.wordPlacement,
+                game: this.game,
+                scoredPoints,
+                createdWords,
+            });
+            this.objectivesCompletedMessages = objectiveUpdateResult ? objectiveUpdateResult.completionMessages : [];
+        }
 
         const updatedSquares = this.updateBoard(createdWords);
 

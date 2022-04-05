@@ -26,6 +26,15 @@ export class HighScoresController {
                 HttpException.sendError(exception, res);
             }
         });
+
+        this.router.delete('/highScores', async (req: HighScoresRequest, res: Response) => {
+            try {
+                await this.highScoresService.resetHighScores();
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
     }
 
     private async handleHighScoresRequest(playerId: string): Promise<void> {

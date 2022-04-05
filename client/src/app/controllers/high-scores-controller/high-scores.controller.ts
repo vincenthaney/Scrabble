@@ -21,6 +21,11 @@ export class HighScoresController {
         this.http.get(endpoint).subscribe();
     }
 
+    resetHighScores(): void {
+        const endpoint = `${environment.serverUrl}/highScores`;
+        this.http.delete(endpoint).subscribe(() => this.handleGetHighScores());
+    }
+
     subscribeToHighScoresListEvent(serviceDestroyed$: Subject<boolean>, callback: (highScores: HighScore[]) => void): void {
         this.highScoresListEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
