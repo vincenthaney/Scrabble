@@ -3,10 +3,8 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
-import { ObjectiveData } from '@app/classes/communication/objective-data';
 import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { GameType } from '@app/classes/game-type';
-import { ObjectiveState } from '@app/classes/objectives/objective-state';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
@@ -28,12 +26,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
+    gameType: GameType = GameType.Classic;
     messages: Message[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
-    gameType: GameType = GameType.LOG2990;
-    objectives: ObjectiveData[] = [];
 
     componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
@@ -48,30 +45,11 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         super();
         this.focusableComponentsService.setActiveKeyboardComponent(this);
         this.messageStorageService.initializeMessages();
-
-        this.objectives = [
-            {
-                name: 'Objective 1',
-                state: ObjectiveState.NotCompleted,
-                progress: 2,
-                maxProgress: 5,
-            },
-            {
-                name: 'Objective 2',
-                state: ObjectiveState.Completed,
-                progress: 4,
-                maxProgress: 4,
-            },
-            {
-                name: 'Objective 3',
-                state: ObjectiveState.CompletedByOpponent,
-                progress: 0,
-                maxProgress: 5,
-            },
-        ];
     }
 
     ngOnInit(): void {
+        this.gameType = this.gameService.getGameType();
+
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });

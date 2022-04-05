@@ -1,15 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { ObjectiveData } from '@app/classes/communication/objective-data';
+import { ObjectiveState } from '@app/classes/objectives/objective-state';
+import { OPPONENT_COMPLETED_THIS_OBJECTIVE, PERCENT, YOU_COMPLETED_THIS_OBJECTIVE } from '@app/constants/components-constants';
 
 @Component({
-  selector: 'app-objective',
-  templateUrl: './objective.component.html',
-  styleUrls: ['./objective.component.scss']
+    selector: 'app-objective',
+    templateUrl: './objective.component.html',
+    styleUrls: ['./objective.component.scss'],
 })
-export class ObjectiveComponent implements OnInit {
+export class ObjectiveComponent {
+    @Input() objective: ObjectiveData;
 
-  constructor() { }
+    getProgress() {
+        return (this.objective.progress / this.objective.maxProgress) * PERCENT;
+    }
 
-  ngOnInit(): void {
-  }
-
+    getStateMessage(): string {
+        switch (this.objective.state) {
+            case ObjectiveState.Completed:
+                return YOU_COMPLETED_THIS_OBJECTIVE;
+            case ObjectiveState.CompletedByOpponent:
+                return OPPONENT_COMPLETED_THIS_OBJECTIVE;
+            default:
+                return '';
+        }
+    }
 }

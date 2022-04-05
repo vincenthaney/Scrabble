@@ -31,6 +31,7 @@ import { HighScoreBoxComponent } from './components/high-score-box/high-score-bo
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { ObjectiveComponent } from './components/objective/objective.component';
+import { ObjectiveBoxComponent } from './components/objective-box/objective-box.component';
 
 /**
  * Main module that is used in main.ts.
@@ -64,6 +65,7 @@ import { ObjectiveComponent } from './components/objective/objective.component';
         ConvertDialogComponent,
         AdminPageComponent,
         ObjectiveComponent,
+        ObjectiveBoxComponent,
     ],
     imports: [
         AppMaterialModule,
