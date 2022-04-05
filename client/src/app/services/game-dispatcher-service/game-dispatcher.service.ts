@@ -31,6 +31,9 @@ export default class GameDispatcherService implements OnDestroy {
     constructor(private gameDispatcherController: GameDispatcherController, public router: Router, private readonly gameService: GameService) {
         this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
             this.currentLobby = lobbyData;
+            if (this.currentLobby.gameMode === GameMode.Multiplayer) {
+                this.router.navigateByUrl('waiting-room');
+            }
         });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),

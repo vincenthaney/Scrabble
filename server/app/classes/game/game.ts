@@ -1,4 +1,5 @@
 import Board from '@app/classes/board/board';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameObjectives } from '@app/classes/objectives/objective';
@@ -13,10 +14,10 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameMode } from './game-mode';
 import { GameType } from './game-type';
 export const GAME_OVER_PASS_THRESHOLD = 6;
 export const WIN = 1;
@@ -27,6 +28,7 @@ export default class Game {
     private static objectivesService: ObjectivesService;
     roundManager: RoundManager;
     gameType: GameType;
+    gameMode: GameMode;
     board: Board;
     dictionarySummary: DictionarySummary;
     player1: Player;
@@ -53,6 +55,7 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
+        game.gameMode = config.gameMode;
         game.dictionarySummary = config.dictionary;
         game.initializeObjectives();
         game.tileReserve = new TileReserve();
@@ -138,6 +141,7 @@ export default class Game {
             player1: this.player1,
             player2: this.player2,
             gameType: this.gameType,
+            gameMode: this.gameMode,
             maxRoundTime: this.roundManager.getMaxRoundTime(),
             dictionary: this.dictionarySummary,
             gameId: this.getId(),
