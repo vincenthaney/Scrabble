@@ -6,6 +6,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
@@ -102,6 +103,8 @@ export class GamePlayService {
 
     handleResetObjectives(gameId: string, playerId: string): GameUpdateData {
         const game: Game = this.activeGameService.getGame(gameId, playerId);
+        if (game.gameType === GameType.Classic) return {};
+
         const objectiveData: GameObjectivesData = game.resetPlayerObjectiveProgression(playerId);
         return { gameObjective: objectiveData };
     }
