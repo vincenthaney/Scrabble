@@ -51,10 +51,13 @@ export default class WordFindingService {
     getWordFindingInstance(useCase: WordFindingUseCase, params: WordFindingParameters): AbstractWordFinding {
         switch (useCase) {
             case WordFindingUseCase.Hint:
+                console.log(`getWordFindingInstance-> Hint`);
                 return new WordFindingHint(...params, this.dictionaryService.getDefaultDictionary(), this.scoreCalculatorService);
             case WordFindingUseCase.Beginner:
+                console.log(`getWordFindingInstance-> Beginner`);
                 return new WordFindingBeginner(...params, this.dictionaryService.getDefaultDictionary(), this.scoreCalculatorService);
             case WordFindingUseCase.Expert:
+                console.log(`getWordFindingInstance-> Expert`);
                 return new WordFindingExpert(...params, this.dictionaryService.getDefaultDictionary(), this.scoreCalculatorService);
         }
     }

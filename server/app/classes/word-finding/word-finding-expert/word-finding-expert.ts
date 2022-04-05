@@ -3,6 +3,7 @@ import { AbstractWordFinding, ScoredWordPlacement } from '@app/classes/word-find
 export default class WordFindingExpert extends AbstractWordFinding {
     protected handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
         if (this.wordPlacements.length === 0 || this.wordPlacements[0].score < wordPlacement.score) {
+            console.log(`handleWordPlacement -> wordPlacement with better score: ${wordPlacement.score}`);
             this.wordPlacements = [wordPlacement];
         }
     }

@@ -8,6 +8,8 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     private wordFindingInstance: AbstractWordFinding;
 
     protected async findAction(): Promise<ActionData> {
+        console.log(`expertVP.findAction`);
+        
         const scoredWordPlacement = this.computeWordPlacement();
         return scoredWordPlacement ? ActionPlace.createActionData(scoredWordPlacement) : this.alternativeMove();
     }
@@ -17,8 +19,11 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     }
 
     protected alternativeMove(): ActionData {
+        console.log(`expertVP.alternativeMove`);
+
         if (this.wordFindingInstance) {
             const bestMove = this.wordFindingInstance.wordPlacements.pop();
+            console.log(`expertVP.alternativeMove.if with best move: ${bestMove}`);
             if (bestMove) return ActionPlace.createActionData(bestMove);
         }
         return this.isExchangePossible() ? ActionExchange.createActionData(this.tiles) : ActionPass.createActionData();

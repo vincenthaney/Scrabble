@@ -15,6 +15,8 @@ import { StatusCodes } from 'http-status-codes';
 @Service()
 export class VirtualPlayerService {
     async sendAction(gameId: string, playerId: string, action: ActionData): Promise<Response> {
+        console.log('sendAction');
+        console.log(action);
         let response = await this.sendFetchRequest(gameId, playerId, action);
         // If an error occurs at reception of the request, send an ActionPass to prevent server from crashing
         if (response.status !== StatusCodes.NO_CONTENT) {
