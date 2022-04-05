@@ -33,6 +33,10 @@ export default class HighScoresService {
         return highScores ? highScores : [];
     }
 
+    resetHighScores(): void {
+        this.highScoresController.resetHighScores();
+    }
+
     private updateHighScores(highScores: HighScore[]): void {
         const [classicHighScores, log2990HighScores] = this.separateHighScoresType(highScores);
         this.highScoresMap.set(GameType.Classic, this.rankHighScores(classicHighScores));
@@ -54,19 +58,18 @@ export default class HighScoresService {
     private rankHighScores(highScores: HighScore[]): SingleHighScore[] {
         const singleHighScores: SingleHighScore[] = [];
         let rank = 1;
-        highScores
-            .sort((previous, current) => current.score - previous.score)
-            .forEach((highScore) => {
-                let isFirst = true;
-                for (const name of highScore.names) {
-                    if (isFirst) {
-                        singleHighScores.push({ ...highScore, name, rank: rank++ });
-                        isFirst = false;
-                    } else {
-                        singleHighScores.push({ ...highScore, name });
-                    }
+        highScores = highScores.sort((previous, current) => current.score - previous.score);
+        highScores.forEach((highScore) => {
+            let isFirst = true;
+            for (const name of highScore.names) {
+                if (isFirst) {
+                    singleHighScores.push({ ...highScore, name, rank: rank++ });
+                    isFirst = false;
+                } else {
+                    singleHighScores.push({ ...highScore, name });
                 }
-            });
+            }
+        });
         return singleHighScores;
     }
 }

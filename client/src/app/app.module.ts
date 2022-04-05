@@ -30,6 +30,7 @@ import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-pa
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
+import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
 import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
@@ -67,6 +68,7 @@ registerLocaleData(localeFr);
         HighScoreBoxComponent,
         ConvertDialogComponent,
         AdminPageComponent,
+        AdminHighScoresComponent,
         AdminGameHistoryComponent,
     ],
     imports: [

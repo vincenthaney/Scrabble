@@ -6,7 +6,7 @@ export class StringConversion {
         return words.map((word) => word.reduce((previous, [, tile]) => previous + StringConversion.tileToString(tile), ''));
     }
 
-    private static tileToString(tile: Tile): string {
+    static tileToString(tile: Tile): string {
         return tile.playedLetter ? tile.playedLetter : tile.letter;
     }
 }
