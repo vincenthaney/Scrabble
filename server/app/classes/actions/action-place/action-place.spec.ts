@@ -14,6 +14,7 @@ import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile, TileReserve } from '@app/classes/tile';
@@ -227,7 +228,8 @@ describe('ActionPlace', () => {
                 assert(scoreCalculatorServiceStub.calculatePoints.calledOnce);
             });
 
-            it('should call objective validation', () => {
+            it('should call objective validation if GameType is LOG2990', () => {
+                game.gameType = GameType.LOG2990;
                 const gameObjectives: GameObjectivesData = {
                     player1Objectives: [],
                     player2Objectives: [],
@@ -236,6 +238,17 @@ describe('ActionPlace', () => {
                 const result: GameUpdateData = action.execute() as GameUpdateData;
                 expect(updateObjectiveStub.called).to.be.true;
                 expect(result.gameObjective).to.equal(gameObjectives);
+            });
+
+            it('should NOT call objective validation if GameType is Classic', () => {
+                game.gameType = GameType.Classic;
+                const gameObjectives: GameObjectivesData = {
+                    player1Objectives: [],
+                    player2Objectives: [],
+                };
+                updateObjectiveStub.returns({ updateData: gameObjectives, completionMessages: [] });
+                action.execute() as GameUpdateData;
+                expect(updateObjectiveStub.called).to.be.false;
             });
 
             it('should call board update', () => {

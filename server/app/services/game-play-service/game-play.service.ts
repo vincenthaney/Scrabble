@@ -108,7 +108,8 @@ export class GamePlayService {
 
     handleResetObjectives(gameId: string, playerId: string): GameUpdateData {
         const game: Game = this.activeGameService.getGame(gameId, playerId);
-        if (game.gameType !== GameType.LOG2990) return {};
+        if (game.gameType === GameType.Classic) return {};
+
         const objectiveData: GameObjectivesData = game.resetPlayerObjectiveProgression(playerId);
         return { gameObjective: objectiveData };
     }

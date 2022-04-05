@@ -12,6 +12,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -412,9 +413,17 @@ describe('GamePlayService', () => {
         });
     });
 
-    it('handleResetObjectives', () => {
+    it('handleResetObjectives should reset if gameType is LOG2990', () => {
+        gameStub.gameType = GameType.LOG2990;
         const resetSpy = chai.spy.on(gameStub, 'resetPlayerObjectiveProgression', () => {});
         gamePlayService.handleResetObjectives(gameStub.getId(), player.id);
         expect(resetSpy).to.have.been.called();
+    });
+
+    it('handleResetObjectives should NOT reset if gameType is Classic', () => {
+        gameStub.gameType = GameType.Classic;
+        const resetSpy = chai.spy.on(gameStub, 'resetPlayerObjectiveProgression', () => {});
+        gamePlayService.handleResetObjectives(gameStub.getId(), player.id);
+        expect(resetSpy).not.to.have.been.called();
     });
 });
