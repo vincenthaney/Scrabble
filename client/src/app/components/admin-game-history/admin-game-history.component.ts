@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DisplayGameHistoryColumnsIteratorItem, DisplayGameHistoryKeys, GameHistoryState } from '@app/classes/admin-game-history';
+import { DisplayGameHistoryColumns, DisplayGameHistoryColumnsIteratorItem, DisplayGameHistoryKeys, GameHistoryState } from '@app/classes/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -19,7 +19,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    columns;
+    columns: DisplayGameHistoryColumns;
     columnsItems: DisplayGameHistoryColumnsIteratorItem[];
     selectedColumnsItems: DisplayGameHistoryColumnsIteratorItem[];
     columnsControl: FormControl;
