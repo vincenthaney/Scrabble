@@ -7,7 +7,7 @@ import { DisplayGameHistoryColumnsIteratorItem, DisplayGameHistoryKeys, GameHist
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-import { COLUMNS, DEFAULT_COLUMNS } from '@app/constants/components-constants';
+import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { isKey } from '@app/utils/is-key';
 
 @Component({
@@ -19,7 +19,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    columns = COLUMNS;
+    columns = GAME_HISTORY_COLUMNS;
     columnsItems: DisplayGameHistoryColumnsIteratorItem[] = [];
     selectedColumnsItems: DisplayGameHistoryColumnsIteratorItem[] = [];
     columnsControl = new FormControl();
@@ -77,7 +77,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     }
 
     getSelectedColumns(): DisplayGameHistoryColumnsIteratorItem[] {
-        return DEFAULT_COLUMNS.map<DisplayGameHistoryColumnsIteratorItem>(
+        return DEFAULT_GAME_HISTORY_COLUMNS.map<DisplayGameHistoryColumnsIteratorItem>(
             (key) => this.columnsItems.find((item) => item.key === key) || { key, label: this.columns[key] },
         );
     }

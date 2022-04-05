@@ -15,7 +15,7 @@ export const DEFAULT_HIGH_SCORE: SingleHighScore = { name: 'player1', gameType: 
 
 export const NOT_FOUND = -1;
 
-export const COLUMNS: DisplayGameHistoryColumns = {
+export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
     startDate: 'Date de début',
     startTime: 'Heure de début',
     endDate: 'Date de fin',
@@ -34,7 +34,7 @@ export const COLUMNS: DisplayGameHistoryColumns = {
     playerWinScore: 'Points joueur gagant',
 };
 
-export const DEFAULT_COLUMNS: DisplayGameHistoryKeys[] = [
+export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
     'startTime',
     'gameType',

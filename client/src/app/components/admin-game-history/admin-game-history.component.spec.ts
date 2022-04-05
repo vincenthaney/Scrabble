@@ -17,7 +17,7 @@ import { GameHistoryState } from '@app/classes/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-import { COLUMNS, DEFAULT_COLUMNS } from '@app/constants/components-constants';
+import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 
 import { AdminGameHistoryComponent } from './admin-game-history.component';
 
@@ -150,7 +150,7 @@ describe('AdminGameHistoryComponent', () => {
 
     describe('getSelectedColumns', () => {
         it('should get columns from DEFAULT_COLUMNS', () => {
-            const expected = DEFAULT_COLUMNS.map((key) => ({ key, label: COLUMNS[key] }));
+            const expected = DEFAULT_GAME_HISTORY_COLUMNS.map((key) => ({ key, label: GAME_HISTORY_COLUMNS[key] }));
 
             const result = component.getSelectedColumns();
 
@@ -169,16 +169,16 @@ describe('AdminGameHistoryComponent', () => {
                     name: 'player-1',
                     score: 1,
                     isVirtualPlayer: false,
+                    isWinner: true,
                 },
                 player2Data: {
                     name: 'player-2',
                     score: 2,
                     isVirtualPlayer: true,
+                    isWinner: false,
                 },
-                replacingPlayer: undefined,
                 gameType: GameType.Classic,
                 gameMode: GameMode.Multiplayer,
-                isOver: true,
                 hasBeenAbandoned: false,
             };
         });
