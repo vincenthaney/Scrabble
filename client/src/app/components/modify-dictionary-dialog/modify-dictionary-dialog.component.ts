@@ -1,7 +1,7 @@
 import { Component, Inject, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
+import { DICTIONARY_DESCRIPTION_VALIDATION, DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
 import { DICTIONARY_NOT_UPDATED, DICTIONARY_UPDATED } from '@app/constants/dictionary-service-constants';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { Subject } from 'rxjs';
@@ -51,9 +51,9 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
             ]),
             inputDictionaryDescription: new FormControl(data.dictionarytoModifyDescription, [
                 Validators.required,
-                Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
-                Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
-                Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
+                Validators.pattern(DICTIONARY_DESCRIPTION_VALIDATION.rule),
+                Validators.minLength(DICTIONARY_DESCRIPTION_VALIDATION.minLength),
+                Validators.maxLength(DICTIONARY_DESCRIPTION_VALIDATION.maxLength),
             ]),
         });
         this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (message) => {
