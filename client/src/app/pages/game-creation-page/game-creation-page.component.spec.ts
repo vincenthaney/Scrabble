@@ -230,21 +230,6 @@ describe('GameCreationPageComponent', () => {
     });
 
     describe('createGame', () => {
-        it('createGame should reroute to waiting-room if multiplayer game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.gameParameters.patchValue({ gameMode: component.gameModes.Multiplayer });
-
-            component['createGame']();
-            expect(spy).toHaveBeenCalledWith('waiting-room');
-        });
-
-        it('createGame should NOT reroute to game if solo game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-            component['createGame']();
-            expect(spy).not.toHaveBeenCalledWith('game');
-        });
-
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component['createGame']();
             expect(handleGameCreationSpy).toHaveBeenCalled();

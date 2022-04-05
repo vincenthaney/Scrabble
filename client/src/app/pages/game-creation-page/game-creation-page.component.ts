@@ -66,14 +66,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService
             .observeGameCreationFailed()
             .pipe(takeUntil(this.pageDestroyed$))
-            .subscribe(async (error: HttpErrorResponse) => {
-                if (error.error.message === INVALID_DICTIONARY_ID) {
-                    this.wasDictionaryDeleted = true;
-                    await this.dictionaryService.updateAllDictionaries();
-                    this.gameParameters.controls.dictionary?.setValue(undefined);
-                    this.gameParameters.controls.dictionary?.markAsTouched();
-                }
-            });
+            .subscribe(async (error: HttpErrorResponse) => await this.handleGameCreationFail(error));
         this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
         });
@@ -126,5 +119,14 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     private createGame(): void {
         this.isCreatingGame = true;
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
+    }
+
+    private async handleGameCreationFail(error: HttpErrorResponse): Promise<void> {
+        if (error.error.message === INVALID_DICTIONARY_ID) {
+            this.wasDictionaryDeleted = true;
+            await this.dictionaryService.updateAllDictionaries();
+            this.gameParameters.controls.dictionary?.setValue(undefined);
+            this.gameParameters.controls.dictionary?.markAsTouched();
+        }
     }
 }
