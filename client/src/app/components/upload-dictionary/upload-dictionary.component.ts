@@ -34,8 +34,6 @@ export class UploadDictionaryComponent {
         };
     }
     onUpload() {
-        // upload code goes here
-        console.log(this.newDictionary);
         this.dictionariesService.uploadDictionary(this.newDictionary);
     }
     closeDialog(): void {
