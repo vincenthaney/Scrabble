@@ -37,49 +37,33 @@
         
                 <ng-container matColumnDef="player1Name">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Name}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} </td>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} <app-icon *ngIf="element.player1Data.isWinner" class="winner-icon" icon="trophy" styling="solid"></app-icon> </td>
                 </ng-container>
         
                 <ng-container matColumnDef="player1Score">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Score}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score}} </td>
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score}} <app-icon *ngIf="element.player1Data.isWinner" class="winner-icon" icon="trophy" styling="solid"></app-icon> </td>
                 </ng-container>
         
                 <ng-container matColumnDef="player1Data">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Data}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} ({{element.player1Data.score}} points)
+                    <td mat-cell *matCellDef="let element"> {{element.player1Data.name}} ({{element.player1Data.score}} points) <app-icon *ngIf="element.player1Data.isWinner" class="winner-icon" icon="trophy" styling="solid"></app-icon> 
                     </td>
                 </ng-container>
         
                 <ng-container matColumnDef="player2Name">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Name}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} </td>
+                    <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} <app-icon *ngIf="element.player2Data.isWinner" class="winner-icon" icon="trophy" styling="solid"></app-icon></td>
                 </ng-container>
         
                 <ng-container matColumnDef="player2Score">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Score}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player2Data.score}} </td>
+                    <td mat-cell *matCellDef="let element"> {{element.player2Data.score}} <app-icon *ngIf="element.player2Data.isWinner" class="winner-icon" icon="trophy" styling="solid"></app-icon> </td>
                 </ng-container>
         
                 <ng-container matColumnDef="player2Data">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player2Data}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} ({{element.player2Data.score}} points)
-                    </td>
-                </ng-container>
-        
-                <ng-container matColumnDef="playerWinName">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.playerWinName}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score > element.player2Data.score ? element.player1Data.name : element.player2Data.name}} </td>
-                </ng-container>
-        
-                <ng-container matColumnDef="playerWinScore">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.playerWinScore}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score > element.player2Data.score ? element.player1Data.score : element.player2Data.score}} </td>
-                </ng-container>
-        
-                <ng-container matColumnDef="playerWinData">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.playerWinData}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.player1Data.score > element.player2Data.score ? element.player1Data.name : element.player2Data.name}} ({{element.player1Data.score > element.player2Data.score ? element.player1Data.score : element.player2Data.score}} points)
+                    <td mat-cell *matCellDef="let element"> {{element.player2Data.name}} ({{element.player2Data.score}} points) <app-icon *ngIf="element.player2Data.isWinner" class="winner-icon" icon="trophy" styling="solid"></app-icon> 
                     </td>
                 </ng-container>
         
@@ -93,18 +77,6 @@
                     <td mat-cell *matCellDef="let element"> {{element.gameMode}} </td>
                 </ng-container>
         
-                <ng-container matColumnDef="isOver">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.isOver}} </th>
-                    <td mat-cell *matCellDef="let element">
-                        <span *ngIf="element.isOver" class="primary">
-                            <app-icon icon="check"></app-icon>
-                        </span>
-                        <span *ngIf="!element.isOver" class="secondary">
-                            <app-icon icon="times"></app-icon>
-                        </span>
-                    </td>
-                </ng-container>
-        
                 <ng-container matColumnDef="hasBeenAbandoned">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.hasBeenAbandoned}} </th>
                     <td mat-cell *matCellDef="let element">
@@ -114,13 +86,6 @@
                         <span *ngIf="!element.hasBeenAbandoned" class="secondary">
                             <app-icon icon="times"></app-icon>
                         </span>
-                </ng-container>
-        
-                <ng-container matColumnDef="replacingPlayer">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.replacingPlayer}} </th>
-                    <td mat-cell *matCellDef="let element"> 
-                        <ng-container *ngIf="element.replacingPlayer">{{element.replacingPlayer?.name}} ({{element.replacingPlayer?.score}} points)</ng-container>
-                    </td>
                 </ng-container>
         
                 <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
