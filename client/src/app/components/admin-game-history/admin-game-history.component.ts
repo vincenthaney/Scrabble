@@ -13,6 +13,7 @@ import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
+import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { isKey } from '@app/utils/is-key';
 
 @Component({
@@ -112,8 +113,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     }
 
     getDuration(item: GameHistory): number {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return (item.endTime.getTime() - item.startTime.getTime()) / 1000;
+        return (item.endTime.getTime() - item.startTime.getTime()) / SECONDS_TO_MILLISECONDS;
     }
 
     getRandomData(): GameHistory[] {
