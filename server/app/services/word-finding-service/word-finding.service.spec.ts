@@ -11,8 +11,6 @@ import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingR
 import { expect } from 'chai';
 import { Tile } from '@app/classes/tile';
 import Range from '@app/classes/range/range';
-import { Dictionary } from '@app/classes/dictionary';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 
 describe('WordFindingService', () => {
@@ -62,13 +60,7 @@ describe('WordFindingService', () => {
         let params: WordFindingParameters;
 
         beforeEach(() => {
-            params = [
-                boardStub as unknown as Board,
-                tiles,
-                request,
-                new Dictionary({ title: '', description: '', words: [] }),
-                undefined as unknown as ScoreCalculatorService,
-            ];
+            params = [boardStub as unknown as Board, tiles, request];
         });
 
         it('should return WordFindingHint if useCase is hint', () => {
