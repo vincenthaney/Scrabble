@@ -5,14 +5,40 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { Square } from '@app/classes/square';
+import Tile from '@app/classes/tile/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
-import { BONUS_POINTS, DESCRIPTION, FourVowelsWordObjective, NAME, VOWELS } from './all-vowels';
+import { BONUS_POINTS, DESCRIPTION, FourVowelsWordObjective, MAX_PROGRESS, NAME, SHOULD_RESET } from './four-vowels-word';
 chai.use(spies);
 
-describe('Vowels Objective', () => {
+const SUCCESS_CREATED_WORD = [
+    [{} as unknown as Square, { letter: 'A' } as Tile],
+    [{} as unknown as Square, { letter: 'D' } as Tile],
+    [{} as unknown as Square, { letter: 'I' } as Tile],
+    [{} as unknown as Square, { letter: 'E' } as Tile],
+    [{} as unknown as Square, { letter: 'U' } as Tile],
+];
+
+const FAIL_CREATED_WORD = [
+    [{} as unknown as Square, { letter: 'M' } as Tile],
+    [{} as unknown as Square, { letter: 'O' } as Tile],
+    [{} as unknown as Square, { letter: 'U' } as Tile],
+    [{} as unknown as Square, { letter: 'C' } as Tile],
+    [{} as unknown as Square, { letter: 'H' } as Tile],
+    [{} as unknown as Square, { letter: 'E' } as Tile],
+    [{} as unknown as Square, { letter: 'S' } as Tile],
+];
+
+const VALID_PARAMETERS = { createdWords: [SUCCESS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
+
+const VALID_PARAMETERS_MULTIPLE = { createdWords: [SUCCESS_CREATED_WORD, SUCCESS_CREATED_WORD] } as ObjectiveValidationParameters;
+
+const INVALID_PARAMETERS = { createdWords: [FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
+
+describe.only('FourVowelsWordObjective', () => {
     let objective: FourVowelsWordObjective;
 
     beforeEach(() => {
@@ -28,59 +54,26 @@ describe('Vowels Objective', () => {
         expect(objective.name).to.equal(NAME);
         expect(objective.description).to.equal(DESCRIPTION);
         expect(objective.bonusPoints).to.equal(BONUS_POINTS);
-        expect(objective['maxProgress']).to.equal(VOWELS().length);
+        expect(objective.shouldResetOnInvalidWord).to.equal(SHOULD_RESET);
+        expect(objective['maxProgress']).to.equal(MAX_PROGRESS);
     });
 
     describe('updateProgress', () => {
-        let validationParameters: ObjectiveValidationParameters;
-
-        beforeEach(() => {
-            validationParameters = {
-                wordPlacement: {
-                    tilesToPlace: [
-                        { letter: 'A', value: 0 },
-                        { letter: 'B', value: 0 },
-                    ],
-                },
-            } as ObjectiveValidationParameters;
+        it('should not update progress if no created word has 4 vowels', () => {
+            objective.progress = 0;
+            objective.updateProgress(INVALID_PARAMETERS);
+            expect(objective.progress).to.equal(0);
         });
 
-        it('should update progress according to vowels played', () => {
+        it('should update progress if a created word has 4 vowels', () => {
             objective.progress = 0;
-            objective.updateProgress(validationParameters);
+            objective.updateProgress(VALID_PARAMETERS);
             expect(objective.progress).to.equal(1);
         });
 
-        it('should remove vowels from vowelsLeftToPlay', () => {
+        it('should only update progress once even if multiple created words have 4 vowels', () => {
             objective.progress = 0;
-            objective.updateProgress(validationParameters);
-            expect(objective['vowelsLeftToPlay'].includes('A')).to.be.false;
-            expect(objective['vowelsLeftToPlay'].length).to.equal(VOWELS().length - 1);
-        });
-
-        it('should not update progress twice if played two times same letter', () => {
-            validationParameters = {
-                wordPlacement: {
-                    tilesToPlace: [
-                        { letter: 'A', value: 0 },
-                        { letter: 'A', value: 0 },
-                    ],
-                },
-            } as ObjectiveValidationParameters;
-            objective.progress = 0;
-            objective.updateProgress(validationParameters);
-            expect(objective.progress).to.equal(1);
-        });
-
-        it('should not update progress if played vowel already played', () => {
-            validationParameters = {
-                wordPlacement: {
-                    tilesToPlace: [{ letter: 'A', value: 0 }],
-                },
-            } as ObjectiveValidationParameters;
-            objective.progress = 0;
-            objective.updateProgress(validationParameters);
-            objective.updateProgress(validationParameters);
+            objective.updateProgress(VALID_PARAMETERS_MULTIPLE);
             expect(objective.progress).to.equal(1);
         });
     });
