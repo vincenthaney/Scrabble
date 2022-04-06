@@ -20,7 +20,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     message: string;
     title: string;
     dictionaryToModifyName: string;
-    dictionarytoModifyDescription: string;
+    dictionaryToModifyDescription: string;
     dictionaryId: string;
     formParameters: FormGroup;
     isDictionaryNameValid: boolean;
@@ -35,7 +35,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         this.state = ModifyDictionaryComponentStates.Ready;
         this.title = data.title;
         this.dictionaryToModifyName = data.dictionaryToModifyName;
-        this.dictionarytoModifyDescription = data.dictionarytoModifyDescription;
+        this.dictionaryToModifyDescription = data.dictionaryToModifyDescription;
         this.dictionaryId = data.dictionaryId;
         this.isDictionaryNameValid = true;
         this.isDictionaryDescriptionValid = true;
@@ -47,7 +47,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
                 Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
             ]),
-            inputDictionaryDescription: new FormControl(data.dictionarytoModifyDescription, [
+            inputDictionaryDescription: new FormControl(data.dictionaryToModifyDescription, [
                 Validators.required,
                 Validators.pattern(DICTIONARY_DESCRIPTION_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_DESCRIPTION_VALIDATION.minLength),
@@ -60,10 +60,6 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(): void {
-        this.onChange();
-    }
-
-    onChange(): void {
         this.formParameters.controls.inputName?.updateValueAndValidity();
         this.isDictionaryNameValid = this.formParameters.get('inputDictionaryName')?.valid ?? false;
         this.isDictionaryDescriptionValid = this.formParameters.get('inputDictionaryDescription')?.valid ?? false;

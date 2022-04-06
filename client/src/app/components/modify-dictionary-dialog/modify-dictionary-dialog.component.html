@@ -16,8 +16,8 @@
             type="text"
             formControlName="inputDictionaryName"
             autocomplete="off"
-            (ngModelChange)="onChange()"
-            (valueChanges)="onChange()"
+            (ngModelChange)="ngOnChanges()"
+            (valueChanges)="ngOnChanges()"
         />
     </mat-form-field>
 </mat-dialog-actions>
@@ -35,8 +35,8 @@
         type="text"
         formControlName="inputDictionaryDescription"
         autocomplete="off"
-        (ngModelChange)="onChange()"
-        (valueChanges)="onChange()"
+        (ngModelChange)="ngOnChanges()"
+        (valueChanges)="ngOnChanges()"
     />
     </mat-form-field>
 </mat-dialog-actions>
