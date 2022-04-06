@@ -10,7 +10,7 @@ export const VOWELS = (): LetterValue[] => ['A', 'E', 'I', 'O', 'U', 'Y'];
 
 const SHOULD_RESET = false;
 
-export class VowelsObjective extends AbstractObjective {
+export class AllVowelsObjective extends AbstractObjective {
     private vowelsLeftToPlay: LetterValue[];
 
     constructor() {
@@ -29,8 +29,8 @@ export class VowelsObjective extends AbstractObjective {
         });
     }
 
-    clone(): VowelsObjective {
-        const clone = new VowelsObjective();
+    clone(): AllVowelsObjective {
+        const clone = new AllVowelsObjective();
         clone.progress = this.progress;
         clone.state = this.state;
         clone.isPublic = this.isPublic;

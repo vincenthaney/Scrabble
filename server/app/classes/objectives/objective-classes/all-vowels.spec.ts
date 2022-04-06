@@ -9,14 +9,14 @@ import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
-import { BONUS_POINTS, DESCRIPTION, NAME, VOWELS, VowelsObjective } from './vowel-objective';
+import { AllVowelsObjective, BONUS_POINTS, DESCRIPTION, NAME, VOWELS } from './all-vowels';
 chai.use(spies);
 
 describe('Vowels Objective', () => {
-    let objective: VowelsObjective;
+    let objective: AllVowelsObjective;
 
     beforeEach(() => {
-        objective = new VowelsObjective();
+        objective = new AllVowelsObjective();
     });
 
     afterEach(() => {
