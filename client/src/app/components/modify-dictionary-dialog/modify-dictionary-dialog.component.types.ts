@@ -1,7 +1,7 @@
 export interface DictionaryDialogParameters {
     title: string;
     dictionaryToModifyName: string;
-    dictionarytoModifyDescription: string;
+    dictionaryToModifyDescription: string;
     dictionaryId: string;
 }
 
