@@ -35,7 +35,6 @@ export class DeleteDictionaryDialogComponent {
 
     cleanupDialogStates(): void {
         this.state = DeleteDictionaryComponentStates.Ready;
-        this.message = '';
     }
 
     async deleteDictionary(): Promise<void> {

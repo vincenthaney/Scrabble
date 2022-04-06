@@ -17,15 +17,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DeleteDictionaryDialogComponent } from './delete-dictionary-dialog.component';
 import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
-// const TEST_ID = 'test';
-// const testElementData: DictionarySummary = {
-//     title: 'testTitle',
-//     description: 'testDescription',
-//     id: 'testId',
-//     isDefault: false,
-// };
-// const TEST_DICTIONARY_SUMMARY_ARRAY: DictionarySummary[] = [testElementData];
-// const TEST_SNACKBAR = undefined as unknown as MatSnackBarRef<TextOnlySnackBar>;
 
 const MODEL: DeleteDictionaryDialogParameters = {
     title: 'Dialog title',
@@ -106,7 +97,7 @@ describe('DeleteDictionaryComponent', () => {
             const spy = spyOn(component['dialogRef'], 'close').and.callFake(() => {
                 return;
             });
-            component['dialogRef'].close();
+            component.closeDialog();
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -115,11 +106,6 @@ describe('DeleteDictionaryComponent', () => {
         it('should turn state to Ready', () => {
             component.cleanupDialogStates();
             expect(component.state).toEqual(DeleteDictionaryComponentStates.Ready);
-        });
-
-        it("should turn state message to ''", () => {
-            component.cleanupDialogStates();
-            expect(component.message).toEqual('');
         });
     });
 
