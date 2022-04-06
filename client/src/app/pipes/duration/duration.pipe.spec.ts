@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DurationPipe, DurationPipeParams } from './duration.pipe';
 
@@ -32,7 +33,11 @@ describe('DurationPipe', () => {
 
     it('should work without suffix', () => {
         const pipe = new DurationPipe();
-        // eslint-disable-next-line dot-notation
-        expect(pipe['addDurationValue'](1, false)).toBeTruthy();
+        pipe['duration'] = 2;
+        pipe['output'] = '';
+
+        pipe['addDurationValue'](1, false);
+
+        expect(pipe['output']).not.toEqual('');
     });
 });

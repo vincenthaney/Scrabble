@@ -44,7 +44,7 @@ export class DurationPipe implements PipeTransform {
         return this.output;
     }
 
-    private addDurationValue(factor: number, padNumber: boolean, suffix: string = '') {
+    private addDurationValue(factor: number, padNumber: boolean, suffix: string = ''): void {
         const value = Math.floor(this.duration / factor);
 
         if (value === 0) return;

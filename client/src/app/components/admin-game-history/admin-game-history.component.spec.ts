@@ -211,4 +211,20 @@ describe('AdminGameHistoryComponent', () => {
             expect(component.sortGameHistory(gameHistory, 'invalidProperty')).toEqual('');
         });
     });
+
+    describe('getDuration', () => {
+        const tests: [start: Date, end: Date, expected: number][] = [
+            [new Date(1, 1, 1, 3, 30), new Date(1, 1, 1, 5, 45), 8100],
+            [new Date(1, 1, 1, 5, 0), new Date(1, 1, 1, 16, 0), 39600],
+        ];
+
+        let index = 1;
+        for (const [start, end, expected] of tests) {
+            it(`should get duration (${index})`, () => {
+                const item: GameHistory = { startTime: start, endTime: end } as GameHistory;
+                expect(component.getDuration(item)).toEqual(expected);
+            });
+            index++;
+        }
+    });
 });
