@@ -14,13 +14,11 @@ import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virt
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import Range from '@app/classes/range/range';
-import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { Random } from '@app/utils/random';
 import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
-    private wordFindingInstance: AbstractWordFinding;
-
     protected async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
         if (randomAction <= PLACE_ACTION_THRESHOLD) {
@@ -59,21 +57,17 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         return ActionPass.createActionData();
     }
 
-    private updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
-        const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
-        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
-    }
-
-    private computeWordPlacement(): ScoredWordPlacement | undefined {
-        return this.getWordFindingService().findWords(this.getGameBoard(this.gameId, this.id), this.tiles, this.generateWordFindingRequest()).pop();
-    }
-
-    private generateWordFindingRequest(): WordFindingRequest {
+    protected generateWordFindingRequest(): WordFindingRequest {
         return {
             pointRange: this.findPointRange(),
             useCase: WordFindingUseCase.Beginner,
             pointHistory: this.pointHistory,
         };
+    }
+
+    private updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
+        const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
+        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
     }
 
     private selectRandomTiles(): Tile[] {

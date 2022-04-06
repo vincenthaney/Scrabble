@@ -4,7 +4,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
+import { AbstractWordFinding, ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     HIGH_SCORE_RANGE_MAX,
     HIGH_SCORE_RANGE_MIN,
@@ -29,10 +29,9 @@ import {
     TEST_SCORE,
     TEST_START_POSITION,
 } from '@app/constants/virtual-player-tests-constants';
-import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
-import { createStubInstance, SinonStubbedInstance, stub } from 'sinon';
+import { createStubInstance, stub } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
 import { ActionData } from '@app/classes/communication/action-data';
 
@@ -216,48 +215,6 @@ describe('BeginnerVirtualPlayer', () => {
         expect(testWordFindingRequest.pointRange).to.deep.equal(TEST_POINT_RANGE);
     });
 
-    describe('computeWordPlacement', () => {
-        let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
-
-        beforeEach(async () => {
-            wordFindingServiceStub = createStubInstance(WordFindingService);
-            beginnerVirtualPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
-        });
-
-        afterEach(() => {
-            chai.spy.restore();
-        });
-
-        it('should call findWords', () => {
-            const findWordsSpy = spy.on(beginnerVirtualPlayer['wordFindingService'], 'findWords', () => {
-                return [];
-            });
-            spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
-                return;
-            });
-            spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
-                return;
-            });
-            beginnerVirtualPlayer['computeWordPlacement']();
-            expect(findWordsSpy).to.have.been.called();
-        });
-
-        it('should call getGameBoard and generateWord', () => {
-            chai.spy.on(beginnerVirtualPlayer['wordFindingService'], 'findWords', () => {
-                return [];
-            });
-            const getGameBoardSpy = spy.on(beginnerVirtualPlayer, 'getGameBoard', () => {
-                return;
-            });
-            const generateWordSpy = spy.on(beginnerVirtualPlayer, 'generateWordFindingRequest', () => {
-                return;
-            });
-            beginnerVirtualPlayer['computeWordPlacement']();
-            expect(getGameBoardSpy).to.have.been.called();
-            expect(generateWordSpy).to.have.been.called();
-        });
-    });
-
     describe('selectRandomTiles', () => {
         it('should send the specified tile count', () => {
             beginnerVirtualPlayer.tiles = [
@@ -276,7 +233,32 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     describe('alternativeMove', () => {
-        it('should ActionPass.createActionData', () => {
+        it('should call ActionPass if no moves are found and exchange is not possible', () => {
+            const wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
+            wordFindingInstanceStub['wordPlacements'] = [];
+            beginnerVirtualPlayer['wordFindingInstance'] = wordFindingInstanceStub as unknown as AbstractWordFinding;
+            const createActionDataSpy = spy.on(ActionPass, 'createActionData', () => {});
+
+            beginnerVirtualPlayer['alternativeMove']();
+            expect(createActionDataSpy).to.have.been.called();
+        });
+
+        it('should call ActionPlace if a moves is found', () => {
+            const wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
+            wordFindingInstanceStub['wordPlacements'] = [{} as unknown as ScoredWordPlacement];
+            beginnerVirtualPlayer['wordFindingInstance'] = wordFindingInstanceStub as unknown as AbstractWordFinding;
+            spy.on(beginnerVirtualPlayer, 'isExchangePossible', () => {
+                return false;
+            });
+            const createActionDataSpy = spy.on(ActionPlace, 'createActionData', () => {});
+            const updateHistorySpy = spy.on(beginnerVirtualPlayer, 'updateHistory', () => {});
+
+            beginnerVirtualPlayer['alternativeMove']();
+            expect(createActionDataSpy).to.have.been.called();
+            expect(updateHistorySpy).to.have.been.called();
+        });
+
+        it('should ActionPass.createActionData  if no moves are found', () => {
             const createActionDataSpy = chai.spy.on(ActionPass, 'createActionData', () => {});
             beginnerVirtualPlayer['alternativeMove']();
             expect(createActionDataSpy).to.have.been.called();
