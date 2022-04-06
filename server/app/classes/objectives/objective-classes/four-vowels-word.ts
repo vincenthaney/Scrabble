@@ -3,7 +3,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import { VOWELS } from '@app/constants/services-constants/objective.const';
 
 export const NAME = 'Voyelles au max';
-export const DESCRIPTION = 'Former un mot qui contient 4 voyelles';
+export const DESCRIPTION = 'Former un mot qui contient 4 voyelles ou plus';
 export const BONUS_POINTS = 30;
 export const SHOULD_RESET = false;
 export const MAX_PROGRESS = 1;
@@ -18,8 +18,8 @@ export class FourVowelsWordObjective extends AbstractObjective {
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
         for (const createdWord of validationParameters.createdWords) {
             const numberOfVowels = createdWord.filter(([, tile]) => VOWELS().includes(tile.letter)).length;
-            if (numberOfVowels === REQUIRED_NUMBER_OF_VOWELS) {
-                this.progress++;
+            if (numberOfVowels >= REQUIRED_NUMBER_OF_VOWELS) {
+                this.progress = this.maxProgress;
                 break;
             }
         }

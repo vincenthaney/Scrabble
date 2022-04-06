@@ -14,11 +14,20 @@ import * as sinon from 'sinon';
 import { BONUS_POINTS, DESCRIPTION, FourVowelsWordObjective, MAX_PROGRESS, NAME, SHOULD_RESET } from './four-vowels-word';
 chai.use(spies);
 
-const SUCCESS_CREATED_WORD = [
+const FOUR_VOWELS_CREATED_WORD = [
     [{} as unknown as Square, { letter: 'A' } as Tile],
     [{} as unknown as Square, { letter: 'D' } as Tile],
     [{} as unknown as Square, { letter: 'I' } as Tile],
     [{} as unknown as Square, { letter: 'E' } as Tile],
+    [{} as unknown as Square, { letter: 'U' } as Tile],
+];
+
+const FIVE_VOWELS_CREATED_WORD = [
+    [{} as unknown as Square, { letter: 'O' } as Tile],
+    [{} as unknown as Square, { letter: 'I' } as Tile],
+    [{} as unknown as Square, { letter: 'S' } as Tile],
+    [{} as unknown as Square, { letter: 'E' } as Tile],
+    [{} as unknown as Square, { letter: 'A' } as Tile],
     [{} as unknown as Square, { letter: 'U' } as Tile],
 ];
 
@@ -32,13 +41,15 @@ const FAIL_CREATED_WORD = [
     [{} as unknown as Square, { letter: 'S' } as Tile],
 ];
 
-const VALID_PARAMETERS = { createdWords: [SUCCESS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
+const VALID_PARAMETERS_4 = { createdWords: [FOUR_VOWELS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
 
-const VALID_PARAMETERS_MULTIPLE = { createdWords: [SUCCESS_CREATED_WORD, SUCCESS_CREATED_WORD] } as ObjectiveValidationParameters;
+const VALID_PARAMETERS_5 = { createdWords: [FOUR_VOWELS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
+
+const VALID_PARAMETERS_MULTIPLE = { createdWords: [FOUR_VOWELS_CREATED_WORD, FIVE_VOWELS_CREATED_WORD] } as ObjectiveValidationParameters;
 
 const INVALID_PARAMETERS = { createdWords: [FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
 
-describe('FourVowelsWordObjective', () => {
+describe.only('FourVowelsWordObjective', () => {
     let objective: FourVowelsWordObjective;
 
     beforeEach(() => {
@@ -67,7 +78,13 @@ describe('FourVowelsWordObjective', () => {
 
         it('should update progress if a created word has 4 vowels', () => {
             objective.progress = 0;
-            objective.updateProgress(VALID_PARAMETERS);
+            objective.updateProgress(VALID_PARAMETERS_4);
+            expect(objective.progress).to.equal(1);
+        });
+
+        it('should update progress if a created word has more than 4 vowels', () => {
+            objective.progress = 0;
+            objective.updateProgress(VALID_PARAMETERS_5);
             expect(objective.progress).to.equal(1);
         });
 
