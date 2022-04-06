@@ -17,6 +17,7 @@ export class UploadDictionaryComponent {
     newDictionary: DictionaryData;
     constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionariesService) {}
 
+    // This explicit-any exclusion is necessary since the event has no specific type nor can be cast to one as this method is called.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onFileChanged(event: any) {
         this.selectedFile = event.target.files[0];
