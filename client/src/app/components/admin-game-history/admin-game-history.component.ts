@@ -54,7 +54,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
         this.dataSource.paginator = this.paginator;
     }
 
-    resetHistory() {
+    resetHistory(): void {
         this.state = GameHistoryState.Loading;
 
         this.gameHistoryService
@@ -64,7 +64,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
             .finally(() => (this.state = GameHistoryState.Ready));
     }
 
-    updateHistoryData() {
+    updateHistoryData(): void {
         this.state = GameHistoryState.Loading;
 
         this.gameHistoryService
