@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
@@ -87,6 +87,35 @@ describe('AdminDictionariesComponent', () => {
             });
             dictionariesServiceMock['dictionariesUpdateMessageEvent'].next();
             expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('On dictionariesUpdateDataEvent', () => {
+        it('should call dictionariesService.getDictionaries', () => {
+            const spy = spyOn(dictionariesServiceMock, 'getDictionaries').and.callFake(() => {
+                return TEST_DICTIONARY_SUMMARY_ARRAY;
+            });
+            spyOn<any>(component, 'convertDictionariesToMatDataSource').and.callFake(() => {
+                return;
+            });
+            dictionariesServiceMock['dictionariesUpdatedEvent'].next();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call convertDictionariesToMatDataSource', () => {
+            spyOn(dictionariesServiceMock, 'getDictionaries').and.callFake(() => {
+                return TEST_DICTIONARY_SUMMARY_ARRAY;
+            });
+            const spy = spyOn<any>(component, 'convertDictionariesToMatDataSource').and.callFake(() => {
+                return;
+            });
+            dictionariesServiceMock['dictionariesUpdatedEvent'].next();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should should turn isWaitingForServerResponse to false', () => {
+            dictionariesServiceMock['dictionariesUpdatedEvent'].next();
+            expect(component.isWaitingForServerResponse).toBeFalse();
         });
     });
 
@@ -173,6 +202,13 @@ describe('AdminDictionariesComponent', () => {
 
         it('should call return item.description', () => {
             expect(component.sortDictionaries(testElementData, 'dictionaryDescription')).toEqual('testDescription');
+        });
+    });
+
+    describe('convertDictionariesToMatDataSource', async () => {
+        it('should assign new MattableDataSource filled with TestArrayDictionarySummary[] to dataSource', async () => {
+            await component['convertDictionariesToMatDataSource'](TEST_DICTIONARY_SUMMARY_ARRAY);
+            expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
         });
     });
 });

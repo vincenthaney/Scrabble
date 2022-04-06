@@ -151,15 +151,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     private async convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
-        const dictionariesSummary: DictionarySummary[] = [];
-        dictionaries.forEach((dictionary) => {
-            dictionariesSummary.push({
-                id: dictionary.id,
-                title: dictionary.title,
-                description: dictionary.description,
-                isDefault: dictionary.isDefault,
-            });
-        });
-        this.dataSource = new MatTableDataSource(dictionariesSummary);
+        this.dataSource = new MatTableDataSource(dictionaries);
     }
 }
