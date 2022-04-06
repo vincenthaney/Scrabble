@@ -61,3 +61,21 @@ mat-paginator:not(.visible) {
     visibility: hidden;
     opacity: 0;
 }
+
+.buttons {
+    button {
+        app-icon {
+            margin-left: 12px;
+        }
+
+        &:not(:last-child) {
+            margin-right: 12px;
+        }
+    }
+}
+
+.no-data-message {
+    text-align: center;
+    opacity: 0.55;
+    margin: 12px 0;
+}

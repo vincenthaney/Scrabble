@@ -17,6 +17,6 @@ export class GameHistoryController {
     }
 
     resetGameHistories(): Observable<void> {
-        return this.http.get<void>(this.endpoint);
+        return this.http.delete<void>(this.endpoint);
     }
 }

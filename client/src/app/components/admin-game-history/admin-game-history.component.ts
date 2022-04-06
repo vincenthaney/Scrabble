@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {
@@ -9,12 +10,14 @@ import {
     DisplayGameHistoryKeys,
     GameHistoryState,
 } from '@app/classes/admin-game-history';
+import { GameHistoriesConverter } from '@app/classes/game-history/game-histories-converter';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { GameHistoryController } from '@app/controllers/game-history-controller/game-history.controller';
 import { isKey } from '@app/utils/is-key';
+import { catchError, retry } from 'rxjs/operators';
 
 @Component({
     selector: 'app-admin-game-history',
@@ -33,7 +36,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     state: GameHistoryState;
     error: string | undefined;
 
-    constructor() {
+    constructor(private readonly gameHistoryController: GameHistoryController, private readonly snackBar: MatSnackBar) {
         this.columns = GAME_HISTORY_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
@@ -47,12 +50,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-        this.setHistoryData()
-            .then(() => (this.state = GameHistoryState.Ready))
-            .catch((error) => {
-                this.error = error.toString();
-                this.state = GameHistoryState.Error;
-            });
+        this.updateHistoryData();
     }
 
     ngAfterViewInit(): void {
@@ -61,18 +59,48 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     }
 
     resetHistory() {
-        // call service
-        this.dataSource.data = [];
+        this.state = GameHistoryState.Loading;
+        this.gameHistoryController
+            .resetGameHistories()
+            .pipe(
+                retry(1),
+                catchError((error, caught) => {
+                    this.state = GameHistoryState.Ready;
+                    this.snackBar.open(error);
+                    return caught;
+                }),
+            )
+            .subscribe(() => {
+                this.dataSource.data = [];
+                this.state = GameHistoryState.Ready;
+            });
+    }
+
+    updateHistoryData() {
+        this.state = GameHistoryState.Loading;
+        this.setHistoryData()
+            .then(() => (this.state = GameHistoryState.Ready))
+            .catch((error) => {
+                this.error = error.toString();
+                this.state = GameHistoryState.Error;
+            });
     }
 
     async setHistoryData() {
-        // call service
-        return new Promise<void>((resolve) => {
-            setTimeout(() => {
-                this.dataSource.data = this.getRandomData();
-                resolve();
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            }, 1000);
+        return new Promise<void>((resolve, reject) => {
+            this.gameHistoryController
+                .getGameHistories()
+                .pipe(
+                    retry(1),
+                    catchError((error, caught) => {
+                        reject(error);
+                        return caught;
+                    }),
+                )
+                .subscribe((gameHistories) => {
+                    this.dataSource.data = GameHistoriesConverter.convert(gameHistories);
+                    resolve();
+                });
         });
     }
 
@@ -107,13 +135,17 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
                 return item.player2Data.score;
             case 'player2Data':
                 return item.player2Data.name;
+            case 'startDate':
+                return item.startTime.valueOf();
+            case 'endDate':
+                return item.endTime.valueOf();
             default:
                 return isKey(property, item) ? (item[property] as string) : '';
         }
     }
 
     getDuration(item: GameHistory): number {
-        return (item.endTime.getTime() - item.startTime.getTime()) / SECONDS_TO_MILLISECONDS;
+        return item.endTime.getTime() - item.startTime.getTime();
     }
 
     getRandomData(): GameHistory[] {

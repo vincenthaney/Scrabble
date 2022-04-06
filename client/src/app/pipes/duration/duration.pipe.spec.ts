@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { DurationPipe, DurationPipeParams } from './duration.pipe';
+import { DurationPipe } from './duration.pipe';
 
 describe('DurationPipe', () => {
     it('create an instance', () => {
@@ -8,20 +8,18 @@ describe('DurationPipe', () => {
         expect(pipe).toBeTruthy();
     });
 
-    const tests: [duration: number, parameters: Partial<DurationPipeParams>, expected: string][] = [
-        [0, {}, '0s'],
-        [10, { hours: false, minutes: false, seconds: true }, '10s'],
-        [60, { minutes: true, padMinutes: false }, '1m'],
-        [3600, { hours: true }, '1h'],
-        [3720, { hours: true, minutes: true, seconds: false, padMinutes: true }, '1h02m'],
-        [3720, { hours: true, minutes: true, seconds: false, padMinutes: false }, '1h2m'],
+    const tests: [duration: number, expected: string][] = [
+        [0, '0m'],
+        [60, '1m'],
+        [3600, '1h'],
+        [3720, '1h 02m'],
     ];
 
     let index = 1;
-    for (const [duration, parameters, expected] of tests) {
+    for (const [duration, expected] of tests) {
         it(`should convert duration (${index})`, () => {
             const pipe = new DurationPipe();
-            expect(pipe.transform(duration, parameters)).toEqual(expected);
+            expect(pipe.transform(duration)).toEqual(expected);
         });
         index++;
     }
@@ -29,15 +27,5 @@ describe('DurationPipe', () => {
     it('should work with empty parameters', () => {
         const pipe = new DurationPipe();
         expect(pipe.transform(0)).toBeTruthy();
-    });
-
-    it('should work without suffix', () => {
-        const pipe = new DurationPipe();
-        pipe['duration'] = 2;
-        pipe['output'] = '';
-
-        pipe['addDurationValue'](1, false);
-
-        expect(pipe['output']).not.toEqual('');
     });
 });

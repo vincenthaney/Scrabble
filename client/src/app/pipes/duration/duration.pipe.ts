@@ -1,56 +1,51 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { padStart } from 'lodash';
+import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { padStart, take } from 'lodash';
+import { pipe } from 'rxjs';
 
-export interface DurationPipeParams {
-    hours: boolean;
-    minutes: boolean;
-    seconds: boolean;
-    padHours: boolean;
-    padMinutes: boolean;
-    padSeconds: boolean;
-}
-
-const DEFAULT_DURATION_PIPE_PARAMS: DurationPipeParams = {
-    hours: true,
-    minutes: true,
-    seconds: false,
-    padHours: false,
-    padMinutes: true,
-    padSeconds: true,
-};
+export type DurationTime = [time: number, suffix: string];
 
 const SECONDS_IN_HOUR = 3600;
 const SECONDS_IN_MINUTE = 60;
+const MAX_ITEMS = 2;
 
 @Pipe({
     name: 'duration',
 })
 export class DurationPipe implements PipeTransform {
     private duration: number;
-    private output: string;
-    private parameters: DurationPipeParams;
 
-    transform(duration: number, params: Partial<DurationPipeParams> = {}): string {
+    transform(duration: number): string {
         this.duration = duration;
-        this.output = '';
-        this.parameters = { ...DEFAULT_DURATION_PIPE_PARAMS, ...params };
-
-        if (this.parameters.hours) this.addDurationValue(SECONDS_IN_HOUR, this.parameters.padHours, 'h');
-        if (this.parameters.minutes) this.addDurationValue(SECONDS_IN_MINUTE, this.parameters.padMinutes, 'm');
-        if (this.parameters.seconds) this.addDurationValue(1, this.parameters.padSeconds, 's');
-
-        if (this.output === '') this.output = '0s';
-
-        return this.output;
+        return pipe(this.trimDurationTimes, this.mapToString, this.merge)(this.getDurationTimes());
     }
 
-    private addDurationValue(factor: number, padNumber: boolean, suffix: string = ''): void {
-        const value = Math.floor(this.duration / factor);
+    private trimDurationTimes(durationsTimes: DurationTime[]) {
+        durationsTimes = [...durationsTimes];
+        while (durationsTimes.length > 0 && durationsTimes[0][0] === 0) durationsTimes.shift();
+        while (durationsTimes.length > 0 && durationsTimes[durationsTimes.length - 1][0] === 0) durationsTimes.pop();
+        return take(durationsTimes, MAX_ITEMS);
+    }
 
-        if (value === 0) return;
+    private mapToString(durationsTimes: DurationTime[]): string[] {
+        return durationsTimes.map(([time, suffix], index) => `${index > 0 ? padStart(time.toString(), 2, '0') : time}${suffix}`);
+    }
 
-        this.duration -= value * factor;
+    private merge(timeString: string[]): string {
+        return timeString.join(' ');
+    }
 
-        this.output += (padNumber ? padStart(`${value}`, 2, '0') : `${value}`) + suffix;
+    private getDurationTimes(): DurationTime[] {
+        return [
+            [this.getTime(SECONDS_IN_HOUR * SECONDS_TO_MILLISECONDS), 'h'],
+            [this.getTime(SECONDS_IN_MINUTE * SECONDS_TO_MILLISECONDS), 'm'],
+            [this.getTime(SECONDS_TO_MILLISECONDS), 's'],
+        ];
+    }
+
+    private getTime(factor: number): number {
+        const time = Math.floor(this.duration / factor);
+        this.duration -= time * factor;
+        return time;
     }
 }

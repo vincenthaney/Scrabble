@@ -1,6 +1,9 @@
 <div matSort>
     <div class="filter-container">
-        <button mat-flat-button color="primary" (click)="resetHistory()" [disabled]="state !== 'ready'">Réinitialiser les historiques de parties</button>
+        <div class="buttons">
+            <button mat-flat-button color="primary" (click)="resetHistory()" [disabled]="state !== 'ready'">Réinitialiser <app-icon icon="history"></app-icon></button>
+            <button mat-flat-button color="primary" (click)="updateHistoryData()" [disabled]="state !== 'ready'">Actualiser <app-icon icon="sync"></app-icon></button>
+        </div>
 
         <mat-form-field appearance="outline" id="column-select">
             <mat-label>Colonnes du tableau</mat-label>
@@ -96,6 +99,8 @@
                 <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
                 <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
             </table>
+
+            <p *ngIf="dataSource.data.length === 0" class="no-data-message">Aucun historique de partie à afficher.<br>Jouez une partie pour la voir affichée ici.</p>
         </ng-container>
 
         <ng-container *ngSwitchCase="'loading'">
