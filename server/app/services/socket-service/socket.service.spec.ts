@@ -35,9 +35,10 @@ describe('SocketService', () => {
         let service: SocketService;
         let server: Server;
         let clientSocket: Socket;
+        const initServer = Container.get(Server);
 
         beforeEach(() => {
-            server = Container.get(Server);
+            server = initServer;
             server.init();
             service = server['socketService'];
             clientSocket = ioClient(SERVER_URL + Server['appPort']);

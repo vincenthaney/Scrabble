@@ -8,9 +8,9 @@ import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionRese
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
@@ -23,8 +23,8 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
-import * as sinon from 'sinon';
 import { EventEmitter } from 'events';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 const expect = chai.expect;
@@ -62,11 +62,12 @@ describe('GamePlayService', () => {
     let round: Round;
     let player: Player;
     let game: Game;
+    const initGamePlayService = Container.get(GamePlayService);
 
     beforeEach(() => {
         Container.set(DictionaryService, getDictionaryTestService());
 
-        gamePlayService = Container.get(GamePlayService);
+        gamePlayService = initGamePlayService;
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
         tileReserveStub = createStubInstance(TileReserve);
