@@ -17,7 +17,7 @@ export class DurationPipe implements PipeTransform {
 
     transform(duration: number): string {
         this.duration = duration;
-        return pipe(this.trimDurationTimes, this.mapToString, this.merge)(this.getDurationTimes());
+        return pipe(this.trimDurationTimes, this.mapToString, this.join)(this.getDurationTimes());
     }
 
     private trimDurationTimes(durationsTimes: DurationTime[]) {
@@ -31,7 +31,7 @@ export class DurationPipe implements PipeTransform {
         return durationsTimes.map(([time, suffix], index) => `${index > 0 ? padStart(time.toString(), 2, '0') : time}${suffix}`);
     }
 
-    private merge(timeString: string[]): string {
+    private join(timeString: string[]): string {
         return timeString.join(' ');
     }
 
