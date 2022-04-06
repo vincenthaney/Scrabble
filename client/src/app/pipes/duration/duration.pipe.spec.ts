@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DurationPipe, DurationPipeParams } from './duration.pipe';
 
-fdescribe('DurationPipe', () => {
+describe('DurationPipe', () => {
     it('create an instance', () => {
         const pipe = new DurationPipe();
         expect(pipe).toBeTruthy();
