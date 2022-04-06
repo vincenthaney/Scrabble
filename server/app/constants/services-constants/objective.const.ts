@@ -1,6 +1,7 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { AllVowelsObjective } from '@app/classes/objectives/objective-classes/all-vowels';
 import { ConsecutivePlaceOrientationObjective } from '@app/classes/objectives/objective-classes/consecutive-place-orientation';
+import { FourVowelsWordObjective } from '@app/classes/objectives/objective-classes/four-vowels-word';
 import { PlaceFiveLettersFiveTimesObjective } from '@app/classes/objectives/objective-classes/place-five-letters-five-times';
 import { TenLetterWord } from '@app/classes/objectives/objective-classes/ten-letter-word';
 import { ThreeWordsPlacement } from '@app/classes/objectives/objective-classes/three-word-placement';
@@ -14,6 +15,7 @@ export const GENERATE_LIST_OF_ALL_OBJECTIVES = (): AbstractObjective[] => {
         new ConsecutivePlaceOrientationObjective(),
         new TwoTenLetter(),
         new PlaceFiveLettersFiveTimesObjective(),
+        new FourVowelsWordObjective(),
     ];
 };
 
