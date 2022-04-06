@@ -1,32 +1,28 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { LetterValue } from '@app/classes/tile';
 import { VOWELS } from '@app/constants/services-constants/objective.const';
-import { StringConversion } from '@app/utils/string-conversion';
 
-export const NAME = 'Les bases';
-export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les lettres blanches)';
+export const NAME = 'Voyelles au max';
+export const DESCRIPTION = 'Former un mot qui contient 4 voyelles';
 export const BONUS_POINTS = 30;
+export const SHOULD_RESET = false;
+export const MAX_PROGRESS = 1;
 
-const SHOULD_RESET = false;
+export const REQUIRED_NUMBER_OF_VOWELS = 4;
 
 export class FourVowelsWordObjective extends AbstractObjective {
-    private vowelsLeftToPlay: LetterValue[];
-
     constructor() {
-        super(NAME, DESCRIPTION, BONUS_POINTS, SHOULD_RESET, VOWELS().length);
-        this.vowelsLeftToPlay = VOWELS();
+        super(NAME, DESCRIPTION, BONUS_POINTS, SHOULD_RESET, MAX_PROGRESS);
     }
+
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
-        const letterPlayed: LetterValue[] = validationParameters.wordPlacement.tilesToPlace.map(
-            (t) => StringConversion.tileToString(t) as LetterValue,
-        );
-        letterPlayed.forEach((letter: LetterValue) => {
-            if (this.vowelsLeftToPlay.includes(letter)) {
+        for (const createdWord of validationParameters.createdWords) {
+            const numberOfVowels = createdWord.filter(([, tile]) => VOWELS().includes(tile.letter)).length;
+            if (numberOfVowels === REQUIRED_NUMBER_OF_VOWELS) {
                 this.progress++;
-                this.vowelsLeftToPlay.splice(this.vowelsLeftToPlay.indexOf(letter), 1);
+                break;
             }
-        });
+        }
     }
 
     clone(): FourVowelsWordObjective {
@@ -34,7 +30,6 @@ export class FourVowelsWordObjective extends AbstractObjective {
         clone.progress = this.progress;
         clone.state = this.state;
         clone.isPublic = this.isPublic;
-        clone.vowelsLeftToPlay = this.vowelsLeftToPlay;
         return clone;
     }
 }
