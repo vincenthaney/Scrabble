@@ -3,15 +3,15 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Orientation } from '@app/classes/board';
+import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
-import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { ConsecutivePlaceOrientationObjective } from './consecutive-place-orientation';
-import { ObjectiveState } from '@app/classes/objectives/objective';
 chai.use(spies);
 
-describe('Abstract Objective', () => {
+describe('Consecutive Place Orientation Objective', () => {
     let objective: ConsecutivePlaceOrientationObjective;
 
     beforeEach(() => {
