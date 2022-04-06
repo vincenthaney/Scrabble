@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -36,7 +38,9 @@ describe('AdminGameHistoryComponent', () => {
                 MatOptionModule,
                 MatProgressSpinnerModule,
                 MatTooltipModule,
+                MatSnackBarModule,
                 MatPaginatorModule,
+                HttpClientTestingModule,
             ],
             declarations: [AdminGameHistoryComponent, MatSort, MatPaginator],
         }).compileComponents();
@@ -214,8 +218,8 @@ describe('AdminGameHistoryComponent', () => {
 
     describe('getDuration', () => {
         const tests: [start: Date, end: Date, expected: number][] = [
-            [new Date(1, 1, 1, 3, 30), new Date(1, 1, 1, 5, 45), 8100],
-            [new Date(1, 1, 1, 5, 0), new Date(1, 1, 1, 16, 0), 39600],
+            [new Date(1, 1, 1, 3, 30), new Date(1, 1, 1, 5, 45), 8100000],
+            [new Date(1, 1, 1, 5, 0), new Date(1, 1, 1, 16, 0), 39600000],
         ];
 
         let index = 1;

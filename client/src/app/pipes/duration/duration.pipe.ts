@@ -5,8 +5,10 @@ import { pipe } from 'rxjs';
 
 export type DurationTime = [time: number, suffix: string];
 
+const SECONDS_IN_DAY = 86400;
 const SECONDS_IN_HOUR = 3600;
 const SECONDS_IN_MINUTE = 60;
+const MIN_ITEMS = 1;
 const MAX_ITEMS = 2;
 
 @Pipe({
@@ -17,13 +19,17 @@ export class DurationPipe implements PipeTransform {
 
     transform(duration: number): string {
         this.duration = duration;
-        return pipe(this.trimDurationTimes, this.mapToString, this.join)(this.getDurationTimes());
+        return pipe(this.trimDurationTimes, this.takeMaxItems, this.trimDurationTimes, this.mapToString, this.join)(this.getDurationTimes());
     }
 
     private trimDurationTimes(durationsTimes: DurationTime[]) {
         durationsTimes = [...durationsTimes];
-        while (durationsTimes.length > 0 && durationsTimes[0][0] === 0) durationsTimes.shift();
-        while (durationsTimes.length > 0 && durationsTimes[durationsTimes.length - 1][0] === 0) durationsTimes.pop();
+        while (durationsTimes.length > MIN_ITEMS && durationsTimes[0][0] === 0) durationsTimes.shift();
+        while (durationsTimes.length > MIN_ITEMS && durationsTimes[durationsTimes.length - 1][0] === 0) durationsTimes.pop();
+        return durationsTimes;
+    }
+
+    private takeMaxItems(durationsTimes: DurationTime[]) {
         return take(durationsTimes, MAX_ITEMS);
     }
 
@@ -37,13 +43,15 @@ export class DurationPipe implements PipeTransform {
 
     private getDurationTimes(): DurationTime[] {
         return [
-            [this.getTime(SECONDS_IN_HOUR * SECONDS_TO_MILLISECONDS), 'h'],
-            [this.getTime(SECONDS_IN_MINUTE * SECONDS_TO_MILLISECONDS), 'm'],
-            [this.getTime(SECONDS_TO_MILLISECONDS), 's'],
+            [this.getRemainingTime(SECONDS_IN_DAY * SECONDS_TO_MILLISECONDS), ' jour(s)'],
+            [this.getRemainingTime(SECONDS_IN_HOUR * SECONDS_TO_MILLISECONDS), 'h'],
+            [this.getRemainingTime(SECONDS_IN_MINUTE * SECONDS_TO_MILLISECONDS), 'm'],
+            [this.getRemainingTime(SECONDS_TO_MILLISECONDS), 's'],
+            [this.getRemainingTime(1), 'ms'],
         ];
     }
 
-    private getTime(factor: number): number {
+    private getRemainingTime(factor: number): number {
         const time = Math.floor(this.duration / factor);
         this.duration -= time * factor;
         return time;
