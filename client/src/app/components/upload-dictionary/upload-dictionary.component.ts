@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DictionaryData } from '@app/classes/dictionary';
+import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 
