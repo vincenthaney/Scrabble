@@ -13,6 +13,10 @@ import { DictionaryDialogParameters } from '@app/components/modify-dictionary-di
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 import { Subject } from 'rxjs';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
+import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component';
+import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { PositiveFeedback, SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -32,9 +36,10 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     state: DictionariesState = DictionariesState.Loading;
     error: string | undefined = undefined;
     isDownloadLoading: boolean;
+    isWaitingForServerResponse: boolean;
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
-    constructor(public dialog: MatDialog, private dictionariesService: DictionariesService) {
+    constructor(public dialog: MatDialog, private dictionariesService: DictionariesService, private snackBar: MatSnackBar) {
         this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
@@ -44,10 +49,24 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         });
         this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
-            this.state = DictionariesState.Ready;
+            this.isWaitingForServerResponse = false;
         });
         this.dictionariesService.subscribeToDownloadLoadingEvent(this.serviceDestroyed$, () => {
             this.isDownloadLoading = false;
+            this.isWaitingForServerResponse = false;
+        });
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
+            this.snackBar.open(
+                response,
+                'OK',
+                Object.values(PositiveFeedback).includes(response as PositiveFeedback)
+                    ? { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] }
+                    : { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] },
+            );
+        });
+        this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.serviceDestroyed$, (state) => {
+            this.state = state;
+            this.isWaitingForServerResponse = false;
         });
     }
 
@@ -68,7 +87,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     modifyDictionary(element: DictionarySummary): void {
         const elementData: DictionaryDialogParameters = {
             title: element.title,
-            dictionarytoModifyDescription: element.description,
+            dictionaryToModifyDescription: element.description,
             dictionaryToModifyName: element.title,
             dictionaryId: element.id,
         };
@@ -79,6 +98,17 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dialog.open(UploadDictionaryComponent);
     }
 
+    deleteDictionary(element: DictionarySummary): void {
+        const elementId: DeleteDictionaryDialogParameters = {
+            title: element.title,
+            dictionaryId: element.id,
+            onClose: () => {
+                this.isWaitingForServerResponse = true;
+            },
+        };
+        this.dialog.open(DeleteDictionaryDialogComponent, { data: elementId });
+    }
+
     async setDictionariesData(): Promise<void> {
         await this.dictionariesService.updateAllDictionaries();
     }
@@ -86,10 +116,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     async downloadDictionary(id: string): Promise<void> {
         this.isDownloadLoading = true;
         await this.dictionariesService.downloadDictionary(id);
-    }
-
-    async deleteDictionary(id: string): Promise<void> {
-        await this.dictionariesService.deleteDictionary(id);
     }
 
     async resetDictionaries() {
@@ -125,15 +151,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     private async convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
-        const dictionariesSummary: DictionarySummary[] = [];
-        dictionaries.forEach((dictionary) => {
-            dictionariesSummary.push({
-                id: dictionary.id,
-                title: dictionary.title,
-                description: dictionary.description,
-                isDefault: dictionary.isDefault,
-            });
-        });
-        this.dataSource = new MatTableDataSource(dictionariesSummary);
+        this.dataSource = new MatTableDataSource(dictionaries);
     }
 }

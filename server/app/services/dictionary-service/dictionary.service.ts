@@ -71,7 +71,7 @@ export default class DictionaryService {
     }
 
     async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
-        if (!this.validateDictionary(basicDictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
+        if (!(await this.validateDictionary(basicDictionaryData))) throw new Error(INVALID_DICTIONARY_FORMAT);
         const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
         await this.collection.updateOne(
             {
@@ -114,7 +114,7 @@ export default class DictionaryService {
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
-            if (!this.isTitleValid(updateInfo.title)) throw new Error(INVALID_TITLE_FORMAT);
+            if (!(await this.isTitleValid(updateInfo.title))) throw new Error(INVALID_TITLE_FORMAT);
             infoToUpdate.title = updateInfo.title;
         }
 

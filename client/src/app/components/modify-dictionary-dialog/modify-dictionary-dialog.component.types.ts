@@ -1,7 +1,7 @@
 export interface DictionaryDialogParameters {
     title: string;
     dictionaryToModifyName: string;
-    dictionarytoModifyDescription: string;
+    dictionaryToModifyDescription: string;
     dictionaryId: string;
 }
 
@@ -13,6 +13,6 @@ export enum ModifyDictionaryComponentStates {
 
 export enum ModifyDictionaryComponentIcons {
     SuccessIcon = 'check',
-    ErrorIcon = 'close',
+    ErrorIcon = 'times',
     NoIcon = '',
 }

@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { environment } from 'src/environments/environment';
+import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
+import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
+import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
 
 @Component({
     selector: 'app-upload-dictionary',
@@ -9,30 +10,38 @@ import { environment } from 'src/environments/environment';
     styleUrls: ['upload-dictionary.component.scss'],
 })
 export class UploadDictionaryComponent {
-    fileName = '';
+    title: string = "Téléchargement d'un nouveau dictionaire";
+    errorMessage: string = '';
     isUploadableFile: boolean = false;
-    constructor(private http: HttpClient, private dialogRef: MatDialogRef<UploadDictionaryComponent>) {}
+    selectedFile: File;
+    newDictionary: DictionaryData;
+    constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionariesService) {}
 
+    // This explicit-any exclusion is necessary since the event has no specific type nor can be cast to one as this method is called.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onFileSelected(event: any): void {
-        const file: File = event.target.files[0];
-        const fileJSON = JSON.stringify(file);
-        if (this.isJSONDictionaryFile(fileJSON)) {
-            this.isUploadableFile = true;
-            const endpoint = `${environment.serverUrl}/dictionaries`;
-            const upload$ = this.http.post(endpoint, JSON.stringify(file));
-            upload$.subscribe();
-            return;
-        }
-        this.isUploadableFile = false;
+    onFileChanged(event: any) {
+        this.selectedFile = event.target.files[0];
+        const fileReader = new FileReader();
+        fileReader.readAsText(this.selectedFile, 'UTF-8');
+        fileReader.onload = () => {
+            try {
+                this.newDictionary = JSON.parse(fileReader.result as string) as DictionaryData;
+            } catch (error) {
+                const newError = error as SyntaxError;
+                this.errorMessage = newError.message;
+            }
+        };
+        fileReader.onerror = () => {
+            this.errorMessage = WRONG_FILE_TYPE;
+        };
     }
-    closeDialog(): void {
+
+    onUpload() {
+        this.dictionariesService.uploadDictionary(this.newDictionary);
         this.dialogRef.close();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    isJSONDictionaryFile(fileJSON: any): boolean {
-        console.log(fileJSON);
-        return fileJSON.title && fileJSON.description && fileJSON.words;
+    closeDialog(): void {
+        this.dialogRef.close();
     }
 }

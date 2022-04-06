@@ -1,0 +1,15 @@
+<h3 mat-dialog-title>{{title}}</h3>
+<mat-dialog-actions>
+    <p>Voulez-vous supprimer le dictionnaire {{data.title}}?</p>
+    <mat-progress-bar *ngIf="state==='loading'" mode="indeterminate"></mat-progress-bar>
+</mat-dialog-actions>
+<div>
+    <button mat-button color = "primary" (click)="deleteDictionary()">
+        <app-icon icon="pencil"></app-icon>
+        Supprimer
+    </button>
+    <button mat flat button mat-button color = "primary" (click)="closeDialog()">
+        <app-icon icon="ban"></app-icon>
+        Annuler
+    </button> 
+</div>

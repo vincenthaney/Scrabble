@@ -1,12 +1,13 @@
+<h3 mat-dialog-title>{{title}}</h3>
 <mat-dialog-actions align='end'>
-  <input type="file" class="file-input"
-       (change)="onFileSelected($event)" #fileUpload>
+  <input
+  style="display: none"
+  type="file" (change)="onFileChanged($event)"
+  #fileInput>
 </mat-dialog-actions>
-<mat-dialog-actions class="file-upload" align='end'>
-    {{fileName || "No file uploaded yet."}}
-</mat-dialog-actions>
+<button mat-button color="primary" (click)="fileInput.click()">Sélectionner le fichier</button>
+<div *ngIf="selectedFile">{{this.selectedFile.name}}</div>
 <mat-dialog-actions align='end'>
-  <button mat-button (click)="fileUpload.click()" [disabled]="isUploadableFile">Télécharger</button>
+  <button mat-button (click)="onUpload()" [disabled]="isUploadableFile">Télécharger</button>
   <button mat-button (click)="closeDialog()">Annuler</button>
 </mat-dialog-actions>
-

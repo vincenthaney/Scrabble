@@ -1,176 +1,243 @@
 /* eslint-disable dot-notation */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { RouterTestingModule } from '@angular/router/testing';
-import { BUTTON_MUST_HAVE_CONTENT, DIALOG_BUTTONS_MUST_BE_AN_ARRAY, DIALOG_MUST_HAVE_TITLE } from '@app/constants/component-errors';
-import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { DefaultDialogParameters, DefaultDialogButtonParameters } from '@app/components/default-dialog/default-dialog.component.types';
+import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AppMaterialModule } from '@app/modules/material.module';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { HttpClientModule } from '@angular/common/http';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
+import { ModifyDictionaryComponent } from './modify-dictionary-dialog.component';
+import { DictionaryDialogParameters, ModifyDictionaryComponentStates } from './modify-dictionary-dialog.component.types';
+import { AbstractControl } from '@angular/forms';
 
-const MODEL: DefaultDialogParameters = {
+const MODEL: DictionaryDialogParameters = {
     title: 'Dialog title',
-    content: 'Dialog content',
-    buttons: [
-        {
-            content: 'Button 1',
-            closeDialog: true,
-        },
-        {
-            content: 'Button 2',
-            redirect: '/test',
-        },
-        {
-            content: 'Button 3',
-            closeDialog: undefined,
-        },
-    ],
+    dictionaryId: 'testId',
+    dictionaryToModifyName: 'testName',
+    dictionaryToModifyDescription: 'testDescription',
 };
 
-const createDialog = (model: DefaultDialogParameters): [component: DefaultDialogComponent, fixture: ComponentFixture<DefaultDialogComponent>] => {
-    TestBed.configureTestingModule({
-        declarations: [DefaultDialogComponent],
-        imports: [MatButtonModule, MatDialogModule, RouterTestingModule.withRoutes([])],
-        providers: [
-            {
-                provide: MAT_DIALOG_DATA,
-                useValue: model,
-            },
-        ],
-    }).compileComponents();
+export class MatDialogMock {
+    close() {
+        return {
+            close: () => ({}),
+        };
+    }
+}
 
-    const fixture: ComponentFixture<DefaultDialogComponent> = TestBed.createComponent(DefaultDialogComponent);
-    const component: DefaultDialogComponent = fixture.componentInstance;
+describe('ModifyDictionaryComponent', () => {
+    let component: ModifyDictionaryComponent;
+    let fixture: ComponentFixture<ModifyDictionaryComponent>;
+    let dictionariesServiceMock: DictionariesService;
 
-    fixture.detectChanges();
-
-    return [component, fixture];
-};
-const createDialogWithUnknownModel = (model: unknown): [component: DefaultDialogComponent, fixture: ComponentFixture<DefaultDialogComponent>] => {
-    return createDialog(model as DefaultDialogParameters);
-};
-
-describe('DefaultDialogComponent', () => {
-    describe('Default', () => {
-        let component: DefaultDialogComponent;
-        let fixture: ComponentFixture<DefaultDialogComponent>;
-
-        beforeEach(() => {
-            [component, fixture] = createDialog(MODEL);
-        });
-
-        it('should be created', async () => {
-            expect(component).toBeTruthy();
-        });
-
-        it('should have model title', () => {
-            expect(component.title).toEqual(MODEL.title);
-        });
-
-        it('should have model content', () => {
-            expect(component.content).toEqual(MODEL.content);
-        });
-
-        it('should have model buttons', () => {
-            for (const button of MODEL.buttons) {
-                expect(component.buttons.some((btn) => btn.content === button.content)).toBeTrue();
-            }
-        });
-
-        it('should call handleButtonClick when a button is clicked', (done) => {
-            const index = 2;
-            const spy = spyOn(component, 'handleButtonClick');
-            const button = fixture.debugElement.nativeElement.querySelector(`button:nth-child(${index + 1})`);
-            button.click();
-
-            fixture.whenStable().then(() => {
-                expect(spy).toHaveBeenCalledWith(component.buttons[index]);
-                done();
-            });
-        });
-
-        it('should set button as closeDialog=true if redirect exists', () => {
-            const index = 1;
-            expect(MODEL.buttons[index].closeDialog).toBeFalsy();
-            expect(MODEL.buttons[index].redirect).toBeTruthy();
-            expect(component.buttons[index].closeDialog).toBeTrue();
-        });
-
-        it('******should set button as closeDialog=true if redirect exists', () => {
-            const index = 2;
-            expect(MODEL.buttons[index].closeDialog).toBeFalsy();
-            expect(MODEL.buttons[index].redirect).toBeFalsy();
-            expect(component.buttons[index].closeDialog).toBeFalse();
-        });
-
-        describe('handleButtonClick', () => {
-            it('should call button action if it exists', () => {
-                type DefaultDialogButtonWithActionParameters = DefaultDialogButtonParameters & { action: () => void };
-                const button: DefaultDialogButtonWithActionParameters = {
-                    content: 'button',
-                    // eslint-disable-next-line @typescript-eslint/no-empty-function
-                    action: () => {},
-                };
-                const spy = spyOn(button, 'action');
-                component.handleButtonClick(button);
-                expect(spy).toHaveBeenCalled();
-            });
-
-            it('should call navigate if redirect exists', () => {
-                const button: DefaultDialogButtonParameters = {
-                    content: 'button',
-                    redirect: '/redirect',
-                };
-                const spy = spyOn(component['router'], 'navigate');
-                component.handleButtonClick(button);
-                expect(spy).toHaveBeenCalled();
-            });
-
-            it('should not call navigate if redirect does not exists', () => {
-                const button: DefaultDialogButtonParameters = {
-                    content: 'button',
-                };
-                const spy = spyOn(component['router'], 'navigate');
-                component.handleButtonClick(button);
-                expect(spy).not.toHaveBeenCalled();
-            });
-        });
-    });
-
-    describe('No buttons', () => {
-        it('should have  an empty button array', () => {
-            const [component] = createDialog({ title: MODEL.title, content: MODEL.content } as unknown as DefaultDialogParameters);
-            expect(component.buttons).toHaveSize(0);
-        });
-    });
-
-    describe('Constructor error', () => {
-        it('should throw error when no title is provided', () => {
-            const model = {
-                notATitle: 'This is not a title',
-            };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(DIALOG_MUST_HAVE_TITLE);
-        });
-
-        it('should throw error when buttons is not an array', () => {
-            const model = {
-                title: 'Title',
-                buttons: {
-                    content: 'Button but not in an array',
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [ModifyDictionaryComponent, IconComponent, PageHeaderComponent],
+            imports: [
+                AppMaterialModule,
+                HttpClientModule,
+                MatFormFieldModule,
+                MatSelectModule,
+                MatDividerModule,
+                MatProgressSpinnerModule,
+                MatDialogModule,
+                MatSnackBarModule,
+                BrowserAnimationsModule,
+                MatCardModule,
+                MatTabsModule,
+            ],
+            providers: [
+                MatDialog,
+                {
+                    provide: MatDialogRef,
+                    useClass: MatDialogMock,
                 },
-            };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(DIALOG_BUTTONS_MUST_BE_AN_ARRAY);
+                DictionariesService,
+                {
+                    provide: MAT_DIALOG_DATA,
+                    useValue: MODEL,
+                },
+            ],
+        }).compileComponents();
+    });
+
+    beforeEach(() => {
+        fixture = TestBed.createComponent(ModifyDictionaryComponent);
+        dictionariesServiceMock = TestBed.inject(DictionariesService);
+
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    describe('On componentUpdateEvent', () => {
+        it('should call component.cleanupState()', () => {
+            const spy = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
+                return;
+            });
+            dictionariesServiceMock['componentUpdateEvent'].next();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('ngOnChanges', () => {
+        let spyComponent: jasmine.Spy;
+        let spyFormParameters: jasmine.Spy;
+        beforeEach(() => {
+            spyComponent = spyOn(component, 'isInformationValid').and.callFake(() => {
+                return true;
+            });
         });
 
-        it('should throw error when any button has no content', () => {
-            const model = {
-                title: 'Title',
-                buttons: [
-                    {
-                        notAContent: 'This it not a content',
-                    },
-                ],
-            };
-            expect(() => createDialogWithUnknownModel(model)).toThrowError(BUTTON_MUST_HAVE_CONTENT);
+        it('should call formParameters.get twice', () => {
+            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.ngOnChanges();
+            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+        });
+
+        it('should call formParameters.get and return valid', () => {
+            spyOn(component.formParameters, 'get').and.callFake(() => {
+                return { valid: true } as unknown as AbstractControl;
+            });
+            component.ngOnChanges();
+            expect(component.isDictionaryNameValid).toBeTrue();
+        });
+
+        it('should call formParameters.get and return false', () => {
+            spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.ngOnChanges();
+            expect(component.isDictionaryNameValid).toBeFalse();
+        });
+
+        it('should call closeDialog', () => {
+            spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.ngOnChanges();
+            expect(spyComponent).toHaveBeenCalled();
+        });
+    });
+
+    describe('updateDictionary', () => {
+        let spyDictionary: jasmine.Spy;
+        let spyFormParameters: jasmine.Spy;
+        let spyClose: jasmine.Spy;
+        beforeEach(() => {
+            spyDictionary = spyOn(dictionariesServiceMock, 'updateDictionary').and.callFake(async () => {
+                return;
+            });
+            spyClose = spyOn(component, 'closeDialog').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should call dictionariesService.updateDictionary', () => {
+            spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.updateDictionary();
+            expect(spyDictionary).toHaveBeenCalled();
+        });
+
+        it('should call formParameters.get twice', () => {
+            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.updateDictionary();
+            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+        });
+
+        it('shouldhave been called with formParameters.get values undefined', () => {
+            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.updateDictionary();
+            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+        });
+
+        it('should have been called with all values defined', () => {
+            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
+                return { value: 'i am a defined value' } as unknown as AbstractControl;
+            });
+            component.updateDictionary();
+            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+        });
+
+        it('should call closeDialog', () => {
+            spyOn(component.formParameters, 'get').and.callFake(() => {
+                return null;
+            });
+            component.updateDictionary();
+            expect(spyClose).toHaveBeenCalled();
+        });
+    });
+
+    describe('closeDialog', () => {
+        let spyDialog: jasmine.Spy;
+        let spyCleanup: jasmine.Spy;
+        beforeEach(() => {
+            spyDialog = spyOn(component['dialogRef'], 'close').and.callFake(() => {
+                return;
+            });
+            spyCleanup = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
+                return;
+            });
+        });
+
+        it('should call dialogRef.close()', () => {
+            component.closeDialog();
+            expect(spyDialog).toHaveBeenCalled();
+        });
+
+        it('should call cleanupDialogStates()', () => {
+            component.closeDialog();
+            expect(spyCleanup).toHaveBeenCalled();
+        });
+    });
+
+    describe('isInformationValid', () => {
+        it('should return true if component.isDictionaryNameValid && component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryNameValid = true;
+            component.isDictionaryDescriptionValid = true;
+            expect(component.isInformationValid()).toBeTrue();
+        });
+        it('should return false if !component.isDictionaryNameValid && component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryNameValid = false;
+            component.isDictionaryDescriptionValid = true;
+            expect(component.isInformationValid()).toBeFalse();
+        });
+        it('should return false if component.isDictionaryNameValid && !component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryNameValid = false;
+            component.isDictionaryDescriptionValid = true;
+            expect(component.isInformationValid()).toBeFalse();
+        });
+        it('should return false if !component.isDictionaryNameValid && !component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryNameValid = false;
+            component.isDictionaryDescriptionValid = true;
+            expect(component.isInformationValid()).toBeFalse();
+        });
+    });
+
+    describe('cleanupDialogStates', () => {
+        it('should turn state to Ready', () => {
+            component.cleanupDialogStates();
+            expect(component.state).toEqual(ModifyDictionaryComponentStates.Ready);
         });
     });
 });

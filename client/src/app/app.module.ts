@@ -33,6 +33,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { AdminDictionariesComponent } from './components/admin-dictionaries-component/admin-dictionaries.component';
 import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
+import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-dialog/delete-dictionary-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -68,6 +69,7 @@ import { UploadDictionaryComponent } from './components/upload-dictionary/upload
         AdminDictionariesComponent,
         ModifyDictionaryComponent,
         UploadDictionaryComponent,
+        DeleteDictionaryDialogComponent,
     ],
     imports: [
         AppMaterialModule,

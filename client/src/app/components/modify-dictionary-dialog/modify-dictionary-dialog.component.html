@@ -16,8 +16,8 @@
             type="text"
             formControlName="inputDictionaryName"
             autocomplete="off"
-            (ngModelChange)="onChange()"
-            (valueChanges)="onChange()"
+            (ngModelChange)="ngOnChanges()"
+            (valueChanges)="ngOnChanges()"
         />
     </mat-form-field>
 </mat-dialog-actions>
@@ -25,7 +25,7 @@
     <mat-form-field
     appearance="outline"
     [formGroup]="formParameters"
-    matTooltip="La description doit être entre 2 et 30 caractères sans caractères spéciaux"
+    matTooltip="La description doit être entre 2 et 80 caractères sans caractères spéciaux"
     matTooltipPosition="above"
     >
     <mat-label><app-icon icon="pencil"></app-icon> Nouvelle description du dictionnaire</mat-label>
@@ -35,8 +35,8 @@
         type="text"
         formControlName="inputDictionaryDescription"
         autocomplete="off"
-        (ngModelChange)="onChange()"
-        (valueChanges)="onChange()"
+        (ngModelChange)="ngOnChanges()"
+        (valueChanges)="ngOnChanges()"
     />
     </mat-form-field>
 </mat-dialog-actions>
@@ -53,16 +53,6 @@
         <app-icon icon="ban"></app-icon>
         Annuler
     </button> 
-</div>
-<div>
-    <button mat-button *ngIf="icon==='check' && state==='message'" color = "primary" (click)="closeDialog()">
-        <app-icon icon="check"></app-icon>
-        OK
-    </button>
-    <button mat-button *ngIf="icon==='close' && state==='message'" color = "primary" (click)="cleanupDialogStates()">
-        <app-icon *icon="icon"></app-icon>
-        Réessayer
-    </button>
 </div>
     
 
