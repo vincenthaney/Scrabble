@@ -87,7 +87,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     modifyDictionary(element: DictionarySummary): void {
         const elementData: DictionaryDialogParameters = {
             title: element.title,
-            dictionarytoModifyDescription: element.description,
+            dictionaryToModifyDescription: element.description,
             dictionaryToModifyName: element.title,
             dictionaryId: element.id,
         };
