@@ -12,8 +12,6 @@ import {
 } from '@app/classes/admin-game-history';
 import { GameHistoriesConverter } from '@app/classes/game-history/game-histories-converter';
 import { GameHistory } from '@app/classes/game-history/game-history';
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { GameHistoryController } from '@app/controllers/game-history-controller/game-history.controller';
 import { isKey } from '@app/utils/is-key';
@@ -146,42 +144,5 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
 
     getDuration(item: GameHistory): number {
         return item.endTime.getTime() - item.startTime.getTime();
-    }
-
-    getRandomData(): GameHistory[] {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return new Array(35).fill({}).map<GameHistory>(() => {
-            const startTime = new Date();
-            const endTime = new Date();
-
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            startTime.setHours(Math.random() * 24);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            startTime.setMinutes(Math.random() * 60);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            endTime.setHours(Math.random() * 24);
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            endTime.setMinutes(Math.random() * 60);
-
-            const player1Wins = Math.floor(Math.random() * 2) === 0;
-
-            return {
-                startTime,
-                endTime,
-                // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                player1Data: { name: 'Player 1', score: Math.floor(Math.random() * 300), isVirtualPlayer: false, isWinner: player1Wins },
-                player2Data: {
-                    name: 'Player 2',
-                    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                    score: Math.floor(Math.random() * 300),
-                    isVirtualPlayer: Math.floor(Math.random() * 2) === 0,
-                    isWinner: !player1Wins,
-                },
-                gameType: Math.floor(Math.random() * 2) === 0 ? GameType.LOG2990 : GameType.Classic,
-                gameMode: Math.floor(Math.random() * 2) === 0 ? GameMode.Solo : GameMode.Multiplayer,
-                isOver: Math.floor(Math.random() * 2) === 0,
-                hasBeenAbandoned: Math.floor(Math.random() * 2) === 0,
-            };
-        });
     }
 }

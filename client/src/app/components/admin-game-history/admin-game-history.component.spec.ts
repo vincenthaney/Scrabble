@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -16,18 +15,28 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GameHistoryState } from '@app/classes/admin-game-history';
+import { GameHistoriesData } from '@app/classes/communication/game-histories';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
+import { GameHistoryController } from '@app/controllers/game-history-controller/game-history.controller';
+import { Observable } from 'rxjs';
+import { IconComponent } from '@app/components/icon/icon.component';
 
 import { AdminGameHistoryComponent } from './admin-game-history.component';
 
-describe('AdminGameHistoryComponent', () => {
+fdescribe('AdminGameHistoryComponent', () => {
     let component: AdminGameHistoryComponent;
     let fixture: ComponentFixture<AdminGameHistoryComponent>;
+    let gameHistoryControllerSpy: jasmine.SpyObj<GameHistoryController>;
 
     beforeEach(async () => {
+        gameHistoryControllerSpy = jasmine.createSpyObj(GameHistoryController, {
+            getGameHistories: new Observable<GameHistoriesData>(),
+            resetGameHistories: new Observable<void>(),
+        });
+
         await TestBed.configureTestingModule({
             imports: [
                 BrowserAnimationsModule,
@@ -40,9 +49,9 @@ describe('AdminGameHistoryComponent', () => {
                 MatTooltipModule,
                 MatSnackBarModule,
                 MatPaginatorModule,
-                HttpClientTestingModule,
             ],
-            declarations: [AdminGameHistoryComponent, MatSort, MatPaginator],
+            declarations: [AdminGameHistoryComponent, MatSort, MatPaginator, IconComponent],
+            providers: [{ provide: GameHistoryController, useValue: gameHistoryControllerSpy }],
         }).compileComponents();
     });
 
@@ -220,6 +229,7 @@ describe('AdminGameHistoryComponent', () => {
         const tests: [start: Date, end: Date, expected: number][] = [
             [new Date(1, 1, 1, 3, 30), new Date(1, 1, 1, 5, 45), 8100000],
             [new Date(1, 1, 1, 5, 0), new Date(1, 1, 1, 16, 0), 39600000],
+            [new Date(1, 1, 1, 5, 0), new Date(1, 1, 2, 6, 0), 90000000],
         ];
 
         let index = 1;
