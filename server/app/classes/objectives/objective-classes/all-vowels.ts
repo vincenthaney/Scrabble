@@ -1,12 +1,12 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { LetterValue } from '@app/classes/tile';
+import { VOWELS } from '@app/constants/services-constants/objective.const';
 import { StringConversion } from '@app/utils/string-conversion';
 
 export const NAME = 'Les bases';
 export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les lettres blanches)';
 export const BONUS_POINTS = 30;
-export const VOWELS = (): LetterValue[] => ['A', 'E', 'I', 'O', 'U', 'Y'];
 
 const SHOULD_RESET = false;
 

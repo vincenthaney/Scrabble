@@ -5,11 +5,12 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
+import { VOWELS } from '@app/constants/services-constants/objective.const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
-import { AllVowelsObjective, BONUS_POINTS, DESCRIPTION, NAME, VOWELS } from './all-vowels';
+import { AllVowelsObjective, BONUS_POINTS, DESCRIPTION, NAME } from './all-vowels';
 chai.use(spies);
 
 describe('Vowels Objective', () => {
