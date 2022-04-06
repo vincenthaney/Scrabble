@@ -19,7 +19,6 @@ import { takeUntil } from 'rxjs/operators';
 export default class GameDispatcherService implements OnDestroy {
     currentName: string = '';
     currentLobby: LobbyInfo | undefined = undefined;
-    isConverting = false;
 
     private gameCreationFailed$: Subject<HttpErrorResponse> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
@@ -97,7 +96,6 @@ export default class GameDispatcherService implements OnDestroy {
 
     handleRecreateGame(gameParameters?: FormGroup): void {
         if (!this.currentLobby) return;
-        this.isConverting = gameParameters !== undefined;
 
         const gameConfig: GameConfigData = {
             playerName: this.currentLobby?.hostName,
