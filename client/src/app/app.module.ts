@@ -34,6 +34,7 @@ import { AdminHighScoresComponent } from './components/admin-high-scores/admin-h
 import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+import { DurationPipe } from './pipes/duration/duration.pipe';
 
 registerLocaleData(localeFr);
 
@@ -70,6 +71,7 @@ registerLocaleData(localeFr);
         AdminPageComponent,
         AdminHighScoresComponent,
         AdminGameHistoryComponent,
+        DurationPipe,
     ],
     imports: [
         AppMaterialModule,

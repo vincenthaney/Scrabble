@@ -20,6 +20,7 @@ export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
     startTime: 'Heure de début',
     endDate: 'Date de fin',
     endTime: 'Heure de fin',
+    duration: 'Durée',
     hasBeenAbandoned: 'Partie abandonnée',
     gameType: 'Type de partie',
     gameMode: 'Mode de partie',
@@ -33,7 +34,7 @@ export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
 
 export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
-    'startTime',
+    'duration',
     'gameType',
     'gameMode',
     'player1Name',

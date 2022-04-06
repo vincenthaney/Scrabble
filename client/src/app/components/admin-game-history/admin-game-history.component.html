@@ -34,6 +34,11 @@
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.endTime}} </th>
                     <td mat-cell *matCellDef="let element"> {{element.endTime | date: 'h:mm a'}} </td>
                 </ng-container>
+
+                <ng-container matColumnDef="duration">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.duration}} </th>
+                    <td mat-cell *matCellDef="let element"> {{getDuration(element) | duration}} </td>
+                </ng-container>
         
                 <ng-container matColumnDef="player1Name">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.player1Name}} </th>

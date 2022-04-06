@@ -111,6 +111,11 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
         }
     }
 
+    getDuration(item: GameHistory): number {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        return (item.endTime.getTime() - item.startTime.getTime()) / 1000;
+    }
+
     getRandomData(): GameHistory[] {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         return new Array(35).fill({}).map<GameHistory>(() => {
