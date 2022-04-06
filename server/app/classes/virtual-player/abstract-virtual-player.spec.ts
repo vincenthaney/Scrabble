@@ -11,14 +11,24 @@ import { ActionData } from '@app/classes/communication/action-data';
 import { ActionPass } from '@app/classes/actions';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Delay } from '@app/utils/delay';
-import { createStubInstance } from 'sinon';
+import { createStubInstance, SinonStubbedInstance, restore } from 'sinon';
 import { Board } from '@app/classes/board';
 import Game from '@app/classes/game/game';
 import { LetterValue } from '@app/classes/tile';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { AbstractWordFinding, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 class TestClass extends AbstractVirtualPlayer {
     async findAction(): Promise<ActionData> {
         return ActionPass.createActionData();
+    }
+
+    generateWordFindingRequest(): WordFindingRequest {
+        return {
+            pointRange: this.findPointRange(),
+            useCase: WordFindingUseCase.Beginner,
+            pointHistory: this.pointHistory,
+        };
     }
 
     findPointRange(): Range {
@@ -35,13 +45,19 @@ const playerName = 'ElScrabblo';
 
 describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
-
+    let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+    let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
     beforeEach(async () => {
         abstractPlayer = new TestClass(playerId, playerName);
+        activeGameServiceStub = createStubInstance(ActiveGameService);
+        wordFindingServiceStub = createStubInstance(WordFindingService);
+        abstractPlayer['activeGameService'] = activeGameServiceStub as unknown as ActiveGameService;
+        abstractPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
     });
 
     afterEach(() => {
         chai.spy.restore();
+        restore();
     });
 
     it('should create', () => {
@@ -100,9 +116,6 @@ describe('AbstractVirtualPlayer', () => {
 
     describe('getGameBoard', () => {
         it('should call getGame', () => {
-            const activeGameServiceStub = createStubInstance(ActiveGameService);
-            abstractPlayer['activeGameService'] = activeGameServiceStub as unknown as ActiveGameService;
-
             const testBoard = {} as unknown as Board;
             const getGameSpy = spy.on(abstractPlayer['activeGameService'], 'getGame', () => {
                 return testBoard;
@@ -140,6 +153,48 @@ describe('AbstractVirtualPlayer', () => {
                 ['C', 3],
             ]);
             expect(abstractPlayer['isExchangePossible']()).to.be.true;
+        });
+    });
+
+    describe('computeWordPlacement', () => {
+        let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
+
+        beforeEach(() => {
+            wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
+            wordFindingInstanceStub['findWords'].returns([]);
+            chai.spy.restore();
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should call findWords', () => {
+            wordFindingServiceStub['getWordFindingInstance'].returns(wordFindingInstanceStub as unknown as AbstractWordFinding);
+
+            spy.on(abstractPlayer, 'getGameBoard', () => {
+                return;
+            });
+            spy.on(abstractPlayer, 'generateWordFindingRequest', () => {
+                return { useCase: WordFindingUseCase.Expert };
+            });
+            abstractPlayer['computeWordPlacement']();
+            expect(wordFindingInstanceStub['findWords'].called).to.be.true;
+        });
+
+        it('should call getGameBoard and generateWord', () => {
+            wordFindingServiceStub['getWordFindingInstance'].returns(wordFindingInstanceStub as unknown as AbstractWordFinding);
+
+            const getGameBoardSpy = spy.on(abstractPlayer, 'getGameBoard', () => {
+                return;
+            });
+            const generateWordSpy = spy.on(abstractPlayer, 'generateWordFindingRequest', () => {
+                return { useCase: WordFindingUseCase.Expert };
+            });
+            abstractPlayer['computeWordPlacement']();
+
+            expect(getGameBoardSpy).to.have.been.called();
+            expect(generateWordSpy).to.have.been.called();
         });
     });
 });

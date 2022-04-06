@@ -14,14 +14,17 @@ import { VirtualPlayerService } from '@app/services/virtual-player-service/virtu
 import { Delay } from '@app/utils/delay';
 import { Board } from '@app/classes/board';
 import { ActionData } from '@app/classes/communication/action-data';
+import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
     pointHistory: Map<number, number>;
 
+    protected wordFindingInstance: AbstractWordFinding;
     private wordFindingService: WordFindingService;
     private activeGameService: ActiveGameService;
     private virtualPlayerService: VirtualPlayerService;
+
     constructor(gameId: string, name: string) {
         super(VIRTUAL_PLAYER_ID_PREFIX + uuidv4(), name);
         this.pointHistory = new Map<number, number>();
@@ -63,6 +66,16 @@ export abstract class AbstractVirtualPlayer extends Player {
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : this.alternativeMove());
     }
 
+    protected computeWordPlacement(): ScoredWordPlacement | undefined {
+        const request = this.generateWordFindingRequest();
+        this.wordFindingInstance = this.getWordFindingService().getWordFindingInstance(request.useCase, [
+            this.getGameBoard(this.gameId, this.id),
+            this.tiles,
+            request,
+        ]);
+        return this.wordFindingInstance.findWords().pop();
+    }
+
     protected isExchangePossible(): boolean {
         let total = 0;
         this.getActiveGameService()
@@ -75,6 +88,8 @@ export abstract class AbstractVirtualPlayer extends Player {
     }
 
     protected abstract findAction(): Promise<ActionData>;
+
+    protected abstract generateWordFindingRequest(): WordFindingRequest;
 
     protected abstract findPointRange(): Range;
 
