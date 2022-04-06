@@ -10,12 +10,10 @@ import {
     DisplayGameHistoryKeys,
     GameHistoryState,
 } from '@app/classes/admin-game-history';
-import { GameHistoriesConverter } from '@app/classes/game-history/game-histories-converter';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
-import { GameHistoryController } from '@app/controllers/game-history-controller/game-history.controller';
+import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
 import { isKey } from '@app/utils/is-key';
-import { catchError, retry } from 'rxjs/operators';
 
 @Component({
     selector: 'app-admin-game-history',
@@ -34,7 +32,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     state: GameHistoryState;
     error: string | undefined;
 
-    constructor(private readonly gameHistoryController: GameHistoryController, private readonly snackBar: MatSnackBar) {
+    constructor(private readonly gameHistoryService: GameHistoryService, private readonly snackBar: MatSnackBar) {
         this.columns = GAME_HISTORY_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
@@ -58,48 +56,27 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
 
     resetHistory() {
         this.state = GameHistoryState.Loading;
-        this.gameHistoryController
+
+        this.gameHistoryService
             .resetGameHistories()
-            .pipe(
-                retry(1),
-                catchError((error, caught) => {
-                    this.state = GameHistoryState.Ready;
-                    this.snackBar.open(error);
-                    return caught;
-                }),
-            )
-            .subscribe(() => {
-                this.dataSource.data = [];
-                this.state = GameHistoryState.Ready;
-            });
+            .then(() => (this.dataSource.data = []))
+            .catch(this.snackBar.open)
+            .finally(() => (this.state = GameHistoryState.Ready));
     }
 
     updateHistoryData() {
         this.state = GameHistoryState.Loading;
-        this.setHistoryData()
-            .then(() => (this.state = GameHistoryState.Ready))
+
+        this.gameHistoryService
+            .getGameHistories()
+            .then((gameHistories) => {
+                this.dataSource.data = gameHistories;
+                this.state = GameHistoryState.Ready;
+            })
             .catch((error) => {
                 this.error = error.toString();
                 this.state = GameHistoryState.Error;
             });
-    }
-
-    async setHistoryData() {
-        return new Promise<void>((resolve, reject) => {
-            this.gameHistoryController
-                .getGameHistories()
-                .pipe(
-                    retry(1),
-                    catchError((error, caught) => {
-                        reject(error);
-                        return caught;
-                    }),
-                )
-                .subscribe((gameHistories) => {
-                    this.dataSource.data = GameHistoriesConverter.convert(gameHistories);
-                    resolve();
-                });
-        });
     }
 
     getColumnIterator(): DisplayGameHistoryColumnsIteratorItem[] {

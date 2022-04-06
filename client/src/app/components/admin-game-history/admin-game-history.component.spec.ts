@@ -1,41 +1,36 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatOptionModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GameHistoryState } from '@app/classes/admin-game-history';
-import { GameHistoriesData } from '@app/classes/communication/game-histories';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
-import { GameHistoryController } from '@app/controllers/game-history-controller/game-history.controller';
-import { Observable, Subject, throwError } from 'rxjs';
 import { IconComponent } from '@app/components/icon/icon.component';
-
 import { AdminGameHistoryComponent } from './admin-game-history.component';
+import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
+import { GameHistoryState } from '@app/classes/admin-game-history';
 
-fdescribe('AdminGameHistoryComponent', () => {
+describe('AdminGameHistoryComponent', () => {
     let component: AdminGameHistoryComponent;
     let fixture: ComponentFixture<AdminGameHistoryComponent>;
-    let gameHistoryControllerSpy: jasmine.SpyObj<GameHistoryController>;
+    let gameHistoryServiceSpy: jasmine.SpyObj<GameHistoryService>;
 
     beforeEach(async () => {
-        gameHistoryControllerSpy = jasmine.createSpyObj(GameHistoryController, {
-            getGameHistories: new Observable<GameHistoriesData>(),
-            resetGameHistories: new Observable<void>(),
+        gameHistoryServiceSpy = jasmine.createSpyObj(GameHistoryService, {
+            getGameHistories: Promise.resolve([]),
+            resetGameHistories: Promise.resolve(),
         });
 
         await TestBed.configureTestingModule({
@@ -52,7 +47,7 @@ fdescribe('AdminGameHistoryComponent', () => {
                 MatPaginatorModule,
             ],
             declarations: [AdminGameHistoryComponent, MatSort, MatPaginator, IconComponent],
-            providers: [{ provide: GameHistoryController, useValue: gameHistoryControllerSpy }],
+            providers: [{ provide: GameHistoryService, useValue: gameHistoryServiceSpy }],
         }).compileComponents();
     });
 
@@ -67,115 +62,127 @@ fdescribe('AdminGameHistoryComponent', () => {
     });
 
     describe('ngOnInit', () => {
-        let setHistoryDataSpy: jasmine.Spy;
-
-        beforeEach(() => {
-            setHistoryDataSpy = spyOn(component, 'setHistoryData');
-        });
-
-        it('should set state to Ready', (done) => {
-            setHistoryDataSpy.and.resolveTo();
+        it('should call updateHistoryData', () => {
+            const spy = spyOn(component, 'updateHistoryData');
 
             component.ngOnInit();
 
-            setTimeout(() => {
-                expect(component.state).toEqual(GameHistoryState.Ready);
-                done();
-            }, 2);
-        });
-
-        it('should set state to Error on reject', (done) => {
-            const error = 'error';
-            setHistoryDataSpy.and.rejectWith(error);
-
-            component.ngOnInit();
-
-            setTimeout(() => {
-                expect(component.state).toEqual(GameHistoryState.Error);
-                done();
-            }, 2);
-        });
-
-        it('should set error on reject', (done) => {
-            const error = 'error';
-            setHistoryDataSpy.and.rejectWith(error);
-
-            component.ngOnInit();
-
-            setTimeout(() => {
-                expect(component.error).toEqual(error);
-                done();
-            }, 2);
-        });
-    });
-
-    describe('ngAfterViewInit', () => {
-        beforeEach(() => {
-            component.dataSource = new MatTableDataSource<GameHistory>();
-        });
-
-        it('should set dataSource sort', () => {
-            const sort = new MatSort();
-            component.sort = sort;
-
-            component.ngAfterViewInit();
-
-            expect(component.dataSource.sort).toEqual(sort);
-        });
-
-        it('should set dataSource paginator', () => {
-            const intl = new MatPaginatorIntl();
-            const paginator = new MatPaginator(intl, undefined as unknown as ChangeDetectorRef);
-            component.paginator = paginator;
-
-            component.ngAfterViewInit();
-
-            expect(component.dataSource.paginator).toEqual(paginator);
+            expect(spy).toHaveBeenCalled();
         });
     });
 
     describe('resetHistory', () => {
         it('should set state to loading', () => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            gameHistoryServiceSpy.resetGameHistories.and.callFake(async () => new Promise(() => {}));
+
             component.resetHistory();
+
             expect(component.state).toEqual(GameHistoryState.Loading);
         });
 
-        it('should call gameHistoryController resetGameHistories', () => {
+        it('should call resetGameHistories', () => {
             component.resetHistory();
-            expect(gameHistoryControllerSpy.resetGameHistories).toHaveBeenCalled();
+            expect(gameHistoryServiceSpy.resetGameHistories).toHaveBeenCalled();
         });
 
-        it('should set data to empty array on resolution', () => {
+        it('should set dataSource to empty array', (done) => {
             (component.dataSource.data as unknown) = [1, 2, 3];
-            const subject = new Subject<void>();
-            gameHistoryControllerSpy.resetGameHistories.and.returnValue(subject);
 
             component.resetHistory();
-            subject.next();
 
-            expect(component.dataSource.data).toHaveSize(0);
+            setTimeout(() => {
+                expect(component.dataSource.data).toHaveSize(0);
+                done();
+            });
         });
 
-        it('should set state to Ready on resolution', () => {
-            const subject = new Subject<void>();
-            gameHistoryControllerSpy.resetGameHistories.and.returnValue(subject);
+        it('should set state to ready', (done) => {
+            (component.state as unknown) = undefined;
 
             component.resetHistory();
-            subject.next();
 
-            expect(component.state).toEqual(GameHistoryState.Ready);
+            setTimeout(() => {
+                expect(component.state).toEqual(GameHistoryState.Ready);
+                done();
+            });
         });
 
-        it('should call snackBarOpen on error', () => {
-            const error = 'my error';
-            const snackbarOpenSpy = spyOn(component['snackBar'], 'open');
-            const subject = new Subject<void>();
-            gameHistoryControllerSpy.resetGameHistories.and.returnValue(throwError(error));
+        it('should open snackBar on error', (done) => {
+            const error = 'reset error';
+            const spy = spyOn(component['snackBar'], 'open');
+            gameHistoryServiceSpy.resetGameHistories.and.rejectWith(error);
 
             component.resetHistory();
-            subject.next();
 
-            expect(snackbarOpenSpy).toHaveBeenCalledWith(error);
+            setTimeout(() => {
+                expect(spy).toHaveBeenCalledOnceWith(error);
+                done();
+            });
+        });
+    });
+
+    describe('updateHistoryData', () => {
+        it('should set state to loading', () => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            gameHistoryServiceSpy.getGameHistories.and.callFake(async () => new Promise(() => {}));
+
+            component.updateHistoryData();
+
+            expect(component.state).toEqual(GameHistoryState.Loading);
+        });
+
+        it('should call getGameHistories', () => {
+            component.updateHistoryData();
+
+            expect(gameHistoryServiceSpy.getGameHistories).toHaveBeenCalled();
+        });
+
+        it('should set state to ready on resolve', (done) => {
+            (component.state as unknown) = undefined;
+
+            component.updateHistoryData();
+
+            setTimeout(() => {
+                expect(component.state).toEqual(GameHistoryState.Ready);
+                done();
+            });
+        });
+
+        it('should set state to ready on resolve', (done) => {
+            const data = new Array<GameHistory>();
+            gameHistoryServiceSpy.getGameHistories.and.resolveTo(data);
+
+            component.updateHistoryData();
+
+            setTimeout(() => {
+                expect(component.dataSource.data).toEqual(data);
+                done();
+            });
+        });
+
+        it('should set error on reject', (done) => {
+            const error = 'update error';
+            gameHistoryServiceSpy.getGameHistories.and.rejectWith(error);
+
+            component.updateHistoryData();
+
+            setTimeout(() => {
+                expect(component.error).toEqual(error);
+                done();
+            });
+        });
+
+        it('should set state to error on reject', (done) => {
+            const error = 'update error';
+            gameHistoryServiceSpy.getGameHistories.and.rejectWith(error);
+
+            component.updateHistoryData();
+
+            setTimeout(() => {
+                expect(component.state).toEqual(GameHistoryState.Error);
+                done();
+            });
         });
     });
 
@@ -265,6 +272,18 @@ fdescribe('AdminGameHistoryComponent', () => {
                 expect(component.sortGameHistory(gameHistory, property) as unknown).toEqual(expected);
             });
         }
+
+        it('should return startTime for startDate', () => {
+            const expected = gameHistory.startTime.valueOf();
+
+            expect(component.sortGameHistory(gameHistory, 'startDate')).toEqual(expected);
+        });
+
+        it('should return endTime for endDate', () => {
+            const expected = gameHistory.endTime.valueOf();
+
+            expect(component.sortGameHistory(gameHistory, 'endDate')).toEqual(expected);
+        });
 
         it('should return empty array if property does not exists', () => {
             expect(component.sortGameHistory(gameHistory, 'invalidProperty')).toEqual('');
