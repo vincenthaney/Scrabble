@@ -1,6 +1,7 @@
 export interface DeleteDictionaryDialogParameters {
     title: string;
     dictionaryId: string;
+    onClose: () => void;
 }
 
 export enum DeleteDictionaryComponentStates {

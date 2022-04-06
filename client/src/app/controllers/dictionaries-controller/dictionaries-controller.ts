@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, OnDestroy } from '@angular/core';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { BasicDictionaryData, DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
-import { DICTIONARIES_DELETED, DICTIONARY_ADDED, DICTIONARY_DELETED, DICTIONARY_UPDATED } from '@app/constants/dictionary-service-constants';
+import { PositiveFeedback } from '@app/constants/dictionaries-components';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -29,7 +29,7 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries`;
         this.http.patch(endpoint, { dictionaryUpdateInfo }).subscribe(
             () => {
-                this.dictionariesUpdateMessageEvent.next(DICTIONARY_UPDATED);
+                this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryUpdated);
             },
             (error) => {
                 this.dictionariesErrorEvent.next(error);
@@ -55,7 +55,7 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries`;
         this.http.delete(endpoint, { params }).subscribe(
             () => {
-                this.dictionariesUpdateMessageEvent.next(DICTIONARY_DELETED);
+                this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryDeleted);
             },
             (error) => {
                 this.dictionariesErrorEvent.next(error);
@@ -68,7 +68,7 @@ export class DictionariesController implements OnDestroy {
 
         this.http.post<string>(endpoint, { dictionaryData }).subscribe(
             () => {
-                this.dictionariesUpdateMessageEvent.next(DICTIONARY_ADDED);
+                this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryAdded);
             },
             (error) => {
                 this.dictionariesErrorEvent.next(error);
@@ -92,7 +92,7 @@ export class DictionariesController implements OnDestroy {
         const endpoint = `${environment.serverUrl}/dictionaries/reset`;
         this.http.delete<string>(endpoint, {}).subscribe(
             () => {
-                this.dictionariesUpdateMessageEvent.next(DICTIONARIES_DELETED);
+                this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionariesDeleted);
             },
             (error) => {
                 this.dictionariesErrorEvent.next(error);

@@ -15,6 +15,8 @@ import { Subject } from 'rxjs';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
 import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component';
 import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { PositiveFeedback, SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -34,9 +36,10 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     state: DictionariesState = DictionariesState.Loading;
     error: string | undefined = undefined;
     isDownloadLoading: boolean;
+    isWaitingForServerResponse: boolean;
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
-    constructor(public dialog: MatDialog, private dictionariesService: DictionariesService) {
+    constructor(public dialog: MatDialog, private dictionariesService: DictionariesService, private snackBar: MatSnackBar) {
         this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
@@ -46,10 +49,24 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         });
         this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
-            this.state = DictionariesState.Ready;
+            this.isWaitingForServerResponse = false;
         });
         this.dictionariesService.subscribeToDownloadLoadingEvent(this.serviceDestroyed$, () => {
             this.isDownloadLoading = false;
+            this.isWaitingForServerResponse = false;
+        });
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
+            this.snackBar.open(
+                response,
+                'OK',
+                Object.values(PositiveFeedback).includes(response as PositiveFeedback)
+                    ? { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] }
+                    : { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] },
+            );
+        });
+        this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.serviceDestroyed$, (state) => {
+            this.state = state;
+            this.isWaitingForServerResponse = false;
         });
     }
 
@@ -85,6 +102,9 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         const elementId: DeleteDictionaryDialogParameters = {
             title: element.title,
             dictionaryId: element.id,
+            onClose: () => {
+                this.isWaitingForServerResponse = true;
+            },
         };
         this.dialog.open(DeleteDictionaryDialogComponent, { data: elementId });
     }

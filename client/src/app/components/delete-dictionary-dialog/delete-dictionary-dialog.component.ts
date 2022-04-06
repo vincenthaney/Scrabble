@@ -24,8 +24,8 @@ export class DeleteDictionaryDialogComponent {
     ) {
         this.title = DELETE_COMPONENT_TITLE;
         this.dictionaryId = data.dictionaryId;
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
-            this.updateMessage(response);
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, () => {
+            this.cleanupDialogStates();
         });
     }
 
@@ -41,10 +41,6 @@ export class DeleteDictionaryDialogComponent {
     async deleteDictionary(): Promise<void> {
         this.state = DeleteDictionaryComponentStates.Loading;
         await this.dictionariesService.deleteDictionary(this.dictionaryId);
-    }
-
-    private updateMessage(message: string): void {
-        this.state = DeleteDictionaryComponentStates.Message;
-        this.message = message;
+        this.closeDialog();
     }
 }

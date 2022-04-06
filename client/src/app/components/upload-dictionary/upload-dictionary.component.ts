@@ -34,10 +34,12 @@ export class UploadDictionaryComponent {
             this.errorMessage = WRONG_FILE_TYPE;
         };
     }
+
     onUpload() {
         this.dictionariesService.uploadDictionary(this.newDictionary);
         this.dialogRef.close();
     }
+
     closeDialog(): void {
         this.dialogRef.close();
     }
