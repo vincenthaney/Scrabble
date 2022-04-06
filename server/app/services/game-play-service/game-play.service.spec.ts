@@ -151,7 +151,7 @@ describe('GamePlayService', () => {
             const spy = chai.spy.on(gamePlayService, 'handleGameOver', () => {});
             const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(spy).to.have.been.called;
+            expect(spy).to.have.been.called();
         });
 
         it('should call next round when action ends turn', async () => {
