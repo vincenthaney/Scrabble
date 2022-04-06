@@ -124,16 +124,6 @@ describe('GameDispatcherController', () => {
             controller.handleConfirmationGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
             expect(httpPostSpy).toHaveBeenCalled();
         });
-
-        it('handleConfirmationGameCreation should subscribe after making an HTTP post request', async () => {
-            spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
-            const observable = new Observable();
-            spyOn(controller['http'], 'post').and.returnValue(observable);
-            const spy = spyOn(observable, 'subscribe');
-
-            controller.handleGameCreation({} as unknown as GameConfigData);
-            expect(spy).toHaveBeenCalled();
-        });
     });
 
     describe('handleRejectionGameCreation', () => {

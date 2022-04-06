@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CommonModule } from '@angular/common';
@@ -10,16 +12,18 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonToggleGroupHarness, MatButtonToggleHarness } from '@angular/material/button-toggle/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
+import { Subject } from 'rxjs';
 import { ConvertDialogComponent } from './convert-dialog.component';
+import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -29,7 +33,18 @@ class TestComponent {}
 describe('ConvertDialogComponent', () => {
     let component: ConvertDialogComponent;
     let fixture: ComponentFixture<ConvertDialogComponent>;
-    let gameDispatcherServiceMock: GameDispatcherService;
+    let gameDispatcherServiceSpy: SpyObj<GameDispatcherService>;
+    let matDialogSpy: SpyObj<MatDialogRef<ConvertDialogComponent>>;
+    let backdropSubject: Subject<MouseEvent>;
+
+    beforeEach(() => {
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['handleRecreateGame']);
+        gameDispatcherServiceSpy.handleRecreateGame.and.callFake(() => {});
+
+        backdropSubject = new Subject();
+        matDialogSpy = jasmine.createSpyObj('MatDialogRef', ['backdropClick', 'close']);
+        matDialogSpy.backdropClick.and.returnValue(backdropSubject.asObservable());
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -48,6 +63,7 @@ describe('ConvertDialogComponent', () => {
                 MatCardModule,
                 MatInputModule,
                 MatDialogModule,
+                NoopAnimationsModule,
                 RouterTestingModule.withRoutes([
                     { path: 'waiting-room', component: TestComponent },
                     { path: 'game', component: TestComponent },
@@ -57,7 +73,8 @@ describe('ConvertDialogComponent', () => {
                 MatButtonToggleHarness,
                 MatButtonHarness,
                 MatButtonToggleGroupHarness,
-                GameDispatcherService,
+                { provide: GameDispatcherService, useValue: gameDispatcherServiceSpy },
+                { provide: MatDialogRef, useValue: matDialogSpy },
                 { provide: MAT_DIALOG_DATA, useValue: {} },
             ],
         }).compileComponents();
@@ -65,8 +82,6 @@ describe('ConvertDialogComponent', () => {
 
     beforeEach(() => {
         fixture = TestBed.createComponent(ConvertDialogComponent);
-        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
-
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -84,47 +99,50 @@ describe('ConvertDialogComponent', () => {
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
             expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
         });
-
-        it('should call returnToWaiting if it is not converting ', () => {
-            component.isConverting = false;
-            const spy = spyOn<any>(component, 'returnToWaiting');
-
-            component.ngOnDestroy();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should NOT call returnToWaiting if it is not converting ', () => {
-            component.isConverting = true;
-            const spy = spyOn<any>(component, 'returnToWaiting');
-
-            component.ngOnDestroy();
-            expect(spy).not.toHaveBeenCalled();
-        });
     });
 
     describe('onSubmit', () => {
-        it('form should call handleConvertToSolo on submit', async () => {
-            const spy = spyOn<any>(component, 'handleConvertToSolo');
+        it('should call handleRecreateGame with params', () => {
             component.onSubmit();
-            expect(spy).toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleRecreateGame).toHaveBeenCalledWith(component.gameParameters);
         });
 
-        it('form should set isConverting to true on submit', async () => {
-            component.isConverting = false;
-            spyOn<any>(component, 'handleConvertToSolo').and.callFake(() => {
-                return;
-            });
+        it('should close the dialog with isConverting = true', () => {
             component.onSubmit();
 
-            expect(component.isConverting).toBeTrue();
+            expect(matDialogSpy.close).toHaveBeenCalledWith({ isConverting: true });
         });
     });
 
-    describe('handleConvertToSolo', () => {
-        it('form should call gameDispatcherService.handleRecreateGame', async () => {
-            const spy = spyOn<any>(gameDispatcherServiceMock, 'handleRecreateGame');
-            component['handleConvertToSolo']();
-            expect(spy).toHaveBeenCalled();
+    describe('returnToWaiting', () => {
+        it('should call handleRecreateGame wit no params', () => {
+            component.returnToWaiting();
+            expect(gameDispatcherServiceSpy.handleRecreateGame).toHaveBeenCalledWith();
+        });
+
+        it('should close the dialog with isConverting = false', () => {
+            component.returnToWaiting();
+
+            expect(matDialogSpy.close).toHaveBeenCalledWith({ isConverting: false });
+        });
+    });
+
+    describe('setupDialog', () => {
+        it('should disable closing', () => {
+            component['dialogRef'].disableClose = false;
+
+            component['setupDialog']();
+
+            expect(component['dialogRef'].disableClose).toBeTrue();
+        });
+
+        it('should call returnToWaiting when backdrop is clicked', () => {
+            component['setupDialog']();
+            const returnSpy = spyOn(component, 'returnToWaiting').and.callFake(() => {});
+
+            backdropSubject.next();
+
+            expect(returnSpy).toHaveBeenCalled();
         });
     });
 });

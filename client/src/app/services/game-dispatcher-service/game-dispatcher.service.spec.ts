@@ -129,11 +129,6 @@ describe('GameDispatcherService', () => {
             expect(spy).toHaveBeenCalledWith(lobbies);
         });
 
-        it('should change lobbyData', () => {
-            service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
-            expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
-        });
-
         it('should initialize game on initializeGame event received', () => {
             const spy = spyOn(service['gameService'], 'handleInitializeGame').and.callFake(async () => {
                 return;
@@ -230,8 +225,8 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
     });
 
-    it('handleCreateGame should call gameDispatcherController.handleGameCreation with the correct parameters for solo game', () => {
-        const spyHandleGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
+    it('handleCreateGame should call handleGameCreation with the correct parameters for solo game', () => {
+        const spyHandleGameCreation = spyOn(service, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -252,8 +247,8 @@ describe('GameDispatcherService', () => {
         expect(spyHandleGameCreation).toHaveBeenCalledWith(EXPECTED_GAME_CONFIG);
     });
 
-    it('handleCreateGame should call gameDispatcherController.handleGameCreation with the correct parameters for multiplayer game', () => {
-        const spyHandleGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
+    it('handleCreateGame should call handleGameCreation with the correct parameters for multiplayer game', () => {
+        const spyHandleGameCreation = spyOn(service, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -315,7 +310,9 @@ describe('GameDispatcherService', () => {
         let createSpy: jasmine.Spy;
 
         beforeEach(() => {
-            createSpy = spyOn(service['gameDispatcherController'], 'handleGameCreation');
+            createSpy = spyOn(service, 'handleGameCreation').and.callFake(() => {
+                return;
+            });
             spyOn(socketServiceMock, 'getId').and.returnValue('socketid');
         });
 
@@ -351,6 +348,45 @@ describe('GameDispatcherService', () => {
             service.currentLobby = undefined;
             service.handleRecreateGame();
             expect(createSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleGameCreation', () => {
+        let handleCreationSpy: jasmine.Spy;
+        let postObservable: Subject<{ lobbyData: LobbyData }>;
+        let routerSpy: jasmine.Spy;
+        let gameConfigData: GameConfigData;
+        let gameCreationFailedSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            postObservable = new Subject();
+            handleCreationSpy = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.returnValue(postObservable.asObservable());
+            gameCreationFailedSpy = spyOn(service['gameCreationFailed$'], 'next').and.callFake(() => {
+                return;
+            });
+            routerSpy = spyOn(service['router'], 'navigateByUrl');
+            gameConfigData = TEST_GAME_PARAMETERS as unknown as GameConfigData;
+            service.handleGameCreation(gameConfigData);
+        });
+
+        it('should call gameDispatcherController.handleGameCreation', () => {
+            expect(handleCreationSpy).toHaveBeenCalledWith(gameConfigData);
+        });
+
+        it('should set currentLobby to response lobbyData', () => {
+            postObservable.next({ lobbyData: TEST_LOBBY_DATA });
+            expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
+        });
+
+        it('should set currentLobby is Multiplayer, should route to waiting-room', () => {
+            TEST_LOBBY_DATA.gameMode = GameMode.Multiplayer;
+            postObservable.next({ lobbyData: TEST_LOBBY_DATA });
+            expect(routerSpy).toHaveBeenCalledWith('waiting-room');
+        });
+
+        it('on error, should send gameCreationFailed$ event', () => {
+            postObservable.error({});
+            expect(gameCreationFailedSpy).toHaveBeenCalled();
         });
     });
 
