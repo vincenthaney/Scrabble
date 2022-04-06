@@ -3,7 +3,7 @@ import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { padStart, take } from 'lodash';
 import { pipe } from 'rxjs';
 
-export type DurationTime = [time: number, suffix: string];
+export type DurationTime = [time: number, suffix: string, noPad?: boolean];
 
 const SECONDS_IN_DAY = 86400;
 const SECONDS_IN_HOUR = 3600;
@@ -34,7 +34,7 @@ export class DurationPipe implements PipeTransform {
     }
 
     private mapToString(durationsTimes: DurationTime[]): string[] {
-        return durationsTimes.map(([time, suffix], index) => `${index > 0 ? padStart(time.toString(), 2, '0') : time}${suffix}`);
+        return durationsTimes.map(([time, suffix, noPad], index) => `${index > 0 && !noPad ? padStart(time.toString(), 2, '0') : time}${suffix}`);
     }
 
     private join(timeString: string[]): string {
@@ -43,8 +43,8 @@ export class DurationPipe implements PipeTransform {
 
     private getDurationTimes(): DurationTime[] {
         return [
-            [this.getRemainingTime(SECONDS_IN_DAY * SECONDS_TO_MILLISECONDS), ' jour(s)'],
-            [this.getRemainingTime(SECONDS_IN_HOUR * SECONDS_TO_MILLISECONDS), 'h'],
+            [this.getRemainingTime(SECONDS_IN_DAY * SECONDS_TO_MILLISECONDS), ' jour(s)', true],
+            [this.getRemainingTime(SECONDS_IN_HOUR * SECONDS_TO_MILLISECONDS), 'h', true],
             [this.getRemainingTime(SECONDS_IN_MINUTE * SECONDS_TO_MILLISECONDS), 'm'],
             [this.getRemainingTime(SECONDS_TO_MILLISECONDS), 's'],
             [this.getRemainingTime(1), 'ms'],

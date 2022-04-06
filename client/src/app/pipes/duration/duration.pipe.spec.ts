@@ -21,6 +21,7 @@ describe('DurationPipe', () => {
         [3730, '1h 02m'],
         [70, '1m 10s'],
         [3610, '1h'],
+        [90000, '1 jour(s) 1h'],
     ];
 
     let index = 1;
