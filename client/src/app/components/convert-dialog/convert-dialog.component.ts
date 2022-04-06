@@ -1,11 +1,15 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
+
+export interface ConvertResult {
+    isConverting: boolean;
+}
 
 @Component({
     selector: 'app-convert-dialog',
@@ -20,7 +24,11 @@ export class ConvertDialogComponent implements OnDestroy {
     gameParameters: FormGroup;
     isConverting: boolean;
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: string, private gameDispatcherService: GameDispatcherService) {
+    constructor(
+        private dialogRef: MatDialogRef<ConvertDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: string,
+        private gameDispatcherService: GameDispatcherService,
+    ) {
         this.isConverting = false;
         this.playerName = data;
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -31,24 +39,27 @@ export class ConvertDialogComponent implements OnDestroy {
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
         });
+
+        this.setupDialog();
     }
 
     ngOnDestroy(): void {
-        if (!this.isConverting) this.returnToWaiting();
         this.pageDestroyed$.next(true);
         this.pageDestroyed$.complete();
     }
 
     onSubmit(): void {
-        this.isConverting = true;
-        this.handleConvertToSolo();
-    }
-
-    private handleConvertToSolo(): void {
         this.gameDispatcherService.handleRecreateGame(this.gameParameters);
+        this.dialogRef.close({ isConverting: true });
     }
 
-    private returnToWaiting(): void {
+    returnToWaiting(): void {
         this.gameDispatcherService.handleRecreateGame();
+        this.dialogRef.close({ isConverting: false });
+    }
+
+    private setupDialog(): void {
+        this.dialogRef.disableClose = true;
+        this.dialogRef.backdropClick().subscribe(() => this.returnToWaiting());
     }
 }
