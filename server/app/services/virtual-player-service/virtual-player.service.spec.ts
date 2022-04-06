@@ -1,20 +1,21 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { ActionPass } from '@app/classes/actions';
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
-import { VirtualPlayerService } from './virtual-player.service';
-import * as mockttp from 'mockttp';
-import * as chai from 'chai';
-import * as spies from 'chai-spies';
-import Player from '@app/classes/player/player';
 import Game from '@app/classes/game/game';
+import { GameConfig, StartGameData } from '@app/classes/game/game-config';
+import { GameMode } from '@app/classes/game/game-mode';
+import { GameType } from '@app/classes/game/game-type';
+import Player from '@app/classes/player/player';
+import { Square } from '@app/classes/square';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
-import { GameConfig, StartGameData } from '@app/classes/game/game-config';
-import { GameType } from '@app/classes/game/game-type';
-import { Square } from '@app/classes/square';
+import * as chai from 'chai';
 import { expect } from 'chai';
+import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
-import { ActionPass } from '@app/classes/actions';
+import * as mockttp from 'mockttp';
+import { VirtualPlayerService } from './virtual-player.service';
 
 chai.use(spies);
 const DEFAULT_PLAYER1_NAME = 'p1';
@@ -28,6 +29,7 @@ const DEFAULT_MAX_ROUND_TIME = 1;
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER1_ID, DEFAULT_PLAYER1_NAME),
     gameType: GameType.Classic,
+    gameMode: GameMode.Solo,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
     dictionary: DEFAULT_DICTIONARY,
 };

@@ -10,6 +10,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -179,17 +180,16 @@ describe('GameService', () => {
             });
         });
 
-        it('should do nothing if initializeGameData is undefined', () => {
-            service.handleInitializeGame(undefined);
+        it('should do nothing if initializeGameData is undefined', async () => {
+            await service.handleInitializeGame(undefined);
             expect(initializeGameSpy).not.toHaveBeenCalled();
         });
 
-        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', () => {
-            service.handleInitializeGame({} as InitializeGameData);
-            Promise.resolve(() => {
-                expect(initializeGameSpy).toHaveBeenCalled();
-                expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
-            });
+        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', async () => {
+            await service.handleInitializeGame({} as InitializeGameData);
+
+            expect(initializeGameSpy).toHaveBeenCalled();
+            expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
         });
     });
 
@@ -201,6 +201,7 @@ describe('GameService', () => {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 1,
                 dictionary: 'default',
                 gameId: 'game-id',
@@ -363,6 +364,7 @@ describe('GameService', () => {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 1,
                 dictionary: 'default',
                 gameId: 'game-id',
