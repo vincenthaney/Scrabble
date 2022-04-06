@@ -38,7 +38,7 @@ const VALID_PARAMETERS_MULTIPLE = { createdWords: [SUCCESS_CREATED_WORD, SUCCESS
 
 const INVALID_PARAMETERS = { createdWords: [FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
 
-describe.only('FourVowelsWordObjective', () => {
+describe('FourVowelsWordObjective', () => {
     let objective: FourVowelsWordObjective;
 
     beforeEach(() => {
