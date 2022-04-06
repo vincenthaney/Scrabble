@@ -96,9 +96,9 @@ describe('VirtualPlayerService', () => {
             const endpoint = `/api/games/${TEST_GAME_ID}/players/${TEST_PLAYER_ID}/action`;
             chai.spy.on(virtualPlayerService, 'getEndpoint', () => mockServer.url);
             await mockServer.forPost(endpoint).once().thenReply(StatusCodes.BAD_REQUEST);
-            await virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
             const sendActionSpy = chai.spy.on(ActionPass, 'createActionData');
-            expect(sendActionSpy).to.have.been.called;
+            await virtualPlayerService.sendAction(TEST_GAME_ID, TEST_PLAYER_ID, TEST_ACTION);
+            expect(sendActionSpy).to.have.been.called();
             mockServer.stop();
         });
     });
