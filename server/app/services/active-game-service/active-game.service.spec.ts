@@ -140,7 +140,7 @@ describe('ActiveGameService', () => {
             });
             activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             const spy = chai.spy.on(activeGameService['activeGames'], 'indexOf');
-            expect(spy).to.have.been.called;
+            expect(spy).not.to.have.been.called();
         });
     });
 
