@@ -22,16 +22,6 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
         return this.isExchangePossible() ? ActionExchange.createActionData(this.tiles) : ActionPass.createActionData();
     }
 
-    // private computeWordPlacement(): ScoredWordPlacement | undefined {
-    //     const request = this.generateWordFindingRequest();
-    //     this.wordFindingInstance = this.getWordFindingService().getWordFindingInstance(request.useCase, [
-    //         this.getGameBoard(this.gameId, this.id),
-    //         this.tiles,
-    //         request,
-    //     ]);
-    //     return this.wordFindingInstance.findWords().pop();
-    // }
-
     protected generateWordFindingRequest(): WordFindingRequest {
         return {
             pointRange: this.findPointRange(),
