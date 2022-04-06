@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ChangeDetectorRef } from '@angular/core';
@@ -21,7 +22,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { GameHistoryController } from '@app/controllers/game-history-controller/game-history.controller';
-import { Observable } from 'rxjs';
+import { Observable, Subject, throwError } from 'rxjs';
 import { IconComponent } from '@app/components/icon/icon.component';
 
 import { AdminGameHistoryComponent } from './admin-game-history.component';
@@ -130,6 +131,51 @@ fdescribe('AdminGameHistoryComponent', () => {
             component.ngAfterViewInit();
 
             expect(component.dataSource.paginator).toEqual(paginator);
+        });
+    });
+
+    describe('resetHistory', () => {
+        it('should set state to loading', () => {
+            component.resetHistory();
+            expect(component.state).toEqual(GameHistoryState.Loading);
+        });
+
+        it('should call gameHistoryController resetGameHistories', () => {
+            component.resetHistory();
+            expect(gameHistoryControllerSpy.resetGameHistories).toHaveBeenCalled();
+        });
+
+        it('should set data to empty array on resolution', () => {
+            (component.dataSource.data as unknown) = [1, 2, 3];
+            const subject = new Subject<void>();
+            gameHistoryControllerSpy.resetGameHistories.and.returnValue(subject);
+
+            component.resetHistory();
+            subject.next();
+
+            expect(component.dataSource.data).toHaveSize(0);
+        });
+
+        it('should set state to Ready on resolution', () => {
+            const subject = new Subject<void>();
+            gameHistoryControllerSpy.resetGameHistories.and.returnValue(subject);
+
+            component.resetHistory();
+            subject.next();
+
+            expect(component.state).toEqual(GameHistoryState.Ready);
+        });
+
+        it('should call snackBarOpen on error', () => {
+            const error = 'my error';
+            const snackbarOpenSpy = spyOn(component['snackBar'], 'open');
+            const subject = new Subject<void>();
+            gameHistoryControllerSpy.resetGameHistories.and.returnValue(throwError(error));
+
+            component.resetHistory();
+            subject.next();
+
+            expect(snackbarOpenSpy).toHaveBeenCalledWith(error);
         });
     });
 
