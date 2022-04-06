@@ -86,15 +86,19 @@ describe('Game', () => {
         sinon.restore();
     });
 
-    describe('createMultiplayerGame', () => {
+    describe('createGame', () => {
         let game: Game;
-        let objectiveInitspy: unknown;
+        let objectiveInitspy: sinon.SinonSpy;
 
         beforeEach(async () => {
-            game = await Game.createGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
-            objectiveInitspy = chai.spy.on(game, 'initializeObjectives', () => {
+            objectiveInitspy = sinon.stub(Game.prototype, <any>'initializeObjectives').callsFake(() => {
                 return;
             });
+            game = await Game.createGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
+        });
+
+        afterEach(() => {
+            sinon.restore();
         });
 
         it('should create', () => {
@@ -115,7 +119,7 @@ describe('Game', () => {
         });
 
         it('should call initializeObjectives', () => {
-            expect(objectiveInitspy).to.have.been.called;
+            sinon.assert.called(objectiveInitspy);
         });
 
         it('should give players their tiles', () => {
@@ -604,26 +608,15 @@ describe('Game', () => {
     });
 
     describe('Game Service Injection', () => {
-        let getSpy: unknown;
-
-        beforeEach(() => {
-            getSpy = chai.spy.on(Container, 'get');
-        });
-
         afterEach(() => {
             chai.spy.restore();
         });
+
         it('injectServices should set static Game BoardService if it does not exist', () => {
             Game['boardService'] = undefined as unknown as BoardService;
 
             Game.injectServices();
             expect(Game['boardService']).to.equal(Container.get(BoardService));
-        });
-
-        it('injectServices should NOT set BoardService if it exists', () => {
-            Game['boardService'] = Container.get(BoardService);
-            Game.injectServices();
-            expect(getSpy).not.to.have.been.called;
         });
 
         it('injectServices should set static Game ObjectivesService if it does not exist', () => {
@@ -633,10 +626,13 @@ describe('Game', () => {
             expect(Game['objectivesService']).to.equal(Container.get(ObjectivesService));
         });
 
-        it('injectServices should  NOT set ObjectivesService if it exists', () => {
+        it('injectServices should NOT set BoardService and ObjectivesService if they exist', () => {
+            Game['boardService'] = Container.get(BoardService);
             Game['objectivesService'] = Container.get(ObjectivesService);
+            const getSpy = chai.spy.on(Container, 'get');
+
             Game.injectServices();
-            expect(getSpy).not.to.have.been.called;
+            expect(getSpy).not.to.have.been.called();
         });
     });
 
@@ -727,15 +723,15 @@ describe('Game', () => {
             const player1Spy = chai.spy.on(game.player1, 'initializeObjectives', () => {});
             const player2Spy = chai.spy.on(game.player2, 'initializeObjectives', () => {});
             game['initializeObjectives']();
-            expect(initSpy).to.have.been.called;
-            expect(player1Spy).to.have.been.called;
-            expect(player2Spy).to.have.been.called;
+            expect(initSpy).to.have.been.called();
+            expect(player1Spy).to.have.been.called();
+            expect(player2Spy).to.have.been.called();
         });
 
         it('should NOT initialize objectives if gameType is CLASSIC', async () => {
             game.gameType = GameType.Classic;
             game['initializeObjectives']();
-            expect(initSpy).not.to.have.been.called;
+            expect(initSpy).not.to.have.been.called();
         });
     });
 
