@@ -13,6 +13,7 @@ import { Container } from 'typedi';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { AbstractWordFinding } from '@app/classes/word-finding';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -20,6 +21,7 @@ const DEFAULT_PLAYER_1_ID = '1';
 describe('ActionHint', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
+    let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
     let action: ActionHint;
 
     beforeEach(() => {
@@ -28,8 +30,12 @@ describe('ActionHint', () => {
         gameStub = createStubInstance(Game);
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
 
-        wordFindingServiceStub = createStubInstance(WordFindingService, {
+        wordFindingInstanceStub = createStubInstance(AbstractWordFinding, {
             findWords: [],
+        });
+
+        wordFindingServiceStub = createStubInstance(WordFindingService, {
+            getWordFindingInstance: wordFindingInstanceStub as unknown as AbstractWordFinding,
         });
 
         action = new ActionHint(gameStub.player1, gameStub as unknown as Game);
@@ -39,7 +45,8 @@ describe('ActionHint', () => {
     describe('execute', () => {
         it('should call findWords', () => {
             action.execute();
-            expect(wordFindingServiceStub.findWords.called).to.be.true;
+            expect(wordFindingServiceStub.getWordFindingInstance.called).to.be.true;
+            expect(wordFindingInstanceStub.findWords.called).to.be.true;
         });
 
         it('should set wordsPlacement', () => {

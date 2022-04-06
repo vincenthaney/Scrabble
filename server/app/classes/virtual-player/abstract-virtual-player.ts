@@ -77,14 +77,14 @@ export abstract class AbstractVirtualPlayer extends Player {
     }
 
     protected isExchangePossible(): boolean {
-        let total = 0;
+        let totalTilesLeft = 0;
         this.getActiveGameService()
             .getGame(this.gameId, this.id)
             .getTilesLeftPerLetter()
             .forEach((value: number) => {
-                total += value;
+                totalTilesLeft += value;
             });
-        return total >= MINIMUM_EXCHANGE_WORD_COUNT;
+        return totalTilesLeft >= MINIMUM_EXCHANGE_WORD_COUNT;
     }
 
     protected abstract findAction(): Promise<ActionData>;
