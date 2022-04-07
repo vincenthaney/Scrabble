@@ -4,12 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import {
-    DisplayDictionariesColumnsIteratorItem,
-    DisplayDictionariesKeys,
-    DictionariesState,
-    DictionariesColumns,
-} from '@app/classes/admin/dictionaries';
+import { DisplayDictionariesColumnsIteratorItem, DisplayDictionariesKeys, DictionariesState } from '@app/classes/admin/dictionaries';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { DEFAULT_DICTIONARIES_COLUMNS, DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
 import { isKey } from '@app/utils/is-key';
@@ -32,7 +27,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    columns: DictionariesColumns;
+    columns;
     columnsItems: DisplayDictionariesColumnsIteratorItem[];
     selectedColumnsItems: DisplayDictionariesColumnsIteratorItem[];
     columnsControl: FormControl;
@@ -48,11 +43,12 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.columns = DICTIONARIES_COLUMNS;
         this.columnsItems = [];
         this.selectedColumnsItems = [];
+        this.dataSource = new MatTableDataSource(new Array());
         this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
-        this.columnsControl.setValue(this.selectedColumnsItems);
         this.columnsControl = new FormControl();
+        this.columnsControl.setValue(this.selectedColumnsItems);
         this.dataSource = new MatTableDataSource(new Array());
         this.state = DictionariesState.Loading;
         this.error = undefined;
