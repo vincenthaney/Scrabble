@@ -48,6 +48,8 @@ export default class GameService implements OnDestroy, IResetServiceData {
             .observeGameUpdate()
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe((newData) => this.handleGameUpdate(newData));
+
+        this.gameViewEventManagerService.subscribeToGameViewEvent('resetServices', this.serviceDestroyed$, () => this.resetServiceData());
     }
 
     ngOnDestroy(): void {

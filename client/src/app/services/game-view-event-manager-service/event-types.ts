@@ -11,6 +11,7 @@ export interface EventTypes {
     usedTiles: PlaceActionPayload | undefined;
     resetUsedTiles: void;
     gameInitialized: InitializeGameData | undefined;
+    resetServices: void;
 }
 
 type GenericEventClass<T> = {
