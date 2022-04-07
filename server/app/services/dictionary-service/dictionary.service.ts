@@ -1,3 +1,10 @@
+import {
+    BasicDictionaryData,
+    CompleteDictionaryData,
+    DictionarySummary,
+    DictionaryUpdateInfo,
+    DictionaryUsage,
+} from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import {
     DICTIONARY_PATH,
@@ -8,20 +15,13 @@ import {
     MAX_DICTIONARY_DESCRIPTION_LENGTH,
     MAX_DICTIONARY_TITLE_LENGTH,
 } from '@app/constants/dictionary.const';
-import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { promises } from 'fs';
-import { join } from 'path';
-import DatabaseService from '@app/services/database-service/database.service';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
-import { Collection, ObjectId } from 'mongodb';
+import DatabaseService from '@app/services/database-service/database.service';
 import Ajv, { ValidateFunction } from 'ajv';
-import {
-    BasicDictionaryData,
-    CompleteDictionaryData,
-    DictionarySummary,
-    DictionaryUpdateInfo,
-    DictionaryUsage,
-} from '@app/classes/communication/dictionary-data';
+import { promises } from 'fs';
+import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { Collection, ObjectId } from 'mongodb';
+import { join } from 'path';
 import { Service } from 'typedi';
 
 @Service()

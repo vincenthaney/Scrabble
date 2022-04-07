@@ -2,24 +2,24 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { HighScore, HighScoresData } from '@app/classes/database/high-score';
+import { GameType } from '@app/classes/game/game-type';
+import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
+import DatabaseService from '@app/services/database-service/database.service';
+import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
+import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { MongoClient } from 'mongodb';
-import { HighScore, HighScoresData } from '@app/classes/database/high-score';
-import { GameType } from '@app/classes/game/game-type';
-import HighScoresService from './high-scores.service';
+import { join } from 'path';
+import * as sinon from 'sinon';
+import { stub } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
-import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
-import DatabaseService from '@app/services/database-service/database.service';
-import { stub } from 'sinon';
-import * as sinon from 'sinon';
+import HighScoresService from './high-scores.service';
 
-import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
-import { join } from 'path';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const HIGH_SCORE_CLASSIC_1: HighScore = {
@@ -71,11 +71,20 @@ describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
     let client: MongoClient;
+    let initDataBaseService;
+    let initHighScoreService;
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(async () => {
-        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        initDataBaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        initHighScoreService = Container.get(HighScoresService);
+
+        databaseService = initDataBaseService;
         client = (await databaseService.connectToServer()) as MongoClient;
-        highScoresService = Container.get(HighScoresService);
+        highScoresService = initHighScoreService;
         highScoresService['databaseService'] = databaseService;
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
     });
