@@ -17,6 +17,7 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ObjectivesManagerService } from '@app/services/objectives-manager-service/objectives-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -36,6 +37,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
+        private objectiveManager: ObjectivesManagerService,
         private gameController: GamePlayController,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
@@ -127,6 +129,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
         this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
+        this.objectiveManager.initializeFromStartGameData(startGameData, this.isLocalPlayerPlayer1());
 
         this.isGameSetUp = true;
         this.isGameOver = false;
@@ -163,6 +166,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
         if (gameUpdateData.tileReserve) {
             this.handleTileReserveUpdate(gameUpdateData.tileReserve);
+        }
+        if (gameUpdateData.gameObjective) {
+            this.objectiveManager.updateObjectives(gameUpdateData.gameObjective);
         }
     }
 
