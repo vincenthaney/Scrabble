@@ -17,6 +17,7 @@ export interface CompleteDictionaryData extends DictionaryData {
 export interface DictionaryUsage {
     dictionary: Dictionary;
     numberOfActiveGames: number;
+    isDeleted: boolean;
 }
 
 export interface DictionarySummary {

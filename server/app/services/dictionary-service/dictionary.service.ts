@@ -6,6 +6,7 @@ import {
     DictionaryUsage,
 } from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import {
     DICTIONARY_PATH,
     INVALID_DESCRIPTION_FORMAT,
@@ -19,8 +20,9 @@ import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-cons
 import DatabaseService from '@app/services/database-service/database.service';
 import Ajv, { ValidateFunction } from 'ajv';
 import { promises } from 'fs';
+import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { Collection, ObjectId } from 'mongodb';
+import { Collection, ObjectId, UpdateResult } from 'mongodb';
 import { join } from 'path';
 import { Service } from 'typedi';
 
@@ -29,7 +31,9 @@ export default class DictionaryService {
     private dictionaryValidator: ValidateFunction<{ [x: string]: unknown }>;
     private activeDictionaries: Map<string, DictionaryUsage> = new Map();
 
-    constructor(private databaseService: DatabaseService) {}
+    constructor(private databaseService: DatabaseService) {
+        this.databaseService.getDatabaseInitializationEvent().on('initialize', async () => await this.initializeDictionaries());
+    }
 
     private static async fetchDefaultDictionary(): Promise<DictionaryData> {
         const filePath = join(__dirname, DICTIONARY_PATH);
@@ -40,16 +44,10 @@ export default class DictionaryService {
     }
 
     async useDictionary(id: string): Promise<DictionaryUsage> {
-        let dictionary = this.activeDictionaries.get(id);
-        if (dictionary) {
-            dictionary.numberOfActiveGames++;
-            return dictionary;
-        }
-        const dictionaryData: CompleteDictionaryData = { ...(await this.getDbDictionary(id)), id };
+        const dictionary: DictionaryUsage | undefined = this.activeDictionaries.get(id);
+        if (!dictionary) throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
 
-        dictionary = { numberOfActiveGames: 1, dictionary: new Dictionary(dictionaryData) };
-        this.activeDictionaries.set(id, dictionary);
-
+        dictionary.numberOfActiveGames++;
         return dictionary;
     }
 
@@ -62,7 +60,8 @@ export default class DictionaryService {
     stopUsingDictionary(id: string): void {
         const dictionaryUsage = this.activeDictionaries.get(id);
         if (!dictionaryUsage) return;
-        if (--dictionaryUsage.numberOfActiveGames === 0) this.activeDictionaries.delete(id);
+        dictionaryUsage.numberOfActiveGames--;
+        this.deleteActiveDictionary(id);
     }
 
     async validateDictionary(dictionaryData: BasicDictionaryData): Promise<boolean> {
@@ -73,15 +72,17 @@ export default class DictionaryService {
     async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
         if (!(await this.validateDictionary(basicDictionaryData))) throw new Error(INVALID_DICTIONARY_FORMAT);
         const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
-        await this.collection.updateOne(
-            {
-                title: dictionaryData.title,
-            },
-            {
-                $setOnInsert: dictionaryData,
-            },
-            { upsert: true },
-        );
+        await this.collection
+            .updateOne(
+                {
+                    title: dictionaryData.title,
+                },
+                {
+                    $setOnInsert: dictionaryData,
+                },
+                { upsert: true },
+            )
+            .then(async (updateResult: UpdateResult) => await this.initializeDictionary(updateResult.upsertedId.toString()));
     }
 
     async resetDbDictionaries(): Promise<void> {
@@ -102,6 +103,8 @@ export default class DictionaryService {
                 isDefault: dictionary.isDefault,
             };
             dictionarySummaries.push(summary);
+
+            this.initializeDictionary(summary.id);
         });
         return dictionarySummaries;
     }
@@ -123,6 +126,11 @@ export default class DictionaryService {
 
     async deleteDictionary(dictionaryId: string): Promise<void> {
         await this.collection.findOneAndDelete({ _id: new ObjectId(dictionaryId), isDefault: false });
+        const dictionaryUsage: DictionaryUsage | undefined = this.activeDictionaries.get(dictionaryId);
+        if (dictionaryUsage) {
+            dictionaryUsage.isDeleted = true;
+            this.deleteActiveDictionary(dictionaryId);
+        }
     }
 
     async getDbDictionary(id: string): Promise<DictionaryData> {
@@ -130,6 +138,29 @@ export default class DictionaryService {
         if (dictionaryData) return dictionaryData;
 
         throw new Error(INVALID_DICTIONARY_ID);
+    }
+
+    private async initializeDictionaries(): Promise<void> {
+        const dictionariesId: string[] = await this.getDictionariesId();
+        dictionariesId.forEach(async (id: string) => await this.initializeDictionary(id));
+    }
+
+    private async getDictionariesId(): Promise<string[]> {
+        return await this.collection
+            .find({})
+            // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
+            // eslint-disable-next-line no-underscore-dangle
+            .map((dictionary) => dictionary._id.toString())
+            .toArray();
+    }
+
+    private async initializeDictionary(id: string): Promise<void> {
+        if (this.activeDictionaries.has(id)) return;
+
+        const dictionaryData: CompleteDictionaryData = { ...(await this.getDbDictionary(id)), id };
+
+        const dictionary = { numberOfActiveGames: 0, dictionary: new Dictionary(dictionaryData), isDeleted: false };
+        this.activeDictionaries.set(id, dictionary);
     }
 
     private async isTitleValid(title: string): Promise<boolean> {
@@ -146,6 +177,7 @@ export default class DictionaryService {
 
     private async populateDb(): Promise<void> {
         await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, [await DictionaryService.fetchDefaultDictionary()]);
+        await this.initializeDictionaries();
     }
 
     private createDictionaryValidator(): void {
@@ -170,5 +202,16 @@ export default class DictionaryService {
         };
 
         this.dictionaryValidator = ajv.compile(schema);
+    }
+
+    private deleteActiveDictionary(dictionaryId: string): void {
+        const dictionaryUsage: DictionaryUsage | undefined = this.activeDictionaries.get(dictionaryId);
+        if (!dictionaryUsage) throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
+
+        if (dictionaryUsage.numberOfActiveGames === 0 && dictionaryUsage.isDeleted) {
+            this.activeDictionaries.delete(dictionaryId);
+        }
+
+        console.log(this.activeDictionaries);
     }
 }
