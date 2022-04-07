@@ -12,13 +12,6 @@
     .top, .bottom {
         display: flex;
         justify-content: space-between;
-    }
-
-    .top {
-        align-items: flex-start;
-    }
-
-    .bottom {
         align-items: center;
     }
     
@@ -40,6 +33,13 @@
         margin-left: 12px;
         line-break: strict;
         white-space: nowrap;
+    }
+
+    .progress-text {
+        margin-right: 6px;
+        font-size: 0.95em;
+        font-weight: 500;
+        opacity: 0.75;
     }
 
     p {

@@ -9,10 +9,10 @@
             <span class="title">{{ objective.name }}</span>
             <app-icon icon="info-circle" class="help-icon" [matTooltip]="objective.description" matTooltipPosition="above"></app-icon>
         </p>
-        <p class="points" *ngIf="objective.state !== 'NotCompleted'">{{ objective.bonusPoints }} points</p>
+        <p class="points">{{ objective.bonusPoints }} points</p>
     </div>
     <div class="bottom">
+        <span class="progress-text">{{ objective.progress }}/{{ objective.maxProgress }}</span>
         <mat-progress-bar mode="determinate" [value]="getProgress()" *ngIf="objective.state === 'NotCompleted'"></mat-progress-bar>
-        <p class="points" *ngIf="objective.state === 'NotCompleted'">{{ objective.bonusPoints }} points</p>
     </div>
 </mat-card>
