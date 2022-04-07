@@ -55,7 +55,7 @@ const DEFAULT_TILES: Tile[] = [
     },
 ];
 
-describe('GamePlayService', () => {
+describe.only('GamePlayService', () => {
     let gamePlayService: GamePlayService;
     let getGameStub: SinonStub;
     let gameStub: SinonStubbedInstance<Game>;
@@ -97,7 +97,7 @@ describe('GamePlayService', () => {
         player = gameStub.player1;
         game = gameStub as unknown as Game;
 
-        getGameStub = stub(gamePlayService['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
+        getGameStub = stub(gamePlayService['activeGameService'], 'getGame').returns(game);
     });
 
     afterEach(() => {
@@ -119,6 +119,7 @@ describe('GamePlayService', () => {
 
         afterEach(() => {
             sinon.restore();
+            chai.spy.restore();
         });
 
         it('should call getGame', async () => {
@@ -220,6 +221,11 @@ describe('GamePlayService', () => {
         it('should return opponentFeedback equal to getOppnentMessage from action', async () => {
             const [, feedback] = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(feedback!.opponentFeedback).to.equal(DEFAULT_ACTION_MESSAGE);
+        });
+
+        it('should return [undefined, undefined] is game is over', async () => {
+            game.gameIsOver = true;
+            expect(await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION)).to.deep.equal([undefined, undefined]);
         });
     });
 
@@ -324,6 +330,44 @@ describe('GamePlayService', () => {
         });
     });
 
+    describe('getActionPlacePayload', () => {
+        it('should return right payload', () => {
+            const payload = {
+                startPosition: { column: 1, row: 1 },
+                orientation: Orientation.Horizontal,
+                tiles: [{ letter: 'A', value: 2 }],
+            };
+            const actionData: ActionData = {
+                type: ActionType.PLACE,
+                input: 'test',
+                payload,
+            };
+            expect(gamePlayService.getActionPlacePayload(actionData)).to.deep.equal(payload);
+        });
+    });
+
+    describe('getActionExchangePayload', () => {
+        it('should return right payload', () => {
+            const payload = {
+                tiles: [{ letter: 'A', value: 2 }],
+            };
+            const actionData: ActionData = {
+                type: ActionType.EXCHANGE,
+                input: 'test',
+                payload,
+            };
+            expect(gamePlayService.getActionExchangePayload(actionData)).to.deep.equal(payload);
+        });
+    });
+
+    describe('isGameOver', () => {
+        it('should return expected value', () => {
+            const expected = true;
+            game['gameIsOver'] = expected;
+            expect(gamePlayService.isGameOver(game.getId(), DEFAULT_PLAYER_ID)).to.equal(expected);
+        });
+    });
+
     describe('PlayerLeftEvent', () => {
         const playerWhoLeftId = 'playerWhoLeftId';
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
@@ -398,10 +442,25 @@ describe('GamePlayService', () => {
             expect(gameStub.getConnectedRealPlayers.calledOnce).to.be.true;
             expect(highScoresServiceStub.addHighScore.calledOnce).to.be.true;
         });
+
+        it('should update set updatedData players score if they exist', async () => {
+            const updatedScore1 = 100;
+            const updatedScore2 = 200;
+            const gameUpdateData = {
+                player1: { id: 'id1', score: 0 },
+                player2: { id: 'id2', score: 0 },
+            };
+            gameStub.endOfGame.returns([updatedScore1, updatedScore2]);
+
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, gameUpdateData);
+            expect(gameUpdateData.player1.score).to.equal(updatedScore1);
+            expect(gameUpdateData.player2.score).to.equal(updatedScore2);
+        });
     });
 
     describe('addMissingPlayerId', () => {
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
