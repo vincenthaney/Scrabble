@@ -40,7 +40,7 @@ export default class Player {
     }
 
     getObjectives(): AbstractObjective[] {
-        return [...this.objectives.values()];
+        return [...this.objectives];
     }
 
     resetObjectivesProgression(): void {
