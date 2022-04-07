@@ -6,6 +6,6 @@
 <button mat-button color="primary" (click)="fileInput.click()">Sélectionner le fichier</button>
 <div *ngIf="selectedFile">{{this.selectedFile.name}}</div>
 <div> 
-  <button mat-flat-button color="primary" (click)="onUpload()" [disabled]="isUploadableFile">Ajouter</button>
+  <button mat-flat-button color="primary" (click)="onUpload()" [disabled]="!isDictionaryReady">Ajouter</button>
   <button mat-button color="primary" (click)="closeDialog()">Annuler</button>
 </div>

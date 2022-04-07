@@ -35,7 +35,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     dataSource: MatTableDataSource<DictionarySummary>;
     state: DictionariesState;
     error: string | undefined;
-    isDownloadLoading: boolean;
     isWaitingForServerResponse: boolean;
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
@@ -100,7 +99,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     async downloadDictionary(id: string): Promise<void> {
-        this.isDownloadLoading = true;
+        this.isWaitingForServerResponse = true;
         await this.dictionariesService.downloadDictionary(id);
     }
 
@@ -144,13 +143,11 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dictionariesService.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
         });
-        this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToDictionariesUpdateDataEvent(this.serviceDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
-            this.isWaitingForServerResponse = false;
         });
-        this.dictionariesService.subscribeToDownloadLoadingEvent(this.serviceDestroyed$, () => {
-            this.isDownloadLoading = false;
-            this.isWaitingForServerResponse = false;
+        this.dictionariesService.subscribeToIsWaitingForServerResponseEvent(this.serviceDestroyed$, () => {
+            this.isWaitingForServerResponse = !this.isWaitingForServerResponse;
         });
         this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
             this.snackBar.open(
@@ -163,7 +160,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         });
         this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.serviceDestroyed$, (state) => {
             this.state = state;
-            this.isWaitingForServerResponse = false;
+            this.isWaitingForServerResponse = !this.isWaitingForServerResponse;
         });
     }
 }

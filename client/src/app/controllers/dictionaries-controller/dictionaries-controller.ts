@@ -71,7 +71,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryAdded);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error.error.message);
+                this.dictionariesErrorEvent.next(error.message);
             },
         );
     }

@@ -12,7 +12,7 @@ import { DictionariesService } from '@app/services/dictionaries-service/dictiona
 export class UploadDictionaryComponent {
     title: string = 'Ajouter un dictionaire';
     errorMessage: string = '';
-    isUploadableFile: boolean = false;
+    isDictionaryReady: boolean = false;
     selectedFile: File;
     newDictionary: DictionaryData;
     constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionariesService) {}
@@ -26,6 +26,7 @@ export class UploadDictionaryComponent {
         fileReader.onload = () => {
             try {
                 this.newDictionary = JSON.parse(fileReader.result as string) as DictionaryData;
+                this.isDictionaryReady = true;
             } catch (error) {
                 const newError = error as SyntaxError;
                 this.errorMessage = newError.message;
