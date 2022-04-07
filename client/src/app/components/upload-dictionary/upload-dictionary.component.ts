@@ -10,7 +10,7 @@ import { DictionariesService } from '@app/services/dictionaries-service/dictiona
     styleUrls: ['upload-dictionary.component.scss'],
 })
 export class UploadDictionaryComponent {
-    title: string = "Téléchargement d'un nouveau dictionaire";
+    title: string = 'Ajouter un dictionaire';
     errorMessage: string = '';
     isUploadableFile: boolean = false;
     selectedFile: File;
