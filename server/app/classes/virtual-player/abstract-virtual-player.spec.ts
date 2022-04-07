@@ -17,6 +17,7 @@ import Game from '@app/classes/game/game';
 import { LetterValue } from '@app/classes/tile';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { AbstractWordFinding, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 
 class TestClass extends AbstractVirtualPlayer {
     async findAction(): Promise<ActionData> {
@@ -158,8 +159,11 @@ describe('AbstractVirtualPlayer', () => {
 
     describe('computeWordPlacement', () => {
         let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
-
+        let gameStub: SinonStubbedInstance<Game>;
         beforeEach(() => {
+            gameStub = createStubInstance(Game);
+            gameStub.dictionarySummary = { id: 'testId' } as unknown as DictionarySummary;
+            activeGameServiceStub['getGame'].returns(gameStub as unknown as Game);
             wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
             wordFindingInstanceStub['findWords'].returns([]);
             chai.spy.restore();

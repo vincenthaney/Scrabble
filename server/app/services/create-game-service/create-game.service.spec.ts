@@ -42,7 +42,7 @@ const DEFAULT_GAME_CONFIG_DATA_EXPERT: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Expert,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {

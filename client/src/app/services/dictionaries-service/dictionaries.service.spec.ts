@@ -100,6 +100,33 @@ describe('DictionariesService', () => {
         });
     });
 
+    describe('GetAllDictionariesEvent', () => {
+        let dictionariesUpdatedEventSpy: jasmine.Spy;
+        let updatingDictionariesEventSpy: jasmine.Spy;
+        beforeEach(() => {
+            dictionariesUpdatedEventSpy = spyOn(service['dictionariesUpdatedEvent'], 'next').and.callFake(() => {
+                return;
+            });
+
+            updatingDictionariesEventSpy = spyOn(service['updatingDictionariesEvent'], 'next').and.callFake(() => {
+                return;
+            });
+        });
+        it('should call dictionariesUpdateMessageEvent.next', () => {
+            controller['getAllDictionariesEvent'].next(TEST_DICTIONARY_SUMMARY_ARRAY);
+            expect(service.dictionaries).toEqual(TEST_DICTIONARY_SUMMARY_ARRAY);
+        });
+        it('should call dictionariesUpdateMessageEvent.next', () => {
+            controller['getAllDictionariesEvent'].next();
+            expect(dictionariesUpdatedEventSpy).toHaveBeenCalled();
+        });
+
+        it('should call startDownload.next', () => {
+            controller['getAllDictionariesEvent'].next();
+            expect(updatingDictionariesEventSpy).toHaveBeenCalled();
+        });
+    });
+
     describe('updateDictionary', async () => {
         it('should call dictionariesController.handleUpdateDictionary', () => {
             const spy = spyOn(controller, 'handleUpdateDictionary').and.callFake(async () => {
