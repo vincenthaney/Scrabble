@@ -31,6 +31,8 @@ import { HighScoreBoxComponent } from './components/high-score-box/high-score-bo
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
+import { ObjectiveComponent } from './components/objective/objective.component';
+import { ObjectiveBoxComponent } from './components/objective-box/objective-box.component';
 import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
@@ -72,6 +74,8 @@ registerLocaleData(localeFr);
         AdminHighScoresComponent,
         AdminGameHistoryComponent,
         DurationPipe,
+        ObjectiveComponent,
+        ObjectiveBoxComponent,
     ],
     imports: [
         AppMaterialModule,

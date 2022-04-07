@@ -1,0 +1,9 @@
+<p class="title"><app-icon icon="lock-open"></app-icon> Objectifs publics</p>
+<div *ngFor="let objective of objectiveManager.getPublicObjectives()">
+    <app-objective [objective]="objective"></app-objective>
+</div>
+
+<p class="title"><app-icon icon="lock"></app-icon> Objectif privé</p>
+<div *ngFor="let objective of objectiveManager.getPrivateObjectives()">
+    <app-objective [objective]="objective"></app-objective>
+</div>

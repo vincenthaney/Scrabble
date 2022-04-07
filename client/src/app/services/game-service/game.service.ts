@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameType } from '@app/classes/game-type';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { AbstractPlayer } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -16,6 +17,7 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ObjectivesManagerService } from '@app/services/objectives-manager-service/objectives-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -27,6 +29,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
     isGameOver: boolean;
 
     private gameId: string;
+    private gameType: GameType;
     private playerContainer?: PlayerContainer;
     private serviceDestroyed$: Subject<boolean>;
 
@@ -34,6 +37,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
         private router: Router,
         private boardService: BoardService,
         private roundManager: RoundManagerService,
+        private objectiveManager: ObjectivesManagerService,
         private gameController: GamePlayController,
         private gameViewEventManagerService: GameViewEventManagerService,
     ) {
@@ -72,6 +76,11 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.getPlayingPlayerId() === this.playerContainer.getLocalPlayerId();
     }
 
+    isLocalPlayerPlayer1(): boolean {
+        if (!this.playerContainer) return false;
+        return this.playerContainer.getLocalPlayerId() === this.playerContainer.getPlayer(1).id;
+    }
+
     getGameId(): string {
         return this.gameId;
     }
@@ -100,22 +109,29 @@ export default class GameService implements OnDestroy, IResetServiceData {
         return this.tileReserve.reduce((prev, { amount }) => prev + amount, 0);
     }
 
+    getGameType(): GameType {
+        return this.gameType;
+    }
+
     resetServiceData(): void {
         this.tileReserve = [];
         this.isGameOver = false;
         this.gameId = '';
+        this.gameType = GameType.Classic;
         this.playerContainer = undefined;
         this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
     }
 
     private async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {
         this.gameId = startGameData.gameId;
+        this.gameType = startGameData.gameType;
         this.playerContainer = new PlayerContainer(localPlayerId).initializePlayers(startGameData.player1, startGameData.player2);
         this.tileReserve = startGameData.tileReserve;
         this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
 
         this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
+        this.objectiveManager.initialize(startGameData, this.isLocalPlayerPlayer1());
 
         this.isGameSetUp = true;
         this.isGameOver = false;
@@ -152,6 +168,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
         if (gameUpdateData.tileReserve) {
             this.handleTileReserveUpdate(gameUpdateData.tileReserve);
+        }
+        if (gameUpdateData.gameObjective) {
+            this.objectiveManager.updateObjectives(gameUpdateData.gameObjective);
         }
     }
 
