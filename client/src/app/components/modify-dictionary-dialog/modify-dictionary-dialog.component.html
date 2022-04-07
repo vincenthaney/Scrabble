@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Mondifier mon {{title}}</h2>
+<h2 mat-dialog-title>Modifier mon {{title}}</h2>
 <div>
     <mat-form-field
         appearance="outline"
@@ -6,7 +6,7 @@
         matTooltip="Le nom du dictionnaire doit être entre 2 et 30 caractères."
         matTooltipPosition="above"
     >
-        <mat-label><app-icon icon="pencil"></app-icon> Renommer le dictionnaire</mat-label>
+        <mat-label> Nom</mat-label>
         <input
             matInput
             id="dictionaryNameValidator"
@@ -25,7 +25,7 @@
         matTooltipPosition="above"
         >
         <div matTooltip="La description doit être entre 2 et 80 caractères."[matTooltipDisabled]="!this.formParameters.get('inputDictionaryName')?.invalid"></div>
-        <mat-label><app-icon icon="pencil"></app-icon> Nouvelle description du dictionnaire</mat-label>
+        <mat-label> Description</mat-label>
         <input
             matInput
             id="dictionaryDescriptionValidator"
