@@ -55,7 +55,7 @@ const DEFAULT_TILES: Tile[] = [
     },
 ];
 
-describe.only('GamePlayService', () => {
+describe('GamePlayService', () => {
     let gamePlayService: GamePlayService;
     let getGameStub: SinonStub;
     let gameStub: SinonStubbedInstance<Game>;
