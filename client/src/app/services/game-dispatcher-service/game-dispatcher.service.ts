@@ -32,8 +32,6 @@ export default class GameDispatcherService implements OnDestroy {
         private readonly gameService: GameService,
         private readonly gameViewEventManagerService: GameViewEventManagerService,
     ) {
-        this.serviceDestroyed$ = new Subject();
-
         this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
             this.currentLobby = lobbyData;
         });
