@@ -11,7 +11,7 @@ export default class Player {
     tiles: Tile[];
     id: string;
     isConnected: boolean;
-    private objectives: Set<AbstractObjective>;
+    private objectives: AbstractObjective[];
     private readonly objectiveService: ObjectivesService;
 
     constructor(id: string, name: string) {
@@ -53,7 +53,7 @@ export default class Player {
 
     initializeObjectives(publicObjectives: Set<AbstractObjective>, privateObjective: AbstractObjective): void {
         const publicObjectiveClones: AbstractObjective[] = [...publicObjectives.values()].map((objective: AbstractObjective) => objective.clone());
-        this.objectives = new Set(publicObjectiveClones).add(privateObjective);
+        this.objectives = [...publicObjectiveClones, privateObjective];
     }
 
     validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
