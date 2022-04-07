@@ -1,7 +1,8 @@
 import { LetterValue, Tile } from '@app/classes/tile';
-import { Orientation, Position } from '@app/classes/board';
-import { DictionaryNode } from '@app/classes/dictionary';
+import { Board, Orientation, Position } from '@app/classes/board';
+import { Dictionary, DictionaryNode } from '@app/classes/dictionary';
 import Range from '@app/classes/range/range';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 
 export interface WithDistance {
     distance: number;
@@ -67,3 +68,7 @@ export interface WordPlacement {
 export interface ScoredWordPlacement extends WordPlacement {
     score: number;
 }
+
+export type PartialWordFindingParameters = [Board, Tile[], WordFindingRequest];
+
+export type WordFindingParameters = [Board, Tile[], WordFindingRequest, Dictionary, ScoreCalculatorService];

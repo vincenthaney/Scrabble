@@ -5,14 +5,14 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { Container } from 'typedi';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import WordFindingService, { WordFindingParameters } from './word-finding.service';
+import WordFindingService from './word-finding.service';
 import { Board } from '@app/classes/board';
 import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { expect } from 'chai';
 import { Tile } from '@app/classes/tile';
 import Range from '@app/classes/range/range';
-import { Dictionary } from '@app/classes/dictionary';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
+import { PartialWordFindingParameters } from '@app/classes/word-finding/word-finding-types';
 
 describe('WordFindingService', () => {
     let findWordsStub: SinonStub;
@@ -40,34 +40,11 @@ describe('WordFindingService', () => {
         findWordsStub.restore();
     });
 
-    describe('findWords', () => {
-        it('should call getWordFindingInstance', () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const getWordFindingInstanceStub = stub(service, 'getWordFindingInstance' as any).callThrough();
-
-            service.findWords(boardStub as unknown as Board, tiles, request);
-
-            expect(getWordFindingInstanceStub.called).to.be.true;
-        });
-
-        it('should call findWords', () => {
-            service.findWords(boardStub as unknown as Board, tiles, request);
-
-            expect(findWordsStub.called).to.be.true;
-        });
-    });
-
     describe('getWordFindingInstance', () => {
-        let params: WordFindingParameters;
+        let params: PartialWordFindingParameters;
 
         beforeEach(() => {
-            params = [
-                boardStub as unknown as Board,
-                tiles,
-                request,
-                new Dictionary({ title: '', description: '', words: [] }),
-                undefined as unknown as ScoreCalculatorService,
-            ];
+            params = [boardStub as unknown as Board, tiles, request];
         });
 
         it('should return WordFindingHint if useCase is hint', () => {
@@ -80,8 +57,9 @@ describe('WordFindingService', () => {
             expect(result).to.be.instanceOf(WordFindingBeginner);
         });
 
-        it('should throw if useCase is expert', () => {
-            expect(() => service['getWordFindingInstance'](WordFindingUseCase.Expert, params)).to.throw();
+        it('should return WordFindingExpert if useCase is expert', () => {
+            const result = service['getWordFindingInstance'](WordFindingUseCase.Expert, params);
+            expect(result).to.be.instanceOf(WordFindingExpert);
         });
     });
 });

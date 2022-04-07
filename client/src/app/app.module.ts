@@ -30,6 +30,7 @@ import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-pa
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
+import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
 import { ObjectiveComponent } from './components/objective/objective.component';
 import { ObjectiveBoxComponent } from './components/objective-box/objective-box.component';
 
@@ -64,6 +65,7 @@ import { ObjectiveBoxComponent } from './components/objective-box/objective-box.
         HighScoreBoxComponent,
         ConvertDialogComponent,
         AdminPageComponent,
+        AdminHighScoresComponent,
         ObjectiveComponent,
         ObjectiveBoxComponent,
     ],

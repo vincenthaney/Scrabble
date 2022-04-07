@@ -2,8 +2,9 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { LobbyData } from '@app/classes/communication/lobby-data';
 import { Message } from '@app/classes/communication/message';
 import { PlayerName } from '@app/classes/communication/player-name';
-import { StartGameData } from '@app/classes/game/game-config';
+import { GameHistory } from '@app/classes/database/game-history';
 import { HighScore } from '@app/classes/database/high-score';
+import { StartGameData } from '@app/classes/game/game-config';
 
 export type SocketEmitEvents =
     | 'gameUpdate'
@@ -28,5 +29,6 @@ export type JoinerLeaveGameEmitArgs = PlayerName;
 export type PlayerLeftGameEmitArgs = PlayerName;
 export type LobbiesUpdateEmitArgs = LobbyData[];
 export type HighScoresEmitArgs = HighScore[];
+export type GameHistoriesEmitArgs = GameHistory[];
 export type NewMessageEmitArgs = Message;
 export type CleanupEmitArgs = never;

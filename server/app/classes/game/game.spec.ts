@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
@@ -5,6 +6,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board } from '@app/classes/board';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
+import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -13,18 +16,22 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
+import { generateGameObjectives } from '@app/constants/services-constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import * as copy from '@app/utils/deep-copy';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
+import { GameMode } from './game-mode';
 import { GameType } from './game-type';
-
 const expect = chai.expect;
 
 chai.use(spies);
@@ -43,6 +50,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: 'francais',
 };
@@ -70,19 +78,27 @@ describe('Game', () => {
             return Promise.resolve();
         };
 
-        const boardService = Container.get(BoardService);
-        Game.injectServices(boardService);
+        Game.injectServices();
     });
 
     afterEach(() => {
         TileReserve.prototype.init = defaultInit;
+        sinon.restore();
     });
 
-    describe('createMultiplayerGame', () => {
+    describe('createGame', () => {
         let game: Game;
+        let objectiveInitspy: sinon.SinonSpy;
 
         beforeEach(async () => {
+            objectiveInitspy = sinon.stub(Game.prototype, <any>'initializeObjectives').callsFake(() => {
+                return;
+            });
             game = await Game.createGame(DEFAULT_GAME_ID, DEFAULT_MULTIPLAYER_CONFIG);
+        });
+
+        afterEach(() => {
+            sinon.restore();
         });
 
         it('should create', () => {
@@ -100,6 +116,10 @@ describe('Game', () => {
 
         it('should init TileReserve', () => {
             expect(game['tileReserve'].isInitialized()).to.be.true;
+        });
+
+        it('should call initializeObjectives', () => {
+            sinon.assert.called(objectiveInitspy);
         });
 
         it('should give players their tiles', () => {
@@ -298,24 +318,23 @@ describe('Game', () => {
             player1Stub = createStubInstance(Player);
             player2Stub = createStubInstance(Player);
             game.roundManager = roundManagerStub as unknown as RoundManager;
-            player1Stub.name = 'Luck Luke';
+            player1Stub.name = 'Lucky Luke';
             player2Stub.name = 'Dalton';
+            player1Stub.id = DEFAULT_PLAYER_1_ID;
+            player2Stub.id = DEFAULT_PLAYER_2_ID;
+            player1Stub.tiles = [{ letter: 'A', value: 2 } as Tile, { letter: 'B', value: 4 } as Tile];
+            player2Stub.tiles = [{ letter: 'A', value: 6 } as Tile, { letter: 'B', value: 8 } as Tile];
+            player1Stub.score = PLAYER_1_SCORE;
+            player2Stub.score = PLAYER_2_SCORE;
+            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
+            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+
             game.player1 = player1Stub as unknown as Player;
             game.player2 = player2Stub as unknown as Player;
 
-            game.player1.tiles = [
-                { letter: 'A', value: 2 },
-                { letter: 'B', value: 4 },
-            ];
-            game.player2.tiles = [
-                { letter: 'A', value: 6 },
-                { letter: 'B', value: 8 },
-            ];
-
-            game.player1.score = PLAYER_1_SCORE;
-            game.player2.score = PLAYER_2_SCORE;
-            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
-            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+            chai.spy.on(game, 'completeGameHistory', () => {
+                return;
+            });
         });
 
         it('should deduct points from both player if the getPassCounter is exceeded', () => {
@@ -349,9 +368,7 @@ describe('Game', () => {
 
         it('should call computeEndOfGameScore with player1Win if winnerName is player1.name', () => {
             roundManagerStub.getPassCounter.returns(0);
-            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScore', () => {
-                return;
-            });
+            const player1WinSpy = chai.spy.on(game, 'computeEndOfGameScore');
             game.endOfGame(game.player1.name);
 
             expect(player1WinSpy).to.have.been.called.with(WIN, LOSE);
@@ -359,12 +376,111 @@ describe('Game', () => {
 
         it('should call computeEndOfGameScore with player2Win if winnerName is player2.name', () => {
             roundManagerStub.getPassCounter.returns(0);
-            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScore', () => {
-                return;
-            });
+            const player2WinSpy = chai.spy.on(game, 'computeEndOfGameScore');
             game.endOfGame(game.player2.name);
 
             expect(player2WinSpy).to.have.been.called.with(LOSE, WIN);
+        });
+    });
+
+    describe('completeGameHistory', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        const PLAYER_1_SCORE = 20;
+        const PLAYER_2_SCORE = 40;
+        const PLAYER_1_NAME = 'Lucky Luke';
+        const PLAYER_2_NAME = 'Joe Dalton';
+        const PLAYER_1_TILE_SCORE = 6;
+        const PLAYER_2_TILE_SCORE = 14;
+
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            player1Stub.name = PLAYER_1_NAME;
+            player2Stub.name = PLAYER_2_NAME;
+            player1Stub.id = DEFAULT_PLAYER_1_ID;
+            player2Stub.id = DEFAULT_PLAYER_2_ID;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+
+            game.player1.tiles = [
+                { letter: 'A', value: 2 },
+                { letter: 'B', value: 4 },
+            ];
+            game.player2.tiles = [
+                { letter: 'A', value: 6 },
+                { letter: 'B', value: 8 },
+            ];
+            game.player1.score = PLAYER_1_SCORE;
+            game.player2.score = PLAYER_2_SCORE;
+            game.player1.isConnected = true;
+            game.player2.isConnected = true;
+            player1Stub.getTileRackPoints.returns(PLAYER_1_TILE_SCORE);
+            player2Stub.getTileRackPoints.returns(PLAYER_2_TILE_SCORE);
+        });
+
+        it('should set hasBeenAbandonned to false if no player is disconnected', () => {
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.hasBeenAbandoned).to.be.false;
+        });
+
+        it('should set hasBeenAbandonned to true if player1 is disconnected', () => {
+            game.player1.isConnected = false;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.hasBeenAbandoned).to.be.true;
+        });
+
+        it('should set hasBeenAbandonned to true if player2 is disconnected', () => {
+            game.player2.isConnected = false;
+            game.completeGameHistory(undefined);
+            expect(game.gameHistory.hasBeenAbandoned).to.be.true;
+        });
+
+        describe('isPlayerWinner', () => {
+            it('should set player1Data.isWinner to true if player1 is winner', () => {
+                expect(game.isPlayerWinner(PLAYER_1_NAME, game.player1, game.player2)).to.be.true;
+            });
+
+            it('should set player1Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
+                game.player1.score = 100;
+                game.player2.score = 90;
+                expect(game.isPlayerWinner(undefined, game.player1, game.player2)).to.be.true;
+            });
+
+            it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
+                game.player1.score = 90;
+                game.player2.score = 100;
+                expect(game.isPlayerWinner(undefined, game.player1, game.player2)).to.be.false;
+            });
+
+            it('should set player2Data.isWinner to true if player1 is winner', () => {
+                expect(game.isPlayerWinner(PLAYER_2_NAME, game.player2, game.player1)).to.be.true;
+            });
+
+            it('should set player2Data.isWinner to true if winnerName is not player 1 but player1 has highest score', () => {
+                game.player2.score = 100;
+                game.player1.score = 90;
+                expect(game.isPlayerWinner(undefined, game.player2, game.player1)).to.be.true;
+            });
+
+            it('should set player1Data.isWinner to false if winnerName is not player 1 and player1 does not have highest score', () => {
+                game.player2.score = 90;
+                game.player1.score = 100;
+                expect(game.isPlayerWinner(undefined, game.player2, game.player1)).to.be.false;
+            });
+
+            it('should set both playerData.isWinner to true if winnerName is undefined and players have equal scores', () => {
+                game.player1.score = 100;
+                game.player2.score = 100;
+                game.completeGameHistory(undefined);
+                expect(game.gameHistory.player1Data.isWinner).to.be.true;
+                expect(game.gameHistory.player2Data.isWinner).to.be.true;
+            });
         });
     });
 
@@ -492,23 +608,34 @@ describe('Game', () => {
     });
 
     describe('Game Service Injection', () => {
-        it('injectServices should set static Game BoardService', () => {
-            chai.spy.on(Game, 'getBoardService', () => null);
-            const boardService = Container.get(BoardService);
-
-            expect(Game['getBoardService']()).to.not.exist;
-            Game.injectServices(boardService);
+        afterEach(() => {
             chai.spy.restore();
-            expect(Game['getBoardService']()).to.equal(boardService);
         });
 
-        it('injectServices should call getBoardService()', () => {
-            const boardService = Container.get(BoardService);
-            chai.spy.on(Game, 'getBoardService', () => boardService);
-            Game.injectServices(boardService);
-            expect(Game['getBoardService']).to.have.been.called;
+        it('injectServices should set static Game BoardService if it does not exist', () => {
+            Game['boardService'] = undefined as unknown as BoardService;
+
+            Game.injectServices();
+            expect(Game['boardService']).to.equal(Container.get(BoardService));
+        });
+
+        it('injectServices should set static Game ObjectivesService if it does not exist', () => {
+            Game['objectivesService'] = undefined as unknown as ObjectivesService;
+
+            Game.injectServices();
+            expect(Game['objectivesService']).to.equal(Container.get(ObjectivesService));
+        });
+
+        it('injectServices should NOT set BoardService and ObjectivesService if they exist', () => {
+            Game['boardService'] = Container.get(BoardService);
+            Game['objectivesService'] = Container.get(ObjectivesService);
+            const getSpy = chai.spy.on(Container, 'get');
+
+            Game.injectServices();
+            expect(getSpy).not.to.have.been.called();
         });
     });
+
     describe('createStartGameData', () => {
         const PLAYER_1_ID = 'player1Id';
         const PLAYER_2_ID = 'player2Id';
@@ -561,6 +688,7 @@ describe('Game', () => {
                 player1: game.player1,
                 player2: game.player2,
                 gameType: game.gameType,
+                gameMode: game.gameMode,
                 maxRoundTime: DEFAULT_TIME,
                 dictionary: DEFAULT_DICTIONARY,
                 gameId: DEFAULT_GAME_ID,
@@ -570,5 +698,53 @@ describe('Game', () => {
             };
             expect(result).to.deep.equal(expectedMultiplayerGameData);
         });
+    });
+
+    describe('initializeObjectives', () => {
+        let game: Game;
+        let objectives: GameObjectives;
+        let initSpy: unknown;
+
+        beforeEach(() => {
+            game = new Game();
+            objectives = generateGameObjectives();
+            initSpy = chai.spy.on(Game['objectivesService'], 'createObjectivesForGame', () => objectives);
+            chai.spy.on(copy, 'setDeepCopy', () => new Set());
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should initialize objectives if gameType is LOG2990', async () => {
+            game.gameType = GameType.LOG2990;
+            game.player1 = DEFAULT_PLAYER_1;
+            game.player2 = DEFAULT_PLAYER_2;
+            const player1Spy = chai.spy.on(game.player1, 'initializeObjectives', () => {});
+            const player2Spy = chai.spy.on(game.player2, 'initializeObjectives', () => {});
+            game['initializeObjectives']();
+            expect(initSpy).to.have.been.called();
+            expect(player1Spy).to.have.been.called();
+            expect(player2Spy).to.have.been.called();
+        });
+
+        it('should NOT initialize objectives if gameType is CLASSIC', async () => {
+            game.gameType = GameType.Classic;
+            game['initializeObjectives']();
+            expect(initSpy).not.to.have.been.called();
+        });
+    });
+
+    it('resetPlayerObjectiveProgression should call reset on ObjectiveService', () => {
+        const updateData: GameObjectivesData = {
+            player1Objectives: [],
+            player2Objectives: [],
+        };
+        const game = new Game();
+        chai.spy.on(game, 'getPlayer', () => DEFAULT_PLAYER_1);
+        const resetStub = stub(Game['objectivesService'], 'resetPlayerObjectiveProgression').returns(updateData);
+        const result = game.resetPlayerObjectiveProgression(DEFAULT_PLAYER_1.id);
+        expect(resetStub.called).to.be.true;
+        expect(result).to.equal(updateData);
     });
 });
