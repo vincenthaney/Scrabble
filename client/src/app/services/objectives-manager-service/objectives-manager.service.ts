@@ -1,23 +1,15 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { ObjectiveData } from '@app/classes/communication/objective-data';
 import { IResetServiceData } from '@app/classes/i-reset-service-data';
-import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class ObjectivesManagerService implements OnDestroy, IResetServiceData {
+export class ObjectivesManagerService implements IResetServiceData {
     private objectives?: GameObjectivesData;
     private isLocalPlayerPlayer1: boolean = false;
-
-    private componentDestroyed$: Subject<boolean> = new Subject<boolean>();
-
-    ngOnDestroy(): void {
-        this.componentDestroyed$.next(true);
-        this.componentDestroyed$.complete();
-    }
 
     initialize(objectives: GameObjectivesData, isLocalPlayerPlayer1: boolean) {
         this.objectives = objectives;
