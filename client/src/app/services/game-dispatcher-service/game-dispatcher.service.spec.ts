@@ -13,6 +13,9 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameDispatcherService, SocketService } from '@app/services/';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { Observable, Subject, Subscription } from 'rxjs';
+import SpyObj = jasmine.SpyObj;
 
 const BASE_GAME_ID = 'baseGameId';
 const TEST_PLAYER_ID = 'playerId';
@@ -54,11 +57,25 @@ describe('GameDispatcherService', () => {
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
     let socketServiceMock: SocketService;
+    let gameViewEventSpy: SpyObj<GameViewEventManagerService>;
+
+    beforeEach(() => {
+        const resetSubject = new Subject();
+        gameViewEventSpy = jasmine.createSpyObj('GameViewEventManagerService', ['subscribeToGameViewEvent', 'emitGameViewEvent']);
+        gameViewEventSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any) => {
+            if (eventType !== 'resetServices') return new Subscription();
+            return resetSubject.subscribe(next);
+        });
+        gameViewEventSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
+            if (eventType !== 'resetServices') return;
+            resetSubject.next(payload);
+        });
+    });
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientModule, RouterTestingModule],
-            providers: [GameDispatcherController, SocketService],
+            providers: [GameDispatcherController, SocketService, { provide: GameViewEventManagerService, useValue: gameViewEventSpy }],
         });
         service = TestBed.inject(GameDispatcherService);
 
@@ -120,6 +137,14 @@ describe('GameDispatcherService', () => {
             });
             service['gameDispatcherController']['initializeGame$'].next(undefined);
             expect(spy).toHaveBeenCalledWith(undefined);
+        });
+
+        it('on resetServices event, should call resetServiceData', () => {
+            const resetDataSpy = spyOn(service, 'resetServiceData').and.callFake(() => {
+                return;
+            });
+            gameViewEventSpy.emitGameViewEvent('resetServices');
+            expect(resetDataSpy).toHaveBeenCalled();
         });
     });
 

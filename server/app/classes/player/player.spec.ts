@@ -73,17 +73,17 @@ describe('Player', () => {
     });
 
     it('getObjectives should return player objectives as array', () => {
-        player['objectives'] = new Set([generateTestObjective(1)]);
-        const expected: AbstractObjective[] = [...player['objectives'].values()];
+        player['objectives'] = [generateTestObjective(1)];
+        const expected: AbstractObjective[] = player['objectives'];
         const actual: AbstractObjective[] = player.getObjectives();
         expect(actual).to.deep.equal(expected);
     });
 
     it('initializeObjectives should set player objectives', async () => {
         const objectives: GameObjectives = generateGameObjectives();
-        player['objectives'] = undefined as unknown as Set<AbstractObjective>;
+        player['objectives'] = undefined as unknown as AbstractObjective[];
         player.initializeObjectives(objectives.publicObjectives, objectives.player1Objective);
-        expect(player['objectives']).to.deep.equal(objectives.publicObjectives.add(objectives.player1Objective));
+        expect(player['objectives']).to.deep.equal([...objectives.publicObjectives, objectives.player1Objective]);
     });
 
     describe('resetObjectivesProgression', () => {
@@ -93,7 +93,7 @@ describe('Player', () => {
         beforeEach(() => {
             objective = generateResetableTestObjective(1);
 
-            player['objectives'] = new Set([objective]);
+            player['objectives'] = [objective];
             objective.progress = initialProgress;
         });
 
@@ -107,7 +107,7 @@ describe('Player', () => {
 
         it('should not reset objective if it is not resetable', () => {
             objective = generateTestObjective(1);
-            player['objectives'] = new Set([objective]);
+            player['objectives'] = [objective];
             objective.progress = initialProgress;
 
             chai.spy.on(objective, 'isCompleted', () => false);

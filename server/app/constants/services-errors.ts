@@ -32,3 +32,4 @@ export const NO_REQUEST_POINT_RANGE = 'La requête doit avoir un pointRange';
 export const INVALID_REQUEST_POINT_RANGE = 'Le minimum du pointRange de la requête doit être plus petit que le maximum';
 export const NO_REQUEST_POINT_HISTORY = 'La requête doit avoir un pointHistory';
 export const NO_OBJECTIVE_LEFT_IN_POOL = "Il n'y a plus d'objectifs disponibles pour la partie";
+export const NO_FIRST_ROUND_EXISTS = "Il n'y a aucune ronde déjà complétée ni de ronde active";

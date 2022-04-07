@@ -10,6 +10,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -83,6 +84,7 @@ describe('GameService', () => {
         const message$ = new Subject();
         const reRender$ = new Subject();
         const noActiveGame$ = new Subject();
+        const resetServices$ = new Subject();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
         gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
             switch (eventType) {
@@ -97,6 +99,10 @@ describe('GameService', () => {
                     break;
                 case 'newMessage':
                     message$.next();
+                    break;
+                case 'resetServices':
+                    resetServices$.next();
+                    break;
             }
         });
 
@@ -110,6 +116,8 @@ describe('GameService', () => {
                     return noActiveGame$.pipe(takeUntil(destroy$)).subscribe(next);
                 case 'newMessage':
                     return message$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'resetServices':
+                    return resetServices$.pipe(takeUntil(destroy$)).subscribe(next);
             }
             return new Subscription();
         });
@@ -150,6 +158,14 @@ describe('GameService', () => {
             service['gameController']['newMessage$'].next(null);
             expect(spy).not.toHaveBeenCalled();
         });
+
+        it('should call resetServiceData if resetServices event is received', () => {
+            const resetDataSpy = spyOn(service, 'resetServiceData').and.callFake(() => {
+                return;
+            });
+            gameViewEventManagerSpy.emitGameViewEvent('resetServices');
+            expect(resetDataSpy).toHaveBeenCalled();
+        });
     });
 
     describe('ngOnDestroy', () => {
@@ -180,17 +196,16 @@ describe('GameService', () => {
             });
         });
 
-        it('should do nothing if initializeGameData is undefined', () => {
-            service.handleInitializeGame(undefined);
+        it('should do nothing if initializeGameData is undefined', async () => {
+            await service.handleInitializeGame(undefined);
             expect(initializeGameSpy).not.toHaveBeenCalled();
         });
 
-        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', () => {
-            service.handleInitializeGame({} as InitializeGameData);
-            Promise.resolve(() => {
-                expect(initializeGameSpy).toHaveBeenCalled();
-                expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
-            });
+        it('should call initializeGame and emit gameInitialized if initializeGameData is defined', async () => {
+            await service.handleInitializeGame({} as InitializeGameData);
+
+            expect(initializeGameSpy).toHaveBeenCalled();
+            expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('gameInitialized', {} as InitializeGameData);
         });
     });
 
@@ -202,6 +217,7 @@ describe('GameService', () => {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 1,
                 dictionary: TEST_DICTIONARY,
                 gameId: 'game-id',
@@ -364,6 +380,7 @@ describe('GameService', () => {
                 player1: DEFAULT_PLAYER_1,
                 player2: DEFAULT_PLAYER_2,
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 1,
                 dictionary: TEST_DICTIONARY,
                 gameId: 'game-id',

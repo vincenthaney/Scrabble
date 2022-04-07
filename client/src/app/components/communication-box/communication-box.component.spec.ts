@@ -14,6 +14,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { PlayerData } from '@app/classes/communication';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -62,6 +63,7 @@ const DEFAULT_START_GAME_DATA: InitializeGameData = {
         player1: undefined as unknown as PlayerData,
         player2: undefined as unknown as PlayerData,
         gameType: GameType.Classic,
+        gameMode: GameMode.Multiplayer,
         maxRoundTime: 0,
         dictionary: TEST_DICTIONARY,
         gameId: DEFAULT_GAME_ID,
@@ -248,8 +250,11 @@ describe('CommunicationBoxComponent', () => {
     });
 
     describe('onReceiveMessage', () => {
+        let gameIdSpy: jasmine.Spy;
+
         beforeEach(() => {
             spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as AbstractPlayer);
+            gameIdSpy = spyOn(component['gameService'], 'getGameId').and.returnValue(DEFAULT_SYSTEM_MESSAGE.gameId);
         });
 
         it('should subscribe to inputParserService and call onReceiveNewMessage', () => {
@@ -258,7 +263,7 @@ describe('CommunicationBoxComponent', () => {
             expect(onReceiveSpy).toHaveBeenCalled();
         });
 
-        it('onReceiveNewMessage should call appropriate functions and receive new message with defined message', () => {
+        it('should call appropriate functions and receive new message with defined message IF GameId is the same', () => {
             const saveMessageSpy = spyOn(component['messageStorageService'], 'saveMessage');
             const messagesLengthBefore: number = component.messages.length;
 
@@ -268,6 +273,21 @@ describe('CommunicationBoxComponent', () => {
             expect(messagesLengthAfter).toEqual(messagesLengthBefore + 1);
             expect(scrollToBottomSpy).toHaveBeenCalled();
             expect(saveMessageSpy).toHaveBeenCalled();
+        });
+
+        it('should NOT call appropriate functions and receive new message with defined message IF GameId is NOT the same', () => {
+            const id = DEFAULT_SYSTEM_MESSAGE.gameId + '-wrong';
+            gameIdSpy.and.returnValue(id);
+
+            const saveMessageSpy = spyOn(component['messageStorageService'], 'saveMessage');
+            const messagesLengthBefore: number = component.messages.length;
+
+            gameServiceMock['handleNewMessage'](DEFAULT_SYSTEM_MESSAGE);
+
+            const messagesLengthAfter: number = component.messages.length;
+            expect(messagesLengthAfter).not.toEqual(messagesLengthBefore + 1);
+            expect(scrollToBottomSpy).not.toHaveBeenCalled();
+            expect(saveMessageSpy).not.toHaveBeenCalled();
         });
 
         it('should add new visualmessage to messages', () => {

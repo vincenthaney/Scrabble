@@ -1,6 +1,11 @@
+import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { ActionData } from '@app/classes/communication/action-data';
+import Range from '@app/classes/range/range';
+import { Tile } from '@app/classes/tile';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
+import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     EXCHANGE_ACTION_THRESHOLD,
-    FINAL_WAIT_TIME,
     HIGH_SCORE_RANGE_MAX,
     HIGH_SCORE_RANGE_MIN,
     LOW_SCORE_RANGE_MAX,
@@ -9,36 +14,11 @@ import {
     MEDIUM_SCORE_RANGE_MAX,
     MEDIUM_SCORE_RANGE_MIN,
     MEDIUM_SCORE_THRESHOLD,
-    MINIMUM_EXCHANGE_WORD_COUNT,
     PLACE_ACTION_THRESHOLD,
-    PRELIMINARY_WAIT_TIME,
 } from '@app/constants/virtual-player-constants';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { ActionData } from '@app/classes/communication/action-data';
-import { Board } from '@app/classes/board';
-import { Delay } from '@app/utils/delay';
-import Range from '@app/classes/range/range';
-import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { Random } from '@app/utils/random';
-import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
-    async playTurn(): Promise<void> {
-        const waitPreliminaryTime = async (): Promise<void> => {
-            await Delay.for(PRELIMINARY_WAIT_TIME);
-        };
-        const waitFinalTime = async (): Promise<void> => {
-            await Delay.for(FINAL_WAIT_TIME);
-        };
-
-        const play = async (): Promise<[ActionData, void]> => {
-            return Promise.all([this.findAction(), waitPreliminaryTime()]);
-        };
-        const actionResult: [ActionData, void] | void = await Promise.race([play(), waitFinalTime()]);
-        this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : ActionPass.createActionData());
-    }
-
     protected async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
         if (randomAction <= PLACE_ACTION_THRESHOLD) {
@@ -66,31 +46,18 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         }
     }
 
-    private updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
-        const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
-        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
+    protected alternativeMove(): ActionData {
+        if (this.wordFindingInstance) {
+            const bestMove = this.wordFindingInstance.wordPlacements.pop();
+            if (bestMove) {
+                this.updateHistory(bestMove);
+                return ActionPlace.createActionData(bestMove);
+            }
+        }
+        return ActionPass.createActionData();
     }
 
-    private getGameBoard(gameId: string, playerId: string): Board {
-        return this.getActiveGameService().getGame(gameId, playerId).board;
-    }
-
-    private getDictionaryId(gameId: string, playerId: string): string {
-        return this.getActiveGameService().getGame(gameId, playerId).dictionarySummary.id;
-    }
-
-    private computeWordPlacement(): ScoredWordPlacement | undefined {
-        return this.getWordFindingService()
-            .findWords(
-                this.getGameBoard(this.gameId, this.id),
-                this.tiles,
-                this.getDictionaryId(this.gameId, this.id),
-                this.generateWordFindingRequest(),
-            )
-            .pop();
-    }
-
-    private generateWordFindingRequest(): WordFindingRequest {
+    protected generateWordFindingRequest(): WordFindingRequest {
         return {
             pointRange: this.findPointRange(),
             useCase: WordFindingUseCase.Beginner,
@@ -98,15 +65,9 @@ export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
         };
     }
 
-    private isExchangePossible(): boolean {
-        let total = 0;
-        this.getActiveGameService()
-            .getGame(this.gameId, this.id)
-            .getTilesLeftPerLetter()
-            .forEach((value: number) => {
-                total += value;
-            });
-        return total >= MINIMUM_EXCHANGE_WORD_COUNT;
+    private updateHistory(scoredWordPlacement: ScoredWordPlacement): void {
+        const scoreCount = this.pointHistory.get(scoredWordPlacement.score);
+        this.pointHistory.set(scoredWordPlacement.score, scoreCount ? scoreCount + 1 : 1);
     }
 
     private selectRandomTiles(): Tile[] {

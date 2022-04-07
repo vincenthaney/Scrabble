@@ -12,6 +12,7 @@ import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -20,6 +21,7 @@ import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
@@ -157,7 +159,7 @@ describe('GamePlayService', () => {
             const spy = chai.spy.on(gamePlayService, 'handleGameOver', () => {});
             const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(spy).to.have.been.called;
+            expect(spy).to.have.been.called();
         });
 
         it('should call next round when action ends turn', async () => {
@@ -327,6 +329,7 @@ describe('GamePlayService', () => {
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
         let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
+        let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
@@ -337,6 +340,7 @@ describe('GamePlayService', () => {
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
                 dictionaryServiceStub as unknown as DictionaryService,
+                gameHistoriesServiceStub as unknown as GameHistoriesService,
             );
         });
 
@@ -417,9 +421,17 @@ describe('GamePlayService', () => {
         });
     });
 
-    it('handleResetObjectives', () => {
+    it('handleResetObjectives should reset if gameType is LOG2990', () => {
+        gameStub.gameType = GameType.LOG2990;
         const resetSpy = chai.spy.on(gameStub, 'resetPlayerObjectiveProgression', () => {});
         gamePlayService.handleResetObjectives(gameStub.getId(), player.id);
         expect(resetSpy).to.have.been.called();
+    });
+
+    it('handleResetObjectives should NOT reset if gameType is Classic', () => {
+        gameStub.gameType = GameType.Classic;
+        const resetSpy = chai.spy.on(gameStub, 'resetPlayerObjectiveProgression', () => {});
+        gamePlayService.handleResetObjectives(gameStub.getId(), player.id);
+        expect(resetSpy).not.to.have.been.called();
     });
 });

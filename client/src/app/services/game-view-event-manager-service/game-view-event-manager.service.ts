@@ -28,6 +28,7 @@ export class GameViewEventManagerService {
         this.eventMap.set('usedTiles', new BehaviorSubject<PlaceActionPayload | undefined>(undefined));
         this.eventMap.set('resetUsedTiles', new Subject<void>());
         this.eventMap.set('gameInitialized', new BehaviorSubject<InitializeGameData | undefined>(undefined));
+        this.eventMap.set('resetServices', new Subject<void>());
     }
 
     emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S): void {

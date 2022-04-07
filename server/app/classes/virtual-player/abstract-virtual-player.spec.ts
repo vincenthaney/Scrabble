@@ -1,24 +1,43 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
-import { AbstractVirtualPlayer } from './abstract-virtual-player';
-import * as chai from 'chai';
-import { expect } from 'chai';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { ActionPass } from '@app/classes/actions';
+import { Board } from '@app/classes/board';
+import { ActionData } from '@app/classes/communication/action-data';
+import Game from '@app/classes/game/game';
 import Range from '@app/classes/range/range';
+import { LetterValue } from '@app/classes/tile';
+import { AbstractWordFinding, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
+import { GAME_ID, PLAYER_ID, TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { Delay } from '@app/utils/delay';
+import * as chai from 'chai';
+import { expect, spy } from 'chai';
+import { createStubInstance, restore, SinonStubbedInstance } from 'sinon';
+import { DictionarySummary } from '../communication/dictionary-data';
+import { AbstractVirtualPlayer } from './abstract-virtual-player';
 
 class TestClass extends AbstractVirtualPlayer {
-    findAction(): void {
-        return;
+    async findAction(): Promise<ActionData> {
+        return ActionPass.createActionData();
     }
 
-    playTurn(): void {
-        return;
+    generateWordFindingRequest(): WordFindingRequest {
+        return {
+            pointRange: this.findPointRange(),
+            useCase: WordFindingUseCase.Beginner,
+            pointHistory: this.pointHistory,
+        };
     }
 
     findPointRange(): Range {
         return TEST_POINT_RANGE;
+    }
+
+    alternativeMove(): ActionData {
+        return ActionPass.createActionData();
     }
 }
 
@@ -27,13 +46,20 @@ const playerName = 'ElScrabblo';
 
 describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
+    let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+    let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         abstractPlayer = new TestClass(playerId, playerName);
+        activeGameServiceStub = createStubInstance(ActiveGameService);
+        wordFindingServiceStub = createStubInstance(WordFindingService);
+        abstractPlayer['activeGameService'] = activeGameServiceStub as unknown as ActiveGameService;
+        abstractPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
     });
 
     afterEach(() => {
         chai.spy.restore();
+        restore();
     });
 
     it('should create', () => {
@@ -52,5 +78,129 @@ describe('AbstractVirtualPlayer', () => {
 
     it('should return virtualPlayerService', () => {
         expect(abstractPlayer.getVirtualPlayerService() instanceof VirtualPlayerService).to.be.true;
+    });
+
+    describe('playTurn', async () => {
+        let actionPassSpy: unknown;
+        let sendActionSpy: unknown;
+        beforeEach(() => {
+            spy.on(Delay, 'for', () => {
+                return;
+            });
+            spy.on(abstractPlayer, 'findAction', () => {
+                return;
+            });
+            actionPassSpy = spy.on(ActionPass, 'createActionData');
+            sendActionSpy = spy.on(abstractPlayer['virtualPlayerService'], 'sendAction');
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should send actionPass when no words are found', async () => {
+            await abstractPlayer['playTurn']();
+
+            expect(sendActionSpy).to.have.been.called();
+            expect(actionPassSpy).to.have.been.called();
+        });
+
+        it('should send action returned by findAction when no words are found', async () => {
+            spy.on(Promise, 'race', () => {
+                return ['testArray'];
+            });
+            await abstractPlayer['playTurn']();
+
+            expect(sendActionSpy).to.have.been.called();
+            expect(actionPassSpy).to.not.have.been.called();
+        });
+    });
+
+    describe('getGameBoard', () => {
+        it('should call getGame', () => {
+            const testBoard = {} as unknown as Board;
+            const getGameSpy = spy.on(abstractPlayer['activeGameService'], 'getGame', () => {
+                return testBoard;
+            });
+            abstractPlayer['getGameBoard'](GAME_ID, PLAYER_ID);
+            expect(getGameSpy).to.have.been.called();
+        });
+    });
+
+    describe('isExchangePossible', () => {
+        let TEST_GAME: Game;
+        let TEST_MAP: Map<LetterValue, number>;
+        beforeEach(() => {
+            TEST_GAME = new Game();
+
+            spy.on(abstractPlayer['activeGameService'], 'getGame', () => {
+                return TEST_GAME;
+            });
+            spy.on(TEST_GAME, 'getTilesLeftPerLetter', () => {
+                return TEST_MAP;
+            });
+        });
+        it('should return false when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            TEST_MAP = new Map<LetterValue, number>([
+                ['A', 2],
+                ['B', 2],
+            ]);
+            expect(abstractPlayer['isExchangePossible']()).to.be.false;
+        });
+
+        it('should return true when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            TEST_MAP = new Map<LetterValue, number>([
+                ['A', 3],
+                ['B', 3],
+                ['C', 3],
+            ]);
+            expect(abstractPlayer['isExchangePossible']()).to.be.true;
+        });
+    });
+
+    describe('computeWordPlacement', () => {
+        let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
+        let gameStub: SinonStubbedInstance<Game>;
+
+        beforeEach(() => {
+            gameStub = createStubInstance(Game);
+            gameStub.dictionarySummary = { id: 'testId' } as unknown as DictionarySummary;
+            activeGameServiceStub['getGame'].returns(gameStub as unknown as Game);
+            wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
+            wordFindingInstanceStub['findWords'].returns([]);
+            chai.spy.restore();
+        });
+
+        afterEach(() => {
+            chai.spy.restore();
+        });
+
+        it('should call findWords', () => {
+            wordFindingServiceStub['getWordFindingInstance'].returns(wordFindingInstanceStub as unknown as AbstractWordFinding);
+
+            spy.on(abstractPlayer, 'getGameBoard', () => {
+                return;
+            });
+            spy.on(abstractPlayer, 'generateWordFindingRequest', () => {
+                return { useCase: WordFindingUseCase.Expert };
+            });
+            abstractPlayer['computeWordPlacement']();
+            expect(wordFindingInstanceStub['findWords'].called).to.be.true;
+        });
+
+        it('should call getGameBoard and generateWord', () => {
+            wordFindingServiceStub['getWordFindingInstance'].returns(wordFindingInstanceStub as unknown as AbstractWordFinding);
+
+            const getGameBoardSpy = spy.on(abstractPlayer, 'getGameBoard', () => {
+                return;
+            });
+            const generateWordSpy = spy.on(abstractPlayer, 'generateWordFindingRequest', () => {
+                return { useCase: WordFindingUseCase.Expert };
+            });
+            abstractPlayer['computeWordPlacement']();
+
+            expect(getGameBoardSpy).to.have.been.called();
+            expect(generateWordSpy).to.have.been.called();
+        });
     });
 });

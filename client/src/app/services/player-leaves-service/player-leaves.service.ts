@@ -3,7 +3,6 @@ import { PlayerLeavesController } from '@app/controllers/player-leaves-controlle
 import { GameService } from '@app/services/';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
-import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -18,16 +17,13 @@ export class PlayerLeavesService implements OnDestroy {
         private readonly playerLeavesController: PlayerLeavesController,
         private readonly gameDispatcherService: GameDispatcherService,
         private readonly gameService: GameService,
-        private readonly roundManagerService: RoundManagerService,
         private readonly gameViewEventManager: GameViewEventManagerService,
     ) {
         this.playerLeavesController.subscribeToJoinerLeavesGameEvent(this.serviceDestroyed$, (leaverName: string) =>
             this.handleJoinerLeaveGame(leaverName),
         );
         this.playerLeavesController.subscribeToResetGameEvent(this.serviceDestroyed$, () => {
-            this.gameService.resetServiceData();
-            this.gameDispatcherService.resetServiceData();
-            this.roundManagerService.resetServiceData();
+            this.gameViewEventManager.emitGameViewEvent('resetServices');
         });
     }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActionType } from '@app/classes/actions/action-data';
 import { StartGameData } from '@app/classes/communication/game-config';
@@ -10,13 +10,14 @@ import { Timer } from '@app/classes/timer/timer';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
 import { ActionService } from '@app/services/action-service/action.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
-export default class RoundManagerService implements IResetServiceData {
+export default class RoundManagerService implements IResetServiceData, OnDestroy {
     gameId: string;
     localPlayerId: string;
     currentRound: Round;
@@ -26,9 +27,21 @@ export default class RoundManagerService implements IResetServiceData {
     timer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
     private endRoundEvent$: Subject<void>;
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
+    private serviceDestroyed$: Subject<boolean>;
 
-    constructor(private router: Router, private readonly actionService: ActionService) {
+    constructor(
+        private router: Router,
+        private readonly actionService: ActionService,
+        private readonly gameViewEventManagerService: GameViewEventManagerService,
+    ) {
+        this.serviceDestroyed$ = new Subject();
         this.initializeEvents();
+        this.gameViewEventManagerService.subscribeToGameViewEvent('resetServices', this.serviceDestroyed$, () => this.resetServiceData());
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     subscribeToEndRoundEvent(destroy$: Observable<boolean>, next: () => void): Subscription {

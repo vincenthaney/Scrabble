@@ -31,32 +31,14 @@ describe('PlayerLeavesService', () => {
         const createGameSpy = spyOn<any>(service, 'handleJoinerLeaveGame').and.callFake(() => {
             return;
         });
-        // eslint-disable-next-line dot-notation
         playerLeavesController['joinerLeavesGameEvent'].emit('testName');
         expect(createGameSpy).toHaveBeenCalledWith('testName');
     });
 
     it('should reset gameService data when playerLeavesController.resetGameEvent emits', () => {
-        const gameServiceResetSpy = spyOn(service['gameService'], 'resetServiceData').and.callFake(() => {
-            return;
-        });
-        // eslint-disable-next-line dot-notation
+        const eventEmitSpy = spyOn(service['gameViewEventManager'], 'emitGameViewEvent').and.callFake(() => {});
         playerLeavesController['resetGameEvent'].emit();
-        expect(gameServiceResetSpy).toHaveBeenCalled();
-    });
-    it('should reset gameDispatcherService data when playerLeavesController.resetGameEvent emits', () => {
-        const spy = spyOn<any>(service['gameDispatcherService'], 'resetServiceData').and.callFake(() => {});
-        // eslint-disable-next-line dot-notation
-        playerLeavesController['resetGameEvent'].emit();
-        expect(spy).toHaveBeenCalled();
-    });
-    it('should reset roundManagerService data when playerLeavesController.resetGameEvent emits', () => {
-        const spy = spyOn(service['roundManagerService'], 'resetServiceData').and.callFake(() => {
-            return;
-        });
-        // eslint-disable-next-line dot-notation
-        playerLeavesController['resetGameEvent'].emit();
-        expect(spy).toHaveBeenCalled();
+        expect(eventEmitSpy).toHaveBeenCalledWith('resetServices');
     });
 
     it('handleJoinerLeaveGame should call joinerLeavesGameEvent.next', () => {

@@ -21,6 +21,7 @@ export interface GameConfigData {
 export interface GameConfig {
     player1: Player;
     gameType: GameType;
+    gameMode: GameMode;
     maxRoundTime: number;
     dictionary: DictionarySummary;
 }
