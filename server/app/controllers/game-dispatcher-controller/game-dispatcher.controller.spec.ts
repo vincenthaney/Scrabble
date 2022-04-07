@@ -83,6 +83,7 @@ const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
+    gameMode: GameMode.Solo,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
     dictionary: TEST_DICTIONARY,
 };
@@ -327,7 +328,7 @@ describe('GameDispatcherController', () => {
             gameStub.createStartGameData.callsFake(() => undefined as unknown as StartGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
-            gameStub.getPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub as unknown as Player);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             gameStub.areGameOverConditionsMet.returns(false);
@@ -840,7 +841,7 @@ describe('GameDispatcherController', () => {
             gameStub = createStubInstance(Game);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             playerStub = createStubInstance(Player);
-            gameStub.getPlayer.returns(playerStub);
+            gameStub.getPlayer.returns(playerStub as unknown as Player);
             handleLeaveSpy = chai.spy.on(controller, 'handleLobbyLeave', () => {});
         });
 

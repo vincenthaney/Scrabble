@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 import { GameConfig, GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -8,10 +10,13 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
 import { Container } from 'typedi';
 import { CreateGameService } from './create-game.service';
+import * as BeginnerVirtualPlayer from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import * as ExpertVirtualPlayer from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 chai.use(spies);
 const DEFAULT_PLAYER_ID = 'playerId';
 
@@ -29,9 +34,21 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     dictionary: TEST_DICTIONARY,
 };
 
+const DEFAULT_GAME_CONFIG_DATA_EXPERT: GameConfigData = {
+    playerName: DEFAULT_PLAYER_NAME,
+    playerId: DEFAULT_PLAYER_ID,
+    gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
+    virtualPlayerLevel: VirtualPlayerLevel.Expert,
+    virtualPlayerName: DEFAULT_PLAYER_NAME,
+    maxRoundTime: DEFAULT_MAX_ROUND_TIME,
+    dictionary: DEFAULT_DICTIONARY,
+};
+
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
     dictionary: TEST_DICTIONARY,
 };
@@ -46,6 +63,7 @@ describe('CreateGameService', () => {
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('createSoloGame', () => {
@@ -61,6 +79,40 @@ describe('CreateGameService', () => {
             });
             createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(beginGameSpy).to.have.been.called();
+        });
+
+        it('should add a Beginner player if it is the selected virtual player level', () => {
+            spy.on(createGameService, 'generateGameConfig', () => {
+                return;
+            });
+            spy.on(createGameService, 'generateReadyGameConfig', () => {
+                return;
+            });
+
+            spy.on(activeGameService, 'beginGame', () => {
+                return;
+            });
+
+            const stub = sinon.spy(BeginnerVirtualPlayer, 'BeginnerVirtualPlayer');
+            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
+            expect(stub.called).to.be.true;
+        });
+
+        it('should add an Expert player if it is the selected virtual player level', () => {
+            spy.on(createGameService, 'generateGameConfig', () => {
+                return;
+            });
+            spy.on(createGameService, 'generateReadyGameConfig', () => {
+                return;
+            });
+
+            spy.on(activeGameService, 'beginGame', () => {
+                return;
+            });
+
+            const stub = sinon.spy(ExpertVirtualPlayer, 'ExpertVirtualPlayer');
+            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA_EXPERT);
+            expect(stub.called).to.be.true;
         });
 
         it('should call generateReadyGameConfig', () => {

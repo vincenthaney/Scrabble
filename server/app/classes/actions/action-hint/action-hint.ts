@@ -19,9 +19,14 @@ export default class ActionHint extends ActionInfo {
     }
 
     execute(): GameUpdateData | void {
-        this.hintResult = this.wordFindingService.findWords(this.game.board, this.player.tiles, this.game.dictionarySummary.id, {
-            useCase: WordFindingUseCase.Hint,
-        });
+        const wordFindingInstance = this.wordFindingService.getWordFindingInstance(WordFindingUseCase.Hint, this.game.dictionarySummary.id, [
+            this.game.board,
+            this.player.tiles,
+            {
+                useCase: WordFindingUseCase.Hint,
+            },
+        ]);
+        this.hintResult = wordFindingInstance.findWords();
     }
 
     getMessage(): string | undefined {

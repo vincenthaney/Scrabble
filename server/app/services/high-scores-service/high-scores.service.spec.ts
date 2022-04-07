@@ -2,24 +2,23 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { HighScore, HighScoresData } from '@app/classes/database/high-score';
+import { GameType } from '@app/classes/game/game-type';
+import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
+import DatabaseService from '@app/services/database-service/database.service';
+import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
+import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { MongoClient } from 'mongodb';
-import { HighScore, HighScoresData } from '@app/classes/database/high-score';
-import { GameType } from '@app/classes/game/game-type';
-import HighScoresService from './high-scores.service';
+import { join } from 'path';
+import { stub } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
-import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
-import DatabaseService from '@app/services/database-service/database.service';
-import { stub } from 'sinon';
+import HighScoresService from './high-scores.service';
 import * as sinon from 'sinon';
-
-import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
-import { join } from 'path';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const HIGH_SCORE_CLASSIC_1: HighScore = {
@@ -148,7 +147,7 @@ describe('HighScoresService', () => {
         it('should call populateDb', async () => {
             const spy = chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
-            expect(spy).to.have.been.called;
+            expect(spy).to.have.been.called();
         });
 
         it('should delete all documents of the array', async () => {
@@ -164,7 +163,7 @@ describe('HighScoresService', () => {
             const spyFetchDefaultHighScores = stub(HighScoresService, <any>'fetchDefaultHighScores');
             const spyPopulateDb = chai.spy.on(highScoresService['databaseService'], 'populateDb', () => {});
             await highScoresService['populateDb']();
-            expect(spyPopulateDb).to.have.been.called;
+            expect(spyPopulateDb).to.have.been.called();
             assert(spyFetchDefaultHighScores.calledOnce);
         });
     });
@@ -172,9 +171,10 @@ describe('HighScoresService', () => {
     describe('getSortedHighScores', () => {
         it('should sort the highScores by ascending score order ', async () => {
             const spyGetHighScores = chai.spy.on(highScoresService, 'getHighScores', () => INITIAL_HIGH_SCORES_CLASSIC);
+            const results = await highScoresService['getSortedHighScores'](GameType.Classic);
 
-            expect(spyGetHighScores).to.have.been.called;
-            expect(await highScoresService['getSortedHighScores'](GameType.Classic)).to.deep.equal(SORTED_HIGH_SCORES_CLASSIC);
+            expect(spyGetHighScores).to.have.been.called();
+            expect(results).to.deep.equal(SORTED_HIGH_SCORES_CLASSIC);
         });
     });
 
@@ -185,7 +185,7 @@ describe('HighScoresService', () => {
             const newScore = 1;
 
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.false;
-            expect(spyGetSortedHighScores).to.have.been.called;
+            expect(spyGetSortedHighScores).to.have.been.called();
         });
 
         it('should call updateHighScore if the score is identical to one in the collection', async () => {
@@ -194,7 +194,7 @@ describe('HighScoresService', () => {
             const newName = 'new name';
             const newScore = HIGH_SCORE_CLASSIC_3.score;
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
-            expect(spyUpdateHighScore).to.have.been.called;
+            expect(spyUpdateHighScore).to.have.been.called();
         });
 
         it('should call replaceHighScore if the score higher and different to one in the collection', async () => {
@@ -203,7 +203,7 @@ describe('HighScoresService', () => {
             const newName = 'new name';
             const newScore = HIGH_SCORE_CLASSIC_3.score + 1;
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
-            expect(spyUpdateHighScore).to.have.been.called;
+            expect(spyUpdateHighScore).to.have.been.called();
         });
     });
 

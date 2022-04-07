@@ -63,6 +63,7 @@ const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_ROUND_TIME,
     dictionary: TEST_DICTIONARY,
 };
@@ -97,6 +98,7 @@ const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
 const DEFAULT_MULTIPLAYER_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_ROUND_TIME,
     dictionary: TEST_DICTIONARY,
 };
@@ -456,6 +458,7 @@ describe('GameDispatcherService', () => {
         const config: GameConfig = {
             player1: stubPlayer as unknown as Player,
             gameType: GameType.Classic,
+            gameMode: GameMode.Multiplayer,
             maxRoundTime: 60,
             dictionary: TEST_DICTIONARY,
         };

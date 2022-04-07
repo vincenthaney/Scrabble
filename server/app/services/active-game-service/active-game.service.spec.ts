@@ -3,15 +3,14 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import Game from '@app/classes/game/game';
 import { ReadyGameConfig } from '@app/classes/game/game-config';
+import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
-import BoardService from '@app/services/board-service/board.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { Container } from 'typedi';
 import { ActiveGameService } from './active-game.service';
 
 const expect = chai.expect;
@@ -26,6 +25,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: TEST_DICTIONARY,
 };
@@ -43,8 +43,7 @@ describe('ActiveGameService', () => {
     let activeGameService: ActiveGameService;
 
     beforeEach(() => {
-        const boardService = Container.get(BoardService);
-        activeGameService = new ActiveGameService(boardService);
+        activeGameService = new ActiveGameService();
     });
 
     it('should create', () => {
@@ -136,7 +135,7 @@ describe('ActiveGameService', () => {
             });
             activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             const spy = chai.spy.on(activeGameService['activeGames'], 'indexOf');
-            expect(spy).to.have.been.called;
+            expect(spy).not.to.have.been.called();
         });
     });
 

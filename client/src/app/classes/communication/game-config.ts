@@ -3,9 +3,9 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import { RoundData } from './round-data';
 import PlayerData from './player-data';
 import { DictionarySummary } from './dictionary-summary';
+import { RoundData } from './round-data';
 
 export interface GameConfigData {
     playerName: string;
@@ -21,6 +21,7 @@ export interface GameConfigData {
 export interface GameConfig {
     player1: PlayerData;
     gameType: GameType;
+    gameMode: GameMode;
     maxRoundTime: number;
     dictionary: DictionarySummary;
 }

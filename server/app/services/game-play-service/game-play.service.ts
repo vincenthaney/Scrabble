@@ -3,12 +3,15 @@ import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
+import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Service } from 'typedi';
@@ -20,6 +23,7 @@ export class GamePlayService {
         private readonly activeGameService: ActiveGameService,
         private readonly highScoresService: HighScoresService,
         private readonly dictionaryService: DictionaryService,
+        private readonly gameHistoriesService: GameHistoriesService,
     ) {
         this.activeGameService.playerLeftEvent.on('playerLeft', async (gameId, playerWhoLeftId) => {
             await this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
@@ -104,6 +108,14 @@ export class GamePlayService {
         return this.activeGameService.getGame(gameId, playerId).gameIsOver;
     }
 
+    handleResetObjectives(gameId: string, playerId: string): GameUpdateData {
+        const game: Game = this.activeGameService.getGame(gameId, playerId);
+        if (game.gameType === GameType.Classic) return {};
+
+        const objectiveData: GameObjectivesData = game.resetPlayerObjectiveProgression(playerId);
+        return { gameObjective: objectiveData };
+    }
+
     private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (!game.isAddedToDatabase) {
@@ -111,6 +123,7 @@ export class GamePlayService {
             for (const player of connectedRealPlayers) {
                 await this.highScoresService.addHighScore(player.name, player.score, game.gameType);
             }
+            this.gameHistoriesService.addGameHistory(game.gameHistory);
             game.isAddedToDatabase = true;
         }
 

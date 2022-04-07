@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { Application } from '@app/app';
 import { HttpException } from '@app/classes/http-exception/http-exception';
@@ -61,7 +62,6 @@ describe('HighScoresController', () => {
 
         describe('GET /highScores/:playerId', () => {
             it('should return NO_CONTENT', async () => {
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 chai.spy.on(controller, 'handleHighScoresRequest', () => {});
 
                 return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.NO_CONTENT);
@@ -75,11 +75,29 @@ describe('HighScoresController', () => {
                 return supertest(expressApp).get(`/api/highScores/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
+
+        describe('DELETE /highScores', () => {
+            it('should return NO_CONTENT', async () => {
+                const spyResetHighScores = chai.spy.on(controller['highScoresService'], 'resetHighScores', () => []);
+
+                return supertest(expressApp)
+                    .delete('/api/highScores')
+                    .expect(StatusCodes.NO_CONTENT)
+                    .then(() => expect(spyResetHighScores).to.have.been.called());
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller, 'handleHighScoresReset', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).delete('/api/highScores').expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
     });
 
     describe('handleHighScoresRequest', () => {
         it('should call socketService.emitToSocket', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spyEmitToSocket = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             const spyGetAllHighScores = chai.spy.on(controller['highScoresService'], 'getAllHighScores', () => []);
             await controller['handleHighScoresRequest'](DEFAULT_PLAYER_ID);

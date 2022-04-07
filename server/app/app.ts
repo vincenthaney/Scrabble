@@ -8,8 +8,8 @@ import { join } from 'path';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
-import { DictionaryController } from './controllers/dictionary-controller/dictionary.controller';
 import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { GameHistoriesController } from './controllers/game-histories-controller/game-histories.controller';
 import { GamePlayController } from './controllers/game-play-controller/game-play.controller';
 import { HighScoresController } from './controllers/high-scores-controller/high-scores.controller';
 import DatabaseService from './services/database-service/database.service';
@@ -24,7 +24,7 @@ export class Application {
         private readonly gamePlayController: GamePlayController,
         private readonly gameDispatcherController: GameDispatcherController,
         private readonly highScoreController: HighScoresController,
-        private readonly dictionaryController: DictionaryController,
+        private readonly gameHistoriesController: GameHistoriesController,
         private readonly databaseService: DatabaseService,
     ) {
         this.app = express();
@@ -53,7 +53,7 @@ export class Application {
         this.app.use('/api', this.gamePlayController.router);
         this.app.use('/api', this.gameDispatcherController.router);
         this.app.use('/api', this.highScoreController.router);
-        this.app.use('/api', this.dictionaryController.router);
+        this.app.use('/api', this.gameHistoriesController.router);
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
