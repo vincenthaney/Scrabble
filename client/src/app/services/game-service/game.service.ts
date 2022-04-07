@@ -129,7 +129,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
         this.roundManager.initialize(localPlayerId, startGameData);
         this.boardService.initializeBoard(startGameData.board);
-        this.objectiveManager.initializeFromStartGameData(startGameData, this.isLocalPlayerPlayer1());
+        this.objectiveManager.initialize(startGameData, this.isLocalPlayerPlayer1());
 
         this.isGameSetUp = true;
         this.isGameOver = false;
