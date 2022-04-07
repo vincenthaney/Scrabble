@@ -71,20 +71,18 @@ describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
     let client: MongoClient;
-    let initDataBaseService;
-    let initHighScoreService;
 
     beforeEach(() => {
         Container.reset();
     });
 
     beforeEach(async () => {
-        initDataBaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-        initHighScoreService = Container.get(HighScoresService);
-
-        databaseService = initDataBaseService;
+        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
         client = (await databaseService.connectToServer()) as MongoClient;
-        highScoresService = initHighScoreService;
+
+        Container.set(DatabaseService, databaseService);
+        highScoresService = Container.get(HighScoresService);
+
         highScoresService['databaseService'] = databaseService;
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
     });
