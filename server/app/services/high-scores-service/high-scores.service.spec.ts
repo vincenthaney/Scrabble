@@ -67,6 +67,28 @@ const mockInitialHighScores: HighScoresData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, DEFAULT_HIGH_SCORES_RELATIVE_PATH)] = JSON.stringify(mockInitialHighScores);
 
+class TestTimer {
+    private name: string;
+    private start: number;
+    private last: number;
+    private count: number;
+
+    constructor(name: string) {
+        this.name = name;
+        this.start = Date.now();
+        this.last = this.start;
+        this.count = 0;
+    }
+
+    check(step: string = '') {
+        const now = Date.now();
+        console.log(`+> ${this.name}: ${step}`, this.count, `${now - this.start}ms`, `${now - this.last}ms`);
+
+        this.last = now;
+        this.count++;
+    }
+}
+
 describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
@@ -77,14 +99,22 @@ describe('HighScoresService', () => {
     });
 
     beforeEach(async () => {
+        const timer = new TestTimer('HIGHSCORE SERVICE');
+
         databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        timer.check();
         client = (await databaseService.connectToServer()) as MongoClient;
+        timer.check();
 
         Container.set(DatabaseService, databaseService);
+        timer.check();
         highScoresService = Container.get(HighScoresService);
+        timer.check();
 
         highScoresService['databaseService'] = databaseService;
+        timer.check();
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
+        timer.check('end');
     });
 
     afterEach(async () => {
