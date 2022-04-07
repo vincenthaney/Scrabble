@@ -285,6 +285,12 @@ describe('AdminGameHistoryComponent', () => {
             expect(component.sortGameHistory(gameHistory, 'endDate')).toEqual(expected);
         });
 
+        it('should return endTime - startTime for duration', () => {
+            const expected = gameHistory.endTime.valueOf() - gameHistory.startTime.valueOf();
+
+            expect(component.sortGameHistory(gameHistory, 'duration')).toEqual(expected);
+        });
+
         it('should return empty array if property does not exists', () => {
             expect(component.sortGameHistory(gameHistory, 'invalidProperty')).toEqual('');
         });

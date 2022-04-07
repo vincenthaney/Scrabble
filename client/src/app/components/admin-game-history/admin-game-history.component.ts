@@ -114,6 +114,8 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
                 return item.startTime.valueOf();
             case 'endDate':
                 return item.endTime.valueOf();
+            case 'duration':
+                return item.endTime.valueOf() - item.startTime.valueOf();
             default:
                 return isKey(property, item) ? (item[property] as string) : '';
         }
