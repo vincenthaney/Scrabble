@@ -1,9 +1,9 @@
 <p class="title">Objectif privé</p>
-<div *ngFor="let objective of getPrivateObjectives()">
+<div *ngFor="let objective of objectiveManager.getPrivateObjectives()">
     <app-objective [objective]="objective"></app-objective>
 </div>
 
 <p class="title">Objectifs publics</p>
-<div *ngFor="let objective of getPublicObjectives()">
+<div *ngFor="let objective of objectiveManager.getPublicObjectives()">
     <app-objective [objective]="objective"></app-objective>
 </div>
