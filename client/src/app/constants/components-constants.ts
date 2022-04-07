@@ -18,7 +18,7 @@ export const NOT_FOUND = -1;
 export const DICTIONARIES_COLUMNS = {
     dictionaryName: 'Nom',
     dictionaryDescription: 'Description',
-    dictionaryActions: 'Actions',
+    dictionaryActions: '',
 };
 export const DEFAULT_DICTIONARIES_COLUMNS: DisplayDictionariesKeys[] = ['dictionaryName', 'dictionaryDescription', 'dictionaryActions'];
 

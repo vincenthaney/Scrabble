@@ -8,12 +8,6 @@
             Ajouter un dictionaire
             <app-icon class="icon" icon="plus-circle" styling="solid" size="lg"></app-icon>
         </button>
-        <mat-form-field appearance="outline" id="column-select">
-            <mat-label>Colonnes du tableau</mat-label>
-            <mat-select #select [formControl]="columnsControl" [(value)]="selectedColumnsItems" multiple>
-                <mat-option *ngFor="let column of columnsItems" [value]="column">{{column.label}}</mat-option>
-            </mat-select>
-        </mat-form-field>
      </div>
 
     <mat-divider></mat-divider>
@@ -24,17 +18,17 @@
         
                 <ng-container matColumnDef="dictionaryName">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.dictionaryName}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.title}} </td>
+                    <td mat-cell class="left-cell" *matCellDef="let element"> {{element.title}} </td>
                 </ng-container>
        
                 <ng-container matColumnDef="dictionaryDescription">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.dictionaryDescription}} </th>
-                    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                    <td mat-cell class="left-cell" *matCellDef="let element"> {{element.description}} </td>
                 </ng-container> 
 
                 <ng-container matColumnDef="dictionaryActions">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.dictionaryActions}} </th>
-                    <td mat-cell *matCellDef="let element"> 
+                    <th mat-header-cell *matHeaderCellDef > {{columns.dictionaryActions}} </th>
+                    <td mat-cell class="right-cell" *matCellDef="let element"> 
                         <button matTooltip="Vous ne pouvez pas modifier le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="modifyDictionary(element)"[disabled] = "element.isDefault">
                             <app-icon icon="pencil">
                             </app-icon>
