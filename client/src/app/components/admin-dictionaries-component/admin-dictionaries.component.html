@@ -35,14 +35,16 @@
                 <ng-container matColumnDef="dictionaryActions">
                     <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.dictionaryActions}} </th>
                     <td mat-cell *matCellDef="let element"> 
-                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="modifyDictionary(element)"[disabled] = "element.isDefault">
-                            <app-icon icon="pencil"></app-icon>
+                        <button matTooltip="Vous ne pouvez pas modifier le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="modifyDictionary(element)"[disabled] = "element.isDefault">
+                            <app-icon icon="pencil">
+                            </app-icon>
                         </button>
                         <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="downloadDictionary(element.id)">
                             <app-icon icon="download"></app-icon>
                         </button>
-                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element)" [disabled] = "element.isDefault">
-                            <app-icon icon="trash-alt"></app-icon>
+                        <button matTooltip="Vous ne pouvez pas supprimer le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element)" [disabled] = "element.isDefault">
+                            <app-icon icon="trash-alt">
+                            </app-icon>
                         </button> 
                     </td>
                 </ng-container> 
