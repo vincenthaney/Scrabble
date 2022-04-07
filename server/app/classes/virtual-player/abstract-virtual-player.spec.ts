@@ -4,6 +4,7 @@
 import { ActionPass } from '@app/classes/actions';
 import { Board } from '@app/classes/board';
 import { ActionData } from '@app/classes/communication/action-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import Range from '@app/classes/range/range';
 import { LetterValue } from '@app/classes/tile';
@@ -16,7 +17,6 @@ import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, restore, SinonStubbedInstance } from 'sinon';
-import { DictionarySummary } from '../communication/dictionary-data';
 import { AbstractVirtualPlayer } from './abstract-virtual-player';
 
 class TestClass extends AbstractVirtualPlayer {
