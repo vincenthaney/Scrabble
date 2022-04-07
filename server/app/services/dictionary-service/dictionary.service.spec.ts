@@ -16,7 +16,7 @@ import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import * as mock from 'mock-fs';
-import { MongoClient, ObjectId, WithId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 import { join } from 'path';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
@@ -55,7 +55,6 @@ mockPaths[join(__dirname, DICTIONARY_PATH)] = JSON.stringify(DICTIONARY_1);
 describe('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
-    let client: MongoClient;
     let initDatabaseServiceMock;
     let initDictionaryService;
 
@@ -68,7 +67,7 @@ describe('DictionaryService', () => {
         initDictionaryService = Container.get(DictionaryService);
 
         databaseService = initDatabaseServiceMock;
-        client = (await databaseService.connectToServer()) as MongoClient;
+        await databaseService.connectToServer();
         dictionaryService = initDictionaryService;
         dictionaryService['databaseService'] = databaseService;
         await dictionaryService['collection'].insertMany(INITIAL_DICTIONARIES);
@@ -418,13 +417,6 @@ describe('DictionaryService', () => {
         it('should not do anything if the dictionaryId is not a key of the map', async () => {
             dictionaryService.stopUsingDictionary('BASE_DICTIONARY_ID');
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
-        });
-    });
-
-    describe('Error handling', () => {
-        it('should throw an error if we try to access the database on a closed connection', async () => {
-            await client.close();
-            expect(dictionaryService['getAllDictionarySummaries']()).to.eventually.be.rejectedWith(Error);
         });
     });
 });
