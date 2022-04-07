@@ -11,19 +11,12 @@ export class ObjectivesManagerService implements IResetServiceData {
     private objectives?: GameObjectivesData;
     private isLocalPlayerPlayer1: boolean = false;
 
-    initialize(objectives: GameObjectivesData, isLocalPlayerPlayer1: boolean) {
-        this.objectives = objectives;
+    initialize(startGameData: StartGameData, isLocalPlayerPlayer1: boolean) {
+        this.objectives = {
+            player1Objectives: startGameData.player1.objectives,
+            player2Objectives: startGameData.player2.objectives,
+        };
         this.isLocalPlayerPlayer1 = isLocalPlayerPlayer1;
-    }
-
-    initializeFromStartGameData(startGameData: StartGameData, isLocalPlayerPlayer1: boolean) {
-        this.initialize(
-            {
-                player1Objectives: startGameData.player1.objectives,
-                player2Objectives: startGameData.player2.objectives,
-            },
-            isLocalPlayerPlayer1,
-        );
     }
 
     updateObjectives(objectives: GameObjectivesData) {
