@@ -8,7 +8,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import { GameService } from '@app/services';
 import { of } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { DictionariesController } from './dictionaries-controller';
 const TEST_DICTIONARY_UPDATE_INFO = {} as DictionaryUpdateInfo;
 const TEST_DICTIONARY_ID = 'testID';
