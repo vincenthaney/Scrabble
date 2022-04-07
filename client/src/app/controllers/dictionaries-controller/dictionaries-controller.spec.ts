@@ -106,18 +106,18 @@ describe('DictionariesController', () => {
             expect(httpDeleteSpy).toHaveBeenCalled();
         });
 
-        it('handleDeleteAllDictionaries should call dictionariesErrorEvent when receiving an error response ', async () => {
-            const endpoint = `${environment.serverUrl}/dictionaries/reset`;
-            const expected = {
-                code: 'validationFailed',
-                message: 'Invalid input',
-            };
-            httpMock.expectOne(endpoint).flush(expected, { status: 400, statusText: 'Bad Request' });
-            const spyErrorEvent = spyOn(controller['dictionariesErrorEvent'], 'next').and.callFake(() => {
-                return;
-            });
-            controller.handleDeleteAllDictionaries();
-            expect(spyErrorEvent).toHaveBeenCalled();
-        });
+        // it('handleDeleteAllDictionaries should call dictionariesErrorEvent when receiving an error response ', async () => {
+        //     const endpoint = `${environment.serverUrl}/dictionaries/reset`;
+        //     const expected = {
+        //         code: 'validationFailed',
+        //         message: 'Invalid input',
+        //     };
+        //     httpMock.expectOne(endpoint).flush(expected, { status: 400, statusText: 'Bad Request' });
+        //     const spyErrorEvent = spyOn(controller['dictionariesErrorEvent'], 'next').and.callFake(() => {
+        //         return;
+        //     });
+        //     controller.handleDeleteAllDictionaries();
+        //     expect(spyErrorEvent).toHaveBeenCalled();
+        // });
     });
 });
