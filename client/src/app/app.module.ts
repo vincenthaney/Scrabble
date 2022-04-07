@@ -1,6 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -31,6 +31,12 @@ import { HighScoreBoxComponent } from './components/high-score-box/high-score-bo
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
+import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import { DurationPipe } from './pipes/duration/duration.pipe';
+
+registerLocaleData(localeFr);
 
 /**
  * Main module that is used in main.ts.
@@ -64,6 +70,8 @@ import { AdminHighScoresComponent } from './components/admin-high-scores/admin-h
         ConvertDialogComponent,
         AdminPageComponent,
         AdminHighScoresComponent,
+        AdminGameHistoryComponent,
+        DurationPipe,
     ],
     imports: [
         AppMaterialModule,
@@ -82,6 +90,10 @@ import { AdminHighScoresComponent } from './components/admin-high-scores/admin-h
             useFactory: (socketService: SocketService) => async () => socketService.initializeService(),
             deps: [SocketService],
             multi: true,
+        },
+        {
+            provide: LOCALE_ID,
+            useValue: 'fr-CA',
         },
     ],
     bootstrap: [AppComponent],
