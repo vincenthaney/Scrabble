@@ -67,7 +67,7 @@ const mockInitialHighScores: HighScoresData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, DEFAULT_HIGH_SCORES_RELATIVE_PATH)] = JSON.stringify(mockInitialHighScores);
 
-class TestTimer {
+export class TestTimer {
     private name: string;
     private start: number;
     private last: number;
