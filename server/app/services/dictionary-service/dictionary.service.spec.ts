@@ -56,10 +56,17 @@ describe('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
     let client: MongoClient;
-    const initDatabaseServiceMock = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-    const initDictionaryService = Container.get(DictionaryService);
+    let initDatabaseServiceMock;
+    let initDictionaryService;
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(async () => {
+        initDatabaseServiceMock = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        initDictionaryService = Container.get(DictionaryService);
+
         databaseService = initDatabaseServiceMock;
         client = (await databaseService.connectToServer()) as MongoClient;
         dictionaryService = initDictionaryService;

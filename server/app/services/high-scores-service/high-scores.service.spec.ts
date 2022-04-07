@@ -71,10 +71,17 @@ describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
     let client: MongoClient;
-    const initDataBaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-    const initHighScoreService = Container.get(HighScoresService);
+    let initDataBaseService;
+    let initHighScoreService;
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(async () => {
+        initDataBaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        initHighScoreService = Container.get(HighScoresService);
+
         databaseService = initDataBaseService;
         client = (await databaseService.connectToServer()) as MongoClient;
         highScoresService = initHighScoreService;

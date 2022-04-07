@@ -65,6 +65,10 @@ describe('GamePlayService', () => {
     const initGamePlayService = Container.get(GamePlayService);
 
     beforeEach(() => {
+        Container.reset();
+    });
+
+    beforeEach(() => {
         Container.set(DictionaryService, getDictionaryTestService());
 
         gamePlayService = initGamePlayService;

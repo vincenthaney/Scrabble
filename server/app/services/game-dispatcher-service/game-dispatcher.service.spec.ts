@@ -115,6 +115,10 @@ describe('GameDispatcherService', () => {
 
     beforeEach(() => {
         Container.reset();
+    });
+
+    beforeEach(() => {
+        Container.reset();
         Container.set(DictionaryService, getDictionaryTestService());
         gameDispatcherService = Container.get(GameDispatcherService);
         socketService = Container.get(SocketService);

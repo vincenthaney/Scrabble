@@ -39,6 +39,11 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
 describe('CreateGameService', () => {
     let createGameService: CreateGameService;
     let activeGameService: ActiveGameService;
+
+    beforeEach(() => {
+        Container.reset();
+    });
+
     beforeEach(() => {
         activeGameService = Container.get(ActiveGameService);
         createGameService = new CreateGameService(activeGameService);

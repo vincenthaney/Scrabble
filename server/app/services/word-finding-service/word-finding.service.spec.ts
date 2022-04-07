@@ -22,6 +22,10 @@ describe('WordFindingService', () => {
     let tiles: Tile[];
     let request: WordFindingRequest;
 
+    // beforeEach(() => {
+    //     Container.reset();
+    // });
+
     beforeEach(() => {
         sinon.restore();
         Container.set(DictionaryService, getDictionaryTestService());
