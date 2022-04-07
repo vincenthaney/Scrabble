@@ -43,13 +43,11 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         this.formParameters = new FormGroup({
             inputDictionaryName: new FormControl(data.dictionaryToModifyName, [
                 Validators.required,
-                Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
             ]),
             inputDictionaryDescription: new FormControl(data.dictionaryToModifyDescription, [
                 Validators.required,
-                Validators.pattern(DICTIONARY_DESCRIPTION_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_DESCRIPTION_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_DESCRIPTION_VALIDATION.maxLength),
             ]),
