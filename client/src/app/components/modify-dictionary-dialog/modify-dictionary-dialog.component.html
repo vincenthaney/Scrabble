@@ -25,9 +25,9 @@
     <mat-form-field
     appearance="outline"
     [formGroup]="formParameters"
-    matTooltip="La description doit être entre 2 et 80 caractères."
     matTooltipPosition="above"
     >
+    <div matTooltip="La description doit être entre 2 et 80 caractères."[matTooltipDisabled]="!this.formParameters.get('inputDictionaryName')?.invalid"></div>
     <mat-label><app-icon icon="pencil"></app-icon> Nouvelle description du dictionnaire</mat-label>
     <input
         matInput

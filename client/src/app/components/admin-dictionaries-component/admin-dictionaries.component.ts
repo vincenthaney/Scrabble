@@ -53,30 +53,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.state = DictionariesState.Loading;
         this.error = undefined;
 
-        this.dictionariesService.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, () => {
-            this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
-        });
-        this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
-            this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
-            this.isWaitingForServerResponse = false;
-        });
-        this.dictionariesService.subscribeToDownloadLoadingEvent(this.serviceDestroyed$, () => {
-            this.isDownloadLoading = false;
-            this.isWaitingForServerResponse = false;
-        });
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
-            this.snackBar.open(
-                response,
-                'OK',
-                Object.values(PositiveFeedback).includes(response as PositiveFeedback)
-                    ? { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] }
-                    : { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] },
-            );
-        });
-        this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.serviceDestroyed$, (state) => {
-            this.state = state;
-            this.isWaitingForServerResponse = false;
-        });
+        this.initializeSubscriptions();
     }
 
     ngOnDestroy(): void {
@@ -161,5 +138,32 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
 
     private async convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
         this.dataSource = new MatTableDataSource(dictionaries);
+    }
+
+    private initializeSubscriptions(): void {
+        this.dictionariesService.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, () => {
+            this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
+        });
+        this.dictionariesService.subscribeToDictionariestUpdateDataEvent(this.serviceDestroyed$, () => {
+            this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
+            this.isWaitingForServerResponse = false;
+        });
+        this.dictionariesService.subscribeToDownloadLoadingEvent(this.serviceDestroyed$, () => {
+            this.isDownloadLoading = false;
+            this.isWaitingForServerResponse = false;
+        });
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
+            this.snackBar.open(
+                response,
+                'OK',
+                Object.values(PositiveFeedback).includes(response as PositiveFeedback)
+                    ? { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] }
+                    : { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] },
+            );
+        });
+        this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.serviceDestroyed$, (state) => {
+            this.state = state;
+            this.isWaitingForServerResponse = false;
+        });
     }
 }

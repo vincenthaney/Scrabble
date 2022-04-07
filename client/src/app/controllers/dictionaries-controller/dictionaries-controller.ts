@@ -32,7 +32,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryUpdated);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }
@@ -44,7 +44,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesDownloadEvent.next(dictionary);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }
@@ -58,7 +58,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryDeleted);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }
@@ -71,7 +71,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryAdded);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }
@@ -83,7 +83,7 @@ export class DictionariesController implements OnDestroy {
                 this.getAllDictionariesEvent.next(body);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }
@@ -95,7 +95,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionariesDeleted);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }

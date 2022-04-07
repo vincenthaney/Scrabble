@@ -8,6 +8,6 @@
 <button mat-button color="primary" (click)="fileInput.click()">Sélectionner le fichier</button>
 <div *ngIf="selectedFile">{{this.selectedFile.name}}</div>
 <mat-dialog-actions align='end'>
-  <button mat-button (click)="onUpload()" [disabled]="isUploadableFile">Téléverser</button>
+  <button mat-button (click)="onUpload()" [disabled]="isUploadableFile">Ajouter</button>
   <button mat-button (click)="closeDialog()">Annuler</button>
 </mat-dialog-actions>

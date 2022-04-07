@@ -16,8 +16,8 @@ export const DEFAULT_HIGH_SCORE: SingleHighScore = { name: 'player1', gameType: 
 
 export const NOT_FOUND = -1;
 export const DICTIONARIES_COLUMNS = {
-    dictionaryName: 'Nom du dictionnaire',
-    dictionaryDescription: 'Description du dictionnaire',
+    dictionaryName: 'Nom',
+    dictionaryDescription: 'Description',
     dictionaryActions: 'Actions',
 };
 export const DEFAULT_DICTIONARIES_COLUMNS: DisplayDictionariesKeys[] = ['dictionaryName', 'dictionaryDescription', 'dictionaryActions'];

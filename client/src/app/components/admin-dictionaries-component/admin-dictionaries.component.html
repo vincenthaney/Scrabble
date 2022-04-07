@@ -1,7 +1,7 @@
 <div matSort>
     <div class="filter-container">
         <button mat-flat-button color="primary" (click)="resetDictionaries()" [disabled]="state !== 'ready'">
-            Réinitialiser les dictionaires
+            Réinitialiser
             <app-icon class="icon" icon="redo"></app-icon>
         </button>
         <button mat-flat-button color="primary" (click)="uploadDictionary()">
@@ -42,7 +42,7 @@
                             <app-icon icon="download"></app-icon>
                         </button>
                         <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element)" [disabled] = "element.isDefault">
-                            <app-icon icon="trash"></app-icon>
+                            <app-icon icon="trash-alt"></app-icon>
                         </button> 
                     </td>
                 </ng-container> 
