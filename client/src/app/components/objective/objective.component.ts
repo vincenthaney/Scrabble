@@ -11,7 +11,7 @@ import { OPPONENT_COMPLETED_THIS_OBJECTIVE, PERCENT, YOU_COMPLETED_THIS_OBJECTIV
 export class ObjectiveComponent {
     @Input() objective: ObjectiveData;
 
-    getProgress() {
+    getProgress(): number {
         return (this.objective.progress / this.objective.maxProgress) * PERCENT;
     }
 
