@@ -11,3 +11,9 @@ export enum DictionariesState {
     Loading = 'loading',
     Error = 'error',
 }
+
+export interface DictionariesColumns {
+    dictionaryName: string;
+    dictionaryDescription: string;
+    dictionaryActions: string;
+}
