@@ -12,7 +12,6 @@ import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { MongoClient } from 'mongodb';
 import { join } from 'path';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
@@ -82,6 +81,7 @@ export class TestTimer {
 
     check(step: string = '') {
         const now = Date.now();
+        // eslint-disable-next-line no-console
         console.log(`+> ${this.name}: ${step}`, this.count, `${now - this.start}ms`, `${now - this.last}ms`);
 
         this.last = now;
@@ -92,29 +92,20 @@ export class TestTimer {
 describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
-    let client: MongoClient;
 
     beforeEach(() => {
         Container.reset();
     });
 
     beforeEach(async () => {
-        const timer = new TestTimer('HIGHSCORE SERVICE');
-
         databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-        timer.check();
-        client = (await databaseService.connectToServer()) as MongoClient;
-        timer.check();
+        await databaseService.connectToServer();
 
         Container.set(DatabaseService, databaseService);
-        timer.check();
         highScoresService = Container.get(HighScoresService);
-        timer.check();
 
         highScoresService['databaseService'] = databaseService;
-        timer.check();
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
-        timer.check('end');
     });
 
     afterEach(async () => {
@@ -241,13 +232,6 @@ describe('HighScoresService', () => {
             const newScore = HIGH_SCORE_CLASSIC_3.score + 1;
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
             expect(spyUpdateHighScore).to.have.been.called;
-        });
-    });
-
-    describe('Error handling', () => {
-        it('should throw an error if we try to access the database on a closed connection', async () => {
-            await client.close();
-            expect(highScoresService['getHighScores'](GameType.Classic)).to.eventually.be.rejectedWith(Error);
         });
     });
 });
