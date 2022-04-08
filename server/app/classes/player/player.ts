@@ -11,7 +11,7 @@ export default class Player {
     tiles: Tile[];
     id: string;
     isConnected: boolean;
-    private objectives: AbstractObjective[];
+    objectives: AbstractObjective[];
     private readonly objectiveService: ObjectivesService;
 
     constructor(id: string, name: string) {
@@ -44,7 +44,7 @@ export default class Player {
     }
 
     resetObjectivesProgression(): void {
-        this.getObjectives()
+        [...this.objectives]
             .filter((objective: AbstractObjective) => !objective.isCompleted() && objective.shouldResetOnInvalidWord)
             .forEach((objective: AbstractObjective) => {
                 objective.progress = 0;
