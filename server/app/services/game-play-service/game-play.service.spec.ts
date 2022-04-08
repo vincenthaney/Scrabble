@@ -8,6 +8,7 @@ import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionRese
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
@@ -25,7 +26,8 @@ import { GamePlayService } from '@app/services/game-play-service/game-play.servi
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
 import { EventEmitter } from 'events';
-import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import * as sinon from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 const expect = chai.expect;
 
@@ -62,11 +64,16 @@ describe('GamePlayService', () => {
     let round: Round;
     let player: Player;
     let game: Game;
+    const initGamePlayService = Container.get(GamePlayService);
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(() => {
         Container.set(DictionaryService, getDictionaryTestService());
 
-        gamePlayService = Container.get(GamePlayService);
+        gamePlayService = initGamePlayService;
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
         tileReserveStub = createStubInstance(TileReserve);
@@ -77,6 +84,7 @@ describe('GamePlayService', () => {
         gameStub.getPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
+        gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
 
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
@@ -89,12 +97,12 @@ describe('GamePlayService', () => {
         player = gameStub.player1;
         game = gameStub as unknown as Game;
 
-        getGameStub = stub(gamePlayService['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
+        getGameStub = stub(gamePlayService['activeGameService'], 'getGame').returns(game);
     });
 
     afterEach(() => {
-        getGameStub.restore();
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('playAction', () => {
@@ -110,7 +118,8 @@ describe('GamePlayService', () => {
         });
 
         afterEach(() => {
-            restore();
+            sinon.restore();
+            chai.spy.restore();
         });
 
         it('should call getGame', async () => {
@@ -213,6 +222,11 @@ describe('GamePlayService', () => {
             const [, feedback] = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(feedback!.opponentFeedback).to.equal(DEFAULT_ACTION_MESSAGE);
         });
+
+        it('should return [undefined, undefined] is game is over', async () => {
+            game.gameIsOver = true;
+            expect(await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION)).to.deep.equal([undefined, undefined]);
+        });
     });
 
     describe('getAction', () => {
@@ -228,6 +242,9 @@ describe('GamePlayService', () => {
 
         it('should return action of type ActionPlace when type is place', () => {
             const type = ActionType.PLACE;
+            chai.spy.on(gamePlayService, 'getActionPlacePayload', () => {
+                return { startPosition: { column: 0, row: 0 } };
+            });
             const payload: ActionPlacePayload = {
                 tiles: [{} as unknown as Tile],
                 startPosition: { column: 0, row: 0 },
@@ -242,6 +259,10 @@ describe('GamePlayService', () => {
             const payload: ActionExchangePayload = {
                 tiles: [{} as unknown as Tile],
             };
+            chai.spy.on(gamePlayService, 'getActionExchangePayload', () => {
+                return { tiles: [{} as unknown as Tile] };
+            });
+
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
         });
@@ -309,10 +330,49 @@ describe('GamePlayService', () => {
         });
     });
 
+    describe('getActionPlacePayload', () => {
+        it('should return right payload', () => {
+            const payload = {
+                startPosition: { column: 1, row: 1 },
+                orientation: Orientation.Horizontal,
+                tiles: [{ letter: 'A', value: 2 }],
+            };
+            const actionData: ActionData = {
+                type: ActionType.PLACE,
+                input: 'test',
+                payload,
+            };
+            expect(gamePlayService.getActionPlacePayload(actionData)).to.deep.equal(payload);
+        });
+    });
+
+    describe('getActionExchangePayload', () => {
+        it('should return right payload', () => {
+            const payload = {
+                tiles: [{ letter: 'A', value: 2 }],
+            };
+            const actionData: ActionData = {
+                type: ActionType.EXCHANGE,
+                input: 'test',
+                payload,
+            };
+            expect(gamePlayService.getActionExchangePayload(actionData)).to.deep.equal(payload);
+        });
+    });
+
+    describe('isGameOver', () => {
+        it('should return expected value', () => {
+            const expected = true;
+            game['gameIsOver'] = expected;
+            expect(gamePlayService.isGameOver(game.getId(), DEFAULT_PLAYER_ID)).to.equal(expected);
+        });
+    });
+
     describe('PlayerLeftEvent', () => {
         const playerWhoLeftId = 'playerWhoLeftId';
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+        let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
         let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
 
         beforeEach(() => {
@@ -323,6 +383,7 @@ describe('GamePlayService', () => {
             gamePlayService = new GamePlayService(
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
+                dictionaryServiceStub as unknown as DictionaryService,
                 gameHistoriesServiceStub as unknown as GameHistoriesService,
             );
         });
@@ -357,6 +418,9 @@ describe('GamePlayService', () => {
             highScoresServiceStub = createStubInstance(HighScoresService);
             highScoresServiceStub.addHighScore.resolves(true);
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
+            chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
+                return;
+            });
         });
 
         it('should call end of game and endgame message', async () => {
@@ -378,20 +442,38 @@ describe('GamePlayService', () => {
             expect(gameStub.getConnectedRealPlayers.calledOnce).to.be.true;
             expect(highScoresServiceStub.addHighScore.calledOnce).to.be.true;
         });
+
+        it('should update set updatedData players score if they exist', async () => {
+            const updatedScore1 = 100;
+            const updatedScore2 = 200;
+            const gameUpdateData = {
+                player1: { id: 'id1', score: 0 },
+                player2: { id: 'id2', score: 0 },
+            };
+            gameStub.endOfGame.returns([updatedScore1, updatedScore2]);
+
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, gameUpdateData);
+            expect(gameUpdateData.player1.score).to.equal(updatedScore1);
+            expect(gameUpdateData.player2.score).to.equal(updatedScore2);
+        });
     });
 
     describe('addMissingPlayerId', () => {
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
-
-            Object.defineProperty(gamePlayService, 'activeGameService', { value: activeGameServiceStub });
+            chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
+                return;
+            });
+            (gamePlayService['activeGameService'] as unknown) = activeGameServiceStub;
         });
 
         it('should modify both ids', async () => {
             const result = gamePlayService['addMissingPlayerId']('', '', { player1: { id: 'id1' }, player2: { id: 'id2' } });
             gameStub.isAddedToDatabase = true;
+            gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
             await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(result.player1!.id).to.equal(gameStub.player1.id);
             expect(result.player2!.id).to.equal(gameStub.player2.id);

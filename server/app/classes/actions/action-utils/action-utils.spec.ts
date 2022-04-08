@@ -9,6 +9,7 @@ import { ActionUtils } from './action-utils';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
+import * as sinon from 'sinon';
 
 const DEFAULT_PLAYER_NAME = 'player1';
 const DEFAULT_PLAYER_ID = '1';
@@ -19,6 +20,10 @@ describe('ActionUtils', () => {
 
         beforeEach(() => {
             player = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+        });
+
+        afterEach(() => {
+            sinon.restore();
         });
 
         it('should return tiles to place and unplayed tiles', () => {

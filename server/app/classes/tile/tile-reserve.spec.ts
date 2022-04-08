@@ -178,7 +178,7 @@ describe('TileReserve', () => {
 describe('TileReserve: uninitialized', () => {
     let tileReserve: TileReserve;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         tileReserve = new TileReserve();
     });
 

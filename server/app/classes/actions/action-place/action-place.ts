@@ -55,7 +55,7 @@ export default class ActionPlace extends ActionPlay {
         const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
         if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
 
-        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionnaryName);
+        this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionarySummary.id);
 
         const scoredPoints = this.scoreCalculator.calculatePoints(createdWords) + this.scoreCalculator.bonusPoints(tilesToPlace);
 

@@ -1,15 +1,17 @@
-import { DictionaryData } from './dictionary-data';
+import { CompleteDictionaryData, DictionarySummary } from '@app/classes/communication/dictionary-data';
 import DictionaryNode from './dictionary-node';
 
 export default class Dictionary extends DictionaryNode {
-    title: string;
-    description: string;
+    summary: DictionarySummary;
 
-    constructor(dictionaryData: DictionaryData) {
+    constructor(dictionaryData: CompleteDictionaryData) {
         super();
-
-        this.title = dictionaryData.title;
-        this.description = dictionaryData.description;
+        this.summary = {
+            title: dictionaryData.title,
+            id: dictionaryData.id,
+            description: dictionaryData.description,
+            isDefault: dictionaryData.isDefault,
+        };
         this.depth = -1;
 
         for (const word of dictionaryData.words) {
