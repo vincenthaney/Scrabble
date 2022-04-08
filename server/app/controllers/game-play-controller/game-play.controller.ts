@@ -103,9 +103,6 @@ export class GamePlayController {
     }
 
     private gameUpdate(gameId: string, data: GameUpdateData): void {
-        console.log('----gameUpdate----');
-        console.log(data);
-        console.log('---------------');
         this.socketService.emitToRoom(gameId, 'gameUpdate', data);
         if (data.round && isIdVirtualPlayer(data.round.playerData.id)) {
             this.virtualPlayerService.triggerVirtualPlayerTurn(data, this.activeGameService.getGame(gameId, data.round.playerData.id));

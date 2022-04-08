@@ -17,6 +17,8 @@ import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { PlayerData } from '@app/classes/communication/player-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -132,27 +134,29 @@ export default class Game {
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
-    replacePlayer(playerId: string, newPlayer: Player): void {
-        console.log(this.getPlayer(playerId, true));
-        if (playerId === this.roundManager.getCurrentRound().player.id) this.roundManager.getCurrentRound().player.id = newPlayer.id;
-
+    replacePlayer(playerId: string, newPlayer: Player): GameUpdateData {
         if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+
+        const updatedData: GameUpdateData = {};
         if (this.player1.id === playerId) {
-            newPlayer.score = this.player1.score;
-            newPlayer.tiles = this.player1.tiles;
+            updatedData.player1 = this.transferPlayerInfo(this.player1, newPlayer);
             this.player1 = newPlayer;
-        }
-        if (this.player2.id === playerId) {
-            newPlayer.score = this.player2.score;
-            newPlayer.tiles = this.player2.tiles;
+        } else {
+            updatedData.player2 = this.transferPlayerInfo(this.player2, newPlayer);
             this.player2 = newPlayer;
         }
-        if (this.player1.id === newPlayer.id) {
-            console.log(this.getPlayer(this.player1.id, true));
-        }
-        if (this.player2.id === newPlayer.id) {
-            console.log(this.getPlayer(this.player2.id, true));
-        }
+
+        this.roundManager.replacePlayer(playerId, newPlayer);
+        this.gameMode = GameMode.Solo;
+
+        return updatedData;
+    }
+
+    transferPlayerInfo(oldPlayer: Player, newPlayer: Player): PlayerData {
+        newPlayer.score = oldPlayer.score;
+        newPlayer.tiles = oldPlayer.tiles;
+        newPlayer.objectives = oldPlayer.objectives;
+        return { id: oldPlayer.id, newId: newPlayer.id, name: newPlayer.name };
     }
 
     areGameOverConditionsMet(): boolean {
