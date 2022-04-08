@@ -132,6 +132,29 @@ export default class Game {
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
+    replacePlayer(playerId: string, newPlayer: Player): void {
+        console.log(this.getPlayer(playerId, true));
+        if (playerId === this.roundManager.getCurrentRound().player.id) this.roundManager.getCurrentRound().player.id = newPlayer.id;
+
+        if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+        if (this.player1.id === playerId) {
+            newPlayer.score = this.player1.score;
+            newPlayer.tiles = this.player1.tiles;
+            this.player1 = newPlayer;
+        }
+        if (this.player2.id === playerId) {
+            newPlayer.score = this.player2.score;
+            newPlayer.tiles = this.player2.tiles;
+            this.player2 = newPlayer;
+        }
+        if (this.player1.id === newPlayer.id) {
+            console.log(this.getPlayer(this.player1.id, true));
+        }
+        if (this.player2.id === newPlayer.id) {
+            console.log(this.getPlayer(this.player2.id, true));
+        }
+    }
+
     areGameOverConditionsMet(): boolean {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
