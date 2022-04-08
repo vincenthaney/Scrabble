@@ -18,7 +18,7 @@ export default abstract class AbstractPlayer {
     }
 
     updatePlayerData(playerData: PlayerData): void {
-        this.id = playerData.id;
+        this.id = playerData.newId ? playerData.newId : this.id;
         this.name = playerData.name ? playerData.name : this.name;
         this.score = playerData.score ? playerData.score : this.score;
         this.tiles = playerData.tiles ? [...playerData.tiles] : this.tiles;
