@@ -4,6 +4,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { ActionData } from '@app/classes/communication/action-data';
 import { AbstractWordFinding, ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     HIGH_SCORE_RANGE_MAX,
@@ -31,9 +32,9 @@ import {
 } from '@app/constants/virtual-player-tests-constants';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
+import * as sinon from 'sinon';
 import { createStubInstance, stub } from 'sinon';
 import { BeginnerVirtualPlayer } from './beginner-virtual-player';
-import { ActionData } from '@app/classes/communication/action-data';
 
 const testEvaluatedPlacements: ScoredWordPlacement[] = [
     { tilesToPlace: [], orientation: TEST_ORIENTATION, startPosition: TEST_START_POSITION, score: TEST_SCORE },
@@ -44,12 +45,13 @@ const TEST_SELECT_COUNT = 3;
 describe('BeginnerVirtualPlayer', () => {
     let beginnerVirtualPlayer: BeginnerVirtualPlayer;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         beginnerVirtualPlayer = new BeginnerVirtualPlayer(PLAYER_ID, PLAYER_NAME);
     });
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {
@@ -105,7 +107,7 @@ describe('BeginnerVirtualPlayer', () => {
     });
 
     describe('Find Action with RANDOM_VALUE_PLACE', () => {
-        beforeEach(async () => {
+        beforeEach(() => {
             spy.on(Math, 'random', () => {
                 return RANDOM_VALUE_PLACE;
             });

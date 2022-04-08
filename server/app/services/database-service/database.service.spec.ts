@@ -20,6 +20,10 @@ describe('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
 
+    // beforeEach(() => {
+    //     Container.reset();
+    // });
+
     beforeEach(async () => {
         databaseService = Container.get(DatabaseService);
 

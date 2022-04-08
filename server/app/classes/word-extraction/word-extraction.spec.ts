@@ -11,6 +11,7 @@ import { EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/co
 import { WordExtraction } from './word-extraction';
 import Direction from '@app/classes/board/direction';
 import { stub } from 'sinon';
+import * as sinon from 'sinon';
 
 type LetterOrEmpty = LetterValue | ' ';
 
@@ -48,6 +49,10 @@ describe('WordExtract', () => {
         grid = gridFromLetterArray(DEFAULT_LETTER_ARRAY);
         board = new Board(grid);
         extraction = new WordExtraction(board);
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('should create', () => {

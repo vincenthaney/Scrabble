@@ -24,6 +24,7 @@ import {
     MAX_LENGTH_TILES_TO_PLACE,
 } from '@app/constants/services-constants/score-calculator.const';
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { Position } from '@app/classes/board';
@@ -52,6 +53,7 @@ describe('ScoreCalculatorService', () => {
     });
 
     afterEach(() => {
+        sinon.restore();
         chai.spy.restore();
     });
 

@@ -13,7 +13,7 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 export class WordsVerificationService {
     constructor(private readonly dictionaryService: DictionaryService) {}
 
-    verifyWords(words: string[], dictionary: string): void {
+    verifyWords(words: string[], dictionaryId: string): void {
         for (const word of words) {
             const curatedWord = this.removeAccents(word).toLowerCase();
 
@@ -21,7 +21,7 @@ export class WordsVerificationService {
             if (curatedWord.includes('*')) throw new Error(curatedWord + WORD_CONTAINS_ASTERISK);
             if (curatedWord.includes('-')) throw new Error(curatedWord + WORD_CONTAINS_HYPHEN);
             if (curatedWord.includes("'")) throw new Error(curatedWord + WORD_CONTAINS_APOSTROPHE);
-            if (!this.dictionaryService.getDictionary(dictionary).wordExists(curatedWord)) throw new Error(INVALID_WORD(word.toUpperCase()));
+            if (!this.dictionaryService.getDictionary(dictionaryId).wordExists(curatedWord)) throw new Error(INVALID_WORD(word.toUpperCase()));
         }
     }
 

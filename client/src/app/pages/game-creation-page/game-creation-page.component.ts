@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { DEFAULT_DICTIONARY_VALUE, DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
@@ -41,7 +41,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
             timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
-            dictionary: new FormControl(DEFAULT_DICTIONARY_VALUE, Validators.required),
+            // TODO: A changer avec la portion de vincent
+            dictionary: new FormControl('Mon dictionnaire', Validators.required),
         });
     }
 

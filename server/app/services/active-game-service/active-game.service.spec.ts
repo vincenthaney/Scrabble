@@ -6,6 +6,7 @@ import { ReadyGameConfig } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -26,7 +27,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
-    dictionary: 'francais',
+    dictionary: TEST_DICTIONARY,
 };
 const DEFAULT_GAME = {
     player1: DEFAULT_PLAYER_1,
@@ -119,12 +120,6 @@ describe('ActiveGameService', () => {
         it('should remove from list with player1 ID', () => {
             expect(activeGameService['activeGames']).to.have.lengthOf(1);
             activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_1.id);
-            expect(activeGameService['activeGames']).to.be.empty;
-        });
-
-        it('should remove from list with player2 ID', () => {
-            expect(activeGameService['activeGames']).to.have.lengthOf(1);
-            activeGameService.removeGame(DEFAULT_ID, DEFAULT_PLAYER_2.id);
             expect(activeGameService['activeGames']).to.be.empty;
         });
 
