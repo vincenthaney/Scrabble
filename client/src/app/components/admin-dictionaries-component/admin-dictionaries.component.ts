@@ -17,6 +17,7 @@ import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictiona
 import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PositiveFeedback, SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
+import { PositiveFeedbackResponse } from './admin-dictionaries-component.types';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -60,8 +61,8 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.serviceDestroyed$.complete();
     }
 
-    ngOnInit(): void {
-        this.setDictionariesData();
+    async ngOnInit(): Promise<void> {
+        await this.dictionariesService.updateAllDictionaries();
     }
 
     ngAfterViewInit(): void {
@@ -69,41 +70,43 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.dataSource.paginator = this.paginator;
     }
 
-    modifyDictionary(element: DictionarySummary): void {
-        const elementData: DictionaryDialogParameters = {
-            title: element.title,
-            dictionaryToModifyDescription: element.description,
-            dictionaryToModifyName: element.title,
-            dictionaryId: element.id,
+    modifyDictionary(newDictionary: DictionarySummary): void {
+        const newDictionaryData: DictionaryDialogParameters = {
+            dictionaryToModifyDescription: newDictionary.description,
+            dictionaryToModifyTitle: newDictionary.title,
+            dictionaryId: newDictionary.id,
         };
-        this.dialog.open(ModifyDictionaryComponent, { data: elementData });
+        this.dialog.open(ModifyDictionaryComponent, {
+            data: newDictionaryData,
+            height: '33%',
+            width: '25%',
+        });
     }
 
     uploadDictionary(): void {
-        this.dialog.open(UploadDictionaryComponent);
+        this.dialog.open(UploadDictionaryComponent, {
+            height: '300px',
+            width: '500px',
+        });
     }
 
-    deleteDictionary(element: DictionarySummary): void {
-        const elementId: DeleteDictionaryDialogParameters = {
-            title: element.title,
-            dictionaryId: element.id,
+    deleteDictionary(dictionary: DictionarySummary): void {
+        const dictionaryId: DeleteDictionaryDialogParameters = {
+            pageTitle: dictionary.title,
+            dictionaryId: dictionary.id,
             onClose: () => {
                 this.isWaitingForServerResponse = true;
             },
         };
-        this.dialog.open(DeleteDictionaryDialogComponent, { data: elementId });
+        this.dialog.open(DeleteDictionaryDialogComponent, { data: dictionaryId });
     }
 
-    async setDictionariesData(): Promise<void> {
-        await this.dictionariesService.updateAllDictionaries();
-    }
-
-    async downloadDictionary(id: string): Promise<void> {
+    async downloadDictionary(dictionaryId: string): Promise<void> {
         this.isWaitingForServerResponse = true;
-        await this.dictionariesService.downloadDictionary(id);
+        await this.dictionariesService.downloadDictionary(dictionaryId);
     }
 
-    async resetDictionaries() {
+    async resetDictionaries(): Promise<void> {
         await this.dictionariesService.deleteAllDictionaries();
     }
 
