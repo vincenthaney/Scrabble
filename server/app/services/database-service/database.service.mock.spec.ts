@@ -5,14 +5,20 @@ import { Service } from 'typedi';
 
 @Service()
 export class DatabaseServiceMock {
+    private static server?: MongoMemoryServer;
     mongoServer: MongoMemoryServer;
     private db: Db;
     private mongoClient: MongoClient;
 
+    private static async getServer(): Promise<MongoMemoryServer> {
+        if (!this.server) this.server = await MongoMemoryServer.create();
+        return this.server;
+    }
+
     // eslint-disable-next-line no-unused-vars
     async connectToServer(databaseUrl?: string): Promise<MongoClient | null> {
         try {
-            this.mongoServer = await MongoMemoryServer.create();
+            this.mongoServer = await DatabaseServiceMock.getServer();
             const mongoUri = this.mongoServer.getUri();
             this.mongoClient = await MongoClient.connect(mongoUri);
             this.db = this.mongoClient.db(MONGO_DATABASE_NAME);
@@ -26,6 +32,7 @@ export class DatabaseServiceMock {
 
     async closeConnection(): Promise<void> {
         if (this.mongoClient) {
+            await this.db.dropDatabase();
             return this.mongoClient.close();
         } else {
             return Promise.resolve();

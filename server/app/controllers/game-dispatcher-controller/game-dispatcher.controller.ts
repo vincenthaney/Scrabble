@@ -219,8 +219,8 @@ export class GameDispatcherController {
         return config.gameMode === GameMode.Multiplayer ? this.handleCreateMultiplayerGame(config) : this.handleCreateSoloGame(config);
     }
 
-    private handleCreateMultiplayerGame(config: GameConfigData): LobbyData {
-        const lobbyData = this.gameDispatcherService.createMultiplayerGame(config);
+    private async handleCreateMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
+        const lobbyData = await this.gameDispatcherService.createMultiplayerGame(config);
         this.handleLobbiesUpdate();
         return lobbyData;
     }
@@ -229,7 +229,7 @@ export class GameDispatcherController {
         if (config.virtualPlayerName === undefined) throw new HttpException(VIRTUAL_PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
         if (config.virtualPlayerLevel === undefined) throw new HttpException(VIRTUAL_PLAYER_LEVEL_REQUIRED, StatusCodes.BAD_REQUEST);
 
-        this.gameDispatcherService.createSoloGame(config);
+        await this.gameDispatcherService.createSoloGame(config);
     }
 
     private handleJoinGame(gameId: string, playerId: string, playerName: string): void {

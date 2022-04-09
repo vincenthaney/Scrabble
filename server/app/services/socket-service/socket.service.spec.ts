@@ -37,6 +37,10 @@ describe('SocketService', () => {
         let clientSocket: Socket;
 
         beforeEach(() => {
+            Container.reset();
+        });
+
+        beforeEach(() => {
             server = Container.get(Server);
             server.init();
             service = server['socketService'];
@@ -59,7 +63,7 @@ describe('SocketService', () => {
 
         it('should add to the socket map on connect', async () => {
             service.handleSockets();
-            await clientSocket.connect();
+            clientSocket.connect();
             await Delay.for(RESPONSE_DELAY); // Wait until the server socket received connection.
             expect(service['sockets'].get(clientSocket.id)).to.exist;
         });
@@ -78,12 +82,12 @@ describe('SocketService', () => {
             let id: string;
 
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should find socket when connected', () => {
@@ -100,12 +104,12 @@ describe('SocketService', () => {
         describe('addToRoom', () => {
             let id: string;
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should add it to the room', () => {
@@ -118,12 +122,12 @@ describe('SocketService', () => {
         describe('deleteRoom', () => {
             let id: string;
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should remove it from the room', () => {
@@ -138,13 +142,13 @@ describe('SocketService', () => {
         describe('removeFromRoom', () => {
             let id: string;
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
                 service.addToRoom(id, DEFAULT_ROOM);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should remove socketId from room', () => {
@@ -157,12 +161,12 @@ describe('SocketService', () => {
         describe('doesRoomExist', () => {
             let id: string;
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should return true if room has socket in it', () => {
@@ -182,12 +186,12 @@ describe('SocketService', () => {
             let id: string;
 
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should emit to room', async () => {
@@ -215,12 +219,12 @@ describe('SocketService', () => {
             let id: string;
 
             beforeEach(async () => {
-                await clientSocket.connect();
+                clientSocket.connect();
                 id = await getSocketId(clientSocket);
             });
 
-            afterEach(async () => {
-                await clientSocket.disconnect();
+            afterEach(() => {
+                clientSocket.disconnect();
             });
 
             it('should emit to socket', async () => {

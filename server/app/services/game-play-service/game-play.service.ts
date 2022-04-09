@@ -11,6 +11,7 @@ import Player from '@app/classes/player/player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
@@ -24,6 +25,7 @@ export class GamePlayService {
     constructor(
         private readonly activeGameService: ActiveGameService,
         private readonly highScoresService: HighScoresService,
+        private readonly dictionaryService: DictionaryService,
         private readonly gameHistoriesService: GameHistoriesService,
         private readonly virtualPlayerService: VirtualPlayerService,
     ) {
@@ -128,6 +130,8 @@ export class GamePlayService {
             this.gameHistoriesService.addGameHistory(game.gameHistory);
             game.isAddedToDatabase = true;
         }
+
+        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id);
 
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
         else updatedData.player1 = { id: game.player1.id, score: updatedScorePlayer1 };

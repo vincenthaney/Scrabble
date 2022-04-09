@@ -1,4 +1,5 @@
 import Board from '@app/classes/board/board';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameHistory } from '@app/classes/database/game-history';
@@ -32,7 +33,7 @@ export default class Game {
     gameType: GameType;
     gameMode: GameMode;
     board: Board;
-    dictionnaryName: string;
+    dictionarySummary: DictionarySummary;
     player1: Player;
     player2: Player;
     isAddedToDatabase: boolean;
@@ -58,8 +59,8 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
+        game.dictionarySummary = config.dictionary;
         game.gameMode = config.gameMode;
-        game.dictionnaryName = config.dictionary;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
@@ -195,7 +196,7 @@ export default class Game {
             gameType: this.gameType,
             gameMode: this.gameMode,
             maxRoundTime: this.roundManager.getMaxRoundTime(),
-            dictionary: this.dictionnaryName,
+            dictionary: this.dictionarySummary,
             gameId: this.getId(),
             board: this.board.grid,
             tileReserve,

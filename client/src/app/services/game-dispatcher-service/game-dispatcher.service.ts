@@ -89,7 +89,8 @@ export default class GameDispatcherService implements OnDestroy {
             gameType: gameParameters.get('gameType')?.value as GameType,
             gameMode,
             maxRoundTime: gameParameters.get('timer')?.value as number,
-            dictionary: gameParameters.get('dictionary')?.value as string,
+            // TODO: MUST BE CHANGED BY VINCENT
+            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4', isDefault: true },
         };
         if (gameMode === GameMode.Solo) {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;

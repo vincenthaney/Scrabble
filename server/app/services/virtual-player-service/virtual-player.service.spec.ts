@@ -9,6 +9,7 @@ import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -23,7 +24,6 @@ const DEFAULT_PLAYER1_ID = 'id1';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER1_NAME, DEFAULT_PLAYER1_ID);
 const DEFAULT_PLAYER_2 = new Player('2', 'p2');
 const DEFAULT_GAME_ID = 'grossePartie';
-const DEFAULT_DICTIONARY = 'french';
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
@@ -31,7 +31,7 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
     gameType: GameType.Classic,
     gameMode: GameMode.Solo,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_STARTING_GAME_DATA: StartGameData = {
@@ -65,7 +65,7 @@ describe('VirtualPlayerService', () => {
     let virtualPlayerService: VirtualPlayerService;
     let mockServer: mockttp.Mockttp;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         virtualPlayerService = new VirtualPlayerService();
     });
 

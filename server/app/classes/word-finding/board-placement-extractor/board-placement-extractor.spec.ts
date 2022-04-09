@@ -16,6 +16,7 @@ import Direction from '@app/classes/board/direction';
 import { BoardPlacement, LinePlacements, WithDistance } from '@app/classes/word-finding';
 import { INITIAL_POSITION } from '@app/constants/game';
 import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
+import * as sinon from 'sinon';
 
 const DEFAULT_BOARD: (LetterValue | ' ')[][] = [
     [' ', ' ', 'X', ' ', 'O', 'P'],
@@ -53,6 +54,10 @@ describe('WordFindingPositionExtractor', () => {
 
         extractor = new BoardPlacementsExtractor(board);
         navigator = extractor['navigator'];
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe('extractBoardPlacements', () => {

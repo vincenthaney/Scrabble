@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -11,8 +12,8 @@ import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { MongoClient } from 'mongodb';
 import { join } from 'path';
+import * as sinon from 'sinon';
 import { stub } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
@@ -64,15 +65,44 @@ const mockInitialHighScores: HighScoresData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, DEFAULT_HIGH_SCORES_RELATIVE_PATH)] = JSON.stringify(mockInitialHighScores);
 
+export class TestTimer {
+    private name: string;
+    private start: number;
+    private last: number;
+    private count: number;
+
+    constructor(name: string) {
+        this.name = name;
+        this.start = Date.now();
+        this.last = this.start;
+        this.count = 0;
+    }
+
+    check(step: string = '') {
+        const now = Date.now();
+        // eslint-disable-next-line no-console
+        console.log(`+> ${this.name}: ${step}`, this.count, `${now - this.start}ms`, `${now - this.last}ms`);
+
+        this.last = now;
+        this.count++;
+    }
+}
+
 describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
-    let client: MongoClient;
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(async () => {
         databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-        client = (await databaseService.connectToServer()) as MongoClient;
+        await databaseService.connectToServer();
+
+        Container.set(DatabaseService, databaseService);
         highScoresService = Container.get(HighScoresService);
+
         highScoresService['databaseService'] = databaseService;
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
     });
@@ -80,6 +110,7 @@ describe('HighScoresService', () => {
     afterEach(async () => {
         await databaseService.closeConnection();
         chai.spy.restore();
+        sinon.restore();
     });
 
     describe('fetchDefaultHighScores', () => {
@@ -100,7 +131,7 @@ describe('HighScoresService', () => {
     });
 
     describe('getAllHighScores', () => {
-        it('should get all courses from DB', async () => {
+        it('should get all highScores from DB', async () => {
             const highScores = await highScoresService.getAllHighScores();
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES.length);
             expect(INITIAL_HIGH_SCORES).to.deep.equals(highScores);
@@ -142,14 +173,12 @@ describe('HighScoresService', () => {
 
     describe('resetHighScores', () => {
         it('should call populateDb', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             const spy = chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
             expect(spy).to.have.been.called();
         });
 
         it('should delete all documents of the array', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             chai.spy.on(highScoresService, 'populateDb', () => {});
             await highScoresService.resetHighScores();
             expect((await highScoresService['collection'].find({}).toArray()).length).to.equal(0);
@@ -160,7 +189,6 @@ describe('HighScoresService', () => {
         it('should call databaseService.populateDb and fetchDefaultHighScores', async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
             const spyFetchDefaultHighScores = stub(HighScoresService, <any>'fetchDefaultHighScores');
-            // eslint-disable-next-line dot-notation, @typescript-eslint/no-empty-function
             const spyPopulateDb = chai.spy.on(highScoresService['databaseService'], 'populateDb', () => {});
             await highScoresService['populateDb']();
             expect(spyPopulateDb).to.have.been.called();
@@ -204,13 +232,6 @@ describe('HighScoresService', () => {
             const newScore = HIGH_SCORE_CLASSIC_3.score + 1;
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
             expect(spyUpdateHighScore).to.have.been.called();
-        });
-    });
-
-    describe('Error handling', async () => {
-        it('should throw an error if we try to access the database on a closed connection', async () => {
-            await client.close();
-            expect(highScoresService['getHighScores'](GameType.Classic)).to.eventually.be.rejectedWith(Error);
         });
     });
 });

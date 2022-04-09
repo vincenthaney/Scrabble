@@ -16,6 +16,7 @@ import WordFindingBeginner from './word-finding-beginner';
 import Range from '@app/classes/range/range';
 import { WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD } from '@app/constants/classes-constants';
 import { NO_REQUEST_POINT_HISTORY, NO_REQUEST_POINT_RANGE } from '@app/constants/services-errors';
+import * as sinon from 'sinon';
 
 const GRID: LetterValues = [
     // 0   1    2    3    4
@@ -53,6 +54,10 @@ describe('WordFindingBeginner', () => {
             dictionaryStub as unknown as Dictionary,
             scoreCalculatorStub as unknown as ScoreCalculatorService,
         );
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe('handleWordPlacement', () => {

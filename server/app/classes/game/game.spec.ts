@@ -15,6 +15,7 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { generateGameObjectives } from '@app/constants/services-constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
@@ -32,6 +33,7 @@ import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
+
 const expect = chai.expect;
 
 chai.use(spies);
@@ -53,7 +55,7 @@ const DEFAULT_MULTIPLAYER_CONFIG: ReadyGameConfig = {
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
-    dictionary: 'francais',
+    dictionary: TEST_DICTIONARY,
 };
 const DEFAULT_TILE: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_2: Tile = { letter: 'B', value: 5 };
@@ -703,7 +705,6 @@ describe('Game', () => {
         const PLAYER_2 = new Player(PLAYER_2_ID, PLAYER_2_NAME);
         const PLAYER_1 = new Player(PLAYER_1_ID, PLAYER_1_NAME);
         const DEFAULT_TIME = 60;
-        const DEFAULT_DICTIONARY = 'dict';
         DEFAULT_MAP = new Map<LetterValue, number>([
             ['A', 1],
             ['B', 2],
@@ -731,7 +732,7 @@ describe('Game', () => {
             game.player2 = PLAYER_2;
             chai.spy.on(game, 'getTilesLeftPerLetter', () => DEFAULT_MAP);
             game.gameType = GameType.Classic;
-            game.dictionnaryName = DEFAULT_DICTIONARY;
+            game.dictionarySummary = TEST_DICTIONARY;
             chai.spy.on(game, 'getId', () => DEFAULT_GAME_ID);
             game.board = board;
             chai.spy.on(game.board, ['isWithinBounds'], () => true);
@@ -749,7 +750,7 @@ describe('Game', () => {
                 gameType: game.gameType,
                 gameMode: game.gameMode,
                 maxRoundTime: DEFAULT_TIME,
-                dictionary: DEFAULT_DICTIONARY,
+                dictionary: TEST_DICTIONARY,
                 gameId: DEFAULT_GAME_ID,
                 board: game.board.grid,
                 tileReserve: TILE_RESERVE_DATA,

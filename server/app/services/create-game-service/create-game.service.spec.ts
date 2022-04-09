@@ -7,19 +7,20 @@ import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import * as chai from 'chai';
-import * as sinon from 'sinon';
-import { expect, spy } from 'chai';
-import * as spies from 'chai-spies';
-import { Container } from 'typedi';
-import { CreateGameService } from './create-game.service';
 import * as BeginnerVirtualPlayer from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import * as ExpertVirtualPlayer from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import * as chai from 'chai';
+import { expect, spy } from 'chai';
+import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
+import { Container } from 'typedi';
+import { CreateGameService } from './create-game.service';
 chai.use(spies);
+
 const DEFAULT_PLAYER_ID = 'playerId';
-const DEFAULT_DICTIONARY = 'french';
+
 const DEFAULT_MAX_ROUND_TIME = 1;
 
 const DEFAULT_PLAYER_NAME = 'player';
@@ -31,7 +32,7 @@ const DEFAULT_GAME_CONFIG_DATA: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Beginner,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG_DATA_EXPERT: GameConfigData = {
@@ -42,7 +43,7 @@ const DEFAULT_GAME_CONFIG_DATA_EXPERT: GameConfigData = {
     virtualPlayerLevel: VirtualPlayerLevel.Expert,
     virtualPlayerName: DEFAULT_PLAYER_NAME,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
 const DEFAULT_GAME_CONFIG: GameConfig = {
@@ -50,16 +51,20 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
     gameType: GameType.Classic,
     gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
-    dictionary: DEFAULT_DICTIONARY,
+    dictionary: TEST_DICTIONARY,
 };
 
-describe('CreateGameService', async () => {
+describe('CreateGameService', () => {
     let createGameService: CreateGameService;
     let activeGameService: ActiveGameService;
+
+    beforeEach(() => {
+        Container.reset();
+    });
+
     beforeEach(() => {
         activeGameService = Container.get(ActiveGameService);
-        const dictionaryService = Container.get(DictionaryService);
-        createGameService = new CreateGameService(dictionaryService, activeGameService);
+        createGameService = new CreateGameService(activeGameService);
     });
 
     afterEach(() => {
@@ -68,7 +73,7 @@ describe('CreateGameService', async () => {
     });
 
     describe('createSoloGame', () => {
-        it('should call activeGameService.beginGame', () => {
+        it('should call activeGameService.beginGame', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return;
             });
@@ -78,7 +83,7 @@ describe('CreateGameService', async () => {
             const beginGameSpy = spy.on(activeGameService, 'beginGame', () => {
                 return;
             });
-            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
+            await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(beginGameSpy).to.have.been.called();
         });
 
@@ -116,7 +121,7 @@ describe('CreateGameService', async () => {
             expect(stub.called).to.be.true;
         });
 
-        it('should call generateReadyGameConfig', () => {
+        it('should call generateReadyGameConfig', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return DEFAULT_GAME_CONFIG;
             });
@@ -126,7 +131,7 @@ describe('CreateGameService', async () => {
             const generateReadyGameConfigSpy = spy.on(createGameService, 'generateReadyGameConfig', () => {
                 return;
             });
-            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
+            await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(generateReadyGameConfigSpy).to.have.been.called();
         });
     });

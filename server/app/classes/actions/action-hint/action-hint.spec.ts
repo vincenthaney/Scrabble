@@ -1,19 +1,21 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { createStubInstance, SinonStubbedInstance, spy } from 'sinon';
+import { Orientation, Position } from '@app/classes/board';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { expect } from 'chai';
-import ActionHint from './action-hint';
-import { Orientation, Position } from '@app/classes/board';
-import { PlacementToString } from '@app/utils/placement-to-string';
-import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import { Container } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { AbstractWordFinding } from '@app/classes/word-finding';
+import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
+import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { PlacementToString } from '@app/utils/placement-to-string';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import { createStubInstance, SinonStubbedInstance, spy } from 'sinon';
+import { Container } from 'typedi';
+import ActionHint from './action-hint';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -29,6 +31,7 @@ describe('ActionHint', () => {
 
         gameStub = createStubInstance(Game);
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
+        gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
 
         wordFindingInstanceStub = createStubInstance(AbstractWordFinding, {
             findWords: [],
@@ -40,6 +43,10 @@ describe('ActionHint', () => {
 
         action = new ActionHint(gameStub.player1, gameStub as unknown as Game);
         (action['wordFindingService'] as unknown) = wordFindingServiceStub;
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe('execute', () => {

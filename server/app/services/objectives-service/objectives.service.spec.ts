@@ -32,6 +32,10 @@ describe('ObjectiveService', () => {
     let game: Game;
 
     beforeEach(() => {
+        Container.reset();
+    });
+
+    beforeEach(() => {
         service = Container.get(ObjectivesService);
         findOpponentSpy = chai.spy.on(service, 'findOpponent', () => OPPONENT);
         player = DEFAULT_PLAYER;

@@ -12,6 +12,7 @@ import { ActionPlacePayload } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { PlayerData } from '@app/classes/communication/player-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
@@ -30,6 +31,7 @@ import * as spies from 'chai-spies';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
 import { ActionErrorsMessages } from './action-errors';
+import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -115,7 +117,7 @@ describe('ActionPlace', () => {
     let scoreCalculatorServiceStub: SinonStubbedInstance<ScoreCalculatorService>;
     let game: Game;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         gameStub = createStubInstance(Game);
         tileReserveStub = createStubInstance(TileReserve);
         boardStub = createStubInstance(Board);
@@ -128,6 +130,7 @@ describe('ActionPlace', () => {
         gameStub.player2.tiles = TILES_PLAYER_1.map((t) => ({ ...t }));
         gameStub.isPlayer1.returns(true);
         boardStub.grid = BOARD.map((row) => row.map((s) => ({ ...s })));
+        gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
 
         // eslint-disable-next-line dot-notation
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
@@ -139,6 +142,7 @@ describe('ActionPlace', () => {
 
     afterEach(() => {
         chai.spy.restore();
+        sinon.restore();
     });
 
     it('should create', () => {

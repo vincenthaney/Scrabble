@@ -47,6 +47,7 @@
     "dependencies": {
         "@types/mock-fs": "^4.13.1",
         "@types/uuid": "^8.3.4",
+        "ajv": "^8.11.0",
         "cookie-parser": "1.4.5",
         "cors": "2.8.5",
         "debug": "^4.3.2",
