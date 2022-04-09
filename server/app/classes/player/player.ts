@@ -4,6 +4,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { Container } from 'typedi';
+import { PlayerData } from '@app/classes/communication/player-data';
 
 export default class Player {
     name: string;
@@ -58,5 +59,12 @@ export default class Player {
 
     validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
+    }
+
+    transferPlayerInfo(oldPlayer: Player): PlayerData {
+        this.score = oldPlayer.score;
+        this.tiles = oldPlayer.tiles;
+        this.objectives = oldPlayer.objectives;
+        return { id: oldPlayer.id, newId: this.id, name: this.name };
     }
 }

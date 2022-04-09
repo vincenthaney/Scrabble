@@ -17,6 +17,7 @@ import * as spies from 'chai-spies';
 import { assert } from 'console';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
+import { Tile } from 'app/classes/tile';
 import Player from './player';
 chai.use(spies);
 
@@ -132,5 +133,18 @@ describe('Player', () => {
         const validationParameters: ObjectiveValidationParameters = { game: new Game() } as unknown as ObjectiveValidationParameters;
         player.validateObjectives(validationParameters);
         expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
+    });
+
+    it('transferPlayerInfo should update the player data', () => {
+        const name = 'nikolaj';
+        const id = 'nikolajID';
+        const otherPlayer = new Player(name, id);
+        otherPlayer.objectives = [{} as unknown as AbstractObjective];
+        otherPlayer.score = 3;
+        otherPlayer.tiles = [{} as unknown as Tile];
+        expect(player.transferPlayerInfo(otherPlayer)).to.deep.equal({ id: otherPlayer.id, newId: player.id, name: player.name });
+        expect(player.score).to.equal(otherPlayer.score);
+        expect(player.tiles).to.equal(otherPlayer.tiles);
+        expect(player.objectives).to.equal(otherPlayer.objectives);
     });
 });
