@@ -27,6 +27,7 @@ import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -314,6 +315,7 @@ describe('GamePlayService', () => {
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
         let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
+        let virtualPlayerServiceStub: SinonStubbedInstance<VirtualPlayerService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
@@ -324,6 +326,7 @@ describe('GamePlayService', () => {
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
                 gameHistoriesServiceStub as unknown as GameHistoriesService,
+                virtualPlayerServiceStub as unknown as VirtualPlayerService,
             );
         });
 

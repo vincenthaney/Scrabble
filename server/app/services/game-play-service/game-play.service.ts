@@ -148,7 +148,7 @@ export class GamePlayService {
             return;
         }
 
-        // TODO: Use service to go fetch a new VP in DB
+        // TODO: Use service to go fetch a new VP name in DB
         const updatedData: GameUpdateData = this.activeGameService
             .getGame(gameId, playerWhoLeftId)
             .replacePlayer(playerWhoLeftId, new BeginnerVirtualPlayer(gameId, 'patnai poche'));

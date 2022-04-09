@@ -302,6 +302,54 @@ describe('Game', () => {
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
     });
+//////////////
+    
+    describe('replacePlayer', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        let newPlayerStub: SinonStubbedInstance<Player>;
+
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            newPlayerStub = createStubInstance(Player);
+            player1Stub.id = DEFAULT_PLAYER_1_ID;
+            player2Stub.id = DEFAULT_PLAYER_2_ID;
+            newPlayerStub.id = DEFAULT_PLAYER_2_ID;
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+        });
+
+        it('should throw if the player is not from the game', () => {
+            const result = ( )=>
+            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
+            expect(game.areGameOverConditionsMet()).to.be.false;
+        });
+
+        it('should be gameOver passCount is equal to threshold', () => {
+            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+
+            expect(game.areGameOverConditionsMet()).to.be.true;
+        });
+
+        it('should be gameOver when player 1 has no tiles', () => {
+            player1Stub.hasTilesLeft.returns(false);
+            expect(game.areGameOverConditionsMet()).to.be.true;
+            expect(game.roundManager.getPassCounter()).to.equal(0);
+        });
+
+        it('should gameOver when player 2 has no tiles', () => {
+            player2Stub.hasTilesLeft.returns(false);
+            expect(game.areGameOverConditionsMet()).to.be.true;
+            expect(game.roundManager.getPassCounter()).to.equal(0);
+        });
+    });
+//////////
 
     describe('endOfGame', () => {
         let game: Game;
