@@ -25,14 +25,14 @@ export class AdminPageComponent implements OnInit {
         this.route.queryParams.subscribe((params) => {
             const tab: string | undefined = params.tab;
 
-            if (tab) {
-                const tabIndex = Number.parseInt(tab, 10);
-                if (!Number.isNaN(tabIndex)) this.selectedTab = tabIndex as AdminTabs;
-            }
+            if (!tab) return;
+
+            const tabIndex = Number.parseInt(tab, 10);
+            if (!Number.isNaN(tabIndex)) this.selectedTab = tabIndex as AdminTabs;
         });
     }
 
-    selectedTabChange(event: MatTabChangeEvent) {
+    selectedTabChange(event: MatTabChangeEvent): void {
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: {
