@@ -302,8 +302,8 @@ describe('Game', () => {
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
     });
-//////////////
-    
+    /// ///////////
+
     describe('replacePlayer', () => {
         let game: Game;
         let roundManagerStub: SinonStubbedInstance<RoundManager>;
@@ -326,9 +326,11 @@ describe('Game', () => {
         });
 
         it('should throw if the player is not from the game', () => {
-            const result = ( )=>
+            const result = () => {
+                game.replacePlayer('badid', newPlayerStub as unknown as Player);
+            };
             roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
-            expect(game.areGameOverConditionsMet()).to.be.false;
+            expect(result).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it('should be gameOver passCount is equal to threshold', () => {
@@ -349,7 +351,7 @@ describe('Game', () => {
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
     });
-//////////
+    /// ///////
 
     describe('endOfGame', () => {
         let game: Game;
