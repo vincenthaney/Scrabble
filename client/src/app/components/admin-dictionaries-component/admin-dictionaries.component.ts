@@ -107,14 +107,14 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         await this.dictionariesService.deleteAllDictionaries();
     }
 
-    sortDictionaries(item: DictionarySummary, property: string): string | number {
+    sortDictionaries(dictionarySummary: DictionarySummary, property: string): string {
         switch (property) {
             case 'dictionaryName':
-                return item.title;
+                return dictionarySummary.title;
             case 'dictionaryDescription':
-                return item.description;
+                return dictionarySummary.description;
             default:
-                return isKey(property, item) ? (item[property] as string) : '';
+                return isKey(property, dictionarySummary) ? (dictionarySummary[property] as string) : '';
         }
     }
 
