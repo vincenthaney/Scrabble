@@ -24,12 +24,12 @@ import GameHistoriesService from '@app/services/game-histories-service/game-hist
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
+import * as arrowFunction from '@app/utils/is-id-virtual-player';
 import { EventEmitter } from 'events';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 const expect = chai.expect;
-
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
 const INVALID_PLAYER_ID = 'invalid-id';
@@ -78,12 +78,14 @@ describe('GamePlayService', () => {
         gameStub.getPlayer.returns(gameStub.player1);
         gameStub.roundManager = roundManagerStub as unknown as RoundManager;
         gameStub['tileReserve'] = tileReserveStub as unknown as TileReserve;
-
+        gameStub.gameIsOver = false;
         round = { player: gameStub.player1, startTime: new Date(), limitTime: new Date() };
         roundManagerStub.nextRound.returns(round);
+        roundManagerStub.getCurrentRound.returns(round);
 
         gameStub.endOfGame.returns([DEFAULT_PLAYER_SCORE, DEFAULT_PLAYER_SCORE]);
         gameStub.endGameMessage.returns([]);
+        gameStub.replacePlayer.returns({});
         gameStub.getConnectedRealPlayers.returns([gameStub.player1]);
         gameStub['getTilesLeftPerLetter'].returns(new Map(DEFAULT_GET_TILES_PER_LETTER_ARRAY));
 
@@ -319,15 +321,23 @@ describe('GamePlayService', () => {
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
+            virtualPlayerServiceStub = createStubInstance(VirtualPlayerService);
             activeGameServiceStub.playerLeftEvent = new EventEmitter();
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
-
+            virtualPlayerServiceStub.triggerVirtualPlayerTurn.returns();
             gamePlayService = new GamePlayService(
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
                 gameHistoriesServiceStub as unknown as GameHistoriesService,
                 virtualPlayerServiceStub as unknown as VirtualPlayerService,
             );
+            gameStub.player1 = new Player(DEFAULT_PLAYER_ID, 'Cool Guy Name');
+            gameStub.player2 = new Player(playerWhoLeftId, 'LeaverName');
+        });
+
+        afterEach(() => {
+            restore();
+            chai.spy.restore();
         });
 
         it('On receive player left event, should call handlePlayerLeftEvent', () => {
@@ -338,19 +348,41 @@ describe('GamePlayService', () => {
             expect(handlePlayerLeftEventSpy).to.have.been.called.with(DEFAULT_GAME_ID, playerWhoLeftId);
         });
 
-        it('handlePlayerLeftEvent should emit playerLeftFeedback', async () => {
-            gameStub.player1 = new Player(DEFAULT_PLAYER_ID, 'Cool Guy Name');
-            gameStub.player2 = new Player(playerWhoLeftId, 'LeaverName');
-            const updatedData: GameUpdateData = {};
-            const endOfGameMessages: string[] = ['test'];
+        it('handlePlayerLeftEvent call handleGameOver and return ', async () => {
+            chai.spy.on(arrowFunction, 'isIdVirtualPlayer', () => {
+                return true;
+            });
 
-            chai.spy.on(gamePlayService, 'handleGameOver', async () => endOfGameMessages);
+            const spy = chai.spy.on(gamePlayService, 'handleGameOver', async () => []);
+
+            await gamePlayService['handlePlayerLeftEvent'](DEFAULT_GAME_ID, playerWhoLeftId);
+            expect(spy).to.have.been.called();
+        });
+
+        it('handlePlayerLeftEvent should call triggerVirtualPlayerTurn and emit', async () => {
+            const isIdVirtualPlayerStub = stub(arrowFunction, 'isIdVirtualPlayer');
+            isIdVirtualPlayerStub.onFirstCall().returns(false);
+            isIdVirtualPlayerStub.onSecondCall().returns(true);
             const emitSpy = chai.spy.on(gamePlayService['activeGameService'].playerLeftEvent, 'emit', () => {
                 return;
             });
 
             await gamePlayService['handlePlayerLeftEvent'](DEFAULT_GAME_ID, playerWhoLeftId);
-            expect(emitSpy).to.have.been.called.with('playerLeftFeedback', DEFAULT_GAME_ID, endOfGameMessages, updatedData);
+            expect(virtualPlayerServiceStub.triggerVirtualPlayerTurn.calledOnce).to.be.true;
+            expect(emitSpy).to.have.been.called();
+        });
+
+        it('handlePlayerLeftEvent should emit and not call triggerVirtualPlayerTurn ', async () => {
+            const isIdVirtualPlayerStub = stub(arrowFunction, 'isIdVirtualPlayer');
+            isIdVirtualPlayerStub.onFirstCall().returns(false);
+            isIdVirtualPlayerStub.onSecondCall().returns(false);
+            const emitSpy = chai.spy.on(gamePlayService['activeGameService'].playerLeftEvent, 'emit', () => {
+                return;
+            });
+
+            await gamePlayService['handlePlayerLeftEvent'](DEFAULT_GAME_ID, playerWhoLeftId);
+            expect(virtualPlayerServiceStub.triggerVirtualPlayerTurn.calledOnce).to.be.false;
+            expect(emitSpy).to.have.been.called();
         });
     });
 
@@ -413,5 +445,10 @@ describe('GamePlayService', () => {
         const resetSpy = chai.spy.on(gameStub, 'resetPlayerObjectiveProgression', () => {});
         gamePlayService.handleResetObjectives(gameStub.getId(), player.id);
         expect(resetSpy).not.to.have.been.called();
+    });
+
+    it('isGameOver should call getGame', () => {
+        gamePlayService.isGameOver('', '');
+        expect(getGameStub.calledOnce).to.be.true;
     });
 });
