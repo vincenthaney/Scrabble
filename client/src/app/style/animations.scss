@@ -25,3 +25,25 @@
         transform: rotate(0);
     }
 }
+
+@keyframes blinking {
+    0% {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    74% {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    75% {
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    100% {
+        visibility: hidden;
+        opacity: 0;
+    }
+}

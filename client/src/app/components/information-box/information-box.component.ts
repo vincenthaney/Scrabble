@@ -19,7 +19,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
     readonly maxTilesPerPlayer;
     isPlayer1Active: boolean;
     isPlayer2Active: boolean;
-    isPlayer1: boolean;
+    isPlayer1: boolean = true;
     localPlayerIcon: IconName;
     timer: Timer;
 
@@ -64,6 +64,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
     getPlayer2(): AbstractPlayer {
         const player2 = this.gameService.getPlayerByNumber(PLAYER_2_INDEX);
         return player2 ? player2 : new Player('', 'Player2', []);
+    }
+
+    isTimerRunning(): boolean {
+        return this.timerSubscription && !this.timerSubscription.closed;
     }
 
     private setupGame(): void {
