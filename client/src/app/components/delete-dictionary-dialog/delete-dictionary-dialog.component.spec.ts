@@ -19,7 +19,7 @@ import { DeleteDictionaryDialogComponent } from './delete-dictionary-dialog.comp
 import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
 
 const MODEL: DeleteDictionaryDialogParameters = {
-    title: 'Dialog title',
+    pageTitle: 'Dialog title',
     dictionaryId: 'testId',
     onClose: () => {
         return;

@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { BasicDictionaryData, DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 })
 export class DictionariesController implements OnDestroy {
     private dictionariesUpdateMessageEvent: Subject<string> = new Subject();
-    private dictionariesErrorEvent: Subject<HttpErrorResponse> = new Subject();
+    private dictionariesErrorEvent: Subject<string> = new Subject();
     private dictionariesDownloadEvent: Subject<BasicDictionaryData> = new Subject();
     private getAllDictionariesEvent: Subject<DictionarySummary[]> = new Subject();
 
@@ -71,7 +71,7 @@ export class DictionariesController implements OnDestroy {
                 this.dictionariesUpdateMessageEvent.next(PositiveFeedback.DictionaryAdded);
             },
             (error) => {
-                this.dictionariesErrorEvent.next(error.message);
+                this.dictionariesErrorEvent.next(error.error.message);
             },
         );
     }
@@ -108,7 +108,7 @@ export class DictionariesController implements OnDestroy {
         this.dictionariesDownloadEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToDictionaryErrorEvent(serviceDestroyed$: Subject<boolean>, callback: (response: HttpErrorResponse) => void): void {
+    subscribeToDictionaryErrorEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
         this.dictionariesErrorEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 

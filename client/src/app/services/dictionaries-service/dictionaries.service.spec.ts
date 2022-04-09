@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -71,7 +70,7 @@ describe('DictionariesService', () => {
         let downloadLoadingSpy: jasmine.Spy;
         let startDownloadSpy: jasmine.Spy;
         beforeEach(() => {
-            downloadLoadingSpy = spyOn(service['downloadLoadingEvent'], 'next').and.callFake(() => {
+            downloadLoadingSpy = spyOn(service['isWaitingForServerResponseEvent'], 'next').and.callFake(() => {
                 return;
             });
 
@@ -95,7 +94,7 @@ describe('DictionariesService', () => {
             const componentUpdateSpy = spyOn(service['componentUpdateEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller['dictionariesErrorEvent'].next({} as HttpErrorResponse);
+            controller['dictionariesErrorEvent'].next({} as string);
             expect(componentUpdateSpy).toHaveBeenCalled();
         });
     });

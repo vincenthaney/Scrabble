@@ -119,14 +119,14 @@ describe('AdminDictionariesComponent', () => {
         });
     });
 
-    describe('On DownloadLoadingEvent', () => {
+    describe('On isWaitingForServerResponseEvent', () => {
         it('should turn isDownloadLoading to false', () => {
-            dictionariesServiceMock['downloadLoadingEvent'].next();
-            expect(component.isDownloadLoading).toBeFalse();
+            dictionariesServiceMock['isWaitingForServerResponseEvent'].next();
+            expect(component.isWaitingForServerResponse).toBeFalse();
         });
 
         it('should should turn isWaitingForServerResponse to false', () => {
-            dictionariesServiceMock['downloadLoadingEvent'].next();
+            dictionariesServiceMock['isWaitingForServerResponseEvent'].next();
             expect(component.isWaitingForServerResponse).toBeFalse();
         });
     });
@@ -165,14 +165,6 @@ describe('AdminDictionariesComponent', () => {
         });
     });
 
-    describe('setDictionariesData', async () => {
-        it('should call dictionariesService.updateAllDictionaries', async () => {
-            const spy = spyOn(dictionariesServiceMock, 'updateAllDictionaries');
-            await component.setDictionariesData();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('downloadDictionary', async () => {
         it('should call dictionariesService.downloadDictionary', async () => {
             const spy = spyOn(dictionariesServiceMock, 'downloadDictionary');
@@ -180,10 +172,10 @@ describe('AdminDictionariesComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should turn isDownloadingLoading to true', async () => {
+        it('should turn isWaitingForServerResponse to true', async () => {
             spyOn(dictionariesServiceMock, 'downloadDictionary');
             await component.downloadDictionary(TEST_ID);
-            expect(component.isDownloadLoading).toBeTrue();
+            expect(component.isWaitingForServerResponse).toBeTrue();
         });
     });
 
