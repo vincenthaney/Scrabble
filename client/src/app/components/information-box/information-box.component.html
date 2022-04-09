@@ -12,7 +12,10 @@
             </p>
         </mat-card>
 
-        <p class="local-player-active-indicator">C'est votre tour</p>
+        <p class="local-player-active-indicator">
+            <span *ngIf="isPlayer1">C'est votre tour</span>
+            <span *ngIf="!isPlayer1">C'est au tour de {{ getPlayer1().name }}</span>
+        </p>
     </div>
 
     <mat-card id="time-container" [ngClass]="{ running: isTimerRunning() }">
@@ -37,6 +40,9 @@
             </p>
         </mat-card>
 
-        <p class="local-player-active-indicator">C'est votre tour</p>
+        <p class="local-player-active-indicator">
+            <span *ngIf="!isPlayer1">C'est votre tour</span>
+            <span *ngIf="isPlayer1">C'est au tour de {{ getPlayer2().name }}</span>
+        </p>
     </div>
 </div>

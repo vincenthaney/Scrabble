@@ -129,6 +129,12 @@
                     transition: ease-in all 0.2s;
                 }
             }
+        }
+
+        &.active {
+            .name-container .name {
+                font-weight: 600;
+            }
 
             .local-player-active-indicator {
                 @keyframes hide {
@@ -140,14 +146,8 @@
                 animation-name: hide;
                 animation-duration: 0.2s;
                 animation-fill-mode: forwards;
-                animation-delay: 5s;
-                transition: ease-in transform 0.7s;
-            }
-        }
-
-        .active {
-            .name-container .name {
-                font-weight: 700;
+                animation-delay: 4s;
+                transition: ease-in transform 0.5s;
             }
         }
 
