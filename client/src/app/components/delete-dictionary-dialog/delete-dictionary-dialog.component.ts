@@ -4,7 +4,6 @@ import { DictionariesService } from '@app/services/dictionaries-service/dictiona
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { Subject } from 'rxjs';
 import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
-import { DELETE_COMPONENT_TITLE } from '@app/constants/dictionaries-components';
 
 @Component({
     selector: 'app-delete-dictionary-dialog',
@@ -12,7 +11,6 @@ import { DELETE_COMPONENT_TITLE } from '@app/constants/dictionaries-components';
     styleUrls: ['delete-dictionary-dialog.component.scss'],
 })
 export class DeleteDictionaryDialogComponent {
-    title: string;
     state: DeleteDictionaryComponentStates;
     message: string;
     dictionaryId: string;
@@ -22,7 +20,6 @@ export class DeleteDictionaryDialogComponent {
         private dictionariesService: DictionariesService,
         @Inject(MAT_DIALOG_DATA) public data: DeleteDictionaryDialogParameters,
     ) {
-        this.title = DELETE_COMPONENT_TITLE;
         this.dictionaryId = data.dictionaryId;
         this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, () => {
             this.cleanupDialogStates();

@@ -1,5 +1,5 @@
 export interface DeleteDictionaryDialogParameters {
-    title: string;
+    pageTitle: string;
     dictionaryId: string;
     onClose: () => void;
 }

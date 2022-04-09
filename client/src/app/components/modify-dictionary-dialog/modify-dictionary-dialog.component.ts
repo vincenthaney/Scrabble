@@ -18,12 +18,11 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     icon: string;
     state: ModifyDictionaryComponentStates;
     message: string;
-    title: string;
-    dictionaryToModifyName: string;
+    dictionaryToModifyTitle: string;
     dictionaryToModifyDescription: string;
     dictionaryId: string;
     formParameters: FormGroup;
-    isDictionaryNameValid: boolean;
+    isDictionaryTitleValid: boolean;
     isDictionaryDescriptionValid: boolean;
     isNewInformationValid: boolean;
     private serviceDestroyed$: Subject<boolean> = new Subject();
@@ -33,15 +32,14 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         @Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters,
     ) {
         this.state = ModifyDictionaryComponentStates.Ready;
-        this.title = data.title;
-        this.dictionaryToModifyName = data.dictionaryToModifyName;
+        this.dictionaryToModifyTitle = data.dictionaryToModifyTitle;
         this.dictionaryToModifyDescription = data.dictionaryToModifyDescription;
         this.dictionaryId = data.dictionaryId;
-        this.isDictionaryNameValid = true;
+        this.isDictionaryTitleValid = true;
         this.isDictionaryDescriptionValid = true;
-        this.isNewInformationValid = true;
+        this.isNewInformationValid = false;
         this.formParameters = new FormGroup({
-            inputDictionaryName: new FormControl(data.dictionaryToModifyName, [
+            inputDictionaryTitle: new FormControl(data.dictionaryToModifyTitle, [
                 Validators.required,
                 Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
@@ -58,8 +56,8 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(): void {
-        this.formParameters.controls.inputName?.updateValueAndValidity();
-        this.isDictionaryNameValid = this.formParameters.get('inputDictionaryName')?.valid ?? false;
+        this.formParameters.controls.inputTitle?.updateValueAndValidity();
+        this.isDictionaryTitleValid = this.formParameters.get('inputDictionaryTitle')?.valid ?? false;
         this.isDictionaryDescriptionValid = this.formParameters.get('inputDictionaryDescription')?.valid ?? false;
         this.isNewInformationValid = this.isInformationValid();
     }
@@ -73,7 +71,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         this.state = ModifyDictionaryComponentStates.Loading;
         this.dictionariesService.updateDictionary(
             this.dictionaryId,
-            this.formParameters.get('inputDictionaryName')?.value,
+            this.formParameters.get('inputDictionaryTitle')?.value,
             this.formParameters.get('inputDictionaryDescription')?.value,
         );
         this.closeDialog();
@@ -85,7 +83,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     }
 
     isInformationValid(): boolean {
-        return this.isDictionaryNameValid && this.isDictionaryDescriptionValid;
+        return this.isDictionaryTitleValid && this.isDictionaryDescriptionValid;
     }
 
     cleanupDialogStates(): void {

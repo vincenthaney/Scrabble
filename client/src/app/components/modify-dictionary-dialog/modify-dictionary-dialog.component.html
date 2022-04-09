@@ -1,53 +1,55 @@
-<h2 mat-dialog-title>Modifier mon {{title}}</h2>
-<div>
-    <mat-form-field
-        appearance="outline"
-        [formGroup]="formParameters"
-        matTooltip="Le nom du dictionnaire doit être entre 2 et 30 caractères."
-        matTooltipPosition="above"
-    >
-        <mat-label> Nom</mat-label>
-        <input
-            matInput
-            id="dictionaryNameValidator"
-            type="text"
-            formControlName="inputDictionaryName"
-            autocomplete="off"
-            (ngModelChange)="ngOnChanges()"
-            (valueChanges)="ngOnChanges()"
-        />
-    </mat-form-field>
-</div>
-<div>
-    <mat-form-field
-        appearance="outline"
-        [formGroup]="formParameters"
-        matTooltipPosition="above"
+<h2 mat-dialog-title>Modifier le dictionnaire</h2>
+<div id="container">
+    <div>
+        <mat-form-field
+            class="form-field"
+            appearance="outline"
+            [formGroup]="formParameters"
+            matTooltip="Le nom du dictionnaire doit être entre 2 et 30 caractères."
+            matTooltipPosition="above"
         >
-        <div matTooltip="La description doit être entre 2 et 80 caractères."[matTooltipDisabled]="!this.formParameters.get('inputDictionaryName')?.invalid"></div>
-        <mat-label> Description</mat-label>
-        <input
-            matInput
-            id="dictionaryDescriptionValidator"
-            type="text"
-            formControlName="inputDictionaryDescription"
-            autocomplete="off"
-            (ngModelChange)="ngOnChanges()"
-            (valueChanges)="ngOnChanges()"
-        />
-    </mat-form-field>
-</div>
-<mat-progress-bar *ngIf="state==='loading'" mode="indeterminate"></mat-progress-bar>
-<p *ngIf="state==='message'">{{message}}</p>
-<div *ngIf="state!=='message'">
-   <button mat-button color = "primary" (click)="updateDictionary()" [disabled]="!isNewInformationValid">
-        <app-icon icon="pencil"></app-icon>
-        Modifier
-    </button>
-    <button mat flat button mat-button color = "primary" (click)="closeDialog()">
-        <app-icon icon="ban"></app-icon>
-        Annuler
-    </button> 
+            <mat-label> Nom</mat-label>
+            <input
+                matInput
+                id="dictionaryNameValidator"
+                type="text"
+                formControlName="inputDictionaryName"
+                autocomplete="off"
+                (ngModelChange)="ngOnChanges()"
+                (valueChanges)="ngOnChanges()"
+            />
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field
+            class="form-field"
+            appearance="outline"
+            [formGroup]="formParameters"
+            matTooltipPosition="above"
+            matTooltip="La description doit être entre 2 et 80 caractères."
+            >
+            <mat-label> Description</mat-label>
+            <input
+                matInput
+                id="dictionaryDescriptionValidator"
+                type="text"
+                formControlName="inputDictionaryDescription"
+                autocomplete="off"
+                (ngModelChange)="ngOnChanges()"
+                (valueChanges)="ngOnChanges()"
+            />
+        </mat-form-field>
+    </div>
+    <div id="buttons-container">
+        <button mat-flat-button color = "primary" (click)="updateDictionary()" [disabled]="!isNewInformationValid">
+            <app-icon icon="pencil"></app-icon>
+            Modifier
+        </button>
+        <button mat flat button mat-button color = "primary" (click)="closeDialog()">
+            <app-icon icon="ban"></app-icon>
+            Annuler
+        </button> 
+    </div>
 </div>
     
 
