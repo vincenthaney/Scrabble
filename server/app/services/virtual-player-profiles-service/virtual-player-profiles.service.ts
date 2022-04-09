@@ -35,10 +35,7 @@ export default class VirtualPlayerProfilesService {
     }
 
     async addVirtualPlayerProfile(newProfile: VirtualPlayerProfile): Promise<void> {
-        const isNameAlreadyUsed: boolean = (await this.getAllVirtualPlayerProfiles()).some(
-            (profile: VirtualPlayerProfile) => profile.name === newProfile.name,
-        );
-        if (isNameAlreadyUsed) throw new HttpException(NAME_ALREADY_USED(newProfile.name), StatusCodes.BAD_REQUEST);
+        if (await this.isNameAlreadyUsed(newProfile.name)) throw new HttpException(NAME_ALREADY_USED(newProfile.name), StatusCodes.BAD_REQUEST);
         if (newProfile.isDefault) throw new HttpException(CANNOT_ADD_DEFAULT_PROFILE, StatusCodes.BAD_REQUEST);
 
         await this.collection.insertOne(newProfile);
@@ -46,6 +43,7 @@ export default class VirtualPlayerProfilesService {
 
     async updateVirtualPlayerProfile(newName: string, virtualPlayerProfile: VirtualPlayerProfile): Promise<void> {
         if (virtualPlayerProfile.isDefault) throw new HttpException(CANNOT_MODIFY_DEFAULT_PROFILE, StatusCodes.BAD_REQUEST);
+        if (await this.isNameAlreadyUsed(newName)) throw new HttpException(NAME_ALREADY_USED(newName), StatusCodes.BAD_REQUEST);
 
         await this.collection.updateOne(
             { name: virtualPlayerProfile.name, level: virtualPlayerProfile.level, isDefault: virtualPlayerProfile.isDefault },
@@ -64,7 +62,7 @@ export default class VirtualPlayerProfilesService {
     }
 
     async resetVirtualPlayerProfiles(): Promise<void> {
-        await this.collection.deleteMany({});
+        await this.collection.deleteMany({ isDefault: false });
         await this.populateDb();
     }
 
@@ -77,5 +75,9 @@ export default class VirtualPlayerProfilesService {
             VIRTUAL_PLAYER_PROFILES_MONGO_COLLECTION_NAME,
             await VirtualPlayerProfilesService.fetchDefaultVirtualPlayerProfiles(),
         );
+    }
+
+    private async isNameAlreadyUsed(newName: string): Promise<boolean> {
+        return (await this.collection.countDocuments({ name: newName })) > 0;
     }
 }
