@@ -1,0 +1,77 @@
+import { VirtualPlayerProfilesRequest } from '@app/classes/communication/request';
+import { VirtualPlayerProfile } from '@app/classes/database/virtual-player-profile';
+import { HttpException } from '@app/classes/http-exception/http-exception';
+import { MISSING_PARAMETER, MUST_SPECIFY_LEVEL } from '@app/constants/services-errors';
+import VirtualPlayerProfileService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
+
+@Service()
+export class VirtualPlayerProfilesController {
+    router: Router;
+
+    constructor(private virtualPlayerProfileService: VirtualPlayerProfileService) {
+        this.configureRouter();
+    }
+
+    private configureRouter(): void {
+        this.router = Router();
+
+        this.router.get('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
+            try {
+                await this.virtualPlayerProfileService.getAllVirtualPlayerProfiles();
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+
+        this.router.get('/virtualPlayerProfiles/:level', async (req: VirtualPlayerProfilesRequest, res: Response) => {
+            try {
+                const level = req.params.level;
+                if (!level) throw new HttpException(MUST_SPECIFY_LEVEL, StatusCodes.BAD_REQUEST);
+                await this.virtualPlayerProfileService.getVirtualPlayerProfilesFromLevel(level);
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+
+        this.router.post('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
+            const virtualPlayerProfile: VirtualPlayerProfile = req.body.virtualPlayerProfile;
+            if (virtualPlayerProfile) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
+
+            try {
+                await this.virtualPlayerProfileService.addVirtualPlayerProfile(virtualPlayerProfile);
+                res.status(StatusCodes.CREATED).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+
+        this.router.patch('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
+            const virtualPlayerProfile: VirtualPlayerProfile = req.body.virtualPlayerProfile;
+            const newName: string = req.body.newName;
+
+            if (virtualPlayerProfile) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
+            if (newName) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
+
+            try {
+                await this.virtualPlayerProfileService.updateVirtualPlayerProfile(newName, virtualPlayerProfile);
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+
+        this.router.delete('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
+            try {
+                await this.virtualPlayerProfileService.resetVirtualPlayerProfiles();
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+    }
+}

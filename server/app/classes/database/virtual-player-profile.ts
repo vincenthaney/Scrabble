@@ -5,3 +5,7 @@ export interface VirtualPlayerProfile {
     level: VirtualPlayerLevel;
     isDefault: boolean;
 }
+
+export interface VirtualPlayerProfileData {
+    virtualPlayerProfiles: VirtualPlayerProfile[];
+}

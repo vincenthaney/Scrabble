@@ -33,3 +33,10 @@ export const INVALID_REQUEST_POINT_RANGE = 'Le minimum du pointRange de la requ�
 export const NO_REQUEST_POINT_HISTORY = 'La requête doit avoir un pointHistory';
 export const NO_OBJECTIVE_LEFT_IN_POOL = "Il n'y a plus d'objectifs disponibles pour la partie";
 export const NO_FIRST_ROUND_EXISTS = "Il n'y a aucune ronde déjà complétée ni de ronde active";
+
+export const NAME_ALREADY_USED = (name: string) => `Le nom ${name} est déjà utilisé pour un autre profil de joueur virtuel`;
+export const CANNOT_ADD_DEFAULT_PROFILE = "Impossible d'ajouter un nouveau profil de joueur virtuel par défaut";
+export const CANNOT_MODIFY_DEFAULT_PROFILE = 'Impossible de modifier un joueur virtuel par défaut';
+export const CANNOT_DELETE_DEFAULT_PROFILE = 'Impossible de supprimer un joueur virtuel par défaut';
+export const MUST_SPECIFY_LEVEL = 'Un niveau doit être spécifié pour le nouveau profil joueur virtuel';
+export const MISSING_PARAMETER = 'Le corps de la requête ne contient pas tous les paramètres requis';
