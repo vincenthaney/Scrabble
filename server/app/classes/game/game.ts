@@ -18,7 +18,6 @@ import ObjectivesService from '@app/services/objectives-service/objectives.servi
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { PlayerData } from '@app/classes/communication/player-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -139,10 +138,10 @@ export default class Game {
 
         const updatedData: GameUpdateData = {};
         if (this.player1.id === playerId) {
-            updatedData.player1 = this.transferPlayerInfo(this.player1, newPlayer);
+            updatedData.player1 = newPlayer.transferPlayerInfo(this.player1);
             this.player1 = newPlayer;
         } else {
-            updatedData.player2 = this.transferPlayerInfo(this.player2, newPlayer);
+            updatedData.player2 = newPlayer.transferPlayerInfo(this.player2);
             this.player2 = newPlayer;
         }
 
@@ -150,13 +149,6 @@ export default class Game {
         this.gameMode = GameMode.Solo;
 
         return updatedData;
-    }
-
-    transferPlayerInfo(oldPlayer: Player, newPlayer: Player): PlayerData {
-        newPlayer.score = oldPlayer.score;
-        newPlayer.tiles = oldPlayer.tiles;
-        newPlayer.objectives = oldPlayer.objectives;
-        return { id: oldPlayer.id, newId: newPlayer.id, name: newPlayer.name };
     }
 
     areGameOverConditionsMet(): boolean {

@@ -41,6 +41,7 @@ const DEFAULT_GAME_ID = 'gameId';
 
 const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
+const NEW_PLAYER_ID = 'newid';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
 const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
 const DEFAULT_VIRTUAL_PLAYER_ID = 'virtualplayerid';
@@ -329,29 +330,37 @@ describe('Game', () => {
             const result = () => {
                 game.replacePlayer('badid', newPlayerStub as unknown as Player);
             };
-            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD - 1);
             expect(result).to.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
-        it('should be gameOver passCount is equal to threshold', () => {
-            roundManagerStub.getPassCounter.returns(GAME_OVER_PASS_THRESHOLD);
+        it('should update the player1 if called with its id', () => {
+            player1Stub.transferPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            chai.spy.on(game.roundManager, 'replacePlayer', () => {});
+            game.replacePlayer(DEFAULT_PLAYER_1_ID, newPlayerStub as unknown as Player);
 
-            expect(game.areGameOverConditionsMet()).to.be.true;
+            expect(newPlayerStub.transferPlayerInfo.calledOnceWith(player1Stub)).to.be.true;
+            expect(game.player1).to.equal(newPlayerStub);
+            expect(game.player2).to.equal(player2Stub);
         });
 
-        it('should be gameOver when player 1 has no tiles', () => {
-            player1Stub.hasTilesLeft.returns(false);
-            expect(game.areGameOverConditionsMet()).to.be.true;
-            expect(game.roundManager.getPassCounter()).to.equal(0);
+        it('should update the player2 if called with its id', () => {
+            player2Stub.transferPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            chai.spy.on(game.roundManager, 'replacePlayer', () => {});
+            game.replacePlayer(DEFAULT_PLAYER_2_ID, newPlayerStub as unknown as Player);
+
+            expect(newPlayerStub.transferPlayerInfo.calledOnceWith(player2Stub)).to.be.true;
+            expect(game.player1).to.equal(player1Stub);
+            expect(game.player2).to.equal(newPlayerStub);
         });
 
-        it('should gameOver when player 2 has no tiles', () => {
-            player2Stub.hasTilesLeft.returns(false);
-            expect(game.areGameOverConditionsMet()).to.be.true;
-            expect(game.roundManager.getPassCounter()).to.equal(0);
+        it('should call roundManager.replacePlayer', () => {
+            player2Stub.transferPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            const spy = chai.spy.on(game.roundManager, 'replacePlayer', () => {});
+
+            game.replacePlayer(DEFAULT_PLAYER_2_ID, newPlayerStub as unknown as Player);
+            expect(spy).to.have.been.called();
         });
     });
-    /// ///////
 
     describe('endOfGame', () => {
         let game: Game;
