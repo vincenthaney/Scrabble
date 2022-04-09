@@ -135,7 +135,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         );
     }
 
-    private async convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]) {
+    private convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]): void {
         this.dataSource = new MatTableDataSource(dictionaries);
     }
 
