@@ -33,4 +33,4 @@ export const INVALID_REQUEST_POINT_RANGE = 'Le minimum du pointRange de la requ�
 export const NO_REQUEST_POINT_HISTORY = 'La requête doit avoir un pointHistory';
 export const NO_OBJECTIVE_LEFT_IN_POOL = "Il n'y a plus d'objectifs disponibles pour la partie";
 export const NO_FIRST_ROUND_EXISTS = "Il n'y a aucune ronde déjà complétée ni de ronde active";
-export const INVALID_PLAYER_TO_REPLACE = "Le jouest a remplacé n'existe pas";
+export const INVALID_PLAYER_TO_REPLACE = "Le joueur à remplacer n'existe pas";
