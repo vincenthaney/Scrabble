@@ -89,6 +89,7 @@
             border-bottom-right-radius: 3px;
             z-index: -1;
             transition: ease-in transform 0.2s;
+            pointer-events: none;
         }
 
         &#player-1 {
@@ -132,10 +133,6 @@
         }
 
         &.active {
-            .name-container .name {
-                font-weight: 600;
-            }
-
             .local-player-active-indicator {
                 @keyframes hide {
                     0% { transform: translateY(100%); }
