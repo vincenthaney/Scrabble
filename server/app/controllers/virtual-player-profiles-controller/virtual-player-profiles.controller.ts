@@ -21,8 +21,8 @@ export class VirtualPlayerProfilesController {
 
         this.router.get('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
-                await this.virtualPlayerProfileService.getAllVirtualPlayerProfiles();
-                res.status(StatusCodes.NO_CONTENT).send();
+                const virtualPlayerProfiles: VirtualPlayerProfile[] = await this.virtualPlayerProfileService.getAllVirtualPlayerProfiles();
+                res.status(StatusCodes.OK).send({ virtualPlayerProfiles });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
@@ -30,10 +30,8 @@ export class VirtualPlayerProfilesController {
 
         this.router.get('/virtualPlayerProfiles/:level', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
-                const level = req.params.level as VirtualPlayerLevel;
-                if (!level) throw new HttpException(MUST_SPECIFY_LEVEL, StatusCodes.BAD_REQUEST);
-                await this.virtualPlayerProfileService.getVirtualPlayerProfilesFromLevel(level);
-                res.status(StatusCodes.NO_CONTENT).send();
+                const virtualPlayerProfiles: VirtualPlayerProfile[] = await this.virtualPlayerProfileService.getVirtualPlayerProfilesFromLevel(level);
+                res.status(StatusCodes.OK).send({ virtualPlayerProfiles });
             } catch (exception) {
                 HttpException.sendError(exception, res);
             }
