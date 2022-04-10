@@ -13,7 +13,7 @@
                 matInput
                 id="dictionaryNameValidator"
                 type="text"
-                formControlName="inputDictionaryName"
+                formControlName="inputDictionaryTitle"
                 autocomplete="off"
                 (ngModelChange)="ngOnChanges()"
                 (valueChanges)="ngOnChanges()"
@@ -41,7 +41,7 @@
         </mat-form-field>
     </div>
     <div id="buttons-container">
-        <button mat-flat-button color = "primary" (click)="updateDictionary()" [disabled]="!isNewInformationValid">
+        <button mat-flat-button color = "primary" (click)="updateDictionary()" [disabled]="!this.isInformationValid()">
             <app-icon icon="pencil"></app-icon>
             Modifier
         </button>
