@@ -18,6 +18,7 @@ export interface DictionaryUsage {
     dictionary: Dictionary;
     numberOfActiveGames: number;
     isDeleted: boolean;
+    lastUse?: Date;
 }
 
 export interface DictionarySummary {

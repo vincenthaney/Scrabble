@@ -16,6 +16,7 @@ import {
     MAX_DICTIONARY_DESCRIPTION_LENGTH,
     MAX_DICTIONARY_TITLE_LENGTH,
 } from '@app/constants/dictionary.const';
+import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
 import DatabaseService from '@app/services/database-service/database.service';
 import Ajv, { ValidateFunction } from 'ajv';
@@ -48,6 +49,7 @@ export default class DictionaryService {
         if (!dictionary) throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
 
         dictionary.numberOfActiveGames++;
+        dictionary.lastUse = new Date();
         return dictionary;
     }
 
@@ -208,10 +210,18 @@ export default class DictionaryService {
         const dictionaryUsage: DictionaryUsage | undefined = this.activeDictionaries.get(dictionaryId);
         if (!dictionaryUsage) throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
 
-        if (dictionaryUsage.numberOfActiveGames === 0 && dictionaryUsage.isDeleted) {
+        if (this.shouldDeleteActiveDictionary(dictionaryUsage)) {
             this.activeDictionaries.delete(dictionaryId);
         }
 
         console.log(this.activeDictionaries);
+    }
+
+    private shouldDeleteActiveDictionary(dictionaryUsage: DictionaryUsage): boolean {
+        return (
+            dictionaryUsage.numberOfActiveGames <= 0 &&
+            dictionaryUsage.isDeleted &&
+            (!dictionaryUsage.lastUse || (dictionaryUsage.lastUse && Date.now() - dictionaryUsage.lastUse.getDate() > ONE_HOUR_IN_MS))
+        );
     }
 }

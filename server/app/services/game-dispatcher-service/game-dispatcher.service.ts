@@ -64,7 +64,6 @@ export class GameDispatcherService {
     async createMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
         const waitingRoom = this.createGameService.createMultiplayerGame(config);
         await this.dictionaryService.useDictionary(config.dictionary.id);
-        await this.dictionaryService.useDictionary(config.dictionary.id);
 
         this.addToWaitingRoom(waitingRoom);
         this.socketService.addToRoom(config.playerId, waitingRoom.getId());
@@ -102,8 +101,6 @@ export class GameDispatcherService {
             ...waitingRoom.getConfig(),
             player2: waitingRoom.joinedPlayer,
         };
-
-        this.dictionaryService.stopUsingDictionary(config.dictionary.id);
 
         return config;
     }
