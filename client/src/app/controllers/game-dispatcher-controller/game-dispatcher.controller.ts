@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClient, HttpStatusCode } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { LobbyData, LobbyInfo, PlayerName } from '@app/classes/communication/';
 import { GameConfig, GameConfigData, InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
@@ -11,7 +11,6 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameDispatcherController implements OnDestroy {
-    private gameCreationFailed$: Subject<HttpErrorResponse> = new Subject();
     private joinRequestEvent: Subject<string> = new Subject();
     private canceledGameEvent: Subject<string> = new Subject();
     private lobbyFullEvent: Subject<void> = new Subject();
@@ -36,9 +35,9 @@ export class GameDispatcherController implements OnDestroy {
         return this.http.post<{ lobbyData: LobbyData }>(endpoint, gameConfig);
     }
 
-    handleConfirmationGameCreation(opponentName: string, gameId: string): void {
+    handleConfirmationGameCreation(opponentName: string, gameId: string): Observable<void> {
         const endpoint = `${environment.serverUrl}/games/${gameId}/players/${this.socketService.getId()}/accept`;
-        this.http.post(endpoint, { opponentName }).subscribe();
+        return this.http.post<void>(endpoint, { opponentName });
     }
 
     handleRejectionGameCreation(opponentName: string, gameId: string): void {
@@ -94,10 +93,6 @@ export class GameDispatcherController implements OnDestroy {
 
     subscribeToInitializeGame(serviceDestroyed$: Subject<boolean>, callback: (value: InitializeGameData | undefined) => void): void {
         this.initializeGame$.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
-    }
-
-    observeGameCreationFailed(): Observable<HttpErrorResponse> {
-        return this.gameCreationFailed$.asObservable();
     }
 
     private handleJoinError(errorStatus: HttpStatusCode): void {

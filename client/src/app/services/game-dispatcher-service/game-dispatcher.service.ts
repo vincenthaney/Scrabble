@@ -140,7 +140,10 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     handleConfirmation(opponentName: string): void {
-        if (this.getCurrentLobbyId()) this.gameDispatcherController.handleConfirmationGameCreation(opponentName, this.getCurrentLobbyId());
+        if (this.getCurrentLobbyId())
+            this.gameDispatcherController
+                .handleConfirmationGameCreation(opponentName, this.getCurrentLobbyId())
+                .subscribe({ next: undefined, error: (error: HttpErrorResponse) => this.gameCreationFailed$.next(error) });
     }
 
     handleRejection(opponentName: string): void {
