@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -17,9 +18,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UploadDictionaryComponent } from './upload-dictionary.component';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
-const TEST_FILE = { test: 'I am a test file' };
-const TEST_EVENT = {
-    target: { files: [TEST_FILE] },
+// const TEST_FILE = { test: 'I am a test file' };
+const TEST_EVENT: EventTarget = {
+    addEventListener: () => {},
+    dispatchEvent: () => {
+        return false;
+    },
+    removeEventListener: () => {},
 };
 
 export class MatDialogMock {
@@ -33,7 +38,7 @@ export class MatDialogMock {
 describe('UploadDictionaryComponent', () => {
     let component: UploadDictionaryComponent;
     let fixture: ComponentFixture<UploadDictionaryComponent>;
-    let dictionariesServiceMock: DictionariesService;
+    let dictionariesServiceMock: DictionaryService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -57,14 +62,14 @@ describe('UploadDictionaryComponent', () => {
                     provide: MatDialogRef,
                     useClass: MatDialogMock,
                 },
-                DictionariesService,
+                DictionaryService,
             ],
         }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(UploadDictionaryComponent);
-        dictionariesServiceMock = TestBed.inject(DictionariesService);
+        dictionariesServiceMock = TestBed.inject(DictionaryService);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -85,7 +90,7 @@ describe('UploadDictionaryComponent', () => {
             spyOn(JSON, 'parse').and.callFake(() => {
                 return {} as DictionaryData;
             });
-            component.onFileChanged(TEST_EVENT);
+            component.handleFileInput(TEST_EVENT);
             expect(spyReadAsText).toHaveBeenCalled();
         });
 

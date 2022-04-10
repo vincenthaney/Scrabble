@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -20,9 +20,8 @@ import { DictionaryDialogParameters, ModifyDictionaryComponentStates } from './m
 import { AbstractControl } from '@angular/forms';
 
 const MODEL: DictionaryDialogParameters = {
-    title: 'Dialog title',
     dictionaryId: 'testId',
-    dictionaryToModifyName: 'testName',
+    dictionaryToModifyTitle: 'testTitle',
     dictionaryToModifyDescription: 'testDescription',
 };
 
@@ -37,7 +36,7 @@ export class MatDialogMock {
 describe('ModifyDictionaryComponent', () => {
     let component: ModifyDictionaryComponent;
     let fixture: ComponentFixture<ModifyDictionaryComponent>;
-    let dictionariesServiceMock: DictionariesService;
+    let dictionariesServiceMock: DictionaryService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -61,7 +60,7 @@ describe('ModifyDictionaryComponent', () => {
                     provide: MatDialogRef,
                     useClass: MatDialogMock,
                 },
-                DictionariesService,
+                DictionaryService,
                 {
                     provide: MAT_DIALOG_DATA,
                     useValue: MODEL,
@@ -72,7 +71,7 @@ describe('ModifyDictionaryComponent', () => {
 
     beforeEach(() => {
         fixture = TestBed.createComponent(ModifyDictionaryComponent);
-        dictionariesServiceMock = TestBed.inject(DictionariesService);
+        dictionariesServiceMock = TestBed.inject(DictionaryService);
 
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -114,7 +113,7 @@ describe('ModifyDictionaryComponent', () => {
                 return { valid: true } as unknown as AbstractControl;
             });
             component.ngOnChanges();
-            expect(component.isDictionaryNameValid).toBeTrue();
+            expect(component.isDictionaryTitleValid).toBeTrue();
         });
 
         it('should call formParameters.get and return false', () => {
@@ -122,7 +121,7 @@ describe('ModifyDictionaryComponent', () => {
                 return null;
             });
             component.ngOnChanges();
-            expect(component.isDictionaryNameValid).toBeFalse();
+            expect(component.isDictionaryTitleValid).toBeFalse();
         });
 
         it('should call closeDialog', () => {
@@ -212,23 +211,23 @@ describe('ModifyDictionaryComponent', () => {
     });
 
     describe('isInformationValid', () => {
-        it('should return true if component.isDictionaryNameValid && component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryNameValid = true;
+        it('should return true if component.isDictionaryTitleValid && component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryTitleValid = true;
             component.isDictionaryDescriptionValid = true;
             expect(component.isInformationValid()).toBeTrue();
         });
-        it('should return false if !component.isDictionaryNameValid && component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryNameValid = false;
+        it('should return false if !component.isDictionaryTitleValid && component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryTitleValid = false;
             component.isDictionaryDescriptionValid = true;
             expect(component.isInformationValid()).toBeFalse();
         });
-        it('should return false if component.isDictionaryNameValid && !component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryNameValid = false;
+        it('should return false if component.isDictionaryTitleValid && !component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryTitleValid = false;
             component.isDictionaryDescriptionValid = true;
             expect(component.isInformationValid()).toBeFalse();
         });
-        it('should return false if !component.isDictionaryNameValid && !component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryNameValid = false;
+        it('should return false if !component.isDictionaryTitleValid && !component.isDictionaryDescriptionValid', () => {
+            component.isDictionaryTitleValid = false;
             component.isDictionaryDescriptionValid = true;
             expect(component.isInformationValid()).toBeFalse();
         });

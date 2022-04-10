@@ -2,6 +2,7 @@ import Board from '@app/classes/board/board';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
+import { GameHistory } from '@app/classes/database/game-history';
 import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
@@ -15,7 +16,9 @@ import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -35,6 +38,7 @@ export default class Game {
     player2: Player;
     isAddedToDatabase: boolean;
     gameIsOver: boolean;
+    gameHistory: GameHistory;
     private tileReserve: TileReserve;
     private id: string;
 
@@ -63,6 +67,7 @@ export default class Game {
         game.isAddedToDatabase = false;
         game.gameIsOver = false;
 
+        game.initializeObjectives();
         await game.tileReserve.init();
 
         game.player1.tiles = game.tileReserve.getTiles(START_TILES_AMOUNT);
@@ -71,6 +76,32 @@ export default class Game {
         game.roundManager.beginRound();
 
         return game;
+    }
+
+    completeGameHistory(winnerName: string | undefined): void {
+        this.gameHistory = {
+            startTime: this.roundManager.getGameStartTime(),
+            endTime: new Date(),
+            player1Data: {
+                name: this.player1.name,
+                score: this.player1.score,
+                isVirtualPlayer: isIdVirtualPlayer(this.player1.id),
+                isWinner: this.isPlayerWinner(winnerName, this.player1, this.player2),
+            },
+            player2Data: {
+                name: this.player2.name,
+                score: this.player2.score,
+                isVirtualPlayer: isIdVirtualPlayer(this.player2.id),
+                isWinner: this.isPlayerWinner(winnerName, this.player2, this.player1),
+            },
+            gameType: this.gameType,
+            gameMode: this.gameMode,
+            hasBeenAbandoned: !this.player1.isConnected || !this.player2.isConnected,
+        };
+    }
+
+    isPlayerWinner(winnerName: string | undefined, currentPlayer: Player, opponent: Player): boolean {
+        return currentPlayer.name === winnerName || (!winnerName && currentPlayer.score >= opponent.score);
     }
 
     getTilesFromReserve(amount: number): Tile[] {
@@ -110,15 +141,20 @@ export default class Game {
 
     endOfGame(winnerName: string | undefined): [number, number] {
         this.gameIsOver = true;
+        let player1Score: number;
+        let player2Score: number;
+
         if (winnerName) {
-            if (winnerName === this.player1.name) {
-                return this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints());
-            } else {
-                return this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
-            }
+            [player1Score, player2Score] =
+                winnerName === this.player1.name
+                    ? this.computeEndOfGameScore(WIN, LOSE, this.player2.getTileRackPoints(), this.player2.getTileRackPoints())
+                    : this.computeEndOfGameScore(LOSE, WIN, this.player1.getTileRackPoints(), this.player1.getTileRackPoints());
         } else {
-            return this.getEndOfGameScores();
+            [player1Score, player2Score] = this.getEndOfGameScores();
         }
+
+        this.completeGameHistory(winnerName);
+        return [player1Score, player2Score];
     }
 
     endGameMessage(winnerName: string | undefined): string[] {

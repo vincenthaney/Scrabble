@@ -1,6 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, LOCALE_ID, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -34,6 +34,13 @@ import { AdminDictionariesComponent } from './components/admin-dictionaries-comp
 import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
 import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-dialog/delete-dictionary-dialog.component';
+import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
+import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import { DurationPipe } from './pipes/duration/duration.pipe';
+
+registerLocaleData(localeFr);
 
 /**
  * Main module that is used in main.ts.
@@ -70,6 +77,9 @@ import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-
         ModifyDictionaryComponent,
         UploadDictionaryComponent,
         DeleteDictionaryDialogComponent,
+        AdminHighScoresComponent,
+        AdminGameHistoryComponent,
+        DurationPipe,
     ],
     imports: [
         AppMaterialModule,
@@ -88,6 +98,10 @@ import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-
             useFactory: (socketService: SocketService) => async () => socketService.initializeService(),
             deps: [SocketService],
             multi: true,
+        },
+        {
+            provide: LOCALE_ID,
+            useValue: 'fr-CA',
         },
     ],
     bootstrap: [AppComponent],

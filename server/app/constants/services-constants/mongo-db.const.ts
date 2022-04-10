@@ -1,5 +1,6 @@
 export const HIGH_SCORES_MONGO_COLLECTION_NAME = 'HighScores';
 export const DICTIONARIES_MONGO_COLLECTION_NAME = 'Dictionaries';
+export const GAME_HISTORIES_MONGO_COLLECTION_NAME = 'GameHistories';
 export const MONGO_DB_USERNAME = 'Equipe212Scrabble';
 export const MONGO_DB_PASSWORD = 'uva5IyneIE6Tu1tB';
 export const MONGO_DATABASE_NAME = 'LOG2990-equipe212';

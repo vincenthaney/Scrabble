@@ -89,7 +89,7 @@ describe('WordPlacement utils', () => {
             const tile: Tile = { letter: 'B', value: 0, isBlank: true };
             const getLetterSpy = chai.spy.on(PlacementToString, 'getLetterFromBlankTile', (t: Tile) => t.letter.toUpperCase());
             expect(PlacementToString['tileToLetterConversion'](tile)).to.equal('B');
-            expect(getLetterSpy).to.have.been.called;
+            expect(getLetterSpy).to.have.been.called();
         });
     });
 

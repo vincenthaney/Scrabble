@@ -9,5 +9,5 @@ export enum PositiveFeedback {
     DictionaryUpdated = 'Le dictionnaire a été mis à jour.',
     DictionaryAdded = 'Le dictionnaire a été ajouté avec succès.',
     DictionaryDeleted = 'Le dictionnaire a été supprimé avec succès.',
-    DictionariesDeleted = 'Les dictionnaires ont été supprimés.',
+    DictionariesDeleted = 'La liste de dictionnaires a été réinitialisée.',
 }

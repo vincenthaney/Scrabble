@@ -1,16 +1,16 @@
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { LetterValue } from '@app/classes/tile';
+import { VOWELS } from '@app/constants/services-constants/objective.const';
 import { StringConversion } from '@app/utils/string-conversion';
 
 export const NAME = 'Les bases';
 export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les lettres blanches)';
 export const BONUS_POINTS = 30;
-export const VOWELS = (): LetterValue[] => ['A', 'E', 'I', 'O', 'U', 'Y'];
 
 const SHOULD_RESET = false;
 
-export class VowelsObjective extends AbstractObjective {
+export class AllVowelsObjective extends AbstractObjective {
     private vowelsLeftToPlay: LetterValue[];
 
     constructor() {
@@ -29,8 +29,8 @@ export class VowelsObjective extends AbstractObjective {
         });
     }
 
-    clone(): VowelsObjective {
-        const clone = new VowelsObjective();
+    clone(): AllVowelsObjective {
+        const clone = new AllVowelsObjective();
         clone.progress = this.progress;
         clone.state = this.state;
         clone.isPublic = this.isPublic;

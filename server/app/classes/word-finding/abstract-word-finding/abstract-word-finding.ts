@@ -18,7 +18,7 @@ import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 
 export default abstract class AbstractWordFinding {
-    protected wordPlacements: ScoredWordPlacement[] = [];
+    wordPlacements: ScoredWordPlacement[] = [];
 
     constructor(
         private board: Board,

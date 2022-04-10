@@ -11,6 +11,8 @@ import Player from '@app/classes/player/player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { Service } from 'typedi';
@@ -22,6 +24,7 @@ export class GamePlayService {
         private readonly activeGameService: ActiveGameService,
         private readonly highScoresService: HighScoresService,
         private readonly dictionaryService: DictionaryService,
+        private readonly gameHistoriesService: GameHistoriesService,
     ) {
         this.activeGameService.playerLeftEvent.on('playerLeft', async (gameId, playerWhoLeftId) => {
             await this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
@@ -121,6 +124,7 @@ export class GamePlayService {
             for (const player of connectedRealPlayers) {
                 await this.highScoresService.addHighScore(player.name, player.score, game.gameType);
             }
+            this.gameHistoriesService.addGameHistory(game.gameHistory);
             game.isAddedToDatabase = true;
         }
 

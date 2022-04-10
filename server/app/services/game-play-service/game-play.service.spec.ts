@@ -21,6 +21,7 @@ import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import * as chai from 'chai';
@@ -158,7 +159,7 @@ describe('GamePlayService', () => {
             const spy = chai.spy.on(gamePlayService, 'handleGameOver', () => {});
             const result = await gamePlayService.playAction(DEFAULT_GAME_ID, player.id, DEFAULT_ACTION);
             expect(result).to.exist;
-            expect(spy).to.have.been.called;
+            expect(spy).to.have.been.called();
         });
 
         it('should call next round when action ends turn', async () => {
@@ -328,6 +329,7 @@ describe('GamePlayService', () => {
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
         let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
+        let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
@@ -338,6 +340,7 @@ describe('GamePlayService', () => {
                 activeGameServiceStub as unknown as ActiveGameService,
                 highScoresServiceStub as unknown as HighScoresService,
                 dictionaryServiceStub as unknown as DictionaryService,
+                gameHistoriesServiceStub as unknown as GameHistoriesService,
             );
         });
 

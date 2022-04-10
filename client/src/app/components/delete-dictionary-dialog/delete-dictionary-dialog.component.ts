@@ -1,10 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { Subject } from 'rxjs';
 import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
-import { DELETE_COMPONENT_TITLE } from '@app/constants/dictionaries-components';
 
 @Component({
     selector: 'app-delete-dictionary-dialog',
@@ -12,19 +11,17 @@ import { DELETE_COMPONENT_TITLE } from '@app/constants/dictionaries-components';
     styleUrls: ['delete-dictionary-dialog.component.scss'],
 })
 export class DeleteDictionaryDialogComponent {
-    title: string;
     state: DeleteDictionaryComponentStates;
-    message: string;
     dictionaryId: string;
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean>;
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
-        private dictionariesService: DictionariesService,
+        private dictionariesService: DictionaryService,
         @Inject(MAT_DIALOG_DATA) public data: DeleteDictionaryDialogParameters,
     ) {
-        this.title = DELETE_COMPONENT_TITLE;
+        this.componentDestroyed$ = new Subject();
         this.dictionaryId = data.dictionaryId;
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, () => {
             this.cleanupDialogStates();
         });
     }

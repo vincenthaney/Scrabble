@@ -3,7 +3,6 @@
 table {
     width: 100%;
     margin: 12px 0;
-    // box-shadow: none;
 }
 
 .primary {
@@ -59,12 +58,17 @@ mat-paginator:not(.visible) {
     visibility: hidden;
     opacity: 0;
 }
-td.mat-cell {
-    text-align: center !important;
+
+.left-cell {
+    text-align: left !important;
 }
 
-th.mat-header-cell {
-text-align: center !important;
+.right-cell {
+    text-align: right !important;
+}
+
+th.mat-header-container {
+    text-align: center !important;
 }
 
 .icon {

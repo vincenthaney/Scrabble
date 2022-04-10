@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { AdminDictionariesComponent } from './admin-dictionaries.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +18,7 @@ import { DictionarySummary } from '@app/classes/communication/dictionary-summary
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
+import { AdminGameHistoryComponent } from '@app/components/admin-game-history/admin-game-history.component';
 const TEST_ID = 'test';
 const testElementData: DictionarySummary = {
     title: 'testTitle',
@@ -31,11 +32,11 @@ const TEST_SNACKBAR = undefined as unknown as MatSnackBarRef<TextOnlySnackBar>;
 describe('AdminDictionariesComponent', () => {
     let component: AdminDictionariesComponent;
     let fixture: ComponentFixture<AdminDictionariesComponent>;
-    let dictionariesServiceMock: DictionariesService;
+    let dictionariesServiceMock: DictionaryService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [AdminDictionariesComponent, IconComponent, PageHeaderComponent],
+            declarations: [AdminDictionariesComponent, IconComponent, PageHeaderComponent, AdminGameHistoryComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
@@ -50,13 +51,13 @@ describe('AdminDictionariesComponent', () => {
                 MatCardModule,
                 MatTabsModule,
             ],
-            providers: [DictionariesService],
+            providers: [DictionaryService],
         }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(AdminDictionariesComponent);
-        dictionariesServiceMock = TestBed.inject(DictionariesService);
+        dictionariesServiceMock = TestBed.inject(DictionaryService);
 
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -119,14 +120,9 @@ describe('AdminDictionariesComponent', () => {
         });
     });
 
-    describe('On DownloadLoadingEvent', () => {
+    describe('On isWaitingForServerResponseEvent', () => {
         it('should turn isDownloadLoading to false', () => {
-            dictionariesServiceMock['downloadLoadingEvent'].next();
-            expect(component.isDownloadLoading).toBeFalse();
-        });
-
-        it('should should turn isWaitingForServerResponse to false', () => {
-            dictionariesServiceMock['downloadLoadingEvent'].next();
+            dictionariesServiceMock['isWaitingForServerResponseEvent'].next();
             expect(component.isWaitingForServerResponse).toBeFalse();
         });
     });
@@ -165,14 +161,6 @@ describe('AdminDictionariesComponent', () => {
         });
     });
 
-    describe('setDictionariesData', async () => {
-        it('should call dictionariesService.updateAllDictionaries', async () => {
-            const spy = spyOn(dictionariesServiceMock, 'updateAllDictionaries');
-            await component.setDictionariesData();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('downloadDictionary', async () => {
         it('should call dictionariesService.downloadDictionary', async () => {
             const spy = spyOn(dictionariesServiceMock, 'downloadDictionary');
@@ -180,28 +168,18 @@ describe('AdminDictionariesComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should turn isDownloadingLoading to true', async () => {
+        it('should turn isWaitingForServerResponse to true', async () => {
             spyOn(dictionariesServiceMock, 'downloadDictionary');
             await component.downloadDictionary(TEST_ID);
-            expect(component.isDownloadLoading).toBeTrue();
+            expect(component.isWaitingForServerResponse).toBeTrue();
         });
     });
 
     describe('resetDictionaries', async () => {
-        it('should call dictionariesService.deleteAllDictionaries', async () => {
-            const spy = spyOn(dictionariesServiceMock, 'deleteAllDictionaries');
+        it('should call dictionariesService.resetDictionaries', async () => {
+            const spy = spyOn(dictionariesServiceMock, 'resetDictionaries');
             await component.resetDictionaries();
             expect(spy).toHaveBeenCalled();
-        });
-    });
-
-    describe('sortDictionaries', () => {
-        it('should call return item.title', () => {
-            expect(component.sortDictionaries(testElementData, 'dictionaryName')).toEqual('testTitle');
-        });
-
-        it('should call return item.description', () => {
-            expect(component.sortDictionaries(testElementData, 'dictionaryDescription')).toEqual('testDescription');
         });
     });
 

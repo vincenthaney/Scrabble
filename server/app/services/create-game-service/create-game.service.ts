@@ -5,14 +5,19 @@ import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virt
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 
 @Service()
 export class CreateGameService {
     constructor(private activeGameService: ActiveGameService) {}
     async createSoloGame(config: GameConfigData): Promise<StartGameData> {
         const gameId = uuidv4();
+
         const readyGameConfig = this.generateReadyGameConfig(
-            new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string),
+            config.virtualPlayerLevel === VirtualPlayerLevel.Beginner
+                ? new BeginnerVirtualPlayer(gameId, config.virtualPlayerName as string)
+                : new ExpertVirtualPlayer(gameId, config.virtualPlayerName as string),
             this.generateGameConfig(config),
         );
         return this.activeGameService.beginGame(gameId, readyGameConfig);

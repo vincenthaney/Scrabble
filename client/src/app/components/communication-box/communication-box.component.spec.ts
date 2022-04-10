@@ -14,6 +14,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { PlayerData } from '@app/classes/communication';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
@@ -62,6 +63,7 @@ const DEFAULT_START_GAME_DATA: InitializeGameData = {
         player1: undefined as unknown as PlayerData,
         player2: undefined as unknown as PlayerData,
         gameType: GameType.Classic,
+        gameMode: GameMode.Multiplayer,
         maxRoundTime: 0,
         dictionary: TEST_DICTIONARY,
         gameId: DEFAULT_GAME_ID,

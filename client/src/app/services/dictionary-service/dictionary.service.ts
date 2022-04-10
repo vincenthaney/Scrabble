@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { DictionariesState } from '@app/classes/admin/dictionaries';
-import { DictionarySummary } from '@app/classes/communication/dictionary';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { DOWNLOAD_ELEMENT } from '@app/constants/dictionary-service-constants';
-import { DictionariesController } from '@app/controllers/dictionaries-controller/dictionaries-controller';
+import { DictionaryController } from '@app/controllers/dictionary-controller/dictionary-controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
-export class DictionariesService {
+export class DictionaryService {
     dictionaryData: DictionaryData;
     dictionaries: DictionarySummary[];
     updateRequestResponse: string;
@@ -21,26 +21,29 @@ export class DictionariesService {
     private componentUpdateEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
     private dictionariesUpdatedEvent: Subject<DictionarySummary[]> = new Subject();
-    private downloadLoadingEvent: Subject<undefined> = new Subject();
+    private isWaitingForServerResponseEvent: Subject<null> = new Subject();
     private updatingDictionariesEvent: Subject<DictionariesState> = new Subject();
 
-    constructor(private dictionariesController: DictionariesController) {
+    constructor(private dictionariesController: DictionaryController) {
         this.dictionariesController.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, (message) => {
+            this.isWaitingForServerResponseEvent.next();
             this.dictionariesUpdateMessageEvent.next(message);
             this.componentUpdateEvent.next(message);
             this.updateAllDictionaries();
         });
 
         this.dictionariesController.subscribeToDictionaryDownloadEvent(this.serviceDestroyed$, (dictionaryData) => {
-            this.downloadLoadingEvent.next();
+            this.isWaitingForServerResponseEvent.next();
             this.startDownload(dictionaryData);
         });
 
         this.dictionariesController.subscribeToDictionaryErrorEvent(this.serviceDestroyed$, (response) => {
-            this.componentUpdateEvent.next(response.message);
+            this.isWaitingForServerResponseEvent.next();
+            this.componentUpdateEvent.next(response);
         });
 
         this.dictionariesController.subscribeToGetAllDictionariesEvent(this.serviceDestroyed$, (dictionaries: DictionarySummary[]) => {
+            this.isWaitingForServerResponseEvent.next();
             this.dictionaries = dictionaries;
             this.dictionariesUpdatedEvent.next(dictionaries);
             this.updatingDictionariesEvent.next(DictionariesState.Ready);
@@ -51,11 +54,11 @@ export class DictionariesService {
         this.updatingDictionariesEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToDownloadLoadingEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
-        this.downloadLoadingEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    subscribeToIsWaitingForServerResponseEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.isWaitingForServerResponseEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToDictionariestUpdateDataEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void): void {
+    subscribeToDictionariesUpdateDataEvent(serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void): void {
         this.dictionariesUpdatedEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
@@ -68,22 +71,27 @@ export class DictionariesService {
     }
 
     async updateDictionary(id: string, title: string, description: string): Promise<void> {
+        this.isWaitingForServerResponseEvent.next();
         await this.dictionariesController.handleUpdateDictionary({ title, description, id });
     }
 
     async downloadDictionary(id: string): Promise<void> {
+        this.isWaitingForServerResponseEvent.next();
         await this.dictionariesController.handleDownloadDictionary(id);
     }
 
     async deleteDictionary(id: string): Promise<void> {
+        this.isWaitingForServerResponseEvent.next();
         await this.dictionariesController.handleDeleteDictionary(id);
     }
 
-    async deleteAllDictionaries(): Promise<void> {
-        await this.dictionariesController.handleDeleteAllDictionaries();
+    async resetDictionaries(): Promise<void> {
+        this.isWaitingForServerResponseEvent.next();
+        await this.dictionariesController.handleResetDictionaries();
     }
 
     async uploadDictionary(dictionaryData: DictionaryData): Promise<void> {
+        this.isWaitingForServerResponseEvent.next();
         await this.dictionariesController.handleUploadDictionary(dictionaryData);
     }
 
@@ -97,7 +105,7 @@ export class DictionariesService {
     }
 
     private startDownload(dictionaryData: DictionaryData): void {
-        const title = dictionaryData.title;
+        const title = dictionaryData.title + '.json';
         const downloadProcess = window.document.createElement(DOWNLOAD_ELEMENT);
         downloadProcess.href = window.URL.createObjectURL(new Blob([JSON.stringify(dictionaryData)], { type: 'application/json' }));
         downloadProcess.download = title;

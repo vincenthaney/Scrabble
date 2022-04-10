@@ -2,7 +2,7 @@ import { Component, Inject, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DICTIONARY_DESCRIPTION_VALIDATION, DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
 import {
     DictionaryDialogParameters,
@@ -15,67 +15,60 @@ import {
     styleUrls: ['./modify-dictionary-dialog.component.scss'],
 })
 export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
-    icon: string;
     state: ModifyDictionaryComponentStates;
-    message: string;
-    title: string;
-    dictionaryToModifyName: string;
+    dictionaryToModifyTitle: string;
     dictionaryToModifyDescription: string;
     dictionaryId: string;
     formParameters: FormGroup;
-    isDictionaryNameValid: boolean;
+    isDictionaryTitleValid: boolean;
     isDictionaryDescriptionValid: boolean;
     isNewInformationValid: boolean;
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean>;
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
-        private dictionariesService: DictionariesService,
+        private dictionariesService: DictionaryService,
         @Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters,
     ) {
+        this.componentDestroyed$ = new Subject();
         this.state = ModifyDictionaryComponentStates.Ready;
-        this.title = data.title;
-        this.dictionaryToModifyName = data.dictionaryToModifyName;
+        this.dictionaryToModifyTitle = data.dictionaryToModifyTitle;
         this.dictionaryToModifyDescription = data.dictionaryToModifyDescription;
         this.dictionaryId = data.dictionaryId;
-        this.isDictionaryNameValid = true;
+        this.isDictionaryTitleValid = true;
         this.isDictionaryDescriptionValid = true;
-        this.isNewInformationValid = true;
         this.formParameters = new FormGroup({
-            inputDictionaryName: new FormControl(data.dictionaryToModifyName, [
+            inputDictionaryTitle: new FormControl(data.dictionaryToModifyTitle, [
                 Validators.required,
-                Validators.pattern(DICTIONARY_NAME_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_NAME_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_NAME_VALIDATION.maxLength),
             ]),
             inputDictionaryDescription: new FormControl(data.dictionaryToModifyDescription, [
                 Validators.required,
-                Validators.pattern(DICTIONARY_DESCRIPTION_VALIDATION.rule),
                 Validators.minLength(DICTIONARY_DESCRIPTION_VALIDATION.minLength),
                 Validators.maxLength(DICTIONARY_DESCRIPTION_VALIDATION.maxLength),
             ]),
         });
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, () => {
             this.cleanupDialogStates();
         });
     }
 
     ngOnChanges(): void {
-        this.formParameters.controls.inputName?.updateValueAndValidity();
-        this.isDictionaryNameValid = this.formParameters.get('inputDictionaryName')?.valid ?? false;
+        this.formParameters.controls.inputTitle?.updateValueAndValidity();
+        this.isDictionaryTitleValid = this.formParameters.get('inputDictionaryTitle')?.valid ?? false;
         this.isDictionaryDescriptionValid = this.formParameters.get('inputDictionaryDescription')?.valid ?? false;
-        this.isNewInformationValid = this.isInformationValid();
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     updateDictionary(): void {
         this.state = ModifyDictionaryComponentStates.Loading;
         this.dictionariesService.updateDictionary(
             this.dictionaryId,
-            this.formParameters.get('inputDictionaryName')?.value,
+            this.formParameters.get('inputDictionaryTitle')?.value,
             this.formParameters.get('inputDictionaryDescription')?.value,
         );
         this.closeDialog();
@@ -87,7 +80,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     }
 
     isInformationValid(): boolean {
-        return this.isDictionaryNameValid && this.isDictionaryDescriptionValid;
+        return this.isDictionaryTitleValid && this.isDictionaryDescriptionValid;
     }
 
     cleanupDialogStates(): void {
