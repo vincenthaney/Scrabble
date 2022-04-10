@@ -33,6 +33,7 @@ import Game, { GAME_OVER_PASS_THRESHOLD, LOSE, WIN } from './game';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
+
 const expect = chai.expect;
 
 chai.use(spies);

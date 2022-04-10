@@ -7,17 +7,18 @@ import { GameType } from '@app/classes/game/game-type';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import * as BeginnerVirtualPlayer from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import * as ExpertVirtualPlayer from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import * as chai from 'chai';
-import * as sinon from 'sinon';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { Container } from 'typedi';
 import { CreateGameService } from './create-game.service';
-import * as BeginnerVirtualPlayer from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import * as ExpertVirtualPlayer from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 chai.use(spies);
+
 const DEFAULT_PLAYER_ID = 'playerId';
 
 const DEFAULT_MAX_ROUND_TIME = 1;
@@ -120,7 +121,7 @@ describe('CreateGameService', () => {
             expect(stub.called).to.be.true;
         });
 
-        it('should call generateReadyGameConfig', () => {
+        it('should call generateReadyGameConfig', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return DEFAULT_GAME_CONFIG;
             });

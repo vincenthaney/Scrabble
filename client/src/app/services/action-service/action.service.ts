@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { IResetServiceData } from '@app/classes/i-reset-service-data';
 import { Orientation } from '@app/classes/orientation';
 import { Position } from '@app/classes/position';
 import { Tile } from '@app/classes/tile';
@@ -13,7 +14,7 @@ import { takeUntil } from 'rxjs/operators';
 @Injectable({
     providedIn: 'root',
 })
-export class ActionService {
+export class ActionService implements IResetServiceData, OnDestroy {
     hasActionBeenPlayed: boolean;
     serviceDestroyed$: Subject<boolean>;
 
@@ -25,6 +26,12 @@ export class ActionService {
             .pipe(takeUntil(this.serviceDestroyed$))
             .subscribe(() => this.resetHasActionBeenSent());
         this.gameViewEventManagerService.subscribeToGameViewEvent('resetUsedTiles', this.serviceDestroyed$, () => this.handleResetUsedTiles());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('resetServices', this.serviceDestroyed$, () => this.resetServiceData());
+    }
+
+    ngOnDestroy(): void {
+        this.serviceDestroyed$.next(true);
+        this.serviceDestroyed$.complete();
     }
 
     createPlaceActionPayload(tiles: Tile[], startPosition: Position, orientation: Orientation): PlaceActionPayload {
@@ -58,6 +65,10 @@ export class ActionService {
 
         this.gamePlayController.sendAction(gameId, playerId, actionData);
         this.hasActionBeenPlayed = true;
+    }
+
+    resetServiceData(): void {
+        this.hasActionBeenPlayed = false;
     }
 
     private actionNeedsInput(actionType: ActionType, needsInput: boolean): boolean {

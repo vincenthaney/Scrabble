@@ -9,6 +9,7 @@ import { NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { CompletedRound, Round } from './round';
 import RoundManager from './round-manager';

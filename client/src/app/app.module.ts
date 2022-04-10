@@ -35,6 +35,8 @@ import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog
 import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
 import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-dialog/delete-dictionary-dialog.component';
 import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
+import { ObjectiveComponent } from './components/objective/objective.component';
+import { ObjectiveBoxComponent } from './components/objective-box/objective-box.component';
 import { AdminGameHistoryComponent } from './components/admin-game-history/admin-game-history.component';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
@@ -80,6 +82,8 @@ registerLocaleData(localeFr);
         AdminHighScoresComponent,
         AdminGameHistoryComponent,
         DurationPipe,
+        ObjectiveComponent,
+        ObjectiveBoxComponent,
     ],
     imports: [
         AppMaterialModule,

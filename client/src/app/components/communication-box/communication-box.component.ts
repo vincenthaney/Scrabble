@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
 import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
+import { GameType } from '@app/classes/game-type';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
@@ -25,6 +26,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     @ViewChild('textBoxContainer') textBoxContainer: ElementRef;
     @ViewChild('virtualScroll', { static: false }) scrollViewport: CdkVirtualScrollViewport;
 
+    gameType: GameType = GameType.Classic;
     messages: Message[] = [];
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
@@ -46,6 +48,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     ngOnInit(): void {
+        this.gameType = this.gameService.getGameType();
+
         this.gameViewEventManagerService.subscribeToGameViewEvent('newMessage', this.componentDestroyed$, (newMessage: Message | null) => {
             if (newMessage) this.onReceiveNewMessage(newMessage);
         });
@@ -53,7 +57,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
             'gameInitialized',
             this.componentDestroyed$,
             (gameData: InitializeGameData | undefined) => {
-                if (gameData) this.initializeMessages(gameData);
+                if (gameData) {
+                    this.initializeMessages(gameData);
+                    this.gameType = gameData.startGameData.gameType;
+                }
             },
         );
     }
@@ -121,6 +128,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     private onReceiveNewMessage(newMessage: Message): void {
+        if (newMessage.gameId !== this.gameService.getGameId()) return;
+
         this.messages = [...this.messages, this.createVisualMessage(newMessage)];
         this.changeDetectorRef.detectChanges();
         this.scrollToBottom();

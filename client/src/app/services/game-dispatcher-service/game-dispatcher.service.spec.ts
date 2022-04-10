@@ -14,7 +14,9 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameDispatcherService, SocketService } from '@app/services/';
-import { Subject } from 'rxjs';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { Observable, Subject, Subscription } from 'rxjs';
+import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -62,8 +64,22 @@ describe('GameDispatcherService', () => {
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
     let socketServiceMock: SocketService;
+    let gameViewEventSpy: SpyObj<GameViewEventManagerService>;
 
     let gameCreationFailedSubjectMock: Subject<HttpErrorResponse>;
+
+    beforeEach(() => {
+        const resetSubject = new Subject();
+        gameViewEventSpy = jasmine.createSpyObj('GameViewEventManagerService', ['subscribeToGameViewEvent', 'emitGameViewEvent']);
+        gameViewEventSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any) => {
+            if (eventType !== 'resetServices') return new Subscription();
+            return resetSubject.subscribe(next);
+        });
+        gameViewEventSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
+            if (eventType !== 'resetServices') return;
+            resetSubject.next(payload);
+        });
+    });
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -74,7 +90,7 @@ describe('GameDispatcherService', () => {
                     { path: 'join-waiting-room', component: TestComponent },
                 ]),
             ],
-            providers: [GameDispatcherController, SocketService],
+            providers: [GameDispatcherController, SocketService, { provide: GameViewEventManagerService, useValue: gameViewEventSpy }],
         });
 
         gameCreationFailedSubjectMock = new Subject<HttpErrorResponse>();
@@ -146,6 +162,14 @@ describe('GameDispatcherService', () => {
             gameCreationFailedSubjectMock.next(error);
 
             expect(spy).toHaveBeenCalledWith(error);
+        });
+
+        it('on resetServices event, should call resetServiceData', () => {
+            const resetDataSpy = spyOn(service, 'resetServiceData').and.callFake(() => {
+                return;
+            });
+            gameViewEventSpy.emitGameViewEvent('resetServices');
+            expect(resetDataSpy).toHaveBeenCalled();
         });
     });
 

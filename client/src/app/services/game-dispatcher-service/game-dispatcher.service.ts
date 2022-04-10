@@ -10,6 +10,7 @@ import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
 import GameService from '@app/services/game-service/game.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -28,7 +29,12 @@ export default class GameDispatcherService implements OnDestroy {
     private joinerRejectedEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
-    constructor(private gameDispatcherController: GameDispatcherController, public router: Router, private readonly gameService: GameService) {
+    constructor(
+        private gameDispatcherController: GameDispatcherController,
+        public router: Router,
+        private readonly gameService: GameService,
+        private readonly gameViewEventManagerService: GameViewEventManagerService,
+    ) {
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
         );
@@ -46,6 +52,8 @@ export default class GameDispatcherService implements OnDestroy {
         this.gameDispatcherController.subscribeToInitializeGame(this.serviceDestroyed$, async (initializeValue: InitializeGameData | undefined) =>
             this.gameService.handleInitializeGame(initializeValue),
         );
+
+        this.gameViewEventManagerService.subscribeToGameViewEvent('resetServices', this.serviceDestroyed$, () => this.resetServiceData());
         this.gameDispatcherController
             .observeGameCreationFailed()
             .pipe(takeUntil(this.serviceDestroyed$))

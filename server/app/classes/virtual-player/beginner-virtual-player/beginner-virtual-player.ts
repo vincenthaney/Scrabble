@@ -1,3 +1,9 @@
+import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import { ActionData } from '@app/classes/communication/action-data';
+import Range from '@app/classes/range/range';
+import { Tile } from '@app/classes/tile';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
+import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     EXCHANGE_ACTION_THRESHOLD,
     HIGH_SCORE_RANGE_MAX,
@@ -10,13 +16,7 @@ import {
     MEDIUM_SCORE_THRESHOLD,
     PLACE_ACTION_THRESHOLD,
 } from '@app/constants/virtual-player-constants';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
-import { ActionData } from '@app/classes/communication/action-data';
-import Range from '@app/classes/range/range';
-import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { Random } from '@app/utils/random';
-import { Tile } from '@app/classes/tile';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     protected async findAction(): Promise<ActionData> {

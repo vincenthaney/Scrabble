@@ -39,6 +39,14 @@ describe('ActionService', () => {
         expect(service).toBeTruthy();
     });
 
+    it('ngOnDestroy should call serviceDestroyed$.complete', () => {
+        const completeSpy = spyOn(service['serviceDestroyed$'], 'complete').and.callFake(() => {
+            return;
+        });
+        service.ngOnDestroy();
+        expect(completeSpy).toHaveBeenCalled();
+    });
+
     describe('subscription handling', () => {
         let resetActionSpy: jasmine.Spy;
         let resetUsedTilesSpy: jasmine.Spy;
@@ -182,6 +190,12 @@ describe('ActionService', () => {
             service.sendAction(DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, actionData);
             expect(service.hasActionBeenPlayed).toBeTrue();
         });
+    });
+
+    it('resetServiceData should set hasActionBeenPlayed to false', () => {
+        service.hasActionBeenPlayed = true;
+        service.resetServiceData();
+        expect(service.hasActionBeenPlayed).toBeFalse();
     });
 
     describe('createInputFromPayload', () => {

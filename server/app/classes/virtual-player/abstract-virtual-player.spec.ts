@@ -1,23 +1,23 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import { ActionPass } from '@app/classes/actions';
+import { Board } from '@app/classes/board';
+import { ActionData } from '@app/classes/communication/action-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import Game from '@app/classes/game/game';
+import Range from '@app/classes/range/range';
+import { LetterValue } from '@app/classes/tile';
+import { AbstractWordFinding, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { GAME_ID, PLAYER_ID, TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
-import { AbstractVirtualPlayer } from './abstract-virtual-player';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import Range from '@app/classes/range/range';
-import { ActionData } from '@app/classes/communication/action-data';
-import { ActionPass } from '@app/classes/actions';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { Delay } from '@app/utils/delay';
-import { createStubInstance, SinonStubbedInstance, restore } from 'sinon';
-import { Board } from '@app/classes/board';
-import Game from '@app/classes/game/game';
-import { LetterValue } from '@app/classes/tile';
-import WordFindingService from '@app/services/word-finding-service/word-finding.service';
-import { AbstractWordFinding, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { createStubInstance, restore, SinonStubbedInstance } from 'sinon';
+import { AbstractVirtualPlayer } from './abstract-virtual-player';
 
 class TestClass extends AbstractVirtualPlayer {
     async findAction(): Promise<ActionData> {
@@ -48,6 +48,7 @@ describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
     let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
     let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
+
     beforeEach(async () => {
         abstractPlayer = new TestClass(playerId, playerName);
         activeGameServiceStub = createStubInstance(ActiveGameService);
@@ -160,6 +161,7 @@ describe('AbstractVirtualPlayer', () => {
     describe('computeWordPlacement', () => {
         let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
         let gameStub: SinonStubbedInstance<Game>;
+
         beforeEach(() => {
             gameStub = createStubInstance(Game);
             gameStub.dictionarySummary = { id: 'testId' } as unknown as DictionarySummary;
