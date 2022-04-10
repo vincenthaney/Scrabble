@@ -56,8 +56,6 @@ install:client:
 install:server:
     stage: install
     <<: *only-server
-    rules:
-        - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
     script:
         - cd server
         - npm ci --cache .npm --prefer-offline
