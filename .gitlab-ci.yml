@@ -24,7 +24,7 @@ cache:
     only:
         refs:
             - master
-            - develop
+            - merge_requests
         changes:
             - server/**/*
     cache:
