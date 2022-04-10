@@ -4,7 +4,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DisplayDictionariesColumnsIteratorItem, DisplayDictionariesKeys, DictionariesState } from '@app/classes/admin/dictionaries';
+import {
+    DisplayDictionariesColumnsIteratorItem,
+    DisplayDictionariesKeys,
+    DictionariesState,
+    DisplayDictionariesColumns,
+} from '@app/classes/admin/dictionaries';
 import { DEFAULT_DICTIONARIES_COLUMNS, DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
 import { isKey } from '@app/utils/is-key';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
@@ -28,7 +33,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
-    columns;
+    columns: DisplayDictionariesColumns;
     columnsItems: DisplayDictionariesColumnsIteratorItem[];
     selectedColumnsItems: DisplayDictionariesColumnsIteratorItem[];
     columnsControl: FormControl;
