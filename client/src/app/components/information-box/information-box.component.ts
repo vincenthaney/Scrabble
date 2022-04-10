@@ -19,7 +19,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
     readonly maxTilesPerPlayer;
     isPlayer1Active: boolean;
     isPlayer2Active: boolean;
-    isPlayer1: boolean = true;
+    isPlayer1: boolean;
     localPlayerIcon: IconName;
     timer: Timer;
 
