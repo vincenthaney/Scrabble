@@ -153,7 +153,7 @@ describe('VirtualPlayerProfilesService', () => {
             expect(spy).to.have.been.called();
         });
 
-        it('should update the dictionary if it is not a default one', async () => {
+        it('should update the profile if it is not a default one', async () => {
             const profileToModify: WithId<VirtualPlayerProfile> = (
                 await virtualPlayerProfilesService['collection'].find({ name: CUSTOM_PROFILE_1.name }).toArray()
             )[0];
@@ -170,7 +170,7 @@ describe('VirtualPlayerProfilesService', () => {
             expect(result._id).to.deep.equal(profileToModify._id);
         });
 
-        it('should not update the dictionary if it is a default one', async () => {
+        it('should not update the profile if it is a default one', async () => {
             const profileToModify: WithId<VirtualPlayerProfile> = (
                 await virtualPlayerProfilesService['collection'].find({ name: DEFAULT_PROFILE_1.name }).toArray()
             )[0];
