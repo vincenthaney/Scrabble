@@ -1,19 +1,13 @@
-export type DisplayDictionariesKeys = 'dictionaryName' | 'dictionaryDescription' | 'dictionaryActions';
+export type DisplayDictionaryKeys = keyof { title: string; description: string } | 'title' | 'description' | 'actions';
 
-export type DisplayDictionariesColumns = {
-    [Property in DisplayDictionariesKeys]: string;
+export type DisplayDictionaryColumns = {
+    [Property in DisplayDictionaryKeys]: string;
 };
 
-export type DisplayDictionariesColumnsIteratorItem = { key: DisplayDictionariesKeys; label: string };
+export type DisplayDictionaryColumnsIteratorItem = { key: DisplayDictionaryKeys; label: string };
 
 export enum DictionariesState {
     Ready = 'ready',
     Loading = 'loading',
     Error = 'error',
-}
-
-export interface DictionariesColumns {
-    dictionaryName: string;
-    dictionaryDescription: string;
-    dictionaryActions: string;
 }

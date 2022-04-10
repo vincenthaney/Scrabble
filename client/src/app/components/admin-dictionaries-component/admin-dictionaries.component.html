@@ -16,18 +16,18 @@
         <ng-container *ngSwitchCase="'ready'">
             <table mat-table [dataSource]="dataSource">
         
-                <ng-container matColumnDef="dictionaryName">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.dictionaryName}} </th>
+                <ng-container matColumnDef="title">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.title}} </th>
                     <td mat-cell class="left-cell" *matCellDef="let element"> {{element.title}} </td>
                 </ng-container>
        
-                <ng-container matColumnDef="dictionaryDescription">
-                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.dictionaryDescription}} </th>
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.description}} </th>
                     <td mat-cell class="left-cell" *matCellDef="let element"> {{element.description}} </td>
                 </ng-container> 
 
-                <ng-container matColumnDef="dictionaryActions">
-                    <th mat-header-cell *matHeaderCellDef > {{columns.dictionaryActions}} </th>
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef> {{columns.actions}} </th>
                     <td mat-cell class="right-cell" *matCellDef="let element"> 
                         <button matTooltip="Vous ne pouvez pas modifier le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="modifyDictionary(element)"[disabled] = "element.isDefault">
                             <app-icon icon="pencil">

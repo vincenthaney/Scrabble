@@ -5,13 +5,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {
-    DisplayDictionariesColumnsIteratorItem,
-    DisplayDictionariesKeys,
+    DisplayDictionaryColumnsIteratorItem,
+    DisplayDictionaryKeys,
     DictionariesState,
-    DisplayDictionariesColumns,
+    DisplayDictionaryColumns,
 } from '@app/classes/admin/dictionaries';
-import { DEFAULT_DICTIONARIES_COLUMNS, DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
-import { isKey } from '@app/utils/is-key';
+import { DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
@@ -32,10 +31,8 @@ import { DictionarySummary } from '@app/classes/communication/dictionary-summary
 export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
-
-    columns: DisplayDictionariesColumns;
-    columnsItems: DisplayDictionariesColumnsIteratorItem[];
-    selectedColumnsItems: DisplayDictionariesColumnsIteratorItem[];
+    columns: DisplayDictionaryColumns;
+    columnsItems: DisplayDictionaryColumnsIteratorItem[];
     columnsControl: FormControl;
     dictionaries: DictionarySummary[];
     dataSource: MatTableDataSource<DictionarySummary>;
@@ -43,18 +40,12 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     error: string | undefined;
     isWaitingForServerResponse: boolean;
 
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean> = new Subject();
     constructor(public dialog: MatDialog, private dictionariesService: DictionaryService, private snackBar: MatSnackBar) {
         this.columns = DICTIONARIES_COLUMNS;
-        this.columnsItems = [];
-        this.selectedColumnsItems = [];
-        this.dataSource = new MatTableDataSource(new Array());
-        this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.columnsItems = this.getColumnIterator();
-        this.selectedColumnsItems = this.getSelectedColumns();
-        this.columnsControl = new FormControl();
-        this.columnsControl.setValue(this.selectedColumnsItems);
         this.dataSource = new MatTableDataSource(new Array());
+        // this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.state = DictionariesState.Loading;
         this.error = undefined;
 
@@ -62,12 +53,12 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
-    async ngOnInit(): Promise<void> {
-        await this.dictionariesService.updateAllDictionaries();
+    ngOnInit(): void {
+        this.dictionariesService.updateAllDictionaries();
     }
 
     ngAfterViewInit(): void {
@@ -115,52 +106,35 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         await this.dictionariesService.resetDictionaries();
     }
 
-    sortDictionaries(dictionarySummary: DictionarySummary, property: string): string {
-        switch (property) {
-            case 'dictionaryName':
-                return dictionarySummary.title;
-            case 'dictionaryDescription':
-                return dictionarySummary.description;
-            default:
-                return isKey(property, dictionarySummary) ? (dictionarySummary[property] as string) : '';
-        }
-    }
-
-    getColumnIterator(): DisplayDictionariesColumnsIteratorItem[] {
-        return Object.keys(this.columns).map<DisplayDictionariesColumnsIteratorItem>((key) => ({
-            key: key as DisplayDictionariesKeys,
-            label: this.columns[key as DisplayDictionariesKeys],
+    getColumnIterator(): DisplayDictionaryColumnsIteratorItem[] {
+        return Object.keys(this.columns).map<DisplayDictionaryColumnsIteratorItem>((key) => ({
+            key: key as DisplayDictionaryKeys,
+            label: this.columns[key as DisplayDictionaryKeys],
         }));
     }
 
-    getDisplayedColumns(): DisplayDictionariesKeys[] {
-        return this.selectedColumnsItems.map(({ key }) => key);
-    }
-
-    getSelectedColumns(): DisplayDictionariesColumnsIteratorItem[] {
-        return DEFAULT_DICTIONARIES_COLUMNS.map<DisplayDictionariesColumnsIteratorItem>(
-            (key) => this.columnsItems.find((item) => item.key === key) || { key, label: this.columns[key] },
-        );
+    getDisplayedColumns(): DisplayDictionaryKeys[] {
+        return this.columnsItems.map(({ key }) => key);
     }
 
     private convertDictionariesToMatDataSource(dictionaries: DictionarySummary[]): void {
-        this.dataSource = new MatTableDataSource(dictionaries);
+        this.dataSource.data = dictionaries;
     }
 
     private initializeSubscriptions(): void {
-        this.dictionariesService.subscribeToDictionariesUpdateMessageEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToDictionariesUpdateMessageEvent(this.componentDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
         });
-        this.dictionariesService.subscribeToDictionariesUpdateDataEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToDictionariesUpdateDataEvent(this.componentDestroyed$, () => {
             this.convertDictionariesToMatDataSource(this.dictionariesService.getDictionaries());
         });
-        this.dictionariesService.subscribeToIsWaitingForServerResponseEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToIsWaitingForServerResponseEvent(this.componentDestroyed$, () => {
             this.isWaitingForServerResponse = !this.isWaitingForServerResponse;
         });
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, (response) => {
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, (response) => {
             this.snackBar.open(response, 'OK', this.isFeedbackPositive(response as PositiveFeedback));
         });
-        this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.serviceDestroyed$, (state) => {
+        this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.componentDestroyed$, (state) => {
             this.state = state;
             this.isWaitingForServerResponse = !this.isWaitingForServerResponse;
         });
