@@ -91,10 +91,6 @@ export abstract class AbstractVirtualPlayer extends Player {
         return totalTilesLeft >= MINIMUM_EXCHANGE_WORD_COUNT;
     }
 
-    private getDictionaryId(): string {
-        return this.activeGameService.getGame(this.gameId, this.id).dictionarySummary.id;
-    }
-
     protected abstract findAction(): Promise<ActionData>;
 
     protected abstract generateWordFindingRequest(): WordFindingRequest;

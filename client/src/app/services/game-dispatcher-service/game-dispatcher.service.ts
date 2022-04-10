@@ -3,7 +3,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication/';
-import { DictionarySummary } from '@app/classes/communication/dictionary';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { GameConfigData, InitializeGameData } from '@app/classes/communication/game-config';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';

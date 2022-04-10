@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { DictionarySummary } from '@app/classes/communication/dictionary';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -10,7 +10,7 @@ import { DICTIONARY_DELETED, DICTIONARY_REQUIRED } from '@app/constants/componen
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -39,7 +39,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     isCreatingGame: boolean;
 
-    constructor(private gameDispatcherService: GameDispatcherService, private readonly dictionaryService: DictionariesService) {
+    constructor(private gameDispatcherService: GameDispatcherService, private readonly dictionaryService: DictionaryService) {
         this.gameTypes = GameType;
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -67,7 +67,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             .observeGameCreationFailed()
             .pipe(takeUntil(this.pageDestroyed$))
             .subscribe(async (error: HttpErrorResponse) => await this.handleGameCreationFail(error));
-        this.dictionaryService.subscribeToDictionariestUpdateDataEvent(this.pageDestroyed$, () => {
+        this.dictionaryService.subscribeToDictionariesUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
         });
     }

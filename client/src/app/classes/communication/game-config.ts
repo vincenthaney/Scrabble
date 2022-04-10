@@ -5,7 +5,6 @@ import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { DictionarySummary } from './dictionary-summary';
 import PlayerData from './player-data';
-import { DictionarySummary } from './dictionary-summary';
 import { RoundData } from './round-data';
 
 export interface GameConfigData {
