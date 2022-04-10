@@ -50,7 +50,7 @@ const DEFAULT_PROFILES: VirtualPlayerProfile[] = [DEFAULT_PROFILE_1, DEFAULT_PRO
 const CUSTOM_PROFILES: VirtualPlayerProfile[] = [CUSTOM_PROFILE_1, CUSTOM_PROFILE_2];
 const ALL_PROFILES: VirtualPlayerProfile[] = DEFAULT_PROFILES.concat(CUSTOM_PROFILES);
 
-describe.only('VirtualPlayerProfilesController', () => {
+describe('VirtualPlayerProfilesController', () => {
     let controller: VirtualPlayerProfilesController;
 
     beforeEach(() => {
