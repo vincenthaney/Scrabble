@@ -213,8 +213,6 @@ export default class DictionaryService {
         if (this.shouldDeleteActiveDictionary(dictionaryUsage)) {
             this.activeDictionaries.delete(dictionaryId);
         }
-
-        console.log(this.activeDictionaries);
     }
 
     private shouldDeleteActiveDictionary(dictionaryUsage: DictionaryUsage): boolean {
