@@ -36,7 +36,6 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         this.dictionaryId = data.dictionaryId;
         this.isDictionaryTitleValid = true;
         this.isDictionaryDescriptionValid = true;
-        this.isNewInformationValid = false;
         this.formParameters = new FormGroup({
             inputDictionaryTitle: new FormControl(data.dictionaryToModifyTitle, [
                 Validators.required,
@@ -58,7 +57,6 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         this.formParameters.controls.inputTitle?.updateValueAndValidity();
         this.isDictionaryTitleValid = this.formParameters.get('inputDictionaryTitle')?.valid ?? false;
         this.isDictionaryDescriptionValid = this.formParameters.get('inputDictionaryDescription')?.valid ?? false;
-        this.isNewInformationValid = this.isInformationValid();
     }
 
     ngOnDestroy(): void {
