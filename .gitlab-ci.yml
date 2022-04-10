@@ -1,11 +1,5 @@
 image: xwiillz/node-chromium-mongo:lts-bionic
 
-rules:
-    - if: $CI_COMMIT_BRANCH == develop
-      when: always
-    - if: $CI_COMMIT_BRANCH != develop
-      when: manual
-
 cache:
     key: '${CI_COMMIT_REF_SLUG}-client'
     paths:
@@ -30,7 +24,7 @@ cache:
     only:
         refs:
             - master
-            - merge_requests
+            - develop
         changes:
             - server/**/*
     cache:
