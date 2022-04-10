@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -66,8 +66,6 @@ describe('GameDispatcherService', () => {
     let socketServiceMock: SocketService;
     let gameViewEventSpy: SpyObj<GameViewEventManagerService>;
 
-    let gameCreationFailedSubjectMock: Subject<HttpErrorResponse>;
-
     beforeEach(() => {
         const resetSubject = new Subject();
         gameViewEventSpy = jasmine.createSpyObj('GameViewEventManagerService', ['subscribeToGameViewEvent', 'emitGameViewEvent']);
@@ -93,9 +91,7 @@ describe('GameDispatcherService', () => {
             providers: [GameDispatcherController, SocketService, { provide: GameViewEventManagerService, useValue: gameViewEventSpy }],
         });
 
-        gameCreationFailedSubjectMock = new Subject<HttpErrorResponse>();
         gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
-        spyOn(gameDispatcherControllerMock, 'observeGameCreationFailed').and.returnValue(gameCreationFailedSubjectMock);
 
         service = TestBed.inject(GameDispatcherService);
 
@@ -151,17 +147,6 @@ describe('GameDispatcherService', () => {
             });
             service['gameDispatcherController']['initializeGame$'].next(undefined);
             expect(spy).toHaveBeenCalledWith(undefined);
-        });
-
-        it('should send gameCreationFail update when receiving it', () => {
-            const spy = spyOn(service['gameCreationFailed$'], 'next').and.callFake(() => {
-                return;
-            });
-
-            const error: HttpErrorResponse = { error: { message: 'Test' } } as HttpErrorResponse;
-            gameCreationFailedSubjectMock.next(error);
-
-            expect(spy).toHaveBeenCalledWith(error);
         });
 
         it('on resetServices event, should call resetServiceData', () => {

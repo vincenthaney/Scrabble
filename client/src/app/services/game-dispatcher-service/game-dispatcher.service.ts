@@ -54,10 +54,6 @@ export default class GameDispatcherService implements OnDestroy {
         );
 
         this.gameViewEventManagerService.subscribeToGameViewEvent('resetServices', this.serviceDestroyed$, () => this.resetServiceData());
-        this.gameDispatcherController
-            .observeGameCreationFailed()
-            .pipe(takeUntil(this.serviceDestroyed$))
-            .subscribe((error: HttpErrorResponse) => this.gameCreationFailed$.next(error));
     }
 
     ngOnDestroy(): void {
