@@ -50,7 +50,7 @@ const DEFAULT_PROFILES: VirtualPlayerProfile[] = [DEFAULT_PROFILE_1, DEFAULT_PRO
 const CUSTOM_PROFILES: VirtualPlayerProfile[] = [CUSTOM_PROFILE_1, CUSTOM_PROFILE_2];
 const ALL_PROFILES: VirtualPlayerProfile[] = DEFAULT_PROFILES.concat(CUSTOM_PROFILES);
 
-describe('VirtualPlayerProfilesController', () => {
+describe.only('VirtualPlayerProfilesController', () => {
     let controller: VirtualPlayerProfilesController;
 
     beforeEach(() => {
@@ -198,6 +198,44 @@ describe('VirtualPlayerProfilesController', () => {
                     .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
                     .send({ newName: CUSTOM_PROFILE_1.name })
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
+        describe('DELETE /virtualPlayerProfiles', () => {
+            it('should return NO_CONTENT', async () => {
+                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'resetVirtualPlayerProfiles', () => []);
+
+                return supertest(expressApp)
+                    .delete('/api/virtualPlayerProfiles')
+                    .expect(StatusCodes.NO_CONTENT)
+                    .then(() => expect(spy).to.have.been.called());
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller['virtualPlayerProfileService'], 'resetVirtualPlayerProfiles', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).delete('/api/virtualPlayerProfiles').expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            });
+        });
+
+        describe('DELETE /virtualPlayerProfiles/:profileId', () => {
+            it('should return NO_CONTENT', async () => {
+                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'deleteVirtualPlayerProfile', () => []);
+
+                return supertest(expressApp)
+                    .delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
+                    .expect(StatusCodes.NO_CONTENT)
+                    .then(() => expect(spy).to.have.been.called());
+            });
+
+            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
+                chai.spy.on(controller['virtualPlayerProfileService'], 'deleteVirtualPlayerProfile', () => {
+                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
+                });
+
+                return supertest(expressApp).delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
 
