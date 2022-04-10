@@ -9,10 +9,10 @@
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { ActionPlacePayload } from '@app/classes/communication/action-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { PlayerData } from '@app/classes/communication/player-data';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
@@ -28,10 +28,10 @@ import * as chai from 'chai';
 import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
 import { ActionErrorsMessages } from './action-errors';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -77,7 +77,7 @@ const EXTRACT_CENTER: [Square, Tile][][] = [
         [{ ...DEFAULT_SQUARE_2 }, { ...DEFAULT_TILE_B }],
     ],
 ];
-const SCORE_RETURN = 1;
+const SCORE_RETURN = 132;
 const UPDATE_BOARD_RETURN: (Square | undefined)[] = [
     { ...DEFAULT_SQUARE_1, tile: DEFAULT_TILE_A },
     { ...DEFAULT_SQUARE_2, tile: DEFAULT_TILE_B },
@@ -109,7 +109,7 @@ const VALID_PLACEMENT: WordPlacement = {
     orientation: DEFAULT_ORIENTATION,
 };
 
-describe('ActionPlace', () => {
+describe.only('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let tileReserveStub: SinonStubbedInstance<TileReserve>;
     let boardStub: SinonStubbedInstance<Board>;
@@ -223,9 +223,10 @@ describe('ActionPlace', () => {
                 assert(wordValidatorStub.verifyWords.calledOnce);
             });
 
-            it('should call score computer', () => {
+            it('should call score computer and set this.scoredPoints', () => {
                 action.execute();
                 assert(scoreCalculatorServiceStub.calculatePoints.calledOnce);
+                expect(action['scoredPoints']).to.equal(SCORE_RETURN);
             });
 
             it('should call objective validation if GameType is LOG2990', () => {
