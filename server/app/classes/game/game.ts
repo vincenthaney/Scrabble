@@ -139,10 +139,10 @@ export default class Game {
 
         const updatedData: GameUpdateData = {};
         if (this.player1.id === playerId) {
-            updatedData.player1 = newPlayer.transferPlayerInfo(this.player1);
+            updatedData.player1 = newPlayer.copyPlayerInfo(this.player1);
             this.player1 = newPlayer;
         } else {
-            updatedData.player2 = newPlayer.transferPlayerInfo(this.player2);
+            updatedData.player2 = newPlayer.copyPlayerInfo(this.player2);
             this.player2 = newPlayer;
         }
 

@@ -135,16 +135,16 @@ describe('Player', () => {
         expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
     });
 
-    it('transferPlayerInfo should update the player data', () => {
+    it('copyPlayerInfo should update the player data', () => {
         const name = 'nikolaj';
         const id = 'nikolajID';
         const otherPlayer = new Player(id, name);
-        otherPlayer.objectives = [{} as unknown as AbstractObjective];
+        otherPlayer['objectives'] = [{} as unknown as AbstractObjective];
         otherPlayer.score = 3;
         otherPlayer.tiles = [{} as unknown as Tile];
-        expect(player.transferPlayerInfo(otherPlayer)).to.deep.equal({ id: otherPlayer.id, newId: player.id, name: player.name });
+        expect(player.copyPlayerInfo(otherPlayer)).to.deep.equal({ id: otherPlayer.id, newId: player.id, name: player.name });
         expect(player.score).to.equal(otherPlayer.score);
         expect(player.tiles).to.equal(otherPlayer.tiles);
-        expect(player.objectives).to.equal(otherPlayer.objectives);
+        expect(player['objectives']).to.equal(otherPlayer['objectives']);
     });
 });

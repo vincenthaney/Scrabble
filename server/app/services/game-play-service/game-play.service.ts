@@ -155,7 +155,7 @@ export class GamePlayService {
         // TODO: Use service to go fetch a new VP name in DB
         const updatedData: GameUpdateData = game.replacePlayer(playerWhoLeftId, new BeginnerVirtualPlayer(gameId, 'patnai poche'));
 
-        if (isIdVirtualPlayer(game.roundManager.getCurrentRound().player.id)) {
+        if (this.isVirtualPlayerTurn(game)) {
             this.virtualPlayerService.triggerVirtualPlayerTurn(
                 { round: game.roundManager.convertRoundToRoundData(game.roundManager.getCurrentRound()) },
                 game,
@@ -174,5 +174,9 @@ export class GamePlayService {
             newGameUpdateData.player2.id = game.player2.id;
         }
         return newGameUpdateData;
+    }
+
+    private isVirtualPlayerTurn(game: Game): boolean {
+        return isIdVirtualPlayer(game.roundManager.getCurrentRound().player.id);
     }
 }

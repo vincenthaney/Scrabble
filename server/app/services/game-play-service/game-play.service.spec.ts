@@ -534,4 +534,17 @@ describe('GamePlayService', () => {
         gamePlayService.isGameOver('', '');
         expect(getGameStub.calledOnce).to.be.true;
     });
+
+    it('isVirtualPlayerTurn should call isIdVirtualPlayer', () => {
+        gamePlayService.isGameOver('', '');
+        expect(getGameStub.calledOnce).to.be.true;
+    });
+
+    it('isVirtualPlayerTurn should call isIdVirtualPlayer', () => {
+        const spy = chai.spy.on(arrowFunction, 'isIdVirtualPlayer', () => {
+            return true;
+        });
+        gamePlayService['isVirtualPlayerTurn'](gameStub as unknown as Game);
+        expect(spy).to.have.been.called();
+    });
 });

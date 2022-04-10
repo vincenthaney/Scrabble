@@ -12,7 +12,7 @@ export default class Player {
     tiles: Tile[];
     id: string;
     isConnected: boolean;
-    objectives: AbstractObjective[];
+    private objectives: AbstractObjective[];
     private readonly objectiveService: ObjectivesService;
 
     constructor(id: string, name: string) {
@@ -61,7 +61,7 @@ export default class Player {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
     }
 
-    transferPlayerInfo(oldPlayer: Player): PlayerData {
+    copyPlayerInfo(oldPlayer: Player): PlayerData {
         this.score = oldPlayer.score;
         this.tiles = oldPlayer.tiles;
         this.objectives = oldPlayer.objectives;

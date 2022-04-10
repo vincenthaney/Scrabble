@@ -305,7 +305,6 @@ describe('Game', () => {
             expect(game.roundManager.getPassCounter()).to.equal(0);
         });
     });
-    /// ///////////
 
     describe('replacePlayer', () => {
         let game: Game;
@@ -336,27 +335,27 @@ describe('Game', () => {
         });
 
         it('should update the player1 if called with its id', () => {
-            player1Stub.transferPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            player1Stub.copyPlayerInfo.returns({ id: NEW_PLAYER_ID });
             chai.spy.on(game.roundManager, 'replacePlayer', () => {});
             game.replacePlayer(DEFAULT_PLAYER_1_ID, newPlayerStub as unknown as Player);
 
-            expect(newPlayerStub.transferPlayerInfo.calledOnceWith(player1Stub)).to.be.true;
+            expect(newPlayerStub.copyPlayerInfo.calledOnceWith(player1Stub)).to.be.true;
             expect(game.player1).to.equal(newPlayerStub);
             expect(game.player2).to.equal(player2Stub);
         });
 
         it('should update the player2 if called with its id', () => {
-            player2Stub.transferPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            player2Stub.copyPlayerInfo.returns({ id: NEW_PLAYER_ID });
             chai.spy.on(game.roundManager, 'replacePlayer', () => {});
             game.replacePlayer(DEFAULT_PLAYER_2_ID, newPlayerStub as unknown as Player);
 
-            expect(newPlayerStub.transferPlayerInfo.calledOnceWith(player2Stub)).to.be.true;
+            expect(newPlayerStub.copyPlayerInfo.calledOnceWith(player2Stub)).to.be.true;
             expect(game.player1).to.equal(player1Stub);
             expect(game.player2).to.equal(newPlayerStub);
         });
 
         it('should call roundManager.replacePlayer', () => {
-            player2Stub.transferPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            player2Stub.copyPlayerInfo.returns({ id: NEW_PLAYER_ID });
             const spy = chai.spy.on(game.roundManager, 'replacePlayer', () => {});
 
             game.replacePlayer(DEFAULT_PLAYER_2_ID, newPlayerStub as unknown as Player);

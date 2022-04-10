@@ -246,12 +246,12 @@ describe('RoundManager', () => {
             expect(roundManager['currentRound'].player).to.equal(newPlayer);
         });
 
-        it('should replace the correct player in the round manager', () => {
+        it('should replace the correct player (player1) in the round manager', () => {
             roundManager.replacePlayer(DEFAULT_PLAYER_1.id, newPlayer);
             expect(roundManager['player1']).to.equal(newPlayer);
         });
 
-        it('should replace the correct player in the round manager', () => {
+        it('should replace the correct player (player2) in the round manager', () => {
             roundManager.replacePlayer(DEFAULT_PLAYER_2.id, newPlayer);
             expect(roundManager['player2']).to.equal(newPlayer);
         });
