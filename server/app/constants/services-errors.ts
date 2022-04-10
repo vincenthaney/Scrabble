@@ -36,7 +36,5 @@ export const NO_FIRST_ROUND_EXISTS = "Il n'y a aucune ronde déjà complétée n
 
 export const NAME_ALREADY_USED = (name: string) => `Le nom ${name} est déjà utilisé pour un autre profil de joueur virtuel`;
 export const CANNOT_ADD_DEFAULT_PROFILE = "Impossible d'ajouter un nouveau profil de joueur virtuel par défaut";
-export const CANNOT_MODIFY_DEFAULT_PROFILE = 'Impossible de modifier un joueur virtuel par défaut';
-export const CANNOT_DELETE_DEFAULT_PROFILE = 'Impossible de supprimer un joueur virtuel par défaut';
 export const MUST_SPECIFY_LEVEL = 'Un niveau doit être spécifié pour le nouveau profil joueur virtuel';
-export const MISSING_PARAMETER = 'Le corps de la requête ne contient pas tous les paramètres requis';
+export const MISSING_PARAMETER = 'La requête ne contient pas toutes les spécifications requises';
