@@ -45,7 +45,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         this.columns = DICTIONARIES_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.dataSource = new MatTableDataSource(new Array());
-        // this.dataSource.sortingDataAccessor = this.sortDictionaries;
         this.state = DictionariesState.Loading;
         this.error = undefined;
 
