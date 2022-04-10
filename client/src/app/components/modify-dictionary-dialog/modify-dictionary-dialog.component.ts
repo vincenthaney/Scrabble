@@ -25,12 +25,13 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     isDictionaryTitleValid: boolean;
     isDictionaryDescriptionValid: boolean;
     isNewInformationValid: boolean;
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean>;
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
         private dictionariesService: DictionariesService,
         @Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters,
     ) {
+        this.componentDestroyed$ = new Subject();
         this.state = ModifyDictionaryComponentStates.Ready;
         this.dictionaryToModifyTitle = data.dictionaryToModifyTitle;
         this.dictionaryToModifyDescription = data.dictionaryToModifyDescription;
@@ -50,7 +51,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
                 Validators.maxLength(DICTIONARY_DESCRIPTION_VALIDATION.maxLength),
             ]),
         });
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, () => {
             this.cleanupDialogStates();
         });
     }
@@ -63,8 +64,8 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.serviceDestroyed$.next(true);
-        this.serviceDestroyed$.complete();
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     updateDictionary(): void {

@@ -14,14 +14,15 @@ export class DeleteDictionaryDialogComponent {
     state: DeleteDictionaryComponentStates;
     message: string;
     dictionaryId: string;
-    private serviceDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean>;
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
         private dictionariesService: DictionariesService,
         @Inject(MAT_DIALOG_DATA) public data: DeleteDictionaryDialogParameters,
     ) {
+        this.componentDestroyed$ = new Subject();
         this.dictionaryId = data.dictionaryId;
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.serviceDestroyed$, () => {
+        this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, () => {
             this.cleanupDialogStates();
         });
     }
