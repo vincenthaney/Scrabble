@@ -109,7 +109,7 @@ const VALID_PLACEMENT: WordPlacement = {
     orientation: DEFAULT_ORIENTATION,
 };
 
-describe.only('ActionPlace', () => {
+describe('ActionPlace', () => {
     let gameStub: SinonStubbedInstance<Game>;
     let tileReserveStub: SinonStubbedInstance<TileReserve>;
     let boardStub: SinonStubbedInstance<Board>;
