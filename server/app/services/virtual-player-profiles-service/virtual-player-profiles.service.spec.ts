@@ -145,14 +145,6 @@ describe('VirtualPlayerProfilesService', () => {
                 NO_PROFILE_OF_LEVEL,
             );
         });
-
-        it('should get all profiles from DB of given level (expert)', async () => {
-            const expertProfiles = await virtualPlayerProfilesService['getVirtualPlayerProfilesFromLevel'](VirtualPlayerLevel.Expert);
-            expect(expertProfiles.length).to.equal(
-                ALL_PROFILES.filter((profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert).length,
-            );
-            expect(expertProfiles).to.deep.equal([DEFAULT_PROFILE_2, CUSTOM_PROFILE_2]);
-        });
     });
 
     describe('addVirtualPlayerProfile', () => {
