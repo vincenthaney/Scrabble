@@ -51,17 +51,17 @@ describe('DictionariesService', () => {
             });
         });
         it('should call dictionariesUpdateMessageEvent.next', () => {
-            controller['dictionariesUpdateMessageEvent'].next();
+            controller['dictionaryUpdateMessageEvent'].next();
             expect(updateMessageSpy).toHaveBeenCalled();
         });
 
         it('should call componentUpdateEvent.next', () => {
-            controller['dictionariesUpdateMessageEvent'].next();
+            controller['dictionaryUpdateMessageEvent'].next();
             expect(componentUpdateSpy).toHaveBeenCalled();
         });
 
         it('should call service.updateAllDictionaries', () => {
-            controller['dictionariesUpdateMessageEvent'].next();
+            controller['dictionaryUpdateMessageEvent'].next();
             expect(updateAllDictionariesSpy).toHaveBeenCalled();
         });
     });
@@ -79,12 +79,12 @@ describe('DictionariesService', () => {
             });
         });
         it('should call dictionariesUpdateMessageEvent.next', () => {
-            controller['dictionariesDownloadEvent'].next();
+            controller['dictionaryDownloadEvent'].next();
             expect(downloadLoadingSpy).toHaveBeenCalled();
         });
 
         it('should call startDownload.next', () => {
-            controller['dictionariesDownloadEvent'].next();
+            controller['dictionaryDownloadEvent'].next();
             expect(startDownloadSpy).toHaveBeenCalled();
         });
     });
@@ -94,7 +94,7 @@ describe('DictionariesService', () => {
             const componentUpdateSpy = spyOn(service['componentUpdateEvent'], 'next').and.callFake(() => {
                 return;
             });
-            controller['dictionariesErrorEvent'].next({} as string);
+            controller['dictionaryErrorEvent'].next({} as string);
             expect(componentUpdateSpy).toHaveBeenCalled();
         });
     });

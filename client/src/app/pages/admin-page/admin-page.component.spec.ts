@@ -6,6 +6,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { AdminDictionariesComponent } from '@app/components/admin-dictionaries-component/admin-dictionaries.component';
+import { AdminGameHistoryComponent } from '@app/components/admin-game-history/admin-game-history.component';
 import { AdminHighScoresComponent } from '@app/components/admin-high-scores/admin-high-scores.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
@@ -27,7 +29,14 @@ describe('AdminPageComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            declarations: [AdminPageComponent, IconComponent, PageHeaderComponent, AdminHighScoresComponent],
+            declarations: [
+                AdminPageComponent,
+                IconComponent,
+                PageHeaderComponent,
+                AdminHighScoresComponent,
+                AdminDictionariesComponent,
+                AdminGameHistoryComponent,
+            ],
             imports: [
                 MatTabsModule,
                 MatCardModule,
