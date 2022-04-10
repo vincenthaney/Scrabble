@@ -31,6 +31,7 @@ import * as sinon from 'sinon';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import VirtualPlayerProfilesService from '../virtual-player-profiles-service/virtual-player-profiles.service';
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';
@@ -379,10 +380,13 @@ describe('GamePlayService', () => {
         let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
         let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
         let virtualPlayerServiceStub: SinonStubbedInstance<VirtualPlayerService>;
+        let virtualPlayerProfilesServiceStub: SinonStubbedInstance<VirtualPlayerProfilesService>;
 
         beforeEach(() => {
             activeGameServiceStub = createStubInstance(ActiveGameService);
             virtualPlayerServiceStub = createStubInstance(VirtualPlayerService);
+            virtualPlayerProfilesServiceStub = createStubInstance(VirtualPlayerProfilesService);
+            virtualPlayerProfilesServiceStub.getRandomVirtualPlayerName.resolves('testname');
             activeGameServiceStub.playerLeftEvent = new EventEmitter();
             activeGameServiceStub.getGame.returns(gameStub as unknown as Game);
             virtualPlayerServiceStub.triggerVirtualPlayerTurn.returns();
@@ -392,6 +396,7 @@ describe('GamePlayService', () => {
                 dictionaryServiceStub as unknown as DictionaryService,
                 gameHistoriesServiceStub as unknown as GameHistoriesService,
                 virtualPlayerServiceStub as unknown as VirtualPlayerService,
+                virtualPlayerProfilesServiceStub as unknown as VirtualPlayerProfilesService,
             );
             gameStub.player1 = new Player(DEFAULT_PLAYER_ID, 'Cool Guy Name');
             gameStub.player2 = new Player(playerWhoLeftId, 'LeaverName');

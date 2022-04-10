@@ -19,6 +19,8 @@ import { Service } from 'typedi';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { FeedbackMessages } from './feedback-messages';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 @Service()
 export class GamePlayService {
@@ -28,6 +30,7 @@ export class GamePlayService {
         private readonly dictionaryService: DictionaryService,
         private readonly gameHistoriesService: GameHistoriesService,
         private readonly virtualPlayerService: VirtualPlayerService,
+        private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
     ) {
         this.activeGameService.playerLeftEvent.on('playerLeft', async (gameId, playerWhoLeftId) => {
             await this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
@@ -152,8 +155,10 @@ export class GamePlayService {
             return;
         }
 
-        // TODO: Use service to go fetch a new VP name in DB
-        const updatedData: GameUpdateData = game.replacePlayer(playerWhoLeftId, new BeginnerVirtualPlayer(gameId, 'patnai poche'));
+        const updatedData: GameUpdateData = game.replacePlayer(
+            playerWhoLeftId,
+            new BeginnerVirtualPlayer(gameId, await this.virtualPlayerProfilesService.getRandomVirtualPlayerName(VirtualPlayerLevel.Beginner)),
+        );
 
         if (this.isVirtualPlayerTurn(game)) {
             this.virtualPlayerService.triggerVirtualPlayerTurn(

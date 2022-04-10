@@ -6,9 +6,10 @@
 import { VirtualPlayerProfile, VirtualPlayerProfileData } from '@app/classes/database/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
-import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED } from '@app/constants/services-errors';
+import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
+import { Random } from '@app/utils/random';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -109,6 +110,40 @@ describe('VirtualPlayerProfilesService', () => {
                 ALL_PROFILES.filter((profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Beginner).length,
             );
             expect(beginnerProfiles).to.deep.equal([DEFAULT_PROFILE_1, CUSTOM_PROFILE_1]);
+        });
+
+        it('should get all profiles from DB of given level (expert)', async () => {
+            const expertProfiles = await virtualPlayerProfilesService['getVirtualPlayerProfilesFromLevel'](VirtualPlayerLevel.Expert);
+            expect(expertProfiles.length).to.equal(
+                ALL_PROFILES.filter((profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert).length,
+            );
+            expect(expertProfiles).to.deep.equal([DEFAULT_PROFILE_2, CUSTOM_PROFILE_2]);
+        });
+    });
+
+    describe('getRandomVirtualPlayerName', () => {
+        it('should call getRandomElementsFromArray and getVirtualPlayerProfilesFromLevel', async () => {
+            chai.spy.on(virtualPlayerProfilesService, 'getVirtualPlayerProfilesFromLevel', () => {
+                return ALL_PROFILES;
+            });
+            chai.spy.on(Random, 'getRandomElementsFromArray', () => {
+                return [DEFAULT_PROFILE_1];
+            });
+
+            expect(await virtualPlayerProfilesService['getRandomVirtualPlayerName'](VirtualPlayerLevel.Beginner)).to.equal(DEFAULT_PROFILE_1.name);
+        });
+
+        it('should throw if there is no profile of the desired level', async () => {
+            chai.spy.on(virtualPlayerProfilesService, 'getVirtualPlayerProfilesFromLevel', () => {
+                return [];
+            });
+            chai.spy.on(Random, 'getRandomElementsFromArray', () => {
+                return [];
+            });
+
+            await expect(virtualPlayerProfilesService['getRandomVirtualPlayerName'](VirtualPlayerLevel.Beginner)).to.eventually.be.rejectedWith(
+                NO_PROFILE_OF_LEVEL,
+            );
         });
 
         it('should get all profiles from DB of given level (expert)', async () => {
