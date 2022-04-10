@@ -5,7 +5,7 @@
     <div style="width: 500px">
       <input
       style="display: none"
-      type="file" (change)="onFileChanged($event)"
+      type="file" (change)="handleFileInput($event.target)"
       accept=".json"
       #fileInput>
         <button mat-button id="select-button" color="primary" (click)="fileInput.click()" style="width: 200px">

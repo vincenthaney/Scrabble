@@ -3,3 +3,7 @@ export enum UploadState {
     Init = 'init',
     Error = 'error',
 }
+
+export interface UploadEvent extends EventTarget {
+    files: File[];
+}

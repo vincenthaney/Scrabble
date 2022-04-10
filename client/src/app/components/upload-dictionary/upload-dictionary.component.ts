@@ -3,7 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
 import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
-import { UploadState } from './upload-dictionary.component.types';
+import { UploadEvent, UploadState } from './upload-dictionary.component.types';
 
 @Component({
     selector: 'app-upload-dictionary',
@@ -14,14 +14,15 @@ export class UploadDictionaryComponent {
     errorMessage: string = '';
     isDictionaryReady: boolean = false;
     state: UploadState = UploadState.Init;
-    selectedFile: File;
+    selectedFile: File | null;
     newDictionary: DictionaryData;
     constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionariesService) {}
 
-    // This explicit-any exclusion is necessary since the event has no specific type nor can be cast to one as this method is called.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onFileChanged(event: any): void {
-        this.selectedFile = event.target.files[0];
+    handleFileInput(eventTarget: EventTarget | null): void {
+        if (!eventTarget) {
+            return;
+        }
+        this.selectedFile = (eventTarget as UploadEvent).files[0];
         const fileReader = new FileReader();
         fileReader.readAsText(this.selectedFile, 'UTF-8');
         if (this.selectedFile.type === 'application/json') {
