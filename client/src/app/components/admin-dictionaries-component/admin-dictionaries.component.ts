@@ -5,7 +5,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { DisplayDictionariesColumnsIteratorItem, DisplayDictionariesKeys, DictionariesState } from '@app/classes/admin/dictionaries';
-import { DictionarySummary } from '@app/classes/communication/dictionary';
 import { DEFAULT_DICTIONARIES_COLUMNS, DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
 import { isKey } from '@app/utils/is-key';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
@@ -108,7 +107,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     async resetDictionaries(): Promise<void> {
-        await this.dictionariesService.deleteAllDictionaries();
+        await this.dictionariesService.resetDictionaries();
     }
 
     sortDictionaries(dictionarySummary: DictionarySummary, property: string): string {
