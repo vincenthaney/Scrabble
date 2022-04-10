@@ -66,6 +66,16 @@ export class VirtualPlayerProfilesController {
             }
         });
 
+        this.router.delete('/virtualPlayerProfiles/:profileId', async (req: VirtualPlayerProfilesRequest, res: Response) => {
+            try {
+                const profileId: string = req.params.profileId;
+                await this.virtualPlayerProfileService.deleteVirtualPlayerProfile(profileId);
+                res.status(StatusCodes.NO_CONTENT).send();
+            } catch (exception) {
+                HttpException.sendError(exception, res);
+            }
+        });
+
         this.router.delete('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
                 await this.virtualPlayerProfileService.resetVirtualPlayerProfiles();
