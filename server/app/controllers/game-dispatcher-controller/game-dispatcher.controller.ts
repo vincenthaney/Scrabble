@@ -197,13 +197,11 @@ export class GameDispatcherController {
 
     private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', updatedData);
-        for (const message of endOfGameMessages) {
-            this.socketService.emitToRoom(gameId, 'newMessage', {
-                content: message,
-                senderId: SYSTEM_ID,
-                gameId,
-            });
-        }
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: endOfGameMessages.join('<br>'),
+            senderId: SYSTEM_ID,
+            gameId,
+        });
     }
 
     private async handleCreateGame(config: GameConfigData): Promise<LobbyData | void> {
