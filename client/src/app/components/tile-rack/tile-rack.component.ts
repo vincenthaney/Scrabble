@@ -183,7 +183,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     }
 
     private createRackTile(tile: Tile, rackTile: RackTile): RackTile {
-        return { ...tile, isUsed: (rackTile && rackTile.isUsed) ?? false, isSelected: (rackTile && rackTile.isSelected) ?? false };
+        return { ...tile, isUsed: false, isSelected: rackTile && rackTile.isSelected };
     }
 
     private handleUsedTiles(usedTilesPayload: PlaceActionPayload | undefined): void {
