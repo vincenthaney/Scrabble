@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { Subject } from 'rxjs';
 import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
@@ -12,12 +12,11 @@ import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } fro
 })
 export class DeleteDictionaryDialogComponent {
     state: DeleteDictionaryComponentStates;
-    message: string;
     dictionaryId: string;
     private componentDestroyed$: Subject<boolean>;
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
-        private dictionariesService: DictionariesService,
+        private dictionariesService: DictionaryService,
         @Inject(MAT_DIALOG_DATA) public data: DeleteDictionaryDialogParameters,
     ) {
         this.componentDestroyed$ = new Subject();

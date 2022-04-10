@@ -2,7 +2,7 @@ import { Component, Inject, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DICTIONARY_DESCRIPTION_VALIDATION, DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
 import {
     DictionaryDialogParameters,
@@ -15,9 +15,7 @@ import {
     styleUrls: ['./modify-dictionary-dialog.component.scss'],
 })
 export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
-    icon: string;
     state: ModifyDictionaryComponentStates;
-    message: string;
     dictionaryToModifyTitle: string;
     dictionaryToModifyDescription: string;
     dictionaryId: string;
@@ -28,7 +26,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     private componentDestroyed$: Subject<boolean>;
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
-        private dictionariesService: DictionariesService,
+        private dictionariesService: DictionaryService,
         @Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters,
     ) {
         this.componentDestroyed$ = new Subject();

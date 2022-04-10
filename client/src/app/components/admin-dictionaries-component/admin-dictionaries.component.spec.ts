@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { AdminDictionariesComponent } from './admin-dictionaries.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,7 +31,7 @@ const TEST_SNACKBAR = undefined as unknown as MatSnackBarRef<TextOnlySnackBar>;
 describe('AdminDictionariesComponent', () => {
     let component: AdminDictionariesComponent;
     let fixture: ComponentFixture<AdminDictionariesComponent>;
-    let dictionariesServiceMock: DictionariesService;
+    let dictionariesServiceMock: DictionaryService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -50,13 +50,13 @@ describe('AdminDictionariesComponent', () => {
                 MatCardModule,
                 MatTabsModule,
             ],
-            providers: [DictionariesService],
+            providers: [DictionaryService],
         }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(AdminDictionariesComponent);
-        dictionariesServiceMock = TestBed.inject(DictionariesService);
+        dictionariesServiceMock = TestBed.inject(DictionaryService);
 
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -180,8 +180,8 @@ describe('AdminDictionariesComponent', () => {
     });
 
     describe('resetDictionaries', async () => {
-        it('should call dictionariesService.deleteAllDictionaries', async () => {
-            const spy = spyOn(dictionariesServiceMock, 'deleteAllDictionaries');
+        it('should call dictionariesService.resetDictionaries', async () => {
+            const spy = spyOn(dictionariesServiceMock, 'resetDictionaries');
             await component.resetDictionaries();
             expect(spy).toHaveBeenCalled();
         });

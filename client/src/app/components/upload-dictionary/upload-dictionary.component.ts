@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { UploadEvent, UploadState } from './upload-dictionary.component.types';
 
 @Component({
@@ -16,7 +16,7 @@ export class UploadDictionaryComponent {
     state: UploadState = UploadState.Init;
     selectedFile: File | null;
     newDictionary: DictionaryData;
-    constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionariesService) {}
+    constructor(private dialogRef: MatDialogRef<UploadDictionaryComponent>, private dictionariesService: DictionaryService) {}
 
     handleFileInput(eventTarget: EventTarget | null): void {
         if (!eventTarget) {

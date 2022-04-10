@@ -10,7 +10,7 @@ import { DEFAULT_DICTIONARIES_COLUMNS, DICTIONARIES_COLUMNS } from '@app/constan
 import { isKey } from '@app/utils/is-key';
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
 import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component';
@@ -18,6 +18,7 @@ import { DeleteDictionaryDialogParameters } from '@app/components/delete-diction
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PositiveFeedback, SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
 import { PositiveFeedbackResponse } from './admin-dictionaries-component.types';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -39,7 +40,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     isWaitingForServerResponse: boolean;
 
     private serviceDestroyed$: Subject<boolean> = new Subject();
-    constructor(public dialog: MatDialog, private dictionariesService: DictionariesService, private snackBar: MatSnackBar) {
+    constructor(public dialog: MatDialog, private dictionariesService: DictionaryService, private snackBar: MatSnackBar) {
         this.columns = DICTIONARIES_COLUMNS;
         this.columnsItems = [];
         this.selectedColumnsItems = [];

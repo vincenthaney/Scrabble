@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -33,7 +33,7 @@ export class MatDialogMock {
 describe('UploadDictionaryComponent', () => {
     let component: UploadDictionaryComponent;
     let fixture: ComponentFixture<UploadDictionaryComponent>;
-    let dictionariesServiceMock: DictionariesService;
+    let dictionariesServiceMock: DictionaryService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -57,14 +57,14 @@ describe('UploadDictionaryComponent', () => {
                     provide: MatDialogRef,
                     useClass: MatDialogMock,
                 },
-                DictionariesService,
+                DictionaryService,
             ],
         }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(UploadDictionaryComponent);
-        dictionariesServiceMock = TestBed.inject(DictionariesService);
+        dictionariesServiceMock = TestBed.inject(DictionaryService);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
