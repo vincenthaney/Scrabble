@@ -744,8 +744,8 @@ describe('Game', () => {
         it('should return the expected StartMultiplayerGameData', () => {
             const result = game['createStartGameData']();
             const expectedMultiplayerGameData: StartGameData = {
-                player1: game.player1,
-                player2: game.player2,
+                player1: game.player1.convertToPlayerData(),
+                player2: game.player2.convertToPlayerData(),
                 gameType: game.gameType,
                 gameMode: game.gameMode,
                 maxRoundTime: DEFAULT_TIME,
