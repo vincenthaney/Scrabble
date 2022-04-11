@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
-import { randomizeArray } from '@app/utils/randomize-array';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -20,18 +21,23 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameModes: typeof GameMode;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
     dictionaryOptions: string[];
-    virtualPlayerNames: string[];
     playerName: string;
     playerNameValid: boolean;
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
 
-    constructor(private router: Router, private gameDispatcherService: GameDispatcherService) {
+    private virtualPlayerProfiles: VirtualPlayerProfile[];
+
+    constructor(
+        private router: Router,
+        private gameDispatcherService: GameDispatcherService,
+        private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
+    ) {
         this.gameTypes = GameType;
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.dictionaryOptions = [];
-        this.virtualPlayerNames = randomizeArray(['Victoria', 'Aristote', 'Herménégilde']);
+        this.virtualPlayerProfiles = [];
         this.playerName = '';
         this.playerNameValid = false;
         this.pageDestroyed$ = new Subject();
@@ -39,7 +45,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             gameType: new FormControl(GameType.Classic, Validators.required),
             gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-            virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
+            virtualPlayerName: new FormControl('', Validators.required),
             timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
             // TODO: A changer avec la portion de vincent
             dictionary: new FormControl('Mon dictionnaire', Validators.required),
@@ -58,6 +64,11 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
                 }
                 this.gameParameters?.get('level')?.updateValueAndValidity();
             });
+
+        this.virtualPlayerProfilesService
+            .getVirtualPlayerProfiles()
+            .then((profiles: VirtualPlayerProfile[]) => (this.virtualPlayerProfiles = profiles));
+        this.gameParameters.patchValue({ virtualPlayerName: this.getVirtualPlayerNames()[0] });
     }
 
     ngOnDestroy(): void {
@@ -77,6 +88,13 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
         this.playerName = playerName;
         this.playerNameValid = valid;
+    }
+
+    getVirtualPlayerNames(): string[] {
+        if (!this.virtualPlayerProfiles) return [''];
+        return this.virtualPlayerProfiles
+            .filter((profile: VirtualPlayerProfile) => profile.level === (this.gameParameters.get('level')?.value as VirtualPlayerLevel))
+            .map((profile: VirtualPlayerProfile) => profile.name);
     }
 
     private createGame(): void {
