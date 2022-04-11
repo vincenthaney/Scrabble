@@ -18,9 +18,9 @@
         justify-items: center;
         align-items: center;
         text-align: center;
-        width: 30%;
+        width: calc(100% - 24px);
 
-        p:first-child {
+        &.top-box p:first-child {
             font-size: larger;
         }
 
@@ -71,8 +71,12 @@
         }
     }
 
-    .fun-fact-box {
-        width: 60%;
+    mat-card.top-box {
+        max-width: 350px;
+    }
+
+    mat-card.fun-fact-box {
+        max-width: 750px;
         text-align: center;
 
         #intro {
