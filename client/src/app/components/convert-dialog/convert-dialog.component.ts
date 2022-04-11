@@ -58,8 +58,6 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     }
 
     onSubmit(): void {
-        if (!this.gameParameters.valid) return;
-
         this.isConverting = true;
         this.handleConvertToSolo();
     }

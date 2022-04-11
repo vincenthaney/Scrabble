@@ -41,7 +41,7 @@
                             color="primary"
                             type="submit"
                             id="convert-game-button"
-                            [disabled]="!gameParameters?.valid"
+                            [disabled]="gameParameters?.invalid"
                             cdkFocusInitial
                         >
                             Démarrer la partie solo
