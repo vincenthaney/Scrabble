@@ -46,7 +46,7 @@ export const FUN_FACTS: string[] = [
 
     'Le champion du monde de Scrabble Classique de 2019, le Québécois Francis Desjardins, conseille de « bien apprendre les mots \
     de deux à cinq lettres qui sont formés avec les lettres chères, les fameux J, K, Q, W, X, Y, Z. Il n’y en a pas tant que ça \
-    et ces mots peuvent permettre de faire beaucoup de points contre l’adversaire. » En effet, des mots comme kyu, dzo, kylix ou \
+    et ces mots peuvent permettre de faire beaucoup de points contre l’adversaire. » En effet, des mots comme kyu, dzo ou \
     qi (accepté depuis janvier 2020) peuvent rapporter beaucoup, surtout s’ils sont posés sur des cases bonus.',
 
     "Le Néo-Zélandais Nigel Richards a remporté plusieurs fois le championnat du monde de Scrabble francophone même s'il ne parle \
