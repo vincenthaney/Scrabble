@@ -24,6 +24,7 @@ export default class GameDispatcherService implements OnDestroy {
     private lobbyFullEvent: Subject<void> = new Subject();
     private lobbiesUpdateEvent: Subject<LobbyInfo[]> = new Subject();
     private joinerRejectedEvent: Subject<string> = new Subject();
+    private receivedLobbyDataEvent: Subject<void> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
@@ -34,6 +35,7 @@ export default class GameDispatcherService implements OnDestroy {
     ) {
         this.gameDispatcherController.subscribeToCreateGameEvent(this.serviceDestroyed$, (lobbyData: LobbyData) => {
             this.currentLobby = lobbyData;
+            this.receivedLobbyDataEvent.next();
         });
         this.gameDispatcherController.subscribeToJoinRequestEvent(this.serviceDestroyed$, (opponentName: string) =>
             this.handleJoinRequest(opponentName),
@@ -62,8 +64,7 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     getCurrentLobbyId(): string {
-        if (!this.currentLobby) return '';
-        return this.currentLobby.lobbyId;
+        return !this.currentLobby ? '' : this.currentLobby.lobbyId;
     }
 
     resetServiceData(): void {
@@ -148,6 +149,10 @@ export default class GameDispatcherService implements OnDestroy {
 
     subscribeToJoinerRejectedEvent(componentDestroyed$: Subject<boolean>, callback: (hostName: string) => void): void {
         this.joinerRejectedEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
+    }
+
+    subscribeToReceivedLobbyDataEvent(componentDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.receivedLobbyDataEvent.pipe(takeUntil(componentDestroyed$)).subscribe(callback);
     }
 
     private isGameModeSolo(gameParameters?: FormGroup): boolean {
