@@ -114,7 +114,7 @@ export default class DictionaryService {
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
-            if (!(await this.isTitleValid(updateInfo.title))) throw new Error(INVALID_TITLE_FORMAT);
+            if (!(await this.isTitleValid(updateInfo.title, updateInfo.id))) throw new Error(INVALID_TITLE_FORMAT);
             infoToUpdate.title = updateInfo.title;
         }
 
@@ -132,8 +132,8 @@ export default class DictionaryService {
         throw new Error(INVALID_DICTIONARY_ID);
     }
 
-    private async isTitleValid(title: string): Promise<boolean> {
-        return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
+    private async isTitleValid(title: string, id: string = ''): Promise<boolean> {
+        return (await this.collection.countDocuments({ _id: { $ne: new ObjectId(id) } })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
     private isDescriptionValid(description: string): boolean {
