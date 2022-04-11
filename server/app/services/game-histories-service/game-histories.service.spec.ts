@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
@@ -59,7 +60,9 @@ describe('GameHistoriesService', () => {
     });
 
     afterEach(async () => {
-        await databaseService.closeConnection();
+        try {
+            await databaseService.closeConnection();
+        } catch (exception) {}
         chai.spy.restore();
     });
 

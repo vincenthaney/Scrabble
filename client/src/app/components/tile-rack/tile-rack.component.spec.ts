@@ -728,10 +728,6 @@ describe('TileRackComponent', () => {
         const DEFAULT_TILE: Tile = new Tile('A' as LetterValue, 1);
         const DEFAULT_RACK_TILE: RackTile = { letter: 'A', value: 1, isUsed: true, isSelected: true };
 
-        it('should set isUsed to true if rackTile is defined && rackTile.isUsed is true', () => {
-            expect(component['createRackTile'](DEFAULT_TILE, DEFAULT_RACK_TILE).isUsed).toBeTrue();
-        });
-
         it('should set isUsed to false if rackTile is undefined && rackTile.isUsed is true', () => {
             expect(component['createRackTile'](DEFAULT_TILE, undefined as unknown as RackTile).isUsed).toBeFalse();
         });
@@ -742,10 +738,6 @@ describe('TileRackComponent', () => {
 
         it('should set isSelected to true if rackTile is defined && rackTile.isSelected is true', () => {
             expect(component['createRackTile'](DEFAULT_TILE, DEFAULT_RACK_TILE).isSelected).toBeTrue();
-        });
-
-        it('should set isSelected to false if rackTile is undefined && rackTile.isSelected is true', () => {
-            expect(component['createRackTile'](DEFAULT_TILE, undefined as unknown as RackTile).isSelected).toBeFalse();
         });
 
         it('should set isSelected to false if rackTile is defined && rackTile.isSelected is false', () => {

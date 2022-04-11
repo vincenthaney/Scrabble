@@ -2,7 +2,7 @@ import { Action, ActionPass } from '@app/classes/actions';
 import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
-import { NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
+import { INVALID_PLAYER_TO_REPLACE, NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
 import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;
@@ -71,6 +71,14 @@ export default class RoundManager {
 
     getPassCounter(): number {
         return this.passCounter;
+    }
+
+    replacePlayer(oldPlayerId: string, newPlayer: Player): void {
+        if (oldPlayerId === this.currentRound.player.id) this.currentRound.player = newPlayer;
+
+        if (oldPlayerId === this.player1.id) this.player1 = newPlayer;
+        else if (oldPlayerId === this.player2.id) this.player2 = newPlayer;
+        else throw new Error(INVALID_PLAYER_TO_REPLACE);
     }
 
     private saveCompletedRound(round: Round, actionPlayed: Action): void {

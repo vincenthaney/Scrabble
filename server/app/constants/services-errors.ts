@@ -18,7 +18,7 @@ export const NOT_PLAYER_TURN = "Ce n'est pas le tour du joueur demandeur de joue
 export const SOCKET_SERVICE_NOT_INITIALIZED = "SocketService n'est pas initalisé";
 export const INVALID_ID_FOR_SOCKET = 'Identifiant invalide pour le socket';
 export const MINIMUM_WORD_LENGTH = 2;
-export const MAXIMUM_WORD_LENGTH = 15;
+export const MAXIMUM_WORD_LENGTH = 40;
 export const INVALID_WORD = (word: string) => `Le mot **${word}** n'est pas dans le dictionnaire choisi. Vous perdez votre tour.`;
 export const WORD_TOO_SHORT = ' Mot trop court';
 export const WORD_CONTAINS_HYPHEN = ' Le mot ne peut pas contenir de tiret';
@@ -33,3 +33,9 @@ export const INVALID_REQUEST_POINT_RANGE = 'Le minimum du pointRange de la requ�
 export const NO_REQUEST_POINT_HISTORY = 'La requête doit avoir un pointHistory';
 export const NO_OBJECTIVE_LEFT_IN_POOL = "Il n'y a plus d'objectifs disponibles pour la partie";
 export const NO_FIRST_ROUND_EXISTS = "Il n'y a aucune ronde déjà complétée ni de ronde active";
+export const INVALID_PLAYER_TO_REPLACE = "Le joueur à remplacer n'existe pas";
+export const NAME_ALREADY_USED = (name: string) => `Le nom ${name} est déjà utilisé pour un autre profil de joueur virtuel`;
+export const CANNOT_ADD_DEFAULT_PROFILE = "Impossible d'ajouter un nouveau profil de joueur virtuel par défaut";
+export const NO_PROFILE_OF_LEVEL = "Il n'y a aucun joueur du niveau demandé";
+export const MUST_SPECIFY_LEVEL = 'Un niveau doit être spécifié pour le nouveau profil joueur virtuel';
+export const MISSING_PARAMETER = 'La requête ne contient pas toutes les spécifications requises';

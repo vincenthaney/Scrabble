@@ -1,4 +1,8 @@
+import { Board } from '@app/classes/board';
+import { ActionData } from '@app/classes/communication/action-data';
 import Player from '@app/classes/player/player';
+import Range from '@app/classes/range/range';
+import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
 import {
     FINAL_WAIT_TIME,
     MINIMUM_EXCHANGE_WORD_COUNT,
@@ -6,15 +10,11 @@ import {
     VIRTUAL_PLAYER_ID_PREFIX,
 } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
+import { Delay } from '@app/utils/delay';
 import { Container } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
-import Range from '@app/classes/range/range';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { Delay } from '@app/utils/delay';
-import { Board } from '@app/classes/board';
-import { ActionData } from '@app/classes/communication/action-data';
-import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
 
 export abstract class AbstractVirtualPlayer extends Player {
     gameId: string;
@@ -66,9 +66,13 @@ export abstract class AbstractVirtualPlayer extends Player {
         this.getVirtualPlayerService().sendAction(this.gameId, this.id, actionResult ? actionResult[0] : this.alternativeMove());
     }
 
+    protected getDictionaryId(gameId: string, playerId: string): string {
+        return this.getActiveGameService().getGame(gameId, playerId).dictionarySummary.id;
+    }
+
     protected computeWordPlacement(): ScoredWordPlacement | undefined {
         const request = this.generateWordFindingRequest();
-        this.wordFindingInstance = this.getWordFindingService().getWordFindingInstance(request.useCase, this.getDictionaryId(), [
+        this.wordFindingInstance = this.getWordFindingService().getWordFindingInstance(request.useCase, this.getDictionaryId(this.gameId, this.id), [
             this.getGameBoard(this.gameId, this.id),
             this.tiles,
             request,
@@ -85,10 +89,6 @@ export abstract class AbstractVirtualPlayer extends Player {
                 totalTilesLeft += value;
             });
         return totalTilesLeft >= MINIMUM_EXCHANGE_WORD_COUNT;
-    }
-
-    private getDictionaryId(): string {
-        return this.activeGameService.getGame(this.gameId, this.id).dictionarySummary.id;
     }
 
     protected abstract findAction(): Promise<ActionData>;

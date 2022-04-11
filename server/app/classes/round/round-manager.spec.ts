@@ -5,14 +5,14 @@ import { Action, ActionExchange, ActionPass } from '@app/classes/actions';
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
+import { INVALID_PLAYER_TO_REPLACE, NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { CompletedRound, Round } from './round';
 import RoundManager from './round-manager';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -23,6 +23,7 @@ const MAX_TRIES = 100;
 const DEFAULT_MAX_ROUND_TIME = 1;
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
+const NEW_PLAYER = { id: 'newplayer-1', name: 'newplayer 1' };
 
 describe('RoundManager', () => {
     let roundManager: RoundManager;
@@ -219,5 +220,47 @@ describe('RoundManager', () => {
         roundManager['currentRound'] = CURRENT_ROUND;
         roundManager.getCurrentRound();
         expect(roundManager.getCurrentRound()).to.deep.equal(CURRENT_ROUND);
+    });
+
+    describe('replacePlayer', () => {
+        let player1: Player;
+        let player2: Player;
+        let newPlayer: Player;
+        beforeEach(() => {
+            player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name);
+            player2 = new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name);
+            newPlayer = new Player(NEW_PLAYER.id, NEW_PLAYER.name);
+
+            const round: Round = {
+                player: player1,
+                startTime: new Date(),
+                limitTime: new Date(),
+            };
+            roundManager['currentRound'] = round;
+            roundManager['player1'] = player1;
+            roundManager['player2'] = player2;
+        });
+
+        it('should replace the player in the current round', () => {
+            roundManager.replacePlayer(DEFAULT_PLAYER_1.id, newPlayer);
+            expect(roundManager['currentRound'].player).to.equal(newPlayer);
+        });
+
+        it('should replace the correct player (player1) in the round manager', () => {
+            roundManager.replacePlayer(DEFAULT_PLAYER_1.id, newPlayer);
+            expect(roundManager['player1']).to.equal(newPlayer);
+        });
+
+        it('should replace the correct player (player2) in the round manager', () => {
+            roundManager.replacePlayer(DEFAULT_PLAYER_2.id, newPlayer);
+            expect(roundManager['player2']).to.equal(newPlayer);
+        });
+
+        it('should throw if it is an invalid id', () => {
+            const result = () => {
+                roundManager.replacePlayer('badId', newPlayer);
+            };
+            expect(result).to.throw(INVALID_PLAYER_TO_REPLACE);
+        });
     });
 });

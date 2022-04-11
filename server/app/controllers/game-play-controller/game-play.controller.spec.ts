@@ -33,11 +33,11 @@ import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { GamePlayController } from './game-play.controller';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -114,7 +114,9 @@ describe('GamePlayController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`).expect(StatusCodes.NO_CONTENT);
+                return await supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`)
+                    .expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -122,7 +124,7 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp)
+                return await supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`)
                     .expect(StatusCodes.BAD_REQUEST);
             });
@@ -130,7 +132,7 @@ describe('GamePlayController', () => {
             it('should call handlePlayAction', async () => {
                 const handlePlayActionSpy = chai.spy.on(gamePlayController, 'handlePlayAction', () => {});
 
-                return supertest(expressApp)
+                return await supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/action`)
                     .then(() => {
                         expect(handlePlayActionSpy).to.have.been.called();
@@ -142,7 +144,7 @@ describe('GamePlayController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handleNewMessage', () => {});
 
-                return supertest(expressApp)
+                return await supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
                     .expect(StatusCodes.NO_CONTENT);
             });
@@ -152,7 +154,7 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp)
+                return await supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
                     .expect(StatusCodes.BAD_REQUEST);
             });
@@ -160,7 +162,7 @@ describe('GamePlayController', () => {
             it('should call handleNewMessage', async () => {
                 const handleNewMessageSpy = chai.spy.on(gamePlayController, 'handleNewMessage', () => {});
 
-                return supertest(expressApp)
+                return await supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/message`)
                     .then(() => {
                         expect(handleNewMessageSpy).to.have.been.called();
@@ -172,7 +174,9 @@ describe('GamePlayController', () => {
             it('should return NO_CONTENT', async () => {
                 chai.spy.on(gamePlayController, 'handleNewError', () => {});
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`).expect(StatusCodes.NO_CONTENT);
+                return await supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`)
+                    .expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on error', async () => {
@@ -180,13 +184,15 @@ describe('GamePlayController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
-                return supertest(expressApp).post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`).expect(StatusCodes.BAD_REQUEST);
+                return await supertest(expressApp)
+                    .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`)
+                    .expect(StatusCodes.BAD_REQUEST);
             });
 
             it('should call handleNewError', async () => {
                 const handleNewErrorSpy = chai.spy.on(gamePlayController, 'handleNewError', () => {});
 
-                return supertest(expressApp)
+                return await supertest(expressApp)
                     .post(`/api/games/${DEFAULT_GAME_ID}/players/${DEFAULT_PLAYER_ID}/error`)
                     .then(() => {
                         expect(handleNewErrorSpy).to.have.been.called();
@@ -458,7 +464,6 @@ describe('GamePlayController', () => {
     });
 
     describe('handleError', () => {
-        // let socketServiceStub: SinonStubbedInstance<SocketService>;
         let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;

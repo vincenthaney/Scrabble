@@ -1,6 +1,7 @@
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { PlayerData } from './';
+import { GameObjectivesData } from './game-objectives-data';
 import { RoundData } from './round-data';
 
 export default interface GameUpdateData {
@@ -10,4 +11,5 @@ export default interface GameUpdateData {
     board?: Square[] | undefined;
     round?: RoundData;
     tileReserve?: TileReserveData[];
+    gameObjective?: GameObjectivesData;
 }

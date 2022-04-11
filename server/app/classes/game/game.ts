@@ -1,4 +1,5 @@
 import Board from '@app/classes/board/board';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameHistory } from '@app/classes/database/game-history';
@@ -17,7 +18,7 @@ import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -58,8 +59,8 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
-        game.gameMode = config.gameMode;
         game.dictionarySummary = config.dictionary;
+        game.gameMode = config.gameMode;
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
@@ -131,6 +132,24 @@ export default class Game {
             if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
         }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+    }
+
+    replacePlayer(playerId: string, newPlayer: Player): GameUpdateData {
+        if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+
+        const updatedData: GameUpdateData = {};
+        if (this.player1.id === playerId) {
+            updatedData.player1 = newPlayer.copyPlayerInfo(this.player1);
+            this.player1 = newPlayer;
+        } else {
+            updatedData.player2 = newPlayer.copyPlayerInfo(this.player2);
+            this.player2 = newPlayer;
+        }
+
+        this.roundManager.replacePlayer(playerId, newPlayer);
+        this.gameMode = GameMode.Solo;
+
+        return updatedData;
     }
 
     areGameOverConditionsMet(): boolean {

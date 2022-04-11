@@ -42,6 +42,7 @@ const DEFAULT_GAME_ID = 'gameId';
 
 const DEFAULT_PLAYER_1_ID = '1';
 const DEFAULT_PLAYER_2_ID = '2';
+const NEW_PLAYER_ID = 'newid';
 const DEFAULT_PLAYER_1 = new Player(DEFAULT_PLAYER_1_ID, 'player1');
 const DEFAULT_PLAYER_2 = new Player(DEFAULT_PLAYER_2_ID, 'player2');
 const DEFAULT_VIRTUAL_PLAYER_ID = 'virtualplayerid';
@@ -301,6 +302,63 @@ describe('Game', () => {
             player2Stub.hasTilesLeft.returns(false);
             expect(game.areGameOverConditionsMet()).to.be.true;
             expect(game.roundManager.getPassCounter()).to.equal(0);
+        });
+    });
+
+    describe('replacePlayer', () => {
+        let game: Game;
+        let roundManagerStub: SinonStubbedInstance<RoundManager>;
+        let player1Stub: SinonStubbedInstance<Player>;
+        let player2Stub: SinonStubbedInstance<Player>;
+        let newPlayerStub: SinonStubbedInstance<Player>;
+
+        beforeEach(() => {
+            game = new Game();
+            roundManagerStub = createStubInstance(RoundManager);
+            player1Stub = createStubInstance(Player);
+            player2Stub = createStubInstance(Player);
+            newPlayerStub = createStubInstance(Player);
+            player1Stub.id = DEFAULT_PLAYER_1_ID;
+            player2Stub.id = DEFAULT_PLAYER_2_ID;
+            newPlayerStub.id = DEFAULT_PLAYER_2_ID;
+            game.roundManager = roundManagerStub as unknown as RoundManager;
+            game.player1 = player1Stub as unknown as Player;
+            game.player2 = player2Stub as unknown as Player;
+        });
+
+        it('should throw if the player is not from the game', () => {
+            const result = () => {
+                game.replacePlayer('badid', newPlayerStub as unknown as Player);
+            };
+            expect(result).to.throw(INVALID_PLAYER_ID_FOR_GAME);
+        });
+
+        it('should update the player1 if called with its id', () => {
+            player1Stub.copyPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            chai.spy.on(game.roundManager, 'replacePlayer', () => {});
+            game.replacePlayer(DEFAULT_PLAYER_1_ID, newPlayerStub as unknown as Player);
+
+            expect(newPlayerStub.copyPlayerInfo.calledOnceWith(player1Stub)).to.be.true;
+            expect(game.player1).to.equal(newPlayerStub);
+            expect(game.player2).to.equal(player2Stub);
+        });
+
+        it('should update the player2 if called with its id', () => {
+            player2Stub.copyPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            chai.spy.on(game.roundManager, 'replacePlayer', () => {});
+            game.replacePlayer(DEFAULT_PLAYER_2_ID, newPlayerStub as unknown as Player);
+
+            expect(newPlayerStub.copyPlayerInfo.calledOnceWith(player2Stub)).to.be.true;
+            expect(game.player1).to.equal(player1Stub);
+            expect(game.player2).to.equal(newPlayerStub);
+        });
+
+        it('should call roundManager.replacePlayer', () => {
+            player2Stub.copyPlayerInfo.returns({ id: NEW_PLAYER_ID });
+            const spy = chai.spy.on(game.roundManager, 'replacePlayer', () => {});
+
+            game.replacePlayer(DEFAULT_PLAYER_2_ID, newPlayerStub as unknown as Player);
+            expect(spy).to.have.been.called();
         });
     });
 

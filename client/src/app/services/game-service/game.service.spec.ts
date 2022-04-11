@@ -84,6 +84,7 @@ describe('GameService', () => {
         const message$ = new Subject();
         const reRender$ = new Subject();
         const noActiveGame$ = new Subject();
+        const resetServices$ = new Subject();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
         gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
             switch (eventType) {
@@ -98,6 +99,10 @@ describe('GameService', () => {
                     break;
                 case 'newMessage':
                     message$.next();
+                    break;
+                case 'resetServices':
+                    resetServices$.next();
+                    break;
             }
         });
 
@@ -111,6 +116,8 @@ describe('GameService', () => {
                     return noActiveGame$.pipe(takeUntil(destroy$)).subscribe(next);
                 case 'newMessage':
                     return message$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'resetServices':
+                    return resetServices$.pipe(takeUntil(destroy$)).subscribe(next);
             }
             return new Subscription();
         });
@@ -150,6 +157,14 @@ describe('GameService', () => {
             const spy = spyOn<any>(service, 'handleNewMessage');
             service['gameController']['newMessage$'].next(null);
             expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should call resetServiceData if resetServices event is received', () => {
+            const resetDataSpy = spyOn(service, 'resetServiceData').and.callFake(() => {
+                return;
+            });
+            gameViewEventManagerSpy.emitGameViewEvent('resetServices');
+            expect(resetDataSpy).toHaveBeenCalled();
         });
     });
 

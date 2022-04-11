@@ -37,6 +37,10 @@ describe('SocketService', () => {
         let clientSocket: Socket;
 
         beforeEach(() => {
+            Container.reset();
+        });
+
+        beforeEach(() => {
             server = Container.get(Server);
             server.init();
             service = server['socketService'];

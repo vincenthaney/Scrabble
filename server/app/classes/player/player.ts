@@ -4,6 +4,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { Container } from 'typedi';
+import { PlayerData } from '@app/classes/communication/player-data';
 
 export default class Player {
     name: string;
@@ -11,7 +12,7 @@ export default class Player {
     tiles: Tile[];
     id: string;
     isConnected: boolean;
-    private objectives: Set<AbstractObjective>;
+    private objectives: AbstractObjective[];
     private readonly objectiveService: ObjectivesService;
 
     constructor(id: string, name: string) {
@@ -40,11 +41,11 @@ export default class Player {
     }
 
     getObjectives(): AbstractObjective[] {
-        return [...this.objectives.values()];
+        return [...this.objectives];
     }
 
     resetObjectivesProgression(): void {
-        this.getObjectives()
+        [...this.objectives]
             .filter((objective: AbstractObjective) => !objective.isCompleted() && objective.shouldResetOnInvalidWord)
             .forEach((objective: AbstractObjective) => {
                 objective.progress = 0;
@@ -53,10 +54,17 @@ export default class Player {
 
     initializeObjectives(publicObjectives: Set<AbstractObjective>, privateObjective: AbstractObjective): void {
         const publicObjectiveClones: AbstractObjective[] = [...publicObjectives.values()].map((objective: AbstractObjective) => objective.clone());
-        this.objectives = new Set(publicObjectiveClones).add(privateObjective);
+        this.objectives = [...publicObjectiveClones, privateObjective];
     }
 
     validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
+    }
+
+    copyPlayerInfo(oldPlayer: Player): PlayerData {
+        this.score = oldPlayer.score;
+        this.tiles = oldPlayer.tiles;
+        this.objectives = oldPlayer.objectives;
+        return { id: oldPlayer.id, newId: this.id, name: this.name };
     }
 }

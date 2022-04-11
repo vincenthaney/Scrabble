@@ -1,22 +1,24 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
-import { Container } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import WordFindingService from './word-finding.service';
 import { Board } from '@app/classes/board';
-import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
-import { expect } from 'chai';
-import { Tile } from '@app/classes/tile';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { Dictionary } from '@app/classes/dictionary';
 import Range from '@app/classes/range/range';
+import { Tile } from '@app/classes/tile';
+import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 import { PartialWordFindingParameters } from '@app/classes/word-finding/word-finding-types';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { Dictionary } from '@app/classes/dictionary';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { Container } from 'typedi';
+import WordFindingService from './word-finding.service';
 
 const TEST_ID = 'TEST_ID';
+
 describe('WordFindingService', () => {
     let findWordsStub: SinonStub;
     let service: WordFindingService;
@@ -58,17 +60,17 @@ describe('WordFindingService', () => {
         });
 
         it('should return WordFindingHint if useCase is hint', () => {
-            const result = service['getWordFindingInstance'](WordFindingUseCase.Hint, TEST_ID, params);
+            const result = service['getWordFindingInstance'](WordFindingUseCase.Hint, TEST_DICTIONARY.id, params);
             expect(result).to.be.instanceOf(WordFindingHint);
         });
 
         it('should return WordFindingBeginner if useCase is beginner', () => {
-            const result = service['getWordFindingInstance'](WordFindingUseCase.Beginner, TEST_ID, params);
+            const result = service['getWordFindingInstance'](WordFindingUseCase.Beginner, TEST_DICTIONARY.id, params);
             expect(result).to.be.instanceOf(WordFindingBeginner);
         });
 
         it('should return WordFindingExpert if useCase is expert', () => {
-            const result = service['getWordFindingInstance'](WordFindingUseCase.Expert, TEST_ID, params);
+            const result = service['getWordFindingInstance'](WordFindingUseCase.Expert, TEST_DICTIONARY.id, params);
             expect(result).to.be.instanceOf(WordFindingExpert);
         });
     });

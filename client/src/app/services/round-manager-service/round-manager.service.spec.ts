@@ -22,7 +22,9 @@ import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
 import { ActionService } from '@app/services/action-service/action.service';
+import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
+import { Observable, Subject, Subscription } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
 
 class RoundManagerServiceWrapper {
@@ -65,6 +67,7 @@ const DEFAULT_PLAYER_DATA: PlayerData = { name: 'name', id: 'id', score: 1, tile
 describe('RoundManagerService', () => {
     let service: RoundManagerService;
     let actionServiceSpy: SpyObj<ActionService>;
+    let gameViewEventSpy: SpyObj<GameViewEventManagerService>;
 
     const currentRound: Round = {
         player: DEFAULT_PLAYER,
@@ -75,6 +78,17 @@ describe('RoundManagerService', () => {
 
     beforeEach(() => {
         actionServiceSpy = jasmine.createSpyObj('ActionService', ['createActionData', 'sendAction']);
+
+        const resetSubject = new Subject();
+        gameViewEventSpy = jasmine.createSpyObj('GameViewEventManagerService', ['subscribeToGameViewEvent', 'emitGameViewEvent']);
+        gameViewEventSpy.subscribeToGameViewEvent.and.callFake((eventType: string, destroy$: Observable<boolean>, next: any) => {
+            if (eventType !== 'resetServices') return new Subscription();
+            return resetSubject.subscribe(next);
+        });
+        gameViewEventSpy.emitGameViewEvent.and.callFake((eventType: string, payload?: any) => {
+            if (eventType !== 'resetServices') return;
+            resetSubject.next(payload);
+        });
     });
 
     beforeEach(() => {
@@ -86,13 +100,32 @@ describe('RoundManagerService', () => {
                     { path: 'home', component: TestComponent },
                 ]),
             ],
-            providers: [{ provide: ActionService, useValue: actionServiceSpy }],
+            providers: [
+                { provide: ActionService, useValue: actionServiceSpy },
+                { provide: GameViewEventManagerService, useValue: gameViewEventSpy },
+            ],
         });
         service = TestBed.inject(RoundManagerService);
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
+    });
+
+    it('on resetServices event, should call resetServiceData', () => {
+        const resetDataSpy = spyOn(service, 'resetServiceData').and.callFake(() => {
+            return;
+        });
+        gameViewEventSpy.emitGameViewEvent('resetServices');
+        expect(resetDataSpy).toHaveBeenCalled();
+    });
+
+    it('ngOnDestroy should call serviceDestroyed$.complete', () => {
+        const completeSpy = spyOn(service['serviceDestroyed$'], 'complete').and.callFake(() => {
+            return;
+        });
+        service.ngOnDestroy();
+        expect(completeSpy).toHaveBeenCalled();
     });
 
     it('initialize should define attributes with provided information', () => {

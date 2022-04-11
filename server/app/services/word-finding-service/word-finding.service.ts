@@ -1,12 +1,12 @@
-import { Service } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import AbstractWordFinding from '@app/classes/word-finding/abstract-word-finding/abstract-word-finding';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import WordFindingHint from '@app/classes/word-finding/word-finding-hint/word-finding-hint';
-import WordFindingBeginner from '@app/classes/word-finding/word-finding-beginner/word-finding-beginner';
 import { WordFindingUseCase } from '@app/classes/word-finding';
+import AbstractWordFinding from '@app/classes/word-finding/abstract-word-finding/abstract-word-finding';
+import WordFindingBeginner from '@app/classes/word-finding/word-finding-beginner/word-finding-beginner';
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
+import WordFindingHint from '@app/classes/word-finding/word-finding-hint/word-finding-hint';
 import { PartialWordFindingParameters, WordFindingParameters } from '@app/classes/word-finding/word-finding-types';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { Service } from 'typedi';
 
 @Service()
 export default class WordFindingService {

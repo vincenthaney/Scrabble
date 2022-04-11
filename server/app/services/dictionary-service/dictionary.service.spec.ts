@@ -5,22 +5,22 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
+import { BasicDictionaryData, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { assert, expect } from 'chai';
-import { Container } from 'typedi';
-import { join } from 'path';
-import * as mock from 'mock-fs';
-import { MongoClient, ObjectId, WithId } from 'mongodb';
-import { ValidateFunction } from 'ajv';
-import * as chai from 'chai';
-import * as sinon from 'sinon';
-
-import * as chaiAsPromised from 'chai-as-promised';
-import { describe } from 'mocha';
+import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
-import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
+import { ValidateFunction } from 'ajv';
+import * as chai from 'chai';
+import { assert, expect } from 'chai';
+import * as chaiAsPromised from 'chai-as-promised';
+import { describe } from 'mocha';
+import * as mock from 'mock-fs';
+import { ObjectId, WithId } from 'mongodb';
+import { join } from 'path';
+import * as sinon from 'sinon';
 import { stub } from 'sinon';
+import { Container } from 'typedi';
 import {
     ADDITIONNAL_PROPERTY_DICTIONARY,
     DICTIONARY_1,
@@ -43,8 +43,8 @@ import {
     SAME_TITLE_DICTIONARY,
     VALID_DICTIONARY,
 } from './dictionary-test.service.spec';
-import { BasicDictionaryData, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import DictionaryService from './dictionary.service';
+
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 // mockPaths must be of type any because keys must be dynamic
@@ -55,12 +55,20 @@ mockPaths[join(__dirname, DICTIONARY_PATH)] = JSON.stringify(DICTIONARY_1);
 describe('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
-    let client: MongoClient;
+    let initDatabaseServiceMock;
+    let initDictionaryService;
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(async () => {
-        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-        client = (await databaseService.connectToServer()) as MongoClient;
-        dictionaryService = Container.get(DictionaryService);
+        initDatabaseServiceMock = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        initDictionaryService = Container.get(DictionaryService);
+
+        databaseService = initDatabaseServiceMock;
+        await databaseService.connectToServer();
+        dictionaryService = initDictionaryService;
         dictionaryService['databaseService'] = databaseService;
         await dictionaryService['collection'].insertMany(INITIAL_DICTIONARIES);
     });
@@ -295,7 +303,7 @@ describe('DictionaryService', () => {
             expect(result.description).to.equal(DICTIONARY_2.description);
         });
 
-        it('should throw with am invalid id', async () => {
+        it('should throw with an invalid id', async () => {
             expect(dictionaryService['getDbDictionary'](new ObjectId().toString())).to.eventually.be.rejectedWith(Error);
         });
     });
@@ -409,13 +417,6 @@ describe('DictionaryService', () => {
         it('should not do anything if the dictionaryId is not a key of the map', async () => {
             dictionaryService.stopUsingDictionary('BASE_DICTIONARY_ID');
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
-        });
-    });
-
-    describe('Error handling', () => {
-        it('should throw an error if we try to access the database on a closed connection', async () => {
-            await client.close();
-            expect(dictionaryService['getAllDictionarySummaries']()).to.eventually.be.rejectedWith(Error);
         });
     });
 });

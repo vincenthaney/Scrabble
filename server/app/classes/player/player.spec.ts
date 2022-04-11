@@ -17,6 +17,7 @@ import * as spies from 'chai-spies';
 import { assert } from 'console';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
+import { Tile } from 'app/classes/tile';
 import Player from './player';
 chai.use(spies);
 
@@ -73,17 +74,17 @@ describe('Player', () => {
     });
 
     it('getObjectives should return player objectives as array', () => {
-        player['objectives'] = new Set([generateTestObjective(1)]);
-        const expected: AbstractObjective[] = [...player['objectives'].values()];
+        player['objectives'] = [generateTestObjective(1)];
+        const expected: AbstractObjective[] = player['objectives'];
         const actual: AbstractObjective[] = player.getObjectives();
         expect(actual).to.deep.equal(expected);
     });
 
     it('initializeObjectives should set player objectives', async () => {
         const objectives: GameObjectives = generateGameObjectives();
-        player['objectives'] = undefined as unknown as Set<AbstractObjective>;
+        player['objectives'] = undefined as unknown as AbstractObjective[];
         player.initializeObjectives(objectives.publicObjectives, objectives.player1Objective);
-        expect(player['objectives']).to.deep.equal(objectives.publicObjectives.add(objectives.player1Objective));
+        expect(player['objectives']).to.deep.equal([...objectives.publicObjectives, objectives.player1Objective]);
     });
 
     describe('resetObjectivesProgression', () => {
@@ -93,7 +94,7 @@ describe('Player', () => {
         beforeEach(() => {
             objective = generateResetableTestObjective(1);
 
-            player['objectives'] = new Set([objective]);
+            player['objectives'] = [objective];
             objective.progress = initialProgress;
         });
 
@@ -107,7 +108,7 @@ describe('Player', () => {
 
         it('should not reset objective if it is not resetable', () => {
             objective = generateTestObjective(1);
-            player['objectives'] = new Set([objective]);
+            player['objectives'] = [objective];
             objective.progress = initialProgress;
 
             chai.spy.on(objective, 'isCompleted', () => false);
@@ -132,5 +133,18 @@ describe('Player', () => {
         const validationParameters: ObjectiveValidationParameters = { game: new Game() } as unknown as ObjectiveValidationParameters;
         player.validateObjectives(validationParameters);
         expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
+    });
+
+    it('copyPlayerInfo should update the player data', () => {
+        const name = 'nikolaj';
+        const id = 'nikolajID';
+        const otherPlayer = new Player(id, name);
+        otherPlayer['objectives'] = [{} as unknown as AbstractObjective];
+        otherPlayer.score = 3;
+        otherPlayer.tiles = [{} as unknown as Tile];
+        expect(player.copyPlayerInfo(otherPlayer)).to.deep.equal({ id: otherPlayer.id, newId: player.id, name: player.name });
+        expect(player.score).to.equal(otherPlayer.score);
+        expect(player.tiles).to.equal(otherPlayer.tiles);
+        expect(player['objectives']).to.equal(otherPlayer['objectives']);
     });
 });

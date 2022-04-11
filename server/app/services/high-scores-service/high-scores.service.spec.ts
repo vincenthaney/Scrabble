@@ -12,13 +12,12 @@ import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { MongoClient } from 'mongodb';
 import { join } from 'path';
+import * as sinon from 'sinon';
 import { stub } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import HighScoresService from './high-scores.service';
-import * as sinon from 'sinon';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const HIGH_SCORE_CLASSIC_1: HighScore = {
@@ -66,15 +65,44 @@ const mockInitialHighScores: HighScoresData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, DEFAULT_HIGH_SCORES_RELATIVE_PATH)] = JSON.stringify(mockInitialHighScores);
 
+export class TestTimer {
+    private name: string;
+    private start: number;
+    private last: number;
+    private count: number;
+
+    constructor(name: string) {
+        this.name = name;
+        this.start = Date.now();
+        this.last = this.start;
+        this.count = 0;
+    }
+
+    check(step: string = '') {
+        const now = Date.now();
+        // eslint-disable-next-line no-console
+        console.log(`+> ${this.name}: ${step}`, this.count, `${now - this.start}ms`, `${now - this.last}ms`);
+
+        this.last = now;
+        this.count++;
+    }
+}
+
 describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
-    let client: MongoClient;
+
+    beforeEach(() => {
+        Container.reset();
+    });
 
     beforeEach(async () => {
         databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-        client = (await databaseService.connectToServer()) as MongoClient;
+        await databaseService.connectToServer();
+
+        Container.set(DatabaseService, databaseService);
         highScoresService = Container.get(HighScoresService);
+
         highScoresService['databaseService'] = databaseService;
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
     });
@@ -86,7 +114,7 @@ describe('HighScoresService', () => {
     });
 
     describe('fetchDefaultHighScores', () => {
-        it('should get all courses from JSON', async () => {
+        it('should get all high scores from JSON', async () => {
             mock(mockPaths);
             const highScores = await HighScoresService['fetchDefaultHighScores']();
             mock.restore();
@@ -95,7 +123,7 @@ describe('HighScoresService', () => {
     });
 
     describe('getHighScores', () => {
-        it('should get all courses from DB of given gameType', async () => {
+        it('should get all high scores from DB of given gameType', async () => {
             const highScores = await highScoresService['getHighScores'](GameType.Classic);
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES_CLASSIC.length);
             expect(INITIAL_HIGH_SCORES_CLASSIC).to.deep.equals(highScores);
@@ -204,13 +232,6 @@ describe('HighScoresService', () => {
             const newScore = HIGH_SCORE_CLASSIC_3.score + 1;
             expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
             expect(spyUpdateHighScore).to.have.been.called();
-        });
-    });
-
-    describe('Error handling', () => {
-        it('should throw an error if we try to access the database on a closed connection', async () => {
-            await client.close();
-            expect(highScoresService['getHighScores'](GameType.Classic)).to.eventually.be.rejectedWith(Error);
         });
     });
 });
