@@ -59,7 +59,7 @@ const TEST_FORM_CONTENT = {
 const TEST_FORM: FormGroup = new FormGroup(TEST_FORM_CONTENT);
 TEST_FORM.setValue(TEST_GAME_PARAMETERS);
 
-describe('GameDispatcherService', () => {
+fdescribe('GameDispatcherService', () => {
     let getCurrentLobbyIdSpy: jasmine.Spy;
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
@@ -407,17 +407,25 @@ describe('GameDispatcherService', () => {
     });
 
     describe('handleConfirmation', () => {
+        let confirmationObservable: Subject<void>;
         let confirmationSpy: jasmine.Spy;
+        let gameCreationFailedSpy: jasmine.Spy;
 
         beforeEach(() => {
-            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation').and.returnValue(new Observable<void>());
+            confirmationObservable = new Subject<void>();
+            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation').and.returnValue(
+                confirmationObservable.asObservable(),
+            );
+            gameCreationFailedSpy = spyOn(service['gameCreationFailed$'], 'next').and.callFake(() => {
+                return;
+            });
         });
 
         afterEach(() => {
             confirmationSpy.calls.reset();
         });
 
-        it('should call handleCancelGame if gameId is defined', () => {
+        it('should call handleConfirmation if gameId is defined', () => {
             getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
@@ -427,6 +435,13 @@ describe('GameDispatcherService', () => {
             getCurrentLobbyIdSpy.and.returnValue('');
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).not.toHaveBeenCalled();
+        });
+
+        it('on error, should emit gameCreationFailed', () => {
+            getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
+            service.handleConfirmation(TEST_PLAYER_NAME);
+            confirmationObservable.error({});
+            expect(gameCreationFailedSpy).toHaveBeenCalled();
         });
     });
 
@@ -564,5 +579,47 @@ describe('GameDispatcherService', () => {
 
     it('observeGameCreationFailed should return observable of gameCreationFailed$', () => {
         expect(service.observeGameCreationFailed()).toEqual(service['gameCreationFailed$'].asObservable());
+    });
+
+    describe('subcription methods', () => {
+        let serviceDestroyed$: Subject<boolean>;
+        let callback: () => void;
+
+        beforeEach(() => {
+            serviceDestroyed$ = new Subject();
+            callback = () => {
+                return;
+            };
+        });
+
+        it('subscribeToJoinRequestEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['joinRequestEvent'], 'subscribe');
+            service.subscribeToJoinRequestEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToCanceledGameEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['canceledGameEvent'], 'subscribe');
+            service.subscribeToCanceledGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbyFullEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['lobbyFullEvent'], 'subscribe');
+            service.subscribeToLobbyFullEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbiesUpdateEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['lobbiesUpdateEvent'], 'subscribe');
+            service.subscribeToLobbiesUpdateEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToJoinerRejectedEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['joinerRejectedEvent'], 'subscribe');
+            service.subscribeToJoinerRejectedEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
     });
 });

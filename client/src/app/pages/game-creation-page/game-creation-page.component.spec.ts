@@ -40,7 +40,7 @@ import SpyObj = jasmine.SpyObj;
 })
 class TestComponent {}
 
-fdescribe('GameCreationPageComponent', () => {
+describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
