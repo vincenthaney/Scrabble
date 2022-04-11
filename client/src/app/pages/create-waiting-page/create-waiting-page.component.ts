@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
 import { ConvertDialogComponent, ConvertResult } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { SNACK_BAR_ERROR_DURATION } from '@app/constants/dictionaries-components';
+import { ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
@@ -114,7 +114,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     private handleGameCreationFail(error: HttpErrorResponse): void {
         this.confirmRejectionToServer();
-        this.snackBar.open(error.error.message, 'OK', { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] });
+        this.snackBar.open(error.error.message, 'OK', ERROR_SNACK_BAR_CONFIG);
         this.router.navigateByUrl('game-creation');
     }
 }
