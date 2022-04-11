@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NAME_VALIDATION } from '@app/classes/name-validation';
 import { NAME_NO_MATCH_REGEX, NAME_SAME_AS_VIRTUAL_PLAYER, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
@@ -8,7 +8,8 @@ import { NAME_NO_MATCH_REGEX, NAME_SAME_AS_VIRTUAL_PLAYER, NAME_TOO_LONG, NAME_T
     templateUrl: './name-field.component.html',
     styleUrls: ['./name-field.component.scss'],
 })
-export class NameFieldComponent implements OnChanges {
+export class NameFieldComponent implements OnChanges, OnInit {
+    @Input() initialPlayerName: string;
     @Input() virtualPlayerName: string;
     @Input() mustVerifyVirtualPlayerName: boolean;
     @Output() isInputNameValid;
@@ -20,6 +21,7 @@ export class NameFieldComponent implements OnChanges {
     formParameters: FormGroup;
 
     constructor() {
+        this.initialPlayerName = '';
         this.virtualPlayerName = '';
         this.mustVerifyVirtualPlayerName = false;
         this.isInputNameValid = new EventEmitter<boolean>();
@@ -37,6 +39,11 @@ export class NameFieldComponent implements OnChanges {
                 this.nameDifferentFromVirtualPlayer(),
             ]),
         });
+    }
+
+    ngOnInit(): void {
+        this.formParameters.get('inputName')?.setValue(this.initialPlayerName);
+        this.onChange();
     }
 
     ngOnChanges(): void {

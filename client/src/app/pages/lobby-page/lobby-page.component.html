@@ -14,20 +14,26 @@
 
     <div class="container">
         <div class="steps">
-            <div class="step" [ngClass]="{ completed: nameValid }">
+            <div class="step" [ngClass]="{ completed: playerNameValid }">
                 <div class="step-indicator">
                     <p class="indicator"><span>1</span></p>
                 </div>
                 <div class="step-content" id="name-input-container">
                     <mat-card>
-                        <app-name-field (isInputNameValid)="onNameChange()"></app-name-field>
+                        <app-name-field
+                            [initialPlayerName]="playerName"
+                            [virtualPlayerName]="''"
+                            [mustVerifyVirtualPlayerName]="false"
+                            (keydown.enter)="$event.preventDefault()"
+                            (playerNameChange)="onPlayerNameChanges($event)"
+                        ></app-name-field>
                     </mat-card>
 
                     <mat-divider class="step-divider"></mat-divider>
                 </div>
             </div>
 
-            <div class="step" [ngClass]="{ disabled: !nameValid }">
+            <div class="step" [ngClass]="{ disabled: !playerNameValid }">
                 <div class="step-indicator">
                     <p class="indicator"><span>2</span></p>
                 </div>
@@ -41,7 +47,7 @@
                             mat-flat-button
                             color="primary"
                             *ngIf="numberOfLobbiesMeetingFilter > 0"
-                            [disabled]="numberOfLobbiesMeetingFilter <= 1 || !nameValid"
+                            [disabled]="numberOfLobbiesMeetingFilter <= 1 || !playerNameValid"
                             (click)="joinRandomLobby()"
                         >
                             <app-icon icon="random"></app-icon> Partie aléatoire

@@ -138,8 +138,6 @@ describe('LobbyPageComponent', () => {
                 canJoin: false,
             },
         ];
-
-        component.nameField = new NameFieldComponent();
     });
 
     it('should create', () => {
@@ -152,7 +150,8 @@ describe('LobbyPageComponent', () => {
         });
 
         it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
-            component.nameField.formParameters.patchValue({ inputName: 'differentName' });
+            component.playerName = 'differentName';
+            component.playerNameValid = true;
             component['validateName']();
             for (const lobby of component.lobbies) {
                 expect(lobby.canJoin).toBeTrue();
@@ -160,7 +159,8 @@ describe('LobbyPageComponent', () => {
         });
 
         it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
-            component.nameField.formParameters.patchValue({ inputName: 'Name1' });
+            component.playerName = 'Name1';
+            component.playerNameValid = true;
             const expected = [false, true, true];
             component['validateName']();
             expect(component.lobbies).toBeTruthy();
@@ -195,20 +195,6 @@ describe('LobbyPageComponent', () => {
             component.filterFormGroup.get('gameType')?.enable();
             component['setFormAvailability'](false);
             expect(component.filterFormGroup.get('gameType')?.disabled).toBeTrue();
-        });
-    });
-
-    describe('onNameChange', () => {
-        it('onNameChange should call validateName', () => {
-            const spy = validateNameSpy.and.returnValue(false);
-            component.onNameChange();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('onNameChange should call validateName', () => {
-            const spy = validateNameSpy.and.returnValue(false);
-            component.onNameChange();
-            expect(spy).toHaveBeenCalled();
         });
     });
 

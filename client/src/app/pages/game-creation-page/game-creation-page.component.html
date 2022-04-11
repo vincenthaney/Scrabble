@@ -80,6 +80,7 @@
                 <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
 
                 <app-name-field
+                    [initialPlayerName]="playerName"
                     [virtualPlayerName]="gameParameters.get('virtualPlayerName')?.value"
                     [mustVerifyVirtualPlayerName]="gameParameters.get('gameMode')?.value === gameModes.Solo"
                     (keydown.enter)="$event.preventDefault()"

@@ -114,7 +114,7 @@ describe('HighScoresService', () => {
     });
 
     describe('fetchDefaultHighScores', () => {
-        it('should get all courses from JSON', async () => {
+        it('should get all high scores from JSON', async () => {
             mock(mockPaths);
             const highScores = await HighScoresService['fetchDefaultHighScores']();
             mock.restore();
@@ -123,7 +123,7 @@ describe('HighScoresService', () => {
     });
 
     describe('getHighScores', () => {
-        it('should get all courses from DB of given gameType', async () => {
+        it('should get all high scores from DB of given gameType', async () => {
             const highScores = await highScoresService['getHighScores'](GameType.Classic);
             expect(highScores.length).to.equal(INITIAL_HIGH_SCORES_CLASSIC.length);
             expect(INITIAL_HIGH_SCORES_CLASSIC).to.deep.equals(highScores);

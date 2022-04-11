@@ -18,6 +18,7 @@ import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -131,6 +132,24 @@ export default class Game {
             if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
         }
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+    }
+
+    replacePlayer(playerId: string, newPlayer: Player): GameUpdateData {
+        if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+
+        const updatedData: GameUpdateData = {};
+        if (this.player1.id === playerId) {
+            updatedData.player1 = newPlayer.copyPlayerInfo(this.player1);
+            this.player1 = newPlayer;
+        } else {
+            updatedData.player2 = newPlayer.copyPlayerInfo(this.player2);
+            this.player2 = newPlayer;
+        }
+
+        this.roundManager.replacePlayer(playerId, newPlayer);
+        this.gameMode = GameMode.Solo;
+
+        return updatedData;
     }
 
     areGameOverConditionsMet(): boolean {
