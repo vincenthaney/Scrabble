@@ -27,8 +27,13 @@
                 </div>
             </cdk-virtual-scroll-viewport>
             <form class="input-zone" [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
-                <input matInput type="text" formControlName="content" placeholder="Écrivez votre message ici" #messageInput />
-                <div matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
+                <div class="horizontal-align">
+                    <input matInput type="text" formControlName="content" autocomplete="off" placeholder="Écrivez votre message ici" #messageInput />
+                    <div class="mat-hint-wrapper">
+                        <mat-hint align="end">{{messageInput.value?.length || 0}}/512</mat-hint>
+                    </div>
+                </div>
+                <div class="button-tooltip" matTooltip="Votre message est trop long" [matTooltipDisabled]="messageForm.valid">
                     <button id="send-button" stype="submit" mat-flat-button color="primary" [disabled]="messageForm.invalid">
                         <app-icon [icon]="'arrow-right'"></app-icon>
                     </button>
