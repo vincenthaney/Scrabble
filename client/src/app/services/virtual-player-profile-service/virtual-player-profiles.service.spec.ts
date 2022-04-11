@@ -12,7 +12,7 @@ import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player
 import { Observable, Subject, throwError } from 'rxjs';
 import { VirtualPlayerProfilesService } from './virtual-player-profiles.service';
 
-fdescribe('VirtualPlayerProfilesService', () => {
+describe('VirtualPlayerProfilesService', () => {
     let service: VirtualPlayerProfilesService;
     let controllerSpy: jasmine.SpyObj<VirtualPlayerProfilesController>;
 
