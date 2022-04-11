@@ -59,7 +59,7 @@ const TEST_FORM_CONTENT = {
 const TEST_FORM: FormGroup = new FormGroup(TEST_FORM_CONTENT);
 TEST_FORM.setValue(TEST_GAME_PARAMETERS);
 
-fdescribe('GameDispatcherService', () => {
+describe('GameDispatcherService', () => {
     let getCurrentLobbyIdSpy: jasmine.Spy;
     let service: GameDispatcherService;
     let gameDispatcherControllerMock: GameDispatcherController;
