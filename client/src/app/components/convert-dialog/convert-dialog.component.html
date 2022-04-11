@@ -30,9 +30,23 @@
             <ng-container>
                 <div class="buttons">
                     <button mat-flat-button style="background-color: rgb(231, 231, 231)" mat-dialog-close>Retourner en attente</button>
-                    <button mat-flat-button mat-dialog-close color="primary" type="submit" id="convert-game-button" cdkFocusInitial>
-                        Démarrer la partie solo
-                    </button>
+                    <div
+                        matTooltip="Veuillez sélectionenr un nom de joueur virtuel d'abord"
+                        matTooltipPosition="above"
+                        [matTooltipDisabled]="gameParameters?.valid"
+                    >
+                        <button
+                            mat-flat-button
+                            mat-dialog-close
+                            color="primary"
+                            type="submit"
+                            id="convert-game-button"
+                            [disabled]="!gameParameters?.valid"
+                            cdkFocusInitial
+                        >
+                            Démarrer la partie solo
+                        </button>
+                    </div>
                 </div>
             </ng-container>
         </form>
