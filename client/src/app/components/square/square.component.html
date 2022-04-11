@@ -5,7 +5,7 @@
 >
     <div class="content">
         <ng-container *ngIf="squareView.square.tile; else noTile">
-            <app-tile [tile]="squareView.square.tile" [ngStyle]="{ fontSize: tileFontSize + 'em' }" [applied]="squareView.applied"></app-tile>
+            <app-tile [tile]="squareView.square.tile" [ngStyle]="{ fontSize: tileFontSize + 'em' }" [applied]="squareView.applied" [newlyPlaced]="squareView.newlyPlaced"></app-tile>
         </ng-container>
         <ng-template #noTile>
             <ng-container *ngIf="squareView.square.isCenter; else notCenter">
