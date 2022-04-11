@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
@@ -14,6 +15,12 @@ import HighScoresService from '@app/services/high-scores-service/high-scores.ser
 import { Subject } from 'rxjs';
 import { AdminPageComponent, DEFAULT_ADMIN_TAB } from './admin-page.component';
 
+@Component({
+    selector: 'app-admin-game-history',
+    template: '',
+})
+class MockAdminGameHistoryComponent {}
+
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
@@ -22,7 +29,7 @@ describe('AdminPageComponent', () => {
         const highScoreService = jasmine.createSpyObj(HighScoresService, ['handleHighScoresRequest', 'subscribeToInitializedHighScoresListEvent']);
 
         await TestBed.configureTestingModule({
-            declarations: [AdminPageComponent, IconComponent, PageHeaderComponent, AdminHighScoresComponent],
+            declarations: [AdminPageComponent, IconComponent, PageHeaderComponent, AdminHighScoresComponent, MockAdminGameHistoryComponent],
             imports: [
                 MatTabsModule,
                 MatCardModule,

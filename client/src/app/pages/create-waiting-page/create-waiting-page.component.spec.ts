@@ -6,12 +6,14 @@ import { CommonModule } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { IconComponent } from '@app/components/icon/icon.component';
 import {
     DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
@@ -47,10 +49,11 @@ describe('CreateWaitingPageComponent', () => {
     let playerLeavesServiceMock: PlayerLeavesService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent, IconComponent],
             imports: [
                 HttpClientTestingModule,
-                MatProgressSpinnerModule,
+                MatProgressBarModule,
+                MatCardModule,
                 MatDialogModule,
                 CommonModule,
                 BrowserAnimationsModule,
