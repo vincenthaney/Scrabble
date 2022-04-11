@@ -94,6 +94,6 @@ describe('VirtualPlayerProfilesService', () => {
         const error: HttpErrorResponse = { error: { message: 'error' } } as HttpErrorResponse;
 
         service['handleError'](error);
-        expect(snackBarSpy).toHaveBeenCalledWith(error.error.message, 'OK', ERROR_SNACK_BAR_CONFIG);
+        expect(snackBarSpy).toHaveBeenCalledWith(error.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
     });
 });
