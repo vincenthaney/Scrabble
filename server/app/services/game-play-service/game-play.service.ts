@@ -14,8 +14,13 @@ import { ActiveGameService } from '@app/services/active-game-service/active-game
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Service } from 'typedi';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { FeedbackMessages } from './feedback-messages';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 @Service()
 export class GamePlayService {
@@ -24,6 +29,8 @@ export class GamePlayService {
         private readonly highScoresService: HighScoresService,
         private readonly dictionaryService: DictionaryService,
         private readonly gameHistoriesService: GameHistoriesService,
+        private readonly virtualPlayerService: VirtualPlayerService,
+        private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
     ) {
         this.activeGameService.playerLeftEvent.on('playerLeft', async (gameId, playerWhoLeftId) => {
             await this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
@@ -141,22 +148,40 @@ export class GamePlayService {
     private async handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): Promise<void> {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.getPlayer(playerWhoLeftId, IS_OPPONENT);
-        game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
-        let updatedData: GameUpdateData = {};
-        const endOfGameMessages = await this.handleGameOver(playerStillInGame.name, game, updatedData);
-        updatedData = this.addMissingPlayerId(gameId, playerStillInGame.id, updatedData);
-        this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
+
+        if (isIdVirtualPlayer(playerStillInGame.id)) {
+            game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
+            await this.handleGameOver(playerStillInGame.name, game, {});
+            return;
+        }
+
+        const updatedData: GameUpdateData = game.replacePlayer(
+            playerWhoLeftId,
+            new BeginnerVirtualPlayer(gameId, await this.virtualPlayerProfilesService.getRandomVirtualPlayerName(VirtualPlayerLevel.Beginner)),
+        );
+
+        if (this.isVirtualPlayerTurn(game)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(
+                { round: game.roundManager.convertRoundToRoundData(game.roundManager.getCurrentRound()) },
+                game,
+            );
+        }
+        this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, [], updatedData);
     }
 
     private addMissingPlayerId(gameId: string, playerId: string, gameUpdateData: GameUpdateData): GameUpdateData {
         const game: Game = this.activeGameService.getGame(gameId, playerId);
-        const newgameUpdateData: GameUpdateData = { ...gameUpdateData };
-        if (newgameUpdateData.player1) {
-            newgameUpdateData.player1.id = game.player1.id;
+        const newGameUpdateData: GameUpdateData = { ...gameUpdateData };
+        if (newGameUpdateData.player1) {
+            newGameUpdateData.player1.id = game.player1.id;
         }
-        if (newgameUpdateData.player2) {
-            newgameUpdateData.player2.id = game.player2.id;
+        if (newGameUpdateData.player2) {
+            newGameUpdateData.player2.id = game.player2.id;
         }
-        return newgameUpdateData;
+        return newGameUpdateData;
+    }
+
+    private isVirtualPlayerTurn(game: Game): boolean {
+        return isIdVirtualPlayer(game.roundManager.getCurrentRound().player.id);
     }
 }

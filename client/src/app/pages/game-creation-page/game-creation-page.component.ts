@@ -5,6 +5,7 @@ import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DICTIONARY_NAME_KEY, PLAYER_NAME_KEY, TIMER_KEY } from '@app/constants/session-storage-constants';
 import { GameDispatcherService } from '@app/services';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
@@ -32,7 +33,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.dictionaryOptions = [];
         this.virtualPlayerNames = randomizeArray(['Victoria', 'Aristote', 'Herménégilde']);
-        this.playerName = '';
+        this.playerName = window.localStorage.getItem(PLAYER_NAME_KEY) || '';
         this.playerNameValid = false;
         this.pageDestroyed$ = new Subject();
         this.gameParameters = new FormGroup({
@@ -40,9 +41,9 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
-            timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
+            timer: new FormControl(this.getDefaultTimerValue(), Validators.required),
             // TODO: A changer avec la portion de vincent
-            dictionary: new FormControl('Mon dictionnaire', Validators.required),
+            dictionary: new FormControl(window.localStorage.getItem(DICTIONARY_NAME_KEY) || 'Mon dictionnaire', Validators.required),
         });
     }
 
@@ -71,12 +72,21 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     onSubmit(): void {
         if (this.isFormValid()) {
+            window.localStorage.setItem(PLAYER_NAME_KEY, this.playerName);
+            window.localStorage.setItem(DICTIONARY_NAME_KEY, this.gameParameters.get('dictionary')?.value);
+            window.localStorage.setItem(TIMER_KEY, this.gameParameters.get('timer')?.value);
             this.createGame();
         }
     }
     onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
         this.playerName = playerName;
         this.playerNameValid = valid;
+    }
+
+    private getDefaultTimerValue(): number {
+        const INVALID = -1;
+        const time = Number.parseInt(window.localStorage.getItem(TIMER_KEY) || `${INVALID}`, 10);
+        return !Number.isNaN(time) && time > INVALID ? time : DEFAULT_TIMER_VALUE;
     }
 
     private createGame(): void {
