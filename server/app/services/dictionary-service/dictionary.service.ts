@@ -24,7 +24,7 @@ import Ajv, { ValidateFunction } from 'ajv';
 import { promises } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { Collection, ObjectId, UpdateResult } from 'mongodb';
+import { Collection, ObjectId, UpdateResult, WithId } from 'mongodb';
 import { join } from 'path';
 import { Service } from 'typedi';
 
@@ -124,7 +124,7 @@ export default class DictionaryService {
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
-            if (!(await this.isTitleValid(updateInfo.title, updateInfo.id))) throw new Error(INVALID_TITLE_FORMAT);
+            if (!(await this.isTitleValid(updateInfo.title, new ObjectId(updateInfo.id)))) throw new Error(INVALID_TITLE_FORMAT);
             infoToUpdate.title = updateInfo.title;
         }
 
@@ -157,7 +157,7 @@ export default class DictionaryService {
             .find({})
             // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
             // eslint-disable-next-line no-underscore-dangle
-            .map((dictionary) => dictionary._id.toString())
+            .map((dictionary: WithId<DictionaryData>) => dictionary._id.toString())
             .toArray();
     }
 
@@ -170,8 +170,8 @@ export default class DictionaryService {
         this.activeDictionaries.set(id, dictionary);
     }
 
-    private async isTitleValid(title: string, id: string = ''): Promise<boolean> {
-        return (await this.collection.countDocuments({ _id: { $ne: new ObjectId(id) } })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
+    private async isTitleValid(title: string, id?: ObjectId): Promise<boolean> {
+        return (await this.collection.countDocuments({ _id: { $ne: id }, title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
     private isDescriptionValid(description: string): boolean {
