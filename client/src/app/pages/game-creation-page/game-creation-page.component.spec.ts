@@ -40,7 +40,7 @@ import SpyObj = jasmine.SpyObj;
 })
 class TestComponent {}
 
-describe('GameCreationPageComponent', () => {
+fdescribe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
@@ -53,10 +53,10 @@ describe('GameCreationPageComponent', () => {
     const EMPTY_VALUE = '';
 
     beforeEach(() => {
-        dictionaryServiceSpy = jasmine.createSpyObj('DictionariesService', [
+        dictionaryServiceSpy = jasmine.createSpyObj('DictionaryService', [
             'getDictionaries',
             'updateAllDictionaries',
-            'subscribeToDictionariestUpdateDataEvent',
+            'subscribeToDictionariesUpdateDataEvent',
         ]);
         dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
         dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
