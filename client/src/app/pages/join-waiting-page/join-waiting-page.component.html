@@ -3,28 +3,26 @@
         <p class="waiting-message">En attente que l'hôte vous accepte.</p>
 
         <mat-progress-bar class="progress" mode="indeterminate"></mat-progress-bar>
-        <div class="grid">
-            <!-- <div id="cell" class="align-left">Votre nom:</div>
-        <div id="cell" class="align-right">{{ currentName }}</div>
-        <div id="cell" class="align-left">Votre adversaire:</div>
-        <div id="cell" class="align-right">{{ currentLobby.hostName }}</div>
-        <div id="cell" class="align-left">Type de partie:</div>
-        <div id="cell" class="align-right">{{ currentLobby.gameType }}</div>
-        <div id="cell" class="align-left">Temps par tour:</div>
-        <div id="cell" class="align-right">{{ currentLobby.maxRoundTime }} secondes</div>
-        <div id="cell" class="align-left">Dictionnaire:</div>
-        <div id="cell" class="align-right">{{ currentLobby.dictionary.title }}</div> -->
-            <div class="align-left">Votre nom :</div>
-            <div class="align-right">Mathilde</div>
-            <div class="align-left">Votre adversaire :</div>
-            <div class="align-right">Trouc</div>
-            <div class="align-left">Type de partie :</div>
-            <div class="align-right">Classique</div>
-            <div class="align-left">Temps par tour :</div>
-            <div class="align-right">60</div>
-            <div class="align-left">Dictionnaire :</div>
-            <div class="align-right">Français</div>
+
+        <div class="players">
+            <span class="name"
+                ><b>{{ currentName }}Mathilde</b></span
+            ><span id="vs"> vs </span><span class="name">{{ currentLobby.hostName }}</span>
+            <!-- <p><b>Mathilde</b> vs Trouc</p> -->
         </div>
+
+        <div class="chip-list">
+            <div class="chip"><app-icon icon="hourglass-half" size="sm"></app-icon> {{ roundTime }}</div>
+            <div class="chip">
+                <app-icon icon="gamepad"></app-icon>
+                {{ currentLobby.gameType }}
+            </div>
+            <div class="chip">
+                <app-icon icon="book"></app-icon>
+                {{ currentLobby.dictionary.title }}
+            </div>
+        </div>
+
         <button id="cancel-button" mat-flat-button color="primary" [routerLink]="'/lobby'">Annuler</button>
     </mat-card>
 

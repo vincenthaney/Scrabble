@@ -1,4 +1,5 @@
 @import '../../style/variables.scss';
+@import '../../style/utils.scss';
 
 ::ng-deep body {
     background: $page-background;
@@ -14,13 +15,31 @@
 
     mat-card {
         justify-content: center;
+        justify-items: center;
         align-items: center;
         text-align: center;
-
         width: 30%;
 
         p:first-child {
             font-size: larger;
+        }
+
+        .players {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            gap: 1vw;
+
+            .name {
+                font-size: 1.2em;
+            }
+
+            #vs {
+                font-size: 0.9em;
+                font-weight: 600;
+                opacity: 0.55;
+            }
         }
 
         mat-progress-bar {
@@ -28,25 +47,26 @@
             margin-bottom: 20px;
         }
 
-        .grid {
-            padding: 10px;
+        .chip-list {
+            display: flex;
             justify-content: center;
-            margin-bottom: 20px;
-            gap: 2%;
-            display: grid;
-            grid-template-columns: 50% 50%;
+            padding: 20px 0;
 
-            .align-right {
-                text-align: right;
-            }
+            .chip {
+                @include no-select;
+                background: $gray;
+                padding: 2px 12px;
+                border-radius: 100px;
+                font-size: 0.85em;
 
-            .align-left {
-                text-align: left;
-                font-weight: bold;
-            }
+                app-icon {
+                    margin-right: 5px;
+                    width: 100%;
+                }
 
-            #cell {
-                min-width: 100px;
+                &:not(:last-child) {
+                    margin-right: 6px;
+                }
             }
         }
     }
