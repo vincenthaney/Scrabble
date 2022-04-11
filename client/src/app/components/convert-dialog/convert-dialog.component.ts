@@ -58,6 +58,8 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     }
 
     onSubmit(): void {
+        if (!this.gameParameters.valid) return;
+
         this.isConverting = true;
         this.handleConvertToSolo();
     }
@@ -65,9 +67,12 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     getVirtualPlayerNames(): string[] {
         return this.virtualPlayerProfiles
             ? this.virtualPlayerProfiles
-                  .filter((profile: VirtualPlayerProfile) => profile.level === (this.gameParameters.get('level')?.value as VirtualPlayerLevel))
+                  .filter(
+                      (profile: VirtualPlayerProfile) =>
+                          profile.level === (this.gameParameters.get('level')?.value as VirtualPlayerLevel) && profile.name !== this.playerName,
+                  )
                   .map((profile: VirtualPlayerProfile) => profile.name)
-            : [''];
+            : [];
     }
 
     private handleConvertToSolo(): void {

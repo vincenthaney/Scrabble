@@ -163,7 +163,7 @@ describe('ConvertDialogComponent', () => {
     describe('getVirtualPlayerNames', () => {
         it('should return empty string if no virtual player profiles', () => {
             component['virtualPlayerProfiles'] = undefined as unknown as VirtualPlayerProfile[];
-            expect(component.getVirtualPlayerNames()).toEqual(['']);
+            expect(component.getVirtualPlayerNames()).toEqual([]);
         });
 
         it('should return all names of profiles with Beginner level if this level is selected', () => {
@@ -184,6 +184,16 @@ describe('ConvertDialogComponent', () => {
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
                 (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert,
             ).map((profile: VirtualPlayerProfile) => profile.name);
+
+            expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
+        });
+
+        it('should filter out name if it is same as player name', () => {
+            component.playerName = 'Jean Charest';
+            component['virtualPlayerProfiles'] = MOCK_PLAYER_PROFILES;
+
+            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Beginner });
+            const expectedResult: string[] = [];
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });
