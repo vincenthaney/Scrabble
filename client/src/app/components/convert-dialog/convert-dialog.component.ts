@@ -1,10 +1,11 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
-import { randomizeArray } from '@app/utils/randomize-array';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -12,25 +13,37 @@ import { Subject } from 'rxjs';
     templateUrl: './convert-dialog.component.html',
     styleUrls: ['./convert-dialog.component.scss'],
 })
-export class ConvertDialogComponent implements OnDestroy {
+export class ConvertDialogComponent implements OnInit, OnDestroy {
     virtualPlayerLevels: typeof VirtualPlayerLevel;
-    virtualPlayerNames: string[];
     playerName: string;
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
     isConverting: boolean;
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: string, private gameDispatcherService: GameDispatcherService) {
+    private virtualPlayerProfiles: VirtualPlayerProfile[];
+
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: string,
+        private gameDispatcherService: GameDispatcherService,
+        private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
+    ) {
         this.isConverting = false;
         this.playerName = data;
         this.virtualPlayerLevels = VirtualPlayerLevel;
-        this.virtualPlayerNames = randomizeArray(['Victoria', 'Aristote', 'Herménégilde'].filter((name: string) => name !== this.playerName));
+        this.virtualPlayerProfiles = [];
         this.pageDestroyed$ = new Subject();
         this.gameParameters = new FormGroup({
             gameMode: new FormControl(GameMode.Solo, Validators.required),
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-            virtualPlayerName: new FormControl(this.virtualPlayerNames[0], Validators.required),
+            virtualPlayerName: new FormControl(this.virtualPlayerProfiles[0], Validators.required),
         });
+    }
+
+    ngOnInit(): void {
+        this.virtualPlayerProfilesService
+            .getVirtualPlayerProfiles()
+            .then((profiles: VirtualPlayerProfile[]) => (this.virtualPlayerProfiles = profiles));
+        this.gameParameters.patchValue({ virtualPlayerName: this.getVirtualPlayerNames()[0] });
     }
 
     ngOnDestroy(): void {
@@ -42,6 +55,13 @@ export class ConvertDialogComponent implements OnDestroy {
     onSubmit(): void {
         this.isConverting = true;
         this.handleConvertToSolo();
+    }
+
+    getVirtualPlayerNames(): string[] {
+        if (!this.virtualPlayerProfiles) return [''];
+        return this.virtualPlayerProfiles
+            .filter((profile: VirtualPlayerProfile) => profile.level === (this.gameParameters.get('level')?.value as VirtualPlayerLevel))
+            .map((profile: VirtualPlayerProfile) => profile.name);
     }
 
     private handleConvertToSolo(): void {

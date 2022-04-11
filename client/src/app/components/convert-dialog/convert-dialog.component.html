@@ -23,18 +23,18 @@
                 <mat-form-field appearance="outline">
                     <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
                     <mat-select formControlName="virtualPlayerName">
-                        <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
+                        <mat-option *ngFor="let virtualPlayer of getVirtualPlayerNames()" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
                     </mat-select>
                 </mat-form-field>
             </ng-container>
             <ng-container>
                 <div class="buttons">
                     <button mat-flat-button style="background-color: rgb(231, 231, 231)" mat-dialog-close>Retourner en attente</button>
-                        <button mat-flat-button mat-dialog-close color="primary" type="submit" id="convert-game-button" cdkFocusInitial>
-                            Démarrer la partie solo 
-                        </button>
+                    <button mat-flat-button mat-dialog-close color="primary" type="submit" id="convert-game-button" cdkFocusInitial>
+                        Démarrer la partie solo
+                    </button>
                 </div>
-            </ng-container> 
+            </ng-container>
         </form>
     </div>
 </mat-dialog-content>
