@@ -47,11 +47,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (this.gameDispatcherService.currentLobby) {
-            this.currentLobby = this.gameDispatcherService.currentLobby;
-        } else {
-            this.currentLobby = DEFAULT_LOBBY;
-        }
+        this.currentLobby = this.gameDispatcherService.currentLobby ?? DEFAULT_LOBBY;
         const roundTime: Timer = Timer.convertTime(this.currentLobby.maxRoundTime);
         this.roundTime = `${roundTime.minutes}:${roundTime.getTimerSecondsPadded()}`;
 
