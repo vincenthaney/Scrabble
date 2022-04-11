@@ -6,13 +6,16 @@ import { CommonModule } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { IconComponent } from '@app/components/icon/icon.component';
 import {
+    DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
     DIALOG_TITLE,
@@ -46,10 +49,11 @@ describe('CreateWaitingPageComponent', () => {
     let playerLeavesServiceMock: PlayerLeavesService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent, IconComponent],
             imports: [
                 HttpClientTestingModule,
-                MatProgressSpinnerModule,
+                MatProgressBarModule,
+                MatCardModule,
                 MatDialogModule,
                 CommonModule,
                 BrowserAnimationsModule,
@@ -103,15 +107,47 @@ describe('CreateWaitingPageComponent', () => {
         expect(component.opponentName).toEqual(undefined);
     });
 
-    it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
-        const spySubscribeJoinRequestEvent = spyOn<any>(gameDispatcherServiceMock['joinRequestEvent'], 'subscribe').and.returnValue(of(true) as any);
-        const spySubscribeJoinerLeaveGameEvent = spyOn<any>(playerLeavesServiceMock['joinerLeavesGameEvent'], 'subscribe').and.returnValue(
-            of(true) as any,
-        );
+    describe('ngOnInit', () => {
+        it('should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
+            const spySubscribeJoinRequestEvent = spyOn<any>(gameDispatcherServiceMock['joinRequestEvent'], 'subscribe').and.returnValue(
+                of(true) as any,
+            );
+            const spySubscribeJoinerLeaveGameEvent = spyOn<any>(playerLeavesServiceMock['joinerLeavesGameEvent'], 'subscribe').and.returnValue(
+                of(true) as any,
+            );
 
-        component.ngOnInit();
-        expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
-        expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+            component.ngOnInit();
+            expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
+            expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+        });
+
+        it('should set roundTime and fun fact', () => {
+            component['gameDispatcherService'].currentLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210 };
+            component.funFact = '';
+            component.ngOnInit();
+            expect(component.roundTime).toEqual('3:30');
+            expect(component.funFact).not.toEqual('');
+        });
+
+        it('should set currentLobby to gameDispatcher currentLobby if it exists', () => {
+            component.currentLobby = DEFAULT_LOBBY;
+            const serviceLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210 };
+            component['gameDispatcherService'].currentLobby = serviceLobby;
+
+            component.ngOnInit();
+
+            expect(component.currentLobby).toEqual(serviceLobby);
+            expect(component.currentLobby).not.toEqual(DEFAULT_LOBBY);
+        });
+
+        it('should set currentLobby to DEFAULT_LOBBY currentLobby if gameDispatcher does not have a currentLobby', () => {
+            component.currentLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210, hostName: 'Alexandre' };
+            component['gameDispatcherService'].currentLobby = undefined;
+
+            component.ngOnInit();
+
+            expect(component.currentLobby).toEqual(DEFAULT_LOBBY);
+        });
     });
 
     describe('ngOnDestroy', () => {

@@ -59,6 +59,9 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
                 }
                 this.gameParameters?.get('level')?.updateValueAndValidity();
             });
+        this.gameDispatcherService.subscribeToReceivedLobbyDataEvent(this.pageDestroyed$, () => {
+            if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) this.router.navigateByUrl('waiting-room');
+        });
     }
 
     ngOnDestroy(): void {
@@ -90,9 +93,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     private createGame(): void {
-        if (this.gameParameters.get('gameMode')?.value === this.gameModes.Multiplayer) {
-            this.router.navigateByUrl('waiting-room');
-        }
         this.gameDispatcherService.handleCreateGame(this.playerName, this.gameParameters);
     }
 }
