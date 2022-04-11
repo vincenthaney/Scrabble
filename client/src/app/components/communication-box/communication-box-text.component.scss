@@ -142,9 +142,11 @@ section#text-box-container {
 
             mat-hint {
                 font-size: 75%;
-                margin-left: auto;
+                // margin-left: auto;
                 margin-right: 0;
                 color: #f3f3f3;
+                display: flex; 
+                margin-top: -1px;
             }
 
             app-icon {
@@ -153,42 +155,16 @@ section#text-box-container {
 
             ::ng-deep .mat-flat-button {
                 line-height: 20px;
+                padding: 0;
+            }
+            .mat-hint-wrapper {
+                height: 15px;
+                background-color: rgba(86, 123, 91);
+                text-align: center;
+                width: 100%;
+                justify-content: center;
+                display: flex;
             }
         }
-
-          // form {
-        //     display: flex;
-        //     align-items: stretch;
-        //     border: solid 2px rgb(207, 207, 207);
-        //     padding: 4px;
-        //     border-radius: 4px;
-
-        //     input {
-        //         flex-grow: 1;
-        //         border: none;
-        //         font-size: inherit;
-        //         font-family: inherit;
-        //         outline: none;
-        //     }
-        //     .horizontal-align {
-        //         display: flex;
-        //         flex-direction: column;
-        //         width:100%;
-        //         padding-right: 4px;
-        //     }
-
-        //     .mat-hint-wrapper {
-        //         margin-left: auto;
-        //         margin-right: 0;
-        //         height: 14px;
-        //         margin-top: -0.9em;
-        //     }
-
-        //     .button-tooltip {
-        //         margin-left: auto;
-        //         margin-right: 0;
-        //     }
-
-        // }
     }
 }
