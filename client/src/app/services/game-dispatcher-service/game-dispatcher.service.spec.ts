@@ -410,7 +410,7 @@ describe('GameDispatcherService', () => {
         let confirmationSpy: jasmine.Spy;
 
         beforeEach(() => {
-            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
+            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation').and.returnValue(new Observable<void>());
         });
 
         afterEach(() => {

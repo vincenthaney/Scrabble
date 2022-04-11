@@ -20,7 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DictionarySummary } from '@app/classes/communication/dictionary';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { GameMode } from '@app/classes/game-mode';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
@@ -30,7 +30,7 @@ import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
-import { DictionariesService } from '@app/services/dictionaries-service/dictionaries.service';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -46,7 +46,7 @@ describe('GameCreationPageComponent', () => {
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
     let gameDispatcherServiceSpy: SpyObj<GameDispatcherService>;
-    let dictionaryServiceSpy: SpyObj<DictionariesService>;
+    let dictionaryServiceSpy: SpyObj<DictionaryService>;
     let gameDispatcherCreationSubject: Subject<HttpErrorResponse>;
     let dictionaryUpdateSubject: Subject<DictionarySummary[]>;
 
@@ -61,7 +61,7 @@ describe('GameCreationPageComponent', () => {
         dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
         dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
         dictionaryUpdateSubject = new Subject();
-        dictionaryServiceSpy.subscribeToDictionariestUpdateDataEvent.and.callFake(
+        dictionaryServiceSpy.subscribeToDictionariesUpdateDataEvent.and.callFake(
             (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void) =>
                 dictionaryUpdateSubject.subscribe(callback),
         );
@@ -99,7 +99,7 @@ describe('GameCreationPageComponent', () => {
                 MatButtonHarness,
                 MatButtonToggleGroupHarness,
                 { provide: GameDispatcherService, useValue: gameDispatcherServiceSpy },
-                { provide: DictionariesService, useValue: dictionaryServiceSpy },
+                { provide: DictionaryService, useValue: dictionaryServiceSpy },
             ],
         }).compileComponents();
     });
