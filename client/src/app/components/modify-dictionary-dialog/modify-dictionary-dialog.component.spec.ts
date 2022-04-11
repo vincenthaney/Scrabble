@@ -92,16 +92,8 @@ describe('ModifyDictionaryComponent', () => {
     });
 
     describe('ngOnChanges', () => {
-        let spyComponent: jasmine.Spy;
-        let spyFormParameters: jasmine.Spy;
-        beforeEach(() => {
-            spyComponent = spyOn(component, 'isInformationValid').and.callFake(() => {
-                return true;
-            });
-        });
-
         it('should call formParameters.get twice', () => {
-            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
+            const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
                 return null;
             });
             component.ngOnChanges();
@@ -122,14 +114,6 @@ describe('ModifyDictionaryComponent', () => {
             });
             component.ngOnChanges();
             expect(component.isDictionaryTitleValid).toBeFalse();
-        });
-
-        it('should call closeDialog', () => {
-            spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.ngOnChanges();
-            expect(spyComponent).toHaveBeenCalled();
         });
     });
 

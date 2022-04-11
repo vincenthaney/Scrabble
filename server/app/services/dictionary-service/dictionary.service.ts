@@ -124,7 +124,7 @@ export default class DictionaryService {
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
-            if (!(await this.isTitleValid(updateInfo.title))) throw new Error(INVALID_TITLE_FORMAT);
+            if (!(await this.isTitleValid(updateInfo.title, updateInfo.id))) throw new Error(INVALID_TITLE_FORMAT);
             infoToUpdate.title = updateInfo.title;
         }
 

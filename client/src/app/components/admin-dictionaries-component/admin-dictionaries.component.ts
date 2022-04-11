@@ -73,8 +73,8 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         };
         this.dialog.open(ModifyDictionaryComponent, {
             data: newDictionaryData,
-            height: '33%',
-            width: '25%',
+            height: '350px',
+            width: '450px',
         });
     }
 

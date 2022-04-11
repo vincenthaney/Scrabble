@@ -18,13 +18,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UploadDictionaryComponent } from './upload-dictionary.component';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
+import { UploadEvent } from './upload-dictionary.component.types';
 // const TEST_FILE = { test: 'I am a test file' };
-const TEST_EVENT: EventTarget = {
+const TEST_EVENT: UploadEvent = {
     addEventListener: () => {},
     dispatchEvent: () => {
         return false;
     },
     removeEventListener: () => {},
+    files: [{ iAmValue: 'heyhey' } as unknown as File],
 };
 
 export class MatDialogMock {
@@ -78,7 +80,7 @@ describe('UploadDictionaryComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('onFileChanged', () => {
+    describe('handleFileInput', () => {
         let spyReadAsText: jasmine.Spy;
         beforeEach(() => {
             spyReadAsText = spyOn(FileReader.prototype, 'readAsText').and.callFake(() => {

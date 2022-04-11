@@ -11,14 +11,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { MatDialogModule } from '@angular/material/dialog';
-import { HttpClientModule } from '@angular/common/http';
-import { MatSnackBarModule, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
-import { AdminGameHistoryComponent } from '@app/components/admin-game-history/admin-game-history.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterModule } from '@angular/router';
 const TEST_ID = 'test';
 const testElementData: DictionarySummary = {
     title: 'testTitle',
@@ -36,10 +36,9 @@ describe('AdminDictionariesComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [AdminDictionariesComponent, IconComponent, PageHeaderComponent, AdminGameHistoryComponent],
+            declarations: [AdminDictionariesComponent, IconComponent, PageHeaderComponent],
             imports: [
                 AppMaterialModule,
-                HttpClientModule,
                 MatFormFieldModule,
                 MatSelectModule,
                 MatDividerModule,
@@ -50,8 +49,10 @@ describe('AdminDictionariesComponent', () => {
                 BrowserAnimationsModule,
                 MatCardModule,
                 MatTabsModule,
+                HttpClientTestingModule,
+                RouterModule,
             ],
-            providers: [DictionaryService],
+            providers: [DictionaryService, MatSnackBar],
         }).compileComponents();
     });
 
@@ -113,17 +114,19 @@ describe('AdminDictionariesComponent', () => {
             dictionariesServiceMock['dictionariesUpdatedEvent'].next();
             expect(spy).toHaveBeenCalled();
         });
-
-        it('should should turn isWaitingForServerResponse to false', () => {
-            dictionariesServiceMock['dictionariesUpdatedEvent'].next();
-            expect(component.isWaitingForServerResponse).toBeFalse();
-        });
     });
 
     describe('On isWaitingForServerResponseEvent', () => {
         it('should turn isDownloadLoading to false', () => {
+            component.isWaitingForServerResponse = true;
             dictionariesServiceMock['isWaitingForServerResponseEvent'].next();
             expect(component.isWaitingForServerResponse).toBeFalse();
+        });
+
+        it('should turn isDownloadLoading to true', () => {
+            component.isWaitingForServerResponse = false;
+            dictionariesServiceMock['isWaitingForServerResponseEvent'].next();
+            expect(component.isWaitingForServerResponse).toBeTrue();
         });
     });
 
