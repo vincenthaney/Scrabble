@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -19,15 +20,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
 import { DEFAULT_PLAYER } from '@app/constants/game';
+import { MOCK_PLAYER_PROFILES } from '@app/constants/service-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { GameCreationPageComponent } from './game-creation-page.component';
+import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -42,6 +48,13 @@ describe('GameCreationPageComponent', () => {
     let gameDispatcherServiceMock: GameDispatcherService;
     let handleGameCreationSpy: jasmine.Spy;
     const EMPTY_VALUE = '';
+
+    let virtualPlayerProfileSpy: SpyObj<VirtualPlayerProfilesService>;
+
+    beforeEach(() => {
+        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', ['getVirtualPlayerProfiles']);
+        virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo(MOCK_PLAYER_PROFILES);
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -66,7 +79,13 @@ describe('GameCreationPageComponent', () => {
                     { path: 'game', component: TestComponent },
                 ]),
             ],
-            providers: [MatButtonToggleHarness, MatButtonHarness, MatButtonToggleGroupHarness, GameDispatcherService],
+            providers: [
+                MatButtonToggleHarness,
+                MatButtonHarness,
+                MatButtonToggleGroupHarness,
+                GameDispatcherService,
+                { provide: VirtualPlayerProfilesService, useValue: virtualPlayerProfileSpy },
+            ],
         }).compileComponents();
     });
 
@@ -86,8 +105,8 @@ describe('GameCreationPageComponent', () => {
         const formValues = {
             gameType: component.gameTypes.LOG2990,
             gameMode: component.gameModes.Solo,
-            virtualPlayerName: DEFAULT_PLAYER.name,
             level: component.virtualPlayerLevels.Beginner,
+            virtualPlayerName: DEFAULT_PLAYER.name,
             timer: '60',
             dictionary: 'français',
         };
@@ -126,6 +145,23 @@ describe('GameCreationPageComponent', () => {
             const subscribeSpy = spyOn<any>(component.gameParameters.get('gameMode')?.valueChanges, 'subscribe');
             component.ngOnInit();
             expect(subscribeSpy).toHaveBeenCalled();
+        });
+
+        it('should subscribe to level value change', () => {
+            const spy = spyOn<any>(component.gameParameters.get('virtualPlayerName'), 'reset').and.callFake(() => {});
+            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should initialize virtual player profiles', (done) => {
+            component['virtualPlayerProfiles'] = [];
+            spyOn(component, 'getVirtualPlayerNames').and.returnValues([MOCK_PLAYER_PROFILES[0].name]);
+            component.ngOnInit();
+
+            setTimeout(() => {
+                expect(component['virtualPlayerProfiles']).toEqual(MOCK_PLAYER_PROFILES);
+                done();
+            });
         });
     });
 
@@ -329,5 +365,34 @@ describe('GameCreationPageComponent', () => {
 
         expect(levelLabel).toBeFalsy();
         expect(levelButtons).toBeFalsy();
+    });
+
+    describe('getVirtualPlayerNames', () => {
+        it('should return empty string if no virtual player profiles', () => {
+            component['virtualPlayerProfiles'] = undefined as unknown as VirtualPlayerProfile[];
+            expect(component.getVirtualPlayerNames()).toEqual(['']);
+        });
+
+        it('should return all names of profiles with Beginner level if this level is selected', () => {
+            component['virtualPlayerProfiles'] = MOCK_PLAYER_PROFILES;
+
+            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Beginner });
+            const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
+                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Beginner,
+            ).map((profile: VirtualPlayerProfile) => profile.name);
+
+            expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
+        });
+
+        it('should return all names of profiles with Expert level if this level is selected', () => {
+            component['virtualPlayerProfiles'] = MOCK_PLAYER_PROFILES;
+
+            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
+            const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
+                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert,
+            ).map((profile: VirtualPlayerProfile) => profile.name);
+
+            expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
+        });
     });
 });

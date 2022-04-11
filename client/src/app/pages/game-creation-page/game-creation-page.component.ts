@@ -76,7 +76,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.virtualPlayerProfilesService
             .getVirtualPlayerProfiles()
             .then((profiles: VirtualPlayerProfile[]) => (this.virtualPlayerProfiles = profiles));
-        this.gameParameters.patchValue({ virtualPlayerName: this.getVirtualPlayerNames()[0] });
     }
 
     ngOnDestroy(): void {
