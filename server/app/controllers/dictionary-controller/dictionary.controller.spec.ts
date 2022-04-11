@@ -3,8 +3,7 @@
 import { Application } from '@app/app';
 import { BasicDictionaryData, DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -25,11 +24,18 @@ const TEST_DICTIONARY_2: DictionarySummary = { id: 'id2', title: 'title2', descr
 
 describe('DictionaryController', () => {
     let controller: DictionaryController;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
+
+    beforeEach(() => {
         controller = Container.get(DictionaryController);
+    });
+
+    afterEach(() => {
+        testingUnit.restore();
     });
 
     it('should create', () => {

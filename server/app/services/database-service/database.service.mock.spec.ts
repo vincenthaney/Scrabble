@@ -3,10 +3,10 @@ import { EventEmitter } from 'events';
 import { Db, MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Service } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 
 @Service()
 export class DatabaseServiceMock {
-    private static server?: MongoMemoryServer;
     mongoServer: MongoMemoryServer;
     private db: Db;
     private mongoClient: MongoClient;
@@ -15,16 +15,10 @@ export class DatabaseServiceMock {
     constructor() {
         this.databaseInitialized$ = new EventEmitter();
     }
-
-    private static async getServer(): Promise<MongoMemoryServer> {
-        if (!this.server) this.server = await MongoMemoryServer.create();
-        return this.server;
-    }
-
     // eslint-disable-next-line no-unused-vars
     async connectToServer(databaseUrl?: string): Promise<MongoClient | null> {
         try {
-            this.mongoServer = await DatabaseServiceMock.getServer();
+            this.mongoServer = await ServicesTestingUnit.getMongoServer();
             const mongoUri = this.mongoServer.getUri();
             this.mongoClient = await MongoClient.connect(mongoUri);
             this.db = this.mongoClient.db(MONGO_DATABASE_NAME);

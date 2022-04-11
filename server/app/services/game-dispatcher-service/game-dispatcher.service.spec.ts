@@ -23,8 +23,6 @@ import {
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
@@ -34,6 +32,7 @@ import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 import { GameDispatcherService } from './game-dispatcher.service';
 
 const expect = chai.expect;
@@ -114,14 +113,13 @@ describe('GameDispatcherService', () => {
     let createGameService: CreateGameService;
     let virtualPlayerService: VirtualPlayerService;
     let activeGameService: ActiveGameService;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
     });
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
         gameDispatcherService = Container.get(GameDispatcherService);
         socketService = Container.get(SocketService);
         createGameService = Container.get(CreateGameService);
@@ -132,6 +130,7 @@ describe('GameDispatcherService', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {

@@ -9,8 +9,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { WordsVerificationService } from './words-verification.service';
 import { Container } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 
 chai.use(spies);
 chai.use(chaiAsPromised);
@@ -18,11 +17,18 @@ chai.use(chaiAsPromised);
 describe('WordsVerificationService', () => {
     let service: WordsVerificationService;
     let dictionaryTitle: string;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
+
+    beforeEach(() => {
         service = Container.get(WordsVerificationService);
+    });
+
+    afterEach(() => {
+        testingUnit.restore();
     });
 
     it('should create', () => {

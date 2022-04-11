@@ -7,15 +7,14 @@ import { GameHistory, PlayerHistoryData } from '@app/classes/database/game-histo
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import DatabaseService from '@app/services/database-service/database.service';
-import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import { MongoClient } from 'mongodb';
-// eslint-disable-next-line import/no-named-as-default
-import Container from 'typedi';
+import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const DEFAULT_WINNER_DATA: PlayerHistoryData = {
@@ -50,12 +49,16 @@ describe('GameHistoriesService', () => {
     let gameHistoriesService: GameHistoriesService;
     let databaseService: DatabaseService;
     let client: MongoClient;
+    let testingUnit: ServicesTestingUnit;
+
+    beforeEach(() => {
+        testingUnit = new ServicesTestingUnit().withMockDatabaseService();
+    });
 
     beforeEach(async () => {
-        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        databaseService = Container.get(DatabaseService);
         client = (await databaseService.connectToServer()) as MongoClient;
         gameHistoriesService = Container.get(GameHistoriesService);
-        gameHistoriesService['databaseService'] = databaseService;
         await gameHistoriesService['collection'].insertMany(INITIAL_GAME_HISTORIES);
     });
 
@@ -64,6 +67,8 @@ describe('GameHistoriesService', () => {
             await databaseService.closeConnection();
         } catch (exception) {}
         chai.spy.restore();
+
+        testingUnit.restore();
     });
 
     describe('getAllGameHistories', () => {

@@ -16,7 +16,7 @@ const TEST_DICTIONARY: CompleteDictionaryData = {
 const getDictionaryTestService = () =>
     createStubInstance(DictionaryService, {
         getDictionary: new Dictionary(TEST_DICTIONARY),
-    }) as unknown as DictionaryService;
+    });
 
 export { getDictionaryTestService };
 

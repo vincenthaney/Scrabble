@@ -8,7 +8,6 @@
 /* eslint-disable dot-notation */
 import { DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Container } from 'typedi';
 import { Orientation, Position } from '@app/classes/board';
@@ -19,6 +18,7 @@ import * as sinon from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 
@@ -27,9 +27,13 @@ describe('DictionarySearcher', () => {
     let node: DictionaryNode;
     let playerLetters: LetterValue[];
     let boardPlacement: BoardPlacement;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
+
+    beforeEach(() => {
         const dictionaryService = Container.get(DictionaryService);
         node = dictionaryService.getDictionary('test');
         playerLetters = ['A', 'B', 'C', '*'];
@@ -51,6 +55,7 @@ describe('DictionarySearcher', () => {
     afterEach(() => {
         Container.reset();
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('constructor', () => {

@@ -19,7 +19,6 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
 import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
@@ -29,6 +28,7 @@ import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 const expect = chai.expect;
 
 const DEFAULT_GAME_ID = 'gameId';
@@ -64,16 +64,14 @@ describe('GamePlayService', () => {
     let round: Round;
     let player: Player;
     let game: Game;
-    const initGamePlayService = Container.get(GamePlayService);
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
     });
 
     beforeEach(() => {
-        Container.set(DictionaryService, getDictionaryTestService());
-
-        gamePlayService = initGamePlayService;
+        gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
         tileReserveStub = createStubInstance(TileReserve);
@@ -103,6 +101,7 @@ describe('GamePlayService', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('playAction', () => {

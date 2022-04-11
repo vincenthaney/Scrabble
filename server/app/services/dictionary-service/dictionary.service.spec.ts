@@ -12,7 +12,6 @@ import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import DatabaseService from '@app/services/database-service/database.service';
-import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
@@ -24,6 +23,7 @@ import { join } from 'path';
 import * as sinon from 'sinon';
 import { SinonStub, stub } from 'sinon';
 import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 import {
     ADDITIONNAL_PROPERTY_DICTIONARY,
     DICTIONARY_1,
@@ -58,21 +58,16 @@ mockPaths[join(__dirname, DICTIONARY_PATH)] = JSON.stringify(DICTIONARY_1);
 describe('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
-    let initDatabaseServiceMock;
-    let initDictionaryService;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withMockDatabaseService();
     });
 
     beforeEach(async () => {
-        initDatabaseServiceMock = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
-        initDictionaryService = Container.get(DictionaryService);
-
-        databaseService = initDatabaseServiceMock;
+        databaseService = Container.get(DatabaseService);
         await databaseService.connectToServer();
-        dictionaryService = initDictionaryService;
-        dictionaryService['databaseService'] = databaseService;
+        dictionaryService = Container.get(DictionaryService);
         await dictionaryService['collection'].insertMany(INITIAL_DICTIONARIES);
     });
 
@@ -80,6 +75,7 @@ describe('DictionaryService', () => {
         await databaseService.closeConnection();
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should initialize dictionaries when database is ready', async () => {

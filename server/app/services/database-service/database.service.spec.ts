@@ -10,6 +10,7 @@ import { describe } from 'mocha';
 import { MongoClient, Document } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 import DatabaseService from './database.service';
 chai.use(chaiAsPromised);
 
@@ -20,14 +21,9 @@ describe('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
 
-    // beforeEach(() => {
-    //     Container.reset();
-    // });
-
     beforeEach(async () => {
         databaseService = Container.get(DatabaseService);
-
-        mongoServer = await MongoMemoryServer.create();
+        mongoServer = await ServicesTestingUnit.getMongoServer();
     });
 
     afterEach(async () => {

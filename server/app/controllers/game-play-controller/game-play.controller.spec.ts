@@ -22,10 +22,9 @@ import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constant
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
@@ -80,10 +79,13 @@ const DEFAULT_VIRTUAL_PLAYER_TURN_DATA: GameUpdateData = {
 describe('GamePlayController', () => {
     let socketServiceStub: SinonStubbedInstance<SocketService>;
     let gamePlayController: GamePlayController;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
+
+    beforeEach(() => {
         gamePlayController = Container.get(GamePlayController);
         socketServiceStub = createStubInstance(SocketService);
         (gamePlayController['socketService'] as unknown) = socketServiceStub;
@@ -92,6 +94,7 @@ describe('GamePlayController', () => {
     afterEach(() => {
         sinon.restore();
         chai.spy.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {

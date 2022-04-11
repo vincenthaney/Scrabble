@@ -30,9 +30,8 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import { spy } from 'chai';
@@ -112,10 +111,13 @@ describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
     let socketServiceStub: SinonStubbedInstance<SocketService>;
     let createGameServiceStub: SinonStubbedInstance<CreateGameService>;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
+
+    beforeEach(() => {
         controller = Container.get(GameDispatcherController);
         socketServiceStub = createStubInstance(SocketService);
         createGameServiceStub = createStubInstance(CreateGameService);
@@ -124,6 +126,7 @@ describe('GameDispatcherController', () => {
 
     afterEach(() => {
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
