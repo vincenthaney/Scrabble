@@ -96,6 +96,10 @@ describe('UploadDictionaryComponent', () => {
             expect(spyReadAsText).toHaveBeenCalled();
         });
 
+        it('should  return null if given null', () => {
+            expect(component.handleFileInput(null)).toBeUndefined();
+        });
+
         // it('should call JSON.parse', () => {
         //     const spyParse = spyOn(JSON, 'parse').and.callFake(() => {
         //         return {} as DictionaryData;

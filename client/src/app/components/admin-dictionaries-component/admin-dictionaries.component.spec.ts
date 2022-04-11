@@ -19,6 +19,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterModule } from '@angular/router';
+import { DictionariesState } from '@app/classes/admin/dictionaries';
 const TEST_ID = 'test';
 const testElementData: DictionarySummary = {
     title: 'testTitle',
@@ -139,6 +140,34 @@ describe('AdminDictionariesComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
     });
+
+    describe('On UpdatingDictionariesEvent', () => {
+        it('should update state', () => {
+            component.state = DictionariesState.Loading;
+            const TEST_STATE = DictionariesState.Ready;
+            dictionariesServiceMock['updatingDictionariesEvent'].next(TEST_STATE);
+            expect(component.state).toEqual(TEST_STATE);
+        });
+
+        it('should switch isWaitingForServerResponse to opposite value', () => {
+            component.isWaitingForServerResponse = true;
+            dictionariesServiceMock['updatingDictionariesEvent'].next();
+            expect(component.isWaitingForServerResponse).toBeFalse();;
+        });
+    });
+
+    // describe('getDisplayedColumns', () => {
+    //     it('should return array of keys', () => {
+    //         component.columnsItems = [
+    //             {
+    //                 key: {} as DisplayDictionaryKeys,
+    //                 label: 'testvalue',
+    //             } as DisplayDictionaryColumnsIteratorItem,
+    //         ] as DisplayDictionaryColumnsIteratorItem[];
+    //         component.getDisplayedColumns();
+    //         expect(component.getDisplayedColumns()).toEqual([]);
+    //     });
+    // });
 
     describe('modifyDictionary', () => {
         it('should call dialog.open', () => {
