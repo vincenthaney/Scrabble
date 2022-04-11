@@ -170,8 +170,8 @@ export default class DictionaryService {
         this.activeDictionaries.set(id, dictionary);
     }
 
-    private async isTitleValid(title: string): Promise<boolean> {
-        return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
+    private async isTitleValid(title: string, id: string = ''): Promise<boolean> {
+        return (await this.collection.countDocuments({ _id: { $ne: new ObjectId(id) } })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
     private isDescriptionValid(description: string): boolean {
