@@ -7,6 +7,7 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-convert-dialog',
@@ -35,11 +36,16 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
         this.gameParameters = new FormGroup({
             gameMode: new FormControl(GameMode.Solo, Validators.required),
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-            virtualPlayerName: new FormControl(this.virtualPlayerProfiles[0], Validators.required),
+            virtualPlayerName: new FormControl('', Validators.required),
         });
     }
 
     ngOnInit(): void {
+        this.gameParameters
+            .get('level')
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
+            .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
+
         this.virtualPlayerProfilesService
             .getVirtualPlayerProfiles()
             .then((profiles: VirtualPlayerProfile[]) => (this.virtualPlayerProfiles = profiles));

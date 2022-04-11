@@ -44,8 +44,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.gameParameters = new FormGroup({
             gameType: new FormControl(GameType.Classic, Validators.required),
             gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
-            level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
-            virtualPlayerName: new FormControl('', Validators.required),
+            level: new FormControl(VirtualPlayerLevel.Beginner),
+            virtualPlayerName: new FormControl(''),
             timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
             // TODO: A changer avec la portion de vincent
             dictionary: new FormControl('Mon dictionnaire', Validators.required),
@@ -59,11 +59,19 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             .subscribe((value) => {
                 if (value === this.gameModes.Solo) {
                     this.gameParameters?.get('level')?.setValidators([Validators.required]);
+                    this.gameParameters?.get('virtualPlayerName')?.setValidators([Validators.required]);
                 } else {
                     this.gameParameters?.get('level')?.clearValidators();
+                    this.gameParameters?.get('virtualPlayerName')?.clearValidators();
                 }
                 this.gameParameters?.get('level')?.updateValueAndValidity();
+                this.gameParameters?.get('virtualPlayerName')?.updateValueAndValidity();
             });
+
+        this.gameParameters
+            .get('level')
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
+            .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
 
         this.virtualPlayerProfilesService
             .getVirtualPlayerProfiles()
