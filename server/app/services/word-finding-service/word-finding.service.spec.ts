@@ -48,7 +48,6 @@ describe('WordFindingService', () => {
 
     describe('getWordFindingInstance', () => {
         let params: PartialWordFindingParameters;
-
         let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
         let dictionaryStub: SinonStubbedInstance<Dictionary>;
         beforeEach(() => {
