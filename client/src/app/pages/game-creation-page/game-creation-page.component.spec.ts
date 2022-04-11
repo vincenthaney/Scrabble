@@ -122,10 +122,32 @@ describe('GameCreationPageComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
+        it('should subscribe to gameMode changes', () => {
             const subscribeSpy = spyOn<any>(component.gameParameters.get('gameMode')?.valueChanges, 'subscribe');
             component.ngOnInit();
             expect(subscribeSpy).toHaveBeenCalled();
+        });
+
+        it('should reroute to waiting-room on gameDispatcherService.ReceivedLobbyDataEvent if gameMode is MultiPlayer', () => {
+            const subscribeSpy = spyOn<any>(component['gameDispatcherService'], 'subscribeToReceivedLobbyDataEvent');
+            component.ngOnInit();
+            expect(subscribeSpy).toHaveBeenCalled();
+        });
+
+        it('should reroute to waiting-room on gameDispatcherService.ReceivedLobbyDataEvent if multiplayer game', () => {
+            const spy = spyOn<any>(component['router'], 'navigateByUrl');
+            component.gameParameters.patchValue({ gameMode: component.gameModes.Multiplayer });
+            component.ngOnInit();
+            component['gameDispatcherService']['receivedLobbyDataEvent'].next();
+            expect(spy).toHaveBeenCalledWith('waiting-room');
+        });
+
+        it('should NOT reroute to game on gameDispatcherService.ReceivedLobbyDataEvent if solo game', () => {
+            const spy = spyOn<any>(component['router'], 'navigateByUrl');
+            component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
+            component.ngOnInit();
+            component['gameDispatcherService']['receivedLobbyDataEvent'].next();
+            expect(spy).not.toHaveBeenCalledWith('game');
         });
     });
 
@@ -230,21 +252,6 @@ describe('GameCreationPageComponent', () => {
     });
 
     describe('createGame', () => {
-        it('createGame should reroute to waiting-room if multiplayer game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.gameParameters.patchValue({ gameMode: component.gameModes.Multiplayer });
-
-            component['createGame']();
-            expect(spy).toHaveBeenCalledWith('waiting-room');
-        });
-
-        it('createGame should NOT reroute to game if solo game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-            component['createGame']();
-            expect(spy).not.toHaveBeenCalledWith('game');
-        });
-
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component['createGame']();
             expect(handleGameCreationSpy).toHaveBeenCalled();

@@ -126,9 +126,11 @@ describe('GameDispatcherService', () => {
             expect(spy).toHaveBeenCalledWith(lobbies);
         });
 
-        it('should change lobbyData', () => {
+        it('should change lobbyData and emit receivedLobbyDataEvent', () => {
+            const spy = spyOn<any>(service['receivedLobbyDataEvent'], 'next');
             service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
             expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
+            expect(spy).toHaveBeenCalled();
         });
 
         it('should initialize game on initializeGame event received', () => {
