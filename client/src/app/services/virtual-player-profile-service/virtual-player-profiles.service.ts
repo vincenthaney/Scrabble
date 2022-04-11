@@ -28,6 +28,6 @@ export class VirtualPlayerProfilesService {
     }
 
     private handleError(err: HttpErrorResponse): void {
-        this.snackBar.open(err.error.message, 'OK', ERROR_SNACK_BAR_CONFIG);
+        this.snackBar.open(err.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
     }
 }
