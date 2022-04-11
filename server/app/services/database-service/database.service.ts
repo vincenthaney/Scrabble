@@ -25,10 +25,10 @@ export default class DatabaseService {
             const client = await MongoClient.connect(databaseUrl);
             this.mongoClient = client;
             this.db = this.mongoClient.db(MONGO_DATABASE_NAME);
+            this.databaseInitialized$.emit('initialize');
         } catch (exception) {
             return null;
         }
-        this.databaseInitialized$.emit('initialize');
         return this.mongoClient;
     }
 

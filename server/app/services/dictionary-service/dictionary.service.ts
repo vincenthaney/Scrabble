@@ -18,6 +18,7 @@ import {
 } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
+import { MAXIMUM_WORD_LENGTH, MINIMUM_WORD_LENGTH } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import Ajv, { ValidateFunction } from 'ajv';
 import { promises } from 'fs';
@@ -50,6 +51,7 @@ export default class DictionaryService {
 
         dictionary.numberOfActiveGames++;
         dictionary.lastUse = new Date();
+
         return dictionary;
     }
 
@@ -59,11 +61,11 @@ export default class DictionaryService {
         throw new Error(INVALID_DICTIONARY_ID);
     }
 
-    stopUsingDictionary(id: string): void {
+    stopUsingDictionary(id: string, forceDeleteIfUnused: boolean = false): void {
         const dictionaryUsage = this.activeDictionaries.get(id);
         if (!dictionaryUsage) return;
         dictionaryUsage.numberOfActiveGames--;
-        this.deleteActiveDictionary(id);
+        this.deleteActiveDictionary(id, forceDeleteIfUnused);
     }
 
     async validateDictionary(dictionaryData: BasicDictionaryData): Promise<boolean> {
@@ -84,7 +86,10 @@ export default class DictionaryService {
                 },
                 { upsert: true },
             )
-            .then(async (updateResult: UpdateResult) => await this.initializeDictionary(updateResult.upsertedId.toString()));
+            .then(async (updateResult: UpdateResult) => {
+                if (updateResult.upsertedCount <= 0) return;
+                await this.initializeDictionary(updateResult.upsertedId.toString());
+            });
     }
 
     async resetDbDictionaries(): Promise<void> {
@@ -195,7 +200,7 @@ export default class DictionaryService {
                     minItems: 1,
                     items: {
                         type: 'string',
-                        pattern: '^[a-z]{2,15}$',
+                        pattern: `^[a-z]{${MINIMUM_WORD_LENGTH},${MAXIMUM_WORD_LENGTH}}$`,
                     },
                 },
             },
@@ -206,20 +211,22 @@ export default class DictionaryService {
         this.dictionaryValidator = ajv.compile(schema);
     }
 
-    private deleteActiveDictionary(dictionaryId: string): void {
+    private deleteActiveDictionary(dictionaryId: string, forceDeleteIfUnused: boolean = false): void {
         const dictionaryUsage: DictionaryUsage | undefined = this.activeDictionaries.get(dictionaryId);
         if (!dictionaryUsage) throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
 
-        if (this.shouldDeleteActiveDictionary(dictionaryUsage)) {
+        if (this.shouldDeleteActiveDictionary(dictionaryUsage, forceDeleteIfUnused)) {
             this.activeDictionaries.delete(dictionaryId);
         }
     }
 
-    private shouldDeleteActiveDictionary(dictionaryUsage: DictionaryUsage): boolean {
+    private shouldDeleteActiveDictionary(dictionaryUsage: DictionaryUsage, forceDeleteIfUnused: boolean = false): boolean {
         return (
             dictionaryUsage.numberOfActiveGames <= 0 &&
             dictionaryUsage.isDeleted &&
-            (!dictionaryUsage.lastUse || (dictionaryUsage.lastUse && Date.now() - dictionaryUsage.lastUse.getDate() > ONE_HOUR_IN_MS))
+            (forceDeleteIfUnused ||
+                !dictionaryUsage.lastUse ||
+                (dictionaryUsage.lastUse && Date.now() - dictionaryUsage.lastUse.getTime() > ONE_HOUR_IN_MS))
         );
     }
 }

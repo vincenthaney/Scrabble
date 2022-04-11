@@ -10,7 +10,6 @@ import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingR
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 import { PartialWordFindingParameters } from '@app/classes/word-finding/word-finding-types';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { expect } from 'chai';
 import * as sinon from 'sinon';

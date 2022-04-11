@@ -127,7 +127,7 @@ export class GamePlayService {
             game.isAddedToDatabase = true;
         }
 
-        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id);
+        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id, true);
 
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
         else updatedData.player1 = { id: game.player1.id, score: updatedScorePlayer1 };
