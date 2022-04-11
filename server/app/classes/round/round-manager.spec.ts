@@ -13,7 +13,6 @@ import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { CompletedRound, Round } from './round';
 import RoundManager from './round-manager';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 

@@ -1,5 +1,5 @@
+import { BasicDictionaryData, CompleteDictionaryData, DictionaryData } from '@app/classes/communication/dictionary-data';
 import { Dictionary } from '@app/classes/dictionary';
-import { DictionaryData, CompleteDictionaryData, BasicDictionaryData } from '@app/classes/communication/dictionary-data';
 import { createStubInstance } from 'sinon';
 import DictionaryService from './dictionary.service';
 
@@ -128,7 +128,7 @@ export const INVALID_WORDS_DICTIONARY_4: BasicDictionaryData = {
 export const INVALID_WORDS_DICTIONARY_5: BasicDictionaryData = {
     title: 'validUniqueTitle',
     description: 'valid Desicrition',
-    words: ['troplongggggggggggggggggg'],
+    words: ['troplongggggggggggggggggggggggggggggggggg'],
 };
 
 export const INVALID_WORDS_DICTIONARY_6: BasicDictionaryData = {
