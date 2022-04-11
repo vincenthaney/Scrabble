@@ -126,36 +126,69 @@ section#text-box-container {
             padding: 4px;
             border-radius: 4px;
 
+            .button-tooltip {
+                display:flex;
+                width:100%;
+            }
+
             input {
                 flex-grow: 1;
                 border: none;
+                margin-right: 6px;
                 font-size: inherit;
                 font-family: inherit;
                 outline: none;
             }
-            .horizontal-align {
-                display: flex;
-                flex-direction: column;
-                width:100%;
-                padding-right: 4px;
-            }
 
-            .mat-hint-wrapper {
-                margin-left: auto;
-                margin-right: 0;
-                height: 14px;
-                margin-top: -0.9em;
-            }
-
-            .button-tooltip {
-                margin-left: auto;
-                margin-right: 0;
-            }
             mat-hint {
-                font-size: smaller;
+                font-size: 75%;
                 margin-left: auto;
                 margin-right: 0;
+                color: #f3f3f3;
+            }
+
+            app-icon {
+                margin-top: 0.3em;
+            }
+
+            ::ng-deep .mat-flat-button {
+                line-height: 20px;
             }
         }
+
+          // form {
+        //     display: flex;
+        //     align-items: stretch;
+        //     border: solid 2px rgb(207, 207, 207);
+        //     padding: 4px;
+        //     border-radius: 4px;
+
+        //     input {
+        //         flex-grow: 1;
+        //         border: none;
+        //         font-size: inherit;
+        //         font-family: inherit;
+        //         outline: none;
+        //     }
+        //     .horizontal-align {
+        //         display: flex;
+        //         flex-direction: column;
+        //         width:100%;
+        //         padding-right: 4px;
+        //     }
+
+        //     .mat-hint-wrapper {
+        //         margin-left: auto;
+        //         margin-right: 0;
+        //         height: 14px;
+        //         margin-top: -0.9em;
+        //     }
+
+        //     .button-tooltip {
+        //         margin-left: auto;
+        //         margin-right: 0;
+        //     }
+
+        // }
     }
 }
