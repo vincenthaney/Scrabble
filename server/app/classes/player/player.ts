@@ -1,10 +1,10 @@
+import { PlayerData } from '@app/classes/communication/player-data';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveUpdate } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { Container } from 'typedi';
-import { PlayerData } from '@app/classes/communication/player-data';
 
 export default class Player {
     name: string;
@@ -66,5 +66,9 @@ export default class Player {
         this.tiles = oldPlayer.tiles;
         this.objectives = oldPlayer.objectives;
         return { id: oldPlayer.id, newId: this.id, name: this.name };
+    }
+
+    convertToPlayerData(): PlayerData {
+        return { id: this.id, name: this.name, score: this.score, tiles: this.tiles, isConnected: this.isConnected, objectives: this.objectives };
     }
 }
