@@ -1,3 +1,5 @@
+import { GameType } from '@app/classes/game-type';
+
 export const HOST_WAITING_MESSAGE = "En attente d'un adversaire";
 export const OPPONENT_FOUND_MESSAGE = ' a rejoint votre partie.';
 export const DIALOG_TITLE = 'Attention!';
@@ -29,3 +31,16 @@ export const MINIMUM_TIMER_VALUE = 30;
 export const MAXIMUM_TIMER_VALUE = 300;
 export const TIMER_VALUE_INCREMENTS = 30;
 export const KEEP_DATA = false;
+
+export const DEFAULT_LOBBY = {
+    lobbyId: '',
+    hostName: 'host',
+    gameType: GameType.Classic,
+    maxRoundTime: 60,
+    dictionary: {
+        title: 'Français',
+        description: '',
+        id: '',
+        isDefault: true,
+    },
+};

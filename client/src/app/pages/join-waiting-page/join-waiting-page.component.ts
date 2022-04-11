@@ -5,6 +5,7 @@ import { LobbyInfo } from '@app/classes/communication';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { getRandomFact } from '@app/constants/fun-facts-scrabble';
 import {
+    DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCEL_CONTENT,
@@ -44,7 +45,9 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (this.gameDispatcherService.currentLobby) this.currentLobby = this.gameDispatcherService.currentLobby;
+        } else {
+            this.currentLobby = DEFAULT_LOBBY;
+        }
         this.currentName = this.gameDispatcherService.currentName;
         this.funFact = getRandomFact();
 
