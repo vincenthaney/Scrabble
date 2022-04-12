@@ -152,7 +152,7 @@ describe('AdminDictionariesComponent', () => {
         it('should switch isWaitingForServerResponse to opposite value', () => {
             component.isWaitingForServerResponse = true;
             dictionariesServiceMock['updatingDictionariesEvent'].next();
-            expect(component.isWaitingForServerResponse).toBeFalse();;
+            expect(component.isWaitingForServerResponse).toBeFalse();
         });
     });
 
