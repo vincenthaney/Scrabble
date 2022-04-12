@@ -1,4 +1,4 @@
-import { VirtualPlayerProfile, VirtualPlayerProfileData } from '@app/classes/database/virtual-player-profile';
+import { VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import {
@@ -22,7 +22,7 @@ export default class VirtualPlayerProfilesService {
     private static async fetchDefaultVirtualPlayerProfiles(): Promise<VirtualPlayerProfile[]> {
         const filePath = join(__dirname, DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH);
         const dataBuffer = await promises.readFile(filePath, 'utf-8');
-        const defaultVirtualPlayerProfiles: VirtualPlayerProfileData = JSON.parse(dataBuffer);
+        const defaultVirtualPlayerProfiles: VirtualPlayerProfilesData = JSON.parse(dataBuffer);
         return defaultVirtualPlayerProfiles.virtualPlayerProfiles;
     }
 

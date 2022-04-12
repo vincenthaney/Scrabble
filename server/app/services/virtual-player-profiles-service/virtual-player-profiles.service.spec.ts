@@ -3,7 +3,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { VirtualPlayerProfile, VirtualPlayerProfileData } from '@app/classes/database/virtual-player-profile';
+import { VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
 import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
@@ -52,7 +52,7 @@ const DEFAULT_PROFILES: VirtualPlayerProfile[] = [DEFAULT_PROFILE_1, DEFAULT_PRO
 const CUSTOM_PROFILES: VirtualPlayerProfile[] = [CUSTOM_PROFILE_1, CUSTOM_PROFILE_2];
 const ALL_PROFILES: VirtualPlayerProfile[] = DEFAULT_PROFILES.concat(CUSTOM_PROFILES);
 
-const mockInitialVirtualPlayerProfiles: VirtualPlayerProfileData = {
+const mockInitialVirtualPlayerProfiles: VirtualPlayerProfilesData = {
     virtualPlayerProfiles: ALL_PROFILES,
 };
 
