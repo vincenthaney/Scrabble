@@ -40,15 +40,7 @@ export class ServicesTestingUnit {
     }
 
     withStubbed<T>(constructor: ClassType<T>, overrides?: ClassOverride<T>, attributesOverrides?: ClassAttributesOverrides<T>): ServicesTestingUnit {
-        const instance = this.sandbox.createStubInstance(constructor, overrides);
-        Container.set(constructor, instance);
-        this.stubbedInstances.set(constructor, instance);
-
-        if (attributesOverrides)
-            for (const key of Object.keys(attributesOverrides)) {
-                instance[key] = attributesOverrides[key];
-            }
-
+        this.setStubbed(constructor, overrides, attributesOverrides);
         return this;
     }
 
@@ -86,6 +78,23 @@ export class ServicesTestingUnit {
         Container.set(WordFindingService, service);
 
         return [instance, service];
+    }
+
+    setStubbed<T>(
+        constructor: ClassType<T>,
+        overrides?: ClassOverride<T>,
+        attributesOverrides?: ClassAttributesOverrides<T>,
+    ): SinonStubbedInstance<T> {
+        const instance = this.sandbox.createStubInstance(constructor, overrides);
+        Container.set(constructor, instance);
+        this.stubbedInstances.set(constructor, instance);
+
+        if (attributesOverrides)
+            for (const key of Object.keys(attributesOverrides)) {
+                instance[key] = attributesOverrides[key];
+            }
+
+        return instance;
     }
 
     getStubbedInstance<T>(constructor: ClassType<T>): SinonStubbedInstance<T> {

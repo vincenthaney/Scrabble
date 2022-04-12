@@ -32,6 +32,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { ActionPlace } from '..';
 import { ActionErrorsMessages } from './action-errors';
 import * as sinon from 'sinon';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 
 const expect = chai.expect;
 
@@ -116,13 +117,24 @@ describe('ActionPlace', () => {
     let wordValidatorStub: SinonStubbedInstance<WordsVerificationService>;
     let scoreCalculatorServiceStub: SinonStubbedInstance<ScoreCalculatorService>;
     let game: Game;
+    let testingUnit: ServicesTestingUnit;
+
+    beforeEach(() => {
+        testingUnit = new ServicesTestingUnit();
+
+        wordValidatorStub = testingUnit.setStubbed(WordsVerificationService, {
+            verifyWords: undefined,
+        });
+        scoreCalculatorServiceStub = testingUnit.setStubbed(ScoreCalculatorService, {
+            calculatePoints: SCORE_RETURN,
+            bonusPoints: 0,
+        });
+    });
 
     beforeEach(() => {
         gameStub = createStubInstance(Game);
         tileReserveStub = createStubInstance(TileReserve);
         boardStub = createStubInstance(Board);
-        wordValidatorStub = createStubInstance(WordsVerificationService);
-        scoreCalculatorServiceStub = createStubInstance(ScoreCalculatorService);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name);
         gameStub.player2 = new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name);
@@ -143,6 +155,7 @@ describe('ActionPlace', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
@@ -183,14 +196,8 @@ describe('ActionPlace', () => {
                 action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
 
-                action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
-                action['scoreCalculator'] = scoreCalculatorServiceStub as unknown as ScoreCalculatorService;
-
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                wordValidatorStub.verifyWords.callsFake(() => {});
-                scoreCalculatorServiceStub.calculatePoints.returns(SCORE_RETURN);
-                scoreCalculatorServiceStub.bonusPoints.returns(0);
                 gameStub.getTilesFromReserve.returns(GET_TILES_RETURN);
+
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, <any>'isLegalPlacement').returns(true) as SinonStub<
                     [words: [Square, Tile][][]],
