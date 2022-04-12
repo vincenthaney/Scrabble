@@ -26,7 +26,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
 
-    private virtualPlayerProfiles: VirtualPlayerProfile[];
+    private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
 
     constructor(
         private router: Router,
@@ -37,7 +37,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.gameModes = GameMode;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.dictionaryOptions = [];
-        this.virtualPlayerProfiles = [];
+        this.virtualPlayerNameMap = new Map();
         this.playerName = '';
         this.playerNameValid = false;
         this.pageDestroyed$ = new Subject();
@@ -75,7 +75,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
         this.virtualPlayerProfilesService
             .getVirtualPlayerProfiles()
-            .then((profiles: VirtualPlayerProfile[]) => (this.virtualPlayerProfiles = profiles));
+            .then((profiles: VirtualPlayerProfile[]) => this.generateVirtualPlayerProfileMap(profiles));
     }
 
     ngOnDestroy(): void {
@@ -98,11 +98,17 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     }
 
     getVirtualPlayerNames(): string[] {
-        return this.virtualPlayerProfiles
-            ? this.virtualPlayerProfiles
-                  .filter((profile: VirtualPlayerProfile) => profile.level === (this.gameParameters.get('level')?.value as VirtualPlayerLevel))
-                  .map((profile: VirtualPlayerProfile) => profile.name)
-            : [''];
+        if (!this.virtualPlayerNameMap) return [];
+        const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(this.gameParameters.get('level')?.value);
+        return namesForLevel ?? [];
+    }
+
+    private generateVirtualPlayerProfileMap(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
+        virtualPlayerProfiles.forEach((profile: VirtualPlayerProfile) => {
+            const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(profile.level);
+            if (!namesForLevel) this.virtualPlayerNameMap.set(profile.level, [profile.name]);
+            else namesForLevel.push(profile.name);
+        });
     }
 
     private createGame(): void {

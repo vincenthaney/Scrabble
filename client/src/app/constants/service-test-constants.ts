@@ -13,3 +13,8 @@ export const MOCK_PLAYER_PROFILES: VirtualPlayerProfile[] = [
         isDefault: false,
     },
 ];
+
+export const MOCK_PLAYER_PROFILE_MAP: Map<VirtualPlayerLevel, string[]> = new Map([
+    [VirtualPlayerLevel.Beginner, [MOCK_PLAYER_PROFILES[0].name]],
+    [VirtualPlayerLevel.Expert, [MOCK_PLAYER_PROFILES[1].name]],
+]);

@@ -21,7 +21,7 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     gameParameters: FormGroup;
     isConverting: boolean;
 
-    private virtualPlayerProfiles: VirtualPlayerProfile[];
+    private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: string,
@@ -31,7 +31,7 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
         this.isConverting = false;
         this.playerName = data;
         this.virtualPlayerLevels = VirtualPlayerLevel;
-        this.virtualPlayerProfiles = [];
+        this.virtualPlayerNameMap = new Map();
         this.pageDestroyed$ = new Subject();
         this.gameParameters = new FormGroup({
             gameMode: new FormControl(GameMode.Solo, Validators.required),
@@ -48,7 +48,7 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
 
         this.virtualPlayerProfilesService
             .getVirtualPlayerProfiles()
-            .then((profiles: VirtualPlayerProfile[]) => (this.virtualPlayerProfiles = profiles));
+            .then((profiles: VirtualPlayerProfile[]) => this.generateVirtualPlayerProfileMap(profiles));
     }
 
     ngOnDestroy(): void {
@@ -63,14 +63,17 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     }
 
     getVirtualPlayerNames(): string[] {
-        return this.virtualPlayerProfiles
-            ? this.virtualPlayerProfiles
-                  .filter(
-                      (profile: VirtualPlayerProfile) =>
-                          profile.level === (this.gameParameters.get('level')?.value as VirtualPlayerLevel) && profile.name !== this.playerName,
-                  )
-                  .map((profile: VirtualPlayerProfile) => profile.name)
-            : [];
+        if (!this.virtualPlayerNameMap) return [];
+        const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(this.gameParameters.get('level')?.value);
+        return namesForLevel ?? [];
+    }
+
+    private generateVirtualPlayerProfileMap(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
+        virtualPlayerProfiles.forEach((profile: VirtualPlayerProfile) => {
+            const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(profile.level);
+            if (!namesForLevel) this.virtualPlayerNameMap.set(profile.level, [profile.name]);
+            else namesForLevel.push(profile.name);
+        });
     }
 
     private handleConvertToSolo(): void {
