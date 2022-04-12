@@ -74,6 +74,11 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
         return namesForLevel ?? [];
     }
 
+    returnToWaiting(): void {
+        this.gameDispatcherService.handleRecreateGame();
+        this.dialogRef.close({ isConverting: false });
+    }
+
     private generateVirtualPlayerProfileMap(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
         virtualPlayerProfiles.forEach((profile: VirtualPlayerProfile) => {
             const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(profile.level);
@@ -85,11 +90,6 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     private handleConvertToSolo(): void {
         this.gameDispatcherService.handleRecreateGame(this.gameParameters);
         this.dialogRef.close({ isConverting: true });
-    }
-
-    returnToWaiting(): void {
-        this.gameDispatcherService.handleRecreateGame();
-        this.dialogRef.close({ isConverting: false });
     }
 
     private setupDialog(): void {
