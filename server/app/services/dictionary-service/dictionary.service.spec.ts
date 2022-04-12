@@ -41,7 +41,6 @@ import {
     INVALID_WORDS_DICTIONARY_6,
     LONG_TITLE_DICTIONARY,
     MISSING_PROPERTY_DICTIONARY,
-    NEW_INVALID_DICTIONARY,
     NEW_VALID_DICTIONARY,
     SAME_TITLE_DICTIONARY,
     VALID_DICTIONARY,
@@ -134,16 +133,6 @@ describe('DictionaryService', () => {
             expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(INITIAL_DICTIONARIES.length + 1);
             expect((await dictionaryService['collection'].find({ title: NEW_VALID_DICTIONARY.title }).toArray())[0].description).to.deep.equal(
                 NEW_VALID_DICTIONARY.description,
-            );
-        });
-
-        it('should not add the dictionary if the title is already present', async () => {
-            chai.spy.on(dictionaryService, 'validateDictionary', () => true);
-
-            await dictionaryService.addNewDictionary(NEW_INVALID_DICTIONARY);
-            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(INITIAL_DICTIONARIES.length);
-            expect((await dictionaryService['collection'].find({ title: NEW_INVALID_DICTIONARY.title }).toArray())[0].description).not.to.deep.equal(
-                NEW_INVALID_DICTIONARY.description,
             );
         });
 
