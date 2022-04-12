@@ -277,11 +277,11 @@ describe('GamePlayController', () => {
             expect(emitToSocketSpy).to.not.have.been.called();
         });
 
-        it('should call emitToScket if localPlayerFeedback exists', async () => {
+        it.only('should call emitToScket if feedback exists', async () => {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [
                 {},
-                { localPlayerFeedback: DEFAULT_FEEDBACK, opponentFeedback: DEFAULT_FEEDBACK, endGameFeedback: undefined },
+                { localPlayerFeedback: DEFAULT_FEEDBACK, opponentFeedback: DEFAULT_FEEDBACK, endGameFeedback: [] },
             ]);
             await gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.twice;
