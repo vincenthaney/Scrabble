@@ -43,7 +43,7 @@ $border-radius: 6px;
             gap: 12px;
             border: none;
             overflow: visible;
-            
+
             mat-button-toggle-label {
                 width: 100%;
             }
@@ -106,8 +106,6 @@ $border-radius: 6px;
             margin-bottom: 0.25em;
         }
 
-
-
         app-timer-selection {
             display: block;
         }
@@ -123,6 +121,15 @@ $border-radius: 6px;
         }
     }
 }
- .mat-button-toggle-label-content {
+.mat-button-toggle-label-content {
     width: 100%;
+}
+
+::ng-deep snack-bar-container.error {
+    background: lighten(tomato, 30%);
+    color: tomato;
+
+    button {
+        color: tomato;
+    }
 }

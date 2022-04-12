@@ -67,7 +67,9 @@
                     <mat-form-field appearance="outline">
                         <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
                         <mat-select formControlName="virtualPlayerName" (selectionChange)="isFormValid()">
-                            <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
+                            <mat-option *ngFor="let virtualPlayer of getVirtualPlayerNames()" value="{{ virtualPlayer }}">{{
+                                virtualPlayer
+                            }}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </ng-container>
