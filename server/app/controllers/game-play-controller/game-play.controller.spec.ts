@@ -24,7 +24,7 @@ import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { FeedbackMessage, FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { Delay } from '@app/utils/delay';
@@ -48,7 +48,7 @@ const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: { tiles: [] }, input: '' };
 const DEFAULT_EXCEPTION = 'exception';
-const DEFAULT_FEEDBACK = 'this is a feedback';
+const DEFAULT_FEEDBACK: FeedbackMessage = { message: 'this is a feedback' };
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
@@ -289,9 +289,9 @@ describe('GamePlayController', () => {
 
         it('should call emitToRoom only once in endGameFeedback', async () => {
             const feedback: FeedbackMessages = {
-                localPlayerFeedback: undefined,
-                opponentFeedback: undefined,
-                endGameFeedback: ['message 1', 'message 2'],
+                localPlayerFeedback: {},
+                opponentFeedback: {},
+                endGameFeedback: [{ message: 'message 1' }, { message: 'message 2' }],
             };
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
             await gamePlayController['handlePlayAction']('', '', {

@@ -1,5 +1,10 @@
+export interface FeedbackMessage {
+    message?: string;
+    isClickable?: boolean;
+}
+
 export interface FeedbackMessages {
-    localPlayerFeedback: string | undefined;
-    opponentFeedback: string | undefined;
-    endGameFeedback: string[] | undefined;
+    localPlayerFeedback: FeedbackMessage;
+    opponentFeedback: FeedbackMessage;
+    endGameFeedback: FeedbackMessage[];
 }
