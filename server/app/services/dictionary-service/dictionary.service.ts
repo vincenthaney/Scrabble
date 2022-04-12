@@ -214,9 +214,11 @@ export default class DictionaryService {
         return (
             dictionaryUsage.numberOfActiveGames <= 0 &&
             dictionaryUsage.isDeleted &&
-            (forceDeleteIfUnused ||
-                !dictionaryUsage.lastUse ||
-                (dictionaryUsage.lastUse && Date.now() - dictionaryUsage.lastUse.getTime() > ONE_HOUR_IN_MS))
+            (forceDeleteIfUnused || !dictionaryUsage.lastUse || this.notUsedInLastHour(dictionaryUsage))
         );
+    }
+
+    private notUsedInLastHour(dictionaryUsage: DictionaryUsage): boolean {
+        return dictionaryUsage.lastUse !== undefined && Date.now() - dictionaryUsage.lastUse.getTime() > ONE_HOUR_IN_MS;
     }
 }

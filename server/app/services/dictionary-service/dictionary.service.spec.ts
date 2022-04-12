@@ -12,6 +12,7 @@ import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import DatabaseService from '@app/services/database-service/database.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
@@ -23,7 +24,6 @@ import { join } from 'path';
 import * as sinon from 'sinon';
 import { SinonStub, stub } from 'sinon';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import {
     ADDITIONNAL_PROPERTY_DICTIONARY,
     DICTIONARY_1,
@@ -542,6 +542,11 @@ describe('DictionaryService', () => {
             isDeleted: true,
             lastUse: undefined,
         };
+        let notUsedStub: SinonStub;
+
+        beforeEach(() => {
+            notUsedStub = stub(dictionaryService, <any>'notUsedInLastHour').returns(false);
+        });
 
         it('should return true if no active games, isDeleted and forceDelete', () => {
             expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, true)).to.be.true;
@@ -552,7 +557,7 @@ describe('DictionaryService', () => {
         });
 
         it('should return true if no active games, isDeleted, no force delete but last use more than 1 hour ago', () => {
-            dictionaryUsage.lastUse = new Date(Date.now() - ONE_HOUR_IN_MS * 2);
+            notUsedStub.returns(true);
             expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
         });
 
@@ -567,8 +572,31 @@ describe('DictionaryService', () => {
         });
 
         it('should return false if used in last hour', () => {
-            dictionaryUsage.lastUse = new Date(Date.now() - ONE_HOUR_IN_MS / 2);
+            notUsedStub.returns(true);
             expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
+        });
+    });
+
+    describe('notUsedInLastHour', () => {
+        const dictionaryUsage: DictionaryUsage = {
+            dictionary: undefined as unknown as Dictionary,
+            numberOfActiveGames: 0,
+            isDeleted: true,
+            lastUse: undefined,
+        };
+
+        it('should return false if no last use', () => {
+            expect(dictionaryService['notUsedInLastHour'](dictionaryUsage)).to.be.false;
+        });
+
+        it('should return true if last use was more than an hour ago', () => {
+            dictionaryUsage.lastUse = new Date(Date.now() - ONE_HOUR_IN_MS * 2);
+            expect(dictionaryService['notUsedInLastHour'](dictionaryUsage)).to.be.true;
+        });
+
+        it('should return false if last use was less than an hour ago', () => {
+            dictionaryUsage.lastUse = new Date(Date.now() - ONE_HOUR_IN_MS / 2);
+            expect(dictionaryService['notUsedInLastHour'](dictionaryUsage)).to.be.false;
         });
     });
 });
