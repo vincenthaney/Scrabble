@@ -37,7 +37,6 @@ class TestComponent {}
 describe('ConvertDialogComponent', () => {
     let component: ConvertDialogComponent;
     let fixture: ComponentFixture<ConvertDialogComponent>;
-    let gameDispatcherServiceMock: GameDispatcherService;
     let virtualPlayerProfileSpy: SpyObj<VirtualPlayerProfilesService>;
     let gameDispatcherServiceSpy: SpyObj<GameDispatcherService>;
     let matDialogSpy: SpyObj<MatDialogRef<ConvertDialogComponent>>;

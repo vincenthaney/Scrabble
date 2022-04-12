@@ -199,7 +199,8 @@ describe('GameCreationPageComponent', () => {
             expect(dictionaryServiceSpy.updateAllDictionaries).toHaveBeenCalled();
         });
 
-        it('should subscribe to level value change', () => {
+        it('should subscribe to level value change', async () => {
+            await component.ngOnInit();
             const spy = spyOn<any>(component.gameParameters.get('virtualPlayerName'), 'reset').and.callFake(() => {});
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
             expect(spy).toHaveBeenCalled();
