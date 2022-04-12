@@ -161,7 +161,7 @@ export default class DictionaryService {
                     minItems: 1,
                     items: {
                         type: 'string',
-                        pattern: '^[a-z]{2,15}$',
+                        pattern: '^[a-z]{2,30}$',
                     },
                 },
             },
