@@ -2,7 +2,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { Router } from '@angular/router';
 import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -14,7 +13,6 @@ import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -45,7 +43,6 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
 
     constructor(
-        private router: Router,
         private gameDispatcherService: GameDispatcherService,
         private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
         private readonly dictionaryService: DictionaryService,
