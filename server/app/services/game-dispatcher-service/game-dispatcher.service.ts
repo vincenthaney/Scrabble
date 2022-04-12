@@ -21,6 +21,7 @@ import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { GOOD_LUCK } from '@app/constants/game';
 
 @Service()
 export class GameDispatcherService {
@@ -59,6 +60,12 @@ export class GameDispatcherService {
                 this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
             );
         }
+
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: GOOD_LUCK,
+            senderId: startGameData.player2.id,
+            gameId,
+        });
     }
 
     async createMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
