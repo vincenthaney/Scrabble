@@ -1,5 +1,6 @@
 import Board from '@app/classes/board/board';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameHistory } from '@app/classes/database/game-history';
@@ -18,7 +19,6 @@ import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -191,8 +191,8 @@ export default class Game {
         const round: Round = this.roundManager.getCurrentRound();
         const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
         const startGameData: StartGameData = {
-            player1: this.player1,
-            player2: this.player2,
+            player1: this.player1.convertToPlayerData(),
+            player2: this.player2.convertToPlayerData(),
             gameType: this.gameType,
             gameMode: this.gameMode,
             maxRoundTime: this.roundManager.getMaxRoundTime(),
