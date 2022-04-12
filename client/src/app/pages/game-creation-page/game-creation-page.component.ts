@@ -40,6 +40,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     isCreatingGame: boolean;
 
+    private shouldSetToDefaultDictionary: boolean;
+
     private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
 
     constructor(
@@ -70,13 +72,15 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
         this.isCreatingGame = false;
 
+        this.shouldSetToDefaultDictionary = true;
+
         this.gameDispatcherService
             .observeGameCreationFailed()
             .pipe(takeUntil(this.pageDestroyed$))
             .subscribe(async (error: HttpErrorResponse) => await this.handleGameCreationFail(error));
         this.dictionaryService.subscribeToDictionariesUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
-            this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
+            if (this.shouldSetToDefaultDictionary) this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
         });
     }
 
@@ -163,6 +167,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     private async handleDictionaryDeleted(): Promise<void> {
         this.wasDictionaryDeleted = true;
+        this.shouldSetToDefaultDictionary = false;
         await this.dictionaryService.updateAllDictionaries();
         this.gameParameters.controls.dictionary?.setValue(undefined);
         this.gameParameters.controls.dictionary?.markAsTouched();
