@@ -1,10 +1,10 @@
+import { Dictionary } from '@app/classes/dictionary';
 import { AbstractWordFinding } from '@app/classes/word-finding';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
 import DatabaseService from './database-service/database.service';
 import { DatabaseServiceMock } from './database-service/database.service.mock.spec';
-import { getDictionaryTestService } from './dictionary-service/dictionary-test.service.spec';
 import DictionaryService from './dictionary-service/dictionary.service';
 import WordFindingService from './word-finding-service/word-finding.service';
 
@@ -61,8 +61,14 @@ export class ServicesTestingUnit {
     }
 
     withStubbedDictionaryService(): ServicesTestingUnit {
-        const stubbedInstance: SinonStubbedInstance<DictionaryService> = getDictionaryTestService();
+        const dictionaryStub = this.sandbox.createStubInstance(Dictionary);
+        const stubbedInstance = this.sandbox.createStubInstance(DictionaryService, {
+            getDictionary: dictionaryStub as unknown as Dictionary,
+        });
+
         Container.set(DictionaryService, stubbedInstance);
+
+        this.stubbedInstances.set(Dictionary, dictionaryStub);
         this.stubbedInstances.set(DictionaryService, stubbedInstance);
         return this;
     }
