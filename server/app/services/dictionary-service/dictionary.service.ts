@@ -71,7 +71,7 @@ export default class DictionaryService {
     }
 
     async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
-        if (!this.validateDictionary(basicDictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
+        if (!(await this.validateDictionary(basicDictionaryData))) throw new Error(INVALID_DICTIONARY_FORMAT);
         const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
         await this.collection.updateOne(
             {
@@ -114,7 +114,7 @@ export default class DictionaryService {
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
-            if (!this.isTitleValid(updateInfo.title)) throw new Error(INVALID_TITLE_FORMAT);
+            if (!(await this.isTitleValid(updateInfo.title, new ObjectId(updateInfo.id)))) throw new Error(INVALID_TITLE_FORMAT);
             infoToUpdate.title = updateInfo.title;
         }
 
@@ -132,8 +132,8 @@ export default class DictionaryService {
         throw new Error(INVALID_DICTIONARY_ID);
     }
 
-    private async isTitleValid(title: string): Promise<boolean> {
-        return (await this.collection.countDocuments({ title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
+    private async isTitleValid(title: string, id?: ObjectId): Promise<boolean> {
+        return (await this.collection.countDocuments({ _id: { $ne: id }, title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
     private isDescriptionValid(description: string): boolean {
@@ -161,7 +161,7 @@ export default class DictionaryService {
                     minItems: 1,
                     items: {
                         type: 'string',
-                        pattern: '^[a-z]{2,15}$',
+                        pattern: '^[a-z]{2,30}$',
                     },
                 },
             },

@@ -19,8 +19,7 @@ export class DictionaryController {
         this.router = Router();
 
         this.router.post('/dictionaries', async (req: DictionaryRequest, res: Response) => {
-            const dictionaryData: DictionaryData = req.body;
-
+            const dictionaryData: DictionaryData = req.body.dictionaryData;
             try {
                 await this.dictionaryService.addNewDictionary(dictionaryData);
                 res.status(StatusCodes.CREATED).send();
@@ -30,7 +29,7 @@ export class DictionaryController {
         });
 
         this.router.patch('/dictionaries', async (req: DictionaryRequest, res: Response) => {
-            const dictionaryUpdateInfo: DictionaryUpdateInfo = req.body;
+            const dictionaryUpdateInfo: DictionaryUpdateInfo = req.body.dictionaryUpdateInfo;
 
             try {
                 await this.dictionaryService.updateDictionary(dictionaryUpdateInfo);
@@ -41,8 +40,7 @@ export class DictionaryController {
         });
 
         this.router.delete('/dictionaries', async (req: DictionaryRequest, res: Response) => {
-            const dictionaryId: string = req.body;
-
+            const dictionaryId: string = req.query.dictionaryId as string;
             try {
                 await this.dictionaryService.deleteDictionary(dictionaryId);
                 res.status(StatusCodes.NO_CONTENT).send();
