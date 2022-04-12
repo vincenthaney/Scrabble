@@ -3,7 +3,7 @@
 import { Application } from '@app/app';
 import { BasicDictionaryData, DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';

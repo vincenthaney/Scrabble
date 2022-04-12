@@ -9,7 +9,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { WordsVerificationService } from './words-verification.service';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
 chai.use(spies);
 chai.use(chaiAsPromised);

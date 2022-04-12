@@ -71,11 +71,9 @@ export class ServicesTestingUnit {
         const instance = this.sandbox.createStubInstance(AbstractWordFinding, {
             findWords: [],
         });
-        const service = this.sandbox.createStubInstance(WordFindingService, {
+        const service = this.setStubbed(WordFindingService, {
             getWordFindingInstance: instance as unknown as AbstractWordFinding,
         });
-
-        Container.set(WordFindingService, service);
 
         return [instance, service];
     }

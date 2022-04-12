@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { Db, MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Service } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
 @Service()
 export class DatabaseServiceMock {

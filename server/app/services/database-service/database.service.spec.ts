@@ -10,7 +10,7 @@ import { describe } from 'mocha';
 import { MongoClient, Document } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import DatabaseService from './database.service';
 chai.use(chaiAsPromised);
 

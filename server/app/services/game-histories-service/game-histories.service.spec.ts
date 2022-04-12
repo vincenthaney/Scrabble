@@ -14,7 +14,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
 import { MongoClient } from 'mongodb';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const DEFAULT_WINNER_DATA: PlayerHistoryData = {

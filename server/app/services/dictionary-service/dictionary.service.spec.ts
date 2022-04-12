@@ -23,7 +23,7 @@ import { join } from 'path';
 import * as sinon from 'sinon';
 import { SinonStub, stub } from 'sinon';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import {
     ADDITIONNAL_PROPERTY_DICTIONARY,
     DICTIONARY_1,

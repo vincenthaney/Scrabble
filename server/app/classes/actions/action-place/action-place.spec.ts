@@ -32,7 +32,7 @@ import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon
 import { ActionPlace } from '..';
 import { ActionErrorsMessages } from './action-errors';
 import * as sinon from 'sinon';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
 const expect = chai.expect;
 

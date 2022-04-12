@@ -31,8 +31,8 @@ import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } fr
 import { Container } from 'typedi';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = '1';

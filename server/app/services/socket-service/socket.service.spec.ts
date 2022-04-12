@@ -9,7 +9,7 @@ import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
 import DatabaseService from '@app/services/database-service/database.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from './socket.service';
 import { Application } from '@app/app';
 

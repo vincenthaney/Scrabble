@@ -7,7 +7,7 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { AbstractWordFinding } from '@app/classes/word-finding';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { expect } from 'chai';

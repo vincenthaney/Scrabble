@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 
