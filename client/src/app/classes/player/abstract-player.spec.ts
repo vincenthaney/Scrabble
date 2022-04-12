@@ -10,10 +10,12 @@ describe('AbstractPlayer', () => {
         {
             name: 'testName2',
             id: 'testId2',
+            newId: 'testId2',
             score: 10,
             tiles: [{ letter: 'Z', value: 10 }],
         },
         {
+            newId: 'testId2',
             id: 'testId2',
             score: 10,
             tiles: [{ letter: 'Z', value: 10 }],
@@ -88,8 +90,8 @@ describe('AbstractPlayer', () => {
             const player = new Player(initId, initName, initTiles);
             player.updatePlayerData(testCase);
 
-            if (testCase.id) {
-                expect(player.id).toEqual(testCase.id);
+            if (testCase.newId) {
+                expect(player.id).toEqual(testCase.newId);
             } else {
                 expect(player.id).toEqual(initId);
             }

@@ -13,6 +13,7 @@ import { GameDispatcherController } from './controllers/game-dispatcher-controll
 import { GameHistoriesController } from './controllers/game-histories-controller/game-histories.controller';
 import { GamePlayController } from './controllers/game-play-controller/game-play.controller';
 import { HighScoresController } from './controllers/high-scores-controller/high-scores.controller';
+import { VirtualPlayerProfilesController } from './controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
 import DatabaseService from './services/database-service/database.service';
 
 @Service()
@@ -27,6 +28,7 @@ export class Application {
         private readonly highScoreController: HighScoresController,
         private readonly dictionaryController: DictionaryController,
         private readonly gameHistoriesController: GameHistoriesController,
+        private readonly virtualPlayerProfilesController: VirtualPlayerProfilesController,
         private readonly databaseService: DatabaseService,
     ) {
         this.app = express();
@@ -57,6 +59,7 @@ export class Application {
         this.app.use('/api', this.highScoreController.router);
         this.app.use('/api', this.dictionaryController.router);
         this.app.use('/api', this.gameHistoriesController.router);
+        this.app.use('/api', this.virtualPlayerProfilesController.router);
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
