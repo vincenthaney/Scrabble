@@ -2,7 +2,7 @@
 <div class="container">
   <h2 mat-dialog-title>Ajouter un dictionnaire</h2>
   <div class="input-container">
-    <div style="width: 500px">
+    <div>
       <input
       style="display: none"
       type="file" (change)="handleFileInput($event.target)"
@@ -13,7 +13,7 @@
           Sélectionner un fichier
         </button>
       </div>
-      <div [className]="state" *ngIf="selectedFile" style="margin-left: 20px; width: 300px;">
+      <div [className]="state" *ngIf="selectedFile" style="margin-left: auto; display: inline-table">
         <app-icon color="primary" icon="file"></app-icon>
         {{this.selectedFile.name}}
       </div>
