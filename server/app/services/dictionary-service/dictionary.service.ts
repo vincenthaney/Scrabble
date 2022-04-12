@@ -24,7 +24,7 @@ import Ajv, { ValidateFunction } from 'ajv';
 import { promises } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { Collection, ObjectId, UpdateResult, WithId } from 'mongodb';
+import { Collection, InsertOneResult, ObjectId, WithId } from 'mongodb';
 import { join } from 'path';
 import { Service } from 'typedi';
 
@@ -76,20 +76,10 @@ export default class DictionaryService {
     async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
         if (!(await this.validateDictionary(basicDictionaryData))) throw new Error(INVALID_DICTIONARY_FORMAT);
         const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
-        await this.collection
-            .updateOne(
-                {
-                    title: dictionaryData.title,
-                },
-                {
-                    $setOnInsert: dictionaryData,
-                },
-                { upsert: true },
-            )
-            .then(async (updateResult: UpdateResult) => {
-                if (updateResult.upsertedCount <= 0) return;
-                await this.initializeDictionary(updateResult.upsertedId.toString());
-            });
+        await this.collection.insertOne(dictionaryData).then(async (insertResult: InsertOneResult) => {
+            if (!insertResult.insertedId) return;
+            await this.initializeDictionary(insertResult.insertedId.toString());
+        });
     }
 
     async resetDbDictionaries(): Promise<void> {
