@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -20,6 +21,7 @@ import { AbstractPlayer, Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
+import { CODE_HTML_TAG } from '@app/constants/components-constants';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
 import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
@@ -387,6 +389,73 @@ describe('CommunicationBoxComponent', () => {
                 jasmine.clock().tick(1);
                 expect(spy).toHaveBeenCalled();
             });
+        });
+    });
+
+    describe('onMessageClicked', () => {
+        let event: MouseEvent;
+        let element: HTMLElement;
+        let isClickableSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            element = { innerText: 'text' } as HTMLElement;
+            event = { target: element as unknown as EventTarget } as MouseEvent;
+            isClickableSpy = spyOn<any>(component, 'isElementClickable').and.returnValue(true);
+            inputParserSpy.handleInput.and.callFake(() => {});
+        });
+
+        it('should call handleInput if element is clickable and has text', () => {
+            component.onMessageClicked(event);
+            expect(inputParserSpy.handleInput).toHaveBeenCalledWith(element.innerText);
+        });
+
+        it('should NOT call handleInput if element is NOT clickable', () => {
+            isClickableSpy.and.returnValue(false);
+            component.onMessageClicked(event);
+            expect(inputParserSpy.handleInput).not.toHaveBeenCalled();
+        });
+
+        it('should NOT call handleInput if element has no text', () => {
+            element.innerText = undefined as unknown as string;
+            component.onMessageClicked(event);
+            expect(inputParserSpy.handleInput).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('isElementClickable', () => {
+        const domTokenList: DOMTokenList = {
+            contains: (): boolean => false,
+        } as unknown as DOMTokenList;
+        let element: HTMLElement;
+        let classIsClickSpy: jasmine.Spy;
+        // let parentIsClickSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            element = {
+                tagName: CODE_HTML_TAG,
+                classList: domTokenList,
+                parentElement: { classList: domTokenList } as unknown as HTMLElement,
+            } as unknown as HTMLElement;
+            classIsClickSpy = spyOn(element.classList, 'contains').and.returnValue(true);
+        });
+
+        it('should return true if parent isClickable and element is CODE', () => {
+            expect(component['isElementClickable'](element)).toBeTrue();
+        });
+
+        it('should return false if element is NOT CODE', () => {
+            element = {
+                tagName: '',
+                classList: domTokenList,
+                parentElement: { classList: domTokenList } as unknown as HTMLElement,
+            } as unknown as HTMLElement;
+
+            expect(component['isElementClickable'](element)).toBeFalse();
+        });
+
+        it('should return false if element is CODE but not isClickable', () => {
+            classIsClickSpy.and.returnValue(false);
+            expect(component['isElementClickable'](element)).toBeFalse();
         });
     });
 });

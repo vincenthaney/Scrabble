@@ -47,3 +47,6 @@ export const YOU_COMPLETED_THIS_OBJECTIVE = 'Vous avez complété cet objectif!'
 export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété cet objectif avant vous';
 
 export const PERCENT = 100;
+
+export const IS_CLICKABLE_CLASS = 'isClickable';
+export const CODE_HTML_TAG = 'CODE';

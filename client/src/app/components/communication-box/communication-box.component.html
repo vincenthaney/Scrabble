@@ -22,7 +22,12 @@
             <cdk-virtual-scroll-viewport itemSize="30*7" class="scrolling-area" #virtualScroll>
                 <div [class]="'scroll-item ' + msg.senderId" *cdkVirtualFor="let msg of messages">
                     <div class="message-container">
-                        <p [ngClass]="{ isClickable: msg.senderId === 'system' }" class="message" [innerHTML]="msg.content"></p>
+                        <p
+                            [ngClass]="{ isClickable: msg.isClickable }"
+                            class="message"
+                            [innerHTML]="msg.content"
+                            (click)="onMessageClicked($event)"
+                        ></p>
                     </div>
                 </div>
             </cdk-virtual-scroll-viewport>
