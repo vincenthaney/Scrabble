@@ -69,6 +69,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             .subscribe(async (error: HttpErrorResponse) => await this.handleGameCreationFail(error));
         this.dictionaryService.subscribeToDictionariesUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
+            this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
         });
     }
 

@@ -131,7 +131,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
             this.isWaitingForServerResponse = !this.isWaitingForServerResponse;
         });
         this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, (response) => {
-            this.snackBar.open(response, 'OK', this.isFeedbackPositive(response as PositiveFeedback));
+            this.snackBar.open(response, 'Fermer', this.isFeedbackPositive(response as PositiveFeedback));
         });
         this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.componentDestroyed$, (state) => {
             this.state = state;

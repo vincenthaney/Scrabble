@@ -146,6 +146,11 @@ describe('GameCreationPageComponent', () => {
             expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
             expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
         });
+        it('should patch dictionary value when dictionary service updates list', () => {
+            const spy = spyOn(component.gameParameters, 'patchValue').and.callFake(() => {});
+            dictionaryUpdateSubject.next();
+            expect(spy).toHaveBeenCalledWith({ dictionary: component.dictionaryOptions[0] });
+        });
     });
 
     describe('ngOnInit', () => {

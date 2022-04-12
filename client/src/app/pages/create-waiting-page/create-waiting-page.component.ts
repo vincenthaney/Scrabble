@@ -114,7 +114,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
 
     private handleGameCreationFail(error: HttpErrorResponse): void {
         this.confirmRejectionToServer();
-        this.snackBar.open(error.error.message, 'OK', ERROR_SNACK_BAR_CONFIG);
+        this.snackBar.open(error.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
         this.router.navigateByUrl('game-creation');
     }
 }

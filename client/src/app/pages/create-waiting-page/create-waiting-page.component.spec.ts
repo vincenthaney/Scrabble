@@ -452,7 +452,7 @@ describe('CreateWaitingPageComponent', () => {
         });
 
         it('should call confirmRejectionToServer', () => {
-            expect(snackBarSpy).toHaveBeenCalledWith(error.error.message, 'OK', ERROR_SNACK_BAR_CONFIG);
+            expect(snackBarSpy).toHaveBeenCalledWith(error.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
         });
 
         it('should call confirmRejectionToServer', () => {
