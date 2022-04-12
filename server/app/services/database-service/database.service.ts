@@ -33,7 +33,7 @@ export default class DatabaseService {
     }
 
     async closeConnection(): Promise<void> {
-        return this.mongoClient.close();
+        return this.mongoClient ? this.mongoClient.close() : Promise.resolve();
     }
 
     get database(): Db {
