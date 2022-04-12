@@ -387,13 +387,13 @@ describe('GameDispatcherService', () => {
             expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
         });
 
-        it('should if is Multiplayer, should route to waiting-room', () => {
+        it('if is Multiplayer, should route to waiting-room', () => {
             TEST_LOBBY_DATA.gameMode = GameMode.Multiplayer;
             postObservable.next({ lobbyData: TEST_LOBBY_DATA });
             expect(routerSpy).toHaveBeenCalledWith('waiting-room');
         });
 
-        it('should if is Solo, should NOT route to waiting-room', () => {
+        it('if is Solo, should NOT route to waiting-room', () => {
             TEST_LOBBY_DATA.gameMode = GameMode.Solo;
             postObservable.next({ lobbyData: TEST_LOBBY_DATA });
             expect(routerSpy).not.toHaveBeenCalledWith('waiting-room');
