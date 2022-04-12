@@ -1,3 +1,4 @@
+import { DisplayDictionaryKeys } from '@app/classes/admin/dictionaries';
 import { DisplayGameHistoryColumns, DisplayGameHistoryKeys } from '@app/classes/admin-game-history';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
@@ -14,6 +15,12 @@ export const KEYDOWN = 'keydown';
 export const DEFAULT_HIGH_SCORE: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0 };
 
 export const NOT_FOUND = -1;
+export const DICTIONARIES_COLUMNS = {
+    title: 'Nom',
+    description: 'Description',
+    actions: '',
+};
+export const DEFAULT_DICTIONARIES_COLUMNS: DisplayDictionaryKeys[] = ['title', 'description', 'actions'];
 
 export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
     startDate: 'Date de début',

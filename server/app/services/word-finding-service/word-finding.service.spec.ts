@@ -10,7 +10,6 @@ import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingR
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 import { PartialWordFindingParameters } from '@app/classes/word-finding/word-finding-types';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
@@ -29,7 +28,6 @@ describe('WordFindingService', () => {
 
     beforeEach(() => {
         sinon.restore();
-        Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
         findWordsStub = stub(AbstractWordFinding.prototype, 'findWords').callsFake(() => []);
 
@@ -50,7 +48,6 @@ describe('WordFindingService', () => {
 
     describe('getWordFindingInstance', () => {
         let params: PartialWordFindingParameters;
-
         let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
         let dictionaryStub: SinonStubbedInstance<Dictionary>;
         beforeEach(() => {

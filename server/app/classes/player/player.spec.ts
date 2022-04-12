@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
+import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/objective';
@@ -11,13 +12,13 @@ import {
     generateResetableTestObjective,
     generateTestObjective,
 } from '@app/constants/services-constants/objectives-test.const';
+import { Tile } from 'app/classes/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { assert } from 'console';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
-import { Tile } from 'app/classes/tile';
 import Player from './player';
 chai.use(spies);
 
@@ -146,5 +147,19 @@ describe('Player', () => {
         expect(player.score).to.equal(otherPlayer.score);
         expect(player.tiles).to.equal(otherPlayer.tiles);
         expect(player['objectives']).to.equal(otherPlayer['objectives']);
+    });
+
+    it('convertToPlayerData should return PlayerData with exact info from instance', () => {
+        player.score = 42069;
+        player['objectives'] = [{} as unknown as AbstractObjective];
+        player.isConnected = true;
+        const convertResult: PlayerData = player.convertToPlayerData();
+
+        expect(convertResult.id).to.equal(player.id);
+        expect(convertResult.name).to.equal(player.name);
+        expect(convertResult.score).to.equal(player.score);
+        expect(convertResult.tiles).to.equal(player.tiles);
+        expect(convertResult.objectives).to.equal(player['objectives']);
+        expect(convertResult.isConnected).to.equal(player.isConnected);
     });
 });
