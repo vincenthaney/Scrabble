@@ -56,5 +56,5 @@ export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété 
 
 export const PERCENT = 100;
 
-export const SUCESS_SNACK_BAR_CONFIG = { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] };
+export const SUCCESS_SNACK_BAR_CONFIG = { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] };
 export const ERROR_SNACK_BAR_CONFIG = { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] };
