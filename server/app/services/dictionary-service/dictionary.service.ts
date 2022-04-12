@@ -151,10 +151,10 @@ export default class DictionaryService {
         const dictionariesId: string[] = await this.getDictionariesId();
         dictionariesId.forEach(async (id: string) => await this.initializeDictionary(id));
     }
-    
+
     private async getDictionariesId(): Promise<string[]> {
         return await this.collection
-            .find({})
+            .find({}, { projection: { _id: 1 } })
             // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
             // eslint-disable-next-line no-underscore-dangle
             .map((dictionary: WithId<DictionaryData>) => dictionary._id.toString())
