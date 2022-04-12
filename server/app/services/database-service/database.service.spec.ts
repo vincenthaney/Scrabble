@@ -20,13 +20,16 @@ const TEST_DOCUMENT_BIG_ARRAY: Document[] = [{ score: 1 }, { score: 1 }, { score
 describe('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(async () => {
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
         databaseService = Container.get(DatabaseService);
         mongoServer = await ServicesTestingUnit.getMongoServer();
     });
 
     afterEach(async () => {
+        testingUnit.restore();
         if (databaseService['mongoClient']) {
             await databaseService['mongoClient'].close();
         }
