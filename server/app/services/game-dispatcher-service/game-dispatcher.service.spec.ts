@@ -82,7 +82,8 @@ const DEFAULT_START_GAME_DATA: StartGameData = {
         startTime: new Date(),
         limitTime: new Date(),
     },
-    player2: DEFAULT_JOINED_PLAYER,
+    player1: DEFAULT_GAME_CONFIG.player1.convertToPlayerData(),
+    player2: DEFAULT_JOINED_PLAYER.convertToPlayerData(),
 };
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {

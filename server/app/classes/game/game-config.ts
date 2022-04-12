@@ -1,4 +1,5 @@
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
@@ -30,7 +31,13 @@ export interface ReadyGameConfig extends GameConfig {
     player2: Player;
 }
 
-export interface StartGameData extends ReadyGameConfig {
+export interface StartGameData {
+    player1: PlayerData;
+    player2: PlayerData;
+    gameType: GameType;
+    gameMode: GameMode;
+    maxRoundTime: number;
+    dictionary: DictionarySummary;
     gameId: string;
     board: Square[][];
     tileReserve: TileReserveData[];

@@ -19,7 +19,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { UploadDictionaryComponent } from './upload-dictionary.component';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { UploadEvent } from './upload-dictionary.component.types';
-// const TEST_FILE = { test: 'I am a test file' };
+
 const TEST_EVENT: UploadEvent = {
     addEventListener: () => {},
     dispatchEvent: () => {
@@ -94,6 +94,10 @@ describe('UploadDictionaryComponent', () => {
             });
             component.handleFileInput(TEST_EVENT);
             expect(spyReadAsText).toHaveBeenCalled();
+        });
+
+        it('should  return null if given null', () => {
+            expect(component.handleFileInput(null)).toBeUndefined();
         });
 
         // it('should call JSON.parse', () => {

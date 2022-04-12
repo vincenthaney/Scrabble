@@ -1,3 +1,4 @@
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { Tile } from '@app/classes/tile';
 
 export interface PlayerData {
@@ -6,4 +7,6 @@ export interface PlayerData {
     name?: string;
     score?: number;
     tiles?: Tile[];
+    isConnected?: boolean;
+    objectives?: AbstractObjective[];
 }

@@ -151,7 +151,7 @@ export default class DictionaryService {
         const dictionariesId: string[] = await this.getDictionariesId();
         dictionariesId.forEach(async (id: string) => await this.initializeDictionary(id));
     }
-
+    
     private async getDictionariesId(): Promise<string[]> {
         return await this.collection
             .find({})

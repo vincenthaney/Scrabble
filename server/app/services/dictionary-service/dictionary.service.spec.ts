@@ -287,9 +287,14 @@ describe('DictionaryService', () => {
     });
 
     describe('isTitleValid', () => {
-        it('should return true if the title is unique and short', async () => {
-            expect(await dictionaryService['isTitleValid']('uniquetitle')).to.be.true;
+        it('should return true if the title is unique and short and id not in db', async () => {
+            expect(await dictionaryService['isTitleValid']('IAmShortAndUnique', new ObjectId())).to.be.true;
         });
+
+        it('should return true if the title is unique and short', async () => {
+            expect(await dictionaryService['isTitleValid']('IAmShortAndUnique')).to.be.true;
+        });
+
         it('should return false if the title is not unique and short', async () => {
             expect(await dictionaryService['isTitleValid'](DICTIONARY_3.title)).to.be.false;
         });

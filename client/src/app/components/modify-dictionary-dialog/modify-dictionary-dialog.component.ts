@@ -16,9 +16,7 @@ import {
 })
 export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     state: ModifyDictionaryComponentStates;
-    dictionaryToModifyTitle: string;
-    dictionaryToModifyDescription: string;
-    dictionaryId: string;
+    dictionaryToModify: DictionaryDialogParameters;
     formParameters: FormGroup;
     isDictionaryTitleValid: boolean;
     isDictionaryDescriptionValid: boolean;
@@ -31,9 +29,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     ) {
         this.componentDestroyed$ = new Subject();
         this.state = ModifyDictionaryComponentStates.Ready;
-        this.dictionaryToModifyTitle = data.dictionaryToModifyTitle;
-        this.dictionaryToModifyDescription = data.dictionaryToModifyDescription;
-        this.dictionaryId = data.dictionaryId;
+        this.dictionaryToModify = data;
         this.isDictionaryTitleValid = true;
         this.isDictionaryDescriptionValid = true;
         this.formParameters = new FormGroup({
@@ -67,7 +63,7 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     updateDictionary(): void {
         this.state = ModifyDictionaryComponentStates.Loading;
         this.dictionariesService.updateDictionary(
-            this.dictionaryId,
+            this.dictionaryToModify.dictionaryId,
             this.formParameters.get('inputDictionaryTitle')?.value,
             this.formParameters.get('inputDictionaryDescription')?.value,
         );

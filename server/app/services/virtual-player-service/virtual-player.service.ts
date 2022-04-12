@@ -1,16 +1,16 @@
-import { ActionData } from '@app/classes/communication/action-data';
-import { Service } from 'typedi';
-import fetch, { Response } from 'node-fetch';
-import { environment } from '@app/environments/environment';
-import { StartGameData } from '@app/classes/game/game-config';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import Game from '@app/classes/game/game';
-import { IS_REQUESTING } from '@app/constants/game';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { CONTENT_TYPE, GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
-import Player from '@app/classes/player/player';
 import { ActionPass } from '@app/classes/actions';
+import { ActionData } from '@app/classes/communication/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { PlayerData } from '@app/classes/communication/player-data';
+import Game from '@app/classes/game/game';
+import { StartGameData } from '@app/classes/game/game-config';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
+import { IS_REQUESTING } from '@app/constants/game';
+import { CONTENT_TYPE, GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
+import { environment } from '@app/environments/environment';
 import { StatusCodes } from 'http-status-codes';
+import fetch, { Response } from 'node-fetch';
+import { Service } from 'typedi';
 
 @Service()
 export class VirtualPlayerService {
@@ -29,11 +29,8 @@ export class VirtualPlayerService {
         virtualPlayer.playTurn();
     }
 
-    sliceVirtualPlayerToPlayer(virtualPlayer: Player): Player {
-        const player = new Player(virtualPlayer.id, virtualPlayer.name);
-        player.tiles = virtualPlayer.tiles;
-        player.isConnected = virtualPlayer.isConnected;
-        return player;
+    sliceVirtualPlayerToPlayer(virtualPlayer: PlayerData): PlayerData {
+        return { id: virtualPlayer.id, name: virtualPlayer.name, tiles: virtualPlayer.tiles };
     }
 
     private getEndPoint(): string {

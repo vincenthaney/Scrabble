@@ -128,7 +128,7 @@ export const INVALID_WORDS_DICTIONARY_4: BasicDictionaryData = {
 export const INVALID_WORDS_DICTIONARY_5: BasicDictionaryData = {
     title: 'validUniqueTitle',
     description: 'valid Desicrition',
-    words: ['troplongggggggggggggggggggggggggggggggggg'],
+    words: ['troplongggggggggggggggggggggggggggggggggggggggggg'],
 };
 
 export const INVALID_WORDS_DICTIONARY_6: BasicDictionaryData = {
