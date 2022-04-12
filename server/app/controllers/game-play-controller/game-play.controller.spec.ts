@@ -20,7 +20,6 @@ import { CONTENT_REQUIRED, SENDER_REQUIRED } from '@app/constants/controllers-er
 import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
-import { Server } from '@app/server';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
@@ -78,17 +77,18 @@ const DEFAULT_VIRTUAL_PLAYER_TURN_DATA: GameUpdateData = {
 
 describe('GamePlayController', () => {
     let socketServiceStub: SinonStubbedInstance<SocketService>;
+    let gamePlayServiceStub: SinonStubbedInstance<GamePlayService>;
     let gamePlayController: GamePlayController;
     let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService().withStubbed(GamePlayService);
+        gamePlayServiceStub = testingUnit.setStubbed(GamePlayService);
+        socketServiceStub = testingUnit.setStubbed(SocketService);
     });
 
     beforeEach(() => {
         gamePlayController = Container.get(GamePlayController);
-        socketServiceStub = createStubInstance(SocketService);
-        (gamePlayController['socketService'] as unknown) = socketServiceStub;
     });
 
     afterEach(() => {
@@ -331,8 +331,6 @@ describe('GamePlayController', () => {
         describe('Word not in dictionnary error', () => {
             let handlePlayActionStub: SinonStub;
             beforeEach(() => {
-                const gamePlayServiceStub: SinonStubbedInstance<GamePlayService> = createStubInstance(GamePlayService);
-                (gamePlayController['gamePlayService'] as unknown) = gamePlayServiceStub;
                 gamePlayServiceStub.playAction.throws('error');
 
                 const handleErrorStub = stub<GamePlayController, any>(gamePlayController, 'handleError');
@@ -341,11 +339,10 @@ describe('GamePlayController', () => {
                 const isWordNotInDictionaryErrorStub = stub<GamePlayController, any>(gamePlayController, 'isWordNotInDictionaryError');
                 isWordNotInDictionaryErrorStub.onFirstCall().returns(true).returns(false);
 
-                handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction');
+                handlePlayActionStub = stub<GamePlayController, any>(gamePlayController, 'handlePlayAction').callThrough();
             });
             it('should call PASS when playAction throw word not in dictionary', async () => {
                 chai.spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => false);
-                handlePlayActionStub.callThrough();
 
                 await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
@@ -354,7 +351,6 @@ describe('GamePlayController', () => {
 
             it('should NOT call PASS if game is OVER', async () => {
                 chai.spy.on(gamePlayController['gamePlayService'], 'isGameOver', () => true);
-                handlePlayActionStub.callThrough();
 
                 await gamePlayController['handlePlayAction']('', '', { type: ActionType.PLACE, payload: { tiles: [] }, input: '' });
 
@@ -364,30 +360,9 @@ describe('GamePlayController', () => {
     });
 
     describe('gameUpdate', () => {
-        it('should call sio.to with gameId', () => {
-            const appServer = Container.get(Server);
-            const server = appServer['server'];
-            (gamePlayController['socketService'] as unknown) = Container.get(SocketService);
-            gamePlayController['socketService'].initialize(server);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const sio = gamePlayController['socketService']['sio']!;
-            const sioSpy = chai.spy.on(sio, 'to', () => ({ emit: () => {} }));
+        it('should call emitToRoom with gameId', () => {
             gamePlayController['gameUpdate'](DEFAULT_GAME_ID, {} as GameUpdateData);
-            expect(sioSpy).to.have.been.called();
-        });
-
-        it('should call sio.to.emit with gameId', () => {
-            const appServer = Container.get(Server);
-            const server = appServer['server'];
-            (gamePlayController['socketService'] as unknown) = Container.get(SocketService);
-            gamePlayController['socketService'].initialize(server);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const sio = gamePlayController['socketService']['sio']!;
-            const toResponse = { emit: () => {} };
-            const toResponseSpy = chai.spy.on(toResponse, 'emit');
-            chai.spy.on(sio, 'to', () => toResponse);
-            gamePlayController['gameUpdate'](DEFAULT_GAME_ID, {} as GameUpdateData);
-            expect(toResponseSpy).to.have.been.called();
+            expect(socketServiceStub.emitToRoom.calledWith(DEFAULT_GAME_ID, 'gameUpdate' as '_test_event')).to.be.true;
         });
 
         it('should call triggerVirtualPlayerTurn if next turn is a virtual player turn', () => {
@@ -487,7 +462,7 @@ describe('GamePlayController', () => {
 
             delayStub = stub(Delay, 'for');
             gameUpdateSpy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
-            resetStub = stub(gamePlayController['gamePlayService'], 'handleResetObjectives').callsFake(() => undefined as unknown as GameUpdateData);
+            resetStub = gamePlayServiceStub.handleResetObjectives.returns(undefined as unknown as GameUpdateData);
         });
 
         afterEach(() => {

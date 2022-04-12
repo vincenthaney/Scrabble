@@ -40,6 +40,7 @@ export default class DictionaryService {
     private static async fetchDefaultDictionary(): Promise<DictionaryData> {
         const filePath = join(__dirname, DICTIONARY_PATH);
         const dataBuffer = await promises.readFile(filePath, 'utf-8');
+        console.log('READ DICTIONNARY FROM FILE', dataBuffer.length);
         const defaultDictionary: DictionaryData = JSON.parse(dataBuffer);
         defaultDictionary.isDefault = true;
         return defaultDictionary;
