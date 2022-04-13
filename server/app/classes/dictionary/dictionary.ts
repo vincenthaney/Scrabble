@@ -14,8 +14,6 @@ export default class Dictionary extends DictionaryNode {
         };
         this.depth = -1;
 
-        console.log('+> Dictionary', dictionaryData.title, dictionaryData.words.length)
-
         for (const word of dictionaryData.words) {
             this.addWord(word);
         }

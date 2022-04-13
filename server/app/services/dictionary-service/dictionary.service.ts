@@ -152,7 +152,6 @@ export default class DictionaryService {
     }
 
     private async initializeDictionary(id: string): Promise<void> {
-        console.log('+> initializeDictionary');
         if (this.activeDictionaries.has(id)) return;
 
         const dictionaryData: CompleteDictionaryData = { ...(await this.getDbDictionary(id)), id };

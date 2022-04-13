@@ -15,7 +15,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '../services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import WordFindingService from './word-finding.service';
 
 const TEST_ID = 'TEST_ID';

@@ -58,15 +58,20 @@ describe('DictionaryService', () => {
     let dictionaryService: DictionaryService;
     let databaseService: DatabaseService;
     let testingUnit: ServicesTestingUnit;
+    let initializeDictionariesStub: SinonStub<[], Promise<void>>;
+    let initializeDictionaryStub: SinonStub<[string], Promise<void>>;
 
     beforeEach(() => {
         testingUnit = new ServicesTestingUnit().withMockDatabaseService();
     });
 
     beforeEach(async () => {
+        dictionaryService = Container.get(DictionaryService);
+        initializeDictionariesStub = stub(dictionaryService, <any>'initializeDictionaries') as SinonStub<[], Promise<void>>;
+        initializeDictionaryStub = stub(dictionaryService, <any>'initializeDictionary') as SinonStub<[string], Promise<void>>;
+
         databaseService = Container.get(DatabaseService);
         await databaseService.connectToServer();
-        dictionaryService = Container.get(DictionaryService);
         await dictionaryService['collection'].insertMany(INITIAL_DICTIONARIES);
     });
 
@@ -139,7 +144,7 @@ describe('DictionaryService', () => {
         it('should initialize dictionary if it was added to database', async () => {
             const mockActiveDictionaries: string[] = [];
             chai.spy.on(dictionaryService, 'validateDictionary', () => true);
-            stub(dictionaryService, <any>'initializeDictionary').callsFake((id: string) => {
+            initializeDictionaryStub.callsFake(async (id: string) => {
                 mockActiveDictionaries.push(id);
             });
 
@@ -445,16 +450,15 @@ describe('DictionaryService', () => {
 
     describe('initializeDictionaries', () => {
         const fakeIds: string[] = ['id1', 'id2', 'id3'];
-        let initStub: SinonStub;
 
         beforeEach(() => {
+            initializeDictionariesStub.callThrough();
             stub(dictionaryService, <any>'getDictionariesId').resolves(fakeIds);
-            initStub = stub(dictionaryService, <any>'initializeDictionary').callsFake(() => {});
         });
 
         it('should call initializeDictionary with every id from database', async () => {
             await dictionaryService['initializeDictionaries']();
-            fakeIds.forEach((id: string) => expect(initStub.calledWith(id)).to.be.true);
+            fakeIds.forEach((id: string) => expect(initializeDictionaryStub.calledWith(id)).to.be.true);
         });
     });
 
@@ -473,6 +477,7 @@ describe('DictionaryService', () => {
         let getDbStub: SinonStub;
 
         beforeEach(() => {
+            initializeDictionaryStub.callThrough();
             getDbStub = stub(dictionaryService, <any>'getDbDictionary').returns(DICTIONARY_1);
         });
 
