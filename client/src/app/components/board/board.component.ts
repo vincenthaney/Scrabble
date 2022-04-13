@@ -125,7 +125,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
-        if (this.cannotPlace(squareView)) return;
+        if (!this.canPlace(squareView)) return;
 
         letter = removeAccents(letter.toUpperCase());
 
@@ -160,12 +160,13 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private cannotPlace(squareView: SquareView | undefined): boolean {
-        return !squareView || this.actionService.hasActionBeenPlayed || squareView.square.tile !== null;
+    private canPlace(squareView: SquareView | undefined): boolean {
+        return squareView !== undefined && !this.actionService.hasActionBeenPlayed && !squareView.square.tile;
+        // return !squareView || this.actionService.hasActionBeenPlayed || squareView.square.tile !== null;
     }
 
     private handleBackspace(): void {
-        if (this.cannotBackspace()) return;
+        if (!this.canBackspace()) return;
 
         let index = this.notAppliedSquares.indexOf(this.navigator.currentSquareView);
 
@@ -186,8 +187,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private cannotBackspace(): boolean {
-        return !this.selectedSquare || !this.areTilesUsed() || this.actionService.hasActionBeenPlayed;
+    private canBackspace(): boolean {
+        return this.selectedSquare !== undefined && this.areTilesUsed() && !this.actionService.hasActionBeenPlayed;
     }
 
     private handleEnter(): void {

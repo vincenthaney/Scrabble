@@ -137,7 +137,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     private getRandomLobby(): LobbyInfo {
-        const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters !== false);
+        const filteredLobbies = this.lobbies.filter((lobby) => lobby.canJoin && lobby.meetFilters);
         if (filteredLobbies.length === 0) throw new Error(NO_LOBBY_CAN_BE_JOINED);
         return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
     }

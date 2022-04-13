@@ -31,8 +31,8 @@ export default class HighScoresService {
 
         const presentHighScore = sortedHighScores.find((highScore) => highScore.score === score);
         if (presentHighScore) return this.updateHighScore(name, presentHighScore);
-
-        return this.replaceHighScore(name, score, sortedHighScores[0]);
+        await this.replaceHighScore(name, score, sortedHighScores[0]);
+        return true;
     }
 
     async resetHighScores(): Promise<void> {
@@ -46,12 +46,11 @@ export default class HighScoresService {
         return true;
     }
 
-    private async replaceHighScore(name: string, score: number, highScore: HighScore): Promise<boolean> {
+    private async replaceHighScore(name: string, score: number, highScore: HighScore): Promise<void> {
         await this.collection.replaceOne(
             { score: highScore.score, gameType: highScore.gameType },
             { gameType: highScore.gameType, score, names: [name] },
         );
-        return true;
     }
 
     private get collection(): Collection<HighScore> {
