@@ -1,14 +1,18 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { Application } from '@app/app';
 import { HttpException } from '@app/classes/http-exception/http-exception';
+import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
 import { afterEach } from 'mocha';
-import * as sinon from 'sinon';
-import { stub } from 'sinon';
+import { SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { HighScoresController } from './high-scores.controller';
@@ -24,31 +28,29 @@ const DEFAULT_EXCEPTION = 'exception';
 
 describe('HighScoresController', () => {
     let controller: HighScoresController;
+    let testingUnit: ServicesTestingUnit;
+    let socketServiceStub: SinonStubbedInstance<SocketService>;
+    let highScoreServicesStub: SinonStubbedInstance<HighScoresService>;
 
     beforeEach(() => {
-        sinon.restore();
-        Container.reset();
-        controller = Container.get(HighScoresController);
+        testingUnit = new ServicesTestingUnit().withMockDatabaseService().withStubbedDictionaryService().withStubbedControllers(HighScoresController);
+        socketServiceStub = testingUnit.setStubbed(SocketService);
+        highScoreServicesStub = testingUnit.setStubbed(HighScoresService);
+    });
 
-        stub(controller['socketService'], 'removeFromRoom').callsFake(() => {
-            return;
-        });
-        stub(controller['socketService'], 'emitToSocket').callsFake(() => {
-            return;
-        });
+    beforeEach(() => {
+        controller = Container.get(HighScoresController);
     });
 
     afterEach(() => {
-        sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
         expect(controller).to.exist;
     });
 
     it('router should be created', () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, no-unused-expressions
         expect(controller.router).to.exist;
     });
 
@@ -78,16 +80,14 @@ describe('HighScoresController', () => {
 
         describe('DELETE /highScores', () => {
             it('should return NO_CONTENT', async () => {
-                const spyResetHighScores = chai.spy.on(controller['highScoresService'], 'resetHighScores', () => []);
-
                 return supertest(expressApp)
                     .delete('/api/highScores')
                     .expect(StatusCodes.NO_CONTENT)
-                    .then(() => expect(spyResetHighScores).to.have.been.called());
+                    .then(() => expect(highScoreServicesStub.resetHighScores.called).to.be.true);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller, 'handleHighScoresReset', () => {
+                highScoreServicesStub.resetHighScores.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -98,11 +98,9 @@ describe('HighScoresController', () => {
 
     describe('handleHighScoresRequest', () => {
         it('should call socketService.emitToSocket', async () => {
-            const spyEmitToSocket = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
-            const spyGetAllHighScores = chai.spy.on(controller['highScoresService'], 'getAllHighScores', () => []);
             await controller['handleHighScoresRequest'](DEFAULT_PLAYER_ID);
-            expect(spyEmitToSocket).to.have.been.called();
-            expect(spyGetAllHighScores).to.have.been.called();
+            expect(socketServiceStub.emitToSocket.called).to.be.true;
+            expect(highScoreServicesStub.getAllHighScores.called).to.be.true;
         });
     });
 });

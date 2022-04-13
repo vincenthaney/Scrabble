@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -8,6 +8,10 @@ import { GameDispatcherService } from '@app/services';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
+export interface ConvertResult {
+    isConverting: boolean;
+}
 
 @Component({
     selector: 'app-convert-dialog',
@@ -24,6 +28,7 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
 
     constructor(
+        private dialogRef: MatDialogRef<ConvertDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: string,
         private gameDispatcherService: GameDispatcherService,
         private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
@@ -38,6 +43,8 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
             level: new FormControl(VirtualPlayerLevel.Beginner, Validators.required),
             virtualPlayerName: new FormControl('', Validators.required),
         });
+
+        this.setupDialog();
     }
 
     ngOnInit(): void {
@@ -52,7 +59,6 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (!this.isConverting) this.returnToWaiting();
         this.pageDestroyed$.next(true);
         this.pageDestroyed$.complete();
     }
@@ -68,6 +74,11 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
         return namesForLevel ?? [];
     }
 
+    returnToWaiting(): void {
+        this.gameDispatcherService.handleRecreateGame();
+        this.dialogRef.close({ isConverting: false });
+    }
+
     private generateVirtualPlayerProfileMap(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
         virtualPlayerProfiles.forEach((profile: VirtualPlayerProfile) => {
             const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(profile.level);
@@ -78,9 +89,11 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
 
     private handleConvertToSolo(): void {
         this.gameDispatcherService.handleRecreateGame(this.gameParameters);
+        this.dialogRef.close({ isConverting: true });
     }
 
-    private returnToWaiting(): void {
-        this.gameDispatcherService.handleRecreateGame();
+    private setupDialog(): void {
+        this.dialogRef.disableClose = true;
+        this.dialogRef.backdropClick().subscribe(() => this.returnToWaiting());
     }
 }

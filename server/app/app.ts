@@ -5,8 +5,6 @@ import * as express from 'express';
 import { StatusCodes } from 'http-status-codes';
 import * as logger from 'morgan';
 import { join } from 'path';
-import * as swaggerJSDoc from 'swagger-jsdoc';
-import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { DictionaryController } from './controllers/dictionary-controller/dictionary.controller';
 import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
@@ -20,7 +18,6 @@ import DatabaseService from './services/database-service/database.service';
 export class Application {
     app: express.Application;
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
-    private readonly swaggerOptions: swaggerJSDoc.Options;
 
     constructor(
         private readonly gamePlayController: GamePlayController,
@@ -32,17 +29,6 @@ export class Application {
         private readonly databaseService: DatabaseService,
     ) {
         this.app = express();
-
-        this.swaggerOptions = {
-            swaggerDefinition: {
-                openapi: '3.0.0',
-                info: {
-                    title: 'Cadriciel Serveur',
-                    version: '1.0.0',
-                },
-            },
-            apis: ['**/*.ts'],
-        };
 
         this.config();
 
@@ -60,10 +46,6 @@ export class Application {
         this.app.use('/api', this.dictionaryController.router);
         this.app.use('/api', this.gameHistoriesController.router);
         this.app.use('/api', this.virtualPlayerProfilesController.router);
-        this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
-        this.app.use('/', (req, res) => {
-            res.redirect('/api/docs');
-        });
         this.errorHandling();
     }
 

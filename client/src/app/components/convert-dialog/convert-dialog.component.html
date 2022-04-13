@@ -29,7 +29,9 @@
             </ng-container>
             <ng-container>
                 <div class="buttons">
-                    <button mat-flat-button style="background-color: rgb(231, 231, 231)" mat-dialog-close>Retourner en attente</button>
+                    <button mat-flat-button style="background-color: rgb(231, 231, 231)" mat-dialog-close (click)="returnToWaiting()">
+                        Retourner en attente
+                    </button>
                     <div
                         matTooltip="Veuillez d'abord sélectionner le nom de votre adversaire virtuel"
                         matTooltipPosition="above"

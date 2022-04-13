@@ -8,5 +8,6 @@ export const convertToLobbyData = (config: GameConfig, id: string): LobbyData =>
         maxRoundTime: config.maxRoundTime,
         lobbyId: id,
         gameType: config.gameType,
+        gameMode: config.gameMode,
     };
 };

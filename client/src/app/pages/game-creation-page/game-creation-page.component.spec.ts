@@ -5,7 +5,7 @@
 import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -21,16 +21,20 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
+import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
+import { Subject } from 'rxjs';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -45,8 +49,11 @@ describe('GameCreationPageComponent', () => {
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let loader: HarnessLoader;
     let gameParameters: FormGroup;
-    let gameDispatcherServiceMock: GameDispatcherService;
-    let handleGameCreationSpy: jasmine.Spy;
+    let gameDispatcherServiceSpy: SpyObj<GameDispatcherService>;
+    let dictionaryServiceSpy: SpyObj<DictionaryService>;
+    let gameDispatcherCreationSubject: Subject<HttpErrorResponse>;
+    let dictionaryUpdateSubject: Subject<DictionarySummary[]>;
+
     const EMPTY_VALUE = '';
 
     let virtualPlayerProfileSpy: SpyObj<VirtualPlayerProfilesService>;
@@ -54,6 +61,25 @@ describe('GameCreationPageComponent', () => {
     beforeEach(() => {
         virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', ['getVirtualPlayerProfiles']);
         virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo([]);
+    });
+
+    beforeEach(() => {
+        dictionaryServiceSpy = jasmine.createSpyObj('DictionaryService', [
+            'getDictionaries',
+            'updateAllDictionaries',
+            'subscribeToDictionariesUpdateDataEvent',
+        ]);
+        dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
+        dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
+        dictionaryUpdateSubject = new Subject();
+        dictionaryServiceSpy.subscribeToDictionariesUpdateDataEvent.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void) =>
+                dictionaryUpdateSubject.subscribe(callback),
+        );
+
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['observeGameCreationFailed', 'handleCreateGame']);
+        gameDispatcherCreationSubject = new Subject();
+        gameDispatcherServiceSpy.observeGameCreationFailed.and.returnValue(gameDispatcherCreationSubject.asObservable());
     });
 
     beforeEach(async () => {
@@ -84,6 +110,8 @@ describe('GameCreationPageComponent', () => {
                 MatButtonHarness,
                 MatButtonToggleGroupHarness,
                 GameDispatcherService,
+                { provide: GameDispatcherService, useValue: gameDispatcherServiceSpy },
+                { provide: DictionaryService, useValue: dictionaryServiceSpy },
                 { provide: VirtualPlayerProfilesService, useValue: virtualPlayerProfileSpy },
             ],
         }).compileComponents();
@@ -93,11 +121,8 @@ describe('GameCreationPageComponent', () => {
         fixture = TestBed.createComponent(GameCreationPageComponent);
         loader = TestbedHarnessEnvironment.loader(fixture);
         component = fixture.componentInstance;
-        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
         gameParameters = component.gameParameters;
         fixture.detectChanges();
-
-        handleGameCreationSpy = spyOn(gameDispatcherServiceMock, 'handleCreateGame');
     });
 
     const setValidFormValues = () => {
@@ -119,35 +144,63 @@ describe('GameCreationPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    describe('Subscriptions', () => {
+        it('should call handleGameCreationFail when game dispatcher updates game creation failed observable', () => {
+            const handleSpy: jasmine.Spy = spyOn<any>(component, 'handleGameCreationFail').and.callFake(() => {});
+
+            const error: HttpErrorResponse = { error: { message: 'test' } } as HttpErrorResponse;
+            gameDispatcherCreationSubject.next(error);
+
+            expect(handleSpy).toHaveBeenCalledWith(error);
+        });
+
+        it('should update dictionaryOptions when dictionary service updates list', () => {
+            dictionaryUpdateSubject.next();
+            expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
+            expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
+        });
+        it('should patch dictionary value when dictionary service updates list', () => {
+            const spy = spyOn(component.gameParameters, 'patchValue').and.callFake(() => {});
+            dictionaryUpdateSubject.next();
+            expect(spy).toHaveBeenCalledWith({ dictionary: component.dictionaryOptions[0] });
+        });
+    });
+
     describe('ngOnInit', () => {
-        it('should add validator required to level if game mode is Solo', () => {
+        it('should add validator required to level if game mode is Solo', async () => {
             const spy = spyOn<any>(component.gameParameters.get('level'), 'setValidators');
-            component.ngOnInit();
+            await component.ngOnInit();
             component.gameParameters.get('gameMode')?.setValue(GameMode.Solo);
             expect(spy).toHaveBeenCalledWith([Validators.required]);
         });
 
-        it('should remove validator required to level if game mode is not Solo', () => {
+        it('should remove validator required to level if game mode is not Solo', async () => {
             const spy = spyOn<any>(component.gameParameters.get('level'), 'clearValidators');
-            component.ngOnInit();
+            await component.ngOnInit();
             component.gameParameters.get('gameMode')?.setValue(GameMode.Multiplayer);
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should always call updateValueAndValidity to level', () => {
+        it('should always call updateValueAndValidity to level', async () => {
             const spy = spyOn<any>(component.gameParameters.get('level'), 'updateValueAndValidity');
-            component.ngOnInit();
+            await component.ngOnInit();
             component.gameParameters.get('gameMode')?.setValue(undefined);
             expect(spy).toHaveBeenCalled();
         });
 
-        it('ngOnInit should subscribe to RoundManager endRoundEvent', () => {
+        it('ngOnInit should subscribe to value change', async () => {
             const subscribeSpy = spyOn<any>(component.gameParameters.get('gameMode')?.valueChanges, 'subscribe');
-            component.ngOnInit();
+            await component.ngOnInit();
             expect(subscribeSpy).toHaveBeenCalled();
         });
 
-        it('should subscribe to level value change', () => {
+        it('ngOnInit should update dictionary service list', async () => {
+            await component.ngOnInit();
+            expect(dictionaryServiceSpy.updateAllDictionaries).toHaveBeenCalled();
+        });
+
+        it('should subscribe to level value change', async () => {
+            await component.ngOnInit();
             const spy = spyOn<any>(component.gameParameters.get('virtualPlayerName'), 'reset').and.callFake(() => {});
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
             expect(spy).toHaveBeenCalled();
@@ -266,24 +319,14 @@ describe('GameCreationPageComponent', () => {
     });
 
     describe('createGame', () => {
-        it('createGame should reroute to waiting-room if multiplayer game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.gameParameters.patchValue({ gameMode: component.gameModes.Multiplayer });
-
+        it('createGame should set isCreatingGame to true', () => {
+            component.isCreatingGame = false;
             component['createGame']();
-            expect(spy).toHaveBeenCalledWith('waiting-room');
+            expect(component.isCreatingGame).toBeTrue();
         });
-
-        it('createGame should NOT reroute to game if solo game', () => {
-            const spy = spyOn<any>(component['router'], 'navigateByUrl');
-            component.gameParameters.patchValue({ gameMode: component.gameModes.Solo });
-            component['createGame']();
-            expect(spy).not.toHaveBeenCalledWith('game');
-        });
-
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component['createGame']();
-            expect(handleGameCreationSpy).toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleCreateGame).toHaveBeenCalled();
         });
     });
 
@@ -400,5 +443,85 @@ describe('GameCreationPageComponent', () => {
         component['virtualPlayerNameMap'] = new Map();
         component['generateVirtualPlayerProfileMap'](MOCK_PLAYER_PROFILES);
         expect(component['virtualPlayerNameMap']).toEqual(MOCK_PLAYER_PROFILE_MAP);
+    });
+
+    describe('onFormInvalidClick', () => {
+        let markSpy: unknown;
+        let dictionaryChangeSpy: unknown;
+        let nameFieldSpy: unknown;
+
+        beforeEach(() => {
+            markSpy = spyOn(component.gameParameters.controls.dictionary, 'markAsTouched').and.callFake(() => {});
+            dictionaryChangeSpy = spyOn(component, 'onDictionaryChange').and.callFake(() => {});
+            nameFieldSpy = spyOn(component.nameField, 'onFormInvalidClick').and.callFake(() => {});
+            component.onFormInvalidClick();
+        });
+
+        it('should mark dictionary field as touched so it looks invalid', () => {
+            expect(markSpy).toHaveBeenCalled();
+        });
+
+        it('should call dictionaryChange method', () => {
+            expect(dictionaryChangeSpy).toHaveBeenCalled();
+        });
+
+        it('should call onFormInvalidClick on namefield so it updates to look invalid', () => {
+            expect(nameFieldSpy).toHaveBeenCalled();
+        });
+    });
+
+    it('onDictionaryChange should set wasDictionaryDeleted to false', () => {
+        component.wasDictionaryDeleted = true;
+        component.onDictionaryChange();
+        expect(component.wasDictionaryDeleted).toBeFalse();
+    });
+
+    describe('handleGameCreationFail', () => {
+        let error: HttpErrorResponse;
+        let handleDictionaryDeletedSpy: unknown;
+
+        beforeEach(() => {
+            handleDictionaryDeletedSpy = spyOn<any>(component, 'handleDictionaryDeleted').and.callFake(() => {});
+        });
+
+        it('should call handleDictionaryDeleted if error message is INVALID_DICTIONARY_ID', async () => {
+            error = { error: { message: INVALID_DICTIONARY_ID } } as HttpErrorResponse;
+            await component['handleGameCreationFail'](error);
+            expect(handleDictionaryDeletedSpy).toHaveBeenCalled();
+        });
+
+        it('should NOT call handleDictionaryDeleted if error message is INVALID_DICTIONARY_ID', async () => {
+            error = { error: { message: 'NOT INVALID DICTIONARY ID' } } as HttpErrorResponse;
+            await component['handleGameCreationFail'](error);
+            expect(handleDictionaryDeletedSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleDictionaryDeleted', () => {
+        let dictionarySetValueSpy: unknown;
+        let markSpy: unknown;
+
+        beforeEach(async () => {
+            component.wasDictionaryDeleted = false;
+            dictionarySetValueSpy = spyOn(component.gameParameters.controls.dictionary, 'setValue').and.callFake(() => {});
+            markSpy = spyOn(component.gameParameters.controls.dictionary, 'markAsTouched').and.callFake(() => {});
+            await component['handleDictionaryDeleted']();
+        });
+
+        it('should set wasDictionaryDeleted to true', () => {
+            expect(component.wasDictionaryDeleted).toBeTrue();
+        });
+
+        it('should update dictionary in service', () => {
+            expect(dictionaryServiceSpy.updateAllDictionaries).toHaveBeenCalled();
+        });
+
+        it('should remove selected dictionary', () => {
+            expect(dictionarySetValueSpy).toHaveBeenCalledWith(undefined);
+        });
+
+        it('should mark dictionary as touched', () => {
+            expect(markSpy).toHaveBeenCalled();
+        });
     });
 });

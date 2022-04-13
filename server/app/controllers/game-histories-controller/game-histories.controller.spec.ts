@@ -7,10 +7,13 @@ import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { GameHistoriesController } from '@app/controllers/game-histories-controller/game-histories.controller';
+import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
+import { SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 
@@ -46,10 +49,23 @@ const DEFAULT_GAME_HISTORY: GameHistory = {
 
 describe('GameHistoriesController', () => {
     let controller: GameHistoriesController;
+    let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit()
+            .withMockDatabaseService()
+            .withStubbedDictionaryService()
+            .withStubbedControllers(GameHistoriesController);
+        gameHistoriesServiceStub = testingUnit.setStubbed(GameHistoriesService);
+    });
+
+    beforeEach(() => {
         controller = Container.get(GameHistoriesController);
+    });
+
+    afterEach(() => {
+        testingUnit.restore();
     });
 
     it('controller should create', () => {
@@ -70,23 +86,19 @@ describe('GameHistoriesController', () => {
 
         describe('GET /gameHistories/:playerId', () => {
             it('should return OK', async () => {
-                chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
-                    return [];
-                });
+                gameHistoriesServiceStub.getAllGameHistories.resolves([]);
 
                 return supertest(expressApp).get('/api/gameHistories').expect(StatusCodes.OK);
             });
 
             it('should return have gameHistories attribute in body', async () => {
-                chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
-                    return [DEFAULT_GAME_HISTORY];
-                });
+                gameHistoriesServiceStub.getAllGameHistories.resolves([DEFAULT_GAME_HISTORY]);
 
                 return expect((await supertest(expressApp).get('/api/gameHistories')).body).to.have.property('gameHistories');
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['gameHistoriesService'], 'getAllGameHistories', () => {
+                gameHistoriesServiceStub.getAllGameHistories.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -115,9 +127,9 @@ describe('GameHistoriesController', () => {
 
     describe('handleGameHistoriesReset', () => {
         it('should call gameHistoriesService.resetGameHistories', async () => {
-            const spyResetHistories = chai.spy.on(controller['gameHistoriesService'], 'resetGameHistories', () => []);
+            gameHistoriesServiceStub.resetGameHistories.resolves();
             await controller['handleGameHistoriesReset']();
-            expect(spyResetHistories).to.have.been.called();
+            expect(gameHistoriesServiceStub.resetGameHistories.called).to.be.true;
         });
     });
 });

@@ -82,12 +82,12 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/players/:playerId/accept', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/accept', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
             try {
-                this.handleAcceptRequest(gameId, playerId, opponentName);
+                await this.handleAcceptRequest(gameId, playerId, opponentName);
 
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {

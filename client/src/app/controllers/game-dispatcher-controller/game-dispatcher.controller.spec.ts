@@ -110,19 +110,11 @@ describe('GameDispatcherController', () => {
         });
     });
 
-    describe('handleMultiplayerGameCreation', () => {
-        it('handleMultiplayerGameCreation should  make an HTTP post request', () => {
+    describe('handleGameCreation', () => {
+        it('should  make an HTTP post request', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
             controller.handleGameCreation(DEFAULT_GAME_DATA);
             expect(httpPostSpy).toHaveBeenCalled();
-        });
-
-        it('handleMultiplayerGameCreation should emit to createGameEvent', () => {
-            const fakeObservable = of<string>('fakeResponse');
-            spyOn(controller['http'], 'post').and.returnValue(fakeObservable);
-            const createGameSpy = spyOn(controller['createGameEvent'], 'next').and.callThrough();
-            controller.handleGameCreation(DEFAULT_GAME_DATA);
-            expect(createGameSpy).toHaveBeenCalled();
         });
     });
 
@@ -131,16 +123,6 @@ describe('GameDispatcherController', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
             controller.handleConfirmationGameCreation(DEFAULT_PLAYER_NAME, DEFAULT_GAME_ID);
             expect(httpPostSpy).toHaveBeenCalled();
-        });
-
-        it('handleConfirmationGameCreation should subscribe after making an HTTP post request', async () => {
-            spyOn(controller['socketService'], 'getId').and.returnValue(DEFAULT_SOCKET_ID);
-            const observable = new Observable();
-            spyOn(controller['http'], 'post').and.returnValue(observable);
-            const spy = spyOn(observable, 'subscribe');
-
-            controller.handleGameCreation({} as unknown as GameConfigData);
-            expect(spy).toHaveBeenCalled();
         });
     });
 
@@ -289,12 +271,6 @@ describe('GameDispatcherController', () => {
             callback = () => {
                 return;
             };
-        });
-
-        it('subscribeToCreateGameEvent should call subscribe method on createGameEvent', () => {
-            const subscriptionSpy = spyOn(controller['createGameEvent'], 'subscribe');
-            controller.subscribeToCreateGameEvent(serviceDestroyed$, callback);
-            expect(subscriptionSpy).toHaveBeenCalled();
         });
 
         it('subscribeToJoinRequestEvent should call subscribe method on joinRequestEvent', () => {

@@ -7,14 +7,12 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { AbstractWordFinding } from '@app/classes/word-finding';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance, spy } from 'sinon';
-import { Container } from 'typedi';
 import ActionHint from './action-hint';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
@@ -25,28 +23,24 @@ describe('ActionHint', () => {
     let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
     let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
     let action: ActionHint;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+        [wordFindingInstanceStub, wordFindingServiceStub] = testingUnit.setStubbedWordFindingService();
+    });
 
+    beforeEach(() => {
         gameStub = createStubInstance(Game);
         gameStub.player1 = new Player(DEFAULT_PLAYER_1_ID, DEFAULT_PLAYER_1_NAME);
         gameStub.dictionarySummary = { id: 'id' } as unknown as DictionarySummary;
 
-        wordFindingInstanceStub = createStubInstance(AbstractWordFinding, {
-            findWords: [],
-        });
-
-        wordFindingServiceStub = createStubInstance(WordFindingService, {
-            getWordFindingInstance: wordFindingInstanceStub as unknown as AbstractWordFinding,
-        });
-
         action = new ActionHint(gameStub.player1, gameStub as unknown as Game);
-        (action['wordFindingService'] as unknown) = wordFindingServiceStub;
     });
 
     afterEach(() => {
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('execute', () => {

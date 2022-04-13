@@ -59,8 +59,9 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
-        game.dictionarySummary = config.dictionary;
         game.gameMode = config.gameMode;
+        game.dictionarySummary = config.dictionary;
+        game.initializeObjectives();
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;

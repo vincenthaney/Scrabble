@@ -1,9 +1,9 @@
-import { DisplayDictionaryKeys } from '@app/classes/admin/dictionaries';
 import { DisplayGameHistoryColumns, DisplayGameHistoryKeys } from '@app/classes/admin-game-history';
+import { DisplayDictionaryKeys } from '@app/classes/admin/dictionaries';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
 import { IconName } from '@app/components/icon/icon.component.type';
-import { SNACK_BAR_ERROR_DURATION } from './dictionaries-component';
+import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from './dictionaries-components';
 
 export const LOCAL_PLAYER_ICON: IconName[] = ['user-astronaut', 'user-cowboy', 'user-ninja', 'user-crown'];
 
@@ -56,4 +56,5 @@ export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété 
 
 export const PERCENT = 100;
 
+export const SUCCESS_SNACK_BAR_CONFIG = { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] };
 export const ERROR_SNACK_BAR_CONFIG = { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] };
