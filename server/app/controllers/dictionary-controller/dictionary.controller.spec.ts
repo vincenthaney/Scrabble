@@ -27,7 +27,7 @@ describe('DictionaryController', () => {
     let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService().withMockDatabaseService().withStubbedControllers(DictionaryController);
     });
 
     beforeEach(() => {

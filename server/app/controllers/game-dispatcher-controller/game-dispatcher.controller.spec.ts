@@ -110,19 +110,20 @@ const DEFAULT_STARTING_GAME_DATA: StartGameData = {
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
-    let socketServiceStub: SinonStubbedInstance<SocketService>;
     let createGameServiceStub: SinonStubbedInstance<CreateGameService>;
     let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+        testingUnit = new ServicesTestingUnit()
+            .withStubbedDictionaryService()
+            .withMockDatabaseService()
+            .withStubbedControllers(GameDispatcherController)
+            .withStubbed(SocketService);
+        createGameServiceStub = testingUnit.setStubbed(CreateGameService);
     });
 
     beforeEach(() => {
         controller = Container.get(GameDispatcherController);
-        socketServiceStub = createStubInstance(SocketService);
-        createGameServiceStub = createStubInstance(CreateGameService);
-        controller['socketService'] = socketServiceStub as unknown as SocketService;
     });
 
     afterEach(() => {
@@ -392,14 +393,7 @@ describe('GameDispatcherController', () => {
 
     describe('handleCreateGame', () => {
         beforeEach(() => {
-            controller['createGameService'] = createGameServiceStub as unknown as CreateGameService;
-            spy.on(controller['createGameService'], 'createSoloGame', () => {
-                return DEFAULT_STARTING_GAME_DATA;
-            });
-        });
-
-        afterEach(() => {
-            chai.spy.restore();
+            createGameServiceStub.createSoloGame.resolves(DEFAULT_STARTING_GAME_DATA);
         });
 
         it('should call createSoloGame', async () => {

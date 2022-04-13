@@ -1,5 +1,12 @@
 import { Dictionary } from '@app/classes/dictionary';
 import { AbstractWordFinding } from '@app/classes/word-finding';
+import { DictionaryController } from '@app/controllers/dictionary-controller/dictionary.controller';
+import { GameDispatcherController } from '@app/controllers/game-dispatcher-controller/game-dispatcher.controller';
+import { GameHistoriesController } from '@app/controllers/game-histories-controller/game-histories.controller';
+import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
+import { HighScoresController } from '@app/controllers/high-scores-controller/high-scores.controller';
+import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
+import { Router } from 'express';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
@@ -21,6 +28,15 @@ type ClassOverride<TType> = {
 type ClassAttributesOverrides<T> = {
     [K in keyof T]?: T[K];
 };
+
+const CONTROLLERS: ClassType<unknown>[] = [
+    DictionaryController,
+    GameDispatcherController,
+    GameHistoriesController,
+    GamePlayController,
+    HighScoresController,
+    VirtualPlayerProfilesController,
+];
 
 export class ServicesTestingUnit {
     private static server?: MongoMemoryServer;
@@ -62,14 +78,23 @@ export class ServicesTestingUnit {
 
     withStubbedDictionaryService(): ServicesTestingUnit {
         const dictionaryStub = this.sandbox.createStubInstance(Dictionary);
-        const stubbedInstance = this.sandbox.createStubInstance(DictionaryService, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const stubbedInstance = this.sandbox.createStubInstance<any>(DictionaryService, {
             getDictionary: dictionaryStub as unknown as Dictionary,
+            initializeDictionary: Promise.resolve(),
         });
 
         Container.set(DictionaryService, stubbedInstance);
 
         this.stubbedInstances.set(Dictionary, dictionaryStub);
         this.stubbedInstances.set(DictionaryService, stubbedInstance);
+        return this;
+    }
+
+    withStubbedControllers(...exceptions: ClassType<unknown>[]): ServicesTestingUnit {
+        for (const controller of CONTROLLERS.filter((c) => !exceptions.includes(c))) {
+            this.withStubbed(controller, {}, { router: Router() });
+        }
         return this;
     }
 

@@ -40,7 +40,6 @@ export default class DictionaryService {
     private static async fetchDefaultDictionary(): Promise<DictionaryData> {
         const filePath = join(__dirname, DICTIONARY_PATH);
         const dataBuffer = await promises.readFile(filePath, 'utf-8');
-        console.log('READ DICTIONNARY FROM FILE', dataBuffer.length);
         const defaultDictionary: DictionaryData = JSON.parse(dataBuffer);
         defaultDictionary.isDefault = true;
         return defaultDictionary;
@@ -153,6 +152,7 @@ export default class DictionaryService {
     }
 
     private async initializeDictionary(id: string): Promise<void> {
+        console.log('+> initializeDictionary');
         if (this.activeDictionaries.has(id)) return;
 
         const dictionaryData: CompleteDictionaryData = { ...(await this.getDbDictionary(id)), id };

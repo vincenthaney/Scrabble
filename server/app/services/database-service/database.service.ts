@@ -11,6 +11,7 @@ export default class DatabaseService {
 
     constructor() {
         this.databaseInitialized$ = new EventEmitter();
+        console.log('+> DatabaseService');
     }
 
     async populateDb(collectionName: string, data: Document[]): Promise<void> {
@@ -37,6 +38,7 @@ export default class DatabaseService {
     }
 
     get database(): Db {
+        console.log('+> db');
         return this.db;
     }
 

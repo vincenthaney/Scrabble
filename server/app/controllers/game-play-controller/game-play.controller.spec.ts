@@ -25,6 +25,7 @@ import { FeedbackMessages } from '@app/services/game-play-service/feedback-messa
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { spy } from 'chai';
@@ -82,7 +83,12 @@ describe('GamePlayController', () => {
     let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService().withStubbed(GamePlayService);
+        testingUnit = new ServicesTestingUnit()
+            .withMockDatabaseService()
+            .withStubbedDictionaryService()
+            .withStubbed(ActiveGameService)
+            .withStubbed(VirtualPlayerService)
+            .withStubbedControllers(GamePlayController);
         gamePlayServiceStub = testingUnit.setStubbed(GamePlayService);
         socketServiceStub = testingUnit.setStubbed(SocketService);
     });

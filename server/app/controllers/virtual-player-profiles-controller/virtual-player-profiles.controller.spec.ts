@@ -4,12 +4,15 @@ import { Application } from '@app/app';
 import { VirtualPlayerProfile } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
 import { afterEach } from 'mocha';
 import * as sinon from 'sinon';
+import { SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { VirtualPlayerProfilesController } from './virtual-player-profiles.controller';
@@ -52,15 +55,25 @@ const ALL_PROFILES: VirtualPlayerProfile[] = DEFAULT_PROFILES.concat(CUSTOM_PROF
 
 describe('VirtualPlayerProfilesController', () => {
     let controller: VirtualPlayerProfilesController;
+    let testingUnit: ServicesTestingUnit;
+    let virtualPlayerProfileServiceStub: SinonStubbedInstance<VirtualPlayerProfilesService>;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit()
+            .withMockDatabaseService()
+            .withStubbedDictionaryService()
+            .withStubbedControllers(VirtualPlayerProfilesController);
+        virtualPlayerProfileServiceStub = testingUnit.setStubbed(VirtualPlayerProfilesService);
+    });
+
+    beforeEach(() => {
         controller = Container.get(VirtualPlayerProfilesController);
     });
 
     afterEach(() => {
         sinon.restore();
         chai.spy.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
@@ -83,22 +96,22 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('GET /virtualPlayerProfiles', () => {
             it('should return OK on valid request', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'getAllVirtualPlayerProfiles', () => ALL_PROFILES);
+                virtualPlayerProfileServiceStub.getAllVirtualPlayerProfiles.resolves(ALL_PROFILES);
 
                 return supertest(expressApp)
                     .get('/api/virtualPlayerProfiles')
                     .expect(StatusCodes.OK)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.getAllVirtualPlayerProfiles.called).to.be.true);
             });
 
             it('should return have gameHistories attribute in body', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'getAllVirtualPlayerProfiles', () => ALL_PROFILES);
+                virtualPlayerProfileServiceStub.getAllVirtualPlayerProfiles.resolves(ALL_PROFILES);
 
                 return expect((await supertest(expressApp).get('/api/virtualPlayerProfiles')).body).to.have.property('virtualPlayerProfiles');
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'getAllVirtualPlayerProfiles', () => {
+                virtualPlayerProfileServiceStub.getAllVirtualPlayerProfiles.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -108,16 +121,16 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('GET /virtualPlayerProfiles/:level', () => {
             it('should return OK on valid request', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'getVirtualPlayerProfilesFromLevel', () => ALL_PROFILES);
+                virtualPlayerProfileServiceStub.getVirtualPlayerProfilesFromLevel.resolves(ALL_PROFILES);
 
                 return supertest(expressApp)
                     .get(`/api/virtualPlayerProfiles/${VirtualPlayerLevel.Beginner}`)
                     .expect(StatusCodes.OK)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.getVirtualPlayerProfilesFromLevel.called).to.be.true);
             });
 
             it('should return have gameHistories attribute in body', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'getVirtualPlayerProfilesFromLevel', () => ALL_PROFILES);
+                virtualPlayerProfileServiceStub.getVirtualPlayerProfilesFromLevel.resolves(ALL_PROFILES);
 
                 return expect((await supertest(expressApp).get(`/api/virtualPlayerProfiles/${VirtualPlayerLevel.Expert}`)).body).to.have.property(
                     'virtualPlayerProfiles',
@@ -129,7 +142,7 @@ describe('VirtualPlayerProfilesController', () => {
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'getVirtualPlayerProfilesFromLevel', () => {
+                virtualPlayerProfileServiceStub.getVirtualPlayerProfilesFromLevel.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -141,17 +154,14 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('POST /virtualPlayerProfiles', () => {
             it('should return OK on valid request', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'addVirtualPlayerProfile', () => {});
-
                 return supertest(expressApp)
                     .post('/api/virtualPlayerProfiles')
                     .send({ virtualPlayerProfile: CUSTOM_PROFILE_1 })
                     .expect(StatusCodes.CREATED)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.addVirtualPlayerProfile.called).to.be.true);
             });
 
             it('should throw if virtualPlayerProfile is not provided', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'addVirtualPlayerProfile', () => {});
                 return supertest(expressApp)
                     .post('/api/virtualPlayerProfiles')
                     .send({ virtualPlayerProfile: undefined })
@@ -159,7 +169,7 @@ describe('VirtualPlayerProfilesController', () => {
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'addVirtualPlayerProfile', () => {
+                virtualPlayerProfileServiceStub.addVirtualPlayerProfile.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -172,17 +182,14 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('PATCH /virtualPlayerProfiles/:profileId', () => {
             it('should return NO_CONTENT on valid request', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'updateVirtualPlayerProfile', () => {});
-
                 return supertest(expressApp)
                     .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
                     .send({ newName: CUSTOM_PROFILE_1.name })
                     .expect(StatusCodes.NO_CONTENT)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.updateVirtualPlayerProfile.called).to.be.true);
             });
 
             it('should throw if newName is not provided', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'updateVirtualPlayerProfile', () => {});
                 return supertest(expressApp)
                     .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
                     .send({ newName: undefined })
@@ -190,7 +197,7 @@ describe('VirtualPlayerProfilesController', () => {
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'updateVirtualPlayerProfile', () => {
+                virtualPlayerProfileServiceStub.updateVirtualPlayerProfile.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -203,16 +210,14 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('DELETE /virtualPlayerProfiles', () => {
             it('should return NO_CONTENT', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'resetVirtualPlayerProfiles', () => []);
-
                 return supertest(expressApp)
                     .delete('/api/virtualPlayerProfiles')
                     .expect(StatusCodes.NO_CONTENT)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.resetVirtualPlayerProfiles.called).to.be.true);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'resetVirtualPlayerProfiles', () => {
+                virtualPlayerProfileServiceStub.resetVirtualPlayerProfiles.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -222,16 +227,14 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('DELETE /virtualPlayerProfiles/:profileId', () => {
             it('should return NO_CONTENT', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'deleteVirtualPlayerProfile', () => []);
-
                 return supertest(expressApp)
                     .delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
                     .expect(StatusCodes.NO_CONTENT)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.deleteVirtualPlayerProfile.called).to.be.true);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'deleteVirtualPlayerProfile', () => {
+                virtualPlayerProfileServiceStub.deleteVirtualPlayerProfile.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
@@ -241,16 +244,14 @@ describe('VirtualPlayerProfilesController', () => {
 
         describe('DELETE /virtualPlayerProfiles', () => {
             it('should return NO_CONTENT', async () => {
-                const spy = chai.spy.on(controller['virtualPlayerProfileService'], 'resetVirtualPlayerProfiles', () => []);
-
                 return supertest(expressApp)
                     .delete('/api/virtualPlayerProfiles')
                     .expect(StatusCodes.NO_CONTENT)
-                    .then(() => expect(spy).to.have.been.called());
+                    .then(() => expect(virtualPlayerProfileServiceStub.resetVirtualPlayerProfiles.called).to.be.true);
             });
 
             it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                chai.spy.on(controller['virtualPlayerProfileService'], 'resetVirtualPlayerProfiles', () => {
+                virtualPlayerProfileServiceStub.resetVirtualPlayerProfiles.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 

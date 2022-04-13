@@ -31,7 +31,7 @@ export default class DictionaryNode {
     }
 
     protected addWord(word: string, value = '', depth = 0): void {
-        console.log(word);
+        // console.log(word);
         const [key, rest] = this.separateWord(word);
 
         if (rest.length > 0) {
