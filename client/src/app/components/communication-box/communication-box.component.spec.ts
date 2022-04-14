@@ -428,7 +428,6 @@ describe('CommunicationBoxComponent', () => {
         } as unknown as DOMTokenList;
         let element: HTMLElement;
         let classIsClickSpy: jasmine.Spy;
-        // let parentIsClickSpy: jasmine.Spy;
 
         beforeEach(() => {
             element = {

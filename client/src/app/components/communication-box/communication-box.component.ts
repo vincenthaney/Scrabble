@@ -100,7 +100,9 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
 
     onMessageClicked(event: MouseEvent): void {
         const element: HTMLElement = event.target as HTMLElement;
-        if (!element.innerText || !this.isElementClickable(element)) return;
+        if (!element.innerText) return;
+        if (!this.isElementClickable(element)) return;
+
         this.inputParser.handleInput(element.innerText);
     }
 
@@ -158,10 +160,10 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     }
 
     private isElementClickable(element: HTMLElement): boolean {
-        return (
-            (element.classList.contains(IS_CLICKABLE_CLASS) || element.parentElement
-                ? (element.parentElement as HTMLElement).classList.contains(IS_CLICKABLE_CLASS)
-                : false) && element.tagName === CODE_HTML_TAG
-        );
+        const isElementClickable: boolean = element.classList.contains(IS_CLICKABLE_CLASS);
+        const isParentClickable: boolean =
+            element.parentElement !== null && (element.parentElement as HTMLElement).classList.contains(IS_CLICKABLE_CLASS);
+        const isElementCodeTag: boolean = element.tagName === CODE_HTML_TAG;
+        return (isElementClickable || isParentClickable) && isElementCodeTag;
     }
 }

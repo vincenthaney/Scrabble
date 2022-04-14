@@ -129,7 +129,7 @@ export class GamePlayController {
         }
         if (feedback.endGameFeedback.length > 0) {
             this.socketService.emitToRoom(gameId, 'newMessage', {
-                content: feedback.endGameFeedback.map((message: FeedbackMessage) => message.message ?? '').join('<br>'),
+                content: feedback.endGameFeedback.map((feedbackMesssage: FeedbackMessage) => feedbackMesssage.message ?? '').join('<br>'),
                 senderId: SYSTEM_ID,
                 gameId,
             });
