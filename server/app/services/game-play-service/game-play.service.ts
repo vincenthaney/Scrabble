@@ -8,19 +8,19 @@ import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Service } from 'typedi';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { FeedbackMessages } from './feedback-messages';
-import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 @Service()
 export class GamePlayService {
@@ -130,7 +130,7 @@ export class GamePlayService {
             for (const player of connectedRealPlayers) {
                 await this.highScoresService.addHighScore(player.name, player.score, game.gameType);
             }
-            this.gameHistoriesService.addGameHistory(game.gameHistory);
+            await this.gameHistoriesService.addGameHistory(game.gameHistory);
             game.isAddedToDatabase = true;
         }
 
