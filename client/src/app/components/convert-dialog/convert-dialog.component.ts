@@ -46,9 +46,10 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
             ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
             .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
 
-        this.virtualPlayerProfilesService
-            .getVirtualPlayerProfiles()
-            .then((profiles: VirtualPlayerProfile[]) => this.generateVirtualPlayerProfileMap(profiles));
+        this.virtualPlayerProfilesService.subscribeToVirtualPlayerProfilesUpdateEvent(this.pageDestroyed$, (profiles) => {
+            this.generateVirtualPlayerProfileMap(profiles);
+        });
+        this.virtualPlayerProfilesService.getAllVirtualPlayersProfile();
     }
 
     ngOnDestroy(): void {
