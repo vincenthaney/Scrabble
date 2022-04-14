@@ -126,13 +126,11 @@ export class GamePlayController {
             });
         }
         if (feedback.endGameFeedback) {
-            for (const message of feedback.endGameFeedback) {
-                this.socketService.emitToRoom(gameId, 'newMessage', {
-                    content: message,
-                    senderId: SYSTEM_ID,
-                    gameId,
-                });
-            }
+            this.socketService.emitToRoom(gameId, 'newMessage', {
+                content: feedback.endGameFeedback.join('<br>'),
+                senderId: SYSTEM_ID,
+                gameId,
+            });
         }
     }
 

@@ -914,15 +914,13 @@ describe('GameDispatcherController', () => {
 
         it('PlayerLeftFeedback shoud emit end game messages to room', () => {
             const emitToRoomSpy = chai.spy.on(controller['socketService'], 'emitToRoom', () => {});
-            const messages: string[] = ['test'];
+            const messages: string[] = ['test', 'test2', 'test3'];
             const updatedData: GameUpdateData = {};
             controller['handlePlayerLeftFeedback'](DEFAULT_GAME_ID, messages, updatedData);
-            messages.forEach((message) => {
-                expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', {
-                    content: message,
-                    senderId: SYSTEM_ID,
-                    gameId: DEFAULT_GAME_ID,
-                });
+            expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', {
+                content: messages.join('<br>'),
+                senderId: SYSTEM_ID,
+                gameId: DEFAULT_GAME_ID,
             });
         });
     });

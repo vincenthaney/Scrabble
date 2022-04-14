@@ -1,7 +1,5 @@
 @import '../../style/utils.scss';
-
-$primary: #1b5e20;
-$gray: rgb(232, 232, 232);
+@import '../../style/variables.scss';
 
 .content {
     display: flex;

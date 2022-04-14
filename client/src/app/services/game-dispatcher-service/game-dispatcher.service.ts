@@ -62,8 +62,7 @@ export default class GameDispatcherService implements OnDestroy {
     }
 
     getCurrentLobbyId(): string {
-        if (!this.currentLobby) return '';
-        return this.currentLobby.lobbyId;
+        return !this.currentLobby ? '' : this.currentLobby.lobbyId;
     }
 
     resetServiceData(): void {

@@ -296,7 +296,7 @@ describe('GamePlayController', () => {
             expect(emitToSocketSpy).to.have.been.called.twice;
         });
 
-        it('should call emitToRoom for each messages in endGameFeedback', async () => {
+        it('should call emitToRoom only once in endGameFeedback', async () => {
             const feedback: FeedbackMessages = {
                 localPlayerFeedback: undefined,
                 opponentFeedback: undefined,
@@ -308,8 +308,7 @@ describe('GamePlayController', () => {
                 payload: {},
                 input: '',
             });
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            expect(emitToRoomSpy).to.have.been.called.exactly(feedback.endGameFeedback!.length);
+            expect(emitToRoomSpy).to.have.been.called.exactly(1);
         });
 
         it('should throw if data.type is undefined', async () => {

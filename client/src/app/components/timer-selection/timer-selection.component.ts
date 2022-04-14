@@ -12,7 +12,7 @@ export class TimerSelectionComponent implements OnInit {
     timerValue: number;
 
     ngOnInit(): void {
-        this.timerValue = DEFAULT_TIMER_VALUE;
+        this.timerValue = this.parentForm.get('timer')?.value || DEFAULT_TIMER_VALUE;
     }
 
     incrementTimerValue(): void {

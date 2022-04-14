@@ -34,6 +34,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     tileFontSize: number;
     selectedSquare: SquareView | undefined;
     navigator: BoardNavigator;
+    private newlyPlacedTiles: SquareView[];
     private componentDestroyed$: Subject<boolean>;
 
     constructor(
@@ -52,6 +53,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.notAppliedSquares = [];
         this.tileFontSize = SQUARE_TILE_DEFAULT_FONT_SIZE;
         this.selectedSquare = undefined;
+        this.newlyPlacedTiles = [];
         this.componentDestroyed$ = new Subject<boolean>();
     }
 
@@ -102,6 +104,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
             square1.square.position.row === square2.square.position.row &&
             square1.square.position.column === square2.square.position.column
         );
+    }
+
+    clearNewlyPlacedTiles(): void {
+        this.newlyPlacedTiles.forEach((squareView) => (squareView.newlyPlaced = false));
+        this.newlyPlacedTiles = [];
     }
 
     protected onFocusableEvent(event: KeyboardEvent): void {
@@ -233,6 +240,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     private updateBoard(squaresToUpdate: Square[]): boolean {
         if (this.hasBoardBeenUpdated(squaresToUpdate)) return false;
         this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        this.clearNewlyPlacedTiles();
 
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
@@ -249,6 +257,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 .forEach((sameSquare: Square) => {
                     squareView.square = sameSquare;
                     squareView.applied = true;
+                    squareView.newlyPlaced = true;
+
+                    this.newlyPlacedTiles.push(squareView);
                 });
         });
         this.selectedSquare = undefined;

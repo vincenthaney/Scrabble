@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -17,6 +18,12 @@ import { PageHeaderComponent } from '@app/components/page-header/page-header.com
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import { Subject } from 'rxjs';
 import { AdminPageComponent, DEFAULT_ADMIN_TAB } from './admin-page.component';
+
+@Component({
+    selector: 'app-admin-game-history',
+    template: '',
+})
+class MockAdminGameHistoryComponent {}
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;

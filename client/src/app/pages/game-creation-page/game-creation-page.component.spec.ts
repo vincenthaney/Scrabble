@@ -20,8 +20,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
+import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
@@ -34,8 +34,8 @@ import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/se
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { Subject } from 'rxjs';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
+import { Subject } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -188,7 +188,7 @@ describe('GameCreationPageComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('ngOnInit should subscribe to value change', async () => {
+        it('should subscribe to gameMode changes', () => {
             const subscribeSpy = spyOn<any>(component.gameParameters.get('gameMode')?.valueChanges, 'subscribe');
             await component.ngOnInit();
             expect(subscribeSpy).toHaveBeenCalled();
@@ -324,6 +324,7 @@ describe('GameCreationPageComponent', () => {
             component['createGame']();
             expect(component.isCreatingGame).toBeTrue();
         });
+
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component['createGame']();
             expect(gameDispatcherServiceSpy.handleCreateGame).toHaveBeenCalled();
