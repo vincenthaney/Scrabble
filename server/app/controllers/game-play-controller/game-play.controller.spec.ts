@@ -277,7 +277,7 @@ describe('GamePlayController', () => {
             expect(emitToSocketSpy).to.not.have.been.called();
         });
 
-        it.only('should call emitToScket if feedback exists', async () => {
+        it('should call emitToScket if feedback exists', async () => {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [
                 {},
