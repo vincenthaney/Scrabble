@@ -1,5 +1,9 @@
 <div class="center">
-    <div class="button-box">
+    <div *ngIf="isStartingGame" id="game-creation-waiting-container">
+        <mat-label>En attente de la création de la partie</mat-label>
+        <mat-spinner></mat-spinner>
+    </div>
+    <div class="button-box" *ngIf="!isStartingGame">
         <div class="sameline center">
             {{ waitingRoomMessage }}
             <div *ngIf="!isOpponentFound">

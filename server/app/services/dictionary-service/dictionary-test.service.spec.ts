@@ -1,11 +1,11 @@
+import { BasicDictionaryData, CompleteDictionaryData, DictionaryData } from '@app/classes/communication/dictionary-data';
 import { Dictionary } from '@app/classes/dictionary';
-import { DictionaryData, CompleteDictionaryData, BasicDictionaryData } from '@app/classes/communication/dictionary-data';
 import { createStubInstance } from 'sinon';
 import DictionaryService from './dictionary.service';
 
 const TEST_TITLE = 'Test dictionary';
 const TEST_WORDS = ['ab', 'abc', 'abcd', 'abcde'];
-const TEST_DICTIONARY: CompleteDictionaryData = {
+export const TEST_DICTIONARY: CompleteDictionaryData = {
     title: TEST_TITLE,
     description: 'Dictionary for testing',
     words: TEST_WORDS,
@@ -13,10 +13,10 @@ const TEST_DICTIONARY: CompleteDictionaryData = {
     id: 'id',
 };
 
-const getDictionaryTestService = () =>
+const getDictionaryTestService = (dictionary: Dictionary = new Dictionary(TEST_DICTIONARY)) =>
     createStubInstance(DictionaryService, {
-        getDictionary: new Dictionary(TEST_DICTIONARY),
-    }) as unknown as DictionaryService;
+        getDictionary: dictionary,
+    });
 
 export { getDictionaryTestService };
 
@@ -128,7 +128,7 @@ export const INVALID_WORDS_DICTIONARY_4: BasicDictionaryData = {
 export const INVALID_WORDS_DICTIONARY_5: BasicDictionaryData = {
     title: 'validUniqueTitle',
     description: 'valid Desicrition',
-    words: ['troplongggggggggggggggggg'],
+    words: ['troplongggggggggggggggggggggggggggggggggggggggggg'],
 };
 
 export const INVALID_WORDS_DICTIONARY_6: BasicDictionaryData = {

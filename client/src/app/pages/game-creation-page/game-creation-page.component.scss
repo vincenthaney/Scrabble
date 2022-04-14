@@ -22,6 +22,19 @@ $border-radius: 6px;
 
 .page {
     .container {
+        #game-creation-waiting-container {
+            padding-top: 256px;
+            display: grid;
+            align-items: center;
+            justify-items: center;
+
+            mat-label {
+                margin-bottom: 16px;
+                font-weight: 500;
+                font-size: 24px;
+            }
+        }
+
         max-width: 625px;
         margin: 0 auto;
         padding-top: 54px;
@@ -111,6 +124,17 @@ $border-radius: 6px;
             app-timer-selection {
                 display: block;
             }
+
+            .alert {
+                color: red;
+                display: flex;
+            }
+
+            .alert-group {
+                margin: -1.34375em 0px calc(1.34375em / 2) 2px;
+                height: 100%;
+                color: red;
+            }
         }
 
         .buttons {
@@ -122,5 +146,22 @@ $border-radius: 6px;
                 padding: 6px 16px;
             }
         }
+    }
+}
+
+.dictionary-title {
+    font-weight: 500;
+}
+.dictionary-description {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+}
+
+::ng-deep snack-bar-container.error {
+    background: lighten(tomato, 30%);
+    color: tomato;
+
+    button {
+        color: tomato;
     }
 }

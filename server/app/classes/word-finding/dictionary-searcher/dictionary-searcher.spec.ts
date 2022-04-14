@@ -6,32 +6,38 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { DictionaryNode } from '@app/classes/dictionary';
+import { Dictionary, DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { Container } from 'typedi';
 import { Orientation, Position } from '@app/classes/board';
 import DictionarySearcher from './dictionary-searcher';
 import { expect } from 'chai';
-import { SinonStub, stub } from 'sinon';
+import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import * as sinon from 'sinon';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 
 describe('DictionarySearcher', () => {
     let searcher: DictionarySearcher;
     let node: DictionaryNode;
+    let nodeStub: SinonStubbedInstance<DictionaryNode>;
     let playerLetters: LetterValue[];
     let boardPlacement: BoardPlacement;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
+
+    beforeEach(() => {
         const dictionaryService = Container.get(DictionaryService);
         node = dictionaryService.getDictionary('test');
+        nodeStub = testingUnit.getStubbedInstance(Dictionary);
         playerLetters = ['A', 'B', 'C', '*'];
         boardPlacement = {
             letters: [
@@ -51,13 +57,10 @@ describe('DictionarySearcher', () => {
     afterEach(() => {
         Container.reset();
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('constructor', () => {
-        it('should add to stack', () => {
-            expect(searcher['stack']).to.have.length(1);
-        });
-
         it('should add letters as map', () => {
             for (const letter of boardPlacement.letters) {
                 expect(searcher['alreadyPlacedLetters'].get(letter.distance)).to.equal(letter.letter.toLowerCase());
@@ -178,7 +181,7 @@ describe('DictionarySearcher', () => {
         let areValidPerpendicularWordsStub: SinonStub;
 
         beforeEach(() => {
-            getValueStub = stub(node, 'getValue').returns(DEFAULT_WORD);
+            getValueStub = nodeStub.getValue.returns(DEFAULT_WORD);
             isWordValidStub = stub(searcher, 'isWordValid' as any).returns(true);
             getPerpendicularWordsStub = stub(searcher, 'getPerpendicularWords' as any).returns([]);
             areValidPerpendicularWordsStub = stub(searcher, 'areValidPerpendicularWords' as any).returns(true);
@@ -246,9 +249,9 @@ describe('DictionarySearcher', () => {
         let letters: string[];
 
         beforeEach(() => {
-            getDepthStub = stub(node, 'getDepth').returns(0);
+            getDepthStub = nodeStub.getDepth.returns(0);
             getSearchLettersForNextNodeStub = stub(searcher, 'getSearchLettersForNextNode' as any).returns([['A', 'B'], true]);
-            getNodeStub = stub(node, 'getNode').returns(node);
+            getNodeStub = nodeStub.getNode.returns(node);
             unshiftStub = stub(searcher['stack'], 'unshift');
             getLettersLeftStub = stub(searcher, 'getLettersLeft' as any).returns([]);
             letters = ['X', 'Y'];
@@ -294,6 +297,8 @@ describe('DictionarySearcher', () => {
             const n = 3;
             const nodes: DictionaryNode[] = [];
             const lettersToUse: string[] = new Array(n).fill('a');
+
+            getNodeStub.reset();
 
             for (let i = 0; i < n; ++i) {
                 const currentNode = new DictionaryNode();
@@ -522,7 +527,7 @@ describe('DictionarySearcher', () => {
         let words: PerpendicularWord[];
 
         beforeEach(() => {
-            wordExistsStub = stub(searcher['rootNode'], 'wordExists').returns(true);
+            wordExistsStub = nodeStub.wordExists.returns(true);
             words = [
                 { word: 'abc', distance: 0, junctionDistance: 0 },
                 { word: 'abcd', distance: 0, junctionDistance: 0 },

@@ -1,9 +1,12 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AbstractPlayer } from '@app/classes/player';
-import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
+import { ConvertDialogComponent, ConvertResult } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import {
     DIALOG_BUTTON_CONTENT_REJECTED,
@@ -16,6 +19,7 @@ import {
 import { GameDispatcherService } from '@app/services/';
 import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-waiting-page',
@@ -35,6 +39,7 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
         public gameDispatcherService: GameDispatcherService,
         private readonly playerLeavesService: PlayerLeavesService,
         public router: Router,
+        private snackBar: MatSnackBar,
     ) {}
 
     @HostListener('window:beforeunload')
@@ -47,13 +52,20 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.gameDispatcherService.subscribeToJoinRequestEvent(this.componentDestroyed$, (opponentName: string) => this.setOpponent(opponentName));
         this.playerLeavesService.subscribeToJoinerLeavesGameEvent(this.componentDestroyed$, (leaverName: string) => this.opponentLeft(leaverName));
+        this.gameDispatcherService
+            .observeGameCreationFailed()
+            .pipe(takeUntil(this.componentDestroyed$))
+            .subscribe((error: HttpErrorResponse) => this.handleGameCreationFail(error));
     }
 
     confirmConvertToSolo(): void {
         this.gameDispatcherService.handleCancelGame(KEEP_DATA);
-        this.dialog.open(ConvertDialogComponent, {
-            data: this.gameDispatcherService.currentLobby?.hostName,
-        });
+        this.dialog
+            .open(ConvertDialogComponent, {
+                data: this.gameDispatcherService.currentLobby?.hostName,
+            })
+            .afterClosed()
+            .subscribe((convertResult: ConvertResult) => (this.isStartingGame = convertResult.isConverting));
     }
 
     confirmOpponentToServer(): void {
@@ -98,5 +110,11 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
                 ],
             },
         });
+    }
+
+    private handleGameCreationFail(error: HttpErrorResponse): void {
+        this.confirmRejectionToServer();
+        this.snackBar.open(error.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
+        this.router.navigateByUrl('game-creation');
     }
 }
