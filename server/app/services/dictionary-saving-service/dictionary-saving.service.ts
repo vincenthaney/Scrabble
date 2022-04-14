@@ -1,28 +1,26 @@
-import { BasicDictionaryData, DictionarySummary, DictionaryUpdateInfo } from '@app/classes/communication/dictionary-data';
+import {
+    BasicDictionaryData,
+    DictionaryEntry,
+    DictionaryIndexes,
+    DictionarySummary,
+    DictionaryUpdateInfo,
+} from '@app/classes/communication/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
+import {
+    CANNOT_UPDATE_DEFAULT_DICTIONARY,
+    DEFAULT_DICTIONARY_FILENAME,
+    DEFAULT_DICTIONARY_NOT_FOUND,
+    DICTIONARY_DIRECTORY,
+    DICTIONARY_INDEX_FILENAME,
+    NO_DICTIONARY_WITH_ID,
+    NO_DICTIONARY_WITH_NAME,
+} from '@app/constants/dictionary.const';
 import { NOT_FOUND } from '@app/constants/game';
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import { join } from 'path';
 import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
-
-export const DICTIONARY_DIRECTORY = '../../../assets/dictionaries';
-export const DICTIONARY_INDEX_FILENAME = 'index.json';
-export const DEFAULT_DICTIONARY_FILENAME = 'dictionary.json';
-
-export const NO_DICTIONARY_WITH_NAME = (filename: string) => `Le dictionnaire "${filename}" n'existe pas.`;
-export const NO_DICTIONARY_WITH_ID = (id: string) => `Le dictionnaire avec le id "${id}" n'existe pas.`;
-export const DEFAULT_DICTIONARY_NOT_FOUND = 'Le fichier dictionnaire par default est introuvable.';
-export const CANNOT_UPDATE_DEFAULT_DICTIONARY = 'Impossible de modifier le dictionnaire par défaut';
-
-export interface DictionaryEntry extends DictionarySummary {
-    filename: string;
-}
-
-export interface DictionaryIndexes {
-    entries: DictionaryEntry[];
-}
 
 @Service()
 export default class DictionarySavingService {

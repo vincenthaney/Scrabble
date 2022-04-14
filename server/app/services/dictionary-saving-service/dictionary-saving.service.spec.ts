@@ -3,25 +3,24 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BasicDictionaryData, DictionaryUpdateInfo } from '@app/classes/communication/dictionary-data';
+import { BasicDictionaryData, DictionaryEntry, DictionaryIndexes, DictionaryUpdateInfo } from '@app/classes/communication/dictionary-data';
 import { join } from 'path';
 import { Container } from 'typedi';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
-import DictionarySavingService, {
-    CANNOT_UPDATE_DEFAULT_DICTIONARY,
-    DEFAULT_DICTIONARY_FILENAME,
-    DEFAULT_DICTIONARY_NOT_FOUND,
-    DictionaryEntry,
-    DictionaryIndexes,
-    DICTIONARY_DIRECTORY,
-    DICTIONARY_INDEX_FILENAME,
-    NO_DICTIONARY_WITH_ID,
-    NO_DICTIONARY_WITH_NAME,
-} from './dictionary-saving.service';
 import { SinonStub, stub } from 'sinon';
 import { expect } from 'chai';
 import { existsSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
 import { NOT_FOUND } from '@app/constants/game';
+import DictionarySavingService from './dictionary-saving.service';
+import {
+    CANNOT_UPDATE_DEFAULT_DICTIONARY,
+    DEFAULT_DICTIONARY_FILENAME,
+    DEFAULT_DICTIONARY_NOT_FOUND,
+    DICTIONARY_DIRECTORY,
+    DICTIONARY_INDEX_FILENAME,
+    NO_DICTIONARY_WITH_ID,
+    NO_DICTIONARY_WITH_NAME,
+} from '@app/constants/dictionary.const';
 
 const DEFAULT_DICTIONARY: BasicDictionaryData = {
     title: 'default dictionary',

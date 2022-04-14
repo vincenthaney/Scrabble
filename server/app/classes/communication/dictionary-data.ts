@@ -33,3 +33,11 @@ export interface DictionaryUpdateInfo {
     title?: string;
     description?: string;
 }
+
+export interface DictionaryEntry extends DictionarySummary {
+    filename: string;
+}
+
+export interface DictionaryIndexes {
+    entries: DictionaryEntry[];
+}
