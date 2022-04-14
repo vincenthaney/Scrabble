@@ -150,6 +150,7 @@ section#text-box-container {
 
             app-icon {
                 margin-top: 0.3em;
+                font-size: large;
             }
 
             ::ng-deep .mat-flat-button {
@@ -163,6 +164,10 @@ section#text-box-container {
                 width: 100%;
                 justify-content: center;
                 display: flex;
+            }
+
+            .isInvalid {
+                color: black;
             }
         }
     }
