@@ -6,7 +6,7 @@ import {
     DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH,
     VIRTUAL_PLAYER_PROFILES_MONGO_COLLECTION_NAME,
 } from '@app/constants/services-constants/mongo-db.const';
-import { ID_LENGTH, NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL, RANDOM_STRING_LENGTH } from '@app/constants/services-errors';
+import { NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import { Random } from '@app/utils/random';
 import { promises } from 'fs';
@@ -64,7 +64,6 @@ export default class VirtualPlayerProfilesService {
             name: newProfileData.name,
             level: newProfileData.level,
             isDefault: false,
-            id: this.getNewId(),
         } as VirtualPlayerProfile);
     }
 
@@ -96,9 +95,5 @@ export default class VirtualPlayerProfilesService {
 
     private async isNameAlreadyUsed(newName: string): Promise<boolean> {
         return (await this.collection.countDocuments({ name: newName })) > 0;
-    }
-
-    private getNewId(): string {
-        return (Math.random() + 1).toString(RANDOM_STRING_LENGTH).substring(ID_LENGTH);
     }
 }
