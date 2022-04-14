@@ -34,9 +34,7 @@ export class CreateVirtualPlayerComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(): void {
-        this.formParameters.controls.inputTitle?.updateValueAndValidity();
         this.isVirtualPlayerNameValid = this.formParameters.get('inputVirtualPlayerName')?.valid ?? false;
-        console.log(this.formParameters.get('level')?.value);
     }
 
     ngOnDestroy(): void {

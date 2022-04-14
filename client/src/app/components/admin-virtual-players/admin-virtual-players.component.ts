@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
 import { Subject } from 'rxjs';
@@ -62,6 +62,7 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     }
 
     ngAfterViewInit(): void {
+        this.sort.sort({ id: 'level', start: 'asc' } as MatSortable);
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
     }
@@ -77,15 +78,13 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
             height: '300px',
             width: '450px',
         });
-        return;
     }
 
     createVirtualPlayer(): void {
         this.dialog.open(CreateVirtualPlayerComponent, {
-            height: '375px',
+            height: '315px',
             width: '450px',
         });
-        return;
     }
 
     deleteVirtualPlayer(virtualPlayerProfile: VirtualPlayerProfile): void {
@@ -99,7 +98,6 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
                 },
             } as DeleteVirtualPlayerDialogParameters,
         });
-        return;
     }
 
     async resetVirtualPlayers(): Promise<void> {
