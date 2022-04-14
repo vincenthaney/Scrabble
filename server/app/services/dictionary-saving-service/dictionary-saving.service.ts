@@ -1,5 +1,6 @@
 import {
     BasicDictionaryData,
+    DictionaryData,
     DictionaryEntry,
     DictionaryIndexes,
     DictionarySummary,
@@ -12,6 +13,7 @@ import {
     DEFAULT_DICTIONARY_NOT_FOUND,
     DICTIONARY_DIRECTORY,
     DICTIONARY_INDEX_FILENAME,
+    INVALID_TITLE_FORMAT,
     NO_DICTIONARY_WITH_ID,
     NO_DICTIONARY_WITH_NAME,
 } from '@app/constants/dictionary.const';
@@ -34,13 +36,16 @@ export default class DictionarySavingService {
         return this.dictionaryIndexes.entries.map(this.entryToDictionarySummary);
     }
 
-    getDictionaryById(id: string): BasicDictionaryData {
+    getDictionaryById(id: string): DictionaryData {
         const [entry] = this.getEntryFromId(id);
 
-        return this.getDictionaryByFilename(entry.filename);
+        return { ...this.getDictionaryByFilename(entry.filename), isDefault: entry.isDefault };
     }
 
     addDictionary(dictionary: BasicDictionaryData): DictionarySummary {
+        if (this.dictionaryIndexes.entries.find((e) => e.title === dictionary.title))
+            throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.BAD_REQUEST);
+
         const id = uuidv4();
         const filename = `${dictionary.title}-${id}.json`;
 
