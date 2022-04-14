@@ -18,6 +18,7 @@ import {
     DEFAULT_DICTIONARY_NOT_FOUND,
     DICTIONARY_DIRECTORY,
     DICTIONARY_INDEX_FILENAME,
+    INVALID_TITLE_FORMAT,
     NO_DICTIONARY_WITH_ID,
     NO_DICTIONARY_WITH_NAME,
 } from '@app/constants/dictionary.const';
@@ -103,7 +104,7 @@ describe('DictionarySavingService', () => {
             const dictionary = service.addDictionary(DICTIONARY_1);
             const result = service.getDictionaryById(dictionary.id);
 
-            expect(result).to.deep.equal(DICTIONARY_1);
+            expect(result).to.deep.equal({ ...DICTIONARY_1, isDefault: false });
         });
 
         it('should call getEntryFromId', () => {
@@ -121,13 +122,14 @@ describe('DictionarySavingService', () => {
         });
 
         it('should return getDictionaryByFilename result', () => {
-            const dictionary = 'i am very much a dictionary and not a string';
+            const dictionary = { ...DICTIONARY_1 };
 
             getDictionaryByFilenameStub.returns(dictionary);
+            getEntryFromIdStub.returns([{ isDefault: false }]);
 
             const result = service.getDictionaryById(DEFAULT_ID);
 
-            expect(result).to.equal(dictionary);
+            expect(result).to.deep.equal({ ...dictionary, isDefault: false });
         });
     });
 
@@ -160,21 +162,21 @@ describe('DictionarySavingService', () => {
 
         it('should call writeFile with filename and dictionary', () => {
             entryToDictionarySummaryStub.callThrough();
-            const result = service.addDictionary(DEFAULT_DICTIONARY);
+            const result = service.addDictionary(DICTIONARY_1);
             const filename = `${result.title}-${result.id}.json`;
 
-            expect(writeFileStub.calledWithExactly(filename, DEFAULT_DICTIONARY));
+            expect(writeFileStub.calledWithExactly(filename, DICTIONARY_1));
         });
 
         it('should call entries.push with entry', () => {
             entryToDictionarySummaryStub.callsFake((e) => e);
-            const entry = service.addDictionary(DEFAULT_DICTIONARY);
+            const entry = service.addDictionary(DICTIONARY_1);
 
             expect(entriesPushStub.calledWithExactly(entry));
         });
 
         it('should call updateDictionaryIndex after entries.push', () => {
-            service.addDictionary(DEFAULT_DICTIONARY);
+            service.addDictionary(DICTIONARY_1);
 
             expect(updateDictionaryIndexStub.calledImmediatelyAfter(entriesPushStub));
         });
@@ -183,10 +185,15 @@ describe('DictionarySavingService', () => {
             const dictionarySummary = 'totally a dictionary summary, trust me bro';
             entryToDictionarySummaryStub.returns(dictionarySummary);
 
-            const result = service.addDictionary(DEFAULT_DICTIONARY);
+            const result = service.addDictionary(DICTIONARY_1);
 
             expect(entryToDictionarySummaryStub.called).to.be.true;
             expect(result).to.equal(dictionarySummary);
+        });
+
+        it('should throw if name exists', () => {
+            entryToDictionarySummaryStub.callThrough();
+            expect(() => service.addDictionary(DEFAULT_DICTIONARY)).to.throw(INVALID_TITLE_FORMAT);
         });
     });
 
