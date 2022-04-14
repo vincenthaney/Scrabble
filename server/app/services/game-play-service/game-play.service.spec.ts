@@ -23,15 +23,15 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import * as chai from 'chai';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as arrowFunction from '@app/utils/is-id-virtual-player';
+import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';
@@ -455,10 +455,17 @@ describe('GamePlayService', () => {
 
     describe('handleGameOver', () => {
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+        let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
+
         beforeEach(() => {
             highScoresServiceStub = createStubInstance(HighScoresService);
             highScoresServiceStub.addHighScore.resolves(true);
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
+
+            gameHistoriesServiceStub = createStubInstance(GameHistoriesService);
+            gameHistoriesServiceStub.addGameHistory.resolves();
+            Object.defineProperty(gamePlayService, 'gameHistoriesService', { value: gameHistoriesServiceStub });
+
             chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
                 return;
             });
@@ -469,6 +476,12 @@ describe('GamePlayService', () => {
             await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(gameStub.endOfGame.calledOnce).to.be.true;
             expect(gameStub.endGameMessage.calledOnce).to.be.true;
+        });
+
+        it('should add to game histories if not already added', async () => {
+            gameStub.isAddedToDatabase = false;
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
+            expect(gameHistoriesServiceStub.addGameHistory.calledOnce).to.be.true;
         });
 
         it('should change isAddedtoDatabase', async () => {
