@@ -61,7 +61,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.pageDestroyed$ = new Subject();
         this.gameParameters = new FormGroup({
             gameType: new FormControl(GameType.Classic, Validators.required),
-            gameMode: new FormControl(GameMode.Solo, Validators.required),
+            gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
             level: new FormControl(VirtualPlayerLevel.Beginner),
             virtualPlayerName: new FormControl(''),
             timer: new FormControl(this.getDefaultTimerValue(), Validators.required),
