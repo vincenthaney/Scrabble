@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Ajouter un joueur virtuel</h2>
+<div id="container">
+    <div>
+        <mat-label id="level-label">Choisissez le niveau de l'adversaire virtuel</mat-label>
+        <mat-button-toggle-group id="level-buttons" formControlName="level">
+            <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">
+                <mat-card class="content">
+                    <app-icon icon="turtle" styling="solid"></app-icon>
+                    <p class="text">{{ virtualPlayerLevels.Beginner }}</p>
+                </mat-card>
+            </mat-button-toggle>
+            <mat-button-toggle id="expert-button" [value]="virtualPlayerLevels.Expert">
+                <mat-card class="content">
+                    <app-icon icon="rabbit" styling="solid"></app-icon>
+                    <p class="text">{{ virtualPlayerLevels.Expert }}</p>
+                </mat-card>
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <div>
+        <mat-form-field
+        class="form-field"
+        appearance="outline"
+        [formGroup]="formParameters"
+        matTooltipPosition="above"
+        matTooltip="Le nom doit être entre 2 et 20 caractères."
+        >
+        <mat-label> Nom:</mat-label>
+        <input
+            matInput
+            id="virtualPlayerNameValidator"
+            type="text"
+            formControlName="inputVirtualPlayerName"
+            autocomplete="off"
+            (ngModelChange)="ngOnChanges()"
+            (valueChanges)="ngOnChanges()"
+        />
+    </mat-form-field>
+    </div>
+    <div id="buttons-container">
+        <button mat-flat-button color = "primary" (click)="createVirtualPlayer()" [disabled]="!this.isVirtualPlayerNameValid">
+            <app-icon icon="pencil"></app-icon>
+            Ajouter
+        </button>
+        <button mat flat button mat-button color = "primary" (click)="closeDialog()">
+            <app-icon icon="ban"></app-icon>
+            Annuler
+        </button> 
+    </div>
+</div>
+    
+
