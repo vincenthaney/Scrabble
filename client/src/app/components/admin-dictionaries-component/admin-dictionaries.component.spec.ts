@@ -1,25 +1,26 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { IconComponent } from '@app/components/icon/icon.component';
-import { AdminDictionariesComponent } from './admin-dictionaries.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { AppMaterialModule } from '@app/modules/material.module';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
-import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { DictionariesState } from '@app/classes/admin/dictionaries';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { AppMaterialModule } from '@app/modules/material.module';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
+import { AdminDictionariesComponent } from './admin-dictionaries.component';
 const TEST_ID = 'test';
 const testElementData: DictionarySummary = {
     title: 'testTitle',
@@ -44,6 +45,7 @@ describe('AdminDictionariesComponent', () => {
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,
+                MatProgressBarModule,
                 MatTableModule,
                 MatDialogModule,
                 MatSnackBarModule,

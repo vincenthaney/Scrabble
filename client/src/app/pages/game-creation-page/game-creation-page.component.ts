@@ -16,7 +16,7 @@ import { DictionaryService } from '@app/services/dictionary-service/dictionary.s
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -80,6 +80,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             .observeGameCreationFailed()
             .pipe(takeUntil(this.pageDestroyed$))
             .subscribe(async (error: HttpErrorResponse) => await this.handleGameCreationFail(error));
+
         this.dictionaryService.subscribeToDictionariesUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
             if (this.shouldSetToDefaultDictionary) this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
@@ -89,7 +90,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     async ngOnInit(): Promise<void> {
         this.gameParameters
             .get('gameMode')
-            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$), distinctUntilChanged())
             .subscribe((value) => {
                 if (value === this.gameModes.Solo) {
                     this.gameParameters?.get('level')?.setValidators([Validators.required]);
@@ -107,7 +108,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
         this.gameParameters
             .get('level')
-            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$), distinctUntilChanged())
             .subscribe(() => this.gameParameters.patchValue({ virtualPlayerName: randomizeArray(this.getVirtualPlayerNames())[0] }));
 
         this.virtualPlayerProfilesService.getVirtualPlayerProfiles().then((profiles: VirtualPlayerProfile[]) => {

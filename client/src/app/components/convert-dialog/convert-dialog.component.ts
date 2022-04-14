@@ -7,7 +7,6 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 export interface ConvertResult {
     isConverting: boolean;
@@ -48,10 +47,10 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.gameParameters
-            .get('level')
-            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
-            .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
+        // this.gameParameters
+        //     .get('level')
+        //     ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
+        //     .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
 
         this.virtualPlayerProfilesService
             .getVirtualPlayerProfiles()

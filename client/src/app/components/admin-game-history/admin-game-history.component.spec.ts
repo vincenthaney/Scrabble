@@ -13,14 +13,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { GameHistoryState } from '@app/classes/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
-import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { IconComponent } from '@app/components/icon/icon.component';
-import { AdminGameHistoryComponent } from './admin-game-history.component';
+import { DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
-import { GameHistoryState } from '@app/classes/admin-game-history';
+import { AdminGameHistoryComponent } from './admin-game-history.component';
 
 describe('AdminGameHistoryComponent', () => {
     let component: AdminGameHistoryComponent;
@@ -45,6 +45,7 @@ describe('AdminGameHistoryComponent', () => {
                 MatTooltipModule,
                 MatSnackBarModule,
                 MatPaginatorModule,
+                MatDividerModule,
             ],
             declarations: [AdminGameHistoryComponent, MatSort, MatPaginator, IconComponent],
             providers: [{ provide: GameHistoryService, useValue: gameHistoryServiceSpy }],

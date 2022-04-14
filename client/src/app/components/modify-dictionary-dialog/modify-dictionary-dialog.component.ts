@@ -1,13 +1,13 @@
 import { Component, Inject, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DICTIONARY_DESCRIPTION_VALIDATION, DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
-import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { Subject } from 'rxjs';
 import {
     DictionaryDialogParameters,
     ModifyDictionaryComponentStates,
 } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
+import { DICTIONARY_DESCRIPTION_VALIDATION, DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-modify-dictionary-dialog',
