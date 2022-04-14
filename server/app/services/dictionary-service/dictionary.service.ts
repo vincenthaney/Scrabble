@@ -55,13 +55,13 @@ export default class DictionaryService {
         this.deleteActiveDictionary(id, forceDeleteIfUnused);
     }
 
-    async validateDictionary(dictionaryData: BasicDictionaryData): Promise<boolean> {
+    validateDictionary(dictionaryData: BasicDictionaryData): boolean {
         if (!this.dictionaryValidator) this.createDictionaryValidator();
-        return this.dictionaryValidator(dictionaryData) && (await this.isTitleValid(dictionaryData.title));
+        return this.dictionaryValidator(dictionaryData) && this.isTitleValid(dictionaryData.title);
     }
 
-    async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
-        if (!(await this.validateDictionary(basicDictionaryData))) throw new Error(INVALID_DICTIONARY_FORMAT);
+    addNewDictionary(basicDictionaryData: BasicDictionaryData): void {
+        if (!this.validateDictionary(basicDictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
 
         this.dictionarySavingService.addDictionary(basicDictionaryData);
     }
@@ -79,7 +79,8 @@ export default class DictionaryService {
     }
 
     updateDictionary(updateInfo: DictionaryUpdateInfo): void {
-        if (updateInfo.description && !this.isDescriptionValid(updateInfo.description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
+        if (updateInfo.description && !this.isDescriptionValid(updateInfo.description))
+            throw new HttpException(INVALID_DESCRIPTION_FORMAT, StatusCodes.BAD_REQUEST);
 
         if (updateInfo.title && !this.isTitleValid(updateInfo.title)) throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.BAD_REQUEST);
 
@@ -90,6 +91,7 @@ export default class DictionaryService {
         this.dictionarySavingService.deleteDictionaryById(dictionaryId);
 
         const dictionaryUsage: DictionaryUsage | undefined = this.activeDictionaries.get(dictionaryId);
+
         if (dictionaryUsage) {
             dictionaryUsage.isDeleted = true;
             this.deleteActiveDictionary(dictionaryId);
@@ -102,7 +104,7 @@ export default class DictionaryService {
 
     private initializeDictionaries(): void {
         const dictionariesId: string[] = this.getDictionariesId();
-        dictionariesId.forEach(async (id: string) => this.initializeDictionary(id));
+        dictionariesId.forEach((id: string) => this.initializeDictionary(id));
     }
 
     private getDictionariesId(): string[] {
