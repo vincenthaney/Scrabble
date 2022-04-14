@@ -164,6 +164,6 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         const isParentClickable: boolean =
             element.parentElement !== null && (element.parentElement as HTMLElement).classList.contains(IS_CLICKABLE_CLASS);
         const isElementCodeTag: boolean = element.tagName === CODE_HTML_TAG;
-        return (isElementClickable || isParentClickable) && isElementCodeTag;
+        return isElementCodeTag && (isElementClickable || isParentClickable);
     }
 }
