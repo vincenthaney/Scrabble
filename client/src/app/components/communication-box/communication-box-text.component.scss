@@ -44,16 +44,6 @@ section#text-box-container {
                         max-width: 80%;
                         padding: 4px 12px;
                         border-radius: 0.25em;
-
-                        &.isClickable {
-                            ::ng-deep code {
-                                cursor: pointer;
-
-                                &:hover {
-                                    text-decoration: underline;
-                                }
-                            }
-                        }
                     }
                 }
 

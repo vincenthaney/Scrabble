@@ -7,7 +7,7 @@ $b: #e4e4e4;
     grid-template-rows: auto 1fr auto;
     box-sizing: border-box;
 
-    &>section:not(:last-child) {
+    & > section:not(:last-child) {
         margin-bottom: $s;
     }
 
@@ -34,6 +34,16 @@ $b: #e4e4e4;
                     }
                 }
             }
+        }
+    }
+}
+
+p.message.isClickable {
+    ::ng-deep code {
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
         }
     }
 }
