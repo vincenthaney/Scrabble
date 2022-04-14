@@ -20,8 +20,8 @@ import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictiona
 import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PositiveFeedback, SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
-import { PositiveFeedbackResponse } from './admin-dictionaries-component.types';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
+import { PositiveFeedbackResponse } from '@app/constants/dialogs-constants';
 
 @Component({
     selector: 'app-admin-dictionaries',
