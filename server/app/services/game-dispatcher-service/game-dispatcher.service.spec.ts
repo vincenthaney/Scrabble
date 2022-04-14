@@ -273,7 +273,7 @@ describe('GameDispatcherService', () => {
         it('should remove waitingRoom', async () => {
             expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.not.be.empty;
 
-            await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
+            gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
             expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.be.empty;
         });
@@ -281,23 +281,21 @@ describe('GameDispatcherService', () => {
         it(' should throw error when playerId is invalid', () => {
             const invalidId = 'invalidId';
 
-            return expect(gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.rejectedWith(
-                INVALID_PLAYER_ID_FOR_GAME,
-            );
+            expect(() => gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it(' should throw error when playerId is invalid', () => {
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
-            return expect(
-                gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
-            ).to.be.rejectedWith(NO_OPPONENT_IN_WAITING_GAME);
+            expect(() => gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME)).to.be.throw(
+                NO_OPPONENT_IN_WAITING_GAME,
+            );
         });
 
         it(' should throw error when playerId is invalid', () => {
-            return expect(
-                gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2),
-            ).to.be.rejectedWith(OPPONENT_NAME_DOES_NOT_MATCH);
+            expect(() => gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2)).to.be.throw(
+                OPPONENT_NAME_DOES_NOT_MATCH,
+            );
         });
     });
 
