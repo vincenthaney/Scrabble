@@ -12,6 +12,7 @@ import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding';
 import { IN_UPPER_CASE } from '@app/constants/classes-constants';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { PlacementToString } from '@app/utils/placement-to-string';
@@ -90,24 +91,24 @@ export default class ActionPlace extends ActionPlay {
         return response;
     }
 
-    getMessage(): string {
+    getMessage(): FeedbackMessage {
         let placeMessage = `Vous avez placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)} pour ${
             this.scoredPoints
         } points`;
         this.objectivesCompletedMessages.forEach((message: string) => {
             placeMessage += `<br><br>Vous avez${message}`;
         });
-        return placeMessage;
+        return { message: placeMessage };
     }
 
-    getOpponentMessage(): string {
+    getOpponentMessage(): FeedbackMessage {
         let placeMessage = `${this.player.name} a placé ${PlacementToString.tilesToString(this.wordPlacement.tilesToPlace, IN_UPPER_CASE)} pour ${
             this.scoredPoints
         } points`;
         this.objectivesCompletedMessages.forEach((message: string) => {
             placeMessage += `<br><br>${this.player.name} a${message}`;
         });
-        return placeMessage;
+        return { message: placeMessage };
     }
 
     private isLegalPlacement(words: [Square, Tile][][]): boolean {

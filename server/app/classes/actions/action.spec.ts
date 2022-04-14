@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import { expect } from 'chai';
 import { Action, ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
-import { GameUpdateData } from '@app/classes/communication/game-update-data';
 
 const DEFAULT_MESSAGE = 'message';
 
@@ -17,8 +18,8 @@ class MockAction extends Action {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     execute(): void | GameUpdateData {}
 
-    getMessage(): string | undefined {
-        return DEFAULT_MESSAGE;
+    getMessage(): FeedbackMessage {
+        return { message: DEFAULT_MESSAGE };
     }
 }
 
@@ -55,7 +56,7 @@ describe('Action', () => {
         });
 
         it('should return getMessage if method not overloaded', () => {
-            expect(action.getOpponentMessage()).to.equal(action.getMessage());
+            expect(action.getOpponentMessage()).to.deep.equal(action.getMessage());
         });
     });
 });

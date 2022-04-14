@@ -397,12 +397,12 @@ describe('ActionPlace', () => {
         it('should return simple place message if no objectives were completed', () => {
             const lineSkip = '<br>';
             action['objectivesCompletedMessages'] = [];
-            expect(action.getMessage().includes(lineSkip)).to.be.false;
+            expect(action.getMessage().message?.includes(lineSkip)).to.be.false;
         });
 
         it('should return place message with completed objectives if they exist', () => {
             action['objectivesCompletedMessages'] = ['test'];
-            expect(action.getMessage().includes('test')).to.be.true;
+            expect(action.getMessage().message?.includes('test')).to.be.true;
         });
     });
 
@@ -416,12 +416,12 @@ describe('ActionPlace', () => {
         it('should return simple place message if no objectives were completed', () => {
             const lineSkip = '<br>';
             action['objectivesCompletedMessages'] = [];
-            expect(action.getOpponentMessage().includes(lineSkip)).to.be.false;
+            expect(action.getOpponentMessage().message?.includes(lineSkip)).to.be.false;
         });
 
         it('should return place message with completed objectives if they exist', () => {
             action['objectivesCompletedMessages'] = ['test'];
-            expect(action.getOpponentMessage().includes('test')).to.be.true;
+            expect(action.getOpponentMessage().message?.includes('test')).to.be.true;
         });
     });
 

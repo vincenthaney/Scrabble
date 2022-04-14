@@ -13,9 +13,9 @@ import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { assert } from 'console';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import ActionExchange from './action-exchange';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -175,12 +175,12 @@ describe('ActionExchange', () => {
         it('should return message', () => {
             action = new ActionExchange(game.player1, game, PLAYER_TILES);
 
-            expect(action.getMessage()).to.equal('Vous avez échangé les tuiles ABC');
+            expect(action.getMessage().message).to.equal('Vous avez échangé les tuiles ABC');
         });
 
         it('should return message', () => {
             action = new ActionExchange(game.player1, game, [PLAYER_TILES[0]]);
-            expect(action.getMessage()).to.equal('Vous avez échangé la tuile A');
+            expect(action.getMessage().message).to.equal('Vous avez échangé la tuile A');
         });
 
         it('should call lettersToSwap', () => {
@@ -191,12 +191,12 @@ describe('ActionExchange', () => {
 
         it("should have 'les tuiles' if more than one tiles to exchange", () => {
             action['tilesToExchange'] = PLAYER_TILES;
-            expect(action.getMessage()).to.include('les tuiles');
+            expect(action.getMessage().message).to.include('les tuiles');
         });
 
         it("should have 'la tuile' if one tile to exchange", () => {
             action['tilesToExchange'] = [PLAYER_TILES[0]];
-            expect(action.getMessage()).to.include('la tuile');
+            expect(action.getMessage().message).to.include('la tuile');
         });
     });
 
@@ -208,21 +208,21 @@ describe('ActionExchange', () => {
         });
 
         it('should return message', () => {
-            expect(action.getOpponentMessage()).to.exist;
+            expect(action.getOpponentMessage().message).to.exist;
         });
 
         it('should be different from getMessage', () => {
-            expect(action.getOpponentMessage()).to.not.equal(action.getMessage());
+            expect(action.getOpponentMessage().message).to.not.equal(action.getMessage());
         });
 
         it("should have 'tuile' plural if more than one tiles to exchange", () => {
             action['tilesToExchange'] = PLAYER_TILES;
-            expect(action.getOpponentMessage()).to.include(`${PLAYER_TILES.length} tuiles`);
+            expect(action.getOpponentMessage().message).to.include(`${PLAYER_TILES.length} tuiles`);
         });
 
         it("should have 'tuile' singular if one tile to exchange", () => {
             action['tilesToExchange'] = [PLAYER_TILES[0]];
-            expect(action.getOpponentMessage()).to.include('1 tuile');
+            expect(action.getOpponentMessage().message).to.include('1 tuile');
         });
     });
 });
