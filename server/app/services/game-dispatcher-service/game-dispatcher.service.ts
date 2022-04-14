@@ -84,7 +84,7 @@ export class GameDispatcherService {
         return waitingRoom.getConfig();
     }
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<ReadyGameConfig> {
+    acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): ReadyGameConfig {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
