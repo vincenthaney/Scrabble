@@ -199,7 +199,7 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit endRoundEvent subscription should call the functions to end the round', () => {
-            const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
+            const ngOnDestroySpy = spyOn<any>(component, 'onDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
 
             gameViewEventManagerSpy.emitGameViewEvent('reRender');
@@ -209,7 +209,7 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit reRender subscription should call the functions to rerender the component', () => {
-            const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
+            const ngOnDestroySpy = spyOn<any>(component, 'onDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
             const updateBorderSpy = spyOn<any>(component, 'updateActivePlayerBorder');
 
