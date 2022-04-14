@@ -1,6 +1,7 @@
 import ActionPlay from '@app/classes/actions/action-play';
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 
 export default class ActionPass extends ActionPlay {
     static createActionData(): ActionData {
@@ -15,11 +16,11 @@ export default class ActionPass extends ActionPlay {
         return;
     }
 
-    getMessage(): string {
-        return 'Vous avez passé votre tour';
+    getMessage(): FeedbackMessage {
+        return { message: 'Vous avez passé votre tour' };
     }
 
-    getOpponentMessage(): string | undefined {
-        return `${this.player.name} a passé son tour`;
+    getOpponentMessage(): FeedbackMessage {
+        return { message: `${this.player.name} a passé son tour` };
     }
 }

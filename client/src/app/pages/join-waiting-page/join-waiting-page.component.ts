@@ -2,8 +2,11 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NavigationStart, Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication';
+import { Timer } from '@app/classes/timer/timer';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { getRandomFact } from '@app/constants/fun-facts-scrabble';
 import {
+    DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
     DIALOG_CANCEL_CONTENT,
@@ -24,6 +27,8 @@ import { takeUntil } from 'rxjs/operators';
 export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     currentLobby: LobbyInfo;
     currentName: string;
+    funFact: string;
+    roundTime: string;
     routingSubscription: Subscription;
     componentDestroyed$: Subject<boolean>;
 
@@ -42,8 +47,12 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (this.gameDispatcherService.currentLobby) this.currentLobby = this.gameDispatcherService.currentLobby;
+        this.currentLobby = this.gameDispatcherService.currentLobby ?? DEFAULT_LOBBY;
+        const roundTime: Timer = Timer.convertTime(this.currentLobby.maxRoundTime);
+        this.roundTime = `${roundTime.minutes}:${roundTime.getTimerSecondsPadded()}`;
+
         this.currentName = this.gameDispatcherService.currentName;
+        this.funFact = getRandomFact();
 
         this.routingSubscription = this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
             if (event instanceof NavigationStart) {
@@ -54,6 +63,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, (hostName: string) => this.hostHasCanceled(hostName));
         this.gameDispatcherService.subscribeToJoinerRejectedEvent(this.componentDestroyed$, (hostName: string) => this.playerRejected(hostName));
     }
+
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();

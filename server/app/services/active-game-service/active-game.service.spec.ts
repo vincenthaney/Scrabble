@@ -33,6 +33,7 @@ const DEFAULT_GAME = {
     player1: DEFAULT_PLAYER_1,
     player2: DEFAULT_PLAYER_2,
     id: DEFAULT_ID,
+    gameIsOver: false,
 
     getId: () => DEFAULT_ID,
     createStartGameData: () => undefined,
@@ -141,6 +142,6 @@ describe('ActiveGameService', () => {
 
     it('isGameOver should return if the game with the game id provided is over', () => {
         chai.spy.on(activeGameService, 'getGame', () => DEFAULT_GAME);
-        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.be.equal(DEFAULT_GAME.areGameOverConditionsMet());
+        expect(activeGameService.isGameOver(DEFAULT_ID, DEFAULT_PLAYER_1.id)).to.be.equal(DEFAULT_GAME.gameIsOver);
     });
 });

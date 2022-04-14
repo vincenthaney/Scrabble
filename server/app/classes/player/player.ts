@@ -1,3 +1,4 @@
+import { PlayerData } from '@app/classes/communication/player-data';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { ObjectiveUpdate } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
@@ -44,7 +45,7 @@ export default class Player {
     }
 
     resetObjectivesProgression(): void {
-        this.getObjectives()
+        [...this.objectives]
             .filter((objective: AbstractObjective) => !objective.isCompleted() && objective.shouldResetOnInvalidWord)
             .forEach((objective: AbstractObjective) => {
                 objective.progress = 0;
@@ -58,5 +59,16 @@ export default class Player {
 
     validateObjectives(validationParameters: ObjectiveValidationParameters): ObjectiveUpdate | undefined {
         return this.objectiveService.validatePlayerObjectives(this, validationParameters.game, validationParameters);
+    }
+
+    copyPlayerInfo(oldPlayer: Player): PlayerData {
+        this.score = oldPlayer.score;
+        this.tiles = oldPlayer.tiles;
+        this.objectives = oldPlayer.objectives;
+        return { id: oldPlayer.id, newId: this.id, name: this.name };
+    }
+
+    convertToPlayerData(): PlayerData {
+        return { id: this.id, name: this.name, score: this.score, tiles: this.tiles, isConnected: this.isConnected, objectives: this.objectives };
     }
 }

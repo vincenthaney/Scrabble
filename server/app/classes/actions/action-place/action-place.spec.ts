@@ -9,10 +9,10 @@
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { Board, Orientation, Position } from '@app/classes/board';
 import { ActionPlacePayload } from '@app/classes/communication/action-data';
+import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { PlayerData } from '@app/classes/communication/player-data';
-import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
@@ -22,16 +22,17 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { WordPlacement } from '@app/classes/word-finding';
 import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { StringConversion } from '@app/utils/string-conversion';
 import * as chai from 'chai';
 import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
 import { ActionErrorsMessages } from './action-errors';
-import * as sinon from 'sinon';
 
 const expect = chai.expect;
 
@@ -77,7 +78,7 @@ const EXTRACT_CENTER: [Square, Tile][][] = [
         [{ ...DEFAULT_SQUARE_2 }, { ...DEFAULT_TILE_B }],
     ],
 ];
-const SCORE_RETURN = 1;
+const SCORE_RETURN = 132;
 const UPDATE_BOARD_RETURN: (Square | undefined)[] = [
     { ...DEFAULT_SQUARE_1, tile: DEFAULT_TILE_A },
     { ...DEFAULT_SQUARE_2, tile: DEFAULT_TILE_B },
@@ -116,13 +117,24 @@ describe('ActionPlace', () => {
     let wordValidatorStub: SinonStubbedInstance<WordsVerificationService>;
     let scoreCalculatorServiceStub: SinonStubbedInstance<ScoreCalculatorService>;
     let game: Game;
+    let testingUnit: ServicesTestingUnit;
+
+    beforeEach(() => {
+        testingUnit = new ServicesTestingUnit();
+
+        wordValidatorStub = testingUnit.setStubbed(WordsVerificationService, {
+            verifyWords: undefined,
+        });
+        scoreCalculatorServiceStub = testingUnit.setStubbed(ScoreCalculatorService, {
+            calculatePoints: SCORE_RETURN,
+            bonusPoints: 0,
+        });
+    });
 
     beforeEach(() => {
         gameStub = createStubInstance(Game);
         tileReserveStub = createStubInstance(TileReserve);
         boardStub = createStubInstance(Board);
-        wordValidatorStub = createStubInstance(WordsVerificationService);
-        scoreCalculatorServiceStub = createStubInstance(ScoreCalculatorService);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_1.id, DEFAULT_PLAYER_1.name);
         gameStub.player2 = new Player(DEFAULT_PLAYER_2.id, DEFAULT_PLAYER_2.name);
@@ -143,6 +155,7 @@ describe('ActionPlace', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
@@ -183,14 +196,8 @@ describe('ActionPlace', () => {
                 action = new ActionPlace(game.player1, game, VALID_PLACEMENT);
                 getTilesFromPlayerSpy = chai.spy.on(ActionUtils, 'getTilesFromPlayer', () => [[...VALID_TILES_TO_PLACE], []]);
 
-                action['wordValidator'] = wordValidatorStub as unknown as WordsVerificationService;
-                action['scoreCalculator'] = scoreCalculatorServiceStub as unknown as ScoreCalculatorService;
-
-                // eslint-disable-next-line @typescript-eslint/no-empty-function
-                wordValidatorStub.verifyWords.callsFake(() => {});
-                scoreCalculatorServiceStub.calculatePoints.returns(SCORE_RETURN);
-                scoreCalculatorServiceStub.bonusPoints.returns(0);
                 gameStub.getTilesFromReserve.returns(GET_TILES_RETURN);
+
                 updateBoardSpy = chai.spy.on(ActionPlace.prototype, 'updateBoard', () => UPDATE_BOARD_RETURN);
                 isLegalPlacementStub = stub(ActionPlace.prototype, <any>'isLegalPlacement').returns(true) as SinonStub<
                     [words: [Square, Tile][][]],
@@ -223,9 +230,10 @@ describe('ActionPlace', () => {
                 assert(wordValidatorStub.verifyWords.calledOnce);
             });
 
-            it('should call score computer', () => {
+            it('should call score computer and set this.scoredPoints', () => {
                 action.execute();
                 assert(scoreCalculatorServiceStub.calculatePoints.calledOnce);
+                expect(action['scoredPoints']).to.equal(SCORE_RETURN);
             });
 
             it('should call objective validation if GameType is LOG2990', () => {
@@ -396,12 +404,12 @@ describe('ActionPlace', () => {
         it('should return simple place message if no objectives were completed', () => {
             const lineSkip = '<br>';
             action['objectivesCompletedMessages'] = [];
-            expect(action.getMessage().includes(lineSkip)).to.be.false;
+            expect(action.getMessage().message?.includes(lineSkip)).to.be.false;
         });
 
         it('should return place message with completed objectives if they exist', () => {
             action['objectivesCompletedMessages'] = ['test'];
-            expect(action.getMessage().includes('test')).to.be.true;
+            expect(action.getMessage().message?.includes('test')).to.be.true;
         });
     });
 
@@ -415,12 +423,12 @@ describe('ActionPlace', () => {
         it('should return simple place message if no objectives were completed', () => {
             const lineSkip = '<br>';
             action['objectivesCompletedMessages'] = [];
-            expect(action.getOpponentMessage().includes(lineSkip)).to.be.false;
+            expect(action.getOpponentMessage().message?.includes(lineSkip)).to.be.false;
         });
 
         it('should return place message with completed objectives if they exist', () => {
             action['objectivesCompletedMessages'] = ['test'];
-            expect(action.getOpponentMessage().includes('test')).to.be.true;
+            expect(action.getOpponentMessage().message?.includes('test')).to.be.true;
         });
     });
 

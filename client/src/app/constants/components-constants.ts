@@ -1,7 +1,9 @@
 import { DisplayGameHistoryColumns, DisplayGameHistoryKeys } from '@app/classes/admin-game-history';
+import { DisplayDictionaryKeys } from '@app/classes/admin/dictionaries';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/classes/game-type';
 import { IconName } from '@app/components/icon/icon.component.type';
+import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from './dictionaries-components';
 
 export const LOCAL_PLAYER_ICON: IconName[] = ['user-astronaut', 'user-cowboy', 'user-ninja', 'user-crown'];
 
@@ -14,6 +16,12 @@ export const KEYDOWN = 'keydown';
 export const DEFAULT_HIGH_SCORE: SingleHighScore = { name: 'player1', gameType: GameType.Classic, score: 0 };
 
 export const NOT_FOUND = -1;
+export const DICTIONARIES_COLUMNS = {
+    title: 'Nom',
+    description: 'Description',
+    actions: '',
+};
+export const DEFAULT_DICTIONARIES_COLUMNS: DisplayDictionaryKeys[] = ['title', 'description', 'actions'];
 
 export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
     startDate: 'Date de début',
@@ -47,3 +55,9 @@ export const YOU_COMPLETED_THIS_OBJECTIVE = 'Vous avez complété cet objectif!'
 export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété cet objectif avant vous';
 
 export const PERCENT = 100;
+
+export const SUCCESS_SNACK_BAR_CONFIG = { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] };
+export const ERROR_SNACK_BAR_CONFIG = { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] };
+
+export const IS_CLICKABLE_CLASS = 'isClickable';
+export const CODE_HTML_TAG = 'CODE';

@@ -5,8 +5,9 @@ import {
     DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH,
     VIRTUAL_PLAYER_PROFILES_MONGO_COLLECTION_NAME,
 } from '@app/constants/services-constants/mongo-db.const';
-import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED } from '@app/constants/services-errors';
+import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
+import { Random } from '@app/utils/random';
 import { promises } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
@@ -31,6 +32,14 @@ export default class VirtualPlayerProfilesService {
 
     async getVirtualPlayerProfilesFromLevel(level: VirtualPlayerLevel): Promise<VirtualPlayerProfile[]> {
         return this.collection.find({ level }).toArray();
+    }
+
+    async getRandomVirtualPlayerName(level: VirtualPlayerLevel): Promise<string> {
+        const virtualPlayerProfile: VirtualPlayerProfile | undefined = Random.getRandomElementsFromArray(
+            await this.getVirtualPlayerProfilesFromLevel(level),
+        ).pop();
+        if (virtualPlayerProfile) return virtualPlayerProfile.name;
+        throw new HttpException(NO_PROFILE_OF_LEVEL, StatusCodes.BAD_REQUEST);
     }
 
     async addVirtualPlayerProfile(newProfile: VirtualPlayerProfile): Promise<void> {

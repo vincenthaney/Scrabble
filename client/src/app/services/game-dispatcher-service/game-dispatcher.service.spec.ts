@@ -2,6 +2,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -17,6 +18,11 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import { Observable, Subject, Subscription } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
 
+@Component({
+    template: '',
+})
+export class TestComponent {}
+
 const BASE_GAME_ID = 'baseGameId';
 const TEST_PLAYER_ID = 'playerId';
 const TEST_PLAYER_NAME = 'playerName';
@@ -25,6 +31,7 @@ const TEST_LOBBY_DATA: LobbyData = {
     lobbyId: BASE_GAME_ID,
     hostName: '',
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 0,
     dictionary: TEST_DICTIONARY,
 };
@@ -74,13 +81,21 @@ describe('GameDispatcherService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientModule, RouterTestingModule],
+            imports: [
+                HttpClientModule,
+                RouterTestingModule.withRoutes([
+                    { path: 'waiting-room', component: TestComponent },
+                    { path: 'join-waiting-room', component: TestComponent },
+                ]),
+            ],
             providers: [GameDispatcherController, SocketService, { provide: GameViewEventManagerService, useValue: gameViewEventSpy }],
         });
+
+        gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
+
         service = TestBed.inject(GameDispatcherService);
 
         getCurrentLobbyIdSpy = spyOn(service, 'getCurrentLobbyId').and.returnValue(BASE_GAME_ID);
-        gameDispatcherControllerMock = TestBed.inject(GameDispatcherController);
         socketServiceMock = TestBed.inject(SocketService);
     });
 
@@ -124,11 +139,6 @@ describe('GameDispatcherService', () => {
             const spy = spyOn<any>(service, 'handleLobbiesUpdate');
             service['gameDispatcherController']['lobbiesUpdateEvent'].next(lobbies);
             expect(spy).toHaveBeenCalledWith(lobbies);
-        });
-
-        it('should change lobbyData', () => {
-            service['gameDispatcherController']['createGameEvent'].next(TEST_LOBBY_DATA);
-            expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
         });
 
         it('should initialize game on initializeGame event received', () => {
@@ -224,8 +234,8 @@ describe('GameDispatcherService', () => {
         expect(spyHandleLobbyJoinRequest).toHaveBeenCalled();
     });
 
-    it('handleCreateGame should call gameDispatcherController.handleGameCreation with the correct parameters for solo game', () => {
-        const spyHandleGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
+    it('handleCreateGame should call handleGameCreation with the correct parameters for solo game', () => {
+        const spyHandleGameCreation = spyOn(service, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -239,16 +249,15 @@ describe('GameDispatcherService', () => {
             virtualPlayerName: TEST_GAME_PARAMETERS.virtualPlayerName,
             virtualPlayerLevel: TEST_GAME_PARAMETERS.level,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            // TODO: VINCENT DOIT LE CHANGER
-            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4', isDefault: true },
+            dictionary: TEST_DICTIONARY,
         };
 
         service.handleCreateGame(TEST_PLAYER_NAME, TEST_FORM);
         expect(spyHandleGameCreation).toHaveBeenCalledWith(EXPECTED_GAME_CONFIG);
     });
 
-    it('handleCreateGame should call gameDispatcherController.handleGameCreation with the correct parameters for multiplayer game', () => {
-        const spyHandleGameCreation = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.callFake(() => {
+    it('handleCreateGame should call handleGameCreation with the correct parameters for multiplayer game', () => {
+        const spyHandleGameCreation = spyOn(service, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -260,8 +269,7 @@ describe('GameDispatcherService', () => {
             gameType: TEST_GAME_PARAMETERS.gameType,
             gameMode: GameMode.Multiplayer,
             maxRoundTime: TEST_GAME_PARAMETERS.timer as unknown as number,
-            // TODO: VINCENT DOIT LE CHANGER
-            dictionary: { title: 'default', description: 'desc', id: '62427177eb813565542cd0f4', isDefault: true },
+            dictionary: TEST_DICTIONARY,
         };
 
         TEST_FORM.controls.gameMode.patchValue(GameMode.Multiplayer);
@@ -311,7 +319,9 @@ describe('GameDispatcherService', () => {
         let createSpy: jasmine.Spy;
 
         beforeEach(() => {
-            createSpy = spyOn(service['gameDispatcherController'], 'handleGameCreation');
+            createSpy = spyOn(service, 'handleGameCreation').and.callFake(() => {
+                return;
+            });
             spyOn(socketServiceMock, 'getId').and.returnValue('socketid');
         });
 
@@ -350,18 +360,72 @@ describe('GameDispatcherService', () => {
         });
     });
 
-    describe('handleConfirmation', () => {
-        let confirmationSpy: jasmine.Spy;
+    describe('handleGameCreation', () => {
+        let handleCreationSpy: jasmine.Spy;
+        let postObservable: Subject<{ lobbyData: LobbyData }>;
+        let routerSpy: jasmine.Spy;
+        let gameConfigData: GameConfigData;
+        let gameCreationFailedSpy: jasmine.Spy;
 
         beforeEach(() => {
-            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation');
+            postObservable = new Subject();
+            handleCreationSpy = spyOn(gameDispatcherControllerMock, 'handleGameCreation').and.returnValue(postObservable.asObservable());
+            gameCreationFailedSpy = spyOn(service['gameCreationFailed$'], 'next').and.callFake(() => {
+                return;
+            });
+            routerSpy = spyOn(service['router'], 'navigateByUrl');
+            gameConfigData = TEST_GAME_PARAMETERS as unknown as GameConfigData;
+            service.handleGameCreation(gameConfigData);
+        });
+
+        it('should call gameDispatcherController.handleGameCreation', () => {
+            expect(handleCreationSpy).toHaveBeenCalledWith(gameConfigData);
+        });
+
+        it('should set currentLobby to response lobbyData', () => {
+            postObservable.next({ lobbyData: TEST_LOBBY_DATA });
+            expect(service.currentLobby).toEqual(TEST_LOBBY_DATA);
+        });
+
+        it('if is Multiplayer, should route to waiting-room', () => {
+            TEST_LOBBY_DATA.gameMode = GameMode.Multiplayer;
+            postObservable.next({ lobbyData: TEST_LOBBY_DATA });
+            expect(routerSpy).toHaveBeenCalledWith('waiting-room');
+        });
+
+        it('if is Solo, should NOT route to waiting-room', () => {
+            TEST_LOBBY_DATA.gameMode = GameMode.Solo;
+            postObservable.next({ lobbyData: TEST_LOBBY_DATA });
+            expect(routerSpy).not.toHaveBeenCalledWith('waiting-room');
+            TEST_LOBBY_DATA.gameMode = GameMode.Multiplayer;
+        });
+
+        it('on error, should send gameCreationFailed$ event', () => {
+            postObservable.error({});
+            expect(gameCreationFailedSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('handleConfirmation', () => {
+        let confirmationObservable: Subject<void>;
+        let confirmationSpy: jasmine.Spy;
+        let gameCreationFailedSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            confirmationObservable = new Subject<void>();
+            confirmationSpy = spyOn(service['gameDispatcherController'], 'handleConfirmationGameCreation').and.returnValue(
+                confirmationObservable.asObservable(),
+            );
+            gameCreationFailedSpy = spyOn(service['gameCreationFailed$'], 'next').and.callFake(() => {
+                return;
+            });
         });
 
         afterEach(() => {
             confirmationSpy.calls.reset();
         });
 
-        it('should call handleCancelGame if gameId is defined', () => {
+        it('should call handleConfirmation if gameId is defined', () => {
             getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).toHaveBeenCalledWith(TEST_PLAYER_NAME, BASE_GAME_ID);
@@ -371,6 +435,13 @@ describe('GameDispatcherService', () => {
             getCurrentLobbyIdSpy.and.returnValue('');
             service.handleConfirmation(TEST_PLAYER_NAME);
             expect(confirmationSpy).not.toHaveBeenCalled();
+        });
+
+        it('on error, should emit gameCreationFailed', () => {
+            getCurrentLobbyIdSpy.and.returnValue(BASE_GAME_ID);
+            service.handleConfirmation(TEST_PLAYER_NAME);
+            confirmationObservable.error({});
+            expect(gameCreationFailedSpy).toHaveBeenCalled();
         });
     });
 
@@ -503,6 +574,52 @@ describe('GameDispatcherService', () => {
             TEST_FORM.patchValue({ gameMode: GameMode.Multiplayer });
             expect(service['isGameModeSolo'](TEST_FORM)).toBeFalse();
             TEST_FORM.patchValue({ gameMode: GameMode.Solo });
+        });
+    });
+
+    it('observeGameCreationFailed should return observable of gameCreationFailed$', () => {
+        expect(service.observeGameCreationFailed()).toEqual(service['gameCreationFailed$'].asObservable());
+    });
+
+    describe('subcription methods', () => {
+        let serviceDestroyed$: Subject<boolean>;
+        let callback: () => void;
+
+        beforeEach(() => {
+            serviceDestroyed$ = new Subject();
+            callback = () => {
+                return;
+            };
+        });
+
+        it('subscribeToJoinRequestEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['joinRequestEvent'], 'subscribe');
+            service.subscribeToJoinRequestEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToCanceledGameEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['canceledGameEvent'], 'subscribe');
+            service.subscribeToCanceledGameEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbyFullEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['lobbyFullEvent'], 'subscribe');
+            service.subscribeToLobbyFullEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToLobbiesUpdateEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['lobbiesUpdateEvent'], 'subscribe');
+            service.subscribeToLobbiesUpdateEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
+        });
+
+        it('subscribeToJoinerRejectedEvent should call subscribe method on joinRequestEvent', () => {
+            const subscriptionSpy = spyOn(service['joinerRejectedEvent'], 'subscribe');
+            service.subscribeToJoinerRejectedEvent(serviceDestroyed$, callback);
+            expect(subscriptionSpy).toHaveBeenCalled();
         });
     });
 });

@@ -6,7 +6,6 @@ import { HighScore, HighScoresData } from '@app/classes/database/high-score';
 import { GameType } from '@app/classes/game/game-type';
 import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
 import DatabaseService from '@app/services/database-service/database.service';
-import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -15,8 +14,8 @@ import * as mock from 'mock-fs'; // required when running test. Otherwise compil
 import { join } from 'path';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
-// eslint-disable-next-line import/no-named-as-default
-import Container from 'typedi';
+import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import HighScoresService from './high-scores.service';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
@@ -65,45 +64,21 @@ const mockInitialHighScores: HighScoresData = {
 const mockPaths: any = [];
 mockPaths[join(__dirname, DEFAULT_HIGH_SCORES_RELATIVE_PATH)] = JSON.stringify(mockInitialHighScores);
 
-export class TestTimer {
-    private name: string;
-    private start: number;
-    private last: number;
-    private count: number;
-
-    constructor(name: string) {
-        this.name = name;
-        this.start = Date.now();
-        this.last = this.start;
-        this.count = 0;
-    }
-
-    check(step: string = '') {
-        const now = Date.now();
-        // eslint-disable-next-line no-console
-        console.log(`+> ${this.name}: ${step}`, this.count, `${now - this.start}ms`, `${now - this.last}ms`);
-
-        this.last = now;
-        this.count++;
-    }
-}
-
 describe('HighScoresService', () => {
     let highScoresService: HighScoresService;
     let databaseService: DatabaseService;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withMockDatabaseService();
     });
 
     beforeEach(async () => {
-        databaseService = Container.get(DatabaseServiceMock) as unknown as DatabaseService;
+        databaseService = Container.get(DatabaseService);
         await databaseService.connectToServer();
 
-        Container.set(DatabaseService, databaseService);
         highScoresService = Container.get(HighScoresService);
 
-        highScoresService['databaseService'] = databaseService;
         await highScoresService['collection'].insertMany(INITIAL_HIGH_SCORES);
     });
 
@@ -111,6 +86,7 @@ describe('HighScoresService', () => {
         await databaseService.closeConnection();
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('fetchDefaultHighScores', () => {

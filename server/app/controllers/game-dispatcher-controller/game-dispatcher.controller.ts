@@ -82,12 +82,12 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/players/:playerId/accept', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/accept', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
             try {
-                this.handleAcceptRequest(gameId, playerId, opponentName);
+                await this.handleAcceptRequest(gameId, playerId, opponentName);
 
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
@@ -177,6 +177,7 @@ export class GameDispatcherController {
         }
         // Check if there is no player left --> cleanup server and client
         if (!this.socketService.doesRoomExist(gameId)) {
+            this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
             this.activeGameService.removeGame(gameId, playerId);
             return;
         }
@@ -197,13 +198,11 @@ export class GameDispatcherController {
 
     private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', updatedData);
-        for (const message of endOfGameMessages) {
-            this.socketService.emitToRoom(gameId, 'newMessage', {
-                content: message,
-                senderId: SYSTEM_ID,
-                gameId,
-            });
-        }
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: endOfGameMessages.join('<br>'),
+            senderId: SYSTEM_ID,
+            gameId,
+        });
     }
 
     private async handleCreateGame(config: GameConfigData): Promise<LobbyData | void> {

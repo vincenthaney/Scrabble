@@ -61,7 +61,7 @@ export class PlayerContainer {
         playersData.forEach((playerData: PlayerData) => {
             [...this.players.values()]
                 .filter((player: AbstractPlayer) => player.id === playerData.id)
-                .map((player: AbstractPlayer) => player.updatePlayerData(playerData));
+                .forEach((player: AbstractPlayer) => player.updatePlayerData(playerData));
         });
         return this;
     }

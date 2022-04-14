@@ -1,5 +1,6 @@
 import Board from '@app/classes/board/board';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameHistory } from '@app/classes/database/game-history';
@@ -15,6 +16,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
@@ -58,8 +60,9 @@ export default class Game {
         game.player2 = config.player2;
         game.roundManager = new RoundManager(config.maxRoundTime, config.player1, config.player2);
         game.gameType = config.gameType;
-        game.dictionarySummary = config.dictionary;
         game.gameMode = config.gameMode;
+        game.dictionarySummary = config.dictionary;
+        game.initializeObjectives();
         game.tileReserve = new TileReserve();
         game.board = this.boardService.initializeBoard();
         game.isAddedToDatabase = false;
@@ -133,6 +136,24 @@ export default class Game {
         throw new Error(INVALID_PLAYER_ID_FOR_GAME);
     }
 
+    replacePlayer(playerId: string, newPlayer: Player): GameUpdateData {
+        if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+
+        const updatedData: GameUpdateData = {};
+        if (this.player1.id === playerId) {
+            updatedData.player1 = newPlayer.copyPlayerInfo(this.player1);
+            this.player1 = newPlayer;
+        } else {
+            updatedData.player2 = newPlayer.copyPlayerInfo(this.player2);
+            this.player2 = newPlayer;
+        }
+
+        this.roundManager.replacePlayer(playerId, newPlayer);
+        this.gameMode = GameMode.Solo;
+
+        return updatedData;
+    }
+
     areGameOverConditionsMet(): boolean {
         return !this.player1.hasTilesLeft() || !this.player2.hasTilesLeft() || this.roundManager.getPassCounter() >= GAME_OVER_PASS_THRESHOLD;
     }
@@ -155,11 +176,13 @@ export default class Game {
         return [player1Score, player2Score];
     }
 
-    endGameMessage(winnerName: string | undefined): string[] {
+    endGameMessage(winnerName: string | undefined): FeedbackMessage[] {
         const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
         const winnerMessage = winnerName ? WINNER_MESSAGE(winnerName) : this.congratulateWinner();
         messages.push(winnerMessage);
-        return messages;
+        return messages.map((message: string) => {
+            return { message };
+        });
     }
 
     isPlayer1(player: string | Player): boolean {
@@ -172,8 +195,8 @@ export default class Game {
         const round: Round = this.roundManager.getCurrentRound();
         const roundData: RoundData = this.roundManager.convertRoundToRoundData(round);
         const startGameData: StartGameData = {
-            player1: this.player1,
-            player2: this.player2,
+            player1: this.player1.convertToPlayerData(),
+            player2: this.player2.convertToPlayerData(),
             gameType: this.gameType,
             gameMode: this.gameMode,
             maxRoundTime: this.roundManager.getMaxRoundTime(),

@@ -3,14 +3,15 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { LobbyInfo } from '@app/classes/communication';
-import { GameType } from '@app/classes/game-type';
-import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { DEFAULT_LOBBY } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
 import { of, Subject } from 'rxjs';
 import { JoinWaitingPageComponent } from './join-waiting-page.component';
@@ -22,14 +23,6 @@ class TestComponent {}
 
 const EMPTY_LOBBY = {} as unknown as LobbyInfo;
 
-const DEFAULT_LOBBY: LobbyInfo = {
-    lobbyId: '1',
-    hostName: 'Name1',
-    gameType: GameType.Classic,
-    dictionary: TEST_DICTIONARY,
-    maxRoundTime: 60,
-    canJoin: false,
-};
 const DEFAULT_NAME = 'playerName';
 
 describe('JoinWaitingPageComponent', () => {
@@ -40,9 +33,10 @@ describe('JoinWaitingPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [JoinWaitingPageComponent],
+            declarations: [JoinWaitingPageComponent, IconComponent],
             imports: [
                 MatDialogModule,
+                MatCardModule,
                 MatProgressBarModule,
                 BrowserAnimationsModule,
                 HttpClientTestingModule,
@@ -91,13 +85,35 @@ describe('JoinWaitingPageComponent', () => {
             expect(component.currentName).toEqual(DEFAULT_NAME);
         });
 
-        it('ngOnInit should set the values to the gameDispatcherService lobby and name (currentLobby undefined)', () => {
-            component.currentLobby = EMPTY_LOBBY;
-            gameDispatcherServiceMock.currentLobby = undefined;
+        it('should set roundTime, currentName and fun fact', () => {
+            component['gameDispatcherService'].currentLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210 };
+            component['gameDispatcherService'].currentName = 'Mathilde';
+            component.funFact = '';
             component.currentName = '';
             component.ngOnInit();
-            expect(component.currentLobby).toEqual(EMPTY_LOBBY);
-            expect(component.currentName).toEqual(DEFAULT_NAME);
+            expect(component.roundTime).toEqual('3:30');
+            expect(component.funFact).not.toEqual('');
+            expect(component.currentName).toEqual('Mathilde');
+        });
+
+        it('should set currentLobby to gameDispatcher currentLobby if it exists', () => {
+            component.currentLobby = DEFAULT_LOBBY;
+            const serviceLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210 };
+            component['gameDispatcherService'].currentLobby = serviceLobby;
+
+            component.ngOnInit();
+
+            expect(component.currentLobby).toEqual(serviceLobby);
+            expect(component.currentLobby).not.toEqual(DEFAULT_LOBBY);
+        });
+
+        it('should set currentLobby to DEFAULT_LOBBY currentLobby if gameDispatcher does not have a currentLobby', () => {
+            component.currentLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210, hostName: 'Alexandre' };
+            component['gameDispatcherService'].currentLobby = undefined;
+
+            component.ngOnInit();
+
+            expect(component.currentLobby).toEqual(DEFAULT_LOBBY);
         });
 
         it('ngOnInit should call the get the gameDispatcherService lobby and playerName ', () => {

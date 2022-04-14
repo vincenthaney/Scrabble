@@ -66,6 +66,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         return player2 ? player2 : new Player('', 'Player2', []);
     }
 
+    isTimerRunning(): boolean {
+        return this.timerSubscription && !this.timerSubscription.closed;
+    }
+
     private setupGame(): void {
         if (this.roundManager.timer) {
             this.roundManager.timer.pipe(takeUntil(this.componentDestroyed$)).subscribe(([timer, activePlayer]) => {

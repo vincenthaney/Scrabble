@@ -8,14 +8,19 @@ import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Service } from 'typedi';
-import { FeedbackMessages } from './feedback-messages';
+import { FeedbackMessage, FeedbackMessages } from './feedback-messages';
 
 @Service()
 export class GamePlayService {
@@ -24,6 +29,8 @@ export class GamePlayService {
         private readonly highScoresService: HighScoresService,
         private readonly dictionaryService: DictionaryService,
         private readonly gameHistoriesService: GameHistoriesService,
+        private readonly virtualPlayerService: VirtualPlayerService,
+        private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
     ) {
         this.activeGameService.playerLeftEvent.on('playerLeft', async (gameId, playerWhoLeftId) => {
             await this.handlePlayerLeftEvent(gameId, playerWhoLeftId);
@@ -40,9 +47,9 @@ export class GamePlayService {
 
         let updatedData: void | GameUpdateData = action.execute();
 
-        const localPlayerFeedback = action.getMessage();
-        const opponentFeedback = action.getOpponentMessage();
-        let endGameFeedback: string[] | undefined;
+        const localPlayerFeedback: FeedbackMessage = action.getMessage();
+        const opponentFeedback: FeedbackMessage = action.getOpponentMessage();
+        let endGameFeedback: FeedbackMessage[] = [];
 
         if (updatedData) {
             updatedData = this.addMissingPlayerId(gameId, playerId, updatedData);
@@ -116,7 +123,7 @@ export class GamePlayService {
         return { gameObjective: objectiveData };
     }
 
-    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
+    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<FeedbackMessage[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (!game.isAddedToDatabase) {
             const connectedRealPlayers = game.getConnectedRealPlayers();
@@ -127,7 +134,7 @@ export class GamePlayService {
             game.isAddedToDatabase = true;
         }
 
-        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id);
+        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id, true);
 
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
         else updatedData.player1 = { id: game.player1.id, score: updatedScorePlayer1 };
@@ -141,22 +148,40 @@ export class GamePlayService {
     private async handlePlayerLeftEvent(gameId: string, playerWhoLeftId: string): Promise<void> {
         const game = this.activeGameService.getGame(gameId, playerWhoLeftId);
         const playerStillInGame = game.getPlayer(playerWhoLeftId, IS_OPPONENT);
-        game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
-        let updatedData: GameUpdateData = {};
-        const endOfGameMessages = await this.handleGameOver(playerStillInGame.name, game, updatedData);
-        updatedData = this.addMissingPlayerId(gameId, playerStillInGame.id, updatedData);
-        this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, endOfGameMessages, updatedData);
+
+        if (isIdVirtualPlayer(playerStillInGame.id)) {
+            game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
+            await this.handleGameOver(playerStillInGame.name, game, {});
+            return;
+        }
+
+        const updatedData: GameUpdateData = game.replacePlayer(
+            playerWhoLeftId,
+            new BeginnerVirtualPlayer(gameId, await this.virtualPlayerProfilesService.getRandomVirtualPlayerName(VirtualPlayerLevel.Beginner)),
+        );
+
+        if (this.isVirtualPlayerTurn(game)) {
+            this.virtualPlayerService.triggerVirtualPlayerTurn(
+                { round: game.roundManager.convertRoundToRoundData(game.roundManager.getCurrentRound()) },
+                game,
+            );
+        }
+        this.activeGameService.playerLeftEvent.emit('playerLeftFeedback', gameId, [], updatedData);
     }
 
     private addMissingPlayerId(gameId: string, playerId: string, gameUpdateData: GameUpdateData): GameUpdateData {
         const game: Game = this.activeGameService.getGame(gameId, playerId);
-        const newgameUpdateData: GameUpdateData = { ...gameUpdateData };
-        if (newgameUpdateData.player1) {
-            newgameUpdateData.player1.id = game.player1.id;
+        const newGameUpdateData: GameUpdateData = { ...gameUpdateData };
+        if (newGameUpdateData.player1) {
+            newGameUpdateData.player1.id = game.player1.id;
         }
-        if (newgameUpdateData.player2) {
-            newgameUpdateData.player2.id = game.player2.id;
+        if (newGameUpdateData.player2) {
+            newGameUpdateData.player2.id = game.player2.id;
         }
-        return newgameUpdateData;
+        return newGameUpdateData;
+    }
+
+    private isVirtualPlayerTurn(game: Game): boolean {
+        return isIdVirtualPlayer(game.roundManager.getCurrentRound().player.id);
     }
 }

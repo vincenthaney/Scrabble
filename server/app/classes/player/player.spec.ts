@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
+import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives } from '@app/classes/objectives/objective';
@@ -11,6 +12,7 @@ import {
     generateResetableTestObjective,
     generateTestObjective,
 } from '@app/constants/services-constants/objectives-test.const';
+import { Tile } from 'app/classes/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
@@ -132,5 +134,32 @@ describe('Player', () => {
         const validationParameters: ObjectiveValidationParameters = { game: new Game() } as unknown as ObjectiveValidationParameters;
         player.validateObjectives(validationParameters);
         expect(serviceSpy).to.have.been.called.with(player, validationParameters.game, validationParameters);
+    });
+
+    it('copyPlayerInfo should update the player data', () => {
+        const name = 'nikolaj';
+        const id = 'nikolajID';
+        const otherPlayer = new Player(id, name);
+        otherPlayer['objectives'] = [{} as unknown as AbstractObjective];
+        otherPlayer.score = 3;
+        otherPlayer.tiles = [{} as unknown as Tile];
+        expect(player.copyPlayerInfo(otherPlayer)).to.deep.equal({ id: otherPlayer.id, newId: player.id, name: player.name });
+        expect(player.score).to.equal(otherPlayer.score);
+        expect(player.tiles).to.equal(otherPlayer.tiles);
+        expect(player['objectives']).to.equal(otherPlayer['objectives']);
+    });
+
+    it('convertToPlayerData should return PlayerData with exact info from instance', () => {
+        player.score = 42069;
+        player['objectives'] = [{} as unknown as AbstractObjective];
+        player.isConnected = true;
+        const convertResult: PlayerData = player.convertToPlayerData();
+
+        expect(convertResult.id).to.equal(player.id);
+        expect(convertResult.name).to.equal(player.name);
+        expect(convertResult.score).to.equal(player.score);
+        expect(convertResult.tiles).to.equal(player.tiles);
+        expect(convertResult.objectives).to.equal(player['objectives']);
+        expect(convertResult.isConnected).to.equal(player.isConnected);
     });
 });

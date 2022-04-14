@@ -7,7 +7,7 @@ $b: #e4e4e4;
     grid-template-rows: auto 1fr auto;
     box-sizing: border-box;
 
-    &>section:not(:last-child) {
+    & > section:not(:last-child) {
         margin-bottom: $s;
     }
 
@@ -46,8 +46,8 @@ form {
     border-radius: 4px;
 
     .button-tooltip {
-        display:flex;
-        width:100%;
+        display: flex;
+        width: 100%;
     }
 
     input {
@@ -63,7 +63,7 @@ form {
         font-size: 75%;
         margin-right: 0;
         color: #f3f3f3;
-        display: flex; 
+        display: flex;
         margin-top: -1px;
     }
 
@@ -87,5 +87,15 @@ form {
 
     .isInvalid {
         color: black;
+    }
+}
+
+p.message.isClickable {
+    ::ng-deep code {
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }

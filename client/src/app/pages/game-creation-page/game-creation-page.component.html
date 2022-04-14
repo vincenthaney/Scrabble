@@ -4,7 +4,11 @@
     <br />
 
     <div class="container">
-        <mat-card>
+        <div *ngIf="isCreatingGame" id="game-creation-waiting-container">
+            <mat-label>En attente de la création de la partie</mat-label>
+            <mat-spinner></mat-spinner>
+        </div>
+        <mat-card *ngIf="!isCreatingGame">
             <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
                 <mat-label class="button-toggle-label">Choisissez un type de partie</mat-label>
                 <mat-button-toggle-group formControlName="gameType" ngDefaultControl>
@@ -63,7 +67,9 @@
                     <mat-form-field appearance="outline">
                         <mat-label floatLabel="always">Choissez votre adversaire virtuel</mat-label>
                         <mat-select formControlName="virtualPlayerName" (selectionChange)="isFormValid()">
-                            <mat-option *ngFor="let virtualPlayer of virtualPlayerNames" value="{{ virtualPlayer }}">{{ virtualPlayer }}</mat-option>
+                            <mat-option *ngFor="let virtualPlayer of getVirtualPlayerNames()" value="{{ virtualPlayer }}">{{
+                                virtualPlayer
+                            }}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </ng-container>
@@ -72,14 +78,38 @@
 
                 <mat-form-field appearance="outline" class="margin-top">
                     <mat-label floatLabel="always"><app-icon icon="book"></app-icon> Choisissez le dictionnaire à utiliser</mat-label>
-                    <mat-select formControlName="dictionary">
-                        <mat-option value="default-dictionary">Par défaut (Français)</mat-option>
+                    <mat-select formControlName="dictionary" (selectionChange)="onDictionaryChange()">
+                        <mat-select-trigger>
+                            <span class="dictionary-title">{{ gameParameters.get('dictionary')?.value?.title }}</span>
+                            <span> - </span>
+                            <span class="dictionary-description">{{ gameParameters.get('dictionary')?.value?.description }}</span>
+                        </mat-select-trigger>
+                        <mat-option *ngFor="let dictionary of dictionaryOptions" [value]="dictionary">
+                            <span class="dictionary-title">{{ dictionary.title }}</span>
+                            <span> - </span>
+                            <span class="dictionary-description">{{ dictionary.description }}</span>
+                        </mat-option>
                     </mat-select>
                 </mat-form-field>
+                <div
+                    class="alert-group"
+                    *ngIf="
+                        (gameParameters.get('dictionary')?.invalid &&
+                        (gameParameters.get('dictionary')?.dirty || gameParameters.get('dictionary')?.touched)) && gameParameters.get('dictionary')?.errors?.['required']
+                    "
+                >
+                    <mat-error class="alert" *ngIf="!wasDictionaryDeleted">
+                        {{ dictionaryRequiredError }}
+                    </mat-error>
+                    <mat-error class="alert" *ngIf="wasDictionaryDeleted">
+                        {{ dictionaryDeletedError }}
+                    </mat-error>
+                </div>
 
                 <app-timer-selection [parentForm]="gameParameters"></app-timer-selection>
 
                 <app-name-field
+                    [initialPlayerName]="playerName"
                     [virtualPlayerName]="gameParameters.get('virtualPlayerName')?.value"
                     [mustVerifyVirtualPlayerName]="gameParameters.get('gameMode')?.value === gameModes.Solo"
                     (keydown.enter)="$event.preventDefault()"
@@ -92,6 +122,7 @@
                         matTooltip="Veuillez remplir tous les champs avec des données valides"
                         [matTooltipDisabled]="isFormValid()"
                         matTooltipPosition="above"
+                        (click)="onFormInvalidClick()"
                     >
                         <button mat-flat-button color="primary" type="submit" id="create-game-button" [disabled]="!isFormValid()" cdkFocusInitial>
                             Créer la partie
