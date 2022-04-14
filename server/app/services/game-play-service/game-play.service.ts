@@ -130,7 +130,7 @@ export class GamePlayService {
             for (const player of connectedRealPlayers) {
                 await this.highScoresService.addHighScore(player.name, player.score, game.gameType);
             }
-            this.gameHistoriesService.addGameHistory(game.gameHistory);
+            await this.gameHistoriesService.addGameHistory(game.gameHistory);
             game.isAddedToDatabase = true;
         }
 

@@ -456,10 +456,17 @@ describe('GamePlayService', () => {
 
     describe('handleGameOver', () => {
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
+        let gameHistoriesServiceStub: SinonStubbedInstance<GameHistoriesService>;
+
         beforeEach(() => {
             highScoresServiceStub = createStubInstance(HighScoresService);
             highScoresServiceStub.addHighScore.resolves(true);
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
+
+            gameHistoriesServiceStub = createStubInstance(GameHistoriesService);
+            gameHistoriesServiceStub.addGameHistory.resolves();
+            Object.defineProperty(gamePlayService, 'gameHistoriesService', { value: gameHistoriesServiceStub });
+
             chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
                 return;
             });
@@ -470,6 +477,12 @@ describe('GamePlayService', () => {
             await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
             expect(gameStub.endOfGame.calledOnce).to.be.true;
             expect(gameStub.endGameMessage.calledOnce).to.be.true;
+        });
+
+        it('should add to game histories if not already added', async () => {
+            gameStub.isAddedToDatabase = false;
+            await gamePlayService['handleGameOver']('', gameStub as unknown as Game, {});
+            expect(gameHistoriesServiceStub.addGameHistory.calledOnce).to.be.true;
         });
 
         it('should change isAddedtoDatabase', async () => {
