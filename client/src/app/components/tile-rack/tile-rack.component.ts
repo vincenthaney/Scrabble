@@ -173,7 +173,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     private updateTileRack(playerId?: string): void {
         const player = this.gameService.getLocalPlayer();
-        if (!player || playerId !== this.gameService.getLocalPlayerId()) return;
+        if (!player) return;
+        if (playerId !== this.gameService.getLocalPlayerId()) return;
 
         const previousTiles: RackTile[] = [...this.tiles];
         const newTiles: Tile[] = [...player.getTiles()];
