@@ -21,6 +21,13 @@ export const DICTIONARIES_COLUMNS = {
     description: 'Description',
     actions: '',
 };
+
+export const VIRTUAL_PLAYERS_COLUMNS = {
+    name: 'Nom',
+    level: 'Niveau',
+    actions: '',
+};
+
 export const DEFAULT_DICTIONARIES_COLUMNS: DisplayDictionaryKeys[] = ['title', 'description', 'actions'];
 
 export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
