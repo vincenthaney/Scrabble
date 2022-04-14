@@ -1,4 +1,5 @@
 import { VirtualPlayerProfilesRequest } from '@app/classes/communication/request';
+import { VirtualPlayerData } from '@app/classes/communication/virtual-player';
 import { VirtualPlayerProfile } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -43,10 +44,10 @@ export class VirtualPlayerProfilesController {
 
         this.router.post('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
-                const virtualPlayerProfile: VirtualPlayerProfile = req.body.virtualPlayerProfile;
-                if (!virtualPlayerProfile) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
+                const virtualPlayerData: VirtualPlayerData = req.body.virtualPlayerData;
+                if (!virtualPlayerData) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
 
-                await this.virtualPlayerProfileService.addVirtualPlayerProfile(virtualPlayerProfile);
+                await this.virtualPlayerProfileService.addVirtualPlayerProfile(virtualPlayerData);
                 res.status(StatusCodes.CREATED).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);
@@ -56,9 +57,8 @@ export class VirtualPlayerProfilesController {
         this.router.patch('/virtualPlayerProfiles/:profileId', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
                 const profileId: string = req.params.profileId;
-                const newName: string = req.body.newName;
+                const newName: string = req.body.profileData.name;
                 if (!newName) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
-
                 await this.virtualPlayerProfileService.updateVirtualPlayerProfile(newName, profileId);
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
