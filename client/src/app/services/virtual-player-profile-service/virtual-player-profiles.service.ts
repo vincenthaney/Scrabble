@@ -1,33 +1,64 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/admin/virtual-player-profile';
-import { ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
+import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
-import { retry } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class VirtualPlayerProfilesService {
-    constructor(private readonly virtualPlayerProfilesController: VirtualPlayerProfilesController, private readonly snackBar: MatSnackBar) {}
-
-    async getVirtualPlayerProfiles(): Promise<VirtualPlayerProfile[]> {
-        return new Promise((resolve, reject) => {
-            this.virtualPlayerProfilesController
-                .getAllVirtualPlayerProfiles()
-                .pipe(retry(1))
-                .subscribe(
-                    (result: VirtualPlayerProfilesData) => resolve(result.virtualPlayerProfiles),
-                    (err: HttpErrorResponse) => {
-                        this.handleError(err);
-                        reject(err);
-                    },
-                );
+    virtualPlayerProfiles: VirtualPlayerProfile[];
+    private serviceDestroyed$: Subject<boolean>;
+    private virtualPlayersUpdateEvent: Subject<VirtualPlayerProfile[]>;
+    private componentUpdateEvent: Subject<string>;
+    private requestSentEvent: Subject<undefined>;
+    constructor(private readonly virtualPlayerProfilesController: VirtualPlayerProfilesController) {
+        this.serviceDestroyed$ = new Subject();
+        this.virtualPlayersUpdateEvent = new Subject();
+        this.componentUpdateEvent = new Subject();
+        this.requestSentEvent = new Subject();
+        this.virtualPlayerProfilesController.subscribeToGetAllVirtualPlayersEvent(this.serviceDestroyed$, (profiles) => {
+            this.virtualPlayerProfiles = profiles;
+            this.virtualPlayersUpdateEvent.next(profiles);
+        });
+        this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponse(this.serviceDestroyed$, (message) => {
+            this.requestSentEvent.next();
+            this.getAllVirtualPlayersProfile();
+            this.componentUpdateEvent.next(message);
+        });
+        this.virtualPlayerProfilesController.subscribeToVirtualPlayerErrorEvent(this.serviceDestroyed$, (message) => {
+            this.componentUpdateEvent.next(message);
         });
     }
 
-    private handleError(err: HttpErrorResponse): void {
-        this.snackBar.open(err.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
+    async createVirtualPlayer(virtualPlayerData: VirtualPlayerData): Promise<void> {
+        await this.virtualPlayerProfilesController.handleCreateVirtualPlayerProfileEvent(virtualPlayerData);
+    }
+
+    async updateVirtualPlayer(virtualPlayerData: VirtualPlayerData): Promise<void> {
+        await this.virtualPlayerProfilesController.handleUpdateVirtualPlayerProfileEvent(virtualPlayerData);
+    }
+
+    async getAllVirtualPlayersProfile(): Promise<void> {
+        await this.virtualPlayerProfilesController.handleGetAllVirtualPlayerProfilesEvent();
+    }
+
+    async resetVirtualPlayerProfiles(): Promise<void> {
+        await this.virtualPlayerProfilesController.handleResetVirtualPlayerProfilesEvent();
+    }
+
+    async deleteVirtualPlayer(id: string): Promise<void> {
+        await this.virtualPlayerProfilesController.handleDeleteVirtualPlayerProfileEvent(id);
+    }
+
+    subscribeToVirtualPlayerProfilesUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (profiles: VirtualPlayerProfile[]) => void): void {
+        this.virtualPlayersUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+    subscribeToComponentUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (message: string) => void): void {
+        this.componentUpdateEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+    }
+    subscribeToRequestSentEvent(serviceDestroyed$: Subject<boolean>, callback: () => void): void {
+        this.requestSentEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 }
