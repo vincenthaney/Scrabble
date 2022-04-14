@@ -6,6 +6,7 @@ import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 
 export default class ActionExchange extends ActionPlay {
     private tilesToExchange: Tile[];
@@ -43,12 +44,12 @@ export default class ActionExchange extends ActionPlay {
         return response;
     }
 
-    getMessage(): string {
-        return `Vous avez échangé ${this.tilesToExchange.length === 1 ? 'la tuile' : 'les tuiles'} ${this.lettersToSwap()}`;
+    getMessage(): FeedbackMessage {
+        return { message: `Vous avez échangé ${this.tilesToExchange.length === 1 ? 'la tuile' : 'les tuiles'} ${this.lettersToSwap()}` };
     }
 
-    getOpponentMessage(): string {
-        return `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${this.tilesToExchange.length > 1 ? 's' : ''}`;
+    getOpponentMessage(): FeedbackMessage {
+        return { message: `${this.player.name} a échangé ${this.tilesToExchange.length} tuile${this.tilesToExchange.length > 1 ? 's' : ''}` };
     }
 
     private lettersToSwap(): string {

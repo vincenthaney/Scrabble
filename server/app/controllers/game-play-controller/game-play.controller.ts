@@ -7,7 +7,7 @@ import { CONTENT_REQUIRED, SENDER_REQUIRED } from '@app/constants/controllers-er
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { FeedbackMessage, FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
@@ -110,24 +110,26 @@ export class GamePlayController {
     }
 
     private handleFeedback(gameId: string, playerId: string, feedback: FeedbackMessages): void {
-        if (feedback.localPlayerFeedback) {
+        if (feedback.localPlayerFeedback.message) {
             this.socketService.emitToSocket(playerId, 'newMessage', {
-                content: feedback.localPlayerFeedback,
+                content: feedback.localPlayerFeedback.message,
                 senderId: SYSTEM_ID,
                 gameId,
+                isClickable: feedback.localPlayerFeedback.isClickable,
             });
         }
-        if (feedback.opponentFeedback) {
+        if (feedback.opponentFeedback.message) {
             const opponentId = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_OPPONENT).id;
             this.socketService.emitToSocket(opponentId, 'newMessage', {
-                content: feedback.opponentFeedback,
+                content: feedback.opponentFeedback.message,
                 senderId: SYSTEM_ID,
                 gameId,
+                isClickable: feedback.opponentFeedback.isClickable,
             });
         }
-        if (feedback.endGameFeedback) {
+        if (feedback.endGameFeedback.length > 0) {
             this.socketService.emitToRoom(gameId, 'newMessage', {
-                content: feedback.endGameFeedback.join('<br>'),
+                content: feedback.endGameFeedback.map((feedbackMesssage: FeedbackMessage) => feedbackMesssage.message ?? '').join('<br>'),
                 senderId: SYSTEM_ID,
                 gameId,
             });

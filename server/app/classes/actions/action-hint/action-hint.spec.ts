@@ -7,6 +7,7 @@ import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
 import { AbstractWordFinding } from '@app/classes/word-finding';
 import { NO_WORDS_FOUND } from '@app/constants/classes-constants';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { PlacementToString } from '@app/utils/placement-to-string';
@@ -60,7 +61,7 @@ describe('ActionHint', () => {
     describe('getMessage', () => {
         it('should return message', () => {
             action['hintResult'] = [];
-            expect(action.getMessage()).to.not.be.undefined;
+            expect(action.getMessage().message).to.not.be.undefined;
         });
 
         it('should return message with content', () => {
@@ -96,20 +97,20 @@ describe('ActionHint', () => {
                 });
             }
 
-            const message = action.getMessage();
+            const message: FeedbackMessage = action.getMessage();
 
-            expect(message).to.include('mot(s) ont été trouvé');
+            expect(message.message).to.include('mot(s) ont été trouvé');
         });
 
         it('should return no words found if empty', () => {
-            const message = action.getMessage();
-            expect(message).to.equal(NO_WORDS_FOUND);
+            const message: FeedbackMessage = action.getMessage();
+            expect(message.message).to.equal(NO_WORDS_FOUND);
         });
     });
 
     describe('getOpponentMessage', () => {
         it('should return undefined', () => {
-            expect(action.getOpponentMessage()).to.be.undefined;
+            expect(action.getOpponentMessage()).to.deep.equal({});
         });
     });
 });

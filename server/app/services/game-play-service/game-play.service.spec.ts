@@ -23,15 +23,16 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import * as chai from 'chai';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as arrowFunction from '@app/utils/is-id-virtual-player';
+import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { FeedbackMessage } from './feedback-messages';
 
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';
@@ -49,7 +50,7 @@ const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['D', 0],
     ['E', 2],
 ];
-const DEFAULT_ACTION_MESSAGE = 'default action message';
+const DEFAULT_ACTION_MESSAGE: FeedbackMessage = { message: 'default action message' };
 const DEFAULT_TILES: Tile[] = [
     {
         letter: 'A',

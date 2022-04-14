@@ -16,6 +16,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Container } from 'typedi';
@@ -175,11 +176,13 @@ export default class Game {
         return [player1Score, player2Score];
     }
 
-    endGameMessage(winnerName: string | undefined): string[] {
+    endGameMessage(winnerName: string | undefined): FeedbackMessage[] {
         const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
         const winnerMessage = winnerName ? WINNER_MESSAGE(winnerName) : this.congratulateWinner();
         messages.push(winnerMessage);
-        return messages;
+        return messages.map((message: string) => {
+            return { message };
+        });
     }
 
     isPlayer1(player: string | Player): boolean {
