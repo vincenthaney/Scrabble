@@ -15,5 +15,5 @@ export const INVALID_TITLE_FORMAT = 'Le titre donné ne respecte pas le format a
 
 export const NO_DICTIONARY_WITH_NAME = (filename: string) => `Le dictionnaire "${filename}" n'existe pas.`;
 export const NO_DICTIONARY_WITH_ID = (id: string) => `Le dictionnaire avec le id "${id}" n'existe pas.`;
-export const DEFAULT_DICTIONARY_NOT_FOUND = 'Le fichier dictionnaire par default est introuvable.';
+export const DEFAULT_DICTIONARY_NOT_FOUND = 'Le fichier dictionnaire par défaut est introuvable.';
 export const CANNOT_UPDATE_DEFAULT_DICTIONARY = 'Impossible de modifier le dictionnaire par défaut';
