@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionPass } from '@app/classes/actions';
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
+import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import { GameConfig, StartGameData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -39,7 +40,8 @@ const DEFAULT_STARTING_GAME_DATA: StartGameData = {
     gameId: DEFAULT_GAME_ID,
     board: undefined as unknown as Square[][],
     tileReserve: [],
-    player2: DEFAULT_PLAYER_2,
+    player1: DEFAULT_GAME_CONFIG.player1.convertToPlayerData(),
+    player2: DEFAULT_PLAYER_2.convertToPlayerData(),
     round: { playerData: { id: DEFAULT_PLAYER1_ID }, startTime: new Date(), limitTime: new Date() },
 };
 
@@ -53,9 +55,9 @@ const DEFAULT_GAME = {
     },
 };
 
-const DEFAULT_GAME_UPDATE_DATA = {
-    player1: DEFAULT_PLAYER_1,
-    player2: DEFAULT_PLAYER_2,
+const DEFAULT_GAME_UPDATE_DATA: GameUpdateData = {
+    player1: DEFAULT_PLAYER_1.convertToPlayerData(),
+    player2: DEFAULT_PLAYER_2.convertToPlayerData(),
     isGameOver: false,
 };
 
@@ -120,7 +122,7 @@ describe('VirtualPlayerService', () => {
     describe('sliceVirtualPlayerToPlayer', () => {
         it('should return sliced player', async () => {
             const virtualPlayer = new BeginnerVirtualPlayer(DEFAULT_GAME_ID, DEFAULT_PLAYER1_NAME);
-            expect(virtualPlayerService.sliceVirtualPlayerToPlayer(virtualPlayer)).to.be.an.instanceof(Player);
+            expect(virtualPlayerService.sliceVirtualPlayerToPlayer(virtualPlayer.convertToPlayerData())).to.exist;
         });
     });
 });

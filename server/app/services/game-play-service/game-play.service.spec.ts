@@ -19,11 +19,11 @@ import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
 import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as arrowFunction from '@app/utils/is-id-virtual-player';
@@ -68,16 +68,14 @@ describe('GamePlayService', () => {
     let round: Round;
     let player: Player;
     let game: Game;
-    const initGamePlayService = Container.get(GamePlayService);
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
     });
 
     beforeEach(() => {
-        Container.set(DictionaryService, getDictionaryTestService());
-
-        gamePlayService = initGamePlayService;
+        gamePlayService = Container.get(GamePlayService);
         gameStub = createStubInstance(Game);
         roundManagerStub = createStubInstance(RoundManager);
         tileReserveStub = createStubInstance(TileReserve);
@@ -110,6 +108,7 @@ describe('GamePlayService', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('playAction', () => {

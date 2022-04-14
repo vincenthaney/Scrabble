@@ -30,9 +30,8 @@ import { SYSTEM_ID } from '@app/constants/game';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import { spy } from 'chai';
@@ -83,7 +82,7 @@ const DEFAULT_SOLO_GAME_CONFIG_DATA: GameConfigData = {
 const DEFAULT_GAME_CONFIG: GameConfig = {
     player1: new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME),
     gameType: GameType.Classic,
-    gameMode: GameMode.Solo,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: DEFAULT_MAX_ROUND_TIME,
     dictionary: TEST_DICTIONARY,
 };
@@ -105,25 +104,31 @@ const DEFAULT_STARTING_GAME_DATA: StartGameData = {
         startTime: new Date(),
         limitTime: new Date(),
     },
-    player2: DEFAULT_JOINED_PLAYER,
+    player1: DEFAULT_GAME_CONFIG.player1.convertToPlayerData(),
+    player2: DEFAULT_JOINED_PLAYER.convertToPlayerData(),
 };
 
 describe('GameDispatcherController', () => {
     let controller: GameDispatcherController;
-    let socketServiceStub: SinonStubbedInstance<SocketService>;
     let createGameServiceStub: SinonStubbedInstance<CreateGameService>;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
+        testingUnit = new ServicesTestingUnit()
+            .withStubbedDictionaryService()
+            .withMockDatabaseService()
+            .withStubbedControllers(GameDispatcherController)
+            .withStubbed(SocketService);
+        createGameServiceStub = testingUnit.setStubbed(CreateGameService);
+    });
+
+    beforeEach(() => {
         controller = Container.get(GameDispatcherController);
-        socketServiceStub = createStubInstance(SocketService);
-        createGameServiceStub = createStubInstance(CreateGameService);
-        controller['socketService'] = socketServiceStub as unknown as SocketService;
     });
 
     afterEach(() => {
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
@@ -388,14 +393,7 @@ describe('GameDispatcherController', () => {
 
     describe('handleCreateGame', () => {
         beforeEach(() => {
-            controller['createGameService'] = createGameServiceStub as unknown as CreateGameService;
-            spy.on(controller['createGameService'], 'createSoloGame', () => {
-                return DEFAULT_STARTING_GAME_DATA;
-            });
-        });
-
-        afterEach(() => {
-            chai.spy.restore();
+            createGameServiceStub.createSoloGame.resolves(DEFAULT_STARTING_GAME_DATA);
         });
 
         it('should call createSoloGame', async () => {

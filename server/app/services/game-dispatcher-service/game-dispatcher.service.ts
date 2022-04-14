@@ -4,6 +4,7 @@ import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
+import { GOOD_LUCK_MESSAGE } from '@app/constants/game';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -12,15 +13,15 @@ import {
     OPPONENT_NAME_DOES_NOT_MATCH,
     PLAYER_ALREADY_TRYING_TO_JOIN,
 } from '@app/constants/services-errors';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { CreateGameService } from '@app/services/create-game-service/create-game.service';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { SocketService } from '@app/services/socket-service/socket.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
+import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import { SocketService } from '@app/services/socket-service/socket.service';
-import { CreateGameService } from '@app/services/create-game-service/create-game.service';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
-import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 @Service()
 export class GameDispatcherService {
@@ -59,6 +60,12 @@ export class GameDispatcherService {
                 this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
             );
         }
+
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: GOOD_LUCK_MESSAGE,
+            senderId: startGameData.player2.id,
+            gameId,
+        });
     }
 
     async createMultiplayerGame(config: GameConfigData): Promise<LobbyData> {

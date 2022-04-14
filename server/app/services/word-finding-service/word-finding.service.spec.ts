@@ -10,12 +10,12 @@ import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingR
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 import { PartialWordFindingParameters } from '@app/classes/word-finding/word-finding-types';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import WordFindingService from './word-finding.service';
 
 const TEST_ID = 'TEST_ID';
@@ -26,10 +26,14 @@ describe('WordFindingService', () => {
     let boardStub: SinonStubbedInstance<Board>;
     let tiles: Tile[];
     let request: WordFindingRequest;
+    let testingUnit: ServicesTestingUnit;
+
+    beforeEach(() => {
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
+    });
 
     beforeEach(() => {
         sinon.restore();
-        Container.set(DictionaryService, getDictionaryTestService());
         service = Container.get(WordFindingService);
         findWordsStub = stub(AbstractWordFinding.prototype, 'findWords').callsFake(() => []);
 
@@ -46,11 +50,11 @@ describe('WordFindingService', () => {
         sinon.restore();
         Container.reset();
         findWordsStub.restore();
+        testingUnit.restore();
     });
 
     describe('getWordFindingInstance', () => {
         let params: PartialWordFindingParameters;
-
         let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
         let dictionaryStub: SinonStubbedInstance<Dictionary>;
         beforeEach(() => {

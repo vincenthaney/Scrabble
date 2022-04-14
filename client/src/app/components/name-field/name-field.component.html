@@ -20,6 +20,7 @@
         class="alert-group"
         *ngIf="formParameters.get('inputName')?.invalid && (formParameters.get('inputName')?.dirty || formParameters.get('inputName')?.touched)"
     >
+        <mat-error class="alert" *ngIf="formParameters.get('inputName')?.errors?.['required']"> {{ errorNameRequired }} </mat-error>
         <mat-error class="alert" *ngIf="formParameters.get('inputName')?.errors?.['minlength']">
             {{ errorNameTooShort }}
         </mat-error>

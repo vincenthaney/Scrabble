@@ -7,9 +7,13 @@ import { Server } from 'app/server';
 import { expect } from 'chai';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
+import DatabaseService from '@app/services/database-service/database.service';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from './socket.service';
+import { Application } from '@app/app';
 
-const RESPONSE_DELAY = 600;
+const RESPONSE_DELAY = 400;
 const SERVER_URL = 'http://localhost:';
 
 const DEFAULT_ROOM = 'default_room';
@@ -35,9 +39,15 @@ describe('SocketService', () => {
         let service: SocketService;
         let server: Server;
         let clientSocket: Socket;
+        let testingUnit: ServicesTestingUnit;
 
         beforeEach(() => {
-            Container.reset();
+            testingUnit = new ServicesTestingUnit()
+                .withStubbed(DatabaseService, {
+                    connectToServer: Promise.resolve(null),
+                })
+                .withStubbed(DictionaryService)
+                .withStubbedPrototypes(Application, { bindRoutes: undefined });
         });
 
         beforeEach(() => {
@@ -51,6 +61,7 @@ describe('SocketService', () => {
         afterEach(() => {
             clientSocket.close();
             service['sio']?.close();
+            testingUnit.restore();
         });
 
         it('should create', () => {

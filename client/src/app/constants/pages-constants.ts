@@ -1,3 +1,4 @@
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 
 export const HOST_WAITING_MESSAGE = "En attente d'un adversaire";
@@ -36,6 +37,7 @@ export const DEFAULT_LOBBY = {
     lobbyId: '',
     hostName: 'host',
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 60,
     dictionary: {
         title: 'Français',

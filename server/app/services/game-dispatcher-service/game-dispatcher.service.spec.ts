@@ -11,6 +11,7 @@ import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -22,19 +23,17 @@ import {
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
-import * as sinon from 'sinon';
 import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
+import * as sinon from 'sinon';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { GameDispatcherService } from './game-dispatcher.service';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 
 const expect = chai.expect;
 
@@ -83,7 +82,8 @@ const DEFAULT_START_GAME_DATA: StartGameData = {
         startTime: new Date(),
         limitTime: new Date(),
     },
-    player2: DEFAULT_JOINED_PLAYER,
+    player1: DEFAULT_GAME_CONFIG.player1.convertToPlayerData(),
+    player2: DEFAULT_JOINED_PLAYER.convertToPlayerData(),
 };
 
 const DEFAULT_MULTIPLAYER_CONFIG_DATA: GameConfigData = {
@@ -114,14 +114,13 @@ describe('GameDispatcherService', () => {
     let createGameService: CreateGameService;
     let virtualPlayerService: VirtualPlayerService;
     let activeGameService: ActiveGameService;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
     });
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
         gameDispatcherService = Container.get(GameDispatcherService);
         socketService = Container.get(SocketService);
         createGameService = Container.get(CreateGameService);
@@ -132,6 +131,7 @@ describe('GameDispatcherService', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
@@ -153,7 +153,8 @@ describe('GameDispatcherService', () => {
         let createSoloGameSpy: unknown;
         let addToRoomSpy: unknown;
         let sliceVirtualPlayerToPlayerSpy: unknown;
-        let socketServiceSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let emitToRoomSpy: unknown;
         let virtualPlayerServiceSpy: unknown;
         let activeGameServiceSpy: unknown;
 
@@ -167,7 +168,10 @@ describe('GameDispatcherService', () => {
             sliceVirtualPlayerToPlayerSpy = chai.spy.on(virtualPlayerService, 'sliceVirtualPlayerToPlayer', () => {
                 return DEFAULT_PLAYER;
             });
-            socketServiceSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+            emitToSocketSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+                return;
+            });
+            emitToRoomSpy = chai.spy.on(socketService, 'emitToRoom', () => {
                 return;
             });
             virtualPlayerServiceSpy = chai.spy.on(virtualPlayerService, 'triggerVirtualPlayerTurn', () => {
@@ -183,7 +187,8 @@ describe('GameDispatcherService', () => {
             expect(createSoloGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();
             expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
-            expect(socketServiceSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.have.been.called();
+            expect(emitToRoomSpy).to.have.been.called();
             expect(virtualPlayerServiceSpy).to.have.been.called();
             expect(activeGameServiceSpy).to.have.been.called();
         });

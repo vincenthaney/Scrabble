@@ -46,6 +46,6 @@ export class ActiveGameService {
     }
 
     isGameOver(gameId: string, playerId: string): boolean {
-        return this.getGame(gameId, playerId).areGameOverConditionsMet();
+        return this.getGame(gameId, playerId).gameIsOver;
     }
 }

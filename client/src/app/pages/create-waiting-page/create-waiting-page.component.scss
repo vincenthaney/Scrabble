@@ -101,3 +101,25 @@
         }
     }
 }
+
+#game-creation-waiting-container {
+    margin-top: -64px;
+    display: grid;
+    align-items: center;
+    justify-items: center;
+
+    mat-label {
+        margin-bottom: 16px;
+        font-weight: 500;
+        font-size: 24px;
+    }
+}
+
+::ng-deep snack-bar-container.error {
+    background: lighten(tomato, 30%);
+    color: tomato;
+
+    button {
+        color: tomato;
+    }
+}
