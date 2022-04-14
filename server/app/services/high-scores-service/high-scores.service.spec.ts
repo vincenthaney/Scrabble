@@ -140,7 +140,7 @@ describe('HighScoresService', () => {
         it('should replace the highscore ', async () => {
             const newName = 'new name';
             const newScore = 1111;
-            expect(await highScoresService['replaceHighScore'](newName, newScore, HIGH_SCORE_CLASSIC_1)).to.be.true;
+            await highScoresService['replaceHighScore'](newName, newScore, HIGH_SCORE_CLASSIC_1);
             expect(await highScoresService['collection'].findOne({ score: HIGH_SCORE_CLASSIC_1.score, gameType: HIGH_SCORE_CLASSIC_1.gameType })).to
                 .not.be.ok;
             expect(await highScoresService['collection'].findOne({ score: newScore })).to.be.ok;
