@@ -36,9 +36,9 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
             this.consecutiveExchangeCount++;
             const totalTilesLeft = this.getActiveGameService().getGame(this.gameId, this.id).getTotalTilesLeft();
             return ActionExchange.createActionData(Random.getRandomElementsFromArray(this.tiles, totalTilesLeft));
-        } else {
-            return ActionPass.createActionData();
         }
+
+        return ActionPass.createActionData();
     }
 
     protected generateWordFindingRequest(): WordFindingRequest {
