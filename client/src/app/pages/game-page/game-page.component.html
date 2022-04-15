@@ -23,13 +23,12 @@
                                 <span *ngIf="gameService.isGameOver"> Quitter</span>
                             </ng-container>
                         </button>
-                        <div matTooltip="Ce n'est pas votre tour à jouer" matTooltipPosition="above" [matTooltipDisabled]="canPass()">
-                            <button mat-flat-button color="primary" [disabled]="!canPass()" (click)="passButtonClicked()">
+                        <div matTooltip="Ce n'est pas votre tour de jouer" matTooltipPosition="above" [matTooltipDisabled]="canPlay()">
                                 <app-icon icon="redo"></app-icon> Passer
                             </button>
                         </div>
                         <div
-                            matTooltip="Ce n'est pas votre tour à jouer ou vous n'avez pas placé de mot encore"
+                            matTooltip="Ce n'est pas votre tour de jouer ou vous n'avez pas placé de mot encore"
                             matTooltipPosition="above"
                             [matTooltipDisabled]="canPlaceWord()"
                         >
@@ -37,6 +36,7 @@
                                 <app-icon icon="square" styling="solid"></app-icon> Placer
                             </button>
                         </div>
+                        <div matTooltip="Ce n'est pas votre tour de jouer" matTooltipPosition="above" [matTooltipDisabled]="canPlay()">
                     </mat-card>
                 </div>
             </div>
