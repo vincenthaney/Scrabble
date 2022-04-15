@@ -14,11 +14,17 @@ import {
     MEDIUM_SCORE_RANGE_MAX,
     MEDIUM_SCORE_RANGE_MIN,
     MEDIUM_SCORE_THRESHOLD,
+    MINIMUM_TILES_LEFT_FOR_EXCHANGE,
     PLACE_ACTION_THRESHOLD,
 } from '@app/constants/virtual-player-constants';
 import { Random } from '@app/utils/random';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
+    protected isExchangePossible(): boolean {
+        const totalTilesLeft = this.getActiveGameService().getGame(this.gameId, this.id).getTotalTilesLeft();
+        return totalTilesLeft >= MINIMUM_TILES_LEFT_FOR_EXCHANGE;
+    }
+
     protected async findAction(): Promise<ActionData> {
         const randomAction = Math.random();
         if (randomAction <= PLACE_ACTION_THRESHOLD) {

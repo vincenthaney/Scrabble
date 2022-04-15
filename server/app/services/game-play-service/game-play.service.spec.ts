@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
@@ -17,7 +18,11 @@ import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
+import { MUST_HAVE_7_TILES_TO_SWAP } from '@app/constants/classes-errors';
 import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
@@ -260,17 +265,64 @@ describe('GamePlayService', () => {
             expect(action).to.be.instanceOf(ActionPlace);
         });
 
-        it('should return action of type ActionExchange when type is exchange', () => {
+        it('should return action of type ActionExchange when type is exchange (many tiles in payload)', () => {
             const type = ActionType.EXCHANGE;
             const payload: ActionExchangePayload = {
-                tiles: [{} as unknown as Tile],
+                tiles: [{ letter: 'N' } as unknown as Tile, { letter: 'V' } as unknown as Tile],
             };
             chai.spy.on(gamePlayService, 'getActionExchangePayload', () => {
-                return { tiles: [{} as unknown as Tile] };
+                return { tiles: [{ letter: 'N' } as unknown as Tile, { letter: 'V' } as unknown as Tile] };
             });
 
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
+            expect((action as ActionExchange)['tilesToExchange']).to.deep.equal(payload.tiles);
+        });
+
+        it('should return action of type ActionExchange when type is exchange (undefined tiles in payload)', () => {
+            const type = ActionType.EXCHANGE;
+            const payload: ActionExchangePayload = {
+                tiles: [],
+            };
+            chai.spy.on(gamePlayService, 'getActionExchangePayload', () => {
+                return {};
+            });
+
+            const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
+            expect(action).to.be.instanceOf(ActionExchange);
+            expect((action as ActionExchange)['tilesToExchange']).to.deep.equal([]);
+        });
+
+        it('should throw on exchange if a regular player tries to exchange when reserve has less than 7 tiles left', () => {
+            const type = ActionType.EXCHANGE;
+            const payload: ActionExchangePayload = {
+                tiles: [{} as unknown as Tile],
+            };
+            chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
+        });
+
+        it('should throw on exchange if a beginner virtual player tries to exchange when reserve has less than 7 tiles left', () => {
+            player = new BeginnerVirtualPlayer(VIRTUAL_PLAYER_ID_PREFIX + 'un id de debutant', 'Débutant');
+            const type = ActionType.EXCHANGE;
+            const payload: ActionExchangePayload = {
+                tiles: [{} as unknown as Tile],
+            };
+            chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
+        });
+
+        it('should NOT throw on exchange if an expert virtual player tries to exchange when reserve has less than 7 tiles left', () => {
+            player = new ExpertVirtualPlayer(VIRTUAL_PLAYER_ID_PREFIX + 'un id de expert', 'Expert');
+            const type = ActionType.EXCHANGE;
+            const payload: ActionExchangePayload = {
+                tiles: [{} as unknown as Tile],
+            };
+            chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).not.to.throw(MUST_HAVE_7_TILES_TO_SWAP);
         });
 
         it('should return action of type ActionPass when type is pass', () => {
@@ -300,40 +352,6 @@ describe('GamePlayService', () => {
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionHint);
         });
-
-        it("should throw if place payload doesn't have tiles", () => {
-            const type = ActionType.PLACE;
-            const payload = {
-                tiles: [],
-                startPosition: { column: 0, row: 0 },
-                orientation: Orientation.Horizontal,
-            };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
-
-        it("should throw if place payload doesn't have startPosition", () => {
-            const type = ActionType.PLACE;
-            const payload: Omit<ActionPlacePayload, 'startPosition'> = {
-                tiles: DEFAULT_TILES,
-                orientation: Orientation.Horizontal,
-            };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
-
-        it("should throw if place payload doesn't have orientation", () => {
-            const type = ActionType.PLACE;
-            const payload: Omit<ActionPlacePayload, 'orientation'> = {
-                tiles: DEFAULT_TILES,
-                startPosition: { column: 0, row: 0 },
-            };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
-
-        it("should throw if exchange payload doesn't have tiles", () => {
-            const type = ActionType.EXCHANGE;
-            const payload = { tiles: [] };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
     });
 
     describe('getActionPlacePayload', () => {
@@ -350,6 +368,34 @@ describe('GamePlayService', () => {
             };
             expect(gamePlayService.getActionPlacePayload(actionData)).to.deep.equal(payload);
         });
+
+        it("should throw if place payload doesn't have tiles", () => {
+            const type = ActionType.PLACE;
+            const payload = {
+                tiles: [],
+                startPosition: { column: 0, row: 0 },
+                orientation: Orientation.Horizontal,
+            };
+            expect(() => gamePlayService.getActionPlacePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
+
+        it("should throw if place payload doesn't have startPosition", () => {
+            const type = ActionType.PLACE;
+            const payload: Omit<ActionPlacePayload, 'startPosition'> = {
+                tiles: DEFAULT_TILES,
+                orientation: Orientation.Horizontal,
+            };
+            expect(() => gamePlayService.getActionPlacePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
+
+        it("should throw if place payload doesn't have orientation", () => {
+            const type = ActionType.PLACE;
+            const payload: Omit<ActionPlacePayload, 'orientation'> = {
+                tiles: DEFAULT_TILES,
+                startPosition: { column: 0, row: 0 },
+            };
+            expect(() => gamePlayService.getActionPlacePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
     });
 
     describe('getActionExchangePayload', () => {
@@ -363,6 +409,12 @@ describe('GamePlayService', () => {
                 payload,
             };
             expect(gamePlayService.getActionExchangePayload(actionData)).to.deep.equal(payload);
+        });
+
+        it("should throw if exchange payload doesn't have tiles", () => {
+            const type = ActionType.EXCHANGE;
+            const payload = { tiles: [] };
+            expect(() => gamePlayService.getActionExchangePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
     });
 
@@ -460,7 +512,7 @@ describe('GamePlayService', () => {
 
         beforeEach(() => {
             highScoresServiceStub = createStubInstance(HighScoresService);
-            highScoresServiceStub.addHighScore.resolves(true);
+            highScoresServiceStub.addHighScore.resolves();
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
 
             gameHistoriesServiceStub = createStubInstance(GameHistoriesService);

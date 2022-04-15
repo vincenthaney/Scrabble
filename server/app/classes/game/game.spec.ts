@@ -165,6 +165,12 @@ describe('Game', () => {
             assert(tileReserveStub.getTilesLeftPerLetter.calledOnce);
         });
 
+        it('getTotalTilesLeft should call same function from tileReserve', () => {
+            tileReserveStub.getTotalTilesLeft.returns(1);
+            game.getTotalTilesLeft();
+            assert(tileReserveStub.getTotalTilesLeft.calledOnce);
+        });
+
         describe('getPlayer', () => {
             beforeEach(() => {
                 game.player1 = DEFAULT_PLAYER_1;
