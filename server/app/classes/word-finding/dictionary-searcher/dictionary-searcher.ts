@@ -49,7 +49,7 @@ export default class DictionarySearcher {
     private next(): DictionarySearchResult {
         const stackItem = this.stack.pop();
 
-        if (!stackItem) throw new Error(NEXT_NODE_DOES_NOT_EXISTS);
+        if (!stackItem) throw new HttpException(NEXT_NODE_DOES_NOT_EXISTS, StatusCodes.BAD_REQUEST);
 
         this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
 

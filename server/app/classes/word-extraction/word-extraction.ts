@@ -6,6 +6,8 @@ import { Tile } from '@app/classes/tile';
 import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { switchOrientation } from '@app/utils/switch-orientation';
 import { WordPlacement } from '@app/classes/word-finding';
+import { StatusCodes } from 'http-status-codes';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 
 export class WordExtraction {
     constructor(private board: Board) {}
@@ -13,14 +15,14 @@ export class WordExtraction {
     extract(wordPlacement: WordPlacement): [Square, Tile][][] {
         const navigator = this.board.navigate(wordPlacement.startPosition, wordPlacement.orientation);
 
-        if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
-        if (this.isWordWithinBounds(navigator, wordPlacement.tilesToPlace)) throw new Error(POSITION_OUT_OF_BOARD);
+        if (navigator.verify(HAS_TILE)) throw new HttpException(EXTRACTION_SQUARE_ALREADY_FILLED, StatusCodes.BAD_REQUEST);
+        if (this.isWordWithinBounds(navigator, wordPlacement.tilesToPlace)) throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.BAD_REQUEST);
 
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
 
         for (let i = 0; i < wordPlacement.tilesToPlace.length; ) {
-            if (!navigator.isWithinBounds()) throw new Error(POSITION_OUT_OF_BOARD);
+            if (!navigator.isWithinBounds()) throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.BAD_REQUEST);
 
             if (navigator.square.tile) {
                 newWord.push([navigator.square, navigator.square.tile]);
@@ -61,7 +63,7 @@ export class WordExtraction {
 
     private extractWordInDirection(orientation: Orientation, direction: Direction, position: Position): [Square, Tile][] {
         const navigator = this.board.navigate(position, orientation);
-        if (navigator.verify(HAS_TILE)) throw new Error(EXTRACTION_SQUARE_ALREADY_FILLED);
+        if (navigator.verify(HAS_TILE)) throw new HttpException(EXTRACTION_SQUARE_ALREADY_FILLED, StatusCodes.BAD_REQUEST);
         const word: [Square, Tile][] = [];
 
         while (navigator.move(direction).verify(HAS_TILE)) {
