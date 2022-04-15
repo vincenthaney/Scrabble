@@ -32,6 +32,7 @@ import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import { FeedbackMessage } from './feedback-messages';
 
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';
@@ -49,7 +50,7 @@ const DEFAULT_GET_TILES_PER_LETTER_ARRAY: [LetterValue, number][] = [
     ['D', 0],
     ['E', 2],
 ];
-const DEFAULT_ACTION_MESSAGE = 'default action message';
+const DEFAULT_ACTION_MESSAGE: FeedbackMessage = { message: 'default action message' };
 const DEFAULT_TILES: Tile[] = [
     {
         letter: 'A',

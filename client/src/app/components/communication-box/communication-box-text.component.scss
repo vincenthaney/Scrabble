@@ -57,7 +57,8 @@ section#text-box-container {
                     }
                 }
 
-                &.system, &.system-error {
+                &.system,
+                &.system-error {
                     text-align: center;
 
                     &.system-error {
@@ -72,8 +73,8 @@ section#text-box-container {
                         padding: 4px 0;
                     }
 
-                    &+.me p.message,
-                    &+.opponent p.message {
+                    & + .me p.message,
+                    & + .opponent p.message {
                         border-top-left-radius: 1em;
                         border-top-right-radius: 1em;
                     }
@@ -87,11 +88,11 @@ section#text-box-container {
                         border-bottom-right-radius: 1em;
                     }
 
-                    &+.opponent {
+                    & + .opponent {
                         margin-top: 3px;
                     }
 
-                    &+.me p.message {
+                    & + .me p.message {
                         margin-top: 8px;
                         border-top-left-radius: 1em;
                         border-top-right-radius: 1em;
@@ -106,33 +107,16 @@ section#text-box-container {
                         border-bottom-left-radius: 1em;
                     }
 
-                    &+.me {
+                    & + .me {
                         margin-top: 3px;
                     }
 
-                    &+.opponent p.message {
+                    & + .opponent p.message {
                         margin-top: 8px;
                         border-top-left-radius: 1em;
                         border-top-right-radius: 1em;
                     }
                 }
-            }
-        }
-
-        form {
-            display: flex;
-            align-items: stretch;
-            border: solid 2px rgb(207, 207, 207);
-            padding: 4px;
-            border-radius: 4px;
-
-            input {
-                flex-grow: 1;
-                border: none;
-                margin-right: 6px;
-                font-size: inherit;
-                font-family: inherit;
-                outline: none;
             }
         }
     }

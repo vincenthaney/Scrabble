@@ -6,7 +6,6 @@ import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-he
 import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { SocketService } from '@app/services/';
 import { Socket } from 'socket.io-client';
-
 describe('SocketService', () => {
     let service: SocketService;
 

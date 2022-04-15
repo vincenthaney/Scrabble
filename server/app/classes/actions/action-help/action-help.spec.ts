@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { ActionHelp } from '..';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
+import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { ActionHelp } from '..';
 
 const DEFAULT_PLAYER_1_NAME = 'player1';
 const DEFAULT_PLAYER_1_ID = '1';
@@ -39,7 +39,7 @@ describe('ActionHelp', () => {
 
     describe('getOpponentMessage', () => {
         it('should return undefined', () => {
-            expect(action.getOpponentMessage()).to.be.undefined;
+            expect(action.getOpponentMessage()).to.deep.equal({});
         });
     });
 });

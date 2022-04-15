@@ -153,7 +153,8 @@ describe('GameDispatcherService', () => {
         let createSoloGameSpy: unknown;
         let addToRoomSpy: unknown;
         let sliceVirtualPlayerToPlayerSpy: unknown;
-        let socketServiceSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let emitToRoomSpy: unknown;
         let virtualPlayerServiceSpy: unknown;
         let activeGameServiceSpy: unknown;
 
@@ -167,7 +168,10 @@ describe('GameDispatcherService', () => {
             sliceVirtualPlayerToPlayerSpy = chai.spy.on(virtualPlayerService, 'sliceVirtualPlayerToPlayer', () => {
                 return DEFAULT_PLAYER;
             });
-            socketServiceSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+            emitToSocketSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+                return;
+            });
+            emitToRoomSpy = chai.spy.on(socketService, 'emitToRoom', () => {
                 return;
             });
             virtualPlayerServiceSpy = chai.spy.on(virtualPlayerService, 'triggerVirtualPlayerTurn', () => {
@@ -183,7 +187,8 @@ describe('GameDispatcherService', () => {
             expect(createSoloGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();
             expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
-            expect(socketServiceSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.have.been.called();
+            expect(emitToRoomSpy).to.have.been.called();
             expect(virtualPlayerServiceSpy).to.have.been.called();
             expect(activeGameServiceSpy).to.have.been.called();
         });

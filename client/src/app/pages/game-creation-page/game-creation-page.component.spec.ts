@@ -16,26 +16,28 @@ import { MatButtonHarness } from '@angular/material/button/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
+import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
+import { DEFAULT_OPPONENT_NAME } from '@app/constants/controller-test-constants';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { Subject } from 'rxjs';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
+import { Subject } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -98,6 +100,7 @@ describe('GameCreationPageComponent', () => {
                 MatSelectModule,
                 MatCardModule,
                 MatInputModule,
+                MatProgressSpinnerModule,
                 RouterTestingModule.withRoutes([
                     { path: 'waiting-room', component: TestComponent },
                     { path: 'home', component: TestComponent },
@@ -188,7 +191,7 @@ describe('GameCreationPageComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('ngOnInit should subscribe to value change', async () => {
+        it('should subscribe to gameMode changes', async () => {
             const subscribeSpy = spyOn<any>(component.gameParameters.get('gameMode')?.valueChanges, 'subscribe');
             await component.ngOnInit();
             expect(subscribeSpy).toHaveBeenCalled();
@@ -200,10 +203,11 @@ describe('GameCreationPageComponent', () => {
         });
 
         it('should subscribe to level value change', async () => {
+            spyOn<any>(component, 'getVirtualPlayerNames').and.returnValue([DEFAULT_OPPONENT_NAME]);
+            const spy = spyOn<any>(component.gameParameters, 'patchValue').and.callFake(() => {});
             await component.ngOnInit();
-            const spy = spyOn<any>(component.gameParameters.get('virtualPlayerName'), 'reset').and.callFake(() => {});
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
-            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith({ virtualPlayerName: DEFAULT_OPPONENT_NAME });
         });
 
         it('should generate virtual player profiles map', (done) => {
@@ -324,6 +328,7 @@ describe('GameCreationPageComponent', () => {
             component['createGame']();
             expect(component.isCreatingGame).toBeTrue();
         });
+
         it('createGame button should always call gameDispatcher.handleCreateGame', () => {
             component['createGame']();
             expect(gameDispatcherServiceSpy.handleCreateGame).toHaveBeenCalled();

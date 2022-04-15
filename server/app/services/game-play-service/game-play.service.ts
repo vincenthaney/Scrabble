@@ -20,7 +20,7 @@ import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Service } from 'typedi';
-import { FeedbackMessages } from './feedback-messages';
+import { FeedbackMessage, FeedbackMessages } from './feedback-messages';
 
 @Service()
 export class GamePlayService {
@@ -47,9 +47,9 @@ export class GamePlayService {
 
         let updatedData: void | GameUpdateData = action.execute();
 
-        const localPlayerFeedback = action.getMessage();
-        const opponentFeedback = action.getOpponentMessage();
-        let endGameFeedback: string[] | undefined;
+        const localPlayerFeedback: FeedbackMessage = action.getMessage();
+        const opponentFeedback: FeedbackMessage = action.getOpponentMessage();
+        let endGameFeedback: FeedbackMessage[] = [];
 
         if (updatedData) {
             updatedData = this.addMissingPlayerId(gameId, playerId, updatedData);
@@ -123,7 +123,7 @@ export class GamePlayService {
         return { gameObjective: objectiveData };
     }
 
-    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
+    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<FeedbackMessage[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (!game.isAddedToDatabase) {
             const connectedRealPlayers = game.getConnectedRealPlayers();
