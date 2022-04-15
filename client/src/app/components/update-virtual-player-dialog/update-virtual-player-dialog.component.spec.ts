@@ -1,7 +1,6 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,16 +14,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
-import { ModifyDictionaryComponent } from './create-virtual-player-dialog.component';
-import { DictionaryDialogParameters, ModifyDictionaryComponentStates } from './modify-dictionary-dialog.component.types';
+import { UpdateVirtualPlayerComponent } from './update-virtual-player-dialog.component';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { AbstractControl } from '@angular/forms';
-
-const MODEL: DictionaryDialogParameters = {
-    dictionaryId: 'testId',
-    dictionaryToModifyTitle: 'testTitle',
-    dictionaryToModifyDescription: 'testDescription',
-};
-
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { UpdateVirtualPlayerDialogParameters } from './update-virtual-player.component.types';
 export class MatDialogMock {
     close() {
         return {
@@ -33,14 +27,20 @@ export class MatDialogMock {
     }
 }
 
-describe('ModifyDictionaryComponent', () => {
-    let component: ModifyDictionaryComponent;
-    let fixture: ComponentFixture<ModifyDictionaryComponent>;
-    let dictionariesServiceMock: DictionaryService;
+const MODEL: UpdateVirtualPlayerDialogParameters = {
+    name: 'testName',
+    level: VirtualPlayerLevel.Beginner,
+    id: 'eyedee',
+};
+
+describe('UpdateDictionaryComponent', () => {
+    let component: UpdateVirtualPlayerComponent;
+    let fixture: ComponentFixture<UpdateVirtualPlayerComponent>;
+    let service: VirtualPlayerProfilesService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ModifyDictionaryComponent, IconComponent, PageHeaderComponent],
+            declarations: [UpdateVirtualPlayerComponent, IconComponent, PageHeaderComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
@@ -60,18 +60,18 @@ describe('ModifyDictionaryComponent', () => {
                     provide: MatDialogRef,
                     useClass: MatDialogMock,
                 },
-                DictionaryService,
                 {
                     provide: MAT_DIALOG_DATA,
                     useValue: MODEL,
                 },
+                VirtualPlayerProfilesService,
             ],
         }).compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ModifyDictionaryComponent);
-        dictionariesServiceMock = TestBed.inject(DictionaryService);
+        fixture = TestBed.createComponent(UpdateVirtualPlayerComponent);
+        service = TestBed.inject(VirtualPlayerProfilesService);
 
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -81,48 +81,53 @@ describe('ModifyDictionaryComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('On componentUpdateEvent', () => {
-        it('should call component.cleanupState()', () => {
-            const spy = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
-                return;
+    describe('ngOnDestroy', () => {
+        it('should call componentDestroyed$.next with true', () => {
+            const spyNext = spyOn(component['componentDestroyed$'], 'next').and.callFake(() => {
+                return null;
             });
-            dictionariesServiceMock['componentUpdateEvent'].next();
-            expect(spy).toHaveBeenCalled();
+            spyOn(component['componentDestroyed$'], 'complete').and.callFake(() => {
+                return null;
+            });
+            component.ngOnDestroy();
+            expect(spyNext).toHaveBeenCalled();
+            expect(spyNext).toHaveBeenCalledWith(true);
+        });
+
+        it('should call componentDestroyed$.complete with true', () => {
+            const spyComplete = spyOn(component['componentDestroyed$'], 'complete').and.callFake(() => {
+                return null;
+            });
+            spyOn(component['componentDestroyed$'], 'next').and.callFake(() => {
+                return null;
+            });
+            component.ngOnDestroy();
+            expect(spyComplete).toHaveBeenCalled();
         });
     });
 
     describe('ngOnChanges', () => {
-        it('should call formParameters.get twice', () => {
+        it("should call formParameters.get('inputVirtualPlayerName')", () => {
             const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
                 return null;
             });
             component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+            expect(spyFormParameters).toHaveBeenCalledWith('inputVirtualPlayerName');
         });
-
-        it('should call formParameters.get and return valid', () => {
+        it('should call formParameters.get twice', () => {
             spyOn(component.formParameters, 'get').and.callFake(() => {
-                return { valid: true } as unknown as AbstractControl;
+                return { valid: true } as AbstractControl;
             });
             component.ngOnChanges();
-            expect(component.isDictionaryTitleValid).toBeTrue();
-        });
-
-        it('should call formParameters.get and return false', () => {
-            spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.ngOnChanges();
-            expect(component.isDictionaryTitleValid).toBeFalse();
+            expect(component.isVirtualPlayerNameValid).toBeTrue();
         });
     });
 
-    describe('updateDictionary', () => {
+    describe('createVirtualPlayer', () => {
         let spyDictionary: jasmine.Spy;
-        let spyFormParameters: jasmine.Spy;
         let spyClose: jasmine.Spy;
         beforeEach(() => {
-            spyDictionary = spyOn(dictionariesServiceMock, 'updateDictionary').and.callFake(async () => {
+            spyDictionary = spyOn(service, 'updateVirtualPlayer').and.callFake(async () => {
                 return;
             });
             spyClose = spyOn(component, 'closeDialog').and.callFake(() => {
@@ -130,97 +135,38 @@ describe('ModifyDictionaryComponent', () => {
             });
         });
 
-        it('should call dictionariesService.updateDictionary', () => {
+        it('should call virtualPlayerProfilesService.updateVirtualPlayer with get returning null', () => {
             spyOn(component.formParameters, 'get').and.callFake(() => {
                 return null;
             });
-            component.updateDictionary();
+            component.updateVirtualPlayer();
             expect(spyDictionary).toHaveBeenCalled();
         });
 
-        it('should call formParameters.get twice', () => {
-            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.updateDictionary();
-            expect(spyFormParameters).toHaveBeenCalledTimes(2);
-        });
-
-        it('shouldhave been called with formParameters.get values undefined', () => {
-            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.updateDictionary();
-            expect(spyFormParameters).toHaveBeenCalledTimes(2);
-        });
-
-        it('should have been called with all values defined', () => {
-            spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return { value: 'i am a defined value' } as unknown as AbstractControl;
-            });
-            component.updateDictionary();
-            expect(spyFormParameters).toHaveBeenCalledTimes(2);
-        });
-
-        it('should call closeDialog', () => {
+        it('should call virtualPlayerProfilesService.updateVirtualPlayer with get returning Abstract Control', () => {
             spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
+                return {} as AbstractControl;
             });
-            component.updateDictionary();
+            component.updateVirtualPlayer();
+            expect(spyDictionary).toHaveBeenCalled();
+        });
+
+        it('should call dialogRef.close()', () => {
+            spyOn(component['dialogRef'], 'close').and.callFake(() => {
+                return;
+            });
+            component.closeDialog();
             expect(spyClose).toHaveBeenCalled();
         });
     });
 
     describe('closeDialog', () => {
-        let spyDialog: jasmine.Spy;
-        let spyCleanup: jasmine.Spy;
-        beforeEach(() => {
-            spyDialog = spyOn(component['dialogRef'], 'close').and.callFake(() => {
-                return;
-            });
-            spyCleanup = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
-                return;
-            });
-        });
-
         it('should call dialogRef.close()', () => {
+            const spyDialog = spyOn(component['dialogRef'], 'close').and.callFake(() => {
+                return;
+            });
             component.closeDialog();
             expect(spyDialog).toHaveBeenCalled();
-        });
-
-        it('should call cleanupDialogStates()', () => {
-            component.closeDialog();
-            expect(spyCleanup).toHaveBeenCalled();
-        });
-    });
-
-    describe('isInformationValid', () => {
-        it('should return true if component.isDictionaryTitleValid && component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = true;
-            component.isDictionaryDescriptionValid = true;
-            expect(component.isInformationValid()).toBeTrue();
-        });
-        it('should return false if !component.isDictionaryTitleValid && component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = false;
-            component.isDictionaryDescriptionValid = true;
-            expect(component.isInformationValid()).toBeFalse();
-        });
-        it('should return false if component.isDictionaryTitleValid && !component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = false;
-            component.isDictionaryDescriptionValid = true;
-            expect(component.isInformationValid()).toBeFalse();
-        });
-        it('should return false if !component.isDictionaryTitleValid && !component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = false;
-            component.isDictionaryDescriptionValid = true;
-            expect(component.isInformationValid()).toBeFalse();
-        });
-    });
-
-    describe('cleanupDialogStates', () => {
-        it('should turn state to Ready', () => {
-            component.cleanupDialogStates();
-            expect(component.state).toEqual(ModifyDictionaryComponentStates.Ready);
         });
     });
 });
