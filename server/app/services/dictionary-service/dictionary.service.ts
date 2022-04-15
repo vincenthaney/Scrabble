@@ -45,7 +45,7 @@ export default class DictionaryService {
     getDictionary(id: string): Dictionary {
         const dictionaryUsage = this.activeDictionaries.get(id);
         if (dictionaryUsage) return dictionaryUsage.dictionary;
-        throw new Error(INVALID_DICTIONARY_ID);
+        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.BAD_REQUEST);
     }
 
     stopUsingDictionary(id: string, forceDeleteIfUnused: boolean = false): void {
@@ -61,12 +61,12 @@ export default class DictionaryService {
     }
 
     addNewDictionary(basicDictionaryData: BasicDictionaryData): void {
-        if (!this.validateDictionary(basicDictionaryData)) throw new Error(INVALID_DICTIONARY_FORMAT);
+        if (!this.validateDictionary(basicDictionaryData)) throw new HttpException(INVALID_DICTIONARY_FORMAT, StatusCodes.NOT_ACCEPTABLE);
 
         this.dictionarySavingService.addDictionary(basicDictionaryData);
     }
 
-    resetDbDictionaries(): void {
+    restoreDictionaries(): void {
         this.dictionarySavingService.restore();
     }
 
@@ -98,7 +98,7 @@ export default class DictionaryService {
         }
     }
 
-    getDbDictionary(id: string): DictionaryData {
+    getDictionaryData(id: string): DictionaryData {
         return this.dictionarySavingService.getDictionaryById(id);
     }
 
@@ -114,7 +114,7 @@ export default class DictionaryService {
     private initializeDictionary(id: string): void {
         if (this.activeDictionaries.has(id)) return;
 
-        const dictionaryData: CompleteDictionaryData = { ...this.getDbDictionary(id), id };
+        const dictionaryData: CompleteDictionaryData = { ...this.getDictionaryData(id), id };
 
         const dictionary = { numberOfActiveGames: 0, dictionary: new Dictionary(dictionaryData), isDeleted: false };
         this.activeDictionaries.set(id, dictionary);

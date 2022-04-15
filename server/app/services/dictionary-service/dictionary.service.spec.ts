@@ -195,7 +195,7 @@ describe('DictionaryService', () => {
 
     describe('resetDbDictionaries', () => {
         it('should call restore', () => {
-            service.resetDbDictionaries();
+            service.restoreDictionaries();
             expect(dictionarySavingServiceStub.restore.called).to.be.true;
         });
     });
@@ -294,7 +294,7 @@ describe('DictionaryService', () => {
         it('should call getDictionaryById and returns its value', () => {
             const dictionary = { ...DICTIONARY_1 };
             dictionarySavingServiceStub.getDictionaryById.returns(dictionary);
-            const result = service.getDbDictionary(DEFAULT_ID);
+            const result = service.getDictionaryData(DEFAULT_ID);
 
             expect(dictionarySavingServiceStub.getDictionaryById.calledWith(DEFAULT_ID));
             expect(result).to.equal(dictionary);
@@ -329,7 +329,7 @@ describe('DictionaryService', () => {
         let getDbStub: SinonStub;
 
         beforeEach(() => {
-            getDbStub = stub(service, <any>'getDbDictionary').returns(DICTIONARY_1);
+            getDbStub = stub(service, <any>'getDictionaryData').returns(DICTIONARY_1);
         });
 
         it('should not add dictionary if it is already in array', () => {

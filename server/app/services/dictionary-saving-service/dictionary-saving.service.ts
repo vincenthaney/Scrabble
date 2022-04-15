@@ -8,12 +8,12 @@ import {
 } from '@app/classes/communication/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import {
-    CANNOT_UPDATE_DEFAULT_DICTIONARY,
+    CANNOT_USE_DEFAULT_DICTIONARY,
     DEFAULT_DICTIONARY_FILENAME,
     DEFAULT_DICTIONARY_NOT_FOUND,
     DICTIONARY_DIRECTORY,
     DICTIONARY_INDEX_FILENAME,
-    INVALID_TITLE_FORMAT,
+    INVALID_TITLE_ALREADY_USED,
     NO_DICTIONARY_WITH_ID,
     NO_DICTIONARY_WITH_NAME,
 } from '@app/constants/dictionary.const';
@@ -37,19 +37,19 @@ export default class DictionarySavingService {
     }
 
     getDictionaryById(id: string): DictionaryData {
-        const [entry] = this.getEntryFromId(id);
+        const [dictionaryEntry] = this.getEntryFromId(id);
 
-        return { ...this.getDictionaryByFilename(entry.filename), isDefault: entry.isDefault };
+        return { ...this.getDictionaryByFilename(dictionaryEntry.filename), isDefault: dictionaryEntry.isDefault };
     }
 
     addDictionary(dictionary: BasicDictionaryData): DictionarySummary {
-        if (this.dictionaryIndexes.entries.find((e) => e.title === dictionary.title))
-            throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.BAD_REQUEST);
+        if (this.dictionaryIndexes.entries.find((entry) => entry.title === dictionary.title))
+            throw new HttpException(INVALID_TITLE_ALREADY_USED(dictionary.title), StatusCodes.BAD_REQUEST);
 
         const id = uuidv4();
         const filename = `${dictionary.title}-${id}.json`;
 
-        const entry: DictionaryEntry = {
+        const dictionaryEntry: DictionaryEntry = {
             title: dictionary.title,
             description: dictionary.description,
             id,
@@ -59,40 +59,38 @@ export default class DictionarySavingService {
 
         this.writeFile(filename, dictionary);
 
-        this.dictionaryIndexes.entries.push(entry);
+        this.dictionaryIndexes.entries.push(dictionaryEntry);
 
         this.updateDictionaryIndex();
 
-        return this.entryToDictionarySummary(entry);
+        return this.entryToDictionarySummary(dictionaryEntry);
     }
 
-    updateDictionary(info: DictionaryUpdateInfo): DictionarySummary {
-        const [entry, entryIndex] = this.getEntryFromId(info.id, false);
+    updateDictionary(updateInfo: DictionaryUpdateInfo): DictionarySummary {
+        const [dictionaryEntry, dictionaryEntryIndex] = this.getEntryFromId(updateInfo.id, false);
 
-        const dictionary = this.getDictionaryByFilename(entry.filename);
-        this.patchDictionary(entry, dictionary, info);
+        const dictionary = this.getDictionaryByFilename(dictionaryEntry.filename);
+        this.patchDictionary(dictionaryEntry, dictionary, updateInfo);
 
-        this.writeFile(entry.filename, dictionary);
+        this.writeFile(dictionaryEntry.filename, dictionary);
 
-        this.dictionaryIndexes.entries.splice(entryIndex, 1, entry);
+        this.dictionaryIndexes.entries.splice(dictionaryEntryIndex, 1, dictionaryEntry);
         this.updateDictionaryIndex();
 
-        return this.entryToDictionarySummary(entry);
+        return this.entryToDictionarySummary(dictionaryEntry);
     }
 
     deleteDictionaryById(id: string): void {
-        const [entry, entryIndex] = this.getEntryFromId(id, false);
+        const [dictionaryEntry, dictionaryEntryIndex] = this.getEntryFromId(id, false);
 
-        this.dictionaryIndexes.entries.splice(entryIndex, 1);
+        this.dictionaryIndexes.entries.splice(dictionaryEntryIndex, 1);
         this.updateDictionaryIndex();
 
-        this.deleteFile(entry.filename);
+        this.deleteFile(dictionaryEntry.filename);
     }
 
     restore(): void {
-        const files = this.readDir();
-
-        files.forEach((file) => {
+        this.readDir().forEach((file) => {
             if (file === DEFAULT_DICTIONARY_FILENAME) return;
             this.deleteFile(file);
         });
@@ -108,25 +106,25 @@ export default class DictionarySavingService {
         return this.readFile(filename);
     }
 
-    private getEntryFromId(id: string, allowDefault = true): [entry: DictionaryEntry, index: number] {
-        const entryIndex = this.dictionaryIndexes.entries.findIndex((index) => index.id === id);
+    private getEntryFromId(id: string, allowDefault = true): [dictionaryEntry: DictionaryEntry, dictionaryEntryIndex: number] {
+        const dictionaryEntryIndex = this.dictionaryIndexes.entries.findIndex((index) => index.id === id);
 
-        if (entryIndex === NOT_FOUND) throw new HttpException(NO_DICTIONARY_WITH_ID(id), StatusCodes.NOT_FOUND);
+        if (dictionaryEntryIndex === NOT_FOUND) throw new HttpException(NO_DICTIONARY_WITH_ID(id), StatusCodes.NOT_FOUND);
 
-        const entry = this.dictionaryIndexes.entries[entryIndex];
+        const dictionaryEntry = this.dictionaryIndexes.entries[dictionaryEntryIndex];
 
-        if (entry.isDefault && !allowDefault) throw new HttpException(CANNOT_UPDATE_DEFAULT_DICTIONARY, StatusCodes.BAD_REQUEST);
+        if (dictionaryEntry.isDefault && !allowDefault) throw new HttpException(CANNOT_USE_DEFAULT_DICTIONARY, StatusCodes.BAD_REQUEST);
 
-        return [entry, entryIndex];
+        return [dictionaryEntry, dictionaryEntryIndex];
     }
 
-    private patchDictionary(entry: DictionaryEntry, dictionary: BasicDictionaryData, updateInfo: DictionaryUpdateInfo): void {
+    private patchDictionary(dictionaryEntry: DictionaryEntry, dictionary: BasicDictionaryData, updateInfo: DictionaryUpdateInfo): void {
         if (updateInfo.title) {
-            entry.title = updateInfo.title;
+            dictionaryEntry.title = updateInfo.title;
             dictionary.title = updateInfo.title;
         }
         if (updateInfo.description) {
-            entry.description = updateInfo.description;
+            dictionaryEntry.description = updateInfo.description;
             dictionary.description = updateInfo.description;
         }
     }
@@ -157,17 +155,17 @@ export default class DictionarySavingService {
                     },
                 ],
             };
-        } catch (e) {
+        } catch (exception) {
             throw new HttpException(DEFAULT_DICTIONARY_NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private entryToDictionarySummary(entry: DictionaryEntry): DictionarySummary {
+    private entryToDictionarySummary(dictionaryEntry: DictionaryEntry): DictionarySummary {
         return {
-            title: entry.title,
-            description: entry.description,
-            id: entry.id,
-            isDefault: entry.isDefault,
+            title: dictionaryEntry.title,
+            description: dictionaryEntry.description,
+            id: dictionaryEntry.id,
+            isDefault: dictionaryEntry.isDefault,
         };
     }
 

@@ -13,7 +13,7 @@ import { existsSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
 import { NOT_FOUND } from '@app/constants/game';
 import DictionarySavingService from './dictionary-saving.service';
 import {
-    CANNOT_UPDATE_DEFAULT_DICTIONARY,
+    CANNOT_USE_DEFAULT_DICTIONARY,
     DEFAULT_DICTIONARY_FILENAME,
     DEFAULT_DICTIONARY_NOT_FOUND,
     DICTIONARY_DIRECTORY,
@@ -520,7 +520,7 @@ describe('DictionarySavingService', () => {
         it('should throw if dont allow default and is default', () => {
             service['dictionaryIndexes'].entries[index].isDefault = true;
 
-            expect(() => service['getEntryFromId'](DEFAULT_ID, false)).to.throw(CANNOT_UPDATE_DEFAULT_DICTIONARY);
+            expect(() => service['getEntryFromId'](DEFAULT_ID, false)).to.throw(CANNOT_USE_DEFAULT_DICTIONARY);
         });
     });
 
