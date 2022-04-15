@@ -16,6 +16,8 @@ import {
 } from '@app/classes/word-finding';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
+import { HttpException } from '@app/classes/http-exception/http-exception';
+import { StatusCodes } from 'http-status-codes';
 
 export default abstract class AbstractWordFinding {
     wordPlacements: ScoredWordPlacement[] = [];
@@ -128,7 +130,7 @@ export default abstract class AbstractWordFinding {
 
         if (index === NOT_FOUND) {
             index = tiles.findIndex((tile) => tile.letter === BLANK_TILE_LETTER_VALUE);
-            if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+            if (index === NOT_FOUND) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.BAD_REQUEST);
             const foundBlankTile = tiles.splice(index, 1)[0];
             return { ...foundBlankTile, letter: letter.toUpperCase() as LetterValue, isBlank: true };
         }

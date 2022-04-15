@@ -19,7 +19,9 @@ import BoardService from '@app/services/board-service/board.service';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { StatusCodes } from 'http-status-codes';
 import { Container } from 'typedi';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
 import { GameType } from './game-type';
@@ -137,11 +139,11 @@ export default class Game {
             if (this.player1.id === playerId) return isRequestingPlayer ? this.player1 : this.player2;
             if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
         }
-        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+        throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
     }
 
     replacePlayer(playerId: string, newPlayer: Player): GameUpdateData {
-        if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+        if (!this.isPlayerFromGame(playerId)) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
 
         const updatedData: GameUpdateData = {};
         if (this.player1.id === playerId) {

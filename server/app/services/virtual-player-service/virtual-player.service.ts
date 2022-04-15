@@ -4,6 +4,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { StartGameData } from '@app/classes/game/game-config';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { IS_REQUESTING } from '@app/constants/game';
 import { CONTENT_TYPE, GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
@@ -24,7 +25,7 @@ export class VirtualPlayerService {
     }
 
     triggerVirtualPlayerTurn(data: StartGameData | GameUpdateData, game: Game): void {
-        if (!data.round) throw new Error(GAME_SHOULD_CONTAIN_ROUND);
+        if (!data.round) throw new HttpException(GAME_SHOULD_CONTAIN_ROUND, StatusCodes.BAD_REQUEST);
         const virtualPlayer = game.getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
         virtualPlayer.playTurn();
     }

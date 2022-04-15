@@ -10,6 +10,8 @@ import {
     PerpendicularWord,
     SearcherPerpendicularLetters,
 } from '@app/classes/word-finding';
+import { HttpException } from '@app/classes/http-exception/http-exception';
+import { StatusCodes } from 'http-status-codes';
 
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;
@@ -101,7 +103,7 @@ export default class DictionarySearcher {
     private getLettersLeft(letters: string[], playingLetter: string): string[] {
         let index = letters.indexOf(playingLetter);
         if (index === NOT_FOUND) index = letters.indexOf(BLANK_TILE_LETTER_VALUE);
-        if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+        if (index === NOT_FOUND) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.BAD_REQUEST);
 
         const lettersLeft = [...letters];
         lettersLeft.splice(index, 1);

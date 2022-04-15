@@ -1,5 +1,6 @@
 import { GameObjectivesData, ObjectiveData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
 import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
@@ -11,6 +12,7 @@ import {
 } from '@app/constants/services-constants/objective.const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
 @Service()
@@ -72,12 +74,12 @@ export default class ObjectivesService {
         opponentPlayer
             .getObjectives()
             .filter((objective: AbstractObjective) => objective.isPublic && objective.name === playerObjective.name)
-            .map((objective: AbstractObjective) => (objective.state = ObjectiveState.CompletedByOpponent));
+            .forEach((objective: AbstractObjective) => (objective.state = ObjectiveState.CompletedByOpponent));
     }
 
     private findOpponent(game: Game, originalPlayer: Player): Player {
         const opponentPlayer: Player | undefined = [game.player1, game.player2].find((player: Player) => player.id !== originalPlayer.id);
-        if (!opponentPlayer) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+        if (!opponentPlayer) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
         return opponentPlayer;
     }
 
@@ -94,7 +96,7 @@ export default class ObjectivesService {
 
     private popObjectiveFromPool(objectivePool: AbstractObjective[]): AbstractObjective {
         const objective: AbstractObjective | undefined = objectivePool.pop();
-        if (!objective) throw new Error(NO_OBJECTIVE_LEFT_IN_POOL);
+        if (!objective) throw new HttpException(NO_OBJECTIVE_LEFT_IN_POOL, StatusCodes.BAD_REQUEST);
         return objective;
     }
 }

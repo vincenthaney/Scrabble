@@ -52,9 +52,8 @@ export default class Board {
     verifySquare(position: Position, shouldBeFilled: boolean): boolean {
         if (this.isWithinBounds(position)) {
             return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
-        } else {
-            throw new Error(POSITION_OUT_OF_BOARD);
         }
+        throw new Error(POSITION_OUT_OF_BOARD);
     }
 
     private isWithinBounds(position: Position): boolean {

@@ -3,6 +3,8 @@ import { PlayerData } from '@app/classes/communication/player-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Player from '@app/classes/player/player';
 import { INVALID_PLAYER_TO_REPLACE, NO_FIRST_ROUND_EXISTS } from '@app/constants/services-errors';
+import { StatusCodes } from 'http-status-codes';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { CompletedRound, Round } from './round';
 
 const SECONDS_TO_MILLISECONDS = 1000;
@@ -61,7 +63,7 @@ export default class RoundManager {
     }
 
     getGameStartTime(): Date {
-        if (!this.completedRounds[0] && !this.currentRound) throw new Error(NO_FIRST_ROUND_EXISTS);
+        if (!this.completedRounds[0] && !this.currentRound) throw new HttpException(NO_FIRST_ROUND_EXISTS, StatusCodes.BAD_REQUEST);
         return this.completedRounds[0] !== undefined ? this.completedRounds[0].startTime : this.currentRound.startTime;
     }
 
@@ -78,7 +80,7 @@ export default class RoundManager {
 
         if (oldPlayerId === this.player1.id) this.player1 = newPlayer;
         else if (oldPlayerId === this.player2.id) this.player2 = newPlayer;
-        else throw new Error(INVALID_PLAYER_TO_REPLACE);
+        else throw new HttpException(INVALID_PLAYER_TO_REPLACE, StatusCodes.BAD_REQUEST);
     }
 
     private saveCompletedRound(round: Round, actionPlayed: Action): void {

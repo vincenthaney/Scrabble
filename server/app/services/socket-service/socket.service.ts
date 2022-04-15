@@ -33,7 +33,7 @@ export class SocketService {
     }
 
     handleSockets(): void {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
 
         this.sio.on('connection', (socket) => {
             this.sockets.set(socket.id, socket);
@@ -46,24 +46,24 @@ export class SocketService {
     }
 
     addToRoom(socketId: string, room: string): void {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
         const socket = this.getSocket(socketId);
         socket.join(room);
     }
 
     removeFromRoom(socketId: string, room: string): void {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
         const socket = this.getSocket(socketId);
         socket.leave(room);
     }
 
     deleteRoom(roomName: string): void {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
         this.sio.sockets.in(roomName).socketsLeave(roomName);
     }
 
     doesRoomExist(roomName: string): boolean {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
         return this.sio.sockets.adapter.rooms.get(roomName) !== undefined;
     }
 
@@ -90,7 +90,7 @@ export class SocketService {
     emitToRoom(id: string, ev: 'newMessage', ...args: NewMessageEmitArgs[]): void;
     emitToRoom(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToRoom<T>(room: string, ev: SocketEmitEvents, ...args: T[]): void {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
 
         this.sio.to(room).emit(ev, ...args);
     }
@@ -107,7 +107,7 @@ export class SocketService {
     emitToSocket(id: string, ev: 'cleanup', ...args: CleanupEmitArgs[]): void;
     emitToSocket(id: string, ev: '_test_event', ...args: unknown[]): void;
     emitToSocket<T>(id: string, ev: SocketEmitEvents, ...args: T[]): void {
-        if (this.sio === undefined) throw new Error(SOCKET_SERVICE_NOT_INITIALIZED);
+        if (this.sio === undefined) throw new HttpException(SOCKET_SERVICE_NOT_INITIALIZED, StatusCodes.BAD_REQUEST);
         if (isIdVirtualPlayer(id)) return;
         this.getSocket(id).emit(ev, ...args);
     }
