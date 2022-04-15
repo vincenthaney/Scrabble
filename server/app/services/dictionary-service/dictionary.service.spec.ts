@@ -7,30 +7,25 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { BasicDictionaryData, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
+import { BasicDictionaryData, DictionarySummary, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { DICTIONARY_PATH, INVALID_DICTIONARY_ID } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
-import DatabaseService from '@app/services/database-service/database.service';
+import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary.const';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
-import * as mock from 'mock-fs';
-import { ObjectId, WithId } from 'mongodb';
-import { join } from 'path';
 import * as sinon from 'sinon';
-import { SinonStub, stub } from 'sinon';
+import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
+import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 import {
-    ADDITIONNAL_PROPERTY_DICTIONARY,
+    ADDITIONAL_PROPERTY_DICTIONARY as ADDITIONAL_PROPERTY_DICTIONARY,
+    DEFAULT_SUMMARY,
     DICTIONARY_1,
     DICTIONARY_1_ID,
-    DICTIONARY_2,
-    DICTIONARY_3,
-    INITIAL_DICTIONARIES,
     INVALID_ARRAY_TYPES_DICTIONARY,
     INVALID_TYPES_DICTIONARY,
     INVALID_WORDS_DICTIONARY_1,
@@ -41,353 +36,59 @@ import {
     INVALID_WORDS_DICTIONARY_6,
     LONG_TITLE_DICTIONARY,
     MISSING_PROPERTY_DICTIONARY,
-    NEW_VALID_DICTIONARY,
-    SAME_TITLE_DICTIONARY,
     VALID_DICTIONARY,
 } from './dictionary-test.service.spec';
 import DictionaryService from './dictionary.service';
 
+const DEFAULT_ID = 'id';
+
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
-// mockPaths must be of type any because keys must be dynamic
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockPaths: any = [];
-mockPaths[join(__dirname, DICTIONARY_PATH)] = JSON.stringify(DICTIONARY_1);
-
 describe('DictionaryService', () => {
-    let dictionaryService: DictionaryService;
-    let databaseService: DatabaseService;
+    let service: DictionaryService;
     let testingUnit: ServicesTestingUnit;
-    let initializeDictionariesStub: SinonStub<[], Promise<void>>;
-    let initializeDictionaryStub: SinonStub<[string], Promise<void>>;
+    let dictionarySavingServiceStub: SinonStubbedInstance<DictionarySavingService>;
 
     beforeEach(() => {
         testingUnit = new ServicesTestingUnit().withMockDatabaseService();
+        dictionarySavingServiceStub = testingUnit.setStubbed(DictionarySavingService, {
+            getDictionarySummaries: [],
+        });
     });
 
     beforeEach(async () => {
-        dictionaryService = Container.get(DictionaryService);
-        initializeDictionariesStub = stub(dictionaryService, <any>'initializeDictionaries') as SinonStub<[], Promise<void>>;
-        initializeDictionaryStub = stub(dictionaryService, <any>'initializeDictionary') as SinonStub<[string], Promise<void>>;
-
-        databaseService = Container.get(DatabaseService);
-        await databaseService.connectToServer();
-        await dictionaryService['collection'].insertMany(INITIAL_DICTIONARIES);
+        service = Container.get(DictionaryService);
     });
 
     afterEach(async () => {
-        await databaseService.closeConnection();
         chai.spy.restore();
         sinon.restore();
         testingUnit.restore();
     });
 
-    it('should initialize dictionaries when database is ready', async () => {
-        const testDictionaryService = new DictionaryService(databaseService);
-        const initSpy = stub(testDictionaryService, <any>'initializeDictionaries').callsFake(() => {});
-        databaseService['databaseInitialized$'].emit('initialize');
-
-        expect(initSpy.called).to.be.true;
-    });
-
-    describe('fetchDefaultDictionary', () => {
-        it('should get the default dictionary from JSON', async () => {
-            mock(mockPaths);
-            const dictionaries = await DictionaryService['fetchDefaultDictionary']();
-            mock.restore();
-            expect(dictionaries.title).to.deep.equal(DICTIONARY_1.title);
-        });
-    });
-
-    describe('validateDictionary', () => {
-        it('should create the dictionary validator if it was not done before', async () => {
-            dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
-            const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {
-                dictionaryService['dictionaryValidator'] = ((x: string) => {
-                    return x;
-                }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
-            });
-
-            await dictionaryService.validateDictionary(DICTIONARY_1);
-            expect(spyCreate).to.have.been.called;
-        });
-
-        it('should not create the dictionary validator if was done before', async () => {
-            dictionaryService['dictionaryValidator'] = dictionaryService['dictionaryValidator'] = ((x: string) => {
-                return x;
-            }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
-            const spyCreate = chai.spy.on(dictionaryService, 'createDictionaryValidator', () => {});
-
-            await dictionaryService.validateDictionary(DICTIONARY_1);
-            expect(spyCreate).not.to.have.been.called;
-        });
-    });
-
-    describe('addNewDictionary', () => {
-        it('should throw if the dictionary is not valid ', async () => {
-            dictionaryService['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
-            chai.spy.on(dictionaryService, 'validateDictionary', () => false);
-
-            expect(dictionaryService.addNewDictionary({} as unknown as DictionaryData)).to.eventually.be.rejectedWith(Error);
-        });
-
-        it('should add the dictionary if the title is unique', async () => {
-            chai.spy.on(dictionaryService, 'validateDictionary', () => true);
-
-            await dictionaryService.addNewDictionary(NEW_VALID_DICTIONARY);
-            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(INITIAL_DICTIONARIES.length + 1);
-            expect((await dictionaryService['collection'].find({ title: NEW_VALID_DICTIONARY.title }).toArray())[0].description).to.deep.equal(
-                NEW_VALID_DICTIONARY.description,
-            );
-        });
-
-        it('should initialize dictionary if it was added to database', async () => {
-            const mockActiveDictionaries: string[] = [];
-            chai.spy.on(dictionaryService, 'validateDictionary', () => true);
-            initializeDictionaryStub.callsFake(async (id: string) => {
-                mockActiveDictionaries.push(id);
-            });
-
-            await dictionaryService.addNewDictionary(NEW_VALID_DICTIONARY);
-            expect(mockActiveDictionaries.length).not.to.equal(0);
-            const addedId: ObjectId = (await dictionaryService['collection'].find({ title: NEW_VALID_DICTIONARY.title }).toArray())[0]._id;
-            expect(mockActiveDictionaries.includes(addedId.toString())).to.be.true;
-        });
-    });
-
-    describe('resetDbDictionaries', () => {
-        it('should call populateDb if the collection has no default dictionaries ', async () => {
-            const spy = chai.spy.on(dictionaryService, 'populateDb', () => {});
-            await dictionaryService['collection'].deleteMany({ isDefault: { $exists: true } });
-            await dictionaryService.resetDbDictionaries();
-            expect(spy).to.have.been.called;
-        });
-
-        it('should not call populateDb if the collection has a default dictionary ', async () => {
-            const spy = chai.spy.on(dictionaryService, 'populateDb', () => {});
-            await dictionaryService.resetDbDictionaries();
-            expect(spy).not.to.have.been.called;
-        });
-
-        it('should only leave the default dictionary', async () => {
-            chai.spy.on(dictionaryService, 'populateDb', () => {});
-            await dictionaryService.resetDbDictionaries();
-            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(1);
-            expect((await dictionaryService['collection'].find({}).toArray())[0].title).to.equal(DICTIONARY_1.title);
-        });
-    });
-
-    describe('getAllDictionarySummaries', () => {
-        it('should return the list with only the wanted attributes', async () => {
-            const result = await dictionaryService.getAllDictionarySummaries();
-            expect(result.length).to.equal(INITIAL_DICTIONARIES.length);
-            expect(result[0].description).to.equal(INITIAL_DICTIONARIES[0].description);
-        });
-    });
-
-    describe('deleteDictionary', () => {
-        it('should delete the dictionary if it is not the default one', async () => {
-            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-
-            await dictionaryService.deleteDictionary(dictToGet._id.toString());
-            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(2);
-            expect((await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray()).length).to.equal(0);
-        });
-
-        it('should not delete the dictionary if it is the default one', async () => {
-            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray())[0];
-
-            await dictionaryService.deleteDictionary(dictToGet._id.toString());
-            expect((await dictionaryService['collection'].find({}).toArray()).length).to.equal(3);
-            expect((await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray()).length).to.equal(1);
-        });
-
-        it('should call deleteActiveDictionary', async () => {
-            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray())[0];
-
-            const deleteActiveStub = stub(dictionaryService, <any>'deleteActiveDictionary').callsFake(() => {});
-            const dictUsage = { isDeleted: false } as unknown as DictionaryUsage;
-            dictionaryService['activeDictionaries'].set(dictToGet._id.toString(), dictUsage);
-
-            await dictionaryService.deleteDictionary(dictToGet._id.toString());
-            expect(dictUsage.isDeleted).to.be.true;
-            expect(deleteActiveStub.calledWith(dictToGet._id.toString())).to.be.true;
-        });
-    });
-
-    describe('updateDictionary', () => {
-        it('should update the dictionary if it is not a default one and legal', async () => {
-            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription', title: 'modifiedTitle' };
-
-            await dictionaryService.updateDictionary(updateInfo);
-
-            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
-
-            expect(result.title).to.equal(updateInfo.title);
-            expect(result.description).to.equal(updateInfo.description);
-            expect(result._id).to.deep.equal(dictToModify._id);
-        });
-
-        it('should update the dictionary if it is not a default one and legal (only new title)', async () => {
-            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), title: 'modifiedTitle' };
-
-            await dictionaryService.updateDictionary(updateInfo);
-            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
-
-            expect(result.title).to.equal(updateInfo.title);
-            expect(result.description).to.equal(DICTIONARY_2.description);
-            expect(result._id).to.deep.equal(dictToModify._id);
-        });
-
-        it('should update the dictionary if it is not a default one and legal (only new description)', async () => {
-            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifiedDescription' };
-
-            await dictionaryService.updateDictionary(updateInfo);
-            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
-
-            expect(result.title).to.equal(DICTIONARY_2.title);
-            expect(result.description).to.equal(updateInfo.description);
-            expect(result._id).to.deep.equal(dictToModify._id);
-        });
-
-        it('should not update the dictionary if it is a default one and legal', async () => {
-            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_1.title }).toArray())[0];
-
-            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription', title: 'modifiedTitle' };
-            await dictionaryService.updateDictionary(updateInfo);
-            const result: WithId<DictionaryData> = (await dictionaryService['collection'].find({ _id: dictToModify._id }).toArray())[0];
-
-            expect(result.title).to.equal(DICTIONARY_1.title);
-            expect(result.description).to.equal(DICTIONARY_1.description);
-            expect(result._id).to.deep.equal(dictToModify._id);
-        });
-
-        it('should throw if the data is invalid (description)', async () => {
-            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-            chai.spy.on(dictionaryService, 'isDescriptionValid', () => false);
-            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), description: 'modifieddescription' };
-            expect(dictionaryService.updateDictionary(updateInfo)).to.eventually.be.rejectedWith(Error);
-        });
-
-        it('should throw if the data is invalid (title)', async () => {
-            const dictToModify: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-            chai.spy.on(dictionaryService, 'isTitleValid', () => false);
-            const updateInfo: DictionaryUpdateInfo = { id: dictToModify._id.toString(), title: 'modifiedTitle' };
-            expect(dictionaryService.updateDictionary(updateInfo)).to.eventually.be.rejectedWith(Error);
-        });
-    });
-
-    describe('isTitleValid', () => {
-        it('should return true if the title is unique and short and id not in db', async () => {
-            expect(await dictionaryService['isTitleValid']('IAmShortAndUnique', new ObjectId())).to.be.true;
-        });
-
-        it('should return true if the title is unique and short', async () => {
-            expect(await dictionaryService['isTitleValid']('IAmShortAndUnique')).to.be.true;
-        });
-
-        it('should return false if the title is not unique and short', async () => {
-            expect(await dictionaryService['isTitleValid'](DICTIONARY_3.title)).to.be.false;
-        });
-
-        it('should return false if the title is unique and long', async () => {
-            expect(await dictionaryService['isTitleValid']('uniquqweqweqweqweqweqwewqqweetitle')).to.be.false;
-        });
-    });
-
-    describe('isDescriptionValid', () => {
-        it('should return true if the description is short', async () => {
-            expect(dictionaryService['isDescriptionValid']('shortdescription')).to.be.true;
-        });
-
-        it('should return false if the description is unique and long', () => {
-            expect(
-                dictionaryService['isDescriptionValid'](
-                    `uniquqweqweqweqweqweqwewqqweedescriptionsdaofhdsfjsdhfosdhfosdfhsdohfsdhifoihsdfhiosdhiofsdihfhidsiohf
-                    hdsifhisdoihfhdsifihodsihfhisdhiofsdih`,
-                ),
-            ).to.be.false;
-        });
-    });
-
-    describe('populateDb', () => {
-        it('should call databaseService.populateDb and fetchDefaultDictionary', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions
-            const spyFetchDefaultHighScores = stub(DictionaryService, <any>'fetchDefaultDictionary');
-            const spyPopulateDb = chai.spy.on(dictionaryService['databaseService'], 'populateDb', () => {});
-            await dictionaryService['populateDb']();
-            expect(spyPopulateDb).to.have.been.called;
-            assert(spyFetchDefaultHighScores.calledOnce);
-            sinon.restore();
-        });
-    });
-
-    describe('getDbDictionary', () => {
-        it('should return the wanted dictionary with a valid id', async () => {
-            const dictToGet: WithId<DictionaryData> = (await dictionaryService['collection'].find({ title: DICTIONARY_2.title }).toArray())[0];
-
-            const result = await dictionaryService['getDbDictionary'](dictToGet._id.toString());
-            expect(result.title).to.equal(DICTIONARY_2.title);
-            expect(result.description).to.equal(DICTIONARY_2.description);
-        });
-
-        it('should throw with an invalid id', async () => {
-            expect(dictionaryService['getDbDictionary'](new ObjectId().toString())).to.eventually.be.rejectedWith(Error);
-        });
-    });
-
-    describe('createDictionaryValidator', () => {
-        const dictionariesToTest: [BasicDictionaryData, boolean, string][] = [
-            [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
-            [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
-            [LONG_TITLE_DICTIONARY, false, 'LONG_TITLE_DICTIONARY'],
-            [MISSING_PROPERTY_DICTIONARY, false, 'MISSING_PROPERTY_DICTIONARY'],
-            [SAME_TITLE_DICTIONARY, false, 'SAME_TITLE_DICTIONARY'],
-            [INVALID_ARRAY_TYPES_DICTIONARY, false, 'INVALID_ARRAY_TYPES_DICTIONARY'],
-            [ADDITIONNAL_PROPERTY_DICTIONARY, false, 'ADDITIONNAL_PROPERTY_DICTIONARY'],
-            [INVALID_WORDS_DICTIONARY_1, false, 'INVALID_WORDS_DICTIONARY_1'],
-            [INVALID_WORDS_DICTIONARY_2, false, 'INVALID_WORDS_DICTIONARY_2'],
-            [INVALID_WORDS_DICTIONARY_3, false, 'INVALID_WORDS_DICTIONARY_3'],
-            [INVALID_WORDS_DICTIONARY_4, false, 'INVALID_WORDS_DICTIONARY_4'],
-            [INVALID_WORDS_DICTIONARY_5, false, 'INVALID_WORDS_DICTIONARY_5'],
-            [INVALID_WORDS_DICTIONARY_6, false, 'INVALID_WORDS_DICTIONARY_6'],
-        ];
-        const DICTIONARY = 0;
-        const EXPECTED = 1;
-        const TEST_DESCRIPTION = 2;
-
-        for (const test of dictionariesToTest) {
-            it(`should return ${test[EXPECTED]} for a ${test[TEST_DESCRIPTION]}`, async () => {
-                expect(await dictionaryService['validateDictionary'](test[DICTIONARY])).to.equal(test[EXPECTED]);
-            });
-        }
-    });
-
     describe('useDictionary', () => {
         const BASE_DICTIONARY_USAGE: DictionaryUsage = { dictionary: {} as unknown as Dictionary, numberOfActiveGames: 1, isDeleted: false };
         const BASE_DICTIONARY_ID = 'id1';
+
         beforeEach(() => {
-            dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
+            service['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
-        it('should increment the number of active games, update lastUse and return the correct dictionary', async () => {
-            const spy = chai.spy.on(dictionaryService, 'getDbDictionary', () => {
+        it('should increment the number of active games, update lastUse and return the correct dictionary', () => {
+            const spy = chai.spy.on(service, 'getDbDictionary', () => {
                 return {} as unknown as DictionaryData;
             });
             BASE_DICTIONARY_USAGE.lastUse = undefined;
 
-            expect(await dictionaryService.useDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE);
+            expect(service.useDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE);
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
             expect(BASE_DICTIONARY_USAGE.lastUse).not.to.be.undefined;
-            expect(dictionaryService['activeDictionaries'].size).to.equal(1);
+            expect(service['activeDictionaries'].size).to.equal(1);
             expect(spy).not.to.have.called();
         });
 
         it('should throw if dictionary is not active', () => {
-            expect(dictionaryService.useDictionary('invalid-id')).to.eventually.be.rejectedWith(INVALID_DICTIONARY_ID);
+            expect(() => service.useDictionary('invalid-id')).to.throw(INVALID_DICTIONARY_ID);
         });
     });
 
@@ -399,15 +100,15 @@ describe('DictionaryService', () => {
             isDeleted: false,
         };
         beforeEach(() => {
-            dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
+            service['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
         });
 
         it('should return the dictionary if it exists', () => {
-            expect(dictionaryService.getDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE.dictionary);
+            expect(service.getDictionary(BASE_DICTIONARY_ID)).to.deep.equal(BASE_DICTIONARY_USAGE.dictionary);
         });
 
         it('should throw if the dictionaryId is not a key of the map', () => {
-            const result = () => dictionaryService.getDictionary('allo');
+            const result = () => service.getDictionary('allo');
             expect(result).to.throw(INVALID_DICTIONARY_ID);
         });
     });
@@ -423,74 +124,224 @@ describe('DictionaryService', () => {
         let deleteSpy: sinon.SinonStub;
 
         beforeEach(() => {
-            dictionaryService['activeDictionaries'].clear();
-            dictionaryService['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
-            deleteSpy = stub(dictionaryService, <any>'deleteActiveDictionary').callsFake(() => {});
+            service['activeDictionaries'].clear();
+            service['activeDictionaries'].set(BASE_DICTIONARY_ID, BASE_DICTIONARY_USAGE);
+            deleteSpy = stub(service, <any>'deleteActiveDictionary').callsFake(() => {});
         });
 
         it('should decrement a dictionary that had more than 1 active game', async () => {
             BASE_DICTIONARY_USAGE.numberOfActiveGames = 3;
-            dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
+            service.stopUsingDictionary(BASE_DICTIONARY_ID);
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(2);
-            dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
+            service.stopUsingDictionary(BASE_DICTIONARY_ID);
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
         });
 
         it('should not do anything if the dictionaryId is not a key of the map', async () => {
-            dictionaryService.stopUsingDictionary('BASE_DICTIONARY_ID');
+            service.stopUsingDictionary('BASE_DICTIONARY_ID');
             expect(BASE_DICTIONARY_USAGE.numberOfActiveGames).to.equal(1);
             expect(deleteSpy.called).to.be.false;
         });
 
         it('should call deleteActiveDictionary', async () => {
-            dictionaryService.stopUsingDictionary(BASE_DICTIONARY_ID);
+            service.stopUsingDictionary(BASE_DICTIONARY_ID);
             expect(deleteSpy.called).to.be.true;
+        });
+    });
+
+    describe('validateDictionary', () => {
+        it('should create the dictionary validator if it was not done before', async () => {
+            service['dictionaryValidator'] = undefined as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            const spyCreate = chai.spy.on(service, 'createDictionaryValidator', () => {
+                service['dictionaryValidator'] = ((x: string) => {
+                    return x;
+                }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            });
+
+            await service.validateDictionary(DICTIONARY_1);
+            expect(spyCreate).to.have.been.called;
+        });
+
+        it('should not create the dictionary validator if was done before', async () => {
+            service['dictionaryValidator'] = service['dictionaryValidator'] = ((x: string) => {
+                return x;
+            }) as unknown as ValidateFunction<{ [x: string]: unknown }>;
+            const spyCreate = chai.spy.on(service, 'createDictionaryValidator', () => {});
+
+            await service.validateDictionary(DICTIONARY_1);
+            expect(spyCreate).not.to.have.been.called;
+        });
+    });
+
+    describe('addNewDictionary', () => {
+        let newDictionary: BasicDictionaryData;
+        let validateDictionaryStub: SinonStub;
+
+        beforeEach(() => {
+            newDictionary = { ...DICTIONARY_1 };
+            validateDictionaryStub = stub(service, 'validateDictionary').returns(true);
+        });
+
+        it('should throw if the dictionary is not valid ', async () => {
+            validateDictionaryStub.returns(false);
+            expect(() => service.addNewDictionary(newDictionary)).to.throw(INVALID_DICTIONARY_FORMAT);
+        });
+
+        it('should add the dictionary if the title is unique', async () => {
+            service.addNewDictionary(newDictionary);
+            expect(dictionarySavingServiceStub.addDictionary.calledWithExactly(newDictionary)).to.be.true;
+        });
+    });
+
+    describe('resetDbDictionaries', () => {
+        it('should call restore', () => {
+            service.restoreDictionaries();
+            expect(dictionarySavingServiceStub.restore.called).to.be.true;
+        });
+    });
+
+    describe('getAllDictionarySummaries', () => {
+        const nSummaries = 8;
+        let summaries: DictionarySummary[];
+        let initializeDictionaryStub: SinonStub;
+
+        beforeEach(() => {
+            summaries = [];
+
+            for (let i = 0; i < nSummaries; ++i) {
+                summaries.push({ ...DEFAULT_SUMMARY });
+            }
+
+            dictionarySavingServiceStub.getDictionarySummaries.returns(summaries);
+            initializeDictionaryStub = stub(service, 'initializeDictionary' as any);
+        });
+
+        it('should call getDictionarySummaries and return its values', () => {
+            const result = service.getAllDictionarySummaries();
+
+            expect(dictionarySavingServiceStub.getDictionarySummaries.called).to.be.true;
+            expect(result).to.equal(summaries);
+        });
+
+        it('should call initializeDictionary for every summary', () => {
+            service.getAllDictionarySummaries();
+
+            for (const summary of summaries) {
+                expect(initializeDictionaryStub.calledWithExactly(summary));
+            }
+        });
+    });
+
+    describe('updateDictionary', () => {
+        let updateInfo: DictionaryUpdateInfo;
+        let isDescriptionValidStub: SinonStub;
+        let isTitleValidStub: SinonStub;
+
+        beforeEach(() => {
+            updateInfo = {
+                id: 'id',
+                title: 'a',
+                description: 'b',
+            };
+            isDescriptionValidStub = stub(service, 'isDescriptionValid' as any).returns(true);
+            isTitleValidStub = stub(service, 'isTitleValid' as any).returns(true);
+        });
+
+        it('should call updateDictionary with updateInfo', () => {
+            service.updateDictionary(updateInfo);
+
+            expect(dictionarySavingServiceStub.updateDictionary.calledWithExactly(updateInfo)).to.be.true;
+        });
+
+        it('should throw if title is invalid', () => {
+            isTitleValidStub.returns(false);
+
+            expect(() => service.updateDictionary(updateInfo)).to.throw(INVALID_TITLE_FORMAT);
+        });
+
+        it('should throw if description is invalid', () => {
+            isDescriptionValidStub.returns(false);
+
+            expect(() => service.updateDictionary(updateInfo)).to.throw(INVALID_DESCRIPTION_FORMAT);
+        });
+    });
+
+    describe('deleteDictionary', () => {
+        let deleteActiveDictionaryStub: SinonStub;
+
+        beforeEach(() => {
+            deleteActiveDictionaryStub = stub(service, 'deleteActiveDictionary' as any);
+        });
+
+        it('should call deleteDictionaryById', () => {
+            service.deleteDictionary(DEFAULT_ID);
+
+            expect(dictionarySavingServiceStub.deleteDictionaryById.calledWithExactly(DEFAULT_ID)).to.be.true;
+        });
+
+        it('should set dictionary to deleted and call deleteActiveDictionary', () => {
+            const dictionary: DictionaryUsage = { isDeleted: false } as DictionaryUsage;
+            service['activeDictionaries'].set(DEFAULT_ID, dictionary);
+
+            service.deleteDictionary(DEFAULT_ID);
+
+            expect(dictionary.isDeleted).to.be.true;
+            expect(deleteActiveDictionaryStub.calledWith(DEFAULT_ID)).to.be.true;
+        });
+    });
+
+    describe('getDbDictionary', () => {
+        it('should call getDictionaryById and returns its value', () => {
+            const dictionary = { ...DICTIONARY_1 };
+            dictionarySavingServiceStub.getDictionaryById.returns(dictionary);
+            const result = service.getDictionaryData(DEFAULT_ID);
+
+            expect(dictionarySavingServiceStub.getDictionaryById.calledWith(DEFAULT_ID));
+            expect(result).to.equal(dictionary);
         });
     });
 
     describe('initializeDictionaries', () => {
         const fakeIds: string[] = ['id1', 'id2', 'id3'];
+        let initializeDictionaryStub: SinonStub;
 
         beforeEach(() => {
-            initializeDictionariesStub.callThrough();
-            stub(dictionaryService, <any>'getDictionariesId').resolves(fakeIds);
+            stub(service, 'getDictionariesId' as any).returns(fakeIds);
+            initializeDictionaryStub = stub(service, 'initializeDictionary' as any);
         });
 
-        it('should call initializeDictionary with every id from database', async () => {
-            await dictionaryService['initializeDictionaries']();
+        it('should call initializeDictionary with every id', async () => {
+            service['initializeDictionaries']();
             fakeIds.forEach((id: string) => expect(initializeDictionaryStub.calledWith(id)).to.be.true);
         });
     });
 
     describe('getDictionariesId', () => {
-        it('should return every id in database', async () => {
-            const result: string[] = await dictionaryService['getDictionariesId']();
-            expect(result.length).to.equal(INITIAL_DICTIONARIES.length);
-            result.forEach(async (id: string, index: number) =>
-                expect((await dictionaryService['collection'].find({ _id: new ObjectId(id) }).toArray())[0].title).to.equal(
-                    INITIAL_DICTIONARIES[index].title,
-                ),
-            );
+        it('should return ids from getDictionarySummaries', () => {
+            const fakeIds: string[] = ['id1', 'id2', 'id3'];
+            dictionarySavingServiceStub.getDictionarySummaries.returns(fakeIds.map((id) => ({ id } as DictionarySummary)));
+
+            expect(service['getDictionariesId']()).to.deep.equal(fakeIds);
         });
     });
+
     describe('initializeDictionary', () => {
         let getDbStub: SinonStub;
 
         beforeEach(() => {
-            initializeDictionaryStub.callThrough();
-            getDbStub = stub(dictionaryService, <any>'getDbDictionary').returns(DICTIONARY_1);
+            getDbStub = stub(service, <any>'getDictionaryData').returns(DICTIONARY_1);
         });
 
         it('should not add dictionary if it is already in array', () => {
-            dictionaryService['activeDictionaries'].set(DICTIONARY_1_ID, {} as unknown as DictionaryUsage);
-            dictionaryService['initializeDictionary'](DICTIONARY_1_ID);
+            service['activeDictionaries'].set(DICTIONARY_1_ID, {} as unknown as DictionaryUsage);
+            service['initializeDictionary'](DICTIONARY_1_ID);
             expect(getDbStub.called).to.be.false;
         });
 
         it('should create a new dictionary and add it to the map ', async () => {
-            await dictionaryService['initializeDictionary'](DICTIONARY_1_ID);
+            await service['initializeDictionary'](DICTIONARY_1_ID);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const result: DictionaryUsage = dictionaryService['activeDictionaries'].get(DICTIONARY_1_ID)!;
+            const result: DictionaryUsage = service['activeDictionaries'].get(DICTIONARY_1_ID)!;
 
             expect(result.dictionary.summary.id).to.equal(DICTIONARY_1_ID);
             expect(result.dictionary.summary.title).to.equal(DICTIONARY_1.title);
@@ -498,34 +349,85 @@ describe('DictionaryService', () => {
         });
     });
 
+    describe('isTitleValid', () => {
+        it('should return true if the title is short', async () => {
+            expect(await service['isTitleValid']('IAmShortAndUnique')).to.be.true;
+        });
+
+        it('should return false if the title is long', async () => {
+            expect(await service['isTitleValid']('uniquqweqweqweqweqweqwewqqweetitle')).to.be.false;
+        });
+    });
+
+    describe('isDescriptionValid', () => {
+        it('should return true if the description is short', async () => {
+            expect(service['isDescriptionValid']('shortdescription')).to.be.true;
+        });
+
+        it('should return false if the description is unique and long', () => {
+            expect(
+                service['isDescriptionValid'](
+                    `uniquqweqweqweqweqweqwewqqweedescriptionsdaofhdsfjsdhfosdhfosdfhsdohfsdhifoihsdfhiosdhiofsdihfhidsiohf
+                    hdsifhisdoihfhdsifihodsihfhisdhiofsdih`,
+                ),
+            ).to.be.false;
+        });
+    });
+
+    describe('createDictionaryValidator', () => {
+        const dictionariesToTest: [BasicDictionaryData, boolean, string][] = [
+            [VALID_DICTIONARY, true, 'VALID_DICTIONARY'],
+            [INVALID_TYPES_DICTIONARY, false, 'INVALID_TYPES_DICTIONARY'],
+            [LONG_TITLE_DICTIONARY, false, 'LONG_TITLE_DICTIONARY'],
+            [MISSING_PROPERTY_DICTIONARY, false, 'MISSING_PROPERTY_DICTIONARY'],
+            [INVALID_ARRAY_TYPES_DICTIONARY, false, 'INVALID_ARRAY_TYPES_DICTIONARY'],
+            [ADDITIONAL_PROPERTY_DICTIONARY, false, 'ADDITIONNAL_PROPERTY_DICTIONARY'],
+            [INVALID_WORDS_DICTIONARY_1, false, 'INVALID_WORDS_DICTIONARY_1'],
+            [INVALID_WORDS_DICTIONARY_2, false, 'INVALID_WORDS_DICTIONARY_2'],
+            [INVALID_WORDS_DICTIONARY_3, false, 'INVALID_WORDS_DICTIONARY_3'],
+            [INVALID_WORDS_DICTIONARY_4, false, 'INVALID_WORDS_DICTIONARY_4'],
+            [INVALID_WORDS_DICTIONARY_5, false, 'INVALID_WORDS_DICTIONARY_5'],
+            [INVALID_WORDS_DICTIONARY_6, false, 'INVALID_WORDS_DICTIONARY_6'],
+        ];
+        const DICTIONARY = 0;
+        const EXPECTED = 1;
+        const TEST_DESCRIPTION = 2;
+
+        for (const test of dictionariesToTest) {
+            it(`should return ${test[EXPECTED]} for a ${test[TEST_DESCRIPTION]}`, async () => {
+                expect(await service['validateDictionary'](test[DICTIONARY])).to.equal(test[EXPECTED]);
+            });
+        }
+    });
+
     describe('deleteActiveDictionary', () => {
         let dictionaryId: string;
         let shouldDeleteStub: SinonStub;
 
         beforeEach(async () => {
-            dictionaryId = (await dictionaryService['collection'].find({ title: INITIAL_DICTIONARIES[0].title }).toArray())[0]._id.toString();
-            dictionaryService['activeDictionaries'].set(dictionaryId, {} as unknown as DictionaryUsage);
-            shouldDeleteStub = stub(dictionaryService, <any>'shouldDeleteActiveDictionary').returns(true);
+            dictionaryId = service['activeDictionaries'].keys()[0];
+            service['activeDictionaries'].set(dictionaryId, {} as unknown as DictionaryUsage);
+            shouldDeleteStub = stub(service, <any>'shouldDeleteActiveDictionary').returns(true);
         });
 
         it('should call shouldDeleteActiveDictionary with appropriate arguments', () => {
-            dictionaryService['deleteActiveDictionary'](dictionaryId, true);
+            service['deleteActiveDictionary'](dictionaryId, true);
             expect(shouldDeleteStub.calledWith({}, true)).to.be.true;
         });
 
         it('should delete dictionary if predicate is true', () => {
-            dictionaryService['deleteActiveDictionary'](dictionaryId);
-            expect(dictionaryService['activeDictionaries'].has(dictionaryId)).to.be.false;
+            service['deleteActiveDictionary'](dictionaryId);
+            expect(service['activeDictionaries'].has(dictionaryId)).to.be.false;
         });
 
         it('should not delete dictionary if predicate is false', () => {
             shouldDeleteStub.returns(false);
-            dictionaryService['deleteActiveDictionary'](dictionaryId);
-            expect(dictionaryService['activeDictionaries'].has(dictionaryId)).to.be.true;
+            service['deleteActiveDictionary'](dictionaryId);
+            expect(service['activeDictionaries'].has(dictionaryId)).to.be.true;
         });
 
         it('should throw if dictionary is not in active dictionaries', () => {
-            expect(() => dictionaryService['deleteActiveDictionary']('invalid-id')).to.throw(INVALID_DICTIONARY_ID);
+            expect(() => service['deleteActiveDictionary']('invalid-id')).to.throw(INVALID_DICTIONARY_ID);
         });
     });
 
@@ -539,35 +441,35 @@ describe('DictionaryService', () => {
         let notUsedStub: SinonStub;
 
         beforeEach(() => {
-            notUsedStub = stub(dictionaryService, <any>'notUsedInLastHour').returns(false);
+            notUsedStub = stub(service, <any>'notUsedInLastHour').returns(false);
         });
 
         it('should return true if no active games, isDeleted and forceDelete', () => {
-            expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, true)).to.be.true;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, true)).to.be.true;
         });
 
         it('should return true if no active games, isDeleted, no force delete but no last use', () => {
-            expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
         });
 
         it('should return true if no active games, isDeleted, no force delete but last use more than 1 hour ago', () => {
             notUsedStub.returns(true);
-            expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
         });
 
         it('should return false if still active games', () => {
             dictionaryUsage.numberOfActiveGames = 1;
-            expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
         });
 
         it('should return false if not deleted on database', () => {
             dictionaryUsage.isDeleted = false;
-            expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
         });
 
         it('should return false if used in last hour', () => {
             notUsedStub.returns(true);
-            expect(dictionaryService['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
         });
     });
 
@@ -580,17 +482,17 @@ describe('DictionaryService', () => {
         };
 
         it('should return false if no last use', () => {
-            expect(dictionaryService['notUsedInLastHour'](dictionaryUsage)).to.be.false;
+            expect(service['notUsedInLastHour'](dictionaryUsage)).to.be.false;
         });
 
         it('should return true if last use was more than an hour ago', () => {
             dictionaryUsage.lastUse = new Date(Date.now() - ONE_HOUR_IN_MS * 2);
-            expect(dictionaryService['notUsedInLastHour'](dictionaryUsage)).to.be.true;
+            expect(service['notUsedInLastHour'](dictionaryUsage)).to.be.true;
         });
 
         it('should return false if last use was less than an hour ago', () => {
             dictionaryUsage.lastUse = new Date(Date.now() - ONE_HOUR_IN_MS / 2);
-            expect(dictionaryService['notUsedInLastHour'](dictionaryUsage)).to.be.false;
+            expect(service['notUsedInLastHour'](dictionaryUsage)).to.be.false;
         });
     });
 });

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {
@@ -10,19 +11,18 @@ import {
     DisplayDictionaryColumnsIteratorItem,
     DisplayDictionaryKeys,
 } from '@app/classes/admin/dictionaries';
-
-import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
-import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
-import { DICTIONARIES_COLUMNS, ERROR_SNACK_BAR_CONFIG, SUCCESS_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
+import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
+import { DICTIONARIES_COLUMNS, SUCCESS_SNACK_BAR_CONFIG, ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
+import { PositiveFeedbackResponse } from '@app/constants/dialogs-constants';
+import { PositiveFeedback } from '@app/constants/dictionaries-components';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
-import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
 import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component';
 import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { PositiveFeedback } from '@app/constants/dictionaries-components';
-import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { PositiveFeedbackResponse } from '@app/constants/dialogs-constants';
+import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
+import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
+import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
+
 
 @Component({
     selector: 'app-admin-dictionaries',

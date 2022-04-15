@@ -65,6 +65,15 @@ describe('ConvertDialogComponent', () => {
         matDialogSpy.backdropClick.and.returnValue(backdropSubject.asObservable());
     });
 
+    beforeEach(() => {
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['handleRecreateGame']);
+        gameDispatcherServiceSpy.handleRecreateGame.and.callFake(() => {});
+
+        backdropSubject = new Subject();
+        matDialogSpy = jasmine.createSpyObj('MatDialogRef', ['backdropClick', 'close']);
+        matDialogSpy.backdropClick.and.returnValue(backdropSubject.asObservable());
+    });
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ConvertDialogComponent, TestComponent, IconComponent],

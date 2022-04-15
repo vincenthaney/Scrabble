@@ -89,6 +89,25 @@ describe('GameCreationPageComponent', () => {
         gameDispatcherServiceSpy.observeGameCreationFailed.and.returnValue(gameDispatcherCreationSubject.asObservable());
     });
 
+    beforeEach(() => {
+        dictionaryServiceSpy = jasmine.createSpyObj('DictionaryService', [
+            'getDictionaries',
+            'updateAllDictionaries',
+            'subscribeToDictionariesUpdateDataEvent',
+        ]);
+        dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
+        dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
+        dictionaryUpdateSubject = new Subject();
+        dictionaryServiceSpy.subscribeToDictionariesUpdateDataEvent.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void) =>
+                dictionaryUpdateSubject.subscribe(callback),
+        );
+
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['observeGameCreationFailed', 'handleCreateGame']);
+        gameDispatcherCreationSubject = new Subject();
+        gameDispatcherServiceSpy.observeGameCreationFailed.and.returnValue(gameDispatcherCreationSubject.asObservable());
+    });
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent, TimerSelectionComponent, IconComponent, PageHeaderComponent],
