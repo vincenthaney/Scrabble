@@ -457,7 +457,7 @@ describe('GamePlayService', () => {
         let highScoresServiceStub: SinonStubbedInstance<HighScoresService>;
         beforeEach(() => {
             highScoresServiceStub = createStubInstance(HighScoresService);
-            highScoresServiceStub.addHighScore.resolves(true);
+            highScoresServiceStub.addHighScore.resolves();
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
             chai.spy.on(gamePlayService['dictionaryService'], 'stopUsingDictionary', () => {
                 return;

@@ -117,7 +117,7 @@ describe('HighScoresService', () => {
     describe('updateHighScore', () => {
         it('should update the highScore if the name is not already on it ', async () => {
             const newName = 'new name';
-            expect(await highScoresService['updateHighScore'](newName, HIGH_SCORE_CLASSIC_1)).to.be.true;
+            await highScoresService['updateHighScore'](newName, HIGH_SCORE_CLASSIC_1);
             const updatedHighScore = await highScoresService['collection'].findOne({
                 score: HIGH_SCORE_CLASSIC_1.score,
                 gameType: HIGH_SCORE_CLASSIC_1.gameType,
@@ -127,7 +127,7 @@ describe('HighScoresService', () => {
         });
         it('should not update the highScore if the name is already on it ', async () => {
             const newName = HIGH_SCORE_CLASSIC_1.names[0];
-            expect(await highScoresService['updateHighScore'](newName, HIGH_SCORE_CLASSIC_1)).to.be.false;
+            await highScoresService['updateHighScore'](newName, HIGH_SCORE_CLASSIC_1);
             const updatedHighScore = await highScoresService['collection'].findOne({
                 score: HIGH_SCORE_CLASSIC_1.score,
                 gameType: HIGH_SCORE_CLASSIC_1.gameType,
@@ -183,12 +183,11 @@ describe('HighScoresService', () => {
     });
 
     describe('addHighScore', () => {
-        it('should call getSortedHighScores and return false if the new score is lower than the minimum score', async () => {
+        it('should call getSortedHighScores and return early return if the new score is lower than the minimum score', async () => {
             const spyGetSortedHighScores = chai.spy.on(highScoresService, 'getSortedHighScores', () => SORTED_HIGH_SCORES_CLASSIC);
             const newName = 'new name';
             const newScore = 1;
-
-            expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.false;
+            await highScoresService.addHighScore(newName, newScore, GameType.Classic);
             expect(spyGetSortedHighScores).to.have.been.called();
         });
 
@@ -197,16 +196,16 @@ describe('HighScoresService', () => {
             chai.spy.on(highScoresService, 'getSortedHighScores', () => SORTED_HIGH_SCORES_CLASSIC);
             const newName = 'new name';
             const newScore = HIGH_SCORE_CLASSIC_3.score;
-            expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
+            await highScoresService.addHighScore(newName, newScore, GameType.Classic);
             expect(spyUpdateHighScore).to.have.been.called();
         });
 
         it('should call replaceHighScore if the score higher and different to one in the collection', async () => {
-            const spyUpdateHighScore = chai.spy.on(highScoresService, 'replaceHighScore', () => true);
+            const spyUpdateHighScore = chai.spy.on(highScoresService, 'replaceHighScore', () => {});
             chai.spy.on(highScoresService, 'getSortedHighScores', () => SORTED_HIGH_SCORES_CLASSIC);
             const newName = 'new name';
             const newScore = HIGH_SCORE_CLASSIC_3.score + 1;
-            expect(await highScoresService.addHighScore(newName, newScore, GameType.Classic)).to.be.true;
+            await highScoresService.addHighScore(newName, newScore, GameType.Classic);
             expect(spyUpdateHighScore).to.have.been.called();
         });
     });

@@ -82,9 +82,9 @@ export default class InputParserService {
 
         switch (actionType) {
             case ActionType.PLACE:
-                return this.actionService.createActionData(ActionType.PLACE, this.createPlaceActionPayload(inputWords[1], inputWords[2]), input);
+                return this.actionService.createActionData(actionType, this.createPlaceActionPayload(inputWords[1], inputWords[2]), input);
             case ActionType.EXCHANGE:
-                return this.actionService.createActionData(ActionType.EXCHANGE, this.createExchangeActionPayload(inputWords[1]), input);
+                return this.actionService.createActionData(actionType, this.createExchangeActionPayload(inputWords[1]), input);
             case ActionType.PASS:
             case ActionType.RESERVE:
             case ActionType.HINT:
