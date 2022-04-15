@@ -101,7 +101,6 @@ describe('VirtualPlayerProfilesController', () => {
         });
     });
 
-
     describe('subscriptions', () => {
         let serviceDestroyed$: Subject<boolean>;
         let callback: () => void;
@@ -130,6 +129,5 @@ describe('VirtualPlayerProfilesController', () => {
             controller.subscribeToVirtualPlayerServerResponseEvent(serviceDestroyed$, callback);
             expect(subscribeSpy).toHaveBeenCalled();
         });
-
-    })
+    });
 });

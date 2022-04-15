@@ -1,4 +1,3 @@
-
 import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
