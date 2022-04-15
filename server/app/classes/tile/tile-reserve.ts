@@ -36,7 +36,7 @@ export default class TileReserve {
     }
 
     getTiles(amount: number): Tile[] {
-        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIATED, StatusCodes.FORBIDDEN);
+        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIATED, StatusCodes.INTERNAL_SERVER_ERROR);
         if (amount < 1) throw new HttpException(AMOUNT_MUST_BE_GREATER_THAN_1, StatusCodes.FORBIDDEN);
         const tilesToReturn: Tile[] = [];
         const tileToGive = Math.min(this.tiles.length, amount);
