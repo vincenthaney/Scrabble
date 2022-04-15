@@ -10,6 +10,7 @@ import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { MUST_HAVE_7_TILES_TO_SWAP } from '@app/constants/classes-errors';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { MINIMUM_TILES_LEFT_FOR_EXCHANGE } from '@app/constants/virtual-player-constants';
@@ -77,6 +78,9 @@ export class GamePlayService {
                 return new ActionPlace(player, game, { tilesToPlace: payload.tiles ?? [], startPosition, orientation: payload.orientation });
             }
             case ActionType.EXCHANGE: {
+                const totalTilesLeft = this.activeGameService.getGame(game.getId(), player.id).getTotalTilesLeft();
+                if (!isIdVirtualPlayer(player.id) && totalTilesLeft < MINIMUM_TILES_LEFT_FOR_EXCHANGE) throw new Error(MUST_HAVE_7_TILES_TO_SWAP);
+
                 const payload = this.getActionExchangePayload(actionData);
                 return new ActionExchange(player, game, payload.tiles ?? []);
             }
