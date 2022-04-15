@@ -116,6 +116,10 @@ export default class Game {
         return this.tileReserve.getTilesLeftPerLetter();
     }
 
+    getTotalTilesLeft(): number {
+        return this.tileReserve.getTotalTilesLeft();
+    }
+
     getId(): string {
         return this.id;
     }
