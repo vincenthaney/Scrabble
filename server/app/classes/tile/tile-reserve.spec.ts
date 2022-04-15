@@ -1,18 +1,14 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
+import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
+import { AMOUNT_MUST_BE_GREATER_THAN_1, TILE_NOT_IN_RESERVE, TILE_RESERVE_MUST_BE_INITIATED } from '@app/constants/classes-errors';
 import { LETTER_VALUES } from '@app/constants/game';
-import { expect } from 'chai';
+import { expect, spy } from 'chai';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { join } from 'path';
 import Tile from './tile';
 import TileReserve from './tile-reserve';
 import { LetterDistributionData, LetterValue } from './tile.types';
-import {
-    AMOUNT_MUST_BE_GREATER_THAN_1,
-    MUST_HAVE_7_TILES_TO_SWAP,
-    TILE_NOT_IN_RESERVE,
-    TILE_RESERVE_MUST_BE_INITIATED,
-} from '@app/constants/classes-errors';
-import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
 
 const mockLetterDistribution: LetterDistributionData = {
     tiles: [
@@ -45,112 +41,138 @@ describe('TileReserve', () => {
         expect(tileReserve.isInitialized()).to.equal(true);
     });
 
-    it('getTilesLeftPerLetter: should have a specific amount of tiles for each letters', async () => {
-        const letterMap = tileReserve.getTilesLeftPerLetter();
-        const tilesData = await TileReserve['fetchLetterDistribution']();
-        tilesData.forEach((tile) => {
-            expect(letterMap.get(tile.letter as LetterValue)).to.equal(tile.amount);
+    describe('getTilesLeftPerLetter', () => {
+        it('should have a specific amount of tiles for each letters', async () => {
+            const letterMap = tileReserve.getTilesLeftPerLetter();
+            const tilesData = await TileReserve['fetchLetterDistribution']();
+            tilesData.forEach((tile) => {
+                expect(letterMap.get(tile.letter as LetterValue)).to.equal(tile.amount);
+            });
+        });
+
+        it('should have 0 for each when no letters are left', () => {
+            tileReserve.getTiles(tileReserve['tiles'].length);
+            const letterMap = tileReserve.getTilesLeftPerLetter();
+            LETTER_VALUES.forEach((letter) => expect(letterMap.get(letter)).to.equal(0));
         });
     });
 
-    it('getTilesLeftPerLetter: should have 0 for each when no letters are left', () => {
-        tileReserve.getTiles(tileReserve['tiles'].length);
-        const letterMap = tileReserve.getTilesLeftPerLetter();
-        LETTER_VALUES.forEach((letter) => expect(letterMap.get(letter)).to.equal(0));
+    describe('getTotalTilesLeft', () => {
+        it('should call getTilesLeftPerLetter', () => {
+            const getTilesLeftPerLetterSpy = spy.on(tileReserve, 'getTilesLeftPerLetter', () => {
+                return new Map<LetterValue, number>([
+                    ['A', 4],
+                    ['B', 2],
+                    ['C', 6],
+                ]);
+            });
+            tileReserve.getTotalTilesLeft();
+            expect(getTilesLeftPerLetterSpy).to.have.been.called();
+        });
+
+        it('should return expected value', () => {
+            spy.on(tileReserve, 'getTilesLeftPerLetter', () => {
+                return new Map<LetterValue, number>([
+                    ['A', 4],
+                    ['B', 2],
+                    ['C', 6],
+                ]);
+            });
+            expect(tileReserve.getTotalTilesLeft()).to.equal(12);
+        });
     });
 
-    it('getTiles: should throw error when get 0 tiles', () => {
-        const amountToRemove = 0;
-        expect(() => tileReserve.getTiles(amountToRemove)).to.throw(AMOUNT_MUST_BE_GREATER_THAN_1);
+    describe('getTiles', () => {
+        it('should throw error when get 0 tiles', () => {
+            const amountToRemove = 0;
+            expect(() => tileReserve.getTiles(amountToRemove)).to.throw(AMOUNT_MUST_BE_GREATER_THAN_1);
+        });
+
+        it('should remove tiles when getTiles (1)', () => {
+            const amountToRemove = 1;
+            const totalTiles = tileReserve['tiles'].length;
+            testGetTilesOnSuccess(amountToRemove, totalTiles);
+        });
+
+        it('should remove tiles when getTiles (2)', () => {
+            const amountToRemove = 2;
+            const totalTiles = tileReserve['tiles'].length;
+            testGetTilesOnSuccess(amountToRemove, totalTiles);
+        });
+
+        it('should remove tiles when getTiles (7)', () => {
+            const amountToRemove = 7;
+            const totalTiles = tileReserve['tiles'].length;
+            testGetTilesOnSuccess(amountToRemove, totalTiles);
+        });
+
+        it('should remove tiles when getTiles (max - 1)', () => {
+            const totalTiles = tileReserve['tiles'].length;
+            const amountToRemove = totalTiles - 1;
+            testGetTilesOnSuccess(amountToRemove, totalTiles);
+        });
+
+        it('should remove tiles when getTiles (max)', () => {
+            const totalTiles = tileReserve['tiles'].length;
+            const amountToRemove = totalTiles;
+            testGetTilesOnSuccess(amountToRemove, totalTiles);
+        });
+
+        it('should return every tile left when trying to get more than amount in reserve.', () => {
+            const totalTiles = tileReserve['tiles'].length;
+            const amountToRemove = totalTiles + 1;
+            const result = tileReserve.getTiles(amountToRemove);
+            expect(result.length).to.equal(totalTiles);
+            expect(tileReserve['tiles'].length).to.equal(0);
+        });
     });
 
-    it('getTiles: should remove tiles when getTiles (1)', () => {
-        const amountToRemove = 1;
-        const totalTiles = tileReserve['tiles'].length;
-        testGetTilesOnSuccess(amountToRemove, totalTiles);
+    describe('swapTiles', () => {
+        it('should throw error when swapping no tiles', () => {
+            const tiles: Tile[] = [];
+            expect(() => tileReserve.swapTiles(tiles)).to.throw(AMOUNT_MUST_BE_GREATER_THAN_1);
+        });
+
+        it('should contain the same amount of tiles, but not the same instances (1)', () => {
+            const amount = 1;
+            testSwapTilesOnSuccess(amount);
+        });
+
+        it('should contain the same amount of tiles, but not the same instances (2)', () => {
+            const amount = 2;
+            testSwapTilesOnSuccess(amount);
+        });
+
+        it('should contain the same amount of tiles, but not the same instances (7)', () => {
+            const amount = 7;
+            testSwapTilesOnSuccess(amount);
+        });
+
+        it('should contain the same amount of tiles, but not the same instances (max - 1)', () => {
+            const amount = tileReserve['tiles'].length / 2 - 2;
+            testSwapTilesOnSuccess(amount);
+        });
+
+        it('should contain the same amount of tiles, but not the same instances (max)', () => {
+            const amount = tileReserve['tiles'].length / 2 - 1;
+            testSwapTilesOnSuccess(amount);
+        });
+
+        it('should throw error when swap more than amount in reserve', () => {
+            const amount = tileReserve['tiles'].length / 2 + 1;
+            const tiles: Tile[] = tileReserve.getTiles(amount);
+
+            expect(() => tileReserve.swapTiles(tiles)).to.throw();
+        });
     });
 
-    it('getTiles: should remove tiles when getTiles (2)', () => {
-        const amountToRemove = 2;
-        const totalTiles = tileReserve['tiles'].length;
-        testGetTilesOnSuccess(amountToRemove, totalTiles);
-    });
+    describe('removeTiles', () => {
+        it('should throw error when tile is not in reserve', () => {
+            const tile = tileReserve.getTiles(1);
 
-    it('getTiles: should remove tiles when getTiles (7)', () => {
-        const amountToRemove = 7;
-        const totalTiles = tileReserve['tiles'].length;
-        testGetTilesOnSuccess(amountToRemove, totalTiles);
-    });
-
-    it('getTiles: should remove tiles when getTiles (max - 1)', () => {
-        const totalTiles = tileReserve['tiles'].length;
-        const amountToRemove = totalTiles - 1;
-        testGetTilesOnSuccess(amountToRemove, totalTiles);
-    });
-
-    it('getTiles: should remove tiles when getTiles (max)', () => {
-        const totalTiles = tileReserve['tiles'].length;
-        const amountToRemove = totalTiles;
-        testGetTilesOnSuccess(amountToRemove, totalTiles);
-    });
-
-    it('getTiles: should return every tile left when trying to get more than amount in reserve.', () => {
-        const totalTiles = tileReserve['tiles'].length;
-        const amountToRemove = totalTiles + 1;
-        const result = tileReserve.getTiles(amountToRemove);
-        expect(result.length).to.equal(totalTiles);
-        expect(tileReserve['tiles'].length).to.equal(0);
-    });
-
-    it('swapTiles: should throw error when swapping no tiles', () => {
-        const tiles: Tile[] = [];
-        expect(() => tileReserve.swapTiles(tiles)).to.throw(AMOUNT_MUST_BE_GREATER_THAN_1);
-    });
-
-    it('swapTiles: should contain the same amount of tiles, but not the same instances (1)', () => {
-        const amount = 1;
-        testSwapTilesOnSuccess(amount);
-    });
-
-    it('swapTiles: should contain the same amount of tiles, but not the same instances (2)', () => {
-        const amount = 2;
-        testSwapTilesOnSuccess(amount);
-    });
-
-    it('swapTiles: should contain the same amount of tiles, but not the same instances (7)', () => {
-        const amount = 7;
-        testSwapTilesOnSuccess(amount);
-    });
-
-    it('swapTiles: should contain the same amount of tiles, but not the same instances (max - 1)', () => {
-        const amount = tileReserve['tiles'].length / 2 - 2;
-        testSwapTilesOnSuccess(amount);
-    });
-
-    it('swapTiles: should contain the same amount of tiles, but not the same instances (max)', () => {
-        const amount = tileReserve['tiles'].length / 2 - 1;
-        testSwapTilesOnSuccess(amount);
-    });
-
-    it('swapTiles: should throw error when swap more than amount in reserve', () => {
-        const amount = tileReserve['tiles'].length / 2 + 1;
-        const tiles: Tile[] = tileReserve.getTiles(amount);
-
-        expect(() => tileReserve.swapTiles(tiles)).to.throw();
-    });
-
-    it('swapTiles: should throw error when reserve have less than 7 tiles', () => {
-        const amount = tileReserve['tiles'].length - 3;
-        const tiles: Tile[] = tileReserve.getTiles(amount - 3);
-
-        expect(() => tileReserve.swapTiles([tiles[0]])).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
-    });
-
-    it('removeTile: should throw error when tile is not in reserve', () => {
-        const tile = tileReserve.getTiles(1);
-
-        // eslint-disable-next-line dot-notation
-        expect(() => tileReserve['removeTile'](tile[0])).to.throw(TILE_NOT_IN_RESERVE);
+            // eslint-disable-next-line dot-notation
+            expect(() => tileReserve['removeTile'](tile[0])).to.throw(TILE_NOT_IN_RESERVE);
+        });
     });
 
     const testGetTilesOnSuccess = (amount: number, total: number) => {

@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
+import Game from '@app/classes/game/game';
 import { AbstractWordFinding, ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     HIGH_SCORE_RANGE_MAX,
@@ -13,6 +14,7 @@ import {
     LOW_SCORE_RANGE_MIN,
     MEDIUM_SCORE_RANGE_MAX,
     MEDIUM_SCORE_RANGE_MIN,
+    MINIMUM_TILES_LEFT_FOR_EXCHANGE,
 } from '@app/constants/virtual-player-constants';
 import {
     EXPECTED_INCREMENT_VALUE,
@@ -56,6 +58,27 @@ describe('BeginnerVirtualPlayer', () => {
 
     it('should create', () => {
         expect(beginnerVirtualPlayer).to.exist;
+    });
+
+    describe('isExchangePossible', () => {
+        let TEST_GAME: Game;
+
+        beforeEach(() => {
+            TEST_GAME = new Game();
+            spy.on(beginnerVirtualPlayer['activeGameService'], 'getGame', () => {
+                return TEST_GAME;
+            });
+        });
+
+        it('should return false when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            spy.on(TEST_GAME, 'getTotalTilesLeft', () => MINIMUM_TILES_LEFT_FOR_EXCHANGE - 3);
+            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.false;
+        });
+
+        it('should return true when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
+            spy.on(TEST_GAME, 'getTotalTilesLeft', () => MINIMUM_TILES_LEFT_FOR_EXCHANGE + 3);
+            expect(beginnerVirtualPlayer['isExchangePossible']()).to.be.true;
+        });
     });
 
     describe('findPointRange', () => {

@@ -1,12 +1,6 @@
 import { LetterValue, Tile } from '@app/classes/tile';
-import { LETTER_DISTRIBUTION_RELATIVE_PATH, TILE_RESERVE_THRESHOLD } from '@app/constants/classes-constants';
-import {
-    AMOUNT_MUST_BE_GREATER_THAN_1,
-    MUST_HAVE_7_TILES_TO_SWAP,
-    NOT_ENOUGH_TILES,
-    TILE_NOT_IN_RESERVE,
-    TILE_RESERVE_MUST_BE_INITIATED,
-} from '@app/constants/classes-errors';
+import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
+import { AMOUNT_MUST_BE_GREATER_THAN_1, NOT_ENOUGH_TILES, TILE_NOT_IN_RESERVE, TILE_RESERVE_MUST_BE_INITIATED } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES } from '@app/constants/game';
 import { promises } from 'fs';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
@@ -55,7 +49,6 @@ export default class TileReserve {
     swapTiles(tilesToSwap: Tile[]): Tile[] {
         if (!this.initialized) throw new Error(TILE_RESERVE_MUST_BE_INITIATED);
         if (this.tiles.length < tilesToSwap.length) throw new Error(NOT_ENOUGH_TILES);
-        if (this.tiles.length < TILE_RESERVE_THRESHOLD) throw new Error(MUST_HAVE_7_TILES_TO_SWAP);
 
         const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
         this.tiles = this.tiles.concat(tilesToSwap);
@@ -72,6 +65,14 @@ export default class TileReserve {
         });
 
         return map;
+    }
+
+    getTotalTilesLeft(): number {
+        let totalTilesLeft = 0;
+        this.getTilesLeftPerLetter().forEach((value: number) => {
+            totalTilesLeft += value;
+        });
+        return totalTilesLeft;
     }
 
     isInitialized(): boolean {
