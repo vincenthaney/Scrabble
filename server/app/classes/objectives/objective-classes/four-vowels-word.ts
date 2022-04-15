@@ -4,7 +4,7 @@ import { VOWELS } from '@app/constants/services-constants/objective.const';
 
 export const NAME = 'Voyelles au max';
 export const DESCRIPTION = 'Former un mot qui contient 4 voyelles ou plus';
-export const BONUS_POINTS = 50;
+export const BONUS_POINTS = 30;
 export const SHOULD_RESET = false;
 export const MAX_PROGRESS = 1;
 

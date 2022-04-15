@@ -4,7 +4,7 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 
 export const NAME = 'Entêtement';
 export const DESCRIPTION = "Faire des placements dans la même orientation 5 fois d'affilée";
-export const BONUS_POINTS = 30;
+export const BONUS_POINTS = 70;
 export const SHOULD_RESET = true;
 export const MAX_PROGRESS = 5;
 

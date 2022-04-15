@@ -3,9 +3,9 @@ import { ObjectiveValidationParameters } from '@app/classes/objectives/validatio
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 
-export const NAME = 'Ça vaut cher au Scrable ça';
+export const NAME = 'Hippopotomonstrosesuipédaliophobie';
 export const DESCRIPTION = 'Former un mot de 10 lettres ou plus';
-export const BONUS_POINTS = 70;
+export const BONUS_POINTS = 50;
 export const NUMBER_OF_LETTERS_TO_COMPLETE = 10;
 
 export class TenLetterWord extends AbstractObjective {
