@@ -1,31 +1,92 @@
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpParams } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
+import { RouterTestingModule } from '@angular/router/testing';
+import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { of, Subject } from 'rxjs';
 import { VirtualPlayerProfilesController } from './virtual-player-profiles.controller';
+const TEST_VIRTUAL_PLAYER_DATA = {} as VirtualPlayerData;
+const TEST_ID = 'iamtheidthatwillbetested';
 
-describe('GameHistoryControllerService', () => {
+describe('VirtualPlayerProfilesController', () => {
     let controller: VirtualPlayerProfilesController;
+    let httpMock: HttpTestingController;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, RouterTestingModule],
+            providers: [VirtualPlayerProfilesController],
         });
         controller = TestBed.inject(VirtualPlayerProfilesController);
+        httpMock = TestBed.inject(HttpTestingController);
     });
 
-    it('should be created', () => {
+    afterEach(() => {
+        httpMock.verify();
+    });
+
+    it('should create', () => {
         expect(controller).toBeTruthy();
     });
 
-    describe('getAllVirtualPlayerProfiles', () => {
-        it('should call get with right endpoint', () => {
-            const spy = spyOn(controller['http'], 'get');
+    describe('ngOnDestroy', () => {
+        it('should call next', () => {
+            const spy = spyOn(controller['serviceDestroyed$'], 'next');
+            spyOn(controller['serviceDestroyed$'], 'complete');
+            controller.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
 
-            controller.getAllVirtualPlayerProfiles();
+        it('should call complete', () => {
+            spyOn(controller['serviceDestroyed$'], 'next');
+            const spy = spyOn(controller['serviceDestroyed$'], 'complete');
+            controller.ngOnDestroy();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
 
-            expect(spy).toHaveBeenCalledOnceWith(controller['endpoint']);
+    describe('handleGetAllVirtualPlayerProfilesEvent', () => {
+        it('should  make an HTTP get request', async () => {
+            const httpGetSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
+            controller.handleGetAllVirtualPlayerProfilesEvent();
+            expect(httpGetSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('handleCreateVirtualPlayerProfileEvent', () => {
+        it('should  make an HTTP post request', async () => {
+            const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
+            controller.handleCreateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
+            expect(httpPostSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('handleUpdateVirtualPlayerProfileEvent', () => {
+        it('handleUpdateVirtualPlayerProfileEvent should  make an HTTP patch request', async () => {
+            spyOn(HttpParams.prototype, 'append').and.returnValue({} as HttpParams);
+            const httpPatchSpy = spyOn(controller['http'], 'patch').and.returnValue(of(true) as any);
+            await controller.handleUpdateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
+            expect(httpPatchSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('handleDeleteVirtualPlayerProfileEvent', () => {
+        it('handleDeleteVirtualPlayerProfileEvent should  make an HTTP delete request', async () => {
+            const httpDeleteSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+            controller.handleDeleteVirtualPlayerProfileEvent(TEST_ID);
+            expect(httpDeleteSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('handleResetVirtualPlayerProfilesEvent', () => {
+        it('handleResetVirtualPlayerProfilesEvent should  make an HTTP delete request', async () => {
+            const httpDeleteSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
+            controller.handleResetVirtualPlayerProfilesEvent();
+            expect(httpDeleteSpy).toHaveBeenCalled();
         });
     });
 
@@ -40,51 +101,35 @@ describe('GameHistoryControllerService', () => {
         });
     });
 
-    describe('createVirtualPlayerProfile', () => {
-        it('should call post with right endpoint', () => {
-            const spy = spyOn(controller['http'], 'post');
-            const profile: VirtualPlayerProfile = {
-                name: 'Brun',
-                level: VirtualPlayerLevel.Beginner,
-                isDefault: true,
+
+    describe('subscriptions', () => {
+        let serviceDestroyed$: Subject<boolean>;
+        let callback: () => void;
+
+        beforeEach(() => {
+            serviceDestroyed$ = new Subject();
+            callback = () => {
+                return;
             };
-
-            controller.createVirtualPlayerProfile(profile);
-
-            expect(spy).toHaveBeenCalledOnceWith(controller['endpoint'], { virtualPlayerProfile: profile });
         });
-    });
 
-    describe('updateVirtualPlayerProfile', () => {
-        it('should call patch with right endpoint', () => {
-            const spy = spyOn(controller['http'], 'patch');
-            const profilId = 'un id';
-            const newName = 'mathiloulilou';
-
-            controller.updateVirtualPlayerProfile(profilId, newName);
-
-            expect(spy).toHaveBeenCalledOnceWith(`${controller['endpoint']}/${profilId}`, { newName });
+        it('should subscribe to GetAllVirtualPlayersEvent', () => {
+            const subscribeSpy = spyOn<any>(controller['getAllVirtualPlayersEvent'], 'subscribe');
+            controller.subscribeToGetAllVirtualPlayersEvent(serviceDestroyed$, callback);
+            expect(subscribeSpy).toHaveBeenCalled();
         });
-    });
 
-    describe('deleteVirtualPlayerProfile', () => {
-        it('should call delete with right endpoint', () => {
-            const spy = spyOn(controller['http'], 'delete');
-            const profilId = 'un id';
-
-            controller.deleteVirtualPlayerProfile(profilId);
-
-            expect(spy).toHaveBeenCalledOnceWith(`${controller['endpoint']}/${profilId}`);
+        it('should subscribe to VirtualPlayerErrorEvent', () => {
+            const subscribeSpy = spyOn<any>(controller['virtualPlayerErrorEvent'], 'subscribe');
+            controller.subscribeToVirtualPlayerErrorEvent(serviceDestroyed$, callback);
+            expect(subscribeSpy).toHaveBeenCalled();
         });
-    });
 
-    describe('resetVirtualPlayerProfiles', () => {
-        it('should call delete with right endpoint', () => {
-            const spy = spyOn(controller['http'], 'delete');
-
-            controller.resetVirtualPlayerProfiles();
-
-            expect(spy).toHaveBeenCalledOnceWith(controller['endpoint']);
+        it('should subscribe to VirtualPlayerServerResponseEvent', () => {
+            const subscribeSpy = spyOn<any>(controller['virtualPlayerServerResponseEvent'], 'subscribe');
+            controller.subscribeToVirtualPlayerServerResponseEvent(serviceDestroyed$, callback);
+            expect(subscribeSpy).toHaveBeenCalled();
         });
-    });
+
+    })
 });

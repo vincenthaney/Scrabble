@@ -14,7 +14,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
     private endpoint = `${environment.serverUrl}/virtualPlayerProfiles`;
     private virtualPlayerServerResponseEvent: Subject<string> = new Subject();
     private getAllVirtualPlayersEvent: Subject<VirtualPlayerProfile[]> = new Subject();
-    private virtualPlayersErrorEvent: Subject<string> = new Subject();
+    private virtualPlayerErrorEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
     constructor(private readonly http: HttpClient) {}
 
@@ -29,7 +29,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
                 this.getAllVirtualPlayersEvent.next(body.virtualPlayerProfiles);
             },
             (error) => {
-                this.virtualPlayersErrorEvent.next(error.error.message);
+                this.virtualPlayerErrorEvent.next(error.error.message);
             },
         );
     }
@@ -40,7 +40,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayerCreated);
             },
             (error) => {
-                this.virtualPlayersErrorEvent.next(error.error.message);
+                this.virtualPlayerErrorEvent.next(error.error.message);
             },
         );
     }
@@ -51,7 +51,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayerUpdated);
             },
             (error) => {
-                this.virtualPlayersErrorEvent.next(error.error.message);
+                this.virtualPlayerErrorEvent.next(error.error.message);
             },
         );
     }
@@ -62,7 +62,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayerDeleted);
             },
             (error) => {
-                this.virtualPlayersErrorEvent.next(error.error.message);
+                this.virtualPlayerErrorEvent.next(error.error.message);
             },
         );
     }
@@ -73,7 +73,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayersDeleted);
             },
             (error) => {
-                this.virtualPlayersErrorEvent.next(error.error.message);
+                this.virtualPlayerErrorEvent.next(error.error.message);
             },
         );
     }
@@ -87,10 +87,10 @@ export class VirtualPlayerProfilesController implements OnDestroy {
     }
 
     subscribeToVirtualPlayerErrorEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
-        this.virtualPlayersErrorEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
+        this.virtualPlayerErrorEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    subscribeToVirtualPlayerServerResponse(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
+    subscribeToVirtualPlayerServerResponseEvent(serviceDestroyed$: Subject<boolean>, callback: (response: string) => void): void {
         this.virtualPlayerServerResponseEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 }
