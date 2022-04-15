@@ -1,21 +1,26 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
+import Game from '@app/classes/game/game';
 import { AbstractWordFinding, ScoredWordPlacement, WordFindingUseCase } from '@app/classes/word-finding';
 import { PLAYER_ID, PLAYER_NAME, TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
+import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance } from 'sinon';
-import { ExpertVirtualPlayer } from './expert-virtual-player';
+import { ExpertVirtualPlayer, MAX_EXPERT_CONSECUTIVE_EXCHANGES } from './expert-virtual-player';
 
 describe('ExpertVirtualPlayer', () => {
     let expertVirtualPlayer: ExpertVirtualPlayer;
 
     beforeEach(async () => {
         expertVirtualPlayer = new ExpertVirtualPlayer(PLAYER_ID, PLAYER_NAME);
+        spy.on(ActiveGameService.prototype, 'getGame', () => new Game());
+        spy.on(Game.prototype, 'getTotalTilesLeft', () => 5);
     });
 
     afterEach(() => {
@@ -24,6 +29,12 @@ describe('ExpertVirtualPlayer', () => {
 
     it('should create', () => {
         expect(expertVirtualPlayer).to.exist;
+    });
+
+    describe('isExchangePossible', () => {
+        it('should return true in all cases', () => {
+            expect(expertVirtualPlayer['isExchangePossible']()).to.be.true;
+        });
     });
 
     describe('findPointRange', () => {
@@ -35,27 +46,32 @@ describe('ExpertVirtualPlayer', () => {
     });
 
     describe('alternativeMove', () => {
-        it('should call ActionExchange if no moves are found and exchange is possible', () => {
+        it('should call ActionExchange and increment echange counter IF no moves are found and exchange is \
+        possible + max exchange count has not been reached', () => {
             spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
                 return true;
             });
+            expertVirtualPlayer['consecutiveExchangeCount'] = 1;
             const createActionDataSpy = spy.on(ActionExchange, 'createActionData', () => {});
 
             expertVirtualPlayer['alternativeMove']();
+            expect(expertVirtualPlayer['consecutiveExchangeCount']).to.equal(2);
             expect(createActionDataSpy).to.have.been.called();
         });
 
-        it('should call ActionPass if no moves are found and exchange is not possible', () => {
+        it('should call ActionPass and not increment counter if no moves are found and exchange is not possible', () => {
             spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
                 return false;
             });
             const createActionDataSpy = spy.on(ActionPass, 'createActionData', () => {});
+            expertVirtualPlayer['consecutiveExchangeCount'] = 1;
 
             expertVirtualPlayer['alternativeMove']();
+            expect(expertVirtualPlayer['consecutiveExchangeCount']).to.equal(1);
             expect(createActionDataSpy).to.have.been.called();
         });
 
-        it('should call ActionPass if no moves are found and exchange is not possible', () => {
+        it('should call ActionPass and not increment counter if no moves are found and exchange is not possible', () => {
             const wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
             wordFindingInstanceStub['wordPlacements'] = [];
             expertVirtualPlayer['wordFindingInstance'] = wordFindingInstanceStub as unknown as AbstractWordFinding;
@@ -63,12 +79,26 @@ describe('ExpertVirtualPlayer', () => {
                 return false;
             });
             const createActionDataSpy = spy.on(ActionPass, 'createActionData', () => {});
+            expertVirtualPlayer['consecutiveExchangeCount'] = 1;
 
             expertVirtualPlayer['alternativeMove']();
+            expect(expertVirtualPlayer['consecutiveExchangeCount']).to.equal(1);
             expect(createActionDataSpy).to.have.been.called();
         });
 
-        it('should call ActionPlace if a moves is found', () => {
+        it('should call ActionPass and not increment counter if no moves are found and max exchange count has been reached', () => {
+            spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
+                return true;
+            });
+            const createActionDataSpy = spy.on(ActionPass, 'createActionData', () => {});
+            expertVirtualPlayer['consecutiveExchangeCount'] = MAX_EXPERT_CONSECUTIVE_EXCHANGES;
+
+            expertVirtualPlayer['alternativeMove']();
+            expect(expertVirtualPlayer['consecutiveExchangeCount']).to.equal(MAX_EXPERT_CONSECUTIVE_EXCHANGES);
+            expect(createActionDataSpy).to.have.been.called();
+        });
+
+        it('should call ActionPlace and reset exchange counter if a moves is found', () => {
             const wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
             wordFindingInstanceStub['wordPlacements'] = [{} as unknown as ScoredWordPlacement];
             expertVirtualPlayer['wordFindingInstance'] = wordFindingInstanceStub as unknown as AbstractWordFinding;
@@ -76,9 +106,11 @@ describe('ExpertVirtualPlayer', () => {
                 return false;
             });
             const createActionDataSpy = spy.on(ActionPlace, 'createActionData', () => {});
+            expertVirtualPlayer['consecutiveExchangeCount'] = 2;
 
             expertVirtualPlayer['alternativeMove']();
             expect(createActionDataSpy).to.have.been.called();
+            expect(expertVirtualPlayer['consecutiveExchangeCount']).to.equal(0);
         });
     });
 
