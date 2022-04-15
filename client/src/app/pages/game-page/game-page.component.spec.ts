@@ -186,12 +186,12 @@ describe('GamePageComponent', () => {
         }
     });
 
-    describe('playButtonClicked', () => {
+    describe('hintButtonClicked', () => {
         const fakeData = { fake: 'data' };
         let createActionDataSpy: jasmine.Spy;
         let sendAction: jasmine.Spy;
 
-        it('should use action service to play', () => {
+        it('should use action service to get hint', () => {
             spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
             spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
 
@@ -199,8 +199,27 @@ describe('GamePageComponent', () => {
             sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
                 return;
             });
-            component.playButtonClicked();
-            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.play, {}, '', true);
+            component.hintButtonClicked();
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.HINT, {}, '', true);
+            expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
+        });
+    });
+
+    describe('passButtonClicked', () => {
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
+
+        it('should use action service to pass', () => {
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
+            component.passButtonClicked();
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.PASS, {}, '', true);
             expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
         });
     });
