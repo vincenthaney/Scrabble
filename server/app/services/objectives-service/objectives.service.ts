@@ -79,7 +79,7 @@ export default class ObjectivesService {
 
     private findOpponent(game: Game, originalPlayer: Player): Player {
         const opponentPlayer: Player | undefined = [game.player1, game.player2].find((player: Player) => player.id !== originalPlayer.id);
-        if (!opponentPlayer) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
+        if (!opponentPlayer) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.NOT_FOUND);
         return opponentPlayer;
     }
 
@@ -96,7 +96,7 @@ export default class ObjectivesService {
 
     private popObjectiveFromPool(objectivePool: AbstractObjective[]): AbstractObjective {
         const objective: AbstractObjective | undefined = objectivePool.pop();
-        if (!objective) throw new HttpException(NO_OBJECTIVE_LEFT_IN_POOL, StatusCodes.BAD_REQUEST);
+        if (!objective) throw new HttpException(NO_OBJECTIVE_LEFT_IN_POOL, StatusCodes.INTERNAL_SERVER_ERROR);
         return objective;
     }
 }

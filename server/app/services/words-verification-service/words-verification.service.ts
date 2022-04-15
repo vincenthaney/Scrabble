@@ -1,3 +1,4 @@
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import {
     INVALID_WORD,
     MINIMUM_WORD_LENGTH,
@@ -6,10 +7,9 @@ import {
     WORD_CONTAINS_HYPHEN,
     WORD_TOO_SHORT,
 } from '@app/constants/services-errors';
-import { Service } from 'typedi';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { HttpException } from '@app/classes/http-exception/http-exception';
 import { StatusCodes } from 'http-status-codes';
+import { Service } from 'typedi';
 
 @Service()
 export class WordsVerificationService {
@@ -19,12 +19,12 @@ export class WordsVerificationService {
         for (const word of words) {
             const curatedWord = this.removeAccents(word).toLowerCase();
 
-            if (curatedWord.length < MINIMUM_WORD_LENGTH) throw new HttpException(curatedWord + WORD_TOO_SHORT, StatusCodes.BAD_REQUEST);
-            if (curatedWord.includes('*')) throw new HttpException(curatedWord + WORD_CONTAINS_ASTERISK, StatusCodes.BAD_REQUEST);
-            if (curatedWord.includes('-')) throw new HttpException(curatedWord + WORD_CONTAINS_HYPHEN, StatusCodes.BAD_REQUEST);
-            if (curatedWord.includes("'")) throw new HttpException(curatedWord + WORD_CONTAINS_APOSTROPHE, StatusCodes.BAD_REQUEST);
+            if (curatedWord.length < MINIMUM_WORD_LENGTH) throw new HttpException(curatedWord + WORD_TOO_SHORT, StatusCodes.FORBIDDEN);
+            if (curatedWord.includes('*')) throw new HttpException(curatedWord + WORD_CONTAINS_ASTERISK, StatusCodes.FORBIDDEN);
+            if (curatedWord.includes('-')) throw new HttpException(curatedWord + WORD_CONTAINS_HYPHEN, StatusCodes.FORBIDDEN);
+            if (curatedWord.includes("'")) throw new HttpException(curatedWord + WORD_CONTAINS_APOSTROPHE, StatusCodes.FORBIDDEN);
             if (!this.dictionaryService.getDictionary(dictionaryId).wordExists(curatedWord))
-                throw new HttpException(INVALID_WORD(word.toUpperCase()), StatusCodes.BAD_REQUEST);
+                throw new HttpException(INVALID_WORD(word.toUpperCase()), StatusCodes.FORBIDDEN);
         }
     }
 

@@ -39,18 +39,18 @@ export default class VirtualPlayerProfilesService {
             await this.getVirtualPlayerProfilesFromLevel(level),
         ).pop();
         if (virtualPlayerProfile) return virtualPlayerProfile.name;
-        throw new HttpException(NO_PROFILE_OF_LEVEL, StatusCodes.BAD_REQUEST);
+        throw new HttpException(NO_PROFILE_OF_LEVEL, StatusCodes.NOT_FOUND);
     }
 
     async addVirtualPlayerProfile(newProfile: VirtualPlayerProfile): Promise<void> {
-        if (await this.isNameAlreadyUsed(newProfile.name)) throw new HttpException(NAME_ALREADY_USED(newProfile.name), StatusCodes.BAD_REQUEST);
+        if (await this.isNameAlreadyUsed(newProfile.name)) throw new HttpException(NAME_ALREADY_USED(newProfile.name), StatusCodes.FORBIDDEN);
         if (newProfile.isDefault) throw new HttpException(CANNOT_ADD_DEFAULT_PROFILE, StatusCodes.BAD_REQUEST);
 
         await this.collection.insertOne(newProfile);
     }
 
     async updateVirtualPlayerProfile(newName: string, profileId: string): Promise<void> {
-        if (await this.isNameAlreadyUsed(newName)) throw new HttpException(NAME_ALREADY_USED(newName), StatusCodes.BAD_REQUEST);
+        if (await this.isNameAlreadyUsed(newName)) throw new HttpException(NAME_ALREADY_USED(newName), StatusCodes.FORBIDDEN);
 
         await this.collection.updateOne({ _id: new ObjectId(profileId), isDefault: false }, { $set: { name: newName } });
     }

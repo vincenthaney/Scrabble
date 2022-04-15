@@ -1,13 +1,13 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import { SHOULD_HAVE_A_TILE as HAS_TILE } from '@app/classes/board/board';
 import Direction from '@app/classes/board/direction';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
+import { WordPlacement } from '@app/classes/word-finding';
 import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { switchOrientation } from '@app/utils/switch-orientation';
-import { WordPlacement } from '@app/classes/word-finding';
 import { StatusCodes } from 'http-status-codes';
-import { HttpException } from '@app/classes/http-exception/http-exception';
 
 export class WordExtraction {
     constructor(private board: Board) {}
@@ -16,13 +16,13 @@ export class WordExtraction {
         const navigator = this.board.navigate(wordPlacement.startPosition, wordPlacement.orientation);
 
         if (navigator.verify(HAS_TILE)) throw new HttpException(EXTRACTION_SQUARE_ALREADY_FILLED, StatusCodes.BAD_REQUEST);
-        if (this.isWordWithinBounds(navigator, wordPlacement.tilesToPlace)) throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.BAD_REQUEST);
+        if (this.isWordWithinBounds(navigator, wordPlacement.tilesToPlace)) throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.NOT_FOUND);
 
         const wordsCreated: [Square, Tile][][] = new Array();
         const newWord: [Square, Tile][] = [];
 
         for (let i = 0; i < wordPlacement.tilesToPlace.length; ) {
-            if (!navigator.isWithinBounds()) throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.BAD_REQUEST);
+            if (!navigator.isWithinBounds()) throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.NOT_FOUND);
 
             if (navigator.square.tile) {
                 newWord.push([navigator.square, navigator.square.tile]);

@@ -1,7 +1,6 @@
 import { DictionaryNode } from '@app/classes/dictionary';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { LetterValue } from '@app/classes/tile';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
-import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import {
     BoardPlacement,
     DictionarySearcherStackItem,
@@ -10,7 +9,8 @@ import {
     PerpendicularWord,
     SearcherPerpendicularLetters,
 } from '@app/classes/word-finding';
-import { HttpException } from '@app/classes/http-exception/http-exception';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
+import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import { StatusCodes } from 'http-status-codes';
 
 export default class DictionarySearcher {
@@ -49,7 +49,7 @@ export default class DictionarySearcher {
     private next(): DictionarySearchResult {
         const stackItem = this.stack.pop();
 
-        if (!stackItem) throw new HttpException(NEXT_NODE_DOES_NOT_EXISTS, StatusCodes.BAD_REQUEST);
+        if (!stackItem) throw new HttpException(NEXT_NODE_DOES_NOT_EXISTS, StatusCodes.NOT_FOUND);
 
         this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
 

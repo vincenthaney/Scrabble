@@ -45,7 +45,7 @@ export class GamePlayService {
     async playAction(gameId: string, playerId: string, actionData: ActionData): Promise<[void | GameUpdateData, void | FeedbackMessages]> {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getPlayer(playerId, IS_REQUESTING);
-        if (player.id !== playerId) throw new HttpException(NOT_PLAYER_TURN, StatusCodes.BAD_REQUEST);
+        if (player.id !== playerId) throw new HttpException(NOT_PLAYER_TURN, StatusCodes.FORBIDDEN);
         if (game.gameIsOver) return [undefined, undefined];
 
         const action: Action = this.getAction(player, game, actionData);
@@ -82,7 +82,7 @@ export class GamePlayService {
             }
             case ActionType.EXCHANGE: {
                 const totalTilesLeft = this.activeGameService.getGame(game.getId(), player.id).getTotalTilesLeft();
-                if (!this.isExchangeLegal(player, totalTilesLeft)) throw new HttpException(MUST_HAVE_7_TILES_TO_SWAP, StatusCodes.BAD_REQUEST);
+                if (!this.isExchangeLegal(player, totalTilesLeft)) throw new HttpException(MUST_HAVE_7_TILES_TO_SWAP, StatusCodes.FORBIDDEN);
 
                 const payload = this.getActionExchangePayload(actionData);
                 return new ActionExchange(player, game, payload.tiles ?? []);

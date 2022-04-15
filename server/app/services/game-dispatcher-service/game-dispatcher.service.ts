@@ -80,10 +80,10 @@ export class GameDispatcherService {
     requestJoinGame(waitingRoomId: string, playerId: string, playerName: string): GameConfig {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer !== undefined) {
-            throw new HttpException(PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.UNAUTHORIZED);
+            throw new HttpException(PLAYER_ALREADY_TRYING_TO_JOIN, StatusCodes.FORBIDDEN);
         }
         if (waitingRoom.getConfig().player1.name === playerName) {
-            throw new HttpException(CANNOT_HAVE_SAME_NAME);
+            throw new HttpException(CANNOT_HAVE_SAME_NAME, StatusCodes.FORBIDDEN);
         }
 
         waitingRoom.joinedPlayer = new Player(playerId, playerName);
@@ -93,11 +93,11 @@ export class GameDispatcherService {
     acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): ReadyGameConfig {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.getConfig().player1.id !== playerId) {
-            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
+            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.FORBIDDEN);
         } else if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME);
+            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME, StatusCodes.BAD_REQUEST);
         } else if (waitingRoom.joinedPlayer.name !== opponentName) {
-            throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
+            throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH, StatusCodes.BAD_REQUEST);
         }
 
         const index = this.waitingRooms.indexOf(waitingRoom);
@@ -115,11 +115,11 @@ export class GameDispatcherService {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
-            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
+            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.FORBIDDEN);
         } else if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME);
+            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME, StatusCodes.BAD_REQUEST);
         } else if (waitingRoom.joinedPlayer.name !== opponentName) {
-            throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH);
+            throw new HttpException(OPPONENT_NAME_DOES_NOT_MATCH, StatusCodes.BAD_REQUEST);
         }
 
         const rejectedPlayer = waitingRoom.joinedPlayer;
@@ -130,9 +130,9 @@ export class GameDispatcherService {
     leaveLobbyRequest(waitingRoomId: string, playerId: string): [string, string] {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.joinedPlayer === undefined) {
-            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME);
+            throw new HttpException(NO_OPPONENT_IN_WAITING_GAME, StatusCodes.BAD_REQUEST);
         } else if (waitingRoom.joinedPlayer.id !== playerId) {
-            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);
+            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.FORBIDDEN);
         }
         const leaverName = waitingRoom.joinedPlayer.name;
         const hostPlayerId = waitingRoom.getConfig().player1.id;
@@ -145,7 +145,7 @@ export class GameDispatcherService {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
 
         if (waitingRoom.getConfig().player1.id !== playerId) {
-            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.BAD_REQUEST);
+            throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.FORBIDDEN);
         }
         this.dictionaryService.stopUsingDictionary(waitingRoom.getConfig().dictionary.id);
 
@@ -166,7 +166,7 @@ export class GameDispatcherService {
     getMultiplayerGameFromId(waitingRoomId: string): WaitingRoom {
         const filteredWaitingRoom = this.waitingRooms.filter((g) => g.getId() === waitingRoomId);
         if (filteredWaitingRoom.length > 0) return filteredWaitingRoom[0];
-        throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.GONE);
+        throw new HttpException(NO_GAME_FOUND_WITH_ID, StatusCodes.NOT_FOUND);
     }
 
     isGameInWaitingRooms(gameId: string): boolean {

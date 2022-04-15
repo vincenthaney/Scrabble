@@ -25,7 +25,7 @@ export class VirtualPlayerService {
     }
 
     triggerVirtualPlayerTurn(data: StartGameData | GameUpdateData, game: Game): void {
-        if (!data.round) throw new HttpException(GAME_SHOULD_CONTAIN_ROUND, StatusCodes.BAD_REQUEST);
+        if (!data.round) throw new HttpException(GAME_SHOULD_CONTAIN_ROUND, StatusCodes.INTERNAL_SERVER_ERROR);
         const virtualPlayer = game.getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
         virtualPlayer.playTurn();
     }

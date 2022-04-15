@@ -58,7 +58,7 @@ export default class DictionaryService {
     getDictionary(id: string): Dictionary {
         const dictionaryUsage = this.activeDictionaries.get(id);
         if (dictionaryUsage) return dictionaryUsage.dictionary;
-        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.BAD_REQUEST);
+        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
     }
 
     stopUsingDictionary(id: string, forceDeleteIfUnused: boolean = false): void {
@@ -74,7 +74,7 @@ export default class DictionaryService {
     }
 
     async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
-        if (!(await this.validateDictionary(basicDictionaryData))) throw new HttpException(INVALID_DICTIONARY_FORMAT, StatusCodes.BAD_REQUEST);
+        if (!(await this.validateDictionary(basicDictionaryData))) throw new HttpException(INVALID_DICTIONARY_FORMAT, StatusCodes.FORBIDDEN);
         const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
         await this.collection.insertOne(dictionaryData).then(async (insertResult: InsertOneResult) => {
             if (!insertResult.insertedId) return;
@@ -110,12 +110,12 @@ export default class DictionaryService {
         const infoToUpdate: { description?: string; title?: string } = {};
 
         if (updateInfo.description) {
-            if (!this.isDescriptionValid(updateInfo.description)) throw new HttpException(INVALID_DESCRIPTION_FORMAT, StatusCodes.BAD_REQUEST);
+            if (!this.isDescriptionValid(updateInfo.description)) throw new HttpException(INVALID_DESCRIPTION_FORMAT, StatusCodes.FORBIDDEN);
             infoToUpdate.description = updateInfo.description;
         }
         if (updateInfo.title) {
             if (!(await this.isTitleValid(updateInfo.title, new ObjectId(updateInfo.id))))
-                throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.BAD_REQUEST);
+                throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.FORBIDDEN);
             infoToUpdate.title = updateInfo.title;
         }
 
@@ -135,7 +135,7 @@ export default class DictionaryService {
         const dictionaryData: DictionaryData | null = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
         if (dictionaryData) return dictionaryData;
 
-        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.BAD_REQUEST);
+        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.FORBIDDEN);
     }
 
     private async initializeDictionaries(): Promise<void> {

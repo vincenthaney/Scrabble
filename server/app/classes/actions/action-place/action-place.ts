@@ -59,7 +59,7 @@ export default class ActionPlace extends ActionPlay {
 
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
-        if (!this.isLegalPlacement(createdWords)) throw new HttpException(ActionErrorsMessages.ImpossibleAction, StatusCodes.BAD_REQUEST);
+        if (!this.isLegalPlacement(createdWords)) throw new HttpException(ActionErrorsMessages.ImpossibleAction, StatusCodes.FORBIDDEN);
 
         this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionarySummary.id);
 
