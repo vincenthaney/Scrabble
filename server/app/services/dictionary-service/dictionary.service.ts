@@ -8,7 +8,6 @@ import {
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import {
-    DICTIONARY_PATH,
     INVALID_DESCRIPTION_FORMAT,
     INVALID_DICTIONARY_FORMAT,
     INVALID_DICTIONARY_ID,
@@ -17,35 +16,23 @@ import {
     MAX_DICTIONARY_TITLE_LENGTH,
 } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
-import { DICTIONARIES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
 import { MAXIMUM_WORD_LENGTH, MINIMUM_WORD_LENGTH } from '@app/constants/services-errors';
-import DatabaseService from '@app/services/database-service/database.service';
 import Ajv, { ValidateFunction } from 'ajv';
-import { promises } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
-import { Collection, InsertOneResult, ObjectId, WithId } from 'mongodb';
-import { join } from 'path';
 import { Service } from 'typedi';
+import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 
 @Service()
 export default class DictionaryService {
     private dictionaryValidator: ValidateFunction<{ [x: string]: unknown }>;
     private activeDictionaries: Map<string, DictionaryUsage> = new Map();
 
-    constructor(private databaseService: DatabaseService) {
-        this.databaseService.getDatabaseInitializationEvent().on('initialize', async () => await this.initializeDictionaries());
+    constructor(private readonly dictionarySavingService: DictionarySavingService) {
+        this.initializeDictionaries();
     }
 
-    private static async fetchDefaultDictionary(): Promise<DictionaryData> {
-        const filePath = join(__dirname, DICTIONARY_PATH);
-        const dataBuffer = await promises.readFile(filePath, 'utf-8');
-        const defaultDictionary: DictionaryData = JSON.parse(dataBuffer);
-        defaultDictionary.isDefault = true;
-        return defaultDictionary;
-    }
-
-    async useDictionary(id: string): Promise<DictionaryUsage> {
+    useDictionary(id: string): DictionaryUsage {
         const dictionary: DictionaryUsage | undefined = this.activeDictionaries.get(id);
         if (!dictionary) throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
 
@@ -58,7 +45,7 @@ export default class DictionaryService {
     getDictionary(id: string): Dictionary {
         const dictionaryUsage = this.activeDictionaries.get(id);
         if (dictionaryUsage) return dictionaryUsage.dictionary;
-        throw new Error(INVALID_DICTIONARY_ID);
+        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.BAD_REQUEST);
     }
 
     stopUsingDictionary(id: string, forceDeleteIfUnused: boolean = false): void {
@@ -68,113 +55,77 @@ export default class DictionaryService {
         this.deleteActiveDictionary(id, forceDeleteIfUnused);
     }
 
-    async validateDictionary(dictionaryData: BasicDictionaryData): Promise<boolean> {
+    validateDictionary(dictionaryData: BasicDictionaryData): boolean {
         if (!this.dictionaryValidator) this.createDictionaryValidator();
-        return this.dictionaryValidator(dictionaryData) && (await this.isTitleValid(dictionaryData.title));
+        return this.dictionaryValidator(dictionaryData) && this.isTitleValid(dictionaryData.title);
     }
 
-    async addNewDictionary(basicDictionaryData: BasicDictionaryData): Promise<void> {
-        if (!(await this.validateDictionary(basicDictionaryData))) throw new Error(INVALID_DICTIONARY_FORMAT);
-        const dictionaryData: DictionaryData = { ...basicDictionaryData, isDefault: false };
-        await this.collection.insertOne(dictionaryData).then(async (insertResult: InsertOneResult) => {
-            if (!insertResult.insertedId) return;
-            await this.initializeDictionary(insertResult.insertedId.toString());
-        });
+    addNewDictionary(basicDictionaryData: BasicDictionaryData): void {
+        if (!this.validateDictionary(basicDictionaryData)) throw new HttpException(INVALID_DICTIONARY_FORMAT, StatusCodes.NOT_ACCEPTABLE);
+
+        this.dictionarySavingService.addDictionary(basicDictionaryData);
     }
 
-    async resetDbDictionaries(): Promise<void> {
-        await this.collection.deleteMany({ isDefault: false });
-        await this.populateDb();
+    restoreDictionaries(): void {
+        this.dictionarySavingService.restore();
     }
 
-    async getAllDictionarySummaries(): Promise<DictionarySummary[]> {
-        const data = await this.collection.find({}, { projection: { title: 1, description: 1, isDefault: 1 } }).toArray();
-        const dictionarySummaries: DictionarySummary[] = [];
-        data.forEach((dictionary) => {
-            const summary: DictionarySummary = {
-                title: dictionary.title,
-                description: dictionary.description,
-                // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
-                // eslint-disable-next-line no-underscore-dangle
-                id: dictionary._id.toString(),
-                isDefault: dictionary.isDefault,
-            };
-            dictionarySummaries.push(summary);
+    getAllDictionarySummaries(): DictionarySummary[] {
+        const summaries = this.dictionarySavingService.getDictionarySummaries();
 
-            this.initializeDictionary(summary.id);
-        });
-        return dictionarySummaries;
+        summaries.forEach((summary) => this.initializeDictionary(summary.id));
+
+        return summaries;
     }
 
-    async updateDictionary(updateInfo: DictionaryUpdateInfo): Promise<void> {
-        const infoToUpdate: { description?: string; title?: string } = {};
+    updateDictionary(updateInfo: DictionaryUpdateInfo): void {
+        if (updateInfo.description && !this.isDescriptionValid(updateInfo.description))
+            throw new HttpException(INVALID_DESCRIPTION_FORMAT, StatusCodes.BAD_REQUEST);
 
-        if (updateInfo.description) {
-            if (!this.isDescriptionValid(updateInfo.description)) throw new Error(INVALID_DESCRIPTION_FORMAT);
-            infoToUpdate.description = updateInfo.description;
-        }
-        if (updateInfo.title) {
-            if (!(await this.isTitleValid(updateInfo.title, new ObjectId(updateInfo.id)))) throw new Error(INVALID_TITLE_FORMAT);
-            infoToUpdate.title = updateInfo.title;
-        }
+        if (updateInfo.title && !this.isTitleValid(updateInfo.title)) throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.BAD_REQUEST);
 
-        await this.collection.findOneAndUpdate({ _id: new ObjectId(updateInfo.id), isDefault: false }, { $set: infoToUpdate });
+        this.dictionarySavingService.updateDictionary(updateInfo);
     }
 
-    async deleteDictionary(dictionaryId: string): Promise<void> {
-        await this.collection.findOneAndDelete({ _id: new ObjectId(dictionaryId), isDefault: false });
+    deleteDictionary(dictionaryId: string): void {
+        this.dictionarySavingService.deleteDictionaryById(dictionaryId);
+
         const dictionaryUsage: DictionaryUsage | undefined = this.activeDictionaries.get(dictionaryId);
+
         if (dictionaryUsage) {
             dictionaryUsage.isDeleted = true;
             this.deleteActiveDictionary(dictionaryId);
         }
     }
 
-    async getDbDictionary(id: string): Promise<DictionaryData> {
-        const dictionaryData: DictionaryData | null = await this.collection.findOne({ _id: new ObjectId(id) }, { projection: { _id: 0 } });
-        if (dictionaryData) return dictionaryData;
-
-        throw new Error(INVALID_DICTIONARY_ID);
+    getDictionaryData(id: string): DictionaryData {
+        return this.dictionarySavingService.getDictionaryById(id);
     }
 
-    private async initializeDictionaries(): Promise<void> {
-        const dictionariesId: string[] = await this.getDictionariesId();
-        dictionariesId.forEach(async (id: string) => await this.initializeDictionary(id));
+    private initializeDictionaries(): void {
+        const dictionariesId: string[] = this.getDictionariesId();
+        dictionariesId.forEach((id: string) => this.initializeDictionary(id));
     }
 
-    private async getDictionariesId(): Promise<string[]> {
-        return await this.collection
-            .find({}, { projection: { _id: 1 } })
-            // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
-            // eslint-disable-next-line no-underscore-dangle
-            .map((dictionary: WithId<DictionaryData>) => dictionary._id.toString())
-            .toArray();
+    private getDictionariesId(): string[] {
+        return this.dictionarySavingService.getDictionarySummaries().map((summary) => summary.id);
     }
 
-    private async initializeDictionary(id: string): Promise<void> {
+    private initializeDictionary(id: string): void {
         if (this.activeDictionaries.has(id)) return;
 
-        const dictionaryData: CompleteDictionaryData = { ...(await this.getDbDictionary(id)), id };
+        const dictionaryData: CompleteDictionaryData = { ...this.getDictionaryData(id), id };
 
         const dictionary = { numberOfActiveGames: 0, dictionary: new Dictionary(dictionaryData), isDeleted: false };
         this.activeDictionaries.set(id, dictionary);
     }
 
-    private async isTitleValid(title: string, id?: ObjectId): Promise<boolean> {
-        return (await this.collection.countDocuments({ _id: { $ne: id }, title })) === 0 && title.length < MAX_DICTIONARY_TITLE_LENGTH;
+    private isTitleValid(title: string): boolean {
+        return title.length < MAX_DICTIONARY_TITLE_LENGTH;
     }
 
     private isDescriptionValid(description: string): boolean {
         return description.length < MAX_DICTIONARY_DESCRIPTION_LENGTH;
-    }
-
-    private get collection(): Collection<DictionaryData> {
-        return this.databaseService.database.collection(DICTIONARIES_MONGO_COLLECTION_NAME);
-    }
-
-    private async populateDb(): Promise<void> {
-        await this.databaseService.populateDb(DICTIONARIES_MONGO_COLLECTION_NAME, [await DictionaryService.fetchDefaultDictionary()]);
-        await this.initializeDictionaries();
     }
 
     private createDictionaryValidator(): void {

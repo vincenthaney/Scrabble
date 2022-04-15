@@ -14,6 +14,7 @@ import DatabaseService from './database-service/database.service';
 import { DatabaseServiceMock } from './database-service/database.service.mock.spec';
 import DictionaryService from './dictionary-service/dictionary.service';
 import WordFindingService from './word-finding-service/word-finding.service';
+import * as mock from 'mock-fs';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ClassType<T> = Function & { prototype: T };
@@ -28,6 +29,12 @@ type ClassOverride<TType> = {
 type ClassAttributesOverrides<T> = {
     [K in keyof T]?: T[K];
 };
+
+type DirectoryItem = string | Buffer | (() => File) | DirectoryItems;
+
+interface DirectoryItems {
+    [name: string]: DirectoryItem;
+}
 
 const CONTROLLERS: ClassType<unknown>[] = [
     DictionaryController,
@@ -98,6 +105,12 @@ export class ServicesTestingUnit {
         return this;
     }
 
+    withMockedFileSystem(paths: DirectoryItems): ServicesTestingUnit {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mock(paths as any);
+        return this;
+    }
+
     setStubbedWordFindingService(): [instance: SinonStubbedInstance<AbstractWordFinding>, service: SinonStubbedInstance<WordFindingService>] {
         const instance = this.sandbox.createStubInstance(AbstractWordFinding, {
             findWords: [],
@@ -135,5 +148,6 @@ export class ServicesTestingUnit {
 
     restore() {
         this.sandbox.restore();
+        mock.restore();
     }
 }
