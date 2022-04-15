@@ -21,7 +21,7 @@ import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { COMMAND_IS_INVALID, INVALID_COMMAND, INVALID_WORD } from '@app/constants/services-errors';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
+import { FeedbackMessage, FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
@@ -47,7 +47,7 @@ const DEFAULT_GAME_ID = 'gameId';
 const DEFAULT_PLAYER_ID = 'playerId';
 const DEFAULT_DATA: ActionData = { type: ActionType.EXCHANGE, payload: { tiles: [] }, input: '' };
 const DEFAULT_EXCEPTION = 'exception';
-const DEFAULT_FEEDBACK = 'this is a feedback';
+const DEFAULT_FEEDBACK: FeedbackMessage = { message: 'this is a feedback' };
 const DEFAULT_PLAYER_1 = new Player('player-1', 'Player 1');
 const DEFAULT_PLAYER_2 = new Player('player-2', 'Player 2');
 const DEFAULT_SQUARE_1: Square = { tile: null, position: new Position(0, 0), scoreMultiplier: null, wasMultiplierUsed: false, isCenter: false };
@@ -286,21 +286,21 @@ describe('GamePlayController', () => {
             expect(emitToSocketSpy).to.not.have.been.called();
         });
 
-        it('should call emitToScket if localPlayerFeedback exists', async () => {
+        it('should call emitToScket if feedback exists', async () => {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [
                 {},
-                { localPlayerFeedback: DEFAULT_FEEDBACK, opponentFeedback: DEFAULT_FEEDBACK, endGameFeedback: undefined },
+                { localPlayerFeedback: DEFAULT_FEEDBACK, opponentFeedback: DEFAULT_FEEDBACK, endGameFeedback: [] },
             ]);
             await gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_DATA);
             expect(emitToSocketSpy).to.have.been.called.twice;
         });
 
-        it('should call emitToRoom for each messages in endGameFeedback', async () => {
+        it('should call emitToRoom only once in endGameFeedback', async () => {
             const feedback: FeedbackMessages = {
-                localPlayerFeedback: undefined,
-                opponentFeedback: undefined,
-                endGameFeedback: ['message 1', 'message 2'],
+                localPlayerFeedback: {},
+                opponentFeedback: {},
+                endGameFeedback: [{ message: 'message 1' }, { message: 'message 2' }],
             };
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
             await gamePlayController['handlePlayAction']('', '', {
@@ -308,8 +308,7 @@ describe('GamePlayController', () => {
                 payload: {},
                 input: '',
             });
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            expect(emitToRoomSpy).to.have.been.called.exactly(feedback.endGameFeedback!.length);
+            expect(emitToRoomSpy).to.have.been.called.exactly(1);
         });
 
         it('should throw if data.type is undefined', async () => {

@@ -1070,4 +1070,25 @@ describe('BoardComponent', () => {
             expect(result).toBeFalse();
         });
     });
+
+    describe('clearNewlyPlacedTiles', () => {
+        let newlyPlacedTiles: SquareView[];
+
+        beforeEach(() => {
+            newlyPlacedTiles = [{ newlyPlaced: true }, { newlyPlaced: true }] as SquareView[];
+            component['newlyPlacedTiles'] = newlyPlacedTiles;
+        });
+
+        it('should set newlyPlaced to false', () => {
+            component.clearNewlyPlacedTiles();
+
+            newlyPlacedTiles.forEach((squareView) => expect(squareView.newlyPlaced).toBeFalse());
+        });
+
+        it('should clear array', () => {
+            component.clearNewlyPlacedTiles();
+
+            expect(component['newlyPlacedTiles']).toHaveSize(0);
+        });
+    });
 });

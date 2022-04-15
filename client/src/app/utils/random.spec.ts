@@ -1,0 +1,49 @@
+import { Random } from './random';
+
+const DEFAULT_ARRAY = ['a', 'b', 'c'];
+
+describe('random -> getRandomElementsFromArray', () => {
+    describe('getRandomElementsFromArray', () => {
+        it('should return an array of the desired length', () => {
+            expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY).length).toBe(1);
+            expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, 2).length).toBe(2);
+        });
+
+        it('should return the entire array if the desired length is larger than the array.length', () => {
+            expect(Random.getRandomElementsFromArray(DEFAULT_ARRAY, DEFAULT_ARRAY.length + 1)).toEqual(DEFAULT_ARRAY);
+        });
+
+        it('should not always return the same element', () => {
+            let result: string | undefined;
+            let sameResult = true;
+            const iterations = 100;
+            for (let i = 0; i < iterations; i++) {
+                const currentRandomSelection = Random.getRandomElementsFromArray(DEFAULT_ARRAY);
+                if (currentRandomSelection[0] !== result && i !== 0) {
+                    sameResult = false;
+                    break;
+                } else {
+                    result = currentRandomSelection[0];
+                }
+            }
+            expect(sameResult).toBeFalse();
+        });
+    });
+
+    describe('popRandom', () => {
+        it('should not always return same element', () => {
+            const lastResult = Random.popRandom([...DEFAULT_ARRAY]);
+
+            const iterations = 100;
+            for (let i = 0; i < iterations; ++i) {
+                const result = Random.popRandom([...DEFAULT_ARRAY]);
+                if (result !== lastResult) {
+                    expect(true).toBeTruthy();
+                    return;
+                }
+            }
+
+            expect(false).toBeTruthy();
+        });
+    });
+});

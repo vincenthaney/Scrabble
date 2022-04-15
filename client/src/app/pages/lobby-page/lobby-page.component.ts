@@ -1,10 +1,9 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LobbyInfo } from '@app/classes/communication/';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { NO_LOBBY_CAN_BE_JOINED } from '@app/constants/component-errors';
 import {
     DIALOG_BUTTON_CONTENT_RETURN_LOBBY,
@@ -13,6 +12,7 @@ import {
     DIALOG_FULL_CONTENT,
     DIALOG_FULL_TITLE,
 } from '@app/constants/pages-constants';
+import { PLAYER_NAME_KEY } from '@app/constants/session-storage-constants';
 import { GameDispatcherService } from '@app/services/';
 import { Subject, Subscription } from 'rxjs';
 
@@ -22,11 +22,10 @@ import { Subject, Subscription } from 'rxjs';
     styleUrls: ['./lobby-page.component.scss'],
 })
 export class LobbyPageComponent implements OnInit, OnDestroy {
-    @ViewChild(NameFieldComponent) nameField: NameFieldComponent;
-
     filterFormGroup: FormGroup;
     numberOfLobbiesMeetingFilter: number;
-    nameValid: boolean;
+    playerName: string;
+    playerNameValid: boolean;
     lobbies: LobbyInfo[];
 
     lobbiesUpdateSubscription: Subscription;
@@ -34,12 +33,10 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     lobbyCanceledSubscription: Subscription;
     componentDestroyed$: Subject<boolean>;
 
-    constructor(
-        private ref: ChangeDetectorRef,
-        public gameDispatcherService: GameDispatcherService,
-        public dialog: MatDialog,
-        private snackBar: MatSnackBar,
-    ) {
+    constructor(public gameDispatcherService: GameDispatcherService, public dialog: MatDialog, private snackBar: MatSnackBar) {
+        this.playerName = window.localStorage.getItem(PLAYER_NAME_KEY) || '';
+        this.playerNameValid = false;
+        this.lobbies = [];
         this.componentDestroyed$ = new Subject();
         this.filterFormGroup = new FormGroup({
             gameType: new FormControl('all'),
@@ -59,16 +56,9 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.componentDestroyed$.complete();
     }
 
-    onNameChange(): void {
-        this.validateName();
-        this.ref.markForCheck();
-    }
-
     joinLobby(lobbyId: string): void {
-        this.gameDispatcherService.handleJoinLobby(
-            this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0],
-            this.nameField.formParameters.get('inputName')?.value,
-        );
+        window.localStorage.setItem(PLAYER_NAME_KEY, this.playerName);
+        this.gameDispatcherService.handleJoinLobby(this.lobbies.filter((lobby) => lobby.lobbyId === lobbyId)[0], this.playerName);
     }
 
     joinRandomLobby(): void {
@@ -82,10 +72,17 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         }
     }
 
+    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
+        setTimeout(() => {
+            this.playerName = playerName;
+            this.playerNameValid = valid;
+            this.validateName();
+        });
+    }
+
     private validateName(): void {
         this.numberOfLobbiesMeetingFilter = 0;
-        this.nameValid = (this.nameField.formParameters?.get('inputName')?.valid as boolean) ?? false;
-        this.setFormAvailability(this.nameValid);
+        this.setFormAvailability(this.playerNameValid);
 
         for (const lobby of this.lobbies) {
             this.updateLobbyAttributes(lobby);
@@ -145,6 +142,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     private updateLobbyAttributes(lobby: LobbyInfo): void {
         const gameType = this.filterFormGroup.get('gameType')?.value;
         lobby.meetFilters = gameType === 'all' || gameType === lobby.gameType;
-        lobby.canJoin = this.nameValid && this.nameField.formParameters.get('inputName')?.value !== lobby.hostName;
+        lobby.canJoin = this.playerNameValid && this.playerName !== lobby.hostName;
     }
 }

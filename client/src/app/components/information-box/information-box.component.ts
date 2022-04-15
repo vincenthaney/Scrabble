@@ -65,6 +65,10 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         return player2 ? player2 : new Player('', 'Player2', []);
     }
 
+    isTimerRunning(): boolean {
+        return this.timerSubscription && !this.timerSubscription.closed;
+    }
+
     private onDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
