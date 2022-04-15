@@ -85,7 +85,6 @@ describe('GamePlayService', () => {
         tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
-        // gameStub.player2 = new Player(INVALID_PLAYER_ID, 'JCol');
         gameStub.player2 = new Player(INVALID_PLAYER_ID, 'JCol');
 
         gameStub.getPlayer.returns(gameStub.player1);
