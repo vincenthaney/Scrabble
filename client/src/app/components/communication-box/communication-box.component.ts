@@ -6,6 +6,7 @@ import { Message } from '@app/classes/communication/message';
 import { FocusableComponent } from '@app/classes/focusable-component/focusable-component';
 import { GameType } from '@app/classes/game-type';
 import { TileReserveData } from '@app/classes/tile/tile.types';
+import { CODE_HTML_TAG, IS_CLICKABLE_CLASS } from '@app/constants/components-constants';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { LOCAL_PLAYER_ID, MAX_INPUT_LENGTH, OPPONENT_ID, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
 import { GameService, InputParserService } from '@app/services';
@@ -31,6 +32,7 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
+    isClickableClass = IS_CLICKABLE_CLASS;
 
     componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
@@ -96,6 +98,14 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
         this.focusableComponentsService.setActiveKeyboardComponent(this);
     }
 
+    onMessageClicked(event: MouseEvent): void {
+        const element: HTMLElement = event.target as HTMLElement;
+        if (!element.innerText) return;
+        if (!this.isElementClickable(element)) return;
+
+        this.inputParser.handleInput(element.innerText);
+    }
+
     protected onFocusableEvent(event: KeyboardEvent): void {
         if (!this.isCtrlC(event)) this.messageInputElement?.nativeElement?.focus();
     }
@@ -147,5 +157,13 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
                 behavior: 'auto',
             });
         }, 0);
+    }
+
+    private isElementClickable(element: HTMLElement): boolean {
+        const isElementClickable: boolean = element.classList.contains(IS_CLICKABLE_CLASS);
+        const isParentClickable: boolean =
+            element.parentElement !== null && (element.parentElement as HTMLElement).classList.contains(IS_CLICKABLE_CLASS);
+        const isElementCodeTag: boolean = element.tagName === CODE_HTML_TAG;
+        return isElementCodeTag && (isElementClickable || isParentClickable);
     }
 }

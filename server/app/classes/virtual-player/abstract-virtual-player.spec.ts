@@ -7,12 +7,11 @@ import { ActionData } from '@app/classes/communication/action-data';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
 import Game from '@app/classes/game/game';
 import Range from '@app/classes/range/range';
-import { LetterValue } from '@app/classes/tile';
 import { AbstractWordFinding, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { GAME_ID, PLAYER_ID, TEST_POINT_RANGE } from '@app/constants/virtual-player-tests-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { Delay } from '@app/utils/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
@@ -39,6 +38,10 @@ class TestClass extends AbstractVirtualPlayer {
     alternativeMove(): ActionData {
         return ActionPass.createActionData();
     }
+
+    protected isExchangePossible(): boolean {
+        return false;
+    }
 }
 
 const playerId = 'testPlayerId';
@@ -46,15 +49,16 @@ const playerName = 'ElScrabblo';
 
 describe('AbstractVirtualPlayer', () => {
     let abstractPlayer: TestClass;
-    let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
-    let wordFindingServiceStub: SinonStubbedInstance<WordFindingService>;
+    let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
+    let testingUnit: ServicesTestingUnit;
+
+    beforeEach(() => {
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService().withStubbed(ActiveGameService);
+        [wordFindingInstanceStub] = testingUnit.setStubbedWordFindingService();
+    });
 
     beforeEach(async () => {
         abstractPlayer = new TestClass(playerId, playerName);
-        activeGameServiceStub = createStubInstance(ActiveGameService);
-        wordFindingServiceStub = createStubInstance(WordFindingService);
-        abstractPlayer['activeGameService'] = activeGameServiceStub as unknown as ActiveGameService;
-        abstractPlayer['wordFindingService'] = wordFindingServiceStub as unknown as WordFindingService;
     });
 
     afterEach(() => {
@@ -127,47 +131,13 @@ describe('AbstractVirtualPlayer', () => {
         });
     });
 
-    describe('isExchangePossible', () => {
-        let TEST_GAME: Game;
-        let TEST_MAP: Map<LetterValue, number>;
-        beforeEach(() => {
-            TEST_GAME = new Game();
-
-            spy.on(abstractPlayer['activeGameService'], 'getGame', () => {
-                return TEST_GAME;
-            });
-            spy.on(TEST_GAME, 'getTilesLeftPerLetter', () => {
-                return TEST_MAP;
-            });
-        });
-        it('should return false when tiles count is below MINIMUM_EXCHANGE_WORD_COUNT', () => {
-            TEST_MAP = new Map<LetterValue, number>([
-                ['A', 2],
-                ['B', 2],
-            ]);
-            expect(abstractPlayer['isExchangePossible']()).to.be.false;
-        });
-
-        it('should return true when tiles count is above or equal to MINIMUM_EXCHANGE_WORD_COUNT', () => {
-            TEST_MAP = new Map<LetterValue, number>([
-                ['A', 3],
-                ['B', 3],
-                ['C', 3],
-            ]);
-            expect(abstractPlayer['isExchangePossible']()).to.be.true;
-        });
-    });
-
     describe('computeWordPlacement', () => {
-        let wordFindingInstanceStub: SinonStubbedInstance<AbstractWordFinding>;
         let gameStub: SinonStubbedInstance<Game>;
 
         beforeEach(() => {
             gameStub = createStubInstance(Game);
             gameStub.dictionarySummary = { id: 'testId' } as unknown as DictionarySummary;
-            activeGameServiceStub['getGame'].returns(gameStub as unknown as Game);
-            wordFindingInstanceStub = createStubInstance(AbstractWordFinding);
-            wordFindingInstanceStub['findWords'].returns([]);
+            testingUnit.getStubbedInstance(ActiveGameService).getGame.returns(gameStub as unknown as Game);
             chai.spy.restore();
         });
 
@@ -176,8 +146,6 @@ describe('AbstractVirtualPlayer', () => {
         });
 
         it('should call findWords', () => {
-            wordFindingServiceStub['getWordFindingInstance'].returns(wordFindingInstanceStub as unknown as AbstractWordFinding);
-
             spy.on(abstractPlayer, 'getGameBoard', () => {
                 return;
             });
@@ -189,8 +157,6 @@ describe('AbstractVirtualPlayer', () => {
         });
 
         it('should call getGameBoard and generateWord', () => {
-            wordFindingServiceStub['getWordFindingInstance'].returns(wordFindingInstanceStub as unknown as AbstractWordFinding);
-
             const getGameBoardSpy = spy.on(abstractPlayer, 'getGameBoard', () => {
                 return;
             });

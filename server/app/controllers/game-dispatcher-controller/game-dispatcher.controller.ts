@@ -82,12 +82,12 @@ export class GameDispatcherController {
             }
         });
 
-        this.router.post('/games/:gameId/players/:playerId/accept', (req: GameRequest, res: Response) => {
+        this.router.post('/games/:gameId/players/:playerId/accept', async (req: GameRequest, res: Response) => {
             const { gameId, playerId } = req.params;
             const { opponentName }: { opponentName: string } = req.body;
 
             try {
-                this.handleAcceptRequest(gameId, playerId, opponentName);
+                await this.handleAcceptRequest(gameId, playerId, opponentName);
 
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
@@ -198,13 +198,11 @@ export class GameDispatcherController {
 
     private handlePlayerLeftFeedback(gameId: string, endOfGameMessages: string[], updatedData: GameUpdateData): void {
         this.socketService.emitToRoom(gameId, 'gameUpdate', updatedData);
-        for (const message of endOfGameMessages) {
-            this.socketService.emitToRoom(gameId, 'newMessage', {
-                content: message,
-                senderId: SYSTEM_ID,
-                gameId,
-            });
-        }
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: endOfGameMessages.join('<br>'),
+            senderId: SYSTEM_ID,
+            gameId,
+        });
     }
 
     private async handleCreateGame(config: GameConfigData): Promise<LobbyData | void> {
@@ -216,7 +214,7 @@ export class GameDispatcherController {
 
         if (!validateName(config.playerName)) throw new HttpException(NAME_IS_INVALID, StatusCodes.BAD_REQUEST);
 
-        return config.gameMode === GameMode.Multiplayer ? this.handleCreateMultiplayerGame(config) : this.handleCreateSoloGame(config);
+        return config.gameMode === GameMode.Multiplayer ? await this.handleCreateMultiplayerGame(config) : await this.handleCreateSoloGame(config);
     }
 
     private async handleCreateMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
@@ -244,7 +242,7 @@ export class GameDispatcherController {
 
     private async handleAcceptRequest(gameId: string, playerId: string, playerName: string): Promise<void> {
         if (playerName === undefined) throw new HttpException(PLAYER_NAME_REQUIRED, StatusCodes.BAD_REQUEST);
-        const gameConfig = await this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
+        const gameConfig = this.gameDispatcherService.acceptJoinRequest(gameId, playerId, playerName);
         const startGameData = await this.activeGameService.beginGame(gameId, gameConfig);
 
         this.socketService.addToRoom(startGameData.player2.id, gameId);

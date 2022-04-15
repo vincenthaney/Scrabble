@@ -23,8 +23,7 @@ import {
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
-import { getDictionaryTestService } from '@app/services/dictionary-service/dictionary-test.service.spec';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as chai from 'chai';
@@ -115,14 +114,13 @@ describe('GameDispatcherService', () => {
     let createGameService: CreateGameService;
     let virtualPlayerService: VirtualPlayerService;
     let activeGameService: ActiveGameService;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
+        testingUnit = new ServicesTestingUnit().withStubbedDictionaryService();
     });
 
     beforeEach(() => {
-        Container.reset();
-        Container.set(DictionaryService, getDictionaryTestService());
         gameDispatcherService = Container.get(GameDispatcherService);
         socketService = Container.get(SocketService);
         createGameService = Container.get(CreateGameService);
@@ -133,6 +131,7 @@ describe('GameDispatcherService', () => {
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     it('should create', () => {
@@ -154,7 +153,8 @@ describe('GameDispatcherService', () => {
         let createSoloGameSpy: unknown;
         let addToRoomSpy: unknown;
         let sliceVirtualPlayerToPlayerSpy: unknown;
-        let socketServiceSpy: unknown;
+        let emitToSocketSpy: unknown;
+        let emitToRoomSpy: unknown;
         let virtualPlayerServiceSpy: unknown;
         let activeGameServiceSpy: unknown;
 
@@ -168,7 +168,10 @@ describe('GameDispatcherService', () => {
             sliceVirtualPlayerToPlayerSpy = chai.spy.on(virtualPlayerService, 'sliceVirtualPlayerToPlayer', () => {
                 return DEFAULT_PLAYER;
             });
-            socketServiceSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+            emitToSocketSpy = chai.spy.on(socketService, 'emitToSocket', () => {
+                return;
+            });
+            emitToRoomSpy = chai.spy.on(socketService, 'emitToRoom', () => {
                 return;
             });
             virtualPlayerServiceSpy = chai.spy.on(virtualPlayerService, 'triggerVirtualPlayerTurn', () => {
@@ -184,7 +187,8 @@ describe('GameDispatcherService', () => {
             expect(createSoloGameSpy).to.have.been.called();
             expect(addToRoomSpy).to.have.been.called();
             expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
-            expect(socketServiceSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.have.been.called();
+            expect(emitToRoomSpy).to.have.been.called();
             expect(virtualPlayerServiceSpy).to.have.been.called();
             expect(activeGameServiceSpy).to.have.been.called();
         });
@@ -274,7 +278,7 @@ describe('GameDispatcherService', () => {
         it('should remove waitingRoom', async () => {
             expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.not.be.empty;
 
-            await gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
+            gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
             expect(gameDispatcherService['waitingRooms'].filter((g) => g.getId() === id)).to.be.empty;
         });
@@ -282,23 +286,21 @@ describe('GameDispatcherService', () => {
         it(' should throw error when playerId is invalid', () => {
             const invalidId = 'invalidId';
 
-            return expect(gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.rejectedWith(
-                INVALID_PLAYER_ID_FOR_GAME,
-            );
+            expect(() => gameDispatcherService.acceptJoinRequest(id, invalidId, DEFAULT_OPPONENT_NAME)).to.be.throw(INVALID_PLAYER_ID_FOR_GAME);
         });
 
         it(' should throw error when playerId is invalid', () => {
             gameDispatcherService.rejectJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME);
 
-            return expect(
-                gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME),
-            ).to.be.rejectedWith(NO_OPPONENT_IN_WAITING_GAME);
+            expect(() => gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME)).to.be.throw(
+                NO_OPPONENT_IN_WAITING_GAME,
+            );
         });
 
         it(' should throw error when playerId is invalid', () => {
-            return expect(
-                gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2),
-            ).to.be.rejectedWith(OPPONENT_NAME_DOES_NOT_MATCH);
+            expect(() => gameDispatcherService.acceptJoinRequest(id, DEFAULT_MULTIPLAYER_CONFIG_DATA.playerId, DEFAULT_OPPONENT_NAME_2)).to.be.throw(
+                OPPONENT_NAME_DOES_NOT_MATCH,
+            );
         });
     });
 

@@ -5,21 +5,22 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import {
-    DisplayDictionaryColumnsIteratorItem,
-    DisplayDictionaryKeys,
     DictionariesState,
     DisplayDictionaryColumns,
+    DisplayDictionaryColumnsIteratorItem,
+    DisplayDictionaryKeys,
 } from '@app/classes/admin/dictionaries';
-import { DICTIONARIES_COLUMNS } from '@app/constants/components-constants';
+
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
+import { DICTIONARIES_COLUMNS, ERROR_SNACK_BAR_CONFIG, SUCCESS_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
 import { DeleteDictionaryDialogComponent } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component';
 import { DeleteDictionaryDialogParameters } from '@app/components/delete-dictionary-dialog/delete-dictionary-dialog.component.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { PositiveFeedback, SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
+import { PositiveFeedback } from '@app/constants/dictionaries-components';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { PositiveFeedbackResponse } from '@app/constants/dialogs-constants';
 
@@ -131,7 +132,7 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
             this.isWaitingForServerResponse = !this.isWaitingForServerResponse;
         });
         this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, (response) => {
-            this.snackBar.open(response, 'OK', this.isFeedbackPositive(response as PositiveFeedback));
+            this.snackBar.open(response, 'Fermer', this.isFeedbackPositive(response as PositiveFeedback));
         });
         this.dictionariesService.subscribeToUpdatingDictionariesEvent(this.componentDestroyed$, (state) => {
             this.state = state;
@@ -140,8 +141,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     private isFeedbackPositive(response: PositiveFeedback): PositiveFeedbackResponse {
-        return Object.values(PositiveFeedback).includes(response as PositiveFeedback)
-            ? { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] }
-            : { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] };
+        return Object.values(PositiveFeedback).includes(response as PositiveFeedback) ? SUCCESS_SNACK_BAR_CONFIG : ERROR_SNACK_BAR_CONFIG;
     }
 }

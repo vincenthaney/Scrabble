@@ -12,6 +12,7 @@ import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { LobbyInfo } from '@app/classes/communication';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { Timer } from '@app/classes/timer/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
@@ -29,6 +30,7 @@ const TEST_LOBBY: LobbyInfo = {
     lobbyId: 'lobbyId',
     hostName: 'playerName',
     gameType: GameType.Classic,
+    gameMode: GameMode.Multiplayer,
     maxRoundTime: 1,
     dictionary: TEST_DICTIONARY,
     canJoin: false,

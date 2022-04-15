@@ -90,7 +90,7 @@ describe('DeleteVirtualPlayerDialogComponent', () => {
             spyDelete = spyOn(service, 'deleteVirtualPlayer').and.callFake(async () => {
                 return;
             });
-            spyClose = spyOn(component['dialogRef'], 'close').and.callFake(async () => {
+            spyClose = spyOn(component, 'closeDialog').and.callFake(async () => {
                 return;
             });
         });
@@ -100,9 +100,19 @@ describe('DeleteVirtualPlayerDialogComponent', () => {
             expect(spyDelete).toHaveBeenCalled();
         });
 
-        it('should call this.dialogRef.close', async () => {
+        it('should call component.closeDialog', async () => {
             await component.deleteVirtualPlayer();
             expect(spyClose).toHaveBeenCalled();
+        });
+    });
+
+    describe('closeDialog', () => {
+        it('should call dialogRef.close()', () => {
+            const spyDialog = spyOn(component['dialogRef'], 'close').and.callFake(() => {
+                return;
+            });
+            component.closeDialog();
+            expect(spyDialog).toHaveBeenCalled();
         });
     });
 });

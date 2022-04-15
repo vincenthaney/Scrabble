@@ -74,7 +74,7 @@ export class BoardNavigator {
     }
 
     isEmpty(allowNotApplied: boolean = false): boolean {
-        return this.currentSquareView.square.tile === null || (allowNotApplied && this.currentSquareView.applied === false);
+        return this.currentSquareView.square.tile === null || (allowNotApplied && !this.currentSquareView.applied);
     }
 
     clone(): BoardNavigator {

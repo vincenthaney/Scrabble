@@ -82,17 +82,14 @@ export default class InputParserService {
 
         switch (actionType) {
             case ActionType.PLACE:
-                return this.actionService.createActionData(ActionType.PLACE, this.createPlaceActionPayload(inputWords[1], inputWords[2]), input);
+                return this.actionService.createActionData(actionType, this.createPlaceActionPayload(inputWords[1], inputWords[2]), input);
             case ActionType.EXCHANGE:
-                return this.actionService.createActionData(ActionType.EXCHANGE, this.createExchangeActionPayload(inputWords[1]), input);
+                return this.actionService.createActionData(actionType, this.createExchangeActionPayload(inputWords[1]), input);
             case ActionType.PASS:
-                return this.actionService.createActionData(ActionType.PASS, {}, input);
             case ActionType.RESERVE:
-                return this.actionService.createActionData(ActionType.RESERVE, {}, input);
             case ActionType.HINT:
-                return this.actionService.createActionData(ActionType.HINT, {}, input);
             case ActionType.HELP:
-                return this.actionService.createActionData(ActionType.HELP, {}, input);
+                return this.actionService.createActionData(actionType, {}, input);
             default:
                 /* This line cannot be covered in tests because we already throw an error before the switch case
                 if the command is not part of the known commands (verifyActionValidity) so we will never reach the 

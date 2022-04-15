@@ -1,23 +1,23 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { IconComponent } from '@app/components/icon/icon.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AppMaterialModule } from '@app/modules/material.module';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { AppMaterialModule } from '@app/modules/material.module';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { ModifyDictionaryComponent } from './modify-dictionary-dialog.component';
 import { DictionaryDialogParameters, ModifyDictionaryComponentStates } from './modify-dictionary-dialog.component.types';
-import { AbstractControl } from '@angular/forms';
 
 const MODEL: DictionaryDialogParameters = {
     dictionaryId: 'testId',
@@ -53,6 +53,9 @@ describe('ModifyDictionaryComponent', () => {
                 BrowserAnimationsModule,
                 MatCardModule,
                 MatTabsModule,
+                BrowserAnimationsModule,
+                FormsModule,
+                ReactiveFormsModule,
             ],
             providers: [
                 MatDialog,

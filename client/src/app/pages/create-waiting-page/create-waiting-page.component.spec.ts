@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-classes-per-file */
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConvertDialogComponent } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
 import {
+    DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
     DIALOG_TITLE,
@@ -21,8 +28,9 @@ import {
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
+import SpyObj = jasmine.SpyObj;
 
 @Component({
     template: '',
@@ -42,17 +50,41 @@ describe('CreateWaitingPageComponent', () => {
     let fixture: ComponentFixture<CreateWaitingPageComponent>;
     const testOpponentName = 'testname';
 
-    let gameDispatcherServiceMock: GameDispatcherService;
     let playerLeavesServiceMock: PlayerLeavesService;
+
+    let gameDispatcherServiceSpy: SpyObj<GameDispatcherService>;
+    let gameDispatcherCreationSubject: Subject<HttpErrorResponse>;
+
+    beforeEach(() => {
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', [
+            'observeGameCreationFailed',
+            'subscribeToJoinRequestEvent',
+            'handleCancelGame',
+            'handleConfirmation',
+            'handleRejection',
+        ]);
+        gameDispatcherCreationSubject = new Subject();
+        gameDispatcherServiceSpy.observeGameCreationFailed.and.returnValue(gameDispatcherCreationSubject.asObservable());
+        gameDispatcherServiceSpy['joinRequestEvent'] = new Subject();
+        gameDispatcherServiceSpy.subscribeToJoinRequestEvent.and.callFake(
+            (componentDestroyed$: Subject<boolean>, callBack: (opponentName: string) => void) => {
+                gameDispatcherServiceSpy['joinRequestEvent'].subscribe(callBack);
+            },
+        );
+        gameDispatcherServiceSpy.handleConfirmation.and.callFake(() => {});
+    });
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent],
+            declarations: [CreateWaitingPageComponent, DefaultDialogComponent, ConvertDialogComponent, IconComponent],
             imports: [
                 HttpClientTestingModule,
-                MatProgressSpinnerModule,
+                MatProgressBarModule,
+                MatCardModule,
                 MatDialogModule,
                 CommonModule,
                 BrowserAnimationsModule,
+                MatSnackBarModule,
                 RouterTestingModule.withRoutes([
                     { path: 'game-creation', component: TestComponent },
                     { path: 'waiting-room', component: CreateWaitingPageComponent },
@@ -60,7 +92,7 @@ describe('CreateWaitingPageComponent', () => {
                 ]),
             ],
             providers: [
-                GameDispatcherService,
+                { provide: GameDispatcherService, useValue: gameDispatcherServiceSpy },
                 {
                     provide: MatDialog,
                     useClass: MatDialogMock,
@@ -69,6 +101,7 @@ describe('CreateWaitingPageComponent', () => {
                     provide: ConvertDialogComponent,
                     useClass: MatDialogMock,
                 },
+                MatSnackBar,
             ],
         }).compileComponents();
     });
@@ -77,7 +110,6 @@ describe('CreateWaitingPageComponent', () => {
         fixture = TestBed.createComponent(CreateWaitingPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        gameDispatcherServiceMock = TestBed.inject(GameDispatcherService);
         playerLeavesServiceMock = TestBed.inject(PlayerLeavesService);
 
         component.waitingRoomMessage = 'initialWaitingRoomMessage';
@@ -103,36 +135,73 @@ describe('CreateWaitingPageComponent', () => {
         expect(component.opponentName).toEqual(undefined);
     });
 
-    it('ngOnInit should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
-        const spySubscribeJoinRequestEvent = spyOn<any>(gameDispatcherServiceMock['joinRequestEvent'], 'subscribe').and.returnValue(of(true) as any);
-        const spySubscribeJoinerLeaveGameEvent = spyOn<any>(playerLeavesServiceMock['joinerLeavesGameEvent'], 'subscribe').and.returnValue(
-            of(true) as any,
-        );
+    describe('ngOnInit', () => {
+        it('should subscribe to gameDispatcherService joinRequestEvent and joinerLeaveGameEvent and router events', () => {
+            const spySubscribeJoinRequestEvent = spyOn<any>(gameDispatcherServiceSpy['joinRequestEvent'], 'subscribe').and.returnValue(
+                of(true) as any,
+            );
+            const spySubscribeJoinerLeaveGameEvent = spyOn<any>(playerLeavesServiceMock['joinerLeavesGameEvent'], 'subscribe').and.returnValue(
+                of(true) as any,
+            );
 
-        component.ngOnInit();
-        expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
-        expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+            component.ngOnInit();
+            expect(spySubscribeJoinRequestEvent).toHaveBeenCalled();
+            expect(spySubscribeJoinerLeaveGameEvent).toHaveBeenCalled();
+        });
+
+        it('should call handleGameCreationFail when game dispatcher updates game creation failed observable', () => {
+            const handleSpy: jasmine.Spy = spyOn<any>(component, 'handleGameCreationFail').and.callFake(() => {});
+
+            const error: HttpErrorResponse = { error: { message: 'test' } } as HttpErrorResponse;
+            gameDispatcherCreationSubject.next(error);
+
+            expect(handleSpy).toHaveBeenCalledWith(error);
+        });
+
+        it('should set roundTime and fun fact', () => {
+            component['gameDispatcherService'].currentLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210 };
+            component.funFact = '';
+            component.ngOnInit();
+            expect(component.roundTime).toEqual('3:30');
+            expect(component.funFact).not.toEqual('');
+        });
+
+        it('should set currentLobby to gameDispatcher currentLobby if it exists', () => {
+            component.currentLobby = DEFAULT_LOBBY;
+            const serviceLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210 };
+            component['gameDispatcherService'].currentLobby = serviceLobby;
+
+            component.ngOnInit();
+
+            expect(component.currentLobby).toEqual(serviceLobby);
+            expect(component.currentLobby).not.toEqual(DEFAULT_LOBBY);
+        });
+
+        it('should set currentLobby to DEFAULT_LOBBY currentLobby if gameDispatcher does not have a currentLobby', () => {
+            component.currentLobby = { ...DEFAULT_LOBBY, maxRoundTime: 210, hostName: 'Alexandre' };
+            component['gameDispatcherService'].currentLobby = undefined;
+
+            component.ngOnInit();
+
+            expect(component.currentLobby).toEqual(DEFAULT_LOBBY);
+        });
     });
 
     describe('ngOnDestroy', () => {
         it('ngOnDestroy should call handleCancelGame if the isStartingGame is false', () => {
             component.isStartingGame = false;
-            const spyCancelGame = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {
-                return;
-            });
+            gameDispatcherServiceSpy.handleCancelGame.and.callFake(() => {});
 
             component.ngOnDestroy();
-            expect(spyCancelGame).toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleCancelGame).toHaveBeenCalled();
         });
 
         it('ngOnDestroy should NOT call handleCancelGame if the isStartingGame is true', () => {
             component.isStartingGame = true;
-            const spyCancelGame = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {
-                return;
-            });
+            gameDispatcherServiceSpy.handleCancelGame.and.callFake(() => {});
 
             component.ngOnDestroy();
-            expect(spyCancelGame).not.toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleCancelGame).not.toHaveBeenCalled();
         });
     });
 
@@ -142,7 +211,7 @@ describe('CreateWaitingPageComponent', () => {
             const spySetOpponent = spyOn<any>(component, 'setOpponent').and.callFake(() => {
                 return;
             });
-            gameDispatcherServiceMock['joinRequestEvent'].next(emitName);
+            gameDispatcherServiceSpy['joinRequestEvent'].next(emitName);
             expect(spySetOpponent).toHaveBeenCalledWith(emitName);
         });
 
@@ -233,22 +302,16 @@ describe('CreateWaitingPageComponent', () => {
         it('should call gameDispatcher.handleConfirmation if opponentName is defined', () => {
             const opponentName = 'some name';
             component.opponentName = opponentName;
-            const handleConfirmationSpy = spyOn(component.gameDispatcherService, 'handleConfirmation').and.callFake(() => {
-                return;
-            });
             component.confirmOpponentToServer();
 
-            expect(handleConfirmationSpy).toHaveBeenCalledWith(opponentName);
+            expect(gameDispatcherServiceSpy.handleConfirmation).toHaveBeenCalledWith(opponentName);
         });
 
         it('should NOT call gameDispatcher.handleConfirmation if opponentName is undefined', () => {
             component.opponentName = undefined;
-            const handleConfirmationSpy = spyOn(component.gameDispatcherService, 'handleConfirmation').and.callFake(() => {
-                return;
-            });
             component.confirmOpponentToServer();
 
-            expect(handleConfirmationSpy).not.toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleConfirmation).not.toHaveBeenCalled();
         });
     });
 
@@ -256,31 +319,27 @@ describe('CreateWaitingPageComponent', () => {
         it('should call gameDispatcher.handleConfirmation and disconnectOpponent if opponentName is defined', () => {
             const opponentName = 'some name';
             component.opponentName = opponentName;
-            const handleConfirmationSpy = spyOn(component.gameDispatcherService, 'handleRejection').and.callFake(() => {
-                return;
-            });
+            gameDispatcherServiceSpy.handleRejection.and.callFake(() => {});
             const disconnectOpponentSpy = spyOn<any>(component, 'disconnectOpponent').and.callFake(() => {
                 return;
             });
 
             component.confirmRejectionToServer();
 
-            expect(handleConfirmationSpy).toHaveBeenCalledWith(opponentName);
+            expect(gameDispatcherServiceSpy.handleRejection).toHaveBeenCalledWith(opponentName);
             expect(disconnectOpponentSpy).toHaveBeenCalled();
         });
 
         it('should NOT call gameDispatcher.handleConfirmation and disconnectOpponent if opponentName is undefined', () => {
             component.opponentName = undefined;
-            const handleConfirmationSpy = spyOn(component.gameDispatcherService, 'handleRejection').and.callFake(() => {
-                return;
-            });
+            gameDispatcherServiceSpy.handleRejection.and.callFake(() => {});
             const disconnectOpponentSpy = spyOn<any>(component, 'disconnectOpponent').and.callFake(() => {
                 return;
             });
 
             component.confirmRejectionToServer();
 
-            expect(handleConfirmationSpy).not.toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleRejection).not.toHaveBeenCalled();
             expect(disconnectOpponentSpy).not.toHaveBeenCalled();
         });
     });
@@ -305,12 +364,9 @@ describe('CreateWaitingPageComponent', () => {
             startGameButton.disabled = false;
             fixture.detectChanges();
 
-            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConfirmation').and.callFake(() => {
-                return;
-            });
             startGameButton.click();
 
-            expect(gameDispatcherSpy).toHaveBeenCalledWith(component.opponentName as string);
+            expect(gameDispatcherServiceSpy.handleConfirmation).toHaveBeenCalledWith(component.opponentName as string);
         });
 
         it('clicking on the startGame Button should not call confirmOpponentToServer() if there is no opponent (it is disabled)', () => {
@@ -318,11 +374,8 @@ describe('CreateWaitingPageComponent', () => {
             startGameButton.disabled = true;
             fixture.detectChanges();
 
-            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleConfirmation').and.callFake(() => {
-                return;
-            });
             startGameButton.click();
-            expect(gameDispatcherSpy).not.toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleConfirmation).not.toHaveBeenCalled();
         });
     });
 
@@ -349,15 +402,13 @@ describe('CreateWaitingPageComponent', () => {
             const spyDisconnect = spyOn<any>(component, 'disconnectOpponent').and.callFake(() => {
                 return;
             });
-            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection')
-                .withArgs(component.opponentName as string)
-                .and.callFake(() => {
-                    return;
-                });
+            gameDispatcherServiceSpy.handleRejection.withArgs(component.opponentName as string).and.callFake(() => {
+                return;
+            });
             rejectButton.click();
 
             expect(spyDisconnect).toHaveBeenCalled();
-            expect(gameDispatcherSpy).toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleRejection).toHaveBeenCalled();
         });
 
         it('should not call handleRejection() and disconnectOpponent on click when disabled', () => {
@@ -366,13 +417,11 @@ describe('CreateWaitingPageComponent', () => {
             fixture.detectChanges();
 
             const disconnectSpy = spyOn<any>(component, 'disconnectOpponent');
-            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleRejection').and.callFake(() => {
-                return;
-            });
+            gameDispatcherServiceSpy.handleRejection.and.callFake(() => {});
             rejectButton.click();
 
             expect(disconnectSpy).not.toHaveBeenCalled();
-            expect(gameDispatcherSpy).not.toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleRejection).not.toHaveBeenCalled();
         });
     });
 
@@ -399,25 +448,47 @@ describe('CreateWaitingPageComponent', () => {
 
             const spyDisconnect = spyOn(component, 'confirmConvertToSolo').and.callThrough();
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {});
+            gameDispatcherServiceSpy.handleCancelGame.and.callFake(() => {});
             convertButton.click();
 
             expect(spyDisconnect).toHaveBeenCalled();
-            expect(gameDispatcherSpy).toHaveBeenCalled();
-        });
-
-        it('should call not handleCancelGame() if an opponent is found on click', () => {
-            component.isOpponentFound = true;
-            component.confirmConvertToSolo();
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            const gameDispatcherSpy = spyOn(gameDispatcherServiceMock, 'handleCancelGame').and.callFake(() => {});
-
-            expect(gameDispatcherSpy).not.toHaveBeenCalled();
+            expect(gameDispatcherServiceSpy.handleCancelGame).toHaveBeenCalled();
         });
     });
 
     it('cancelButton should be enabled when the game is created and no opponent has joined it', () => {
         const cancelButtonButton = fixture.nativeElement.querySelector('#cancel-button');
         expect(cancelButtonButton.disabled).toBeFalsy();
+    });
+
+    describe('handleGameCreationFail', () => {
+        let error: HttpErrorResponse;
+        let confirmRejectionToServerSpy: jasmine.Spy;
+        let snackBarSpy: jasmine.Spy;
+        let routerSpy: jasmine.Spy;
+
+        beforeEach(() => {
+            error = {
+                error: {
+                    message: 'error',
+                },
+            } as HttpErrorResponse;
+            confirmRejectionToServerSpy = spyOn(component, 'confirmRejectionToServer').and.callFake(() => {});
+            snackBarSpy = spyOn(component['snackBar'], 'open');
+            routerSpy = spyOn(component['router'], 'navigateByUrl');
+            component['handleGameCreationFail'](error);
+        });
+
+        it('should call confirmRejectionToServer', () => {
+            expect(confirmRejectionToServerSpy).toHaveBeenCalled();
+        });
+
+        it('should call confirmRejectionToServer', () => {
+            expect(snackBarSpy).toHaveBeenCalledWith(error.error.message, 'Fermer', ERROR_SNACK_BAR_CONFIG);
+        });
+
+        it('should call confirmRejectionToServer', () => {
+            expect(routerSpy).toHaveBeenCalledWith('game-creation');
+        });
     });
 });

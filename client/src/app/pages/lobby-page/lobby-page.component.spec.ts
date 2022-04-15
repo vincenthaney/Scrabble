@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { LobbyInfo } from '@app/classes/communication';
+import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LobbyInfoComponent } from '@app/components/lobby-info/lobby-info.component';
@@ -117,6 +118,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '1',
                 hostName: 'Name1',
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 dictionary: TEST_DICTIONARY,
                 maxRoundTime: 60,
                 canJoin: false,
@@ -125,6 +127,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '2',
                 hostName: 'Name2',
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 dictionary: TEST_DICTIONARY,
                 maxRoundTime: 60,
                 canJoin: true,
@@ -133,13 +136,12 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '3',
                 hostName: 'Name3',
                 gameType: GameType.LOG2990,
+                gameMode: GameMode.Multiplayer,
                 dictionary: TEST_DICTIONARY,
                 maxRoundTime: 90,
                 canJoin: false,
             },
         ];
-
-        component.nameField = new NameFieldComponent();
     });
 
     it('should create', () => {
@@ -152,7 +154,8 @@ describe('LobbyPageComponent', () => {
         });
 
         it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
-            component.nameField.formParameters.patchValue({ inputName: 'differentName' });
+            component.playerName = 'differentName';
+            component.playerNameValid = true;
             component['validateName']();
             for (const lobby of component.lobbies) {
                 expect(lobby.canJoin).toBeTrue();
@@ -160,7 +163,8 @@ describe('LobbyPageComponent', () => {
         });
 
         it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
-            component.nameField.formParameters.patchValue({ inputName: 'Name1' });
+            component.playerName = 'Name1';
+            component.playerNameValid = true;
             const expected = [false, true, true];
             component['validateName']();
             expect(component.lobbies).toBeTruthy();
@@ -198,20 +202,6 @@ describe('LobbyPageComponent', () => {
         });
     });
 
-    describe('onNameChange', () => {
-        it('onNameChange should call validateName', () => {
-            const spy = validateNameSpy.and.returnValue(false);
-            component.onNameChange();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('onNameChange should call validateName', () => {
-            const spy = validateNameSpy.and.returnValue(false);
-            component.onNameChange();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('updateLobbies', () => {
         it('updateLobbies should call validateName', () => {
             const spy = validateNameSpy.and.returnValue(false);
@@ -225,6 +215,7 @@ describe('LobbyPageComponent', () => {
                     lobbyId: 'id',
                     hostName: 'name',
                     gameType: GameType.Classic,
+                    gameMode: GameMode.Multiplayer,
                     maxRoundTime: 60,
                     dictionary: TEST_DICTIONARY,
                     canJoin: true,
@@ -312,6 +303,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '1',
                 hostName: 'player',
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 maxRoundTime: 0,
                 dictionary: TEST_DICTIONARY,
             };
@@ -375,6 +367,7 @@ describe('LobbyPageComponent', () => {
                 lobbyId: '1',
                 hostName: 'Name1',
                 gameType: GameType.Classic,
+                gameMode: GameMode.Multiplayer,
                 dictionary: TEST_DICTIONARY,
                 maxRoundTime: 60,
                 canJoin: false,

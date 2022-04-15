@@ -8,19 +8,22 @@ import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
+import { MUST_HAVE_7_TILES_TO_SWAP } from '@app/constants/classes-errors';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
+import { MINIMUM_TILES_LEFT_FOR_EXCHANGE } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
 import { Service } from 'typedi';
-import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { FeedbackMessages } from './feedback-messages';
-import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
+import { FeedbackMessage, FeedbackMessages } from './feedback-messages';
 
 @Service()
 export class GamePlayService {
@@ -47,9 +50,9 @@ export class GamePlayService {
 
         let updatedData: void | GameUpdateData = action.execute();
 
-        const localPlayerFeedback = action.getMessage();
-        const opponentFeedback = action.getOpponentMessage();
-        let endGameFeedback: string[] | undefined;
+        const localPlayerFeedback: FeedbackMessage = action.getMessage();
+        const opponentFeedback: FeedbackMessage = action.getOpponentMessage();
+        let endGameFeedback: FeedbackMessage[] = [];
 
         if (updatedData) {
             updatedData = this.addMissingPlayerId(gameId, playerId, updatedData);
@@ -76,6 +79,10 @@ export class GamePlayService {
                 return new ActionPlace(player, game, { tilesToPlace: payload.tiles ?? [], startPosition, orientation: payload.orientation });
             }
             case ActionType.EXCHANGE: {
+                const totalTilesLeft = this.activeGameService.getGame(game.getId(), player.id).getTotalTilesLeft();
+                if (!(player instanceof ExpertVirtualPlayer) && totalTilesLeft < MINIMUM_TILES_LEFT_FOR_EXCHANGE)
+                    throw new Error(MUST_HAVE_7_TILES_TO_SWAP);
+
                 const payload = this.getActionExchangePayload(actionData);
                 return new ActionExchange(player, game, payload.tiles ?? []);
             }
@@ -99,7 +106,7 @@ export class GamePlayService {
 
     getActionPlacePayload(actionData: ActionData): ActionPlacePayload {
         const payload = actionData.payload as ActionPlacePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles.length <= 0) throw new Error(INVALID_PAYLOAD);
         if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
         if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
         return payload;
@@ -107,7 +114,7 @@ export class GamePlayService {
 
     getActionExchangePayload(actionData: ActionData): ActionExchangePayload {
         const payload = actionData.payload as ActionExchangePayload;
-        if (payload.tiles === undefined || !Array.isArray(payload.tiles) || !payload.tiles.length) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles.length <= 0) throw new Error(INVALID_PAYLOAD);
         return payload;
     }
 
@@ -123,18 +130,18 @@ export class GamePlayService {
         return { gameObjective: objectiveData };
     }
 
-    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<string[]> {
+    private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<FeedbackMessage[]> {
         const [updatedScorePlayer1, updatedScorePlayer2] = game.endOfGame(winnerName);
         if (!game.isAddedToDatabase) {
             const connectedRealPlayers = game.getConnectedRealPlayers();
             for (const player of connectedRealPlayers) {
                 await this.highScoresService.addHighScore(player.name, player.score, game.gameType);
             }
-            this.gameHistoriesService.addGameHistory(game.gameHistory);
+            await this.gameHistoriesService.addGameHistory(game.gameHistory);
             game.isAddedToDatabase = true;
         }
 
-        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id);
+        this.dictionaryService.stopUsingDictionary(game.dictionarySummary.id, true);
 
         if (updatedData.player1) updatedData.player1.score = updatedScorePlayer1;
         else updatedData.player1 = { id: game.player1.id, score: updatedScorePlayer1 };
