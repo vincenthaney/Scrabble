@@ -99,6 +99,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
+    hintButtonClicked(): void {
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.HINT, {}, '', true),
+        );
+    }
+
     passButtonClicked(): void {
         this.actionService.sendAction(
             this.gameService.getGameId(),

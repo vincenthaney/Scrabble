@@ -13,16 +13,23 @@
                 </div>
                 <div class="grid-item-container" id="button-group">
                     <mat-card>
-                        <button mat-flat-button id="surrender-dialog-button" (click)="quitButtonClicked()" color="primary">
-                            <ng-container *ngIf="!gameService.isGameOver">
-                                <app-icon icon="flag-alt" styling="solid"></app-icon>
-                                <span> Abandonner</span>
-                            </ng-container>
-                            <ng-container *ngIf="gameService.isGameOver">
-                                <app-icon icon="door-open" styling="solid"></app-icon>
-                                <span *ngIf="gameService.isGameOver"> Quitter</span>
-                            </ng-container>
-                        </button>
+                        <div>
+                            <button mat-flat-button id="surrender-dialog-button" (click)="quitButtonClicked()" color="primary">
+                                <ng-container *ngIf="!gameService.isGameOver">
+                                    <app-icon icon="flag-alt" styling="solid"></app-icon>
+                                    <span> Abandonner</span>
+                                </ng-container>
+                                <ng-container *ngIf="gameService.isGameOver">
+                                    <app-icon icon="door-open" styling="solid"></app-icon>
+                                    <span *ngIf="gameService.isGameOver"> Quitter</span>
+                                </ng-container>
+                            </button>
+                        </div>
+                        <div matTooltip="Ce n'est pas votre tour de jouer" matTooltipPosition="above" [matTooltipDisabled]="canPlay()">
+                            <button mat-flat-button color="primary" [disabled]="!canPlay()" (click)="hintButtonClicked()">
+                                <app-icon icon="lightbulb" styling="solid"></app-icon> Indice
+                            </button>
+                        </div>
                         <div matTooltip="Ce n'est pas votre tour de jouer" matTooltipPosition="above" [matTooltipDisabled]="canPlay()">
                             <button mat-flat-button color="primary" [disabled]="!canPlay()" (click)="passButtonClicked()">
                                 <app-icon icon="redo"></app-icon> Passer
@@ -37,7 +44,6 @@
                                 <app-icon icon="square" styling="solid"></app-icon> Placer
                             </button>
                         </div>
-                        <div matTooltip="Ce n'est pas votre tour de jouer" matTooltipPosition="above" [matTooltipDisabled]="canPlay()">
                     </mat-card>
                 </div>
             </div>
