@@ -3,12 +3,7 @@ import { ActionData } from '@app/classes/communication/action-data';
 import Player from '@app/classes/player/player';
 import Range from '@app/classes/range/range';
 import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
-import {
-    FINAL_WAIT_TIME,
-    MINIMUM_EXCHANGE_WORD_COUNT,
-    PRELIMINARY_WAIT_TIME,
-    VIRTUAL_PLAYER_ID_PREFIX,
-} from '@app/constants/virtual-player-constants';
+import { FINAL_WAIT_TIME, PRELIMINARY_WAIT_TIME, VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
@@ -80,16 +75,7 @@ export abstract class AbstractVirtualPlayer extends Player {
         return this.wordFindingInstance.findWords().pop();
     }
 
-    protected isExchangePossible(): boolean {
-        let totalTilesLeft = 0;
-        this.getActiveGameService()
-            .getGame(this.gameId, this.id)
-            .getTilesLeftPerLetter()
-            .forEach((value: number) => {
-                totalTilesLeft += value;
-            });
-        return totalTilesLeft >= MINIMUM_EXCHANGE_WORD_COUNT;
-    }
+    protected abstract isExchangePossible(): boolean;
 
     protected abstract findAction(): Promise<ActionData>;
 

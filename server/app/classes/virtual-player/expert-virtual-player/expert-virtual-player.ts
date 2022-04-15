@@ -5,6 +5,9 @@ import Range from '@app/classes/range/range';
 import { WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 
 export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
+    protected isExchangePossible(): boolean {
+        return true;
+    }
     protected async findAction(): Promise<ActionData> {
         const scoredWordPlacement = this.computeWordPlacement();
         return scoredWordPlacement ? ActionPlace.createActionData(scoredWordPlacement) : this.alternativeMove();
