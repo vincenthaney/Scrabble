@@ -97,7 +97,8 @@ describe('ModifyDictionaryComponent', () => {
                 return null;
             });
             component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+            expect(spyFormParameters).toHaveBeenCalledWith('inputDictionaryTitle');
+            expect(spyFormParameters).toHaveBeenCalledWith('inputDictionaryDescription');
         });
 
         it('should call formParameters.get and return valid', () => {
@@ -146,7 +147,7 @@ describe('ModifyDictionaryComponent', () => {
             expect(spyFormParameters).toHaveBeenCalledTimes(2);
         });
 
-        it('shouldhave been called with formParameters.get values undefined', () => {
+        it('should have been called with formParameters.get values undefined', () => {
             spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
                 return null;
             });
