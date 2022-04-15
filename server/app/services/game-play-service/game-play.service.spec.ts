@@ -18,8 +18,11 @@ import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
 import { LetterValue, Tile, TileReserve } from '@app/classes/tile';
+import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
+import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import { MUST_HAVE_7_TILES_TO_SWAP } from '@app/constants/classes-errors';
 import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors';
+import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
@@ -82,6 +85,7 @@ describe('GamePlayService', () => {
         tileReserveStub = createStubInstance(TileReserve);
 
         gameStub.player1 = new Player(DEFAULT_PLAYER_ID, DEFAULT_PLAYER_NAME);
+        // gameStub.player2 = new Player(INVALID_PLAYER_ID, 'JCol');
         gameStub.player2 = new Player(INVALID_PLAYER_ID, 'JCol');
 
         gameStub.getPlayer.returns(gameStub.player1);
@@ -297,6 +301,28 @@ describe('GamePlayService', () => {
             chai.spy.on(game, 'getTotalTilesLeft', () => 3);
 
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
+        });
+
+        it('should throw on exchange if a beginner virtual player tries to exchange when reserve has less than 7 tiles left', () => {
+            player = new BeginnerVirtualPlayer(VIRTUAL_PLAYER_ID_PREFIX + 'un id de debutant', 'Débutant');
+            const type = ActionType.EXCHANGE;
+            const payload: ActionExchangePayload = {
+                tiles: [{} as unknown as Tile],
+            };
+            chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
+        });
+
+        it('should NOT throw on exchange if an expert virtual player tries to exchange when reserve has less than 7 tiles left', () => {
+            player = new ExpertVirtualPlayer(VIRTUAL_PLAYER_ID_PREFIX + 'un id de expert', 'Expert');
+            const type = ActionType.EXCHANGE;
+            const payload: ActionExchangePayload = {
+                tiles: [{} as unknown as Tile],
+            };
+            chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+
+            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).not.to.throw(MUST_HAVE_7_TILES_TO_SWAP);
         });
 
         it('should return action of type ActionPass when type is pass', () => {
