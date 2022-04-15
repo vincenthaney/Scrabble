@@ -352,40 +352,6 @@ describe('GamePlayService', () => {
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionHint);
         });
-
-        it("should throw if place payload doesn't have tiles", () => {
-            const type = ActionType.PLACE;
-            const payload = {
-                tiles: [],
-                startPosition: { column: 0, row: 0 },
-                orientation: Orientation.Horizontal,
-            };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
-
-        it("should throw if place payload doesn't have startPosition", () => {
-            const type = ActionType.PLACE;
-            const payload: Omit<ActionPlacePayload, 'startPosition'> = {
-                tiles: DEFAULT_TILES,
-                orientation: Orientation.Horizontal,
-            };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
-
-        it("should throw if place payload doesn't have orientation", () => {
-            const type = ActionType.PLACE;
-            const payload: Omit<ActionPlacePayload, 'orientation'> = {
-                tiles: DEFAULT_TILES,
-                startPosition: { column: 0, row: 0 },
-            };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
-
-        it("should throw if exchange payload doesn't have tiles", () => {
-            const type = ActionType.EXCHANGE;
-            const payload = { tiles: [] };
-            expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
-        });
     });
 
     describe('getActionPlacePayload', () => {
@@ -402,6 +368,34 @@ describe('GamePlayService', () => {
             };
             expect(gamePlayService.getActionPlacePayload(actionData)).to.deep.equal(payload);
         });
+
+        it("should throw if place payload doesn't have tiles", () => {
+            const type = ActionType.PLACE;
+            const payload = {
+                tiles: [],
+                startPosition: { column: 0, row: 0 },
+                orientation: Orientation.Horizontal,
+            };
+            expect(() => gamePlayService.getActionPlacePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
+
+        it("should throw if place payload doesn't have startPosition", () => {
+            const type = ActionType.PLACE;
+            const payload: Omit<ActionPlacePayload, 'startPosition'> = {
+                tiles: DEFAULT_TILES,
+                orientation: Orientation.Horizontal,
+            };
+            expect(() => gamePlayService.getActionPlacePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
+
+        it("should throw if place payload doesn't have orientation", () => {
+            const type = ActionType.PLACE;
+            const payload: Omit<ActionPlacePayload, 'orientation'> = {
+                tiles: DEFAULT_TILES,
+                startPosition: { column: 0, row: 0 },
+            };
+            expect(() => gamePlayService.getActionPlacePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
+        });
     });
 
     describe('getActionExchangePayload', () => {
@@ -415,6 +409,12 @@ describe('GamePlayService', () => {
                 payload,
             };
             expect(gamePlayService.getActionExchangePayload(actionData)).to.deep.equal(payload);
+        });
+
+        it("should throw if exchange payload doesn't have tiles", () => {
+            const type = ActionType.EXCHANGE;
+            const payload = { tiles: [] };
+            expect(() => gamePlayService.getActionExchangePayload({ type, payload, input: DEFAULT_INPUT })).to.throw(INVALID_PAYLOAD);
         });
     });
 
@@ -512,7 +512,7 @@ describe('GamePlayService', () => {
 
         beforeEach(() => {
             highScoresServiceStub = createStubInstance(HighScoresService);
-            highScoresServiceStub.addHighScore.resolves(true);
+            highScoresServiceStub.addHighScore.resolves();
             Object.defineProperty(gamePlayService, 'highScoresService', { value: highScoresServiceStub });
 
             gameHistoriesServiceStub = createStubInstance(GameHistoriesService);

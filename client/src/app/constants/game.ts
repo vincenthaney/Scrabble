@@ -52,7 +52,7 @@ export const UNDEFINED_SQUARE: Square = {
     wasMultiplierUsed: false,
     isCenter: false,
 };
-export const DEFAULT_SQUAREVIEW = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
+export const DEFAULT_SQUARE_VIEW = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
 
 export const VALID_MULTIPLIERS: number[] = [2, 3];
 

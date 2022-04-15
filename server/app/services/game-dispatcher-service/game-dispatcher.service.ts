@@ -86,8 +86,7 @@ export class GameDispatcherService {
             throw new HttpException(CANNOT_HAVE_SAME_NAME);
         }
 
-        const joiningPlayer = new Player(playerId, playerName);
-        waitingRoom.joinedPlayer = joiningPlayer;
+        waitingRoom.joinedPlayer = new Player(playerId, playerName);
         return waitingRoom.getConfig();
     }
 

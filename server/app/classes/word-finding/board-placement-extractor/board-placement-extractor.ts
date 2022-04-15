@@ -55,18 +55,18 @@ export default class BoardPlacementsExtractor {
         for (const distance of this.moveThroughLine(navigator)) {
             const adjustedLinePlacements = this.adjustLinePlacements(linePlacements, distance);
 
-            if (adjustedLinePlacements) {
-                const boardPlacement: BoardPlacement = {
-                    letters: adjustedLinePlacements.letters,
-                    perpendicularLetters: adjustedLinePlacements.perpendicularLetters,
-                    position: navigator.position.copy(),
-                    orientation: navigator.orientation,
-                    maxSize: this.getSize(navigator.orientation) - distance,
-                    minSize: this.getMinSize(adjustedLinePlacements),
-                };
+            if (!adjustedLinePlacements) continue;
 
-                if (this.isValidBoardPlacement(boardPlacement)) boardPlacements.push(boardPlacement);
-            }
+            const boardPlacement: BoardPlacement = {
+                letters: adjustedLinePlacements.letters,
+                perpendicularLetters: adjustedLinePlacements.perpendicularLetters,
+                position: navigator.position.copy(),
+                orientation: navigator.orientation,
+                maxSize: this.getSize(navigator.orientation) - distance,
+                minSize: this.getMinSize(adjustedLinePlacements),
+            };
+
+            if (this.isValidBoardPlacement(boardPlacement)) boardPlacements.push(boardPlacement);
         }
 
         return boardPlacements;

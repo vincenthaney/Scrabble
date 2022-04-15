@@ -39,7 +39,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         this.timer = new Timer(0, 0);
         this.componentDestroyed$ = new Subject();
         this.gameViewEventManagerService.subscribeToGameViewEvent('reRender', this.componentDestroyed$, () => {
-            this.ngOnDestroy();
+            this.onDestroy();
             this.ngOnInit();
             this.updateActivePlayerBorder(this.roundManager.getActivePlayer());
         });
@@ -52,8 +52,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.componentDestroyed$.next(true);
-        this.componentDestroyed$.complete();
+        this.onDestroy();
     }
 
     getPlayer1(): AbstractPlayer {
@@ -68,6 +67,11 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
 
     isTimerRunning(): boolean {
         return this.timerSubscription && !this.timerSubscription.closed;
+    }
+
+    private onDestroy(): void {
+        this.componentDestroyed$.next(true);
+        this.componentDestroyed$.complete();
     }
 
     private setupGame(): void {
