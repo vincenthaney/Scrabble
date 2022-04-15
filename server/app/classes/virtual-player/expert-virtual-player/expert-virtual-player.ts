@@ -11,7 +11,7 @@ export class ExpertVirtualPlayer extends AbstractVirtualPlayer {
     private consecutiveExchangeCount = 0;
 
     protected isExchangePossible(): boolean {
-        return true;
+        return this.getActiveGameService().getGame(this.gameId, this.id).getTotalTilesLeft() > 0;
     }
 
     protected async findAction(): Promise<ActionData> {
