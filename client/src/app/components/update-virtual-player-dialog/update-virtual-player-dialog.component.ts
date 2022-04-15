@@ -41,7 +41,6 @@ export class UpdateVirtualPlayerComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(): void {
-        this.formParameters.controls.inputTitle?.updateValueAndValidity();
         this.isVirtualPlayerNameValid = this.formParameters.get('inputVirtualPlayerName')?.valid ?? false;
     }
 
