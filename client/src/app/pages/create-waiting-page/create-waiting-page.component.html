@@ -1,36 +1,73 @@
-<div class="center">
-    <div *ngIf="isStartingGame" id="game-creation-waiting-container">
-        <mat-label>En attente de la création de la partie</mat-label>
-        <mat-spinner></mat-spinner>
-    </div>
-    <div class="button-box" *ngIf="!isStartingGame">
-        <div class="sameline center">
-            {{ waitingRoomMessage }}
-            <div *ngIf="!isOpponentFound">
-                <mat-progress-spinner id="spinnerOpponentFound" class="spinner" mode="indeterminate" [diameter]="15"></mat-progress-spinner>
+<div class="container">
+    <mat-card class="top-box">
+        <div class="center">
+            <p>{{ waitingRoomMessage }}</p>
+            <ng-container *ngIf="!isOpponentFound">
+                <mat-progress-bar class="progress" mode="indeterminate"></mat-progress-bar>
+            </ng-container>
+            <ng-container *ngIf="isOpponentFound">
+                <mat-progress-bar class="progress" mode="determinate" value="100"></mat-progress-bar>
+            </ng-container>
+        </div>
+
+        <div class="players">
+            <span class="name"
+                ><b>{{ currentLobby.hostName }}</b></span
+            ><span id="vs"> vs </span><span class="name">{{ opponentName ?? '...' }}</span>
+        </div>
+
+        <div class="chip-list">
+            <div class="chip"><app-icon icon="hourglass-half" size="sm"></app-icon> {{ roundTime }}</div>
+            <div class="chip">
+                <app-icon icon="gamepad"></app-icon>
+                {{ currentLobby.gameType }}
+            </div>
+            <div class="chip">
+                <app-icon icon="book"></app-icon>
+                {{ currentLobby.dictionary.title }}
             </div>
         </div>
-        <button
-            id="start-game-button"
-            class="button"
-            mat-flat-button
-            color="primary"
-            [disabled]="!isOpponentFound"
-            (click)="confirmOpponentToServer()"
-        >
-            Démarrer la partie
-        </button>
 
-        <button id="reject-button" class="button" mat-flat-button color="primary" [disabled]="!isOpponentFound" (click)="confirmRejectionToServer()">
-            Rejeter cet adversaire
-        </button>
+        <div class="button-box">
+            <button
+                id="start-game-button"
+                class="button"
+                mat-flat-button
+                color="primary"
+                [disabled]="!isOpponentFound"
+                (click)="confirmOpponentToServer()"
+            >
+                Démarrer la partie
+            </button>
 
-        <button id="convert-solo-button" mat-flat-button class="button" color="primary" [disabled]="isOpponentFound" (click)="confirmConvertToSolo()">
-            Convertir en partie solo
-        </button>
+            <button
+                id="reject-button"
+                class="button"
+                mat-flat-button
+                color="primary"
+                [disabled]="!isOpponentFound"
+                (click)="confirmRejectionToServer()"
+            >
+                Rejeter cet adversaire
+            </button>
 
-        <button id="cancel-button" mat-flat-button class="button" color="primary" routerLink="/game-creation">Annuler la partie</button>
+            <button
+                id="convert-solo-button"
+                mat-flat-button
+                class="button"
+                color="primary"
+                [disabled]="isOpponentFound"
+                (click)="confirmConvertToSolo()"
+            >
+                Convertir en partie solo
+            </button>
 
-        <img class="image" src="https://bit.ly/3m206ss" width="100" height="20" alt="Logo Scrabble" />
-    </div>
+            <button id="cancel-button" mat-flat-button class="button" color="primary" routerLink="/game-creation">Annuler la partie</button>
+        </div>
+    </mat-card>
+
+    <mat-card class="fun-fact-box">
+        <p id="intro">Le saviez-vous ?</p>
+        <p id="fact">{{ funFact }}</p>
+    </mat-card>
 </div>

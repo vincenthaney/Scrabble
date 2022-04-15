@@ -3,12 +3,14 @@ import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { AbstractPlayer } from '@app/classes/player';
+import LobbyInfo from '@app/classes/communication/lobby-info';
+import { Timer } from '@app/classes/timer/timer';
 import { ConvertDialogComponent, ConvertResult } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
-import { DEFAULT_PLAYER } from '@app/constants/game';
+import { getRandomFact } from '@app/constants/fun-facts-scrabble';
 import {
+    DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
     DIALOG_CONTENT,
     DIALOG_TITLE,
@@ -30,8 +32,10 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponentName: string | undefined = undefined;
     isStartingGame: boolean = false;
     isOpponentFound: boolean = false;
-    host: AbstractPlayer = DEFAULT_PLAYER;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
+    roundTime: string = '1:00';
+    currentLobby: LobbyInfo = DEFAULT_LOBBY;
+    funFact: string = '';
     componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
@@ -50,6 +54,11 @@ export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.currentLobby = this.gameDispatcherService.currentLobby ?? DEFAULT_LOBBY;
+        const roundTime: Timer = Timer.convertTime(this.currentLobby.maxRoundTime);
+        this.roundTime = `${roundTime.minutes}:${roundTime.getTimerSecondsPadded()}`;
+        this.funFact = getRandomFact();
+
         this.gameDispatcherService.subscribeToJoinRequestEvent(this.componentDestroyed$, (opponentName: string) => this.setOpponent(opponentName));
         this.playerLeavesService.subscribeToJoinerLeavesGameEvent(this.componentDestroyed$, (leaverName: string) => this.opponentLeft(leaverName));
         this.gameDispatcherService

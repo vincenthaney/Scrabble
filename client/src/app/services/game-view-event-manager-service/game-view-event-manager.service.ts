@@ -41,8 +41,7 @@ export class GameViewEventManagerService {
         destroy$: Observable<boolean>,
         next: (payload: S) => void,
     ): Subscription {
-        const subject: Subject<S> = this.getSubjectFromMap(eventType);
-        return subject.pipe(takeUntil(destroy$)).subscribe(next);
+        return this.getSubjectFromMap<T, S>(eventType).pipe(takeUntil(destroy$)).subscribe(next);
     }
 
     getGameViewEventValue<T extends keyof EventTypes, S extends EventClass[T], U extends EventTypes[T]>(

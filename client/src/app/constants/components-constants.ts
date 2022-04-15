@@ -58,3 +58,6 @@ export const PERCENT = 100;
 
 export const SUCCESS_SNACK_BAR_CONFIG = { duration: SNACK_BAR_SUCCESS_DURATION, panelClass: ['success'] };
 export const ERROR_SNACK_BAR_CONFIG = { duration: SNACK_BAR_ERROR_DURATION, panelClass: ['error'] };
+
+export const IS_CLICKABLE_CLASS = 'isClickable';
+export const CODE_HTML_TAG = 'CODE';

@@ -10,11 +10,13 @@ import { NameFieldComponent } from '@app/components/name-field/name-field.compon
 import { DICTIONARY_DELETED, DICTIONARY_REQUIRED } from '@app/constants/component-errors';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
+import { DICTIONARY_NAME_KEY, PLAYER_NAME_KEY, TIMER_KEY } from '@app/constants/session-storage-constants';
 import { GameDispatcherService } from '@app/services';
-import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
+import { randomizeArray } from '@app/utils/randomize-array';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-game-creation-page',
@@ -54,7 +56,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.dictionaryOptions = [];
         this.virtualPlayerNameMap = new Map();
-        this.playerName = '';
+        this.playerName = window.localStorage.getItem(PLAYER_NAME_KEY) || '';
         this.playerNameValid = false;
         this.pageDestroyed$ = new Subject();
         this.gameParameters = new FormGroup({
@@ -62,7 +64,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             gameMode: new FormControl(GameMode.Multiplayer, Validators.required),
             level: new FormControl(VirtualPlayerLevel.Beginner),
             virtualPlayerName: new FormControl(''),
-            timer: new FormControl(DEFAULT_TIMER_VALUE, Validators.required),
+            timer: new FormControl(this.getDefaultTimerValue(), Validators.required),
             dictionary: new FormControl(undefined, [Validators.required]),
         });
 
@@ -78,6 +80,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             .observeGameCreationFailed()
             .pipe(takeUntil(this.pageDestroyed$))
             .subscribe(async (error: HttpErrorResponse) => await this.handleGameCreationFail(error));
+
         this.dictionaryService.subscribeToDictionariesUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
             if (this.shouldSetToDefaultDictionary) this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
@@ -87,7 +90,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     async ngOnInit(): Promise<void> {
         this.gameParameters
             .get('gameMode')
-            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$), distinctUntilChanged())
             .subscribe((value) => {
                 if (value === this.gameModes.Solo) {
                     this.gameParameters?.get('level')?.setValidators([Validators.required]);
@@ -98,17 +101,20 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
                 }
                 this.gameParameters?.get('level')?.updateValueAndValidity();
                 this.gameParameters?.get('virtualPlayerName')?.updateValueAndValidity();
+                this.gameParameters.patchValue({ virtualPlayerName: randomizeArray(this.getVirtualPlayerNames())[0] });
             });
+
         await this.dictionaryService.updateAllDictionaries();
 
         this.gameParameters
             .get('level')
-            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
-            .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
+            ?.valueChanges.pipe(takeUntil(this.pageDestroyed$), distinctUntilChanged())
+            .subscribe(() => this.gameParameters.patchValue({ virtualPlayerName: randomizeArray(this.getVirtualPlayerNames())[0] }));
 
-        this.virtualPlayerProfilesService
-            .getVirtualPlayerProfiles()
-            .then((profiles: VirtualPlayerProfile[]) => this.generateVirtualPlayerProfileMap(profiles));
+        this.virtualPlayerProfilesService.getVirtualPlayerProfiles().then((profiles: VirtualPlayerProfile[]) => {
+            this.generateVirtualPlayerProfileMap(profiles);
+            this.gameParameters.patchValue({ virtualPlayerName: randomizeArray(this.getVirtualPlayerNames())[0] });
+        });
     }
 
     ngOnDestroy(): void {
@@ -122,9 +128,13 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     onSubmit(): void {
         if (this.isFormValid()) {
+            window.localStorage.setItem(PLAYER_NAME_KEY, this.playerName);
+            window.localStorage.setItem(DICTIONARY_NAME_KEY, this.gameParameters.get('dictionary')?.value);
+            window.localStorage.setItem(TIMER_KEY, this.gameParameters.get('timer')?.value);
             this.createGame();
         }
     }
+
     onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
         this.playerName = playerName;
         this.playerNameValid = valid;
@@ -152,6 +162,12 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             if (!namesForLevel) this.virtualPlayerNameMap.set(profile.level, [profile.name]);
             else namesForLevel.push(profile.name);
         });
+    }
+
+    private getDefaultTimerValue(): number {
+        const INVALID = -1;
+        const time = Number.parseInt(window.localStorage.getItem(TIMER_KEY) || `${INVALID}`, 10);
+        return !Number.isNaN(time) && time > INVALID ? time : DEFAULT_TIMER_VALUE;
     }
 
     private createGame(): void {

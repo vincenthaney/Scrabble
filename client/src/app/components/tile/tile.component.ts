@@ -14,6 +14,7 @@ export class TileComponent implements OnInit {
     @Input() fontSize: string;
     @Input() hideValue: boolean;
     @Input() applied: boolean;
+    @Input() newlyPlaced: boolean;
     isPlayed: boolean;
     backgroundPath: string;
 
@@ -22,6 +23,7 @@ export class TileComponent implements OnInit {
         this.fontSize = '1em';
         this.hideValue = false;
         this.applied = true;
+        this.newlyPlaced = false;
         this.isPlayed = false;
         this.backgroundPath = this.getBackgroundPath();
     }

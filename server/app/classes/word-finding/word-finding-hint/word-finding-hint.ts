@@ -8,12 +8,12 @@ export default class WordFindingHint extends AbstractWordFinding {
         this.findingAttempts++;
         if (this.wordPlacements.length < HINT_ACTION_NUMBER_OF_WORDS) {
             this.wordPlacements.push(wordPlacement);
-        } else {
-            for (let i = 0; i < this.wordPlacements.length; ++i) {
-                if (this.wordPlacements[i].score < wordPlacement.score) {
-                    this.wordPlacements.splice(i, 1, wordPlacement);
-                    return;
-                }
+            return;
+        }
+        for (let i = 0; i < this.wordPlacements.length; ++i) {
+            if (this.wordPlacements[i].score < wordPlacement.score) {
+                this.wordPlacements.splice(i, 1, wordPlacement);
+                return;
             }
         }
     }

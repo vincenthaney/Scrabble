@@ -1,13 +1,16 @@
 import ActionInfo from '@app/classes/actions/action-info';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 
 export default class ActionReserve extends ActionInfo {
-    getMessage(): string | undefined {
-        return Array.from(this.game.getTilesLeftPerLetter(), ([v, k]) => [v, k])
-            .map(([letter, amount]) => `**<span>${letter}</span>**: ${amount}`)
-            .join('<br>');
+    getMessage(): FeedbackMessage {
+        return {
+            message: Array.from(this.game.getTilesLeftPerLetter(), ([v, k]) => [v, k])
+                .map(([letter, amount]) => `**<span>${letter}</span>**: ${amount}`)
+                .join('<br>'),
+        };
     }
 
-    getOpponentMessage(): undefined {
-        return undefined;
+    getOpponentMessage(): FeedbackMessage {
+        return {};
     }
 }

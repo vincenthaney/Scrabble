@@ -199,7 +199,7 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit endRoundEvent subscription should call the functions to end the round', () => {
-            const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
+            const ngOnDestroySpy = spyOn<any>(component, 'onDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
 
             gameViewEventManagerSpy.emitGameViewEvent('reRender');
@@ -209,7 +209,7 @@ describe('InformationBoxComponent', () => {
         });
 
         it('ngOnInit reRender subscription should call the functions to rerender the component', () => {
-            const ngOnDestroySpy = spyOn(component, 'ngOnDestroy');
+            const ngOnDestroySpy = spyOn<any>(component, 'onDestroy');
             const ngOnInitSpy = spyOn(component, 'ngOnInit');
             const updateBorderSpy = spyOn<any>(component, 'updateActivePlayerBorder');
 
@@ -229,7 +229,7 @@ describe('InformationBoxComponent', () => {
         });
     });
 
-    describe('ngOndestroy', () => {
+    describe('onDestroy', () => {
         beforeEach(() => {
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         });
@@ -238,9 +238,18 @@ describe('InformationBoxComponent', () => {
             const ngUnsubscribeNextSpy = spyOn(component['componentDestroyed$'], 'next');
             const ngUnsubscribeCompleteSpy = spyOn(component['componentDestroyed$'], 'complete');
 
-            component.ngOnDestroy();
+            component['onDestroy']();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
             expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('ngOndestroy', () => {
+        it('should call onDestroy', () => {
+            const onDestroySpy = spyOn<any>(component, 'onDestroy');
+
+            component.ngOnDestroy();
+            expect(onDestroySpy).toHaveBeenCalled();
         });
     });
 

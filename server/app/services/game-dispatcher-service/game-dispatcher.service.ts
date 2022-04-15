@@ -4,6 +4,7 @@ import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
+import { GOOD_LUCK_MESSAGE } from '@app/constants/game';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -59,6 +60,12 @@ export class GameDispatcherService {
                 this.activeGameService.getGame(gameId, startGameData.round.playerData.id),
             );
         }
+
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: GOOD_LUCK_MESSAGE,
+            senderId: startGameData.player2.id,
+            gameId,
+        });
     }
 
     async createMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
@@ -79,12 +86,11 @@ export class GameDispatcherService {
             throw new HttpException(CANNOT_HAVE_SAME_NAME);
         }
 
-        const joiningPlayer = new Player(playerId, playerName);
-        waitingRoom.joinedPlayer = joiningPlayer;
+        waitingRoom.joinedPlayer = new Player(playerId, playerName);
         return waitingRoom.getConfig();
     }
 
-    async acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): Promise<ReadyGameConfig> {
+    acceptJoinRequest(waitingRoomId: string, playerId: string, opponentName: string): ReadyGameConfig {
         const waitingRoom = this.getMultiplayerGameFromId(waitingRoomId);
         if (waitingRoom.getConfig().player1.id !== playerId) {
             throw new HttpException(INVALID_PLAYER_ID_FOR_GAME);

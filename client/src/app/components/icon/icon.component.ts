@@ -20,8 +20,6 @@ export class IconComponent implements OnInit {
 
     getPrefix(style?: IconStyle): IconPrefix {
         switch (style) {
-            case 'regular':
-                return 'far';
             case 'light':
                 return 'fal';
             case 'solid':

@@ -34,6 +34,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     tileFontSize: number;
     selectedSquare: SquareView | undefined;
     navigator: BoardNavigator;
+    private newlyPlacedTiles: SquareView[];
     private componentDestroyed$: Subject<boolean>;
 
     constructor(
@@ -52,6 +53,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         this.notAppliedSquares = [];
         this.tileFontSize = SQUARE_TILE_DEFAULT_FONT_SIZE;
         this.selectedSquare = undefined;
+        this.newlyPlacedTiles = [];
         this.componentDestroyed$ = new Subject<boolean>();
     }
 
@@ -104,6 +106,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         );
     }
 
+    clearNewlyPlacedTiles(): void {
+        this.newlyPlacedTiles.forEach((squareView) => (squareView.newlyPlaced = false));
+        this.newlyPlacedTiles = [];
+    }
+
     protected onFocusableEvent(event: KeyboardEvent): void {
         switch (event.key) {
             case BACKSPACE:
@@ -125,7 +132,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     }
 
     private handlePlaceLetter(letter: string, isUppercase: boolean, squareView: SquareView | undefined): void {
-        if (this.cannotPlace(squareView)) return;
+        if (!this.canPlace(squareView)) return;
 
         letter = removeAccents(letter.toUpperCase());
 
@@ -160,12 +167,12 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private cannotPlace(squareView: SquareView | undefined): boolean {
-        return !squareView || this.actionService.hasActionBeenPlayed || squareView.square.tile !== null;
+    private canPlace(squareView: SquareView | undefined): boolean {
+        return squareView !== undefined && !this.actionService.hasActionBeenPlayed && !squareView.square.tile;
     }
 
     private handleBackspace(): void {
-        if (this.cannotBackspace()) return;
+        if (!this.canBackspace()) return;
 
         let index = this.notAppliedSquares.indexOf(this.navigator.currentSquareView);
 
@@ -186,8 +193,8 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
         }
     }
 
-    private cannotBackspace(): boolean {
-        return !this.selectedSquare || !this.areTilesUsed() || this.actionService.hasActionBeenPlayed;
+    private canBackspace(): boolean {
+        return this.selectedSquare !== undefined && this.areTilesUsed() && !this.actionService.hasActionBeenPlayed;
     }
 
     private handleEnter(): void {
@@ -233,6 +240,7 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     private updateBoard(squaresToUpdate: Square[]): boolean {
         if (this.hasBoardBeenUpdated(squaresToUpdate)) return false;
         this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+        this.clearNewlyPlacedTiles();
 
         /* 
             We flatten the 2D grid so it becomes a 1D array of SquareView
@@ -249,6 +257,9 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
                 .forEach((sameSquare: Square) => {
                     squareView.square = sameSquare;
                     squareView.applied = true;
+                    squareView.newlyPlaced = true;
+
+                    this.newlyPlacedTiles.push(squareView);
                 });
         });
         this.selectedSquare = undefined;

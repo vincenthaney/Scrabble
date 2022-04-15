@@ -1,11 +1,12 @@
-import Game from '@app/classes/game/game';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
+import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
+import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 
 export default abstract class Action {
     constructor(protected player: Player, protected game: Game) {}
 
-    getOpponentMessage(): string | undefined {
+    getOpponentMessage(): FeedbackMessage {
         return this.getMessage();
     }
 
@@ -13,5 +14,5 @@ export default abstract class Action {
 
     abstract execute(): GameUpdateData | void;
 
-    abstract getMessage(): string | undefined;
+    abstract getMessage(): FeedbackMessage;
 }
