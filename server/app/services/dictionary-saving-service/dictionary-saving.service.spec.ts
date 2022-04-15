@@ -18,7 +18,7 @@ import {
     DEFAULT_DICTIONARY_NOT_FOUND,
     DICTIONARY_DIRECTORY,
     DICTIONARY_INDEX_FILENAME,
-    INVALID_TITLE_FORMAT,
+    INVALID_TITLE_ALREADY_USED,
     NO_DICTIONARY_WITH_ID,
     NO_DICTIONARY_WITH_NAME,
 } from '@app/constants/dictionary.const';
@@ -193,7 +193,7 @@ describe('DictionarySavingService', () => {
 
         it('should throw if name exists', () => {
             entryToDictionarySummaryStub.callThrough();
-            expect(() => service.addDictionary(DEFAULT_DICTIONARY)).to.throw(INVALID_TITLE_FORMAT);
+            expect(() => service.addDictionary(DEFAULT_DICTIONARY)).to.throw(INVALID_TITLE_ALREADY_USED(DEFAULT_DICTIONARY.title));
         });
     });
 
