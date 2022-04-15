@@ -22,7 +22,7 @@ export class VirtualPlayerProfilesService {
             this.virtualPlayerProfiles = profiles;
             this.virtualPlayersUpdateEvent.next(profiles);
         });
-        this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponse(this.serviceDestroyed$, (message) => {
+        this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponseEvent(this.serviceDestroyed$, (message) => {
             this.requestSentEvent.next();
             this.getAllVirtualPlayersProfile();
             this.componentUpdateEvent.next(message);
