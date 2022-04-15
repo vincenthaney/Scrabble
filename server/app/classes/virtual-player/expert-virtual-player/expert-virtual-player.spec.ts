@@ -46,7 +46,7 @@ describe('ExpertVirtualPlayer', () => {
     });
 
     describe('alternativeMove', () => {
-        it('should call ActionExchange and increment echange counter IF no moves are found and exchange is \
+        it('should call ActionExchange and increment exchange counter IF no moves are found and exchange is \
         possible + max exchange count has not been reached', () => {
             spy.on(expertVirtualPlayer, 'isExchangePossible', () => {
                 return true;
