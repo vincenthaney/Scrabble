@@ -229,7 +229,7 @@ describe('InformationBoxComponent', () => {
         });
     });
 
-    describe('Ondestroy', () => {
+    describe('onDestroy', () => {
         beforeEach(() => {
             spyOnProperty<any>(mockRoundManager, 'timer', 'get').and.returnValue(null);
         });
@@ -238,14 +238,14 @@ describe('InformationBoxComponent', () => {
             const ngUnsubscribeNextSpy = spyOn(component['componentDestroyed$'], 'next');
             const ngUnsubscribeCompleteSpy = spyOn(component['componentDestroyed$'], 'complete');
 
-            component.ngOnDestroy();
+            component['onDestroy']();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
             expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
         });
     });
 
     describe('ngOndestroy', () => {
-        it('should onDestroy', () => {
+        it('should call onDestroy', () => {
             const onDestroySpy = spyOn<any>(component, 'onDestroy');
 
             component.ngOnDestroy();
