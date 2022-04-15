@@ -24,6 +24,7 @@
                             </ng-container>
                         </button>
                         <div matTooltip="Ce n'est pas votre tour de jouer" matTooltipPosition="above" [matTooltipDisabled]="canPlay()">
+                            <button mat-flat-button color="primary" [disabled]="!canPlay()" (click)="passButtonClicked()">
                                 <app-icon icon="redo"></app-icon> Passer
                             </button>
                         </div>
