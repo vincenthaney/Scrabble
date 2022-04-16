@@ -43,6 +43,7 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
 
     private componentDestroyed$: Subject<boolean> = new Subject();
     constructor(public dialog: MatDialog, private virtualPlayerProfilesService: VirtualPlayerProfilesService, private snackBar: MatSnackBar) {
+        this.componentDestroyed$ = new Subject();
         this.columns = VIRTUAL_PLAYERS_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.dataSource = new MatTableDataSource(new Array());
