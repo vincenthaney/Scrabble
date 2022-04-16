@@ -42,8 +42,8 @@ export class CreateVirtualPlayerComponent implements OnChanges, OnDestroy {
         this.componentDestroyed$.complete();
     }
 
-    createVirtualPlayer(): void {
-        this.virtualPlayerProfilesService.createVirtualPlayer({
+    async createVirtualPlayer(): Promise<void> {
+        await this.virtualPlayerProfilesService.createVirtualPlayer({
             name: this.formParameters.get('inputVirtualPlayerName')?.value,
             level: this.formParameters.get('level')?.value as VirtualPlayerLevel,
         } as VirtualPlayerData);
