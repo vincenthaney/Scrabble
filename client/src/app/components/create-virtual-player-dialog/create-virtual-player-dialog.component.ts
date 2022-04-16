@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
@@ -12,17 +12,17 @@ import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
     templateUrl: './create-virtual-player-dialog.component.html',
     styleUrls: ['./create-virtual-player-dialog.component.scss'],
 })
-export class CreateVirtualPlayerComponent implements OnChanges, OnDestroy {
+export class CreateVirtualPlayerComponent implements OnDestroy {
     formParameters: FormGroup;
-    isVirtualPlayerNameValid: boolean;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
     virtualPlayerName: string;
+    isVirtualPlayerNameValid: boolean;
     private componentDestroyed$: Subject<boolean>;
     constructor(private dialogRef: MatDialogRef<CreateVirtualPlayerComponent>, private virtualPlayerProfilesService: VirtualPlayerProfilesService) {
         this.componentDestroyed$ = new Subject();
-        this.isVirtualPlayerNameValid = false;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.virtualPlayerName = '';
+        this.isVirtualPlayerNameValid = false;
         this.formParameters = new FormGroup({
             level: new FormControl(VirtualPlayerLevel.Beginner),
             inputVirtualPlayerName: new FormControl(this.virtualPlayerName, [
@@ -33,8 +33,9 @@ export class CreateVirtualPlayerComponent implements OnChanges, OnDestroy {
         });
     }
 
-    ngOnChanges(): void {
-        this.isVirtualPlayerNameValid = this.formParameters.get('inputVirtualPlayerName')?.valid ?? false;
+    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
+        this.virtualPlayerName = playerName;
+        this.isVirtualPlayerNameValid = valid;
     }
 
     ngOnDestroy(): void {
@@ -44,7 +45,7 @@ export class CreateVirtualPlayerComponent implements OnChanges, OnDestroy {
 
     async createVirtualPlayer(): Promise<void> {
         await this.virtualPlayerProfilesService.createVirtualPlayer({
-            name: this.formParameters.get('inputVirtualPlayerName')?.value,
+            name: this.virtualPlayerName,
             level: this.formParameters.get('level')?.value as VirtualPlayerLevel,
         } as VirtualPlayerData);
         this.closeDialog();

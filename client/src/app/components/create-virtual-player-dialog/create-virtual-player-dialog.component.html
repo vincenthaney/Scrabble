@@ -25,7 +25,7 @@
                     [virtualPlayerName]="''"
                     [mustVerifyVirtualPlayerName]="false"
                     (keydown.enter)="$event.preventDefault()"
-                    (playerNameChange)="ngOnChanges()"
+                    (playerNameChange)="onPlayerNameChanges($event)"
                 ></app-name-field>
         </div>
         <div id="buttons-container">
