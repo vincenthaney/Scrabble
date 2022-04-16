@@ -2,7 +2,7 @@
 <div class="container">
     <form [formGroup]="formParameters" class="inner-container" (ngSubmit)="createVirtualPlayer()">
         <div>
-            <mat-label id="level-label">Choisissez le niveau de l'adversaire virtuel:</mat-label>
+            <mat-label id="level-label">Choisissez le niveau du joueur virtuel:</mat-label>
             <mat-button-toggle-group formControlName="level">
                 <mat-button-toggle id="begginer-button" [value]="virtualPlayerLevels.Beginner">
                     <mat-card class="content">
@@ -19,24 +19,14 @@
             </mat-button-toggle-group>
         </div>
         <div>
-            <mat-form-field
-            class="form-field"
-            appearance="outline"
-            [formGroup]="formParameters"
-            matTooltipPosition="above"
-            matTooltip="Le nom doit être entre 2 et 20 caractères."
-            >
-            <mat-label> Nom:</mat-label>
-            <input
-                matInput
-                id="virtualPlayerNameValidator"
-                type="text"
-                formControlName="inputVirtualPlayerName"
-                autocomplete="off"
-                (ngModelChange)="ngOnChanges()"
-                (valueChanges)="ngOnChanges()"
-            />
-        </mat-form-field>
+            <div>Choisissez le nom du joueur virtuel:</div>
+                <app-name-field
+                    [initialPlayerName]="''"
+                    [virtualPlayerName]="''"
+                    [mustVerifyVirtualPlayerName]="false"
+                    (keydown.enter)="$event.preventDefault()"
+                    (playerNameChange)="ngOnChanges()"
+                ></app-name-field>
         </div>
         <div id="buttons-container">
             <button mat-flat-button color = "primary" type="submit" [disabled]="!this.isVirtualPlayerNameValid">
