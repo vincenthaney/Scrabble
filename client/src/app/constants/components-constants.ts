@@ -69,3 +69,4 @@ export const ERROR_SNACK_BAR_CONFIG = { duration: SNACK_BAR_ERROR_DURATION, pane
 export const IS_CLICKABLE_CLASS = 'isClickable';
 export const CODE_HTML_TAG = 'CODE';
 
+export const ASCENDING = 'asc';
