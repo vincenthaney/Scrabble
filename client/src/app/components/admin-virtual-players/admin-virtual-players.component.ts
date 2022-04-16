@@ -63,7 +63,7 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     }
 
     ngAfterViewInit(): void {
-        this.sort.sort({ id: 'level', start: 'asc' } as MatSortable);
+        this.sort.sort({ id: 'level', start: ASCENDING } as MatSortable);
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
     }
