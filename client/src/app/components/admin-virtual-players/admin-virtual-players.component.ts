@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
+import { ASCENDING, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
 import { Subject } from 'rxjs';
 import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import {
@@ -20,7 +20,13 @@ import { CreateVirtualPlayerComponent } from '@app/components/create-virtual-pla
 import { DeleteVirtualPlayerDialogComponent } from '@app/components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from '@app/components/update-virtual-player-dialog/update-virtual-player-dialog.component';
 import { PositiveFeedback } from '@app/constants/virtual-players-components';
-import { PositiveFeedbackResponse } from '@app/constants/dialogs-constants';
+import {
+    CREATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
+    CREATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
+    PositiveFeedbackResponse,
+    UPDATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
+    UPDATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
+} from '@app/constants/dialogs-constants';
 import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -40,8 +46,7 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     state: VirtualPlayersComponentState;
     error: string | undefined;
     isWaitingForServerResponse: boolean;
-
-    private componentDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean>;
     constructor(public dialog: MatDialog, private virtualPlayerProfilesService: VirtualPlayerProfilesService, private snackBar: MatSnackBar) {
         this.componentDestroyed$ = new Subject();
         this.columns = VIRTUAL_PLAYERS_COLUMNS;
@@ -76,15 +81,15 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
         };
         this.dialog.open(UpdateVirtualPlayerComponent, {
             data: virtualPlayerData,
-            height: '300px',
-            width: '450px',
+            height: UPDATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
+            width: UPDATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
         });
     }
 
     createVirtualPlayer(): void {
         this.dialog.open(CreateVirtualPlayerComponent, {
-            height: '315px',
-            width: '450px',
+            height: CREATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
+            width: CREATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
         });
     }
 
