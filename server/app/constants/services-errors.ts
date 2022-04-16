@@ -39,5 +39,3 @@ export const CANNOT_ADD_DEFAULT_PROFILE = "Impossible d'ajouter un nouveau profi
 export const NO_PROFILE_OF_LEVEL = "Il n'y a aucun joueur du niveau demandé";
 export const MUST_SPECIFY_LEVEL = 'Un niveau doit être spécifié pour le nouveau profil joueur virtuel';
 export const MISSING_PARAMETER = 'La requête ne contient pas toutes les spécifications requises';
-export const RANDOM_STRING_LENGTH = 36;
-export const ID_LENGTH = 7;
