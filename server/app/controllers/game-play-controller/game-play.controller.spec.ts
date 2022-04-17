@@ -235,7 +235,7 @@ describe('GamePlayController', () => {
             emitToSocketSpy = chai.spy.on(gamePlayController['socketService'], 'emitToSocket', () => {});
             emitToRoomSpy = chai.spy.on(gamePlayController['socketService'], 'emitToRoom', () => {});
             gameUpdateSpy = chai.spy.on(gamePlayController, 'gameUpdate', () => ({}));
-            getGameStub = stub(ActiveGameService.prototype, 'getGame').returns(gameStub as unknown as Game);
+            getGameStub = testingUnit.getStubbedInstance(ActiveGameService).getGame.returns(gameStub as unknown as Game);
         });
 
         afterEach(() => {
@@ -296,14 +296,14 @@ describe('GamePlayController', () => {
             expect(emitToSocketSpy).to.have.been.called.twice;
         });
 
-        it('should call emitToRoom only once in endGameFeedback', async () => {
+        it('handlePlayAction should call emitToRoom only once in endGameFeedback', async () => {
             const feedback: FeedbackMessages = {
                 localPlayerFeedback: {},
                 opponentFeedback: {},
                 endGameFeedback: [{ message: 'message 1' }, { message: 'message 2' }],
             };
             chai.spy.on(gamePlayController['gamePlayService'], 'playAction', () => [undefined, feedback]);
-            await gamePlayController['handlePlayAction']('', '', {
+            await gamePlayController['handlePlayAction'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, {
                 type: ActionType.HELP,
                 payload: {},
                 input: '',
@@ -331,6 +331,17 @@ describe('GamePlayController', () => {
                 senderId: SYSTEM_ERROR_ID,
                 gameId: DEFAULT_GAME_ID,
             });
+        });
+
+        it('handlefeedback should call emitToRoom/emitToSocket three times if all feedback messages are defined', async () => {
+            const feedback: FeedbackMessages = {
+                localPlayerFeedback: { message: 'local player feedback' },
+                opponentFeedback: { message: 'opponent feedback' },
+                endGameFeedback: [{ message: 'message 1' }, { message: 'message 2' }],
+            };
+            gamePlayController['handleFeedback'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, feedback);
+            expect(emitToRoomSpy).to.have.been.called.exactly(1);
+            expect(emitToSocketSpy).to.have.been.called.exactly(2);
         });
 
         describe('Word not in dictionnary error', () => {

@@ -563,6 +563,17 @@ describe('GamePlayService', () => {
             expect(gameUpdateData.player1.score).to.equal(updatedScore1);
             expect(gameUpdateData.player2.score).to.equal(updatedScore2);
         });
+
+        it('should set updatedData.isGameOver and updatedData.winners', async () => {
+            const winnerName = 'Mathilde';
+            const gameUpdateData = {
+                isGameOver: false,
+                winners: [],
+            };
+            await gamePlayService['handleGameOver'](winnerName, gameStub as unknown as Game, gameUpdateData);
+            expect(gameUpdateData.isGameOver).to.be.true;
+            expect(gameUpdateData.winners).to.deep.equal([winnerName]);
+        });
     });
 
     describe('addMissingPlayerId', () => {
