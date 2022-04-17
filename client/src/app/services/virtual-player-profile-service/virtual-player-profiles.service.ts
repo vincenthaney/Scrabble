@@ -27,7 +27,8 @@ export class VirtualPlayerProfilesService {
             await this.getAllVirtualPlayersProfile();
             this.componentUpdateEvent.next(message);
         });
-        this.virtualPlayerProfilesController.subscribeToVirtualPlayerErrorEvent(this.serviceDestroyed$, (message) => {
+        this.virtualPlayerProfilesController.subscribeToVirtualPlayerErrorEvent(this.serviceDestroyed$, async (message) => {
+            await this.getAllVirtualPlayersProfile();
             this.componentUpdateEvent.next(message);
         });
     }
