@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { Player } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -152,11 +153,32 @@ describe('GamePageComponent', () => {
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
-        // eslint-disable-next-line -- surrenderDialog is private and we need access for the test
         const spy = spyOn(component['dialog'], 'open');
         const surrenderButton = fixture.debugElement.nativeElement.querySelector('#surrender-dialog-button');
         surrenderButton.click();
         expect(spy).toHaveBeenCalled();
+    });
+
+    describe('endOfGame dialog', () => {
+        it('should open the EndOfGame dialog on endOfGame event', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component['gameViewEventManagerService'].emitGameViewEvent('endOfGame', ['Mathilde']);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should have confettis if local player is winner', () => {
+            const spy = spyOn<any>(component, 'throwConfettis').and.callThrough();
+            spyOn(component['gameService'], 'getLocalPlayer').and.returnValue({ name: 'Mathilde' } as unknown as Player);
+            component['gameViewEventManagerService'].emitGameViewEvent('endOfGame', ['Mathilde']);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT have confettis if local player is not winner', () => {
+            const spy = spyOn<any>(component, 'throwConfettis').and.callThrough();
+            spyOn(component['gameService'], 'getLocalPlayer').and.returnValue({ name: 'Vincent' } as unknown as Player);
+            component['gameViewEventManagerService'].emitGameViewEvent('endOfGame', ['Mathilde']);
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
     describe('keypress/keydown', () => {

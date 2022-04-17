@@ -222,11 +222,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 ],
             },
         });
-        if (winnerNames.includes(this.gameService.getLocalPlayer()?.name ?? '')) {
-            party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
-                count: party.variation.range(100, 150),
-            });
-        }
+
+        if (winnerNames.includes(this.gameService.getLocalPlayer()?.name ?? '')) this.throwConfettis();
     }
 
     private isLocalPlayerTurn(): boolean {
@@ -236,5 +233,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private handlePlayerLeaves(): void {
         this.mustDisconnectGameOnLeave = false;
         this.playerLeavesService.handleLocalPlayerLeavesGame();
+    }
+
+    private throwConfettis(): void {
+        party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
+            count: party.variation.range(100, 150),
+        });
     }
 }
