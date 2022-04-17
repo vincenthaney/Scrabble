@@ -16,7 +16,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { IS_OPPONENT, IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
+import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
 import { generateGameObjectives } from '@app/constants/services-constants/objectives-test.const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
@@ -554,7 +554,7 @@ describe('Game', () => {
         let player1Stub: SinonStubbedInstance<Player>;
         let player2Stub: SinonStubbedInstance<Player>;
 
-        let congratulateStub: SinonStub<any[], any>;
+        let computeWinnersSpy: SinonStub<any[], any>;
 
         const PLAYER_1_END_GAME_MESSAGE = 'player1 : ABC';
         const PLAYER_2_END_GAME_MESSAGE = 'player2 : SOS';
@@ -569,7 +569,7 @@ describe('Game', () => {
             game.player2 = player2Stub as unknown as Player;
             player1Stub.endGameMessage.returns(PLAYER_1_END_GAME_MESSAGE);
             player2Stub.endGameMessage.returns(PLAYER_2_END_GAME_MESSAGE);
-            congratulateStub = stub(game, <any>'congratulateWinner').returns('congratulate winner');
+            computeWinnersSpy = stub(game, <any>'computeWinners').returns([player1Stub.name]);
         });
 
         it('should call the messages', () => {
@@ -578,18 +578,18 @@ describe('Game', () => {
             assert(player2Stub.endGameMessage.calledOnce);
         });
 
-        it('should call congratulateWinner if winnerName is undefined', () => {
+        it('should call computeWinners if winnerName is undefined', () => {
             game.endGameMessage(undefined);
-            assert(congratulateStub.calledOnce);
+            assert(computeWinnersSpy.calledOnce);
         });
 
         it('should call winnerMessage with winner directly if winner name is provided ', () => {
             game.endGameMessage(game.player1.name);
-            expect(congratulateStub.calledOnce).to.be.false;
+            expect(computeWinnersSpy.calledOnce).to.be.false;
         });
     });
 
-    describe('congratulateWinner', () => {
+    describe('computeWinners', () => {
         let game: Game;
         let player1Stub: SinonStubbedInstance<Player>;
         let player2Stub: SinonStubbedInstance<Player>;
@@ -608,23 +608,23 @@ describe('Game', () => {
             game.player2 = player2Stub as unknown as Player;
         });
 
-        it('should congratulate player 1 if he has a higher score ', () => {
+        it('should return player 1 name if he has a higher score ', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = LOWER_SCORE;
-            const expectedMessage = WINNER_MESSAGE(PLAYER_1_NAME);
-            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
+            const expected = [PLAYER_1_NAME];
+            expect(game['computeWinners']()).to.deep.equal(expected);
         });
         it('should congratulate player 2 if he has a higher score ', () => {
             player1Stub.score = LOWER_SCORE;
             player2Stub.score = HIGHER_SCORE;
-            const expectedMessage = WINNER_MESSAGE(PLAYER_2_NAME);
-            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
+            const expected = [PLAYER_2_NAME];
+            expect(game['computeWinners']()).to.deep.equal(expected);
         });
         it('should congratulate player 1 and player 2 if they are tied ', () => {
             player1Stub.score = HIGHER_SCORE;
             player2Stub.score = HIGHER_SCORE;
-            const expectedMessage = WINNER_MESSAGE(`${PLAYER_1_NAME} et ${PLAYER_2_NAME}`);
-            expect(game['congratulateWinner']()).to.deep.equal(expectedMessage);
+            const expected = [PLAYER_1_NAME, PLAYER_2_NAME];
+            expect(game['computeWinners']()).to.deep.equal(expected);
         });
     });
 
