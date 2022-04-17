@@ -273,6 +273,7 @@ describe('GamePlayService', () => {
             chai.spy.on(gamePlayService, 'getActionExchangePayload', () => {
                 return { tiles: [{ letter: 'N' } as unknown as Tile, { letter: 'V' } as unknown as Tile] };
             });
+            chai.spy.on(gamePlayService, 'isExchangeLegal', () => true);
 
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
@@ -287,6 +288,7 @@ describe('GamePlayService', () => {
             chai.spy.on(gamePlayService, 'getActionExchangePayload', () => {
                 return {};
             });
+            chai.spy.on(gamePlayService, 'isExchangeLegal', () => true);
 
             const action = gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT });
             expect(action).to.be.instanceOf(ActionExchange);
@@ -299,6 +301,7 @@ describe('GamePlayService', () => {
                 tiles: [{} as unknown as Tile],
             };
             chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+            chai.spy.on(gamePlayService, 'isExchangeLegal', () => false);
 
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
         });
@@ -310,6 +313,7 @@ describe('GamePlayService', () => {
                 tiles: [{} as unknown as Tile],
             };
             chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+            chai.spy.on(gamePlayService, 'isExchangeLegal', () => false);
 
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).to.throw(MUST_HAVE_7_TILES_TO_SWAP);
         });
@@ -321,6 +325,7 @@ describe('GamePlayService', () => {
                 tiles: [{} as unknown as Tile],
             };
             chai.spy.on(game, 'getTotalTilesLeft', () => 3);
+            chai.spy.on(gamePlayService, 'isExchangeLegal', () => true);
 
             expect(() => gamePlayService.getAction(player, game, { type, payload, input: DEFAULT_INPUT })).not.to.throw(MUST_HAVE_7_TILES_TO_SWAP);
         });
@@ -423,6 +428,22 @@ describe('GamePlayService', () => {
             const expected = true;
             game['gameIsOver'] = expected;
             expect(gamePlayService.isGameOver(game.getId(), DEFAULT_PLAYER_ID)).to.equal(expected);
+        });
+    });
+
+    describe('isExchangeLegal', () => {
+        it('should return false  if a regular player tries to exchange when reserve has less than 7 tiles left', () => {
+            expect(gamePlayService['isExchangeLegal'](player, 3)).to.be.false;
+        });
+
+        it('should return true  if a regular player tries to exchange when reserve has less than 7 tiles left', () => {
+            player = new BeginnerVirtualPlayer(VIRTUAL_PLAYER_ID_PREFIX + 'un id de debutant', 'Débutant');
+            expect(gamePlayService['isExchangeLegal'](player, 3)).to.be.false;
+        });
+
+        it('should return false if a regular player tries to exchange when reserve has less than 7 tiles left', () => {
+            player = new ExpertVirtualPlayer(VIRTUAL_PLAYER_ID_PREFIX + 'un id de expert', 'Expert');
+            expect(gamePlayService['isExchangeLegal'](player, 3)).to.be.true;
         });
     });
 

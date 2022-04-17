@@ -1,7 +1,9 @@
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { Vec2 } from '@app/classes/vec2';
 import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import { StatusCodes } from 'http-status-codes';
 import { BoardNavigator, Orientation, Position } from './';
 
 export const SHOULD_HAVE_A_TILE = true;
@@ -52,9 +54,8 @@ export default class Board {
     verifySquare(position: Position, shouldBeFilled: boolean): boolean {
         if (this.isWithinBounds(position)) {
             return this.grid[position.row][position.column].tile ? shouldBeFilled : !shouldBeFilled;
-        } else {
-            throw new Error(POSITION_OUT_OF_BOARD);
         }
+        throw new HttpException(POSITION_OUT_OF_BOARD, StatusCodes.NOT_FOUND);
     }
 
     private isWithinBounds(position: Position): boolean {
