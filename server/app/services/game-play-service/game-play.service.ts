@@ -149,6 +149,7 @@ export class GamePlayService {
         else updatedData.player2 = { id: game.player2.id, score: updatedScorePlayer2 };
 
         updatedData.isGameOver = true;
+        updatedData.winners = winnerName ? [winnerName] : game.computeWinners();
         return game.endGameMessage(winnerName);
     }
 
