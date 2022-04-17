@@ -14,10 +14,10 @@ import { SYSTEM_ERROR_ID } from '@app/constants/game';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import BoardService from '@app/services/board-service/board.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { ObjectivesManagerService } from '@app/services/objectives-manager-service/objectives-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ObjectivesManagerService } from '@app/services/objectives-manager-service/objectives-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -151,7 +151,7 @@ export default class GameService implements OnDestroy, IResetServiceData {
 
     private handleGameUpdate(gameUpdateData: GameUpdateData): void {
         if (gameUpdateData.isGameOver) {
-            this.handleGameOver();
+            this.handleGameOver(gameUpdateData.winners ?? []);
         }
         if (gameUpdateData.player1) {
             this.handleUpdatePlayerData(gameUpdateData.player1);
@@ -192,9 +192,10 @@ export default class GameService implements OnDestroy, IResetServiceData {
         }
     }
 
-    private handleGameOver(): void {
+    private handleGameOver(winnerNames: string[]): void {
         this.isGameOver = true;
         this.roundManager.resetTimerData();
+        this.gameViewEventManagerService.emitGameViewEvent('endOfGame', winnerNames);
     }
 
     private reconnectReinitialize(startGameData: StartGameData): void {

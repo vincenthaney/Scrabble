@@ -85,6 +85,7 @@ describe('GameService', () => {
         const reRender$ = new Subject();
         const noActiveGame$ = new Subject();
         const resetServices$ = new Subject();
+        const endOfGame$ = new Subject();
         gameViewEventManagerSpy = jasmine.createSpyObj('GameViewEventManagerService', ['emitGameViewEvent', 'subscribeToGameViewEvent']);
         gameViewEventManagerSpy.emitGameViewEvent.and.callFake((eventType: string) => {
             switch (eventType) {
@@ -103,6 +104,9 @@ describe('GameService', () => {
                 case 'resetServices':
                     resetServices$.next();
                     break;
+                case 'endOfGame':
+                    endOfGame$.next();
+                    break;
             }
         });
 
@@ -117,6 +121,8 @@ describe('GameService', () => {
                 case 'newMessage':
                     return message$.pipe(takeUntil(destroy$)).subscribe(next);
                 case 'resetServices':
+                    return resetServices$.pipe(takeUntil(destroy$)).subscribe(next);
+                case 'endOfGame':
                     return resetServices$.pipe(takeUntil(destroy$)).subscribe(next);
             }
             return new Subscription();
@@ -528,11 +534,20 @@ describe('GameService', () => {
             expect(service.tileReserve).toEqual(originalTileReserve);
         });
 
-        it('should call gameOver if gameOver', () => {
+        it('should call gameOver if gameOver with winnerNames if they are defined', () => {
+            const spy = spyOn<any>(service, 'handleGameOver');
+            const winners = ['Mathilde'];
+            gameUpdateData.isGameOver = true;
+            gameUpdateData.winners = winners;
+            service['handleGameUpdate'](gameUpdateData);
+            expect(spy).toHaveBeenCalledWith(winners);
+        });
+
+        it('should call gameOver if gameOver with [] if no winnerNames are defined', () => {
             const spy = spyOn<any>(service, 'handleGameOver');
             gameUpdateData.isGameOver = true;
             service['handleGameUpdate'](gameUpdateData);
-            expect(spy).toHaveBeenCalled();
+            expect(spy).toHaveBeenCalledWith([]);
         });
 
         it('should not call gameOver if gameOver is false or undefined', () => {
@@ -638,14 +653,21 @@ describe('GameService', () => {
     });
 
     describe('gameOver', () => {
+        const winnerNames = ['The best'];
+
         it('should change attribute "isGameOver" to true', () => {
-            service['handleGameOver']();
+            service['handleGameOver'](winnerNames);
             expect(service['isGameOver']).toEqual(true);
         });
 
         it('should call roundManager.resetTimerData()', () => {
-            service['handleGameOver']();
+            service['handleGameOver'](winnerNames);
             expect(roundManagerSpy.resetTimerData).toHaveBeenCalled();
+        });
+
+        it('should emit endOgGame event', () => {
+            service['handleGameOver'](winnerNames);
+            expect(gameViewEventManagerSpy.emitGameViewEvent).toHaveBeenCalledWith('endOfGame', winnerNames);
         });
     });
 
