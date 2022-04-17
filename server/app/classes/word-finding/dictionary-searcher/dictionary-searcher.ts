@@ -49,7 +49,7 @@ export default class DictionarySearcher {
     private next(): DictionarySearchResult {
         const stackItem = this.stack.pop();
 
-        if (!stackItem) throw new HttpException(NEXT_NODE_DOES_NOT_EXISTS, StatusCodes.NOT_FOUND);
+        if (!stackItem) throw new HttpException(NEXT_NODE_DOES_NOT_EXISTS, StatusCodes.INTERNAL_SERVER_ERROR);
 
         this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
 
@@ -103,7 +103,7 @@ export default class DictionarySearcher {
     private getLettersLeft(letters: string[], playingLetter: string): string[] {
         let index = letters.indexOf(playingLetter);
         if (index === NOT_FOUND) index = letters.indexOf(BLANK_TILE_LETTER_VALUE);
-        if (index === NOT_FOUND) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.BAD_REQUEST);
+        if (index === NOT_FOUND) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.FORBIDDEN);
 
         const lettersLeft = [...letters];
         lettersLeft.splice(index, 1);

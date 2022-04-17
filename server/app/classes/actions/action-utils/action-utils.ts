@@ -12,7 +12,7 @@ export class ActionUtils {
 
         for (const tile of tilesToPlay) {
             const index = this.getIndexOfTile(unplayedTiles, tile, allowWildcard);
-            if (index < 0) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.BAD_REQUEST);
+            if (index < 0) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.FORBIDDEN);
 
             const playerTile = unplayedTiles.splice(index, 1)[0];
             if (this.isBlankTile(playerTile)) {

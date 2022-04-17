@@ -1,7 +1,12 @@
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
-import { AMOUNT_MUST_BE_GREATER_THAN_1, NOT_ENOUGH_TILES, TILE_NOT_IN_RESERVE, TILE_RESERVE_MUST_BE_INITIATED } from '@app/constants/classes-errors';
+import {
+    AMOUNT_MUST_BE_GREATER_THAN_1,
+    NOT_ENOUGH_TILES,
+    TILE_NOT_IN_RESERVE,
+    TILE_RESERVE_MUST_BE_INITIALIZED,
+} from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES } from '@app/constants/game';
 import { promises } from 'fs';
 import { StatusCodes } from 'http-status-codes';
@@ -36,7 +41,7 @@ export default class TileReserve {
     }
 
     getTiles(amount: number): Tile[] {
-        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIATED, StatusCodes.INTERNAL_SERVER_ERROR);
+        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIALIZED, StatusCodes.INTERNAL_SERVER_ERROR);
         if (amount < 1) throw new HttpException(AMOUNT_MUST_BE_GREATER_THAN_1, StatusCodes.FORBIDDEN);
         const tilesToReturn: Tile[] = [];
         const tileToGive = Math.min(this.tiles.length, amount);
@@ -49,7 +54,7 @@ export default class TileReserve {
     }
 
     swapTiles(tilesToSwap: Tile[]): Tile[] {
-        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIATED, StatusCodes.INTERNAL_SERVER_ERROR);
+        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIALIZED, StatusCodes.INTERNAL_SERVER_ERROR);
         if (this.tiles.length < tilesToSwap.length) throw new HttpException(NOT_ENOUGH_TILES, StatusCodes.FORBIDDEN);
 
         const tilesToReturn: Tile[] = this.getTiles(tilesToSwap.length);
@@ -59,7 +64,7 @@ export default class TileReserve {
     }
 
     getTilesLeftPerLetter(): Map<LetterValue, number> {
-        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIATED, StatusCodes.INTERNAL_SERVER_ERROR);
+        if (!this.initialized) throw new HttpException(TILE_RESERVE_MUST_BE_INITIALIZED, StatusCodes.INTERNAL_SERVER_ERROR);
         const map = new Map<LetterValue, number>();
 
         LETTER_VALUES.forEach((letter) => {
