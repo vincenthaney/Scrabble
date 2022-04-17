@@ -27,7 +27,6 @@ export class UpdateVirtualPlayerComponent implements OnDestroy {
     ) {
         this.componentDestroyed$ = new Subject();
         this.isVirtualPlayerNameValid = false;
-        this.virtualPlayerLevels = VirtualPlayerLevel;
         this.virtualPlayerName = data.name;
         this.virtualPlayerId = data.id;
         this.formParameters = new FormGroup({
@@ -52,8 +51,8 @@ export class UpdateVirtualPlayerComponent implements OnDestroy {
 
     async updateVirtualPlayer(): Promise<void> {
         await this.virtualPlayerProfilesService.updateVirtualPlayer({
-            name: this.formParameters.get('inputVirtualPlayerName')?.value,
-            level: this.formParameters.get('level')?.value,
+            name: this.virtualPlayerName,
+            level: this.data.level,
             id: this.data.id,
         } as VirtualPlayerData);
         this.closeDialog();

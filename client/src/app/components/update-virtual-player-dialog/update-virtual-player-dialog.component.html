@@ -2,7 +2,7 @@
 <div id="container">
     <div>
         <app-name-field
-        [initialPlayerName]="''"
+        [initialPlayerName]="this.virtualPlayerName"
         [virtualPlayerName]="''"
         [mustVerifyVirtualPlayerName]="false"
         (keydown.enter)="$event.preventDefault()"
