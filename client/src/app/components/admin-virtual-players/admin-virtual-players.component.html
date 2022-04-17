@@ -17,7 +17,7 @@
             <table mat-table [dataSource]="dataSource">
         
                 <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef> {{columns.name}} </th>
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.name}} </th>
                     <td mat-cell class="left-cell" *matCellDef="let element"> {{element.name}} </td>
                 </ng-container>
        
