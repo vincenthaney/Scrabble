@@ -3,11 +3,13 @@
 import { Application } from '@app/app';
 import { BasicDictionaryData, DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { HttpException } from '@app/classes/http-exception/http-exception';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
+import { SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { DictionaryController } from './dictionary.controller';
@@ -25,9 +27,11 @@ const TEST_DICTIONARY_2: DictionarySummary = { id: 'id2', title: 'title2', descr
 describe('DictionaryController', () => {
     let controller: DictionaryController;
     let testingUnit: ServicesTestingUnit;
+    let dictionaryServiceStub: SinonStubbedInstance<DictionaryService>;
 
     beforeEach(() => {
         testingUnit = new ServicesTestingUnit().withStubbedDictionaryService().withMockDatabaseService().withStubbedControllers(DictionaryController);
+        dictionaryServiceStub = testingUnit.getStubbedInstance(DictionaryService);
     });
 
     beforeEach(() => {
@@ -90,13 +94,11 @@ describe('DictionaryController', () => {
 
         describe('DELETE /dictionary', () => {
             it('should return OK', async () => {
-                chai.spy.on(controller['dictionaryService'], 'deleteDictionary', () => {});
-
                 return supertest(expressApp).delete('/api/dictionaries').expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
-                chai.spy.on(controller['dictionaryService'], 'deleteDictionary', () => {
+                dictionaryServiceStub.deleteDictionary.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
@@ -111,7 +113,7 @@ describe('DictionaryController', () => {
                 words: ['dictionaryData.words', 'word2'],
             };
             it('should return OK', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
+                chai.spy.on(controller['dictionaryService'], 'getDictionaryData', () => {
                     return { ...expected, isDefault: true };
                 });
 
@@ -119,7 +121,7 @@ describe('DictionaryController', () => {
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
+                chai.spy.on(controller['dictionaryService'], 'getDictionaryData', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 
@@ -127,7 +129,7 @@ describe('DictionaryController', () => {
             });
 
             it('should have the dictionary in the response body', async () => {
-                chai.spy.on(controller['dictionaryService'], 'getDbDictionary', () => {
+                chai.spy.on(controller['dictionaryService'], 'getDictionaryData', () => {
                     return { ...expected, isDefault: true };
                 });
                 return expect((await supertest(expressApp).get('/api/dictionaries/${DEFAULT_DICTIONARY_ID}')).body).to.deep.equal(expected);
@@ -160,13 +162,11 @@ describe('DictionaryController', () => {
 
         describe('DELETE /dictionaries/reset', () => {
             it('should return OK', async () => {
-                chai.spy.on(controller['dictionaryService'], 'resetDbDictionaries', () => {});
-
                 return supertest(expressApp).delete('/api/dictionaries/reset').expect(StatusCodes.NO_CONTENT);
             });
 
             it('should return BAD_REQUEST on throw httpException', async () => {
-                chai.spy.on(controller['dictionaryService'], 'resetDbDictionaries', () => {
+                dictionaryServiceStub.restoreDictionaries.callsFake(() => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.BAD_REQUEST);
                 });
 

@@ -62,7 +62,7 @@ export class DictionaryController {
             const { dictionaryId } = req.params;
 
             try {
-                const dictionaryData: DictionaryData = await this.dictionaryService.getDbDictionary(dictionaryId);
+                const dictionaryData: DictionaryData = await this.dictionaryService.getDictionaryData(dictionaryId);
                 const dictionaryToSend: BasicDictionaryData = {
                     title: dictionaryData.title,
                     description: dictionaryData.description,
@@ -77,7 +77,7 @@ export class DictionaryController {
 
         this.router.delete('/dictionaries/reset', async (req: DictionaryRequest, res: Response) => {
             try {
-                await this.dictionaryService.resetDbDictionaries();
+                await this.dictionaryService.restoreDictionaries();
                 res.status(StatusCodes.NO_CONTENT).send();
             } catch (exception) {
                 HttpException.sendError(exception, res);

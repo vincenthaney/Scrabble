@@ -1,4 +1,4 @@
-import { BasicDictionaryData, CompleteDictionaryData, DictionaryData } from '@app/classes/communication/dictionary-data';
+import { BasicDictionaryData, CompleteDictionaryData, DictionaryData, DictionarySummary } from '@app/classes/communication/dictionary-data';
 import { Dictionary } from '@app/classes/dictionary';
 import { createStubInstance } from 'sinon';
 import DictionaryService from './dictionary.service';
@@ -94,7 +94,7 @@ export const INVALID_ARRAY_TYPES_DICTIONARY: BasicDictionaryData = {
     words: [1, [], true],
 } as unknown as BasicDictionaryData;
 
-export const ADDITIONNAL_PROPERTY_DICTIONARY: BasicDictionaryData = {
+export const ADDITIONAL_PROPERTY_DICTIONARY: BasicDictionaryData = {
     title: 'validUniqueTitle',
     description: 'valid Desicrition',
     words: ['aa', 'zythums'],
@@ -135,4 +135,11 @@ export const INVALID_WORDS_DICTIONARY_6: BasicDictionaryData = {
     title: 'validUniqueTitle',
     description: 'valid Desicrition',
     words: ['a'],
+};
+
+export const DEFAULT_SUMMARY: DictionarySummary = {
+    title: 'dictionary',
+    description: 'description',
+    id: 'id',
+    isDefault: false,
 };
