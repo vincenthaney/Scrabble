@@ -1,4 +1,4 @@
-import { Component, Inject, OnChanges, OnDestroy } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
@@ -13,7 +13,7 @@ import { UpdateVirtualPlayerDialogParameters } from './update-virtual-player.com
     templateUrl: './update-virtual-player-dialog.component.html',
     styleUrls: ['./update-virtual-player-dialog.component.scss'],
 })
-export class UpdateVirtualPlayerComponent implements OnChanges, OnDestroy {
+export class UpdateVirtualPlayerComponent implements OnDestroy {
     formParameters: FormGroup;
     isVirtualPlayerNameValid: boolean;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
@@ -40,13 +40,14 @@ export class UpdateVirtualPlayerComponent implements OnChanges, OnDestroy {
         });
     }
 
-    ngOnChanges(): void {
-        this.isVirtualPlayerNameValid = this.formParameters.get('inputVirtualPlayerName')?.valid ?? false;
-    }
-
     ngOnDestroy(): void {
         this.componentDestroyed$.next(true);
         this.componentDestroyed$.complete();
+    }
+
+    onPlayerNameChanges([playerName, valid]: [string, boolean]): void {
+        this.virtualPlayerName = playerName;
+        this.isVirtualPlayerNameValid = valid;
     }
 
     async updateVirtualPlayer(): Promise<void> {

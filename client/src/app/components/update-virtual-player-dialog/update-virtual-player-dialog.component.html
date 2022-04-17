@@ -1,24 +1,13 @@
 <h2 mat-dialog-title>Modifier un joueur virtuel</h2>
 <div id="container">
     <div>
-        <mat-form-field
-        class="form-field"
-        appearance="outline"
-        [formGroup]="formParameters"
-        matTooltipPosition="above"
-        matTooltip="Le nom doit être entre 2 et 20 caractères."
-        >
-        <mat-label> Nom:</mat-label>
-        <input
-            matInput
-            id="virtualPlayerNameValidator"
-            type="text"
-            formControlName="inputVirtualPlayerName"
-            autocomplete="off"
-            (ngModelChange)="ngOnChanges()"
-            (valueChanges)="ngOnChanges()"
-        />
-    </mat-form-field>
+        <app-name-field
+        [initialPlayerName]="''"
+        [virtualPlayerName]="''"
+        [mustVerifyVirtualPlayerName]="false"
+        (keydown.enter)="$event.preventDefault()"
+        (playerNameChange)="onPlayerNameChanges($event)"
+    ></app-name-field>
     </div>
     <div id="buttons-container">
         <button mat-flat-button color = "primary" (click)="updateVirtualPlayer()" [disabled]="!this.isVirtualPlayerNameValid">
