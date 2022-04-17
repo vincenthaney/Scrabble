@@ -7,6 +7,7 @@ import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
@@ -22,6 +23,7 @@ import HighScoresService from '@app/services/high-scores-service/high-scores.ser
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 import { FeedbackMessage, FeedbackMessages } from './feedback-messages';
 
@@ -43,7 +45,7 @@ export class GamePlayService {
     async playAction(gameId: string, playerId: string, actionData: ActionData): Promise<[void | GameUpdateData, void | FeedbackMessages]> {
         const game = this.activeGameService.getGame(gameId, playerId);
         const player = game.getPlayer(playerId, IS_REQUESTING);
-        if (player.id !== playerId) throw new Error(NOT_PLAYER_TURN);
+        if (player.id !== playerId) throw new HttpException(NOT_PLAYER_TURN, StatusCodes.FORBIDDEN);
         if (game.gameIsOver) return [undefined, undefined];
 
         const action: Action = this.getAction(player, game, actionData);
@@ -80,8 +82,7 @@ export class GamePlayService {
             }
             case ActionType.EXCHANGE: {
                 const totalTilesLeft = this.activeGameService.getGame(game.getId(), player.id).getTotalTilesLeft();
-                if (!(player instanceof ExpertVirtualPlayer) && totalTilesLeft < MINIMUM_TILES_LEFT_FOR_EXCHANGE)
-                    throw new Error(MUST_HAVE_7_TILES_TO_SWAP);
+                if (!this.isExchangeLegal(player, totalTilesLeft)) throw new HttpException(MUST_HAVE_7_TILES_TO_SWAP, StatusCodes.FORBIDDEN);
 
                 const payload = this.getActionExchangePayload(actionData);
                 return new ActionExchange(player, game, payload.tiles ?? []);
@@ -106,15 +107,15 @@ export class GamePlayService {
 
     getActionPlacePayload(actionData: ActionData): ActionPlacePayload {
         const payload = actionData.payload as ActionPlacePayload;
-        if (payload.tiles.length <= 0) throw new Error(INVALID_PAYLOAD);
-        if (payload.startPosition === undefined) throw new Error(INVALID_PAYLOAD);
-        if (payload.orientation === undefined) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles.length <= 0) throw new HttpException(INVALID_PAYLOAD, StatusCodes.BAD_REQUEST);
+        if (payload.startPosition === undefined) throw new HttpException(INVALID_PAYLOAD, StatusCodes.BAD_REQUEST);
+        if (payload.orientation === undefined) throw new HttpException(INVALID_PAYLOAD, StatusCodes.BAD_REQUEST);
         return payload;
     }
 
     getActionExchangePayload(actionData: ActionData): ActionExchangePayload {
         const payload = actionData.payload as ActionExchangePayload;
-        if (payload.tiles.length <= 0) throw new Error(INVALID_PAYLOAD);
+        if (payload.tiles.length <= 0) throw new HttpException(INVALID_PAYLOAD, StatusCodes.BAD_REQUEST);
         return payload;
     }
 
@@ -128,6 +129,10 @@ export class GamePlayService {
 
         const objectiveData: GameObjectivesData = game.resetPlayerObjectiveProgression(playerId);
         return { gameObjective: objectiveData };
+    }
+
+    private isExchangeLegal(player: Player, totalTilesLeft: number): boolean {
+        return player instanceof ExpertVirtualPlayer || totalTilesLeft >= MINIMUM_TILES_LEFT_FOR_EXCHANGE;
     }
 
     private async handleGameOver(winnerName: string | undefined, game: Game, updatedData: GameUpdateData): Promise<FeedbackMessage[]> {

@@ -1,10 +1,12 @@
 import { Board, Position } from '@app/classes/board';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { Square } from '@app/classes/square';
 import { Multiplier } from '@app/classes/square/square';
 import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG, BOARD_CONFIG_MAP } from '@app/constants/board-config';
 import { BOARD_SIZE } from '@app/constants/game';
 import { BOARD_CONFIG_UNDEFINED_AT, NO_MULTIPLIER_MAPPED_TO_INPUT } from '@app/constants/services-errors';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
 @Service()
@@ -31,13 +33,13 @@ export default class BoardService {
         return new Board(grid);
     }
     private readScoreMultiplierConfig(position: Position): Multiplier {
-        if (!this.isBoardConfigDefined(position)) throw new Error(BOARD_CONFIG_UNDEFINED_AT(position));
+        if (!this.isBoardConfigDefined(position)) throw new HttpException(BOARD_CONFIG_UNDEFINED_AT(position), StatusCodes.BAD_REQUEST);
         return this.parseSquareConfig(BOARD_CONFIG[position.row][position.column]);
     }
 
     private parseSquareConfig(data: string): Multiplier {
         if (BOARD_CONFIG_MAP.get(data) === undefined) {
-            throw new Error(NO_MULTIPLIER_MAPPED_TO_INPUT(data));
+            throw new HttpException(NO_MULTIPLIER_MAPPED_TO_INPUT(data), StatusCodes.BAD_REQUEST);
         }
         return BOARD_CONFIG_MAP.get(data) as Multiplier;
     }

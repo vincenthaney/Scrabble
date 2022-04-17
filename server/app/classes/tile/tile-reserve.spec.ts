@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
-import { AMOUNT_MUST_BE_GREATER_THAN_1, TILE_NOT_IN_RESERVE, TILE_RESERVE_MUST_BE_INITIATED } from '@app/constants/classes-errors';
+import { AMOUNT_MUST_BE_GREATER_THAN_1, TILE_NOT_IN_RESERVE, TILE_RESERVE_MUST_BE_INITIALIZED } from '@app/constants/classes-errors';
 import { LETTER_VALUES } from '@app/constants/game';
 import { expect, spy } from 'chai';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
@@ -210,14 +210,14 @@ describe('TileReserve: uninitialized', () => {
     });
 
     it('should throw error when getTile while uninitialized', () => {
-        expect(() => tileReserve.getTiles(0)).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTiles(0)).to.throw(TILE_RESERVE_MUST_BE_INITIALIZED);
     });
 
     it('should throw error when swapTile while uninitialized', () => {
-        expect(() => tileReserve.swapTiles([])).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.swapTiles([])).to.throw(TILE_RESERVE_MUST_BE_INITIALIZED);
     });
 
     it('should throw error when getTilesLeftPerLetter while uninitialized', () => {
-        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(TILE_RESERVE_MUST_BE_INITIATED);
+        expect(() => tileReserve.getTilesLeftPerLetter()).to.throw(TILE_RESERVE_MUST_BE_INITIALIZED);
     });
 });

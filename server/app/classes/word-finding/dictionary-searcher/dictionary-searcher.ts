@@ -1,7 +1,6 @@
 import { DictionaryNode } from '@app/classes/dictionary';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { LetterValue } from '@app/classes/tile';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
-import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
 import {
     BoardPlacement,
     DictionarySearcherStackItem,
@@ -10,6 +9,9 @@ import {
     PerpendicularWord,
     SearcherPerpendicularLetters,
 } from '@app/classes/word-finding';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
+import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
+import { StatusCodes } from 'http-status-codes';
 
 export default class DictionarySearcher {
     private boardPlacement: BoardPlacement;
@@ -47,7 +49,7 @@ export default class DictionarySearcher {
     private next(): DictionarySearchResult {
         const stackItem = this.stack.pop();
 
-        if (!stackItem) throw new Error(NEXT_NODE_DOES_NOT_EXISTS);
+        if (!stackItem) throw new HttpException(NEXT_NODE_DOES_NOT_EXISTS, StatusCodes.INTERNAL_SERVER_ERROR);
 
         this.addChildrenToStack(stackItem.node, stackItem.playerLetters);
 
@@ -101,7 +103,7 @@ export default class DictionarySearcher {
     private getLettersLeft(letters: string[], playingLetter: string): string[] {
         let index = letters.indexOf(playingLetter);
         if (index === NOT_FOUND) index = letters.indexOf(BLANK_TILE_LETTER_VALUE);
-        if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+        if (index === NOT_FOUND) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.FORBIDDEN);
 
         const lettersLeft = [...letters];
         lettersLeft.splice(index, 1);

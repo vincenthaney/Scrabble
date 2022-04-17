@@ -4,6 +4,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameHistory } from '@app/classes/database/game-history';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { GameObjectives } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
@@ -19,6 +20,7 @@ import BoardService from '@app/services/board-service/board.service';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { StatusCodes } from 'http-status-codes';
 import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';
 import { GameMode } from './game-mode';
@@ -137,11 +139,11 @@ export default class Game {
             if (this.player1.id === playerId) return isRequestingPlayer ? this.player1 : this.player2;
             if (this.player2.id === playerId) return isRequestingPlayer ? this.player2 : this.player1;
         }
-        throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+        throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.FORBIDDEN);
     }
 
     replacePlayer(playerId: string, newPlayer: Player): GameUpdateData {
-        if (!this.isPlayerFromGame(playerId)) throw new Error(INVALID_PLAYER_ID_FOR_GAME);
+        if (!this.isPlayerFromGame(playerId)) throw new HttpException(INVALID_PLAYER_ID_FOR_GAME, StatusCodes.FORBIDDEN);
 
         const updatedData: GameUpdateData = {};
         if (this.player1.id === playerId) {
