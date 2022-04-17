@@ -211,8 +211,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private endOfGameDialog(winnerNames: string[]): void {
         this.dialog.open(DefaultDialogComponent, {
             data: {
-                title: DIALOG_END_OF_GAME_TITLE,
-                content: DIALOG_END_OF_GAME_CONTENT(winnerNames, this.gameService.getLocalPlayer()?.name ?? ''),
+                title: DIALOG_END_OF_GAME_TITLE(this.isLocalPlayerWinner(winnerNames)),
+                content: DIALOG_END_OF_GAME_CONTENT(this.isLocalPlayerWinner(winnerNames)),
                 buttons: [
                     {
                         content: DIALOG_END_OF_GAME_BUTTON,
@@ -223,7 +223,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
             },
         });
 
-        if (winnerNames.includes(this.gameService.getLocalPlayer()?.name ?? '')) this.throwConfettis();
+        if (this.isLocalPlayerWinner(winnerNames)) this.throwConfettis();
     }
 
     private isLocalPlayerTurn(): boolean {
@@ -236,8 +236,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     private throwConfettis(): void {
+        /* Nous n'arrivons pas à couvrir cette ligne parce qu'il est impossible de spyOn la méthode 
+        confetti du package party-js qu'on utilise pour afficher les confettis. En effet, cette méthode n'est 
+        pas exportée dans une classe/module, donc jasmine ne permet pas de la spy. De plus, exécuter cette méthode 
+        telle quelle dans les tests donne un erreur parce que le mat-dialog-container n'est pas présent dans les tests. */
         party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
             count: party.variation.range(100, 150),
         });
+    }
+
+    private isLocalPlayerWinner(winnerNames: string[]): boolean {
+        return winnerNames.includes(this.gameService.getLocalPlayer()?.name ?? '');
     }
 }
