@@ -6,7 +6,6 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { of, Subject } from 'rxjs';
 import { VirtualPlayerProfilesController } from './virtual-player-profiles.controller';
 const TEST_VIRTUAL_PLAYER_DATA = {} as VirtualPlayerData;

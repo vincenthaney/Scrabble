@@ -27,7 +27,6 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleUpdateDictionary(dictionaryUpdateInfo: DictionaryUpdateInfo): Promise<void> {
-
         this.http.patch(this.endpoint, { dictionaryUpdateInfo }).subscribe(
             () => {
                 this.dictionaryUpdateMessageEvent.next(PositiveFeedback.DictionaryUpdated);
@@ -63,7 +62,6 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleUploadDictionary(dictionaryData: DictionaryData): Promise<void> {
-
         this.http.post<string>(this.endpoint, { dictionaryData }).subscribe(
             () => {
                 this.dictionaryUpdateMessageEvent.next(PositiveFeedback.DictionaryAdded);

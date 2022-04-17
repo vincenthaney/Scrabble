@@ -23,7 +23,6 @@ import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dia
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
 
-
 @Component({
     selector: 'app-admin-dictionaries',
     templateUrl: './admin-dictionaries.component.html',
