@@ -1,10 +1,14 @@
-<h2 mat-dialog-title>{{title}}</h2>
+<h2 mat-dialog-title>{{ title }}</h2>
 <mat-dialog-content>
-    {{content}}
+    {{ content }}
 </mat-dialog-content>
-<mat-dialog-actions align='end'>
+<mat-dialog-actions align="end">
     <ng-container *ngFor="let btn of buttons">
-        <button [style]="btn.style" mat-button mat-dialog-close *ngIf='btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
-        <button [style]="btn.style" mat-button *ngIf='!btn.closeDialog' (click)='handleButtonClick(btn)'>{{btn.content}}</button>
-    </ng-container> 
+        <button class="dialog-button" [style]="btn.style" mat-button mat-dialog-close *ngIf="btn.closeDialog" (click)="handleButtonClick(btn)">
+            {{ btn.content }}
+        </button>
+        <button class="dialog-button" [style]="btn.style" mat-button *ngIf="!btn.closeDialog" (click)="handleButtonClick(btn)">
+            {{ btn.content }}
+        </button>
+    </ng-container>
 </mat-dialog-actions>

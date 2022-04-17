@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
@@ -10,6 +11,9 @@ import {
     DIALOG_ABANDON_BUTTON_CONTINUE,
     DIALOG_ABANDON_CONTENT,
     DIALOG_ABANDON_TITLE,
+    DIALOG_END_OF_GAME_BUTTON,
+    DIALOG_END_OF_GAME_CONTENT,
+    DIALOG_END_OF_GAME_TITLE,
     DIALOG_NO_ACTIVE_GAME_BUTTON,
     DIALOG_NO_ACTIVE_GAME_CONTENT,
     DIALOG_NO_ACTIVE_GAME_TITLE,
@@ -32,6 +36,8 @@ import { FocusableComponentsService } from '@app/services/focusable-components-s
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
 import { ReconnectionService } from '@app/services/reconnection-service/reconnection.service';
+import party from 'party-js';
+import { DynamicSourceType } from 'party-js/lib/systems/sources';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -94,6 +100,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('endOfGame', this.componentDestroyed$, (winnerNames: string[]) =>
+            this.endOfGameDialog(winnerNames),
+        );
         if (!this.gameService.getGameId()) {
             this.reconnectionService.reconnectGame();
         }
@@ -197,6 +206,27 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 ],
             },
         });
+    }
+
+    private endOfGameDialog(winnerNames: string[]): void {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: DIALOG_END_OF_GAME_TITLE,
+                content: DIALOG_END_OF_GAME_CONTENT(winnerNames, this.gameService.getLocalPlayer()?.name ?? ''),
+                buttons: [
+                    {
+                        content: DIALOG_END_OF_GAME_BUTTON,
+                        closeDialog: true,
+                        style: 'background-color: rgb(231, 231, 231)',
+                    },
+                ],
+            },
+        });
+        if (winnerNames.includes(this.gameService.getLocalPlayer()?.name ?? '')) {
+            party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
+                count: party.variation.range(100, 150),
+            });
+        }
     }
 
     private isLocalPlayerTurn(): boolean {
