@@ -99,6 +99,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
+    hintButtonClicked(): void {
+        this.actionService.sendAction(
+            this.gameService.getGameId(),
+            this.gameService.getLocalPlayerId(),
+            this.actionService.createActionData(ActionType.HINT, {}, '', true),
+        );
+    }
+
     passButtonClicked(): void {
         this.actionService.sendAction(
             this.gameService.getGameId(),
@@ -145,12 +153,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
         }
     }
 
-    canPass(): boolean {
+    canPlay(): boolean {
         return this.isLocalPlayerTurn() && !this.gameService.isGameOver && !this.actionService.hasActionBeenPlayed;
     }
 
     canPlaceWord(): boolean {
-        return this.canPass() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
+        return this.canPlay() && this.gameViewEventManagerService.getGameViewEventValue('usedTiles') !== undefined;
     }
 
     private openDialog(title: string, content: string, buttonsContent: string[]): void {
