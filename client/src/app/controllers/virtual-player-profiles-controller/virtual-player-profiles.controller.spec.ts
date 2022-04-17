@@ -90,17 +90,6 @@ describe('VirtualPlayerProfilesController', () => {
         });
     });
 
-    describe('getVirtualPlayerProfilesFromLevel', () => {
-        it('should call get with right endpoint', () => {
-            const spy = spyOn(controller['http'], 'get');
-            const level: VirtualPlayerLevel = VirtualPlayerLevel.Beginner;
-
-            controller.getVirtualPlayerProfilesFromLevel(level);
-
-            expect(spy).toHaveBeenCalledOnceWith(`${controller['endpoint']}/${level}`);
-        });
-    });
-
     describe('subscriptions', () => {
         let serviceDestroyed$: Subject<boolean>;
         let callback: () => void;

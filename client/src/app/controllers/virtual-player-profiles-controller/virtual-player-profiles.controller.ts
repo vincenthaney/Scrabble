@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, OnDestroy } from '@angular/core';
 import { VirtualPlayerData, VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/admin/virtual-player-profile';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { PositiveFeedback } from '@app/constants/virtual-players-components';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -76,10 +75,6 @@ export class VirtualPlayerProfilesController implements OnDestroy {
                 this.virtualPlayerErrorEvent.next(error.error.message);
             },
         );
-    }
-
-    getVirtualPlayerProfilesFromLevel(level: VirtualPlayerLevel): Observable<VirtualPlayerProfilesData> {
-        return this.http.get<VirtualPlayerProfilesData>(`${this.endpoint}/${level}`);
     }
 
     subscribeToGetAllVirtualPlayersEvent(serviceDestroyed$: Subject<boolean>, callback: (response: VirtualPlayerProfile[]) => void): void {
