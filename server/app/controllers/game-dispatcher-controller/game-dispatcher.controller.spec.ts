@@ -798,7 +798,7 @@ describe('GameDispatcherController', () => {
                 expect(playerLeftEventSpy).to.have.been.called.with('playerLeft', DEFAULT_GAME_ID, DEFAULT_PLAYER_ID);
             });
 
-            it.only('should send message explaining the user left with new VP message if game is NOT over', () => {
+            it('should send message explaining the user left with new VP message if game is NOT over', () => {
                 doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
                 isGameOverSpy = chai.spy.on(controller['activeGameService'], 'isGameOver', () => false);
                 playerLeftEventSpy = chai.spy.on(controller['activeGameService'].playerLeftEvent, 'emit', () => {});
@@ -808,7 +808,7 @@ describe('GameDispatcherController', () => {
                 expect(emitToRoomSpy).to.have.been.called.with(DEFAULT_GAME_ID, 'newMessage', expectedArg);
             });
 
-            it.only('should send message explaining the user left without VP message if game IS over', () => {
+            it('should send message explaining the user left without VP message if game IS over', () => {
                 doesRoomExistSpy = chai.spy.on(controller['socketService'], 'doesRoomExist', () => true);
                 isGameOverSpy = chai.spy.on(controller['activeGameService'], 'isGameOver', () => true);
                 playerLeftEventSpy = chai.spy.on(controller['activeGameService'].playerLeftEvent, 'emit', () => {});
