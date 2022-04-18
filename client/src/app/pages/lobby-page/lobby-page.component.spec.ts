@@ -157,7 +157,7 @@ describe('LobbyPageComponent', () => {
             validateNameSpy.and.callThrough();
         });
 
-        it('validateName should update canJoin attribute of the lobbies (use #1)', () => {
+        it('should update canJoin attribute of the lobbies (use #1)', () => {
             component.playerName = 'differentName';
             component.playerNameValid = true;
             component['validateName']();
@@ -166,7 +166,7 @@ describe('LobbyPageComponent', () => {
             }
         });
 
-        it('validateName should numberOfLobbiesMeetingFilter correctly', () => {
+        it('should increment numberOfLobbiesMeetingFilter correctly', () => {
             component.filterFormGroup.setValue(CLASSIC_FILTER_VALUES);
 
             component.playerName = 'differentName';
@@ -175,7 +175,7 @@ describe('LobbyPageComponent', () => {
             expect(component.numberOfLobbiesMeetingFilter).toEqual(2);
         });
 
-        it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
+        it('should update canJoin attribute of the lobbies ( use #2)', () => {
             component.playerName = 'Name1';
             component.playerNameValid = true;
             const expected = [false, true, true];

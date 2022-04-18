@@ -20,6 +20,7 @@ import { UploadDictionaryComponent } from './upload-dictionary.component';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { UploadEvent, UploadState } from './upload-dictionary.component.types';
 import SpyObj = jasmine.SpyObj;
+import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
 
 const CORRECT_TYPE_FILE: UploadEvent = {
     files: [{ iAmValue: 'heyhey', type: 'application/json' } as unknown as File],
@@ -103,15 +104,17 @@ describe('UploadDictionaryComponent', () => {
             expect(fileReaderSpy.readAsText).toHaveBeenCalled();
         });
 
-        it('should assign value to component.selectedFile', () => {
+        it('should assign the correct values if the file type is incorrect', () => {
             spyOn(JSON, 'parse').and.callFake(() => {
                 return {} as DictionaryData;
             });
             component.handleFileInput(INCORRECT_TYPE_FILE);
-            expect(fileReaderSpy.readAsText).toHaveBeenCalled();
+            expect(component.errorMessage).toEqual(WRONG_FILE_TYPE);
+            expect(component.isDictionaryReady).toEqual(false);
+            expect(component.state).toEqual(UploadState.Error);
         });
 
-        it('should assign value to component.selectedFile', () => {
+        it('should assign the correct values if the file type is .json', () => {
             const dictionaryData = {} as DictionaryData;
             spyOn(JSON, 'parse').and.callFake(() => {
                 return dictionaryData;
@@ -124,7 +127,7 @@ describe('UploadDictionaryComponent', () => {
             expect(component.newDictionary).toEqual(dictionaryData);
         });
 
-        it('should assign value to component.selectedFile', () => {
+        it('should assign the correct values if the an error is thrown while parsing the .json', () => {
             const errorMessage = 'parsing error';
             spyOn(JSON, 'parse').and.callFake(() => {
                 throw new Error(errorMessage);
@@ -135,8 +138,9 @@ describe('UploadDictionaryComponent', () => {
             expect(component.errorMessage).toEqual(errorMessage);
         });
 
-        it('should  return null if given null', () => {
+        it('should early return if given null', () => {
             expect(component.handleFileInput(null)).toBeUndefined();
+            expect(fileReaderSpy.readAsText).not.toHaveBeenCalled();
         });
     });
 

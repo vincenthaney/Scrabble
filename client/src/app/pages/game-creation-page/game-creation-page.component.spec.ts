@@ -177,7 +177,7 @@ describe('GameCreationPageComponent', () => {
             expect(patchValueSpy).toHaveBeenCalled();
         });
 
-        it('should update dictionaryOptions when dictionary service updates list but not gameParameters if specified', () => {
+        it('should not update gameParameters if specified', () => {
             const patchValueSpy: jasmine.Spy = spyOn<any>(component['gameParameters'], 'patchValue').and.callFake(() => {});
             component['shouldSetToDefaultDictionary'] = false;
             dictionaryUpdateSubject.next();
@@ -185,6 +185,7 @@ describe('GameCreationPageComponent', () => {
             expect(patchValueSpy).not.toHaveBeenCalled();
             expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
         });
+
         it('should patch dictionary value when dictionary service updates list', () => {
             const spy = spyOn(component.gameParameters, 'patchValue').and.callFake(() => {});
             dictionaryUpdateSubject.next();

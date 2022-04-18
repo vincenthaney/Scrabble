@@ -582,7 +582,7 @@ describe('BoardComponent', () => {
         });
 
         it('should not call nextEmpty if the index is found', () => {
-            spyOn(Array.prototype, 'indexOf').and.returnValue(1);
+            spyOn(component.notAppliedSquares, 'indexOf').and.returnValue(1);
 
             component['handleBackspace']();
 
