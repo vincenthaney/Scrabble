@@ -22,6 +22,14 @@ const FOUR_VOWELS_CREATED_WORD = [
     [{} as unknown as Square, { letter: 'U' } as Tile],
 ];
 
+const FOUR_VOWELS_CREATED_WORD_WITH_BLANK = [
+    [{} as unknown as Square, { letter: 'A' } as Tile],
+    [{} as unknown as Square, { letter: 'D' } as Tile],
+    [{} as unknown as Square, { playedLetter: 'I' } as Tile],
+    [{} as unknown as Square, { letter: 'E' } as Tile],
+    [{} as unknown as Square, { letter: 'U' } as Tile],
+];
+
 const FIVE_VOWELS_CREATED_WORD = [
     [{} as unknown as Square, { letter: 'O' } as Tile],
     [{} as unknown as Square, { letter: 'I' } as Tile],
@@ -43,7 +51,9 @@ const FAIL_CREATED_WORD = [
 
 const VALID_PARAMETERS_4 = { createdWords: [FOUR_VOWELS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
 
-const VALID_PARAMETERS_5 = { createdWords: [FOUR_VOWELS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
+const VALID_PARAMETERS_4_BLANK = { createdWords: [FOUR_VOWELS_CREATED_WORD_WITH_BLANK, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
+
+const VALID_PARAMETERS_5 = { createdWords: [FIVE_VOWELS_CREATED_WORD, FAIL_CREATED_WORD] } as ObjectiveValidationParameters;
 
 const VALID_PARAMETERS_MULTIPLE = { createdWords: [FOUR_VOWELS_CREATED_WORD, FIVE_VOWELS_CREATED_WORD] } as ObjectiveValidationParameters;
 
@@ -79,6 +89,12 @@ describe('FourVowelsWordObjective', () => {
         it('should update progress if a created word has 4 vowels', () => {
             objective.progress = 0;
             objective.updateProgress(VALID_PARAMETERS_4);
+            expect(objective.progress).to.equal(1);
+        });
+
+        it('should update progress if a created word has 4 vowels including blank tiles', () => {
+            objective.progress = 0;
+            objective.updateProgress(VALID_PARAMETERS_4_BLANK);
             expect(objective.progress).to.equal(1);
         });
 
