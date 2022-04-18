@@ -89,6 +89,9 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
         const dictionaryId: DeleteDictionaryDialogParameters = {
             pageTitle: dictionary.title,
             dictionaryId: dictionary.id,
+            // We haven't been able to test that the right function is called because this
+            // arrow function creates a new instance of the function. We cannot spy on it.
+            // It totally works tho, try it!
             onClose: () => {
                 this.isWaitingForServerResponse = true;
             },
@@ -140,6 +143,6 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     }
 
     private isFeedbackPositive(response: PositiveFeedback): PositiveFeedbackResponse {
-        return Object.values(PositiveFeedback).includes(response as PositiveFeedback) ? SUCCESS_SNACK_BAR_CONFIG : ERROR_SNACK_BAR_CONFIG;
+        return Object.values(PositiveFeedback).includes(response) ? SUCCESS_SNACK_BAR_CONFIG : ERROR_SNACK_BAR_CONFIG;
     }
 }

@@ -18,6 +18,8 @@ import { DictionariesState } from '@app/classes/admin/dictionaries';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { SUCCESS_SNACK_BAR_CONFIG, ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
+import { PositiveFeedback } from '@app/constants/dictionaries-components';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { AdminDictionariesComponent } from './admin-dictionaries.component';
@@ -138,8 +140,17 @@ describe('AdminDictionariesComponent', () => {
             const spy = spyOn(component['snackBar'], 'open').and.callFake(() => {
                 return TEST_SNACKBAR;
             });
-            dictionariesServiceMock['componentUpdateEvent'].next();
+            dictionariesServiceMock['componentUpdateEvent'].next('aa');
             expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('isFeedbackPositive', () => {
+        it('should return SUCCESS_SNACK_BAR_CONFIG with positive response', () => {
+            expect(component['isFeedbackPositive'](PositiveFeedback.DictionariesDeleted)).toEqual(SUCCESS_SNACK_BAR_CONFIG);
+        });
+        it('should return ERROR_SNACK_BAR_CONFIG with negative response', () => {
+            expect(component['isFeedbackPositive']('nagivete feedback' as PositiveFeedback)).toEqual(ERROR_SNACK_BAR_CONFIG);
         });
     });
 
@@ -158,18 +169,22 @@ describe('AdminDictionariesComponent', () => {
         });
     });
 
-    // describe('getDisplayedColumns', () => {
-    //     it('should return array of keys', () => {
-    //         component.columnsItems = [
-    //             {
-    //                 key: {} as DisplayDictionaryKeys,
-    //                 label: 'testvalue',
-    //             } as DisplayDictionaryColumnsIteratorItem,
-    //         ] as DisplayDictionaryColumnsIteratorItem[];
-    //         component.getDisplayedColumns();
-    //         expect(component.getDisplayedColumns()).toEqual([]);
-    //     });
-    // });
+    describe('getDisplayedColumns', () => {
+        it('should return array of keys', () => {
+            component.columnsItems = [
+                {
+                    key: 'title',
+                    label: 'testvalue',
+                },
+                {
+                    key: 'description',
+                    label: 'testvalue2',
+                },
+            ];
+            component.getDisplayedColumns();
+            expect(component.getDisplayedColumns()).toEqual(['title', 'description']);
+        });
+    });
 
     describe('modifyDictionary', () => {
         it('should call dialog.open', () => {
@@ -217,9 +232,9 @@ describe('AdminDictionariesComponent', () => {
         });
     });
 
-    describe('convertDictionariesToMatDataSource', async () => {
+    describe('convertDictionariesToMatDataSource', () => {
         it('should assign new MattableDataSource filled with TestArrayDictionarySummary[] to dataSource', async () => {
-            await component['convertDictionariesToMatDataSource'](TEST_DICTIONARY_SUMMARY_ARRAY);
+            component['convertDictionariesToMatDataSource'](TEST_DICTIONARY_SUMMARY_ARRAY);
             expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
         });
     });
