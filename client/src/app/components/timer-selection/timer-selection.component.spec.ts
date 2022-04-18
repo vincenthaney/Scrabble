@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { Component } from '@angular/core';
@@ -52,6 +53,13 @@ describe('TimerSelectionComponent', () => {
 
     it('Should have DEFAULT_TIMER_VALUE on creation', () => {
         component.timerValue = -DEFAULT_TIMER_VALUE;
+        component.ngOnInit();
+        expect(component.timerValue).toEqual(DEFAULT_TIMER_VALUE);
+    });
+
+    it('Should have DEFAULT_TIMER_VALUE if no parentForm', () => {
+        component.timerValue = -DEFAULT_TIMER_VALUE;
+        component['parentForm'] = { get: () => {} } as unknown as FormGroup;
         component.ngOnInit();
         expect(component.timerValue).toEqual(DEFAULT_TIMER_VALUE);
     });
