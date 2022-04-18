@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
@@ -22,6 +21,8 @@ import {
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
     DIALOG_QUIT_TITLE,
+    MAX_CONFETTI_COUNT,
+    MIN_CONFETTI_COUNT,
 } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -248,12 +249,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     private throwConfettis(): void {
-        /* Nous n'arrivons pas à couvrir cette ligne parce qu'il est impossible de spyOn la méthode 
+        /* Nous n'arrivons pas à couvrir cette ligne dans les tests parce qu'il est impossible de spyOn la méthode 
         confetti du package party-js qu'on utilise pour afficher les confettis. En effet, cette méthode n'est 
         pas exportée dans une classe/module, donc jasmine ne permet pas de la spy. De plus, exécuter cette méthode 
         telle quelle dans les tests donne un erreur parce que le mat-dialog-container n'est pas présent dans les tests. */
         party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
-            count: party.variation.range(100, 150),
+            count: party.variation.range(MIN_CONFETTI_COUNT, MAX_CONFETTI_COUNT),
         });
     }
 
