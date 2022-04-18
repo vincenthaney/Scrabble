@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
+import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { Message } from '@app/classes/communication/message';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
@@ -26,6 +27,7 @@ import { GameViewEventManagerService } from '@app/services/game-view-event-manag
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ObjectivesManagerService } from '@app/services/objectives-manager-service/objectives-manager.service';
 import SpyObj = jasmine.SpyObj;
 
 const DEFAULT_PLAYER_ID = 'cov-id';
@@ -59,9 +61,11 @@ describe('GameService', () => {
     let roundManagerSpy: SpyObj<RoundManagerService>;
     let gameDispatcherControllerSpy: SpyObj<GameDispatcherController>;
     let gameViewEventManagerSpy: SpyObj<GameViewEventManagerService>;
+    let objectiveManagerSpy: SpyObj<ObjectivesManagerService>;
 
     beforeEach(() => {
         boardServiceSpy = jasmine.createSpyObj('BoardService', ['initializeBoard', 'updateBoard']);
+        objectiveManagerSpy = jasmine.createSpyObj('ObjectivesManagerService', ['updateObjectives', 'initialize']);
         roundManagerSpy = jasmine.createSpyObj('RoundManagerService', [
             'convertRoundDataToRound',
             'startRound',
@@ -143,6 +147,7 @@ describe('GameService', () => {
                 { provide: RoundManagerService, useValue: roundManagerSpy },
                 { provide: GameDispatcherController, useValue: gameDispatcherControllerSpy },
                 { provide: GameViewEventManagerService, useValue: gameViewEventManagerSpy },
+                { provide: ObjectivesManagerService, useValue: objectiveManagerSpy },
             ],
         });
         service = TestBed.inject(GameService);
@@ -534,6 +539,21 @@ describe('GameService', () => {
             expect(service.tileReserve).toEqual(originalTileReserve);
         });
 
+        it('should update gameObjective, if gameObjective are defined', () => {
+            gameUpdateData.gameObjective = {} as GameObjectivesData;
+            objectiveManagerSpy.updateObjectives.and.returnValue();
+
+            service['handleGameUpdate'](gameUpdateData);
+
+            expect(objectiveManagerSpy.updateObjectives).toHaveBeenCalled();
+        });
+
+        it('should not update gameObjective, if gameObjective are undefined', () => {
+            gameUpdateData.gameObjective = undefined;
+            service['handleGameUpdate'](gameUpdateData);
+            expect(objectiveManagerSpy.updateObjectives).not.toHaveBeenCalled();
+        });
+
         it('should call gameOver if gameOver with winnerNames if they are defined', () => {
             const spy = spyOn<any>(service, 'handleGameOver');
             const winners = ['Mathilde'];
@@ -612,11 +632,39 @@ describe('GameService', () => {
         });
 
         it('should return false there is no player container', () => {
-            service['playerContainer'] = undefined as unknown as PlayerContainer;
+            service['playerContainer'] = undefined;
             const result = service.isLocalPlayerPlaying();
             expect(result).toBeFalse();
         });
     });
+
+    describe('isLocalPlayerPlayer1', () => {
+        it('should return true if is local player', () => {
+            const expected = 'expected-id';
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            service['playerContainer'] = new PlayerContainer(expected);
+            service['playerContainer']['players'].set(1, { id: expected } as AbstractPlayer);
+
+            const result = service.isLocalPlayerPlayer1();
+            expect(result).toBeTrue();
+        });
+
+        it('should return false if is not local player', () => {
+            const expected = 'expected-id';
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            service['playerContainer'] = new PlayerContainer('NOT-expected-id');
+            service['playerContainer']['players'].set(1, { id: expected } as AbstractPlayer);
+            const result = service.isLocalPlayerPlayer1();
+            expect(result).toBeFalse();
+        });
+
+        it('should return false there is no player container', () => {
+            service['playerContainer'] = undefined;
+            const result = service.isLocalPlayerPlayer1();
+            expect(result).toBeFalse();
+        });
+    });
+
 
     describe('getGameId', () => {
         it('should return gameId', () => {
