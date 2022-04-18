@@ -18,8 +18,8 @@ import {
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import { MAXIMUM_WORD_LENGTH, MINIMUM_WORD_LENGTH } from '@app/constants/services-errors';
 import Ajv, { ValidateFunction } from 'ajv';
-import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 

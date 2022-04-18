@@ -30,10 +30,6 @@ import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-pa
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
-import { AdminDictionariesComponent } from './components/admin-dictionaries-component/admin-dictionaries.component';
-import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog/modify-dictionary-dialog.component';
-import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
-import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-dialog/delete-dictionary-dialog.component';
 import { AdminHighScoresComponent } from './components/admin-high-scores/admin-high-scores.component';
 import { ObjectiveComponent } from './components/objective/objective.component';
 import { ObjectiveBoxComponent } from './components/objective-box/objective-box.component';
@@ -41,6 +37,14 @@ import { AdminGameHistoryComponent } from './components/admin-game-history/admin
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { DurationPipe } from './pipes/duration/duration.pipe';
+import { AdminVirtualPlayersComponent } from './components/admin-virtual-players/admin-virtual-players.component';
+import { CreateVirtualPlayerComponent } from './components/create-virtual-player-dialog/create-virtual-player-dialog.component';
+import { AdminDictionariesComponent } from './components/admin-dictionaries-component/admin-dictionaries.component';
+import { DeleteDictionaryDialogComponent } from './components/delete-dictionary-dialog/delete-dictionary-dialog.component';
+import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog/modify-dictionary-dialog.component';
+import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
+import { DeleteVirtualPlayerDialogComponent } from './components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
+import { UpdateVirtualPlayerComponent } from './components/update-virtual-player-dialog/update-virtual-player-dialog.component';
 
 registerLocaleData(localeFr);
 
@@ -75,6 +79,10 @@ registerLocaleData(localeFr);
         HighScoreBoxComponent,
         ConvertDialogComponent,
         AdminPageComponent,
+        AdminVirtualPlayersComponent,
+        CreateVirtualPlayerComponent,
+        UpdateVirtualPlayerComponent,
+        DeleteVirtualPlayerDialogComponent,
         AdminDictionariesComponent,
         ModifyDictionaryComponent,
         UploadDictionaryComponent,

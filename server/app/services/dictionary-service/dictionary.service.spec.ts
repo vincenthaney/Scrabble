@@ -9,8 +9,8 @@
 /* eslint-disable dot-notation */
 import { BasicDictionaryData, DictionarySummary, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
+import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary.const';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';

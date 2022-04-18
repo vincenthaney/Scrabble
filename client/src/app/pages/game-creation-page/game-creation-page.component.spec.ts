@@ -21,15 +21,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
-import { DEFAULT_OPPONENT_NAME } from '@app/constants/controller-test-constants';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
@@ -61,8 +60,32 @@ describe('GameCreationPageComponent', () => {
     let virtualPlayerProfileSpy: SpyObj<VirtualPlayerProfilesService>;
 
     beforeEach(() => {
-        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', ['getVirtualPlayerProfiles']);
-        virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo([]);
+        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', [
+            'getAllVirtualPlayersProfile',
+            'subscribeToVirtualPlayerProfilesUpdateEvent',
+            'subscribeToComponentUpdateEvent',
+            'subscribeToRequestSentEvent',
+        ]);
+        virtualPlayerProfileSpy.getAllVirtualPlayersProfile.and.resolveTo();
+    });
+
+    beforeEach(() => {
+        dictionaryServiceSpy = jasmine.createSpyObj('DictionaryService', [
+            'getDictionaries',
+            'updateAllDictionaries',
+            'subscribeToDictionariesUpdateDataEvent',
+        ]);
+        dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
+        dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
+        dictionaryUpdateSubject = new Subject();
+        dictionaryServiceSpy.subscribeToDictionariesUpdateDataEvent.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void) =>
+                dictionaryUpdateSubject.subscribe(callback),
+        );
+
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['observeGameCreationFailed', 'handleCreateGame']);
+        gameDispatcherCreationSubject = new Subject();
+        gameDispatcherServiceSpy.observeGameCreationFailed.and.returnValue(gameDispatcherCreationSubject.asObservable());
     });
 
     beforeEach(() => {
@@ -202,27 +225,13 @@ describe('GameCreationPageComponent', () => {
             expect(dictionaryServiceSpy.updateAllDictionaries).toHaveBeenCalled();
         });
 
-        it('should subscribe to level value change', async () => {
-            spyOn<any>(component, 'getVirtualPlayerNames').and.returnValue([DEFAULT_OPPONENT_NAME]);
-            const spy = spyOn<any>(component.gameParameters, 'patchValue').and.callFake(() => {});
+        it('should subscribe to subscribeToVirtualPlayerProfilesUpdateEvent', async () => {
             await component.ngOnInit();
-            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
-            expect(spy).toHaveBeenCalledWith({ virtualPlayerName: DEFAULT_OPPONENT_NAME });
-        });
-
-        it('should generate virtual player profiles map', (done) => {
-            virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo(MOCK_PLAYER_PROFILES);
-            const generateSpy = spyOn<any>(component, 'generateVirtualPlayerProfileMap').and.callFake(() => {});
-            component.ngOnInit();
-
-            setTimeout(() => {
-                expect(generateSpy).toHaveBeenCalledWith(MOCK_PLAYER_PROFILES);
-                done();
-            });
+            expect(virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent).toHaveBeenCalled();
         });
     });
 
-    describe('ngOndestroy', () => {
+    describe('ngOnDestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
             const ngUnsubscribeNextSpy = spyOn<any>(component.pageDestroyed$, 'next');
             const ngUnsubscribeCompleteSpy = spyOn<any>(component.pageDestroyed$, 'complete');
@@ -426,8 +435,8 @@ describe('GameCreationPageComponent', () => {
 
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Beginner });
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
-                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Beginner,
-            ).map((profile: VirtualPlayerProfile) => profile.name);
+                (profile: VirtualPlayerData) => profile.level === VirtualPlayerLevel.Beginner,
+            ).map((profile: VirtualPlayerData) => profile.name);
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });
@@ -437,8 +446,8 @@ describe('GameCreationPageComponent', () => {
 
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
-                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert,
-            ).map((profile: VirtualPlayerProfile) => profile.name);
+                (profile: VirtualPlayerData) => profile.level === VirtualPlayerLevel.Expert,
+            ).map((profile: VirtualPlayerData) => profile.name);
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });

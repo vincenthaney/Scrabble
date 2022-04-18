@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class DictionaryController implements OnDestroy {
+    endpoint = `${environment.serverUrl}/dictionaries`;
     private dictionaryUpdateMessageEvent: Subject<string> = new Subject();
     private dictionaryErrorEvent: Subject<string> = new Subject();
     private dictionaryDownloadEvent: Subject<BasicDictionaryData> = new Subject();
@@ -26,8 +27,7 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleUpdateDictionary(dictionaryUpdateInfo: DictionaryUpdateInfo): Promise<void> {
-        const endpoint = `${environment.serverUrl}/dictionaries`;
-        this.http.patch(endpoint, { dictionaryUpdateInfo }).subscribe(
+        this.http.patch(this.endpoint, { dictionaryUpdateInfo }).subscribe(
             () => {
                 this.dictionaryUpdateMessageEvent.next(PositiveFeedback.DictionaryUpdated);
             },
@@ -38,8 +38,7 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleDownloadDictionary(dictionaryId: string): Promise<void> {
-        const endpoint = `${environment.serverUrl}/dictionaries/${dictionaryId}`;
-        this.http.get<BasicDictionaryData>(endpoint, { observe: 'body' }).subscribe(
+        this.http.get<BasicDictionaryData>(`${this.endpoint}/${dictionaryId}`, { observe: 'body' }).subscribe(
             (dictionary) => {
                 this.dictionaryDownloadEvent.next(dictionary);
             },
@@ -52,8 +51,7 @@ export class DictionaryController implements OnDestroy {
     async handleDeleteDictionary(dictionaryId: string): Promise<void> {
         let params = new HttpParams();
         params = params.append('dictionaryId', dictionaryId);
-        const endpoint = `${environment.serverUrl}/dictionaries`;
-        this.http.delete(endpoint, { params }).subscribe(
+        this.http.delete(this.endpoint, { params }).subscribe(
             () => {
                 this.dictionaryUpdateMessageEvent.next(PositiveFeedback.DictionaryDeleted);
             },
@@ -64,9 +62,7 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleUploadDictionary(dictionaryData: DictionaryData): Promise<void> {
-        const endpoint = `${environment.serverUrl}/dictionaries`;
-
-        this.http.post<string>(endpoint, { dictionaryData }).subscribe(
+        this.http.post<string>(this.endpoint, { dictionaryData }).subscribe(
             () => {
                 this.dictionaryUpdateMessageEvent.next(PositiveFeedback.DictionaryAdded);
             },
@@ -77,8 +73,7 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleGetAllDictionariesEvent(): Promise<void> {
-        const endpoint = `${environment.serverUrl}/dictionaries/summary`;
-        this.http.get<DictionarySummary[]>(endpoint, { observe: 'body' }).subscribe(
+        this.http.get<DictionarySummary[]>(`${this.endpoint}/summary`, { observe: 'body' }).subscribe(
             (body) => {
                 this.getAllDictionariesEvent.next(body);
             },
@@ -89,8 +84,7 @@ export class DictionaryController implements OnDestroy {
     }
 
     async handleResetDictionaries(): Promise<void> {
-        const endpoint = `${environment.serverUrl}/dictionaries/reset`;
-        this.http.delete<string>(endpoint, {}).subscribe(
+        this.http.delete<string>(`${this.endpoint}/reset`, {}).subscribe(
             () => {
                 this.dictionaryUpdateMessageEvent.next(PositiveFeedback.DictionariesDeleted);
             },

@@ -23,30 +23,35 @@ chai.use(spies);
 chai.use(chaiAsPromised);
 
 const DEFAULT_EXCEPTION = 'exception';
-const DEFAULT_PLAYER_ID = 'player-id';
+const DEFAULT_PLAYER_ID_1 = 'player-id-1';
+const DEFAULT_PLAYER_ID_2 = 'player-id-2';
 
 const DEFAULT_PROFILE_1: VirtualPlayerProfile = {
     name: 'Brun',
     level: VirtualPlayerLevel.Beginner,
     isDefault: true,
+    id: DEFAULT_PLAYER_ID_1,
 };
 
 const DEFAULT_PROFILE_2: VirtualPlayerProfile = {
     name: 'Vert',
     level: VirtualPlayerLevel.Expert,
     isDefault: true,
+    id: DEFAULT_PLAYER_ID_2,
 };
 
 const CUSTOM_PROFILE_1: VirtualPlayerProfile = {
     name: 'Rouge',
     level: VirtualPlayerLevel.Beginner,
     isDefault: false,
+    id: DEFAULT_PLAYER_ID_1,
 };
 
 const CUSTOM_PROFILE_2: VirtualPlayerProfile = {
     name: 'Turquoise',
     level: VirtualPlayerLevel.Expert,
     isDefault: false,
+    id: DEFAULT_PLAYER_ID_2,
 };
 
 const DEFAULT_PROFILES: VirtualPlayerProfile[] = [DEFAULT_PROFILE_1, DEFAULT_PROFILE_2];
@@ -183,7 +188,7 @@ describe('VirtualPlayerProfilesController', () => {
         describe('PATCH /virtualPlayerProfiles/:profileId', () => {
             it('should return NO_CONTENT on valid request', async () => {
                 return supertest(expressApp)
-                    .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
+                    .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID_1}`)
                     .send({ profileData: { name: CUSTOM_PROFILE_1.name } })
                     .expect(StatusCodes.NO_CONTENT)
                     .then(() => expect(virtualPlayerProfileServiceStub.updateVirtualPlayerProfile.called).to.be.true);
@@ -191,7 +196,7 @@ describe('VirtualPlayerProfilesController', () => {
 
             it('should throw if newName is not provided', async () => {
                 return supertest(expressApp)
-                    .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
+                    .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID_1}`)
                     .send({ profileData: { name: undefined } })
                     .expect(StatusCodes.BAD_REQUEST);
             });
@@ -202,7 +207,7 @@ describe('VirtualPlayerProfilesController', () => {
                 });
 
                 return supertest(expressApp)
-                    .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
+                    .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID_1}`)
                     .send({ newName: CUSTOM_PROFILE_1.name })
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
@@ -228,7 +233,7 @@ describe('VirtualPlayerProfilesController', () => {
         describe('DELETE /virtualPlayerProfiles/:profileId', () => {
             it('should return NO_CONTENT', async () => {
                 return supertest(expressApp)
-                    .delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
+                    .delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID_1}`)
                     .expect(StatusCodes.NO_CONTENT)
                     .then(() => expect(virtualPlayerProfileServiceStub.deleteVirtualPlayerProfile.called).to.be.true);
             });
@@ -238,7 +243,7 @@ describe('VirtualPlayerProfilesController', () => {
                     throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
                 });
 
-                return supertest(expressApp).delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
+                return supertest(expressApp).delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID_1}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
 

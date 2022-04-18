@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -111,10 +111,10 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
             ?.valueChanges.pipe(takeUntil(this.pageDestroyed$), distinctUntilChanged())
             .subscribe(() => this.gameParameters.patchValue({ virtualPlayerName: randomizeArray(this.getVirtualPlayerNames())[0] }));
 
-        this.virtualPlayerProfilesService.getVirtualPlayerProfiles().then((profiles: VirtualPlayerProfile[]) => {
+        this.virtualPlayerProfilesService.subscribeToVirtualPlayerProfilesUpdateEvent(this.pageDestroyed$, (profiles) => {
             this.generateVirtualPlayerProfileMap(profiles);
-            this.gameParameters.patchValue({ virtualPlayerName: randomizeArray(this.getVirtualPlayerNames())[0] });
         });
+        this.virtualPlayerProfilesService.getAllVirtualPlayersProfile();
     }
 
     ngOnDestroy(): void {

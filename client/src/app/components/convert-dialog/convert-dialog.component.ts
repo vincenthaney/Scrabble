@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameDispatcherService } from '@app/services';
@@ -53,9 +53,10 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
             ?.valueChanges.pipe(takeUntil(this.pageDestroyed$))
             .subscribe(() => this.gameParameters?.get('virtualPlayerName')?.reset());
 
-        this.virtualPlayerProfilesService
-            .getVirtualPlayerProfiles()
-            .then((profiles: VirtualPlayerProfile[]) => this.generateVirtualPlayerProfileMap(profiles));
+        this.virtualPlayerProfilesService.subscribeToVirtualPlayerProfilesUpdateEvent(this.pageDestroyed$, (profiles) => {
+            this.generateVirtualPlayerProfileMap(profiles);
+        });
+        this.virtualPlayerProfilesService.getAllVirtualPlayersProfile();
     }
 
     ngOnDestroy(): void {

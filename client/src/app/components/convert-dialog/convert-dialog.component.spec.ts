@@ -18,7 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
+import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
@@ -43,8 +43,26 @@ describe('ConvertDialogComponent', () => {
     let backdropSubject: Subject<MouseEvent>;
 
     beforeEach(() => {
-        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', ['getVirtualPlayerProfiles']);
-        virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo([]);
+        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', [
+            'getVirtualPlayerProfiles',
+            'createVirtualPlayer',
+            'updateVirtualPlayer',
+            'getAllVirtualPlayersProfile',
+            'resetVirtualPlayerProfiles',
+            'deleteVirtualPlayer',
+            'subscribeToVirtualPlayerProfilesUpdateEvent',
+            'subscribeToComponentUpdateEvent',
+            'subscribeToRequestSentEvent',
+        ]);
+    });
+
+    beforeEach(() => {
+        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['handleRecreateGame']);
+        gameDispatcherServiceSpy.handleRecreateGame.and.callFake(() => {});
+
+        backdropSubject = new Subject();
+        matDialogSpy = jasmine.createSpyObj('MatDialogRef', ['backdropClick', 'close']);
+        matDialogSpy.backdropClick.and.returnValue(backdropSubject.asObservable());
     });
 
     beforeEach(() => {
@@ -108,15 +126,9 @@ describe('ConvertDialogComponent', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should generate virtual player profiles map', (done) => {
-            virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo(MOCK_PLAYER_PROFILES);
-            const generateSpy = spyOn<any>(component, 'generateVirtualPlayerProfileMap').and.callFake(() => {});
+        it('should subscribe to subscribeToVirtualPlayerProfilesUpdateEvent', () => {
             component.ngOnInit();
-
-            setTimeout(() => {
-                expect(generateSpy).toHaveBeenCalledWith(MOCK_PLAYER_PROFILES);
-                done();
-            });
+            expect(virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent).toHaveBeenCalled();
         });
     });
 
@@ -187,8 +199,8 @@ describe('ConvertDialogComponent', () => {
 
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Beginner });
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
-                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Beginner,
-            ).map((profile: VirtualPlayerProfile) => profile.name);
+                (profile: VirtualPlayerData) => profile.level === VirtualPlayerLevel.Beginner,
+            ).map((profile: VirtualPlayerData) => profile.name);
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });
@@ -198,8 +210,8 @@ describe('ConvertDialogComponent', () => {
 
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
-                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert,
-            ).map((profile: VirtualPlayerProfile) => profile.name);
+                (profile: VirtualPlayerData) => profile.level === VirtualPlayerLevel.Expert,
+            ).map((profile: VirtualPlayerData) => profile.name);
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });
