@@ -16,7 +16,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CreateVirtualPlayerComponent } from './create-virtual-player-dialog.component';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 
 const TEST_NAME = 'TEST_NAME';
 export class MatDialogMock {
@@ -33,11 +34,12 @@ describe('CreateVirtualPlayerComponent', () => {
     let service: VirtualPlayerProfilesService;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [CreateVirtualPlayerComponent, IconComponent, PageHeaderComponent],
+            declarations: [CreateVirtualPlayerComponent, IconComponent, PageHeaderComponent, NameFieldComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
                 MatFormFieldModule,
+                ReactiveFormsModule,
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,

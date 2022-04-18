@@ -28,13 +28,19 @@ class MockAdminGameHistoryComponent {}
     selector: 'app-admin-dictionaries',
     template: '',
 })
-class MockAdminDoctionariesComponent {}
+class MockAdminDictionariesComponent {}
 
 @Component({
     selector: 'app-admin-high-scores',
     template: '',
 })
 class MockAdminHighScoresComponent {}
+
+@Component({
+    selector: 'app-admin-virtual-players',
+    template: '',
+})
+class MockAdminVirtualPlayersComponent {}
 
 describe('AdminPageComponent', () => {
     let component: AdminPageComponent;
@@ -49,8 +55,9 @@ describe('AdminPageComponent', () => {
                 IconComponent,
                 PageHeaderComponent,
                 MockAdminHighScoresComponent,
-                MockAdminDoctionariesComponent,
+                MockAdminDictionariesComponent,
                 MockAdminGameHistoryComponent,
+                MockAdminVirtualPlayersComponent,
             ],
             imports: [
                 MatTabsModule,

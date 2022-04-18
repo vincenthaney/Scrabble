@@ -17,6 +17,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DeleteDictionaryDialogComponent } from './delete-dictionary-dialog.component';
 import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const MODEL: DeleteDictionaryDialogParameters = {
     pageTitle: 'Dialog title',
@@ -46,6 +47,7 @@ describe('DeleteDictionaryComponent', () => {
                 AppMaterialModule,
                 HttpClientModule,
                 MatFormFieldModule,
+                ReactiveFormsModule,
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,

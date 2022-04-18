@@ -13,7 +13,6 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { HttpClientModule } from '@angular/common/http';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UploadDictionaryComponent } from './upload-dictionary.component';
@@ -21,6 +20,7 @@ import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { UploadEvent, UploadState } from './upload-dictionary.component.types';
 import SpyObj = jasmine.SpyObj;
 import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const CORRECT_TYPE_FILE: UploadEvent = {
     files: [{ iAmValue: 'heyhey', type: 'application/json' } as unknown as File],
@@ -51,11 +51,12 @@ describe('UploadDictionaryComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [UploadDictionaryComponent, IconComponent, PageHeaderComponent],
+            declarations: [UploadDictionaryComponent, IconComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
                 MatFormFieldModule,
+                ReactiveFormsModule,
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,

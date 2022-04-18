@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -46,6 +47,7 @@ describe('AdminDictionariesComponent', () => {
                 MatFormFieldModule,
                 MatSelectModule,
                 MatDividerModule,
+                ReactiveFormsModule,
                 MatProgressSpinnerModule,
                 MatProgressBarModule,
                 MatTableModule,

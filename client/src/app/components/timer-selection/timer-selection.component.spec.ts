@@ -3,7 +3,7 @@
 /* eslint-disable dot-notation */
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -36,7 +36,7 @@ describe('TimerSelectionComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [TimerSelectionComponent, TimerSelectionWrapperComponent, IconComponent],
-            imports: [MatInputModule, MatFormFieldModule, MatCardModule, BrowserAnimationsModule],
+            imports: [MatInputModule, MatFormFieldModule,ReactiveFormsModule, MatCardModule, BrowserAnimationsModule],
         }).compileComponents();
     });
 
