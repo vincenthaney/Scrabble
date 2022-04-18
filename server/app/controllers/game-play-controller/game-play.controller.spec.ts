@@ -79,6 +79,7 @@ const DEFAULT_VIRTUAL_PLAYER_TURN_DATA: GameUpdateData = {
 describe('GamePlayController', () => {
     let socketServiceStub: SinonStubbedInstance<SocketService>;
     let gamePlayServiceStub: SinonStubbedInstance<GamePlayService>;
+    let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
     let gamePlayController: GamePlayController;
     let testingUnit: ServicesTestingUnit;
 
@@ -91,6 +92,7 @@ describe('GamePlayController', () => {
             .withStubbedControllers(GamePlayController);
         gamePlayServiceStub = testingUnit.setStubbed(GamePlayService);
         socketServiceStub = testingUnit.setStubbed(SocketService);
+        activeGameServiceStub = testingUnit.setStubbed(ActiveGameService);
     });
 
     beforeEach(() => {
@@ -371,17 +373,10 @@ describe('GamePlayController', () => {
     });
 
     describe('handleFeedback', () => {
-        let emitToRoomSpy: any;
-        let emitToSocketSpy: any;
-        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let gameStub: SinonStubbedInstance<Game>;
         beforeEach(() => {
-            activeGameServiceStub = testingUnit.setStubbed(ActiveGameService);
-            emitToRoomSpy = chai.spy.on(gamePlayController['socketService'], 'emitToRoom', () => {});
-            emitToSocketSpy = chai.spy.on(gamePlayController['socketService'], 'emitToSocket', () => {});
             gameStub = createStubInstance(Game);
             gameStub.getPlayer.returns({ id: '' } as unknown as Player);
-            (gamePlayController['activeGameService'] as unknown) = activeGameServiceStub;
         });
 
         it('should emit a new message if there is one to the playerId', () => {
@@ -390,7 +385,7 @@ describe('GamePlayController', () => {
                 opponentFeedback: {} as unknown as FeedbackMessage,
                 endGameFeedback: [],
             } as FeedbackMessages);
-            expect(emitToSocketSpy).to.have.been.called();
+            expect(socketServiceStub.emitToSocket.calledOnce).to.be.true;
         });
 
         it('should emit a new message if there is one to the opponent', () => {
@@ -400,7 +395,7 @@ describe('GamePlayController', () => {
                 opponentFeedback: { message: 'mess', isClickable: true },
                 endGameFeedback: [],
             } as FeedbackMessages);
-            expect(emitToSocketSpy).to.have.been.called();
+            expect(socketServiceStub.emitToSocket.calledOnce).to.be.true;
         });
 
         it('should emit a new message if there is one for the room', () => {
@@ -409,7 +404,7 @@ describe('GamePlayController', () => {
                 opponentFeedback: {} as unknown as FeedbackMessage,
                 endGameFeedback: [{ message: 'mess', isClickable: true }, { isClickable: true }],
             } as FeedbackMessages);
-            expect(emitToRoomSpy).to.have.been.called();
+            expect(socketServiceStub.emitToRoom.calledOnce).to.be.true;
         });
     });
 
@@ -474,7 +469,6 @@ describe('GamePlayController', () => {
     });
 
     describe('handleError', () => {
-        let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
         let gameStub: SinonStubbedInstance<Game>;
         let delayStub: SinonStub;
         let resetStub: SinonStub;
