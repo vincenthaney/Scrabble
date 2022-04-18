@@ -46,4 +46,26 @@ describe('random -> getRandomElementsFromArray', () => {
             expect(false).toBeTruthy();
         });
     });
+
+    describe('randomize', () => {
+        let array: string[];
+        let result: string[];
+
+        beforeEach(() => {
+            array = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            result = Random.randomize(array);
+        });
+
+        it('should not deep equal input', () => {
+            expect(result).not.toEqual(array);
+        });
+
+        it('should contain all same items', () => {
+            for (const element of array) {
+                expect(result).toContain(element);
+                result.splice(result.indexOf(element), 1);
+            }
+            expect(result).toHaveSize(0);
+        });
+    });
 });

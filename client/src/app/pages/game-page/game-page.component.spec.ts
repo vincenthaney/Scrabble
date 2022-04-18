@@ -186,6 +186,25 @@ describe('GamePageComponent', () => {
         }
     });
 
+    describe('hintButtonClicked', () => {
+        const fakeData = { fake: 'data' };
+        let createActionDataSpy: jasmine.Spy;
+        let sendAction: jasmine.Spy;
+
+        it('should use action service to get hint', () => {
+            spyOn(component['gameService'], 'getGameId').and.returnValue('gameId');
+            spyOn(component['gameService'], 'getLocalPlayerId').and.returnValue('playerId');
+
+            createActionDataSpy = spyOn(component['actionService'], 'createActionData').and.returnValue(fakeData as unknown as ActionData);
+            sendAction = spyOn(component['actionService'], 'sendAction').and.callFake(() => {
+                return;
+            });
+            component.hintButtonClicked();
+            expect(createActionDataSpy).toHaveBeenCalledWith(ActionType.HINT, {}, '', true);
+            expect(sendAction).toHaveBeenCalledWith('gameId', 'playerId', fakeData);
+        });
+    });
+
     describe('passButtonClicked', () => {
         const fakeData = { fake: 'data' };
         let createActionDataSpy: jasmine.Spy;
@@ -294,29 +313,29 @@ describe('GamePageComponent', () => {
         });
     });
 
-    describe('canPass', () => {
-        it('should not be able to pass if its not the player turn', () => {
+    describe('canPlay', () => {
+        it('should not be able to play if its not the player turn', () => {
             spyOn<any>(component, 'isLocalPlayerTurn').and.returnValue(false);
-            expect(component.canPass()).toBeFalse();
+            expect(component.canPlay()).toBeFalse();
         });
 
-        it('should not be able to pass if the game is over', () => {
+        it('should not be able to play if the game is over', () => {
             component['gameService'].isGameOver = true;
-            expect(component.canPass()).toBeFalse();
+            expect(component.canPlay()).toBeFalse();
             component['gameService'].isGameOver = false;
         });
 
-        it('should not be able to pass if action has been played', () => {
+        it('should not be able to play if action has been played', () => {
             component['actionService'].hasActionBeenPlayed = true;
-            expect(component.canPass()).toBeFalse();
+            expect(component.canPlay()).toBeFalse();
             component['actionService'].hasActionBeenPlayed = false;
         });
 
-        it('should be able to pass if the conditions are met', () => {
+        it('should be able to play if the conditions are met', () => {
             spyOn<any>(component, 'isLocalPlayerTurn').and.returnValue(true);
             component['gameService'].isGameOver = false;
             component['actionService'].hasActionBeenPlayed = false;
-            expect(component.canPass()).toBeTrue();
+            expect(component.canPlay()).toBeTrue();
         });
     });
 
@@ -327,19 +346,19 @@ describe('GamePageComponent', () => {
             getPayloadSpy = spyOn(component['gameViewEventManagerService'], 'getGameViewEventValue');
         });
 
-        it('should not be able to place word if pass conditions are not met', () => {
-            spyOn(component, 'canPass').and.returnValue(false);
+        it('should not be able to place word if play conditions are not met', () => {
+            spyOn(component, 'canPlay').and.returnValue(false);
             expect(component.canPlaceWord()).toBeFalse();
         });
 
         it('should not be able to place word if there are no tiles played', () => {
-            spyOn(component, 'canPass').and.returnValue(true);
+            spyOn(component, 'canPlay').and.returnValue(true);
             getPayloadSpy.and.returnValue(undefined);
             expect(component.canPlaceWord()).toBeFalse();
         });
 
-        it('should be able to pass if the conditions are met', () => {
-            spyOn(component, 'canPass').and.returnValue(true);
+        it('should be able to play if the conditions are met', () => {
+            spyOn(component, 'canPlay').and.returnValue(true);
             const payload: PlaceActionPayload = {} as PlaceActionPayload;
             getPayloadSpy.and.returnValue(payload);
 
