@@ -554,7 +554,7 @@ describe('GameService', () => {
             expect(objectiveManagerSpy.updateObjectives).not.toHaveBeenCalled();
         });
 
-        it('should call gameOver if gameOver with winnerNames if they are defined', () => {
+        it('should call handleGameOver with winnerNames if game is over and they are defined', () => {
             const spy = spyOn<any>(service, 'handleGameOver');
             const winners = ['Mathilde'];
             gameUpdateData.isGameOver = true;
