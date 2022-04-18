@@ -12,7 +12,6 @@ import {
     DIALOG_ABANDON_TITLE,
     DIALOG_END_OF_GAME_CLOSE_BUTTON,
     DIALOG_END_OF_GAME_CONTENT,
-    DIALOG_END_OF_GAME_EXIT_BUTTON,
     DIALOG_END_OF_GAME_TITLE,
     DIALOG_NO_ACTIVE_GAME_BUTTON,
     DIALOG_NO_ACTIVE_GAME_CONTENT,
@@ -217,15 +216,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 content: DIALOG_END_OF_GAME_CONTENT(this.isLocalPlayerWinner(winnerNames)),
                 buttons: [
                     {
-                        content: DIALOG_END_OF_GAME_EXIT_BUTTON,
-                        closeDialog: true,
+                        content: DIALOG_QUIT_BUTTON_CONFIRM,
+                        redirect: '/home',
                         style: 'background-color: rgb(231, 231, 231)',
                         // We haven't been able to test that the right function is called because this
                         // arrow function creates a new instance of the function. We cannot spy on it.
                         // It totally works tho, try it!
-                        action: () => {
-                            this.openDialog(DIALOG_QUIT_TITLE, DIALOG_QUIT_CONTENT, [DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_STAY]);
-                        },
+                        action: () => this.handlePlayerLeaves(),
                     },
                     {
                         content: DIALOG_END_OF_GAME_CLOSE_BUTTON,
