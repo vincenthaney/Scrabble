@@ -33,6 +33,10 @@ const DEFAULT_FILTER_VALUES = {
     gameType: 'all',
 };
 
+const CLASSIC_FILTER_VALUES = {
+    gameType: GameType.Classic,
+};
+
 @Component({
     template: '',
 })
@@ -160,6 +164,15 @@ describe('LobbyPageComponent', () => {
             for (const lobby of component.lobbies) {
                 expect(lobby.canJoin).toBeTrue();
             }
+        });
+
+        it('validateName should numberOfLobbiesMeetingFilter correctly', () => {
+            component.filterFormGroup.setValue(CLASSIC_FILTER_VALUES);
+
+            component.playerName = 'differentName';
+            component.playerNameValid = true;
+            component['validateName']();
+            expect(component.numberOfLobbiesMeetingFilter).toEqual(2);
         });
 
         it('validateName should update canJoin attribute of the lobbies ( use #2)', () => {
