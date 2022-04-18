@@ -5,6 +5,8 @@ import { Dictionary } from '@app/classes/dictionary';
 import { Tile } from '@app/classes/tile';
 import { WORD_FINDING_BEGINNER_ACCEPTANCE_THRESHOLD } from '@app/constants/classes-constants';
 import { AbstractWordFinding, ScoredWordPlacement, WordFindingRequest } from '@app/classes/word-finding';
+import { HttpException } from '@app/classes/http-exception/http-exception';
+import { StatusCodes } from 'http-status-codes';
 
 export default class WordFindingBeginner extends AbstractWordFinding {
     private highestAcceptanceFoundPlacement: number = Number.MIN_VALUE;
@@ -30,8 +32,8 @@ export default class WordFindingBeginner extends AbstractWordFinding {
     }
 
     private calculateAcceptanceProbabilities(): void {
-        if (!this.request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
-        if (!this.request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
+        if (!this.request.pointRange) throw new HttpException(NO_REQUEST_POINT_RANGE, StatusCodes.BAD_REQUEST);
+        if (!this.request.pointHistory) throw new HttpException(NO_REQUEST_POINT_HISTORY, StatusCodes.BAD_REQUEST);
 
         const minimumFrequency = this.findScoreMinimumFrequency();
         this.acceptanceProbabilities = new Map<number, number>();
@@ -47,8 +49,8 @@ export default class WordFindingBeginner extends AbstractWordFinding {
     }
 
     private findScoreMinimumFrequency(): number {
-        if (!this.request.pointRange) throw new Error(NO_REQUEST_POINT_RANGE);
-        if (!this.request.pointHistory) throw new Error(NO_REQUEST_POINT_HISTORY);
+        if (!this.request.pointRange) throw new HttpException(NO_REQUEST_POINT_RANGE, StatusCodes.BAD_REQUEST);
+        if (!this.request.pointHistory) throw new HttpException(NO_REQUEST_POINT_HISTORY, StatusCodes.BAD_REQUEST);
 
         let minimumFrequency = Number.MAX_VALUE;
 

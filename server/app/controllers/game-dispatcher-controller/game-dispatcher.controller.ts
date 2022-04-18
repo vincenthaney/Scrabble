@@ -176,14 +176,14 @@ export class GameDispatcherController {
             return;
         }
         // Check if there is no player left --> cleanup server and client
-        if (!this.socketService.doesRoomExist(gameId)) {
-            this.activeGameService.playerLeftEvent.emit('playerLeft', gameId, playerId);
-            this.activeGameService.removeGame(gameId, playerId);
-            return;
-        }
         try {
             this.socketService.removeFromRoom(playerId, gameId);
             this.socketService.emitToSocket(playerId, 'cleanup');
+
+            if (!this.socketService.doesRoomExist(gameId)) {
+                this.activeGameService.removeGame(gameId, playerId);
+                return;
+            }
         } catch (exception) {
             // catch errors caused by inexistent socket after client closed application
         }

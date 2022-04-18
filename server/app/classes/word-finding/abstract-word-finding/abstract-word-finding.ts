@@ -1,11 +1,8 @@
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
-import { LetterValue, Tile } from '@app/classes/tile';
 import { Dictionary } from '@app/classes/dictionary';
-import { Random } from '@app/utils/random';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { Square } from '@app/classes/square';
-import { switchOrientation } from '@app/utils/switch-orientation';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { arrayDeepCopy } from '@app/utils/deep-copy';
+import { LetterValue, Tile } from '@app/classes/tile';
 import {
     BoardPlacement,
     BoardPlacementsExtractor,
@@ -16,6 +13,11 @@ import {
 } from '@app/classes/word-finding';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { arrayDeepCopy } from '@app/utils/deep-copy';
+import { Random } from '@app/utils/random';
+import { switchOrientation } from '@app/utils/switch-orientation';
+import { StatusCodes } from 'http-status-codes';
 
 export default abstract class AbstractWordFinding {
     wordPlacements: ScoredWordPlacement[] = [];
@@ -128,7 +130,7 @@ export default abstract class AbstractWordFinding {
 
         if (index === NOT_FOUND) {
             index = tiles.findIndex((tile) => tile.letter === BLANK_TILE_LETTER_VALUE);
-            if (index === NOT_FOUND) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+            if (index === NOT_FOUND) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.FORBIDDEN);
             const foundBlankTile = tiles.splice(index, 1)[0];
             return { ...foundBlankTile, letter: letter.toUpperCase() as LetterValue, isBlank: true };
         }

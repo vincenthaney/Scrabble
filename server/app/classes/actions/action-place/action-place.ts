@@ -5,6 +5,7 @@ import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import { ObjectiveUpdate } from '@app/classes/objectives/objective';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
@@ -17,6 +18,7 @@ import { ScoreCalculatorService } from '@app/services/score-calculator-service/s
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { PlacementToString } from '@app/utils/placement-to-string';
 import { StringConversion } from '@app/utils/string-conversion';
+import { StatusCodes } from 'http-status-codes';
 import { Container } from 'typedi';
 import { ActionErrorsMessages } from './action-errors';
 
@@ -57,7 +59,7 @@ export default class ActionPlace extends ActionPlay {
 
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
-        if (!this.isLegalPlacement(createdWords)) throw new Error(ActionErrorsMessages.ImpossibleAction);
+        if (!this.isLegalPlacement(createdWords)) throw new HttpException(ActionErrorsMessages.ImpossibleAction, StatusCodes.FORBIDDEN);
 
         this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionarySummary.id);
 

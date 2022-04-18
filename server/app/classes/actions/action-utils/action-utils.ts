@@ -1,7 +1,9 @@
+import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
+import { StatusCodes } from 'http-status-codes';
 
 export class ActionUtils {
     static getTilesFromPlayer(tilesToPlay: Tile[], player: Player, allowWildcard: boolean = true): [played: Tile[], unplayed: Tile[]] {
@@ -10,7 +12,7 @@ export class ActionUtils {
 
         for (const tile of tilesToPlay) {
             const index = this.getIndexOfTile(unplayedTiles, tile, allowWildcard);
-            if (index < 0) throw new Error(ERROR_PLAYER_DOESNT_HAVE_TILE);
+            if (index < 0) throw new HttpException(ERROR_PLAYER_DOESNT_HAVE_TILE, StatusCodes.FORBIDDEN);
 
             const playerTile = unplayedTiles.splice(index, 1)[0];
             if (this.isBlankTile(playerTile)) {
