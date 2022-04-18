@@ -248,6 +248,13 @@ describe('ActionPlace', () => {
                 expect(result.gameObjective).to.equal(gameObjectives);
             });
 
+            it('should set to objectivesCompletedMessages if that is returned if GameType is LOG2990', () => {
+                updateObjectiveStub.returns(undefined);
+                game.gameType = GameType.LOG2990;
+                action.execute();
+                expect(action['objectivesCompletedMessages']).to.deep.equal([]);
+            });
+
             it('should NOT call objective validation if GameType is Classic', () => {
                 game.gameType = GameType.Classic;
                 const gameObjectives: GameObjectivesData = {

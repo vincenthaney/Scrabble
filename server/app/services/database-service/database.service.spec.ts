@@ -12,6 +12,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Container } from 'typedi';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import DatabaseService from './database.service';
+import { createStubInstance } from 'sinon';
 chai.use(chaiAsPromised);
 
 const TEST_DOCUMENT_SMALL_ARRAY: Document[] = [{ name: 'pablito' }, { name: 'pablito' }];
@@ -80,5 +81,13 @@ describe('Database service', () => {
 
         const highScores = await databaseService.database.collection(HIGH_SCORES_MONGO_COLLECTION_NAME).find({}).toArray();
         expect(highScores.length).to.equal(TEST_DOCUMENT_BIG_ARRAY.length);
+    });
+
+    it('closeConnection should call mongoClinet.close()', async () => {
+        const stubMongo = createStubInstance(MongoClient);
+        (databaseService['mongoClient'] as unknown) = stubMongo;
+
+        await databaseService.closeConnection();
+        expect(stubMongo.close.calledOnce).to.be.true;
     });
 });

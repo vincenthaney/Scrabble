@@ -15,8 +15,12 @@ import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
+import { SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { CreateGameService } from './create-game.service';
+import * as arrowFunction from 'uuid';
+
 chai.use(spies);
 
 const DEFAULT_PLAYER_ID = 'playerId';
@@ -56,38 +60,43 @@ const DEFAULT_GAME_CONFIG: GameConfig = {
 
 describe('CreateGameService', () => {
     let createGameService: CreateGameService;
-    let activeGameService: ActiveGameService;
+    let activeGameServiceStub: SinonStubbedInstance<ActiveGameService>;
+    let testingUnit: ServicesTestingUnit;
 
     beforeEach(() => {
-        Container.reset();
-    });
-
-    beforeEach(() => {
-        activeGameService = Container.get(ActiveGameService);
-        createGameService = new CreateGameService(activeGameService);
+        testingUnit = new ServicesTestingUnit();
+        activeGameServiceStub = testingUnit.setStubbed(ActiveGameService);
+        activeGameServiceStub.beginGame.resolves();
+        createGameService = Container.get(CreateGameService);
+        spy.on(arrowFunction, 'v4', () => {
+            return '';
+        });
     });
 
     afterEach(() => {
         chai.spy.restore();
         sinon.restore();
+        testingUnit.restore();
     });
 
     describe('createSoloGame', () => {
         it('should call activeGameService.beginGame', async () => {
+            spy.on(arrowFunction, 'v4', () => {
+                return '';
+            });
             spy.on(createGameService, 'generateGameConfig', () => {
-                return;
+                return {} as unknown as GameConfig;
             });
             spy.on(createGameService, 'generateReadyGameConfig', () => {
-                return;
+                return {} as unknown as GameConfig;
             });
-            const beginGameSpy = spy.on(activeGameService, 'beginGame', () => {
-                return;
-            });
+            sinon.stub(BeginnerVirtualPlayer, 'BeginnerVirtualPlayer');
+
             await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
-            expect(beginGameSpy).to.have.been.called();
+            expect(activeGameServiceStub.beginGame.calledOnce).to.be.true;
         });
 
-        it('should add a Beginner player if it is the selected virtual player level', () => {
+        it('should add a Beginner player if it is the selected virtual player level', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return;
             });
@@ -95,16 +104,12 @@ describe('CreateGameService', () => {
                 return;
             });
 
-            spy.on(activeGameService, 'beginGame', () => {
-                return;
-            });
-
-            const stub = sinon.spy(BeginnerVirtualPlayer, 'BeginnerVirtualPlayer');
-            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
+            const stub = sinon.stub(BeginnerVirtualPlayer, 'BeginnerVirtualPlayer');
+            await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(stub.called).to.be.true;
         });
 
-        it('should add an Expert player if it is the selected virtual player level', () => {
+        it('should add an Expert player if it is the selected virtual player level', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return;
             });
@@ -112,25 +117,21 @@ describe('CreateGameService', () => {
                 return;
             });
 
-            spy.on(activeGameService, 'beginGame', () => {
-                return;
-            });
-
-            const stub = sinon.spy(ExpertVirtualPlayer, 'ExpertVirtualPlayer');
-            createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA_EXPERT);
-            expect(stub.called).to.be.true;
+            const stub = sinon.stub(ExpertVirtualPlayer, 'ExpertVirtualPlayer');
+            await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA_EXPERT);
+            expect(stub.calledOnce).to.be.true;
         });
 
         it('should call generateReadyGameConfig', async () => {
             spy.on(createGameService, 'generateGameConfig', () => {
                 return DEFAULT_GAME_CONFIG;
             });
-            spy.on(activeGameService, 'beginGame', () => {
-                return;
-            });
+
             const generateReadyGameConfigSpy = spy.on(createGameService, 'generateReadyGameConfig', () => {
                 return;
             });
+            sinon.stub(BeginnerVirtualPlayer, 'BeginnerVirtualPlayer');
+
             await createGameService.createSoloGame(DEFAULT_GAME_CONFIG_DATA);
             expect(generateReadyGameConfigSpy).to.have.been.called();
         });

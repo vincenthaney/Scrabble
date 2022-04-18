@@ -3,10 +3,10 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { VirtualPlayerProfile, VirtualPlayerProfileData } from '@app/classes/database/virtual-player-profile';
+import { VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
-import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
+import { NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
 import { Random } from '@app/utils/random';
@@ -52,7 +52,7 @@ const DEFAULT_PROFILES: VirtualPlayerProfile[] = [DEFAULT_PROFILE_1, DEFAULT_PRO
 const CUSTOM_PROFILES: VirtualPlayerProfile[] = [CUSTOM_PROFILE_1, CUSTOM_PROFILE_2];
 const ALL_PROFILES: VirtualPlayerProfile[] = DEFAULT_PROFILES.concat(CUSTOM_PROFILES);
 
-const mockInitialVirtualPlayerProfiles: VirtualPlayerProfileData = {
+const mockInitialVirtualPlayerProfiles: VirtualPlayerProfilesData = {
     virtualPlayerProfiles: ALL_PROFILES,
 };
 
@@ -99,7 +99,15 @@ describe('VirtualPlayerProfilesService', () => {
         it('should get all virtualPlayerProfiles from DB', async () => {
             const virtualPlayerProfiles = await virtualPlayerProfilesService.getAllVirtualPlayerProfiles();
             expect(virtualPlayerProfiles.length).to.equal(ALL_PROFILES.length);
-            expect(virtualPlayerProfiles).to.deep.equal(ALL_PROFILES);
+            expect(
+                virtualPlayerProfiles.map((profile) => {
+                    return profile.name;
+                }),
+            ).to.deep.equal(
+                ALL_PROFILES.map((profile) => {
+                    return profile.name;
+                }),
+            );
         });
     });
 
@@ -154,13 +162,6 @@ describe('VirtualPlayerProfilesService', () => {
                 virtualPlayerProfilesService.addVirtualPlayerProfile({ name: 'name', isDefault: false } as unknown as VirtualPlayerProfile),
             ).to.eventually.be.rejectedWith(NAME_ALREADY_USED('name'));
             expect(spy).to.have.been.called();
-        });
-
-        it('should throw if trying to add default profile', async () => {
-            chai.spy.on(virtualPlayerProfilesService, 'isNameAlreadyUsed', () => false);
-            await expect(
-                virtualPlayerProfilesService.addVirtualPlayerProfile({ isDefault: true } as unknown as VirtualPlayerProfile),
-            ).to.eventually.be.rejectedWith(CANNOT_ADD_DEFAULT_PROFILE);
         });
 
         it('should add a new profile if name valid and is not default', async () => {

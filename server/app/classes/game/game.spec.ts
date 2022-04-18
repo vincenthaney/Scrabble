@@ -182,7 +182,8 @@ describe('Game', () => {
                 expect(() => game.getPlayer(DEFAULT_PLAYER_1_ID, false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
 
-            it('should throw INVALID_PLAYER_ID_FOR_GAME if player is from game but id is not player1 or player2', () => {
+            it('should throw INVALID_PLAYER_ID_FOR_GAME if player is not from ', () => {
+                chai.spy.on(game, 'isPlayerFromGame', () => false);
                 expect(() => game.getPlayer('random id', false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
 
@@ -198,8 +199,13 @@ describe('Game', () => {
                 expect(game.getPlayer(DEFAULT_PLAYER_2_ID, true)).to.equal(game.player2);
             });
 
-            it('should return player 2 if id is player2 and is NOT requesting player', () => {
+            it('should return player 1 if id is player2 and is NOT requesting player', () => {
                 expect(game.getPlayer(DEFAULT_PLAYER_2_ID, false)).to.equal(game.player1);
+            });
+
+            it('should throw INVALID_PLAYER_ID_FOR_GAME if player is from game but id is not player1 or player2', () => {
+                chai.spy.on(game, 'isPlayerFromGame', () => true);
+                expect(() => game.getPlayer('random id', false)).to.throw(INVALID_PLAYER_ID_FOR_GAME);
             });
         });
 

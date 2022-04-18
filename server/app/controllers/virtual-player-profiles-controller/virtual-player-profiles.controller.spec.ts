@@ -156,15 +156,15 @@ describe('VirtualPlayerProfilesController', () => {
             it('should return OK on valid request', async () => {
                 return supertest(expressApp)
                     .post('/api/virtualPlayerProfiles')
-                    .send({ virtualPlayerProfile: CUSTOM_PROFILE_1 })
+                    .send({ virtualPlayerData: CUSTOM_PROFILE_1 })
                     .expect(StatusCodes.CREATED)
                     .then(() => expect(virtualPlayerProfileServiceStub.addVirtualPlayerProfile.called).to.be.true);
             });
 
-            it('should throw if virtualPlayerProfile is not provided', async () => {
+            it('should throw if virtualPlayerData is not provided', async () => {
                 return supertest(expressApp)
                     .post('/api/virtualPlayerProfiles')
-                    .send({ virtualPlayerProfile: undefined })
+                    .send({ virtualPlayerData: undefined })
                     .expect(StatusCodes.BAD_REQUEST);
             });
 
@@ -175,7 +175,7 @@ describe('VirtualPlayerProfilesController', () => {
 
                 return supertest(expressApp)
                     .post('/api/virtualPlayerProfiles')
-                    .send({ virtualPlayerProfile: CUSTOM_PROFILE_1 })
+                    .send({ virtualPlayerData: CUSTOM_PROFILE_1 })
                     .expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
@@ -184,7 +184,7 @@ describe('VirtualPlayerProfilesController', () => {
             it('should return NO_CONTENT on valid request', async () => {
                 return supertest(expressApp)
                     .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
-                    .send({ newName: CUSTOM_PROFILE_1.name })
+                    .send({ profileData: { name: CUSTOM_PROFILE_1.name } })
                     .expect(StatusCodes.NO_CONTENT)
                     .then(() => expect(virtualPlayerProfileServiceStub.updateVirtualPlayerProfile.called).to.be.true);
             });
@@ -192,7 +192,7 @@ describe('VirtualPlayerProfilesController', () => {
             it('should throw if newName is not provided', async () => {
                 return supertest(expressApp)
                     .patch(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID}`)
-                    .send({ newName: undefined })
+                    .send({ profileData: { name: undefined } })
                     .expect(StatusCodes.BAD_REQUEST);
             });
 
