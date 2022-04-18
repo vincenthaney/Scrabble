@@ -223,6 +223,15 @@ describe('AdminGameHistoryComponent', () => {
 
             expect(expected).toEqual(result);
         });
+
+        it('should create new columns if DEFAULT_COLUMNS is empty', () => {
+            component.columnsItems = [];
+            const expected = DEFAULT_GAME_HISTORY_COLUMNS.map((key) => ({ key, label: GAME_HISTORY_COLUMNS[key] }));
+
+            const result = component.getSelectedColumns();
+
+            expect(expected).toEqual(result);
+        });
     });
 
     describe('sortGameHistory', () => {
