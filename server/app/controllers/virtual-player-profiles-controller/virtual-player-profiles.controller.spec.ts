@@ -246,22 +246,5 @@ describe('VirtualPlayerProfilesController', () => {
                 return supertest(expressApp).delete(`/api/virtualPlayerProfiles/${DEFAULT_PLAYER_ID_1}`).expect(StatusCodes.INTERNAL_SERVER_ERROR);
             });
         });
-
-        describe('DELETE /virtualPlayerProfiles', () => {
-            it('should return NO_CONTENT', async () => {
-                return supertest(expressApp)
-                    .delete('/api/virtualPlayerProfiles')
-                    .expect(StatusCodes.NO_CONTENT)
-                    .then(() => expect(virtualPlayerProfileServiceStub.resetVirtualPlayerProfiles.called).to.be.true);
-            });
-
-            it('should return INTERNAL_SERVER_ERROR on throw httpException', async () => {
-                virtualPlayerProfileServiceStub.resetVirtualPlayerProfiles.callsFake(() => {
-                    throw new HttpException(DEFAULT_EXCEPTION, StatusCodes.INTERNAL_SERVER_ERROR);
-                });
-
-                return supertest(expressApp).delete('/api/virtualPlayerProfiles').expect(StatusCodes.INTERNAL_SERVER_ERROR);
-            });
-        });
     });
 });
