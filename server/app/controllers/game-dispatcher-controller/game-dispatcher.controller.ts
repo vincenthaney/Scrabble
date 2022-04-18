@@ -189,7 +189,11 @@ export class GameDispatcherController {
         }
         const playerName = this.activeGameService.getGame(gameId, playerId).getPlayer(playerId, IS_REQUESTING).name;
 
-        this.socketService.emitToRoom(gameId, 'newMessage', { content: `${playerName} ${PLAYER_LEFT_GAME}`, senderId: 'system', gameId });
+        this.socketService.emitToRoom(gameId, 'newMessage', {
+            content: `${playerName} ${PLAYER_LEFT_GAME(this.activeGameService.isGameOver(gameId, playerId))}`,
+            senderId: 'system',
+            gameId,
+        });
 
         if (this.activeGameService.isGameOver(gameId, playerId)) return;
 
