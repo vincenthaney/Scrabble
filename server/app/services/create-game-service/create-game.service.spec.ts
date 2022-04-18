@@ -19,7 +19,7 @@ import { SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { CreateGameService } from './create-game.service';
-import * as arrowFunction from 'uuid';
+import * as uuid from 'uuid';
 
 chai.use(spies);
 
@@ -68,7 +68,7 @@ describe('CreateGameService', () => {
         activeGameServiceStub = testingUnit.setStubbed(ActiveGameService);
         activeGameServiceStub.beginGame.resolves();
         createGameService = Container.get(CreateGameService);
-        spy.on(arrowFunction, 'v4', () => {
+        spy.on(uuid, 'v4', () => {
             return '';
         });
     });
@@ -81,7 +81,7 @@ describe('CreateGameService', () => {
 
     describe('createSoloGame', () => {
         it('should call activeGameService.beginGame', async () => {
-            spy.on(arrowFunction, 'v4', () => {
+            spy.on(uuid, 'v4', () => {
                 return '';
             });
             spy.on(createGameService, 'generateGameConfig', () => {
