@@ -29,7 +29,6 @@ import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
-import { DEFAULT_OPPONENT_NAME } from '@app/constants/controller-test-constants';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
@@ -226,16 +225,8 @@ describe('GameCreationPageComponent', () => {
             expect(dictionaryServiceSpy.updateAllDictionaries).toHaveBeenCalled();
         });
 
-        it('should subscribe to level value change', async () => {
-            spyOn<any>(component, 'getVirtualPlayerNames').and.returnValue([DEFAULT_OPPONENT_NAME]);
-            const spy = spyOn<any>(component.gameParameters, 'patchValue').and.callFake(() => {});
+        it('should subscribe to subscribeToVirtualPlayerProfilesUpdateEvent', async () => {
             await component.ngOnInit();
-            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
-            expect(spy).toHaveBeenCalledWith({ virtualPlayerName: DEFAULT_OPPONENT_NAME });
-        });
-
-        it('should subscribe to subscribeToVirtualPlayerProfilesUpdateEvent', () => {
-            component.ngOnInit();
             expect(virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent).toHaveBeenCalled();
         });
     });

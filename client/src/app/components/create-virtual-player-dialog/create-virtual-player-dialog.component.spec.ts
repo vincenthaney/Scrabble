@@ -18,6 +18,7 @@ import { CreateVirtualPlayerComponent } from './create-virtual-player-dialog.com
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { AbstractControl } from '@angular/forms';
 
+const TEST_NAME: string = 'TEST_NAME';
 export class MatDialogMock {
     close() {
         return {
@@ -69,14 +70,15 @@ describe('CreateVirtualPlayerComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('On componentUpdateEvent', () => {
-        // it('should call component.cleanupState()', () => {
-        //     const spy = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
-        //         return;
-        //     });
-        //     dictionariesServiceMock['componentUpdateEvent'].next();
-        //     expect(spy).toHaveBeenCalled();
-        // });
+    describe('onPlayerNameChanges', () => {
+        it('change value of virtualPlayerName', () => {
+            component.onPlayerNameChanges([TEST_NAME, true]);
+            expect(component['virtualPlayerName']).toEqual(TEST_NAME);
+        });
+        it('change value of isVirtualPlayerNameValid', () => {
+            component.onPlayerNameChanges([TEST_NAME, true]);
+            expect(component['isVirtualPlayerNameValid']).toEqual(true);
+        });
     });
 
     describe('ngOnDestroy', () => {
@@ -101,32 +103,6 @@ describe('CreateVirtualPlayerComponent', () => {
             });
             component.ngOnDestroy();
             expect(spyComplete).toHaveBeenCalled();
-        });
-    });
-
-    describe('ngOnChanges', () => {
-        it('should call formParameters.get once with null', () => {
-            const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledTimes(1);
-        });
-
-        it('should call formParameters.get once with get returning Abstract Control to true', () => {
-            const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return { valid: true } as AbstractControl;
-            });
-            component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledTimes(1);
-        });
-
-        it('should call formParameters.get once with get returning Abstract Control to false', () => {
-            const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return { valid: false } as AbstractControl;
-            });
-            component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledTimes(1);
         });
     });
 

@@ -49,7 +49,7 @@ describe('VirtualPlayerProfilesService', () => {
     });
 
     describe('virtualPlayerServerResponseEvent', () => {
-        it('should react to virtualPlayerServerResponseEvent', () => {
+        it('should react to virtualPlayerServerResponseEvent', async () => {
             const componentUpdateSpy = spyOn(service['componentUpdateEvent'], 'next').and.callFake(() => {
                 return;
             });
@@ -67,12 +67,16 @@ describe('VirtualPlayerProfilesService', () => {
     });
 
     describe('VirtualPlayerErrorEvent', () => {
-        it('should react to VirtualPlayerErrorEvent', () => {
+        it('should react to VirtualPlayerErrorEvent', async () => {
             const componentUpdateSpy = spyOn(service['componentUpdateEvent'], 'next').and.callFake(() => {
+                return;
+            });
+            const getAllSpy = spyOn(service, 'getAllVirtualPlayersProfile').and.callFake(async () => {
                 return;
             });
             controller['virtualPlayerErrorEvent'].next();
             expect(componentUpdateSpy).toHaveBeenCalled();
+            expect(getAllSpy).toHaveBeenCalled();
         });
     });
 

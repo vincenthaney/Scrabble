@@ -24,12 +24,12 @@ export class VirtualPlayerProfilesService {
         });
         this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponseEvent(this.serviceDestroyed$, async (message) => {
             this.requestSentEvent.next();
-            await this.getAllVirtualPlayersProfile();
             this.componentUpdateEvent.next(message);
+            await this.getAllVirtualPlayersProfile();
         });
         this.virtualPlayerProfilesController.subscribeToVirtualPlayerErrorEvent(this.serviceDestroyed$, async (message) => {
-            await this.getAllVirtualPlayersProfile();
             this.componentUpdateEvent.next(message);
+            await this.getAllVirtualPlayersProfile();
         });
     }
 

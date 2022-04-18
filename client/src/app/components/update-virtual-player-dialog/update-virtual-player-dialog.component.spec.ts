@@ -19,6 +19,8 @@ import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profi
 import { AbstractControl } from '@angular/forms';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { UpdateVirtualPlayerDialogParameters } from './update-virtual-player.component.types';
+
+const VIRTUAL_PLAYER_NAME: string = 'steve';
 export class MatDialogMock {
     close() {
         return {
@@ -106,20 +108,14 @@ describe('UpdateDictionaryComponent', () => {
         });
     });
 
-    describe('ngOnChanges', () => {
-        it("should call formParameters.get('inputVirtualPlayerName')", () => {
-            const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledWith('inputVirtualPlayerName');
+    describe('onPlayerNameChanges', () => {
+        it('change value of virtualPlayerName', () => {
+            component.onPlayerNameChanges([VIRTUAL_PLAYER_NAME, true]);
+            expect(component['virtualPlayerName']).toEqual(VIRTUAL_PLAYER_NAME);
         });
-        it('should call formParameters.get twice', () => {
-            spyOn(component.formParameters, 'get').and.callFake(() => {
-                return { valid: true } as AbstractControl;
-            });
-            component.ngOnChanges();
-            expect(component.isVirtualPlayerNameValid).toBeTrue();
+        it('change value of isVirtualPlayerNameValid', () => {
+            component.onPlayerNameChanges([VIRTUAL_PLAYER_NAME, true]);
+            expect(component['isVirtualPlayerNameValid']).toEqual(true);
         });
     });
 
