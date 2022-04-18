@@ -30,7 +30,8 @@ export const DIALOG_NO_ACTIVE_GAME_BUTTON = "Retour à la page d'accueil";
 export const DIALOG_END_OF_GAME_TITLE = (isLocalPlayerWinner: boolean) => `Fin de la partie - ${isLocalPlayerWinner ? 'Victoire' : 'Défaite'}`;
 export const DIALOG_END_OF_GAME_CONTENT = (isLocalPlayerWinner: boolean) =>
     isLocalPlayerWinner ? 'Bravo pour votre victoire!' : 'Meilleure chance la prochaine fois!';
-export const DIALOG_END_OF_GAME_BUTTON = 'Fermer';
+export const DIALOG_END_OF_GAME_CLOSE_BUTTON = 'Rester sur cette page';
+export const DIALOG_END_OF_GAME_EXIT_BUTTON = "Retourner à l'acceuil";
 
 export const DEFAULT_TIMER_VALUE = 60;
 export const MINIMUM_TIMER_VALUE = 30;
