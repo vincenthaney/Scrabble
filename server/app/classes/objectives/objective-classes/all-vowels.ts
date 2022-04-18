@@ -34,7 +34,7 @@ export class AllVowelsObjective extends AbstractObjective {
         clone.progress = this.progress;
         clone.state = this.state;
         clone.isPublic = this.isPublic;
-        clone.vowelsLeftToPlay = this.vowelsLeftToPlay;
+        clone.vowelsLeftToPlay = [...this.vowelsLeftToPlay.copyWithin(0, 0)];
         return clone;
     }
 }
