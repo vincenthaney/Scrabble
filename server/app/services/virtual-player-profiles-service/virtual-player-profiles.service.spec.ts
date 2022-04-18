@@ -24,28 +24,35 @@ import Container from 'typedi';
 import VirtualPlayerProfilesService from './virtual-player-profiles.service';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
+const DEFAULT_PLAYER_ID_1 = 'player-id-1';
+const DEFAULT_PLAYER_ID_2 = 'player-id-2';
+
 const DEFAULT_PROFILE_1: VirtualPlayerProfile = {
     name: 'Brun',
     level: VirtualPlayerLevel.Beginner,
     isDefault: true,
+    id: DEFAULT_PLAYER_ID_1,
 };
 
 const DEFAULT_PROFILE_2: VirtualPlayerProfile = {
     name: 'Vert',
     level: VirtualPlayerLevel.Expert,
     isDefault: true,
+    id: DEFAULT_PLAYER_ID_2,
 };
 
 const CUSTOM_PROFILE_1: VirtualPlayerProfile = {
     name: 'Rouge',
     level: VirtualPlayerLevel.Beginner,
     isDefault: false,
+    id: DEFAULT_PLAYER_ID_1,
 };
 
 const CUSTOM_PROFILE_2: VirtualPlayerProfile = {
     name: 'Turquoise',
     level: VirtualPlayerLevel.Expert,
     isDefault: false,
+    id: DEFAULT_PLAYER_ID_2,
 };
 
 const DEFAULT_PROFILES: VirtualPlayerProfile[] = [DEFAULT_PROFILE_1, DEFAULT_PROFILE_2];
@@ -163,9 +170,9 @@ describe('VirtualPlayerProfilesService', () => {
             ).to.eventually.be.rejectedWith(CANNOT_ADD_DEFAULT_PROFILE);
         });
 
-        it('should add a new profile if name valid and is not default', async () => {
+        it('should add a new profile if name valid', async () => {
             const initialLength = (await virtualPlayerProfilesService.getAllVirtualPlayerProfiles()).length;
-            await virtualPlayerProfilesService.addVirtualPlayerProfile({ name: 'name', level: VirtualPlayerLevel.Beginner, isDefault: false });
+            await virtualPlayerProfilesService.addVirtualPlayerProfile({ name: 'name', level: VirtualPlayerLevel.Beginner });
             const finalLength = (await virtualPlayerProfilesService.getAllVirtualPlayerProfiles()).length;
             expect(finalLength).to.equal(initialLength + 1);
         });

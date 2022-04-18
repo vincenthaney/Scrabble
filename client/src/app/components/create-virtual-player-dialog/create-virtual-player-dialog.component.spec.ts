@@ -18,7 +18,7 @@ import { CreateVirtualPlayerComponent } from './create-virtual-player-dialog.com
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { AbstractControl } from '@angular/forms';
 
-const TEST_NAME: string = 'TEST_NAME';
+const TEST_NAME = 'TEST_NAME';
 export class MatDialogMock {
     close() {
         return {

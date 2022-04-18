@@ -20,7 +20,7 @@ import { AbstractControl } from '@angular/forms';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { UpdateVirtualPlayerDialogParameters } from './update-virtual-player.component.types';
 
-const VIRTUAL_PLAYER_NAME: string = 'steve';
+const VIRTUAL_PLAYER_NAME = 'steve';
 export class MatDialogMock {
     close() {
         return {
