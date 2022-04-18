@@ -249,10 +249,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     private throwConfettis(): void {
-        /* Nous n'arrivons pas à couvrir cette ligne dans les tests parce qu'il est impossible de spyOn la méthode 
-        confetti du package party-js qu'on utilise pour afficher les confettis. En effet, cette méthode n'est 
-        pas exportée dans une classe/module, donc jasmine ne permet pas de la spy. De plus, exécuter cette méthode 
-        telle quelle dans les tests donne un erreur parce que le mat-dialog-container n'est pas présent dans les tests. */
+        /* We have not been able to cover this line in the tests because it is impossible to spyOn the confetti method
+        from the party-js package. This method is not exported from a class or a module, so jasmine does not offer a
+        way to spy on it. Aditionally, calling this method through in the tests would create some errors because the 
+        mat-dialog-container is not defined in the tests. */
         party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
             count: party.variation.range(MIN_CONFETTI_COUNT, MAX_CONFETTI_COUNT),
         });
