@@ -665,7 +665,6 @@ describe('GameService', () => {
         });
     });
 
-
     describe('getGameId', () => {
         it('should return gameId', () => {
             const expected = 'expected-id';
