@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable max-lines */
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -327,25 +329,39 @@ describe('GameDispatcherController', () => {
         let gameStub: SinonStubbedInstance<Game>;
         let getGameSpy: SinonStub;
         let playerStub: SinonStubbedInstance<Player>;
+        let opponent: SinonStubbedInstance<Player>;
         let gameDispatcherStub: SinonStubbedInstance<GameDispatcherService>;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let emitToSocketSpy: any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let addToRoomSpy: any;
+        let mockStartGameData: StartGameData;
 
         beforeEach(() => {
             gameStub = createStubInstance(Game);
             gameDispatcherStub = createStubInstance(GameDispatcherService);
+
             playerStub = createStubInstance(Player);
             playerStub.id = DEFAULT_PLAYER_ID;
             playerStub.isConnected = true;
-            gameStub.createStartGameData.callsFake(() => undefined as unknown as StartGameData);
+
+            opponent = createStubInstance(Player);
+            opponent.id = 'opponent-id';
+
+            mockStartGameData = undefined as unknown as StartGameData;
+            gameStub.createStartGameData.callsFake(() => mockStartGameData);
             getGameSpy = stub(controller['activeGameService'], 'getGame').returns(gameStub as unknown as Game);
             controller['gameDispatcherService'] = gameDispatcherStub as unknown as GameDispatcherService;
-            gameStub.getPlayer.returns(playerStub as unknown as Player);
+            gameStub.getPlayer
+                .onFirstCall()
+                .returns(playerStub as unknown as Player)
+                .onSecondCall()
+                .returns(opponent as unknown as Player);
             emitToSocketSpy = chai.spy.on(controller['socketService'], 'emitToSocket', () => {});
             addToRoomSpy = chai.spy.on(controller['socketService'], 'addToRoom', () => {});
             gameStub.areGameOverConditionsMet.returns(false);
+
+            gameStub.isPlayer1.returns(true);
         });
 
         it('should call activeGameService.getGame', () => {
@@ -366,9 +382,10 @@ describe('GameDispatcherController', () => {
             expect(result).to.throw(GAME_IS_OVER);
         });
 
-        it('should call getPlayer', () => {
+        it('should set Player id to new Id and Connected to true', () => {
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            chai.assert(gameStub.getPlayer.calledOnce);
+            expect(playerStub.id).to.equal(DEFAULT_NEW_PLAYER_ID);
+            expect(playerStub.isConnected).to.be.true;
         });
 
         it('should call addToRoom', () => {
@@ -384,11 +401,19 @@ describe('GameDispatcherController', () => {
             chai.assert(gameStub.createStartGameData.calledOnce);
         });
 
-        it('should call emit to socket', () => {
+        it('should call emit start game data to reconnected socket', () => {
             gameStub.areGameOverConditionsMet.returns(false);
 
             controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
-            expect(emitToSocketSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.have.been.called.with(DEFAULT_NEW_PLAYER_ID, 'startGame', mockStartGameData);
+        });
+
+        it('should call emit new id to opponent', () => {
+            gameStub.areGameOverConditionsMet.returns(false);
+
+            controller['handleReconnection'](DEFAULT_GAME_ID, DEFAULT_PLAYER_ID, DEFAULT_NEW_PLAYER_ID);
+            const updateData: GameUpdateData = { player1: { id: DEFAULT_PLAYER_ID, newId: DEFAULT_NEW_PLAYER_ID } };
+            expect(emitToSocketSpy).to.have.been.called.with(opponent.id, 'gameUpdate', updateData);
         });
     });
 
