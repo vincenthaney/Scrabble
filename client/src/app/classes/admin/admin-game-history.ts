@@ -1,4 +1,4 @@
-import { GameHistory } from './game-history/game-history';
+import { GameHistory } from '@app/classes/game-history/game-history';
 
 export type DisplayGameHistoryKeys =
     | keyof GameHistory

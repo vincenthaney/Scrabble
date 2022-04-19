@@ -6,7 +6,7 @@ import Game from '@app/classes/game/game';
 import { StartGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
-import { IS_REQUESTING } from '@app/constants/game';
+import { IS_REQUESTING } from '@app/constants/game-constants';
 import { CONTENT_TYPE, GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
 import { environment } from '@app/environments/environment';
 import { StatusCodes } from 'http-status-codes';

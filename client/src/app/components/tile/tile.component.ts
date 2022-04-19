@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { BLANK_TILE_LETTER_VALUE, UNDEFINED_TILE } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, UNDEFINED_TILE } from '@app/constants/game-constants';
 
 const AMOUNT_OF_TILE_BACKGROUND_IMAGES = 4;
 

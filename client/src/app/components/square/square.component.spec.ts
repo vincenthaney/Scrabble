@@ -13,10 +13,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Orientation } from '@app/classes/orientation';
+import { Orientation } from '@app/classes/actions/orientation';
 import { SquareView } from '@app/classes/square';
 import { IconComponent } from '@app/components/icon/icon.component';
-import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game';
+import { SQUARE_SIZE, UNDEFINED_SQUARE, UNDEFINED_SQUARE_SIZE } from '@app/constants/game-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { SquareComponent } from './square.component';
 

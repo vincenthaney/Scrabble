@@ -1,4 +1,4 @@
-import { AbstractPlayer } from './player';
+import { AbstractPlayer } from '../player';
 
 export interface Round {
     player: AbstractPlayer;

@@ -1,4 +1,4 @@
-import { COLORS } from '@app/constants/colors';
+import { COLORS } from '@app/constants/colors-constants';
 import { MultiplierEffect } from './score-multiplier';
 
 const LETTER_MULTIPLIER_COLOR_MAP: Map<number, COLORS> = new Map([

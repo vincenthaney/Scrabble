@@ -26,8 +26,8 @@ import {
     VIRTUAL_PLAYER_LEVEL_REQUIRED,
     VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { SYSTEM_ID } from '@app/constants/game';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
+import { SYSTEM_ID } from '@app/constants/game-constants';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';

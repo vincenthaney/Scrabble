@@ -1,5 +1,5 @@
+import { Vec2 } from '@app/classes/board/vec2';
 import { LetterValue } from '@app/classes/tile';
-import { Vec2 } from '@app/classes/vec2';
 
 export const LETTER_VALUES: LetterValue[] = [
     'A',

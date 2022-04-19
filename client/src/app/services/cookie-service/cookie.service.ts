@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
 import { EXPIRED_COOKIE_AGE } from '@app/constants/services-errors';
 
 @Injectable({

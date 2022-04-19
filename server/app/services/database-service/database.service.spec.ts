@@ -1,18 +1,18 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
-import { HIGH_SCORES_MONGO_COLLECTION_NAME, MONGO_DATABASE_NAME } from '@app/constants/services-constants/mongo-db.const';
+import { HIGH_SCORES_MONGO_COLLECTION_NAME, MONGO_DATABASE_NAME } from '@app/constants/services-constants/mongo-db-const';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { fail } from 'assert';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { describe } from 'mocha';
-import { MongoClient, Document } from 'mongodb';
+import { Document, MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
-import DatabaseService from './database.service';
 import { createStubInstance } from 'sinon';
+import { Container } from 'typedi';
+import DatabaseService from './database.service';
 chai.use(chaiAsPromised);
 
 const TEST_DOCUMENT_SMALL_ARRAY: Document[] = [{ name: 'pablito' }, { name: 'pablito' }];

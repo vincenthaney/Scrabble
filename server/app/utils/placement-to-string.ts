@@ -3,7 +3,7 @@ import { ActionType } from '@app/classes/communication/action-data';
 import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding';
 import { ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/constants/classes-constants';
-import { ACTION_COMMAND_INDICATOR } from '@app/constants/services-constants/word-finding.const';
+import { ACTION_COMMAND_INDICATOR } from '@app/constants/services-constants/word-finding-const';
 
 export class PlacementToString {
     static positionNumberToLetter(position: number): string {

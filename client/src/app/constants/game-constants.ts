@@ -1,10 +1,10 @@
 import { ActionType } from '@app/classes/actions/action-data';
-import { Orientation } from '@app/classes/orientation';
+import { Orientation } from '@app/classes/actions/orientation';
+import { Vec2 } from '@app/classes/board-navigator/vec2';
 import { Player } from '@app/classes/player';
 import { Square, SquareView } from '@app/classes/square';
 import { LetterValue } from '@app/classes/tile';
-import { Vec2 } from '@app/classes/vec2';
-import { COLORS } from '@app/constants/colors';
+import { COLORS } from '@app/constants/colors-constants';
 
 export const LETTER_VALUES: LetterValue[] = [
     'A',

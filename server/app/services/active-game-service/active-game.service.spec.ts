@@ -6,7 +6,7 @@ import { ReadyGameConfig } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_GAME_FOUND_WITH_ID } from '@app/constants/services-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

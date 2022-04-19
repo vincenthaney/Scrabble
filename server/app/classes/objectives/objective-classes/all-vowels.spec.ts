@@ -5,7 +5,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { VOWELS } from '@app/constants/services-constants/objective.const';
+import { VOWELS } from '@app/constants/services-constants/objective-const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';

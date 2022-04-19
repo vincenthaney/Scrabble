@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Orientation } from '@app/classes/orientation';
+import { Orientation } from '@app/classes/actions/orientation';
 import { SquareView } from '@app/classes/square';
-import { DEFAULT_SQUARE_VIEW } from '@app/constants/game';
-import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size';
+import { DEFAULT_SQUARE_VIEW } from '@app/constants/game-constants';
+import { SQUARE_TILE_DEFAULT_FONT_SIZE } from '@app/constants/tile-font-size-constants';
 
 export interface CssStyleProperty {
     key: string;

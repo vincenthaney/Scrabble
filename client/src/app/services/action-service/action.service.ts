@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
-import { IResetServiceData } from '@app/classes/i-reset-service-data';
-import { Orientation } from '@app/classes/orientation';
-import { Position } from '@app/classes/position';
+import { Orientation } from '@app/classes/actions/orientation';
+import { Position } from '@app/classes/board-navigator/position';
+import { IResetServiceData } from '@app/classes/services/i-reset-service-data';
 import { Tile } from '@app/classes/tile';
 import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';

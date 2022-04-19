@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
-import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/orientation';
-import { Position } from '@app/classes/position';
+import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/actions/orientation';
+import { Position } from '@app/classes/board-navigator/position';
 import { Tile } from '@app/classes/tile';
 import { INVALID_PAYLOAD_FOR_ACTION_TYPE } from '@app/constants/services-errors';
 import { ActionPayloadToString } from './action-payload-to-string';

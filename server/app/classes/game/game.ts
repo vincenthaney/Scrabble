@@ -14,7 +14,7 @@ import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/classes-constants';
-import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game';
+import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game-constants';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';

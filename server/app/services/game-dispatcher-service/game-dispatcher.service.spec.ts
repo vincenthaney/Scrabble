@@ -11,7 +11,7 @@ import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserve } from '@app/classes/tile';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,

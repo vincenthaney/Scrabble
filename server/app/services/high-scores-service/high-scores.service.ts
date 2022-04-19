@@ -1,6 +1,6 @@
 import { HighScore, HighScoresData } from '@app/classes/database/high-score';
 import { GameType } from '@app/classes/game/game-type';
-import { DEFAULT_HIGH_SCORES_RELATIVE_PATH, HIGH_SCORES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db.const';
+import { DEFAULT_HIGH_SCORES_RELATIVE_PATH, HIGH_SCORES_MONGO_COLLECTION_NAME } from '@app/constants/services-constants/mongo-db-const';
 import DatabaseService from '@app/services/database-service/database.service';
 import { promises } from 'fs';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname

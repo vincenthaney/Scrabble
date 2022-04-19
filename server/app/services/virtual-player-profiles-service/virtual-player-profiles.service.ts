@@ -4,7 +4,7 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import {
     DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH,
     VIRTUAL_PLAYER_PROFILES_MONGO_COLLECTION_NAME,
-} from '@app/constants/services-constants/mongo-db.const';
+} from '@app/constants/services-constants/mongo-db-const';
 import { NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import { Random } from '@app/utils/random';

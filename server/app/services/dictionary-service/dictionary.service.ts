@@ -14,13 +14,13 @@ import {
     INVALID_TITLE_FORMAT,
     MAX_DICTIONARY_DESCRIPTION_LENGTH,
     MAX_DICTIONARY_TITLE_LENGTH,
-} from '@app/constants/dictionary.const';
+} from '@app/constants/dictionary-const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import { MAXIMUM_WORD_LENGTH, MINIMUM_WORD_LENGTH } from '@app/constants/services-errors';
 import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 import Ajv, { ValidateFunction } from 'ajv';
-import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { StatusCodes } from 'http-status-codes';
+import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { Service } from 'typedi';
 
 @Service()

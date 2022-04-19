@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
 import { GameHistoriesData, GameHistoryData } from '@app/classes/communication/game-histories';
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
+import { GameMode } from '@app/constants/game-mode';
+import { GameType } from '@app/constants/game-type';
 import { GameHistoriesConverter } from './game-histories-converter';
 import { GameHistory } from './game-history';
 

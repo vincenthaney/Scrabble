@@ -2,7 +2,7 @@ import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
 import { Tile } from '@app/classes/tile';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
-import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE } from '@app/constants/game-constants';
 import { StatusCodes } from 'http-status-codes';
 
 export class ActionUtils {

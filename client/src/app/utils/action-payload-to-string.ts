@@ -1,5 +1,5 @@
 import { ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
-import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/orientation';
+import { Orientation, ORIENTATION_HORIZONTAL_LETTER, ORIENTATION_VERTICAL_LETTER } from '@app/classes/actions/orientation';
 import { Tile } from '@app/classes/tile';
 import { INVALID_PAYLOAD_FOR_ACTION_TYPE } from '@app/constants/services-errors';
 

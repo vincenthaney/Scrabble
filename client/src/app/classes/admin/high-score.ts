@@ -1,4 +1,4 @@
-import { GameType } from '@app/classes/game-type';
+import { GameType } from '@app/constants/game-type';
 
 export default interface HighScore {
     score: number;

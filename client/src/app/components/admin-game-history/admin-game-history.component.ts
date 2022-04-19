@@ -9,9 +9,9 @@ import {
     DisplayGameHistoryColumnsIteratorItem,
     DisplayGameHistoryKeys,
     GameHistoryState,
-} from '@app/classes/admin-game-history';
+} from '@app/classes/admin/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
-import { GAME_HISTORY_COLUMNS, DEFAULT_GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
+import { DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
 import { isKey } from '@app/utils/is-key';
 

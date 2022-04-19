@@ -9,7 +9,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import { GameService } from '@app/services';
 import { of, throwError } from 'rxjs';
-import { DictionaryController } from './dictionary-controller';
+import { DictionaryController } from './dictionary.controller';
 const TEST_DICTIONARY_UPDATE_INFO = {} as DictionaryUpdateInfo;
 const TEST_DICTIONARY_ID = 'testID';
 const TEST_DICTIONARY_DATA = {} as DictionaryData;

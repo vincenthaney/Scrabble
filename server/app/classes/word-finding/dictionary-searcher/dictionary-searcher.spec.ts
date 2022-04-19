@@ -6,19 +6,19 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
+import { Orientation, Position } from '@app/classes/board';
 import { Dictionary, DictionaryNode } from '@app/classes/dictionary';
 import { LetterValue } from '@app/classes/tile';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { Container } from 'typedi';
-import { Orientation, Position } from '@app/classes/board';
-import DictionarySearcher from './dictionary-searcher';
-import { expect } from 'chai';
-import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
-import * as sinon from 'sinon';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
-import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game';
 import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, SearcherPerpendicularLetters } from '@app/classes/word-finding';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
+import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game-constants';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
+import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import { Container } from 'typedi';
+import DictionarySearcher from './dictionary-searcher';
 
 const DEFAULT_WORD = 'ORNITHORINQUE';
 

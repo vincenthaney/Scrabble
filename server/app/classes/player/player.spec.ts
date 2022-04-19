@@ -11,7 +11,7 @@ import {
     generateGameObjectives,
     generateResetableTestObjective,
     generateTestObjective,
-} from '@app/constants/services-constants/objectives-test.const';
+} from '@app/constants/services-constants/objectives-test-const';
 import { Tile } from 'app/classes/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';

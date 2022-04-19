@@ -4,8 +4,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { HighScore, HighScoresData } from '@app/classes/database/high-score';
 import { GameType } from '@app/classes/game/game-type';
-import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
+import { DEFAULT_HIGH_SCORES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db-const';
 import DatabaseService from '@app/services/database-service/database.service';
+import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -15,7 +16,6 @@ import { join } from 'path';
 import * as sinon from 'sinon';
 import { stub } from 'sinon';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import HighScoresService from './high-scores.service';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 

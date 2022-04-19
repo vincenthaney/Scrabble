@@ -4,32 +4,32 @@
 /* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
+import { BINGO_BONUS_POINTS } from '@app/classes/actions/action-place/action-place.const';
+import { Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect, MultiplierValue } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
-import { assert, expect } from 'chai';
-import { ScoreCalculatorService } from './score-calculator.service';
 import {
+    DEFAULT_LETTER_MULTIPLIER,
+    DEFAULT_MULTIPLIER,
+    DEFAULT_TILE_VALUE,
+    DEFAULT_WORD_MULTIPLIER,
     EMPTY_WORD,
     EMPTY_WORDS,
-    GENERIC_WORDS,
     GENERIC_LETTER_3,
+    GENERIC_WORDS,
     GENERIC_WORDS_SCORE,
-    DEFAULT_WORD_MULTIPLIER,
-    DEFAULT_TILE_VALUE,
-    NOT_USED_MULTIPLIER,
-    DEFAULT_LETTER_MULTIPLIER,
-    USED_MULTIPLIER,
-    DEFAULT_MULTIPLIER,
     MAX_LENGTH_TILES_TO_PLACE,
-} from '@app/constants/services-constants/score-calculator.const';
+    NOT_USED_MULTIPLIER,
+    USED_MULTIPLIER,
+} from '@app/constants/services-constants/score-calculator-const';
 import * as chai from 'chai';
-import * as sinon from 'sinon';
+import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { Position } from '@app/classes/board';
+import * as sinon from 'sinon';
 import { stub } from 'sinon';
-import { BINGO_BONUS_POINTS } from '@app/classes/actions/action-place/action-place.const';
+import { ScoreCalculatorService } from './score-calculator.service';
 
 chai.use(spies);
 chai.use(chaiAsPromised);

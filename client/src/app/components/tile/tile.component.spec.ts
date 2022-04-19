@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Tile } from '@app/classes/tile';
-import { UNDEFINED_TILE } from '@app/constants/game';
+import { UNDEFINED_TILE } from '@app/constants/game-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { TileComponent } from './tile.component';
 

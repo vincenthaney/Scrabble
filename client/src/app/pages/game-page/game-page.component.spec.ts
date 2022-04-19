@@ -20,7 +20,7 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { ARROW_LEFT, ARROW_RIGHT, BACKSPACE, ESCAPE } from '@app/constants/components-constants';
-import { DEFAULT_PLAYER } from '@app/constants/game';
+import { DEFAULT_PLAYER } from '@app/constants/game-constants';
 import { DIALOG_QUIT_BUTTON_CONFIRM, DIALOG_QUIT_CONTENT, DIALOG_QUIT_STAY, DIALOG_QUIT_TITLE } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -31,7 +31,7 @@ import {
     SQUARE_TILE_DEFAULT_FONT_SIZE,
     SQUARE_TILE_MAX_FONT_SIZE,
     SQUARE_TILE_MIN_FONT_SIZE,
-} from '@app/constants/tile-font-size';
+} from '@app/constants/tile-font-size-constants';
 import { GameService } from '@app/services';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
 import { of } from 'rxjs';

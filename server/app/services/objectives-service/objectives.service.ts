@@ -9,7 +9,7 @@ import {
     GENERATE_LIST_OF_ALL_OBJECTIVES,
     NUMBER_OF_OBJECTIVES_IN_GAME,
     OBJECTIVE_COMPLETE_MESSAGE,
-} from '@app/constants/services-constants/objective.const';
+} from '@app/constants/services-constants/objective-const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random';
 import { StatusCodes } from 'http-status-codes';

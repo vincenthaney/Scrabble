@@ -16,8 +16,8 @@ import {
     INVALID_TITLE_ALREADY_USED,
     NO_DICTIONARY_WITH_ID,
     NO_DICTIONARY_WITH_NAME,
-} from '@app/constants/dictionary.const';
-import { NOT_FOUND } from '@app/constants/game';
+} from '@app/constants/dictionary-const';
+import { NOT_FOUND } from '@app/constants/game-constants';
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import { join } from 'path';

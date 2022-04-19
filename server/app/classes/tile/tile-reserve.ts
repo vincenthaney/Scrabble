@@ -7,7 +7,7 @@ import {
     TILE_NOT_IN_RESERVE,
     TILE_RESERVE_MUST_BE_INITIALIZED,
 } from '@app/constants/classes-errors';
-import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES } from '@app/constants/game';
+import { BLANK_TILE_LETTER_VALUE, LETTER_VALUES } from '@app/constants/game-constants';
 import { promises } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname

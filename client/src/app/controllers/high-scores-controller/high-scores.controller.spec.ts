@@ -4,8 +4,8 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HighScore } from '@app/classes/admin';
-import { GameType } from '@app/classes/game-type';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
+import { GameType } from '@app/constants/game-type';
 import SocketService from '@app/services/socket-service/socket.service';
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
