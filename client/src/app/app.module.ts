@@ -25,7 +25,6 @@ import { PageHeaderComponent } from './components/page-header/page-header.compon
 import { TimerSelectionComponent } from './components/timer-selection/timer-selection.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from './pages/lobby-page/lobby-page.component';
-import { SocketService } from './services';
 import { HighScoresPageComponent } from './pages/high-scores-page/high-scores-page.component';
 import { HighScoreBoxComponent } from './components/high-score-box/high-score-box.component';
 import { ConvertDialogComponent } from './components/convert-dialog/convert-dialog.component';
@@ -45,6 +44,8 @@ import { ModifyDictionaryComponent } from './components/modify-dictionary-dialog
 import { UploadDictionaryComponent } from './components/upload-dictionary/upload-dictionary.component';
 import { DeleteVirtualPlayerDialogComponent } from './components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from './components/update-virtual-player-dialog/update-virtual-player-dialog.component';
+import { InitializerService } from './services/initializer-service/initializer.service';
+import { LoadingPageComponent } from './pages/loading-page/loading-page.component';
 
 registerLocaleData(localeFr);
 
@@ -92,6 +93,7 @@ registerLocaleData(localeFr);
         DurationPipe,
         ObjectiveComponent,
         ObjectiveBoxComponent,
+        LoadingPageComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -104,11 +106,11 @@ registerLocaleData(localeFr);
         ScrollingModule,
     ],
     providers: [
-        SocketService,
+        InitializerService,
         {
             provide: APP_INITIALIZER,
-            useFactory: (socketService: SocketService) => async () => socketService.initializeService(),
-            deps: [SocketService],
+            useFactory: (initializer: InitializerService) => () => initializer.initialize(),
+            deps: [InitializerService],
             multi: true,
         },
         {
