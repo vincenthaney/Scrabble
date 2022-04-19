@@ -263,6 +263,11 @@ describe('DictionarySavingService', () => {
             expect(getEntryFromIdStub.calledWithExactly(updateInfo.id, false)).to.be.true;
         });
 
+        it('should throw if same title is given', () => {
+            updateInfo.title = DEFAULT_DICTIONARY.title;
+            expect(() => service.updateDictionary(updateInfo)).to.throw(INVALID_TITLE_ALREADY_USED(DEFAULT_DICTIONARY.title));
+        });
+
         it('should call getDictionaryByFilename with entry filename', () => {
             service.updateDictionary(updateInfo);
 
@@ -503,12 +508,6 @@ describe('DictionarySavingService', () => {
 
             expect(resEntry).to.equal(entry);
             expect(resIndex).to.equal(index);
-        });
-
-        it('should call findIndex', () => {
-            service['getEntryFromId'](DEFAULT_ID);
-
-            expect(entriesFindIndexStub.called).to.be.true;
         });
 
         it('should throw if not found', () => {
