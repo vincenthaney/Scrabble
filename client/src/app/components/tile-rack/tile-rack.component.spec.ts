@@ -28,6 +28,7 @@ import { MAX_TILES_PER_PLAYER } from '@app/constants/game';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { Random } from '@app/utils/random';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RackTile, TileRackComponent } from './tile-rack.component';
@@ -742,6 +743,23 @@ describe('TileRackComponent', () => {
 
         it('should set isSelected to false if rackTile is defined && rackTile.isSelected is false', () => {
             expect(component['createRackTile'](DEFAULT_TILE, { ...DEFAULT_RACK_TILE, isSelected: false }).isSelected).toBeFalse();
+        });
+    });
+
+    describe('shuffleTiles', () => {
+        it('should call randomize with tiles', async () => {
+            const tiles = [1, 2, 3];
+            const random = [2, 1, 3];
+            (component.tiles as unknown) = tiles;
+
+            const spy = spyOn(Random, 'randomize').and.returnValue(random);
+
+            await component.shuffleTiles();
+
+            expect(spy).toHaveBeenCalledWith(tiles);
+            expect(component.tiles as unknown).toEqual(random);
+
+            spy.and.callThrough();
         });
     });
 });

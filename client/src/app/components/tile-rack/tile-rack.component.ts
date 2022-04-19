@@ -11,11 +11,14 @@ import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import Delay from '@app/utils/delay';
 import { nextIndex } from '@app/utils/next-index';
 import { preserveArrayOrder } from '@app/utils/preserve-array-order';
+import { Random } from '@app/utils/random';
 import { pipe, Subject } from 'rxjs';
 
 export type RackTile = Tile & { isUsed: boolean; isSelected: boolean };
+const SHUFFLE_ANIMATION_DELAY = 250;
 
 @Component({
     selector: 'app-tile-rack',
@@ -27,6 +30,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     selectedTiles: RackTile[];
     selectionType: TileRackSelectType;
     tileFontSize: number;
+    isShuffling: boolean;
     componentDestroyed$: Subject<boolean>;
 
     constructor(
@@ -40,6 +44,7 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
         this.selectedTiles = [];
         this.selectionType = TileRackSelectType.Exchange;
         this.tileFontSize = RACK_TILE_DEFAULT_FONT_SIZE;
+        this.isShuffling = false;
         this.componentDestroyed$ = new Subject();
     }
 
@@ -100,6 +105,14 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
 
     onScroll(event: WheelEvent): void {
         this.moveSelectedTile(event.deltaY);
+    }
+
+    async shuffleTiles(): Promise<void> {
+        this.isShuffling = true;
+        await Delay.for(SHUFFLE_ANIMATION_DELAY);
+        this.tiles = Random.randomize(this.tiles);
+        await Delay.for(1);
+        this.isShuffling = false;
     }
 
     protected onLoseFocusEvent(): void {

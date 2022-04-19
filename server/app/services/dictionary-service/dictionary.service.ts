@@ -17,11 +17,11 @@ import {
 } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
 import { MAXIMUM_WORD_LENGTH, MINIMUM_WORD_LENGTH } from '@app/constants/services-errors';
+import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 import Ajv, { ValidateFunction } from 'ajv';
 import 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 
 @Service()
 export default class DictionaryService {
@@ -45,7 +45,7 @@ export default class DictionaryService {
     getDictionary(id: string): Dictionary {
         const dictionaryUsage = this.activeDictionaries.get(id);
         if (dictionaryUsage) return dictionaryUsage.dictionary;
-        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.BAD_REQUEST);
+        throw new HttpException(INVALID_DICTIONARY_ID, StatusCodes.NOT_FOUND);
     }
 
     stopUsingDictionary(id: string, forceDeleteIfUnused: boolean = false): void {
@@ -61,7 +61,7 @@ export default class DictionaryService {
     }
 
     addNewDictionary(basicDictionaryData: BasicDictionaryData): void {
-        if (!this.validateDictionary(basicDictionaryData)) throw new HttpException(INVALID_DICTIONARY_FORMAT, StatusCodes.NOT_ACCEPTABLE);
+        if (!this.validateDictionary(basicDictionaryData)) throw new HttpException(INVALID_DICTIONARY_FORMAT, StatusCodes.FORBIDDEN);
 
         this.dictionarySavingService.addDictionary(basicDictionaryData);
     }
@@ -80,9 +80,9 @@ export default class DictionaryService {
 
     updateDictionary(updateInfo: DictionaryUpdateInfo): void {
         if (updateInfo.description && !this.isDescriptionValid(updateInfo.description))
-            throw new HttpException(INVALID_DESCRIPTION_FORMAT, StatusCodes.BAD_REQUEST);
+            throw new HttpException(INVALID_DESCRIPTION_FORMAT, StatusCodes.FORBIDDEN);
 
-        if (updateInfo.title && !this.isTitleValid(updateInfo.title)) throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.BAD_REQUEST);
+        if (updateInfo.title && !this.isTitleValid(updateInfo.title)) throw new HttpException(INVALID_TITLE_FORMAT, StatusCodes.FORBIDDEN);
 
         this.dictionarySavingService.updateDictionary(updateInfo);
     }

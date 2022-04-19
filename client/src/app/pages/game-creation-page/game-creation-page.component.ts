@@ -83,7 +83,11 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
         this.dictionaryService.subscribeToDictionariesUpdateDataEvent(this.pageDestroyed$, () => {
             this.dictionaryOptions = this.dictionaryService.getDictionaries();
-            if (this.shouldSetToDefaultDictionary) this.gameParameters.patchValue({ dictionary: this.dictionaryOptions[0] });
+            if (this.shouldSetToDefaultDictionary)
+                this.gameParameters.patchValue({
+                    dictionary:
+                        this.dictionaryOptions.find((d) => d.title === window.localStorage.getItem(DICTIONARY_NAME_KEY)) || this.dictionaryOptions[0],
+                });
         });
     }
 
@@ -129,7 +133,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     onSubmit(): void {
         if (this.isFormValid()) {
             window.localStorage.setItem(PLAYER_NAME_KEY, this.playerName);
-            window.localStorage.setItem(DICTIONARY_NAME_KEY, this.gameParameters.get('dictionary')?.value);
+            window.localStorage.setItem(DICTIONARY_NAME_KEY, this.gameParameters.get('dictionary')?.value.title);
             window.localStorage.setItem(TIMER_KEY, this.gameParameters.get('timer')?.value);
             this.createGame();
         }

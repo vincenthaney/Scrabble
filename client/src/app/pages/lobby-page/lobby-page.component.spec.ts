@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -153,6 +154,8 @@ describe('LobbyPageComponent', () => {
     });
 
     describe('validateName', () => {
+        let updateAllLobiesSpy: jasmine.Spy;
+
         beforeEach(() => {
             validateNameSpy.and.callThrough();
         });
@@ -190,6 +193,11 @@ describe('LobbyPageComponent', () => {
             const setFormAvailabilitySpy = spyOn<any>(component, 'setFormAvailability');
             component['validateName']();
             expect(setFormAvailabilitySpy).toHaveBeenCalled();
+        });
+
+        it('should call updateAllLobiesAttributes', () => {
+            component['updateLobbies']([]);
+            expect(updateAllLobiesSpy).toHaveBeenCalled();
         });
     });
 
@@ -304,6 +312,34 @@ describe('LobbyPageComponent', () => {
         it('should throw if no lobby fits filters', () => {
             component.lobbies = component.lobbies.map((lobby) => ({ ...lobby, meetFilters: false }));
             expect(() => component['getRandomLobby']()).toThrowError(NO_LOBBY_CAN_BE_JOINED);
+        });
+    });
+
+    describe('updateAllLobiesAttributes', () => {
+        it('should be called when gameType changes', () => {
+            const spy = spyOn<any>(component, 'updateAllLobiesAttributes').and.callFake(() => {});
+            component.filterFormGroup.patchValue({ gameType: 'LOG2990' });
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should update canJoin attribute of the lobbies (use #1)', () => {
+            component.playerName = 'differentName';
+            component.playerNameValid = true;
+            component['updateAllLobiesAttributes']();
+            for (const lobby of component.lobbies) {
+                expect(lobby.canJoin).toBeTrue();
+            }
+        });
+
+        it('should update canJoin attribute of the lobbies ( use #2)', () => {
+            component.playerName = 'Name1';
+            component.playerNameValid = true;
+            const expected = [false, true, true];
+            component['updateAllLobiesAttributes']();
+            expect(component.lobbies).toBeTruthy();
+            for (let i = 0; i++; i < component.lobbies.length) {
+                expect(component.lobbies[i].canJoin).toEqual(expected[i]);
+            }
         });
     });
 
