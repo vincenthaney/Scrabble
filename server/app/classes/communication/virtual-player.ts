@@ -1,4 +1,4 @@
-export interface VirtualPlayerData {
+export interface AddVirtualPlayerData {
     name: string;
     level: VirtualPlayerLevel;
 }

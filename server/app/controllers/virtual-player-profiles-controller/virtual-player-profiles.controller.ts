@@ -1,5 +1,5 @@
 import { VirtualPlayerProfilesRequest } from '@app/classes/communication/request';
-import { VirtualPlayerData } from '@app/classes/communication/virtual-player';
+import { AddVirtualPlayerData } from '@app/classes/communication/virtual-player';
 import { VirtualPlayerProfile } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -44,7 +44,7 @@ export class VirtualPlayerProfilesController {
 
         this.router.post('/virtualPlayerProfiles', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
-                const virtualPlayerData: VirtualPlayerData = req.body.virtualPlayerData;
+                const virtualPlayerData: AddVirtualPlayerData = req.body.virtualPlayerData;
                 if (!virtualPlayerData) throw new HttpException(MISSING_PARAMETER, StatusCodes.BAD_REQUEST);
 
                 await this.virtualPlayerProfileService.addVirtualPlayerProfile(virtualPlayerData);

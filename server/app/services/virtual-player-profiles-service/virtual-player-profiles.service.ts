@@ -1,4 +1,4 @@
-import { VirtualPlayerData } from '@app/classes/communication/virtual-player';
+import { AddVirtualPlayerData } from '@app/classes/communication/virtual-player';
 import { VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -56,9 +56,8 @@ export default class VirtualPlayerProfilesService {
         throw new HttpException(NO_PROFILE_OF_LEVEL, StatusCodes.BAD_REQUEST);
     }
 
-    async addVirtualPlayerProfile(newProfileData: VirtualPlayerData): Promise<void> {
-        if (await this.isNameAlreadyUsed(newProfileData.name))
-            throw new HttpException(NAME_ALREADY_USED(newProfileData.name), StatusCodes.BAD_REQUEST);
+    async addVirtualPlayerProfile(newProfileData: AddVirtualPlayerData): Promise<void> {
+        if (await this.isNameAlreadyUsed(newProfileData.name)) throw new HttpException(NAME_ALREADY_USED(newProfileData.name), StatusCodes.FORBIDDEN);
 
         await this.collection.insertOne({
             name: newProfileData.name,
