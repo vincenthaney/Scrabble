@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { ObjectiveData } from '@app/classes/communication/objective-data';
 import { ObjectiveState } from '@app/classes/objectives/objective-state';
-
 import { ObjectivesManagerService } from './objectives-manager.service';
 
 const DEFAULT_OBJECTIVE: ObjectiveData = {
@@ -64,11 +66,19 @@ describe('ObjectivesManagerService', () => {
 
     describe('getPublicObjectives', () => {
         it('should return all objectives that are public', () => {
-            const allObjectives = service['getObjectives']();
+            const allObjectives = service['getObjectives'](true);
             const publicObjectives = service.getPublicObjectives();
 
             expect(allObjectives.some((o) => !o.isPublic)).toBeTrue();
             expect(publicObjectives.every((o) => o.isPublic)).toBeTrue();
+        });
+
+        it('should call getObjectives with isLocalPlayerPlayer1', () => {
+            service['isLocalPlayerPlayer1'] = true;
+            const getSpy = spyOn<any>(service, 'getObjectives').and.callFake(() => []);
+            service.getPublicObjectives();
+
+            expect(getSpy).toHaveBeenCalledWith(service['isLocalPlayerPlayer1']);
         });
     });
 
@@ -91,54 +101,88 @@ describe('ObjectivesManagerService', () => {
     });
 
     describe('getPrivateObjectives', () => {
-        it('should return all objectives that are public', () => {
-            const allObjectives = service['getObjectives']();
+        it('should return all objectives that are private', () => {
+            const allObjectives = service['getObjectives'](true);
             const privateObjectives = service.getPrivateObjectives();
 
             expect(allObjectives.some((o) => o.isPublic)).toBeTrue();
             expect(privateObjectives.every((o) => !o.isPublic)).toBeTrue();
         });
+
+        it('should call getObjectives with isLocalPlayerPlayer1', () => {
+            service['isLocalPlayerPlayer1'] = true;
+            const getSpy = spyOn<any>(service, 'getObjectives').and.callFake(() => []);
+            service.getPrivateObjectives();
+
+            expect(getSpy).toHaveBeenCalledWith(service['isLocalPlayerPlayer1']);
+        });
+
+        it('should call getOpponentPrivateObjectiveIfCompleted', () => {
+            service['isLocalPlayerPlayer1'] = true;
+            const getSpy = spyOn<any>(service, 'getOpponentPrivateObjectiveIfCompleted').and.callFake(() => []);
+            service.getPrivateObjectives();
+
+            expect(getSpy).toHaveBeenCalled();
+        });
     });
 
     describe('getObjectives', () => {
         it('should return player1Objectives if is player 1', () => {
-            service['isLocalPlayerPlayer1'] = true;
+            const isLocalPlayerPlayer1 = true;
 
-            expect(service['getObjectives']()).toEqual(player1Objectives);
+            expect(service['getObjectives'](isLocalPlayerPlayer1)).toEqual(player1Objectives);
         });
 
         it('should return player1Objectives if is player 2', () => {
-            service['isLocalPlayerPlayer1'] = false;
+            const isLocalPlayerPlayer1 = false;
 
-            expect(service['getObjectives']()).toEqual(player2Objectives);
+            expect(service['getObjectives'](isLocalPlayerPlayer1)).toEqual(player2Objectives);
         });
 
         it('should return empty array if objectives are undefined (player 1)', () => {
-            service['isLocalPlayerPlayer1'] = true;
+            const isLocalPlayerPlayer1 = true;
             service['objectives'] = undefined;
 
-            expect(service['getObjectives']()).toEqual([]);
+            expect(service['getObjectives'](isLocalPlayerPlayer1)).toEqual([]);
         });
 
         it('should return empty array if objectives are undefined (player 2)', () => {
-            service['isLocalPlayerPlayer1'] = false;
+            const isLocalPlayerPlayer1 = false;
             service['objectives'] = undefined;
 
-            expect(service['getObjectives']()).toEqual([]);
+            expect(service['getObjectives'](isLocalPlayerPlayer1)).toEqual([]);
         });
 
         it('should return empty array if player1 objectives are undefined', () => {
-            service['isLocalPlayerPlayer1'] = true;
+            const isLocalPlayerPlayer1 = true;
             service['objectives'] = {};
 
-            expect(service['getObjectives']()).toEqual([]);
+            expect(service['getObjectives'](isLocalPlayerPlayer1)).toEqual([]);
         });
 
         it('should return empty array if player2 objectives are undefined', () => {
-            service['isLocalPlayerPlayer1'] = false;
+            const isLocalPlayerPlayer1 = false;
             service['objectives'] = {};
 
-            expect(service['getObjectives']()).toEqual([]);
+            expect(service['getObjectives'](isLocalPlayerPlayer1)).toEqual([]);
+        });
+    });
+
+    describe('getOpponentPrivateObjectiveIfCompleted', () => {
+        it('should return empty array if opponent has not completed their private objective', () => {
+            service['objectives']?.player2Objectives?.forEach((objective: ObjectiveData) => (objective.state = ObjectiveState.NotCompleted));
+            expect(service['getOpponentPrivateObjectiveIfCompleted']()).toEqual([]);
+        });
+
+        it('should return opponent private objective with state CompletedByOpponent if it is completed', () => {
+            spyOn<any>(service, 'getObjectives').and.returnValue(service['objectives']?.player2Objectives);
+            service['objectives']!.player2Objectives![0].state = ObjectiveState.Completed;
+
+            const expectedObjective: ObjectiveData = {
+                ...service['objectives']!.player2Objectives![0],
+                state: ObjectiveState.CompletedByOpponent,
+            };
+            expect(service['getOpponentPrivateObjectiveIfCompleted']()).toEqual([expectedObjective]);
         });
     });
 });

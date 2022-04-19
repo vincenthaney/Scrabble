@@ -38,8 +38,8 @@ export class ObjectivesManagerService implements IResetServiceData {
         this.objectives = undefined;
     }
 
-    private getObjectives(requestingPlayerIsPlaye1: boolean): ObjectiveData[] {
-        return (requestingPlayerIsPlaye1 ? this.objectives?.player1Objectives : this.objectives?.player2Objectives) || [];
+    private getObjectives(requestingPlayerIsPlayer1: boolean): ObjectiveData[] {
+        return (requestingPlayerIsPlayer1 ? this.objectives?.player1Objectives : this.objectives?.player2Objectives) || [];
     }
 
     private getOpponentPrivateObjectiveIfCompleted(): ObjectiveData[] {
