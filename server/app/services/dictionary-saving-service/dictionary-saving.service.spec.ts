@@ -15,7 +15,7 @@ import {
     NO_DICTIONARY_WITH_NAME,
 } from '@app/constants/dictionary-const';
 import { NOT_FOUND } from '@app/constants/game-constants';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { expect } from 'chai';
 import { existsSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';

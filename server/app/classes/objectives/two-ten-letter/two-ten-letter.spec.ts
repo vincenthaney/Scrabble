@@ -7,7 +7,7 @@
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_SQUARE } from '@app/classes/word-finding/helper.spec';
-import { StringConversion } from '@app/utils/string-conversion';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';

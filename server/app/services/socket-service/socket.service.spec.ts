@@ -5,7 +5,7 @@ import { Application } from '@app/app';
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { Delay } from '@app/utils/delay/delay';
 import * as arrowFunction from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { Server } from 'app/server';

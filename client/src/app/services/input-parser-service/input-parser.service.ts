@@ -22,7 +22,7 @@ import { ActionService } from '@app/services/action-service/action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import CommandException from '@app/services/input-parser-service/command-exception';
 import { isNumber } from '@app/utils/isNumber/is-number';
-import { removeAccents } from '@app/utils/remove-accents';
+import { removeAccents } from '@app/utils/remove-accents/remove-accents';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 

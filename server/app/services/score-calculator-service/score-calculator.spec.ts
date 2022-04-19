@@ -4,11 +4,11 @@
 /* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
-import { BINGO_BONUS_POINTS } from '@app/classes/actions/action-place/action-place.const';
 import { Position } from '@app/classes/board';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect, MultiplierValue } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
+import { BINGO_BONUS_POINTS } from '@app/constants/game-constants';
 import {
     DEFAULT_LETTER_MULTIPLIER,
     DEFAULT_MULTIPLIER,

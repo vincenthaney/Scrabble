@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable dot-notation */
 import { HIGH_SCORES_MONGO_COLLECTION_NAME, MONGO_DATABASE_NAME } from '@app/constants/services-constants/mongo-db-const';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { fail } from 'assert';
 import * as chai from 'chai';
 import { expect } from 'chai';

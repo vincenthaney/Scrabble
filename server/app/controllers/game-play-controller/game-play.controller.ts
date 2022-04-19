@@ -1,4 +1,5 @@
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
+import { FeedbackMessage, FeedbackMessages } from '@app/classes/communication/feedback-messages';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { Message } from '@app/classes/communication/message';
 import { GameRequest } from '@app/classes/communication/request';
@@ -7,7 +8,6 @@ import { CONTENT_REQUIRED, SENDER_REQUIRED } from '@app/constants/controllers-er
 import { INVALID_WORD_TIMEOUT, IS_OPPONENT, SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game-constants';
 import { COMMAND_IS_INVALID, OPPONENT_PLAYED_INVALID_WORD } from '@app/constants/services-errors';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { FeedbackMessage, FeedbackMessages } from '@app/services/game-play-service/feedback-messages';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';

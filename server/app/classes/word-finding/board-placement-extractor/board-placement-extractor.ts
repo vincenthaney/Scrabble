@@ -1,9 +1,8 @@
-import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import Direction from '@app/classes/board/direction';
 import { LetterValue } from '@app/classes/tile';
 import { BoardPlacement, LetterPosition, LinePlacements, WithDistance } from '@app/classes/word-finding';
-import { INITIAL_POSITION } from '@app/constants/game-constants';
+import { INITIAL_POSITION, MAX_TILES_PER_PLAYER } from '@app/constants/game-constants';
 
 const HAS_TILE_IN_PREVIOUS_POSITION = -1;
 const SHOULD_BE_FILLED = true;

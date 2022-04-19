@@ -1,8 +1,8 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { LetterValue } from '@app/classes/tile';
 import { VOWELS } from '@app/constants/services-constants/objective-const';
-import { StringConversion } from '@app/utils/string-conversion';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 
 export const NAME = 'Les bases';
 export const DESCRIPTION = 'Jouer chaque voyelle au moins une fois (inclue les lettres blanches)';

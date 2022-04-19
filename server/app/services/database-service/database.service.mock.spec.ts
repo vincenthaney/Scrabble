@@ -1,5 +1,5 @@
 import { MONGO_DATABASE_NAME } from '@app/constants/services-constants/mongo-db-const';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { Db, MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Service } from 'typedi';

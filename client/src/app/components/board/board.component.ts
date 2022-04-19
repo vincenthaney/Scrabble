@@ -17,7 +17,7 @@ import { ActionService } from '@app/services/action-service/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
-import { removeAccents } from '@app/utils/remove-accents';
+import { removeAccents } from '@app/utils/remove-accents/remove-accents';
 import { Subject } from 'rxjs';
 
 @Component({

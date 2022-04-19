@@ -1,12 +1,16 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
+import ActionHelp from '@app/classes/actions/action-help/action-help';
+import ActionPass from '@app/classes/actions/action-pass/action-pass';
+import { FeedbackMessage } from '@app/classes/communication/feedback-messages';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import Game from '@app/classes/game/game';
 import Player from '@app/classes/player/player';
-import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import { expect } from 'chai';
-import { Action, ActionHelp, ActionInfo, ActionPass, ActionPlay } from '.';
+import Action from './action';
+import ActionInfo from './action-info';
+import ActionPlay from './action-play';
 
 const DEFAULT_MESSAGE = 'message';
 

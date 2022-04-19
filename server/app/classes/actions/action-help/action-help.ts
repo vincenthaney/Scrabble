@@ -1,6 +1,6 @@
 import ActionInfo from '@app/classes/actions/abstract-actions/action-info';
+import { FeedbackMessage } from '@app/classes/communication/feedback-messages';
 import { HELP_ACTIONS } from '@app/constants/classes-constants';
-import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 
 export default class ActionHelp extends ActionInfo {
     getMessage(): FeedbackMessage {

@@ -1,4 +1,4 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 
 export const NAME = '5 X 5';

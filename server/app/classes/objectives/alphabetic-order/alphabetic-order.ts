@@ -1,6 +1,6 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { StringConversion } from '@app/utils/string-conversion';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 
 export const NAME = 'Placement ordonné';
 export const DESCRIPTION = 'Former un mot de 4 lettres ou plus dont les lettres sont placées en ordre alphabétique';

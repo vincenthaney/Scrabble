@@ -13,7 +13,7 @@ import { BoardPlacement, DictionarySearcherStackItem, PerpendicularWord, Searche
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
 import { ALPHABET, BLANK_TILE_LETTER_VALUE } from '@app/constants/game-constants';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { SinonStub, SinonStubbedInstance, stub } from 'sinon';

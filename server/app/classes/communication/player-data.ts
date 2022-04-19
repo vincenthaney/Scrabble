@@ -1,4 +1,4 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { Tile } from '@app/classes/tile';
 
 export interface PlayerData {

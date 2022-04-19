@@ -1,5 +1,5 @@
 import ActionInfo from '@app/classes/actions/abstract-actions/action-info';
-import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
+import { FeedbackMessage } from '@app/classes/communication/feedback-messages';
 
 export default class ActionReserve extends ActionInfo {
     getMessage(): FeedbackMessage {

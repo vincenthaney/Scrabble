@@ -1,6 +1,7 @@
 import ActionPlay from '@app/classes/actions/abstract-actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { FeedbackMessage } from '@app/classes/communication/feedback-messages';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
@@ -13,7 +14,6 @@ import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding';
 import { IN_UPPER_CASE } from '@app/constants/classes-constants';
-import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
 import { PlacementToString } from '@app/utils/placement-to-string/placement-to-string';

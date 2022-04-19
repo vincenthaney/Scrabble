@@ -11,7 +11,7 @@ import * as BeginnerVirtualPlayer from '@app/classes/virtual-player/beginner-vir
 import * as ExpertVirtualPlayer from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';

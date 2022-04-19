@@ -10,6 +10,7 @@ import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Orientation } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
 import { DictionarySummary } from '@app/classes/communication/dictionary-data';
+import { FeedbackMessage } from '@app/classes/communication/feedback-messages';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import Game from '@app/classes/game/game';
@@ -28,7 +29,7 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as arrowFunction from '@app/utils/is-id-virtual-player/is-id-virtual-player';
@@ -37,7 +38,6 @@ import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { FeedbackMessage } from '../../classes/communication/feedback-messages';
 
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';

@@ -6,15 +6,15 @@ import { GameHistoriesController } from '@app/controllers/game-histories-control
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { HighScoresController } from '@app/controllers/high-scores-controller/high-scores.controller';
 import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
+import DatabaseService from '@app/services/database-service/database.service';
+import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import WordFindingService from '@app/services/word-finding-service/word-finding.service';
 import { Router } from 'express';
+import * as mock from 'mock-fs';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
-import DatabaseService from './database-service/database.service';
-import { DatabaseServiceMock } from './database-service/database.service.mock.spec';
-import DictionaryService from './dictionary-service/dictionary.service';
-import WordFindingService from './word-finding-service/word-finding.service';
-import * as mock from 'mock-fs';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ClassType<T> = Function & { prototype: T };

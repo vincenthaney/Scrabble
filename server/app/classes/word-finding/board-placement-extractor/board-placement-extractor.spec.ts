@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
 import Direction from '@app/classes/board/direction';
 import { Vec2 } from '@app/classes/board/vec2';
@@ -12,7 +11,7 @@ import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { BoardPlacement, LinePlacements, WithDistance } from '@app/classes/word-finding';
-import { INITIAL_POSITION } from '@app/constants/game-constants';
+import { INITIAL_POSITION, MAX_TILES_PER_PLAYER } from '@app/constants/game-constants';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { SinonStub, stub } from 'sinon';

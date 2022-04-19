@@ -1,8 +1,8 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { LetterValue } from '@app/classes/tile';
 import { VOWELS } from '@app/constants/services-constants/objective-const';
-import { StringConversion } from '@app/utils/string-conversion';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 
 export const NAME = 'Voyelles au max';
 export const DESCRIPTION = 'Former un mot qui contient 4 voyelles ou plus (inclue les lettres blanches)';

@@ -1,8 +1,8 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { AllVowelsObjective } from '@app/classes/objectives/all-vowels/all-vowels';
 import { AlphabeticOrderObjective } from '@app/classes/objectives/alphabetic-order/alphabetic-order';
+import { ConsecutivePlaceOrientationObjective } from '@app/classes/objectives/consecutive-place-orientation/consecutive-place-orientation';
 import { FourVowelsWordObjective } from '@app/classes/objectives/four-vowels-word/four-vowels-word';
-import { ConsecutivePlaceOrientationObjective } from '@app/classes/objectives/objective-classes/consecutive-place-orientation';
 import { PlaceFiveLettersFiveTimesObjective } from '@app/classes/objectives/place-five-letters-five-times/place-five-letters-five-times';
 import { TenLetterWord } from '@app/classes/objectives/ten-letter-word/ten-letter-word';
 import { ThreeWordsPlacement } from '@app/classes/objectives/three-word-placement/three-word-placement';

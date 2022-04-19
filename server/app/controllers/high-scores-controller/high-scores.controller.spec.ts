@@ -5,7 +5,7 @@
 import { Application } from '@app/app';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

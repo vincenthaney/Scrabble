@@ -4,7 +4,7 @@ import { Application } from '@app/app';
 import { VirtualPlayerProfile } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
