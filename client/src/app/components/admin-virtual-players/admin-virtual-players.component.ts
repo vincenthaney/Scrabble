@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { CreateVirtualPlayerComponent } from '@app/components/create-virtual-player-dialog/create-virtual-player-dialog.component';
 import { DeleteVirtualPlayerDialogComponent } from '@app/components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from '@app/components/update-virtual-player-dialog/update-virtual-player-dialog.component';
@@ -28,7 +29,6 @@ import {
     UpdateVirtualPlayersDialogParameters,
     VirtualPlayersComponentState,
 } from './admin-virtual-players.types';
-import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 @Component({
     selector: 'app-admin-virtual-players',
@@ -102,6 +102,9 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
                 name: virtualPlayerProfile.name,
                 level: virtualPlayerProfile.level,
                 id: virtualPlayerProfile.id,
+                // We haven't been able to test that the right function is called because this
+                // arrow function creates a new instance of the function. We cannot spy on it.
+                // It totally works tho, try it!
                 onClose: () => {
                     this.isWaitingForServerResponse = true;
                 },
