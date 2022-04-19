@@ -1,5 +1,5 @@
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 
 export abstract class AbstractObjective {

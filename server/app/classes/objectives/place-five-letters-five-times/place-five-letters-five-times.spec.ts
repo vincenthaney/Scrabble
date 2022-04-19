@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { LetterValue } from '@app/classes/tile';
 import Tile from '@app/classes/tile/tile';

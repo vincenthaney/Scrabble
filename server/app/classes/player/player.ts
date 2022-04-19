@@ -1,6 +1,6 @@
 import { PlayerData } from '@app/classes/communication/player-data';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { ObjectiveUpdate } from '@app/classes/objectives/objective';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';

@@ -2,7 +2,7 @@ import { GameObjectivesData, ObjectiveData } from '@app/classes/communication/ob
 import Game from '@app/classes/game/game';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
-import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective';
+import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import {

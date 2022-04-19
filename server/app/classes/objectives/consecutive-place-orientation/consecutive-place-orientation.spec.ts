@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Orientation } from '@app/classes/board';
-import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import * as chai from 'chai';
 import { expect } from 'chai';

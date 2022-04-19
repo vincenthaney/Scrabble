@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { TestObjective } from '@app/constants/services-constants/objectives-test-const';
 import * as chai from 'chai';

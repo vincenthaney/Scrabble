@@ -5,7 +5,7 @@ import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
 import { GameHistory } from '@app/classes/database/game-history';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { GameObjectives } from '@app/classes/objectives/objective';
+import { GameObjectives } from '@app/classes/objectives/objective-utils';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';

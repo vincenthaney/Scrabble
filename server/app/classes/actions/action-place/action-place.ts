@@ -6,7 +6,7 @@ import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { ObjectiveUpdate } from '@app/classes/objectives/objective';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective-utils';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
