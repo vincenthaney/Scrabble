@@ -29,12 +29,12 @@
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef> {{columns.actions}} </th>
                     <td mat-cell class="right-cell" *matCellDef="let element"> 
-                        <button matTooltip="Vous ne pouvez pas modifier un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="updateVirtualPlayer(element)"[disabled] = "element.isDefault">
-                            <app-icon icon="pencil">
+                        <button  mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="updateVirtualPlayer(element)"[disabled] = "element.isDefault">
+                            <app-icon icon="pencil" matTooltip="Vous ne pouvez pas modifier un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault">
                             </app-icon>
                         </button>
-                        <button matTooltip="Vous ne pouvez pas supprimer un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteVirtualPlayer(element)" [disabled] = "element.isDefault">
-                            <app-icon icon="trash-alt">
+                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteVirtualPlayer(element)" [disabled] = "element.isDefault">
+                            <app-icon icon="trash-alt" matTooltip="Vous ne pouvez pas supprimer un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault" >
                             </app-icon>
                         </button> 
                     </td>
