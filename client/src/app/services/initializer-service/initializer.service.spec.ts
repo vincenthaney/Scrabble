@@ -38,7 +38,7 @@ describe('InitializerService', () => {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should call handleSocketUpdate on socket update', () => {
+        it('should call handleDatabaseUpdate on db update', () => {
             const spy = spyOn<any>(service, 'handleDatabaseUpdate');
             service['databaseService']['nextState'](ConnectionState.Loading);
             expect(spy).toHaveBeenCalled();
