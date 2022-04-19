@@ -13,7 +13,7 @@ export default abstract class ConnectionStateService {
         return this.state$.value;
     }
 
-    protected nextState(state: ConnectionState) {
+    protected nextState(state: ConnectionState): void {
         this.state$.next(state);
     }
 }

@@ -38,7 +38,7 @@ export class InitializerService implements OnDestroy {
         return [InitializeState.DatabaseNotReachable, InitializeState.ServerNotReachable].includes(this.state$.value);
     }
 
-    private handleSocketUpdate(state: ConnectionState) {
+    private handleSocketUpdate(state: ConnectionState): void {
         switch (state) {
             case ConnectionState.Connected:
                 if (this.state$.value !== InitializeState.Ready) {
@@ -52,7 +52,7 @@ export class InitializerService implements OnDestroy {
         }
     }
 
-    private handleDatabaseUpdate(state: ConnectionState) {
+    private handleDatabaseUpdate(state: ConnectionState): void {
         switch (state) {
             case ConnectionState.Connected:
                 if (this.canSwitchToReadyFromDatabaseUpdate()) this.state$.next(InitializeState.Ready);
