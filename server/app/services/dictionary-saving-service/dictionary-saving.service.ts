@@ -44,7 +44,7 @@ export default class DictionarySavingService {
 
     addDictionary(dictionary: BasicDictionaryData): DictionarySummary {
         if (this.dictionaryIndexes.entries.find((entry) => entry.title === dictionary.title))
-            throw new HttpException(INVALID_TITLE_ALREADY_USED(dictionary.title), StatusCodes.BAD_REQUEST);
+            throw new HttpException(INVALID_TITLE_ALREADY_USED(dictionary.title), StatusCodes.FORBIDDEN);
 
         const id = uuidv4();
         const filename = `${dictionary.title}-${id}.json`;
