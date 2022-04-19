@@ -118,6 +118,10 @@
                     display: inline-flex;
                     align-items: center;
                     margin: 0 4px;
+
+                    .home-tile-name {
+                        max-height: 20.46px;
+                    }
                 }
                 app-tile {
                     display: inline-block;
