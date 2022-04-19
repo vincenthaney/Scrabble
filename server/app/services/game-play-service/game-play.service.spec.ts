@@ -37,7 +37,7 @@ import { EventEmitter } from 'events';
 import * as sinon from 'sinon';
 import { createStubInstance, restore, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { FeedbackMessage } from './feedback-messages';
+import { FeedbackMessage } from '../../classes/communication/feedback-messages';
 
 const expect = chai.expect;
 const DEFAULT_GAME_ID = 'gameId';

@@ -9,7 +9,7 @@ import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player/abstract-virtual-player';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import { GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';

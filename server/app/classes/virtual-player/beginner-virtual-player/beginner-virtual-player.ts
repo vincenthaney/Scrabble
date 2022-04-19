@@ -2,7 +2,7 @@ import { ActionExchange, ActionPass, ActionPlace } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import Range from '@app/classes/range/range';
 import { Tile } from '@app/classes/tile';
-import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player/abstract-virtual-player';
 import { ScoredWordPlacement, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import {
     BEGINNER_NAME_SUFFIX,
