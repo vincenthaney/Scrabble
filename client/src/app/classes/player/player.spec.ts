@@ -5,7 +5,7 @@ import { PlayerData } from '@app/classes/communication/';
 import { Tile } from '@app/classes/tile';
 import { Player } from '.';
 
-describe('AbstractPlayer', () => {
+describe('Player', () => {
     const playerDataTestCases: PlayerData[] = [
         {
             name: 'testName2',
