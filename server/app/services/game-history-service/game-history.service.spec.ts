@@ -7,7 +7,7 @@ import { GameHistory, PlayerHistoryData } from '@app/classes/database/game-histo
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import DatabaseService from '@app/services/database-service/database.service';
-import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
+import GameHistoriesService from '@app/services/game-history-service/game-history.service';
 import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import * as chai from 'chai';
 import { expect } from 'chai';

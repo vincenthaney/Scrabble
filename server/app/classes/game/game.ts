@@ -18,7 +18,7 @@ import { END_GAME_HEADER_MESSAGE, START_TILES_AMOUNT } from '@app/constants/clas
 import { IS_REQUESTING, WINNER_MESSAGE } from '@app/constants/game-constants';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import ObjectivesService from '@app/services/objective-service/objective.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Container } from 'typedi';

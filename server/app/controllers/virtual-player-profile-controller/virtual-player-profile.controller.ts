@@ -3,7 +3,7 @@ import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/database/v
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { MISSING_PARAMETER, MUST_SPECIFY_LEVEL } from '@app/constants/services-errors';
-import VirtualPlayerProfileService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import VirtualPlayerProfileService from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

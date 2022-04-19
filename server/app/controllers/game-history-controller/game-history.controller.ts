@@ -1,7 +1,7 @@
 import { GameHistoriesRequest } from '@app/classes/communication/request';
 import { GameHistory } from '@app/classes/database/game-history';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
+import GameHistoriesService from '@app/services/game-history-service/game-history.service';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

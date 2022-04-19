@@ -26,11 +26,11 @@ import { INVALID_COMMAND, INVALID_PAYLOAD } from '@app/constants/services-errors
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
+import GameHistoriesService from '@app/services/game-history-service/game-history.service';
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
 import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import * as arrowFunction from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import * as chai from 'chai';

@@ -4,7 +4,7 @@
 /* eslint-disable dot-notation */
 import { Application } from '@app/app';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
 import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
@@ -15,7 +15,7 @@ import { afterEach } from 'mocha';
 import { SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import { HighScoresController } from './high-scores.controller';
+import { HighScoresController } from './high-score.controller';
 
 const expect = chai.expect;
 

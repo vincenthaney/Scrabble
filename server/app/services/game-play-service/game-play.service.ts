@@ -19,9 +19,9 @@ import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constant
 import { MINIMUM_TILES_LEFT_FOR_EXCHANGE } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import GameHistoriesService from '@app/services/game-history-service/game-history.service';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';

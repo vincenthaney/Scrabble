@@ -20,7 +20,7 @@ import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game-constants';
 import { generateGameObjectives } from '@app/constants/services-constants/objectives-test-const';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import ObjectivesService from '@app/services/objective-service/objective.service';
 import * as copy from '@app/utils/deep-copy/deep-copy';
 import * as chai from 'chai';
 import { assert } from 'chai';

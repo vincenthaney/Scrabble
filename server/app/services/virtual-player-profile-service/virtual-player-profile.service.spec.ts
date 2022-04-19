@@ -21,7 +21,7 @@ import * as sinon from 'sinon';
 import { stub } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
-import VirtualPlayerProfilesService from './virtual-player-profiles.service';
+import VirtualPlayerProfilesService from './virtual-player-profile.service';
 chai.use(chaiAsPromised); // this allows us to test for rejection
 
 const DEFAULT_PLAYER_ID_1 = 'player-id-1';

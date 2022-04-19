@@ -5,7 +5,7 @@ import { VirtualPlayerProfile } from '@app/classes/database/virtual-player-profi
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
@@ -15,7 +15,7 @@ import * as sinon from 'sinon';
 import { SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-import { VirtualPlayerProfilesController } from './virtual-player-profiles.controller';
+import { VirtualPlayerProfilesController } from './virtual-player-profile.controller';
 
 const expect = chai.expect;
 

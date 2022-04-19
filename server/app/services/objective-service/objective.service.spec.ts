@@ -19,7 +19,7 @@ import * as spies from 'chai-spies';
 import { describe } from 'mocha';
 import { SinonStub, stub } from 'sinon';
 import { Container } from 'typedi';
-import ObjectivesService from './objectives.service';
+import ObjectivesService from './objective.service';
 chai.use(spies);
 
 const DEFAULT_PLAYER: Player = new Player('id', 'name');

@@ -6,8 +6,8 @@ import { GameHistory, PlayerHistoryData } from '@app/classes/database/game-histo
 import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { GameHistoriesController } from '@app/controllers/game-histories-controller/game-histories.controller';
-import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
+import { GameHistoriesController } from '@app/controllers/game-history-controller/game-history.controller';
+import GameHistoriesService from '@app/services/game-history-service/game-history.service';
 import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

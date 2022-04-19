@@ -3,7 +3,7 @@ import { AbstractObjective } from '@app/classes/objectives/abstract-objective/ab
 import { ObjectiveUpdate } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
-import ObjectivesService from '@app/services/objectives-service/objectives.service';
+import ObjectivesService from '@app/services/objective-service/objective.service';
 import { Container } from 'typedi';
 
 export default class Player {
