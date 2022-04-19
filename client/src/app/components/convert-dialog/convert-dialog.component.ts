@@ -5,7 +5,7 @@ import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile'
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { GameMode } from '@app/constants/game-mode';
 import { GameDispatcherService } from '@app/services';
-import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

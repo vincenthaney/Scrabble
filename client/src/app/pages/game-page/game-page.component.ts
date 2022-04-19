@@ -35,7 +35,7 @@ import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
-import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { PlayerLeavesService } from '@app/services/player-leave-service/player-leave.service';
 import { ReconnectionService } from '@app/services/reconnection-service/reconnection.service';
 import party from 'party-js';
 import { DynamicSourceType } from 'party-js/lib/systems/sources';

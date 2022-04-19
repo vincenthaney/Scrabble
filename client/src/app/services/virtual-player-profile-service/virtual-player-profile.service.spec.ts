@@ -6,9 +6,9 @@ import { TestBed } from '@angular/core/testing';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
+import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profile-controller/virtual-player-profile.controller';
 import { Subject } from 'rxjs';
-import { VirtualPlayerProfilesService } from './virtual-player-profiles.service';
+import { VirtualPlayerProfilesService } from './virtual-player-profile.service';
 
 const TEST_ID = 'losIDgrande';
 

@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { PlayerLeavesController } from '@app/controllers/player-leaves-controller/player-leaves.controller';
+import { PlayerLeavesController } from '@app/controllers/player-leave-controller/player-leave.controller';
 import { GameService } from '@app/services/';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';

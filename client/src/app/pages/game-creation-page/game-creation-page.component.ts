@@ -13,7 +13,7 @@ import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { DICTIONARY_NAME_KEY, PLAYER_NAME_KEY, TIMER_KEY } from '@app/constants/session-storage-constants';
 import { GameDispatcherService } from '@app/services';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { randomizeArray } from '@app/utils/randomize-array/randomize-array';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';

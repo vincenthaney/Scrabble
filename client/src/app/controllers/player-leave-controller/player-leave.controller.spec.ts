@@ -8,7 +8,7 @@ import { DEFAULT_GAME_ID, DEFAULT_OPPONENT_NAME } from '@app/constants/controlle
 import { GameService, SocketService } from '@app/services';
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { PlayerLeavesController } from './player-leaves.controller';
+import { PlayerLeavesController } from './player-leave.controller';
 
 describe('PlayerLeavesController', () => {
     let controller: PlayerLeavesController;

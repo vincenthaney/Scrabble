@@ -15,7 +15,7 @@ import {
     DIALOG_REJECT_TITLE,
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
-import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { PlayerLeavesService } from '@app/services/player-leave-service/player-leave.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

@@ -5,10 +5,10 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import HighScore, { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/constants/game-type';
-import { HighScoresController } from '@app/controllers/high-scores-controller/high-scores.controller';
+import { HighScoresController } from '@app/controllers/high-score-controller/high-score.controller';
 import SocketService from '@app/services/socket-service/socket.service';
 import { Subject } from 'rxjs';
-import HighScoresService from './high-scores.service';
+import HighScoresService from './high-score.service';
 
 const DEFAULT_CLASSIC_HIGH_SCORES: SingleHighScore[] = [
     { name: 'name1', score: 1, gameType: GameType.Classic },

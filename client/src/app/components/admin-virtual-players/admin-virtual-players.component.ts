@@ -19,7 +19,7 @@ import {
 } from '@app/constants/dialogs-constants';
 import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
 import { PositiveFeedback } from '@app/constants/virtual-players-components-constants';
-import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Subject } from 'rxjs';
 import {
     DeleteVirtualPlayerDialogParameters,

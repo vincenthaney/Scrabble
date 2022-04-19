@@ -10,7 +10,7 @@ import SocketService from '@app/services/socket-service/socket.service';
 import { of, Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { HighScoresController } from './high-scores.controller';
+import { HighScoresController } from './high-score.controller';
 
 const DEFAULT_HIGH_SCORES: HighScore[] = [
     { names: ['name1'], score: 120, gameType: GameType.Classic },

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HighScore } from '@app/classes/admin';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { GameType } from '@app/constants/game-type';
-import { HighScoresController } from '@app/controllers/high-scores-controller/high-scores.controller';
+import { HighScoresController } from '@app/controllers/high-score-controller/high-score.controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 @Injectable({

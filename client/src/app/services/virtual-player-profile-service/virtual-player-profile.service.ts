@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
-import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
+import { VirtualPlayerProfilesController } from '@app/controllers/virtual-player-profile-controller/virtual-player-profile.controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

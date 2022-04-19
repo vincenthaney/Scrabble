@@ -8,7 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
 import { of, Subject, throwError } from 'rxjs';
-import { VirtualPlayerProfilesController } from './virtual-player-profiles.controller';
+import { VirtualPlayerProfilesController } from './virtual-player-profile.controller';
 const TEST_VIRTUAL_PLAYER_DATA = {} as VirtualPlayerData;
 const TEST_ID = 'iamtheidthatwillbetested';
 

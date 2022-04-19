@@ -7,7 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { GameType } from '@app/constants/game-type';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
 import { AdminHighScoresComponent } from './admin-high-scores.component';
 
 @Injectable()
