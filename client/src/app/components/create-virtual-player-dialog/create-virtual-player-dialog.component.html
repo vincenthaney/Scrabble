@@ -19,7 +19,6 @@
             </mat-button-toggle-group>
         </div>
         <div>
-            <div>Choisissez le nom du joueur virtuel:</div>
                 <app-name-field
                     [initialPlayerName]="''"
                     [virtualPlayerName]="''"
@@ -30,7 +29,7 @@
         </div>
         <div id="buttons-container">
             <button mat-flat-button color = "primary" type="submit" [disabled]="!this.isVirtualPlayerNameValid">
-                <app-icon icon="pencil"></app-icon>
+                <app-icon icon="plus-circle" styling="solid" ></app-icon>
                 Ajouter
             </button>
             <button mat flat button mat-button color = "primary" type="button" (click)="closeDialog()">

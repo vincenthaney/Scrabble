@@ -1,10 +1,7 @@
 import { Component, Inject, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import {
-    DictionaryDialogParameters,
-    ModifyDictionaryComponentStates,
-} from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
+import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { DICTIONARY_DESCRIPTION_VALIDATION, DICTIONARY_NAME_VALIDATION } from '@app/constants/dictionary-name-validation';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { Subject } from 'rxjs';
@@ -15,7 +12,6 @@ import { Subject } from 'rxjs';
     styleUrls: ['./modify-dictionary-dialog.component.scss'],
 })
 export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
-    state: ModifyDictionaryComponentStates;
     dictionaryToModify: DictionaryDialogParameters;
     formParameters: FormGroup;
     isDictionaryTitleValid: boolean;
@@ -28,7 +24,6 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
         @Inject(MAT_DIALOG_DATA) public data: DictionaryDialogParameters,
     ) {
         this.componentDestroyed$ = new Subject();
-        this.state = ModifyDictionaryComponentStates.Ready;
         this.dictionaryToModify = data;
         this.isDictionaryTitleValid = true;
         this.isDictionaryDescriptionValid = true;
@@ -44,9 +39,6 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
                 Validators.maxLength(DICTIONARY_DESCRIPTION_VALIDATION.maxLength),
             ]),
         });
-        this.dictionariesService.subscribeToComponentUpdateEvent(this.componentDestroyed$, () => {
-            this.cleanupDialogStates();
-        });
     }
 
     ngOnChanges(): void {
@@ -61,7 +53,6 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
     }
 
     updateDictionary(): void {
-        this.state = ModifyDictionaryComponentStates.Loading;
         this.dictionariesService.updateDictionary(
             this.dictionaryToModify.dictionaryId,
             this.formParameters.get('inputDictionaryTitle')?.value,
@@ -72,14 +63,9 @@ export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
 
     closeDialog(): void {
         this.dialogRef.close();
-        this.cleanupDialogStates();
     }
 
     isInformationValid(): boolean {
         return this.isDictionaryTitleValid && this.isDictionaryDescriptionValid;
-    }
-
-    cleanupDialogStates(): void {
-        this.state = ModifyDictionaryComponentStates.Ready;
     }
 }

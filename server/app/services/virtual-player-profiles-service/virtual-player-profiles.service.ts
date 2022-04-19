@@ -56,8 +56,7 @@ export default class VirtualPlayerProfilesService {
     }
 
     async addVirtualPlayerProfile(newProfileData: VirtualPlayerData): Promise<void> {
-        if (await this.isNameAlreadyUsed(newProfileData.name))
-            throw new HttpException(NAME_ALREADY_USED(newProfileData.name), StatusCodes.BAD_REQUEST);
+        if (await this.isNameAlreadyUsed(newProfileData.name)) throw new HttpException(NAME_ALREADY_USED(newProfileData.name), StatusCodes.FORBIDDEN);
 
         await this.collection.insertOne({
             name: newProfileData.name,

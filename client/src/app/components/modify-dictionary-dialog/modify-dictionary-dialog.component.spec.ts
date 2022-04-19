@@ -17,7 +17,7 @@ import { PageHeaderComponent } from '@app/components/page-header/page-header.com
 import { AppMaterialModule } from '@app/modules/material.module';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { ModifyDictionaryComponent } from './modify-dictionary-dialog.component';
-import { DictionaryDialogParameters, ModifyDictionaryComponentStates } from './modify-dictionary-dialog.component.types';
+import { DictionaryDialogParameters } from './modify-dictionary-dialog.component.types';
 
 const MODEL: DictionaryDialogParameters = {
     dictionaryId: 'testId',
@@ -82,16 +82,6 @@ describe('ModifyDictionaryComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    describe('On componentUpdateEvent', () => {
-        it('should call component.cleanupState()', () => {
-            const spy = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
-                return;
-            });
-            dictionariesServiceMock['componentUpdateEvent'].next();
-            expect(spy).toHaveBeenCalled();
-        });
     });
 
     describe('ngOnChanges', () => {
@@ -177,12 +167,8 @@ describe('ModifyDictionaryComponent', () => {
 
     describe('closeDialog', () => {
         let spyDialog: jasmine.Spy;
-        let spyCleanup: jasmine.Spy;
         beforeEach(() => {
             spyDialog = spyOn(component['dialogRef'], 'close').and.callFake(() => {
-                return;
-            });
-            spyCleanup = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
                 return;
             });
         });
@@ -190,11 +176,6 @@ describe('ModifyDictionaryComponent', () => {
         it('should call dialogRef.close()', () => {
             component.closeDialog();
             expect(spyDialog).toHaveBeenCalled();
-        });
-
-        it('should call cleanupDialogStates()', () => {
-            component.closeDialog();
-            expect(spyCleanup).toHaveBeenCalled();
         });
     });
 
@@ -218,13 +199,6 @@ describe('ModifyDictionaryComponent', () => {
             component.isDictionaryTitleValid = false;
             component.isDictionaryDescriptionValid = true;
             expect(component.isInformationValid()).toBeFalse();
-        });
-    });
-
-    describe('cleanupDialogStates', () => {
-        it('should turn state to Ready', () => {
-            component.cleanupDialogStates();
-            expect(component.state).toEqual(ModifyDictionaryComponentStates.Ready);
         });
     });
 });

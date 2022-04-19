@@ -22,7 +22,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
         this.serviceDestroyed$.complete();
     }
 
-    async handleGetAllVirtualPlayerProfilesEvent(): Promise<void> {
+    handleGetAllVirtualPlayerProfilesEvent(): void {
         this.http.get<VirtualPlayerProfilesData>(this.endpoint, { observe: 'body' }).subscribe(
             (body) => {
                 this.getAllVirtualPlayersEvent.next(body.virtualPlayerProfiles);
@@ -33,7 +33,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
         );
     }
 
-    async handleCreateVirtualPlayerProfileEvent(newProfileData: VirtualPlayerData): Promise<void> {
+    handleCreateVirtualPlayerProfileEvent(newProfileData: VirtualPlayerData): void {
         this.http.post(this.endpoint, { virtualPlayerData: newProfileData }).subscribe(
             () => {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayerCreated);
@@ -44,7 +44,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
         );
     }
 
-    async handleUpdateVirtualPlayerProfileEvent(profileData: VirtualPlayerData): Promise<void> {
+    handleUpdateVirtualPlayerProfileEvent(profileData: VirtualPlayerData): void {
         this.http.patch<void>(`${this.endpoint}/${profileData.id}`, { profileData }).subscribe(
             () => {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayerUpdated);
@@ -55,7 +55,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
         );
     }
 
-    async handleDeleteVirtualPlayerProfileEvent(profileId: string): Promise<void> {
+    handleDeleteVirtualPlayerProfileEvent(profileId: string): void {
         this.http.delete<void>(`${this.endpoint}/${profileId}`).subscribe(
             () => {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayerDeleted);
@@ -66,7 +66,7 @@ export class VirtualPlayerProfilesController implements OnDestroy {
         );
     }
 
-    async handleResetVirtualPlayerProfilesEvent(): Promise<void> {
+    handleResetVirtualPlayerProfilesEvent(): void {
         this.http.delete<void>(this.endpoint).subscribe(
             () => {
                 this.virtualPlayerServerResponseEvent.next(PositiveFeedback.VirtualPlayersDeleted);

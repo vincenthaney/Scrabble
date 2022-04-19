@@ -6,12 +6,6 @@ export interface UpdateVirtualPlayerDialogParameters {
     id: string;
 }
 
-export enum UpdateDictionaryComponentStates {
-    Ready = 'ready',
-    Loading = 'loading',
-    Message = 'message',
-}
-
 export enum UpdateDictionaryComponentIcons {
     SuccessIcon = 'check',
     ErrorIcon = 'times',

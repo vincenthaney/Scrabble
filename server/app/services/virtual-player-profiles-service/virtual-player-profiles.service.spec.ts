@@ -3,7 +3,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
+import { VirtualPlayerData, VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH } from '@app/constants/services-constants/mongo-db.const';
 import { NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
@@ -165,15 +165,14 @@ describe('VirtualPlayerProfilesService', () => {
     describe('addVirtualPlayerProfile', () => {
         it('should throw if new name is already used', async () => {
             const spy = chai.spy.on(virtualPlayerProfilesService, 'isNameAlreadyUsed', () => true);
-            await expect(
-                virtualPlayerProfilesService.addVirtualPlayerProfile({ name: 'name', isDefault: false } as unknown as VirtualPlayerProfile),
-            ).to.eventually.be.rejectedWith(NAME_ALREADY_USED('name'));
+            const newProfile: VirtualPlayerData = { name: 'name', isDefault: false } as unknown as VirtualPlayerData;
+            await expect(virtualPlayerProfilesService.addVirtualPlayerProfile(newProfile)).to.eventually.be.rejectedWith(NAME_ALREADY_USED('name'));
             expect(spy).to.have.been.called();
         });
 
         it('should add a new profile if name valid and is not default', async () => {
             const initialLength = (await virtualPlayerProfilesService.getAllVirtualPlayerProfiles()).length;
-            await virtualPlayerProfilesService.addVirtualPlayerProfile({ name: 'name', level: VirtualPlayerLevel.Beginner });
+            await virtualPlayerProfilesService.addVirtualPlayerProfile({ name: 'name', level: VirtualPlayerLevel.Beginner } as VirtualPlayerData);
             const finalLength = (await virtualPlayerProfilesService.getAllVirtualPlayerProfiles()).length;
             expect(finalLength).to.equal(initialLength + 1);
         });
