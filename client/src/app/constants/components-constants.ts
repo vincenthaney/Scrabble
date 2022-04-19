@@ -49,6 +49,7 @@ export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
 
 export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
+    'startTime',
     'duration',
     'gameType',
     'gameMode',
