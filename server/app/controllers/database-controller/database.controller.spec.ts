@@ -26,20 +26,20 @@ describe('DatabaseController', () => {
         testingUnit.restore();
     });
 
-    describe('/api/database/connected', () => {
+    describe('/api/database/is-connected', () => {
         it('should send NO_CONTENT', async () => {
             databaseServiceStub.connectToServer.resolves('client' as unknown as MongoClient);
-            return supertest(expressApp).get('/api/database/connected').expect(StatusCodes.NO_CONTENT);
+            return supertest(expressApp).get('/api/database/is-connected').expect(StatusCodes.NO_CONTENT);
         });
 
         it('should send INTERNAL_SERVER_ERROR if no client', async () => {
             databaseServiceStub.connectToServer.resolves(null);
-            return supertest(expressApp).get('/api/database/connected').expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            return supertest(expressApp).get('/api/database/is-connected').expect(StatusCodes.INTERNAL_SERVER_ERROR);
         });
 
         it('should send INTERNAL_SERVER_ERROR if error', async () => {
             databaseServiceStub.connectToServer.rejects();
-            return supertest(expressApp).get('/api/database/connected').expect(StatusCodes.INTERNAL_SERVER_ERROR);
+            return supertest(expressApp).get('/api/database/is-connected').expect(StatusCodes.INTERNAL_SERVER_ERROR);
         });
     });
 });

@@ -4,7 +4,7 @@ import { ConnectionState } from '@app/classes/connection-state-service/connectio
 import ConnectionStateService from '@app/classes/connection-state-service/connection-state-service';
 import { environment } from 'src/environments/environment';
 
-export const ENDPOINT = `${environment.serverUrl}/database/connected`;
+export const ENDPOINT = `${environment.serverUrl}/database/is-connected`;
 
 @Injectable({
     providedIn: 'root',

@@ -14,7 +14,7 @@ export class DatabaseController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/connected', async (req, res) => {
+        this.router.get('/is-connected', async (req, res) => {
             this.databaseService
                 .connectToServer()
                 .then((client) => (client ? res.status(StatusCodes.NO_CONTENT).send() : res.status(StatusCodes.INTERNAL_SERVER_ERROR).send()))
