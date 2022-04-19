@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ASCENDING, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
+import { ASCENDING_COLUMN_SORTER, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
 import { Subject } from 'rxjs';
 import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import {
@@ -68,7 +68,7 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     }
 
     ngAfterViewInit(): void {
-        this.sort.sort({ id: 'level', start: ASCENDING } as MatSortable);
+        this.sort.sort({ id: 'level', start: ASCENDING_COLUMN_SORTER } as MatSortable);
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
     }
