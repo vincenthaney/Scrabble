@@ -26,7 +26,7 @@ export class InitializerService implements OnDestroy {
         this.destroyed$.complete();
     }
 
-    initialize() {
+    initialize(): void {
         this.socketService.initializeService();
     }
 
