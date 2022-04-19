@@ -1,5 +1,5 @@
 import { PlayerData } from '@app/classes/communication/player-data';
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveUpdate } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Tile } from '@app/classes/tile';
