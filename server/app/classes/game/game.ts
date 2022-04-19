@@ -184,8 +184,8 @@ export default class Game {
 
     endGameMessage(winnerName: string | undefined): FeedbackMessage[] {
         const messages: string[] = [END_GAME_HEADER_MESSAGE, this.player1.endGameMessage(), this.player2.endGameMessage()];
-        const winnerMessage = winnerName ? WINNER_MESSAGE(winnerName) : this.congratulateWinner();
-        messages.push(winnerMessage);
+        const winnerNames: string[] = winnerName ? [winnerName] : this.computeWinners();
+        messages.push(WINNER_MESSAGE(winnerNames.join(' et ')));
         return messages.map((message: string) => {
             return { message };
         });
@@ -219,16 +219,17 @@ export default class Game {
         return Game.objectivesService.resetPlayerObjectiveProgression(this, this.getPlayer(playerId, IS_REQUESTING));
     }
 
-    private congratulateWinner(): string {
-        let winner: string;
+    computeWinners(): string[] {
+        const winners: string[] = [];
         if (this.player1.score > this.player2.score) {
-            winner = this.player1.name;
+            winners.push(this.player1.name);
         } else if (this.player1.score < this.player2.score) {
-            winner = this.player2.name;
+            winners.push(this.player2.name);
         } else {
-            winner = this.player1.name + ' et ' + this.player2.name;
+            winners.push(this.player1.name);
+            winners.push(this.player2.name);
         }
-        return WINNER_MESSAGE(winner);
+        return winners;
     }
 
     private computeEndOfGameScore(

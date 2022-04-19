@@ -10,6 +10,9 @@ import {
     DIALOG_ABANDON_BUTTON_CONTINUE,
     DIALOG_ABANDON_CONTENT,
     DIALOG_ABANDON_TITLE,
+    DIALOG_END_OF_GAME_CLOSE_BUTTON,
+    DIALOG_END_OF_GAME_CONTENT,
+    DIALOG_END_OF_GAME_TITLE,
     DIALOG_NO_ACTIVE_GAME_BUTTON,
     DIALOG_NO_ACTIVE_GAME_CONTENT,
     DIALOG_NO_ACTIVE_GAME_TITLE,
@@ -17,6 +20,8 @@ import {
     DIALOG_QUIT_CONTENT,
     DIALOG_QUIT_STAY,
     DIALOG_QUIT_TITLE,
+    MAX_CONFETTI_COUNT,
+    MIN_CONFETTI_COUNT,
 } from '@app/constants/pages-constants';
 import {
     RACK_FONT_SIZE_INCREMENT,
@@ -32,6 +37,8 @@ import { FocusableComponentsService } from '@app/services/focusable-components-s
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
 import { ReconnectionService } from '@app/services/reconnection-service/reconnection.service';
+import party from 'party-js';
+import { DynamicSourceType } from 'party-js/lib/systems/sources';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -94,6 +101,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.gameViewEventManagerService.subscribeToGameViewEvent('noActiveGame', this.componentDestroyed$, () => this.noActiveGameDialog());
+        this.gameViewEventManagerService.subscribeToGameViewEvent('endOfGame', this.componentDestroyed$, (winnerNames: string[]) =>
+            this.endOfGameDialog(winnerNames),
+        );
         if (!this.gameService.getGameId()) {
             this.reconnectionService.reconnectGame();
         }
@@ -207,6 +217,33 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
 
+    private endOfGameDialog(winnerNames: string[]): void {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: DIALOG_END_OF_GAME_TITLE(this.isLocalPlayerWinner(winnerNames)),
+                content: DIALOG_END_OF_GAME_CONTENT(this.isLocalPlayerWinner(winnerNames)),
+                buttons: [
+                    {
+                        content: DIALOG_QUIT_BUTTON_CONFIRM,
+                        redirect: '/home',
+                        style: 'background-color: rgb(231, 231, 231)',
+                        // We haven't been able to test that the right function is called because this
+                        // arrow function creates a new instance of the function. We cannot spy on it.
+                        // It totally works tho, try it!
+                        action: () => this.handlePlayerLeaves(),
+                    },
+                    {
+                        content: DIALOG_END_OF_GAME_CLOSE_BUTTON,
+                        closeDialog: true,
+                        style: 'background-color: rgb(231, 231, 231)',
+                    },
+                ],
+            },
+        });
+
+        if (this.isLocalPlayerWinner(winnerNames)) this.throwConfettis();
+    }
+
     private isLocalPlayerTurn(): boolean {
         return this.gameService.isLocalPlayerPlaying();
     }
@@ -214,5 +251,19 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private handlePlayerLeaves(): void {
         this.mustDisconnectGameOnLeave = false;
         this.playerLeavesService.handleLocalPlayerLeavesGame();
+    }
+
+    private throwConfettis(): void {
+        /* We have not been able to cover this line in the tests because it is impossible to spyOn the confetti method
+        from the party-js package. This method is not exported from a class or a module, so jasmine does not offer a
+        way to spy on it. Aditionally, calling this method through in the tests would create some errors because the 
+        mat-dialog-container is not defined in the tests. */
+        party.confetti(document.querySelector('.mat-dialog-container') as DynamicSourceType, {
+            count: party.variation.range(MIN_CONFETTI_COUNT, MAX_CONFETTI_COUNT),
+        });
+    }
+
+    private isLocalPlayerWinner(winnerNames: string[]): boolean {
+        return winnerNames.includes(this.gameService.getLocalPlayer()?.name ?? '');
     }
 }

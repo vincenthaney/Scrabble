@@ -15,6 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActionData, ActionType, PlaceActionPayload } from '@app/classes/actions/action-data';
+import { Player } from '@app/classes/player';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -152,11 +153,57 @@ describe('GamePageComponent', () => {
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
-        // eslint-disable-next-line -- surrenderDialog is private and we need access for the test
         const spy = spyOn(component['dialog'], 'open');
         const surrenderButton = fixture.debugElement.nativeElement.querySelector('#surrender-dialog-button');
         surrenderButton.click();
         expect(spy).toHaveBeenCalled();
+    });
+
+    describe('endOfGame dialog', () => {
+        it('should open the EndOfGame dialog on endOfGame event', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component['gameViewEventManagerService'].emitGameViewEvent('endOfGame', ['Mathilde']);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should call confettis if local player is winner', () => {
+            spyOn<any>(component, 'isLocalPlayerWinner').and.returnValue(true);
+            const spy = spyOn<any>(component, 'throwConfettis').and.callFake(() => {
+                return;
+            });
+            component['endOfGameDialog'](['Mathilde']);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should not call confettis if local player is not winner', () => {
+            spyOn<any>(component, 'isLocalPlayerWinner').and.returnValue(false);
+            const spy = spyOn<any>(component, 'throwConfettis').and.callFake(() => {
+                return;
+            });
+            component['endOfGameDialog'](['Mathilde']);
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should call isLocalPlayerWinner 3 times', () => {
+            spyOn<any>(component, 'throwConfettis').and.callFake(() => {
+                return;
+            });
+            const spy = spyOn(component['gameService'], 'getLocalPlayer').and.returnValue({ name: 'Mathilde' } as unknown as Player);
+            component['endOfGameDialog'](['Mathilde']);
+            expect(spy).toHaveBeenCalledTimes(3);
+        });
+    });
+
+    describe('isLocalPlayerWinner', () => {
+        it('should return true if local player is winner', () => {
+            spyOn(component['gameService'], 'getLocalPlayer').and.returnValue({ name: 'Vincent' } as unknown as Player);
+            expect(component['isLocalPlayerWinner'](['Vincent'])).toBeTrue();
+        });
+
+        it('should return false if local player is not winner', () => {
+            spyOn(component['gameService'], 'getLocalPlayer').and.returnValue({ name: 'Vincent' } as unknown as Player);
+            expect(component['isLocalPlayerWinner'](['Jérôme'])).toBeFalse();
+        });
     });
 
     describe('keypress/keydown', () => {
