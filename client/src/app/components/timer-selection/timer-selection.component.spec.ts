@@ -36,7 +36,7 @@ describe('TimerSelectionComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [TimerSelectionComponent, TimerSelectionWrapperComponent, IconComponent],
-            imports: [MatInputModule, MatFormFieldModule,ReactiveFormsModule, MatCardModule, BrowserAnimationsModule],
+            imports: [MatInputModule, MatFormFieldModule, ReactiveFormsModule, MatCardModule, BrowserAnimationsModule],
         }).compileComponents();
     });
 
