@@ -68,7 +68,7 @@ export default class DictionarySavingService {
 
     updateDictionary(updateInfo: DictionaryUpdateInfo): DictionarySummary {
         if (updateInfo.title && this.dictionaryIndexes.entries.find((entry) => entry.title === updateInfo.title))
-            throw new HttpException(INVALID_TITLE_ALREADY_USED(updateInfo.title), StatusCodes.BAD_REQUEST);
+            throw new HttpException(INVALID_TITLE_ALREADY_USED(updateInfo.title), StatusCodes.FORBIDDEN);
 
         const [dictionaryEntry, dictionaryEntryIndex] = this.getEntryFromId(updateInfo.id, false);
 
