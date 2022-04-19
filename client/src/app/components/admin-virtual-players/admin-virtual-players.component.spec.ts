@@ -143,16 +143,9 @@ describe('AdminVirtualPlayersComponent', () => {
     });
 
     describe('ngOnInit', () => {
-        it('should call next', () => {
+        it('should call getAllVirtualPlayersProfile', () => {
             const spy = spyOn(virtualPlayerProfilesServiceMock, 'getAllVirtualPlayersProfile');
             component.ngOnInit();
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should call complete', () => {
-            spyOn(component['componentDestroyed$'], 'next');
-            const spy = spyOn(component['componentDestroyed$'], 'complete');
-            component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -199,16 +192,6 @@ describe('AdminVirtualPlayersComponent', () => {
         });
     });
 
-    describe('resetVirtualPlayers', () => {
-        it('should call virtualPlayerProfilesService.resetVirtualProfiles', () => {
-            const spy = spyOn(virtualPlayerProfilesServiceMock, 'resetVirtualPlayerProfiles').and.callFake(() => {
-                return;
-            });
-            component.resetVirtualPlayers();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('getDisplayedColumns', () => {
         it('should return array of keys', () => {
             component.columnsItems = [
@@ -236,19 +219,22 @@ describe('AdminVirtualPlayersComponent', () => {
 
     describe('initializeSubscriptions', () => {
         it('should call subscription methods', () => {
-            const spy1 = spyOn(virtualPlayerProfilesServiceMock, 'subscribeToVirtualPlayerProfilesUpdateEvent').and.callFake(() => {
+            const subscribeToVirtualPlayerProfilesUpdateEventSpy = spyOn(
+                virtualPlayerProfilesServiceMock,
+                'subscribeToVirtualPlayerProfilesUpdateEvent',
+            ).and.callFake(() => {
                 return;
             });
-            const spy2 = spyOn(virtualPlayerProfilesServiceMock, 'subscribeToRequestSentEvent').and.callFake(() => {
+            const subscribeToRequestSentEventSpy = spyOn(virtualPlayerProfilesServiceMock, 'subscribeToRequestSentEvent').and.callFake(() => {
                 return;
             });
-            const spy3 = spyOn(virtualPlayerProfilesServiceMock, 'subscribeToComponentUpdateEvent').and.callFake(() => {
+            const subscribeToComponentUpdateEventSpy = spyOn(virtualPlayerProfilesServiceMock, 'subscribeToComponentUpdateEvent').and.callFake(() => {
                 return;
             });
             component['initializeSubscriptions']();
-            expect(spy1).toHaveBeenCalled();
-            expect(spy2).toHaveBeenCalled();
-            expect(spy3).toHaveBeenCalled();
+            expect(subscribeToVirtualPlayerProfilesUpdateEventSpy).toHaveBeenCalled();
+            expect(subscribeToRequestSentEventSpy).toHaveBeenCalled();
+            expect(subscribeToComponentUpdateEventSpy).toHaveBeenCalled();
         });
     });
 
@@ -257,7 +243,7 @@ describe('AdminVirtualPlayersComponent', () => {
             expect(component['isFeedbackPositive'](PositiveFeedback.VirtualPlayerCreated)).toEqual(SUCCESS_SNACK_BAR_CONFIG);
         });
         it('should return ERROR_SNACK_BAR_CONFIG with negative response', () => {
-            expect(component['isFeedbackPositive']('nagivete feedback' as PositiveFeedback)).toEqual(ERROR_SNACK_BAR_CONFIG);
+            expect(component['isFeedbackPositive']('un ti feedback avec po dfautes' as PositiveFeedback)).toEqual(ERROR_SNACK_BAR_CONFIG);
         });
     });
 });
