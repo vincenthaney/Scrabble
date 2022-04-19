@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
 export default class SocketService extends ConnectionStateService {
     private socket: Socket;
 
-    initializeService() {
+    initializeService(): void {
         this.socket = this.getSocket();
         this.socket.on('connect', () => this.nextState(ConnectionState.Connected)).on('connect_error', () => this.nextState(ConnectionState.Error));
     }
