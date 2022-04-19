@@ -578,8 +578,15 @@ describe('BoardComponent', () => {
 
         it('should call nextEmpty with backward direction', () => {
             component['handleBackspace']();
-
             expect(nextEmptySpy).toHaveBeenCalledOnceWith(Direction.Backward, true);
+        });
+
+        it('should not call nextEmpty if the index is found', () => {
+            spyOn(component.notAppliedSquares, 'indexOf').and.returnValue(1);
+
+            component['handleBackspace']();
+
+            expect(nextEmptySpy).not.toHaveBeenCalled();
         });
 
         it('should set selectedSquare to nextSquare', () => {

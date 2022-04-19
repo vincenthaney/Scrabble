@@ -21,7 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { VirtualPlayerData } from '@app/classes/admin/virtual-player-profile';
+import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
@@ -31,6 +31,7 @@ import { PageHeaderComponent } from '@app/components/page-header/page-header.com
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
@@ -54,6 +55,7 @@ describe('GameCreationPageComponent', () => {
     let dictionaryServiceSpy: SpyObj<DictionaryService>;
     let gameDispatcherCreationSubject: Subject<HttpErrorResponse>;
     let dictionaryUpdateSubject: Subject<DictionarySummary[]>;
+    let updateObs: Subject<VirtualPlayerProfile[]>;
 
     const EMPTY_VALUE = '';
 
@@ -65,27 +67,14 @@ describe('GameCreationPageComponent', () => {
             'subscribeToVirtualPlayerProfilesUpdateEvent',
             'subscribeToComponentUpdateEvent',
             'subscribeToRequestSentEvent',
+            'virtualPlayersUpdateEvent',
         ]);
         virtualPlayerProfileSpy.getAllVirtualPlayersProfile.and.resolveTo();
-    });
+        updateObs = new Subject();
 
-    beforeEach(() => {
-        dictionaryServiceSpy = jasmine.createSpyObj('DictionaryService', [
-            'getDictionaries',
-            'updateAllDictionaries',
-            'subscribeToDictionariesUpdateDataEvent',
-        ]);
-        dictionaryServiceSpy.getDictionaries.and.callFake(() => [{ title: 'Test' } as DictionarySummary]);
-        dictionaryServiceSpy.updateAllDictionaries.and.callFake(async () => {});
-        dictionaryUpdateSubject = new Subject();
-        dictionaryServiceSpy.subscribeToDictionariesUpdateDataEvent.and.callFake(
-            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: DictionarySummary[]) => void) =>
-                dictionaryUpdateSubject.subscribe(callback),
+        virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: VirtualPlayerProfile[]) => void) => updateObs.subscribe(callback),
         );
-
-        gameDispatcherServiceSpy = jasmine.createSpyObj('GameDispatcherService', ['observeGameCreationFailed', 'handleCreateGame']);
-        gameDispatcherCreationSubject = new Subject();
-        gameDispatcherServiceSpy.observeGameCreationFailed.and.returnValue(gameDispatcherCreationSubject.asObservable());
     });
 
     beforeEach(() => {
@@ -181,10 +170,22 @@ describe('GameCreationPageComponent', () => {
         });
 
         it('should update dictionaryOptions when dictionary service updates list', () => {
+            const patchValueSpy: jasmine.Spy = spyOn<any>(component['gameParameters'], 'patchValue').and.callFake(() => {});
             dictionaryUpdateSubject.next();
             expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
             expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
+            expect(patchValueSpy).toHaveBeenCalled();
         });
+
+        it('should not update gameParameters if specified', () => {
+            const patchValueSpy: jasmine.Spy = spyOn<any>(component['gameParameters'], 'patchValue').and.callFake(() => {});
+            component['shouldSetToDefaultDictionary'] = false;
+            dictionaryUpdateSubject.next();
+            expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
+            expect(patchValueSpy).not.toHaveBeenCalled();
+            expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
+        });
+
         it('should patch dictionary value when dictionary service updates list', () => {
             const spy = spyOn(component.gameParameters, 'patchValue').and.callFake(() => {});
             dictionaryUpdateSubject.next();
@@ -229,6 +230,13 @@ describe('GameCreationPageComponent', () => {
             await component.ngOnInit();
             expect(virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent).toHaveBeenCalled();
         });
+
+        it('subscribeToVirtualPlayerProfilesUpdateEvent should call generateVirtualPlayerProfileMap', async () => {
+            const spy = spyOn<any>(component, 'generateVirtualPlayerProfileMap').and.callFake(() => {});
+            await component.ngOnInit();
+            updateObs.next([]);
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
     describe('ngOnDestroy', () => {
@@ -239,6 +247,23 @@ describe('GameCreationPageComponent', () => {
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
             expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('getDefaultTimerValue', () => {
+        it('should return the equivalent number', () => {
+            spyOn<any>(window['localStorage'], 'getItem').and.returnValue('1');
+            expect(component['getDefaultTimerValue']()).toEqual(1);
+        });
+
+        it('should return the default value if the stored information is invalid', () => {
+            spyOn<any>(window['localStorage'], 'getItem').and.returnValue('a');
+            expect(component['getDefaultTimerValue']()).toEqual(DEFAULT_TIMER_VALUE);
+        });
+
+        it('should return the default value if there is no stored information', () => {
+            spyOn<any>(window['localStorage'], 'getItem').and.returnValue(null);
+            expect(component['getDefaultTimerValue']()).toEqual(DEFAULT_TIMER_VALUE);
         });
     });
 

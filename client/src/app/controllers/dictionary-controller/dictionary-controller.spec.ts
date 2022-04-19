@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
@@ -7,7 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DictionaryData, DictionaryUpdateInfo } from '@app/classes/dictionary/dictionary-data';
 import { GameService } from '@app/services';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { DictionaryController } from './dictionary-controller';
 const TEST_DICTIONARY_UPDATE_INFO = {} as DictionaryUpdateInfo;
 const TEST_DICTIONARY_ID = 'testID';
@@ -51,72 +52,112 @@ describe('DictionariesController', () => {
     });
 
     describe('handleUpdateDictionary', () => {
-        it('handleUpdateDictionary should  make an HTTP patch request', async () => {
+        it('should  make an HTTP patch request', async () => {
             const httpPatchSpy = spyOn(controller['http'], 'patch').and.returnValue(of(true) as any);
-            controller.handleUpdateDictionary(TEST_DICTIONARY_UPDATE_INFO);
+            await controller.handleUpdateDictionary(TEST_DICTIONARY_UPDATE_INFO);
             expect(httpPatchSpy).toHaveBeenCalled();
+        });
+
+        it('should call dictionaryErrorEvent.next on an error', async () => {
+            spyOn(controller['http'], 'patch').and.callFake(() => {
+                return throwError({ error: { message: 'errormessage' } });
+            });
+            const dictionaryErrorEventSpy = spyOn(controller['dictionaryErrorEvent'], 'next');
+            await controller.handleUpdateDictionary(TEST_DICTIONARY_UPDATE_INFO);
+            expect(dictionaryErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleDownloadDictionary', () => {
-        it('handleDownloadDictionary should  make an HTTP get request', async () => {
+        it('should  make an HTTP get request', async () => {
             const httpGetSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
-            controller.handleDownloadDictionary(TEST_DICTIONARY_ID);
+            await controller.handleDownloadDictionary(TEST_DICTIONARY_ID);
             expect(httpGetSpy).toHaveBeenCalled();
+        });
+
+        it('should call dictionaryErrorEvent.next on an error', async () => {
+            spyOn(controller['http'], 'get').and.callFake(() => {
+                return throwError({ error: { message: 'errormessage' } });
+            });
+            const dictionaryErrorEventSpy = spyOn(controller['dictionaryErrorEvent'], 'next');
+            await controller.handleDownloadDictionary(TEST_DICTIONARY_ID);
+            expect(dictionaryErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleDeleteDictionary', () => {
-        it('handleDeleteDictionary should  make an HTTP delete request', async () => {
+        it('should  make an HTTP delete request', async () => {
             spyOn(HttpParams.prototype, 'append').and.returnValue({} as HttpParams);
             const httpDeleteSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
             await controller.handleDeleteDictionary(TEST_DICTIONARY_ID);
             expect(httpDeleteSpy).toHaveBeenCalled();
         });
 
-        it('handleDeleteDictionary should  call HTTPParams.append', async () => {
+        it('should  call HTTPParams.append', async () => {
             spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
             const httpAppendSpy = spyOn(HttpParams.prototype, 'append').and.returnValue({} as HttpParams);
-            controller.handleDeleteDictionary(TEST_DICTIONARY_ID);
+            await controller.handleDeleteDictionary(TEST_DICTIONARY_ID);
             expect(httpAppendSpy).toHaveBeenCalled();
+        });
+
+        it('should call dictionaryErrorEvent.next on an error', async () => {
+            spyOn(controller['http'], 'delete').and.callFake(() => {
+                return throwError({ error: { message: 'errormessage' } });
+            });
+            const dictionaryErrorEventSpy = spyOn(controller['dictionaryErrorEvent'], 'next');
+            await controller.handleDeleteDictionary(TEST_DICTIONARY_ID);
+            expect(dictionaryErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleUploadDictionary', () => {
         it('handleUploadDictionary should  make an HTTP post request', async () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
-            controller.handleUploadDictionary(TEST_DICTIONARY_DATA);
+            await controller.handleUploadDictionary(TEST_DICTIONARY_DATA);
             expect(httpPostSpy).toHaveBeenCalled();
+        });
+
+        it('should call dictionaryErrorEvent.next on an error', async () => {
+            spyOn(controller['http'], 'post').and.callFake(() => {
+                return throwError({ error: { message: 'errormessage' } });
+            });
+            const dictionaryErrorEventSpy = spyOn(controller['dictionaryErrorEvent'], 'next');
+            await controller.handleUploadDictionary(TEST_DICTIONARY_DATA);
+            expect(dictionaryErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleGetAllDictionariesEvent', () => {
         it('handleGetAllDictionariesEvent should  make an HTTP get request', async () => {
             const httpGetSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
-            controller.handleGetAllDictionariesEvent();
+            await controller.handleGetAllDictionariesEvent();
             expect(httpGetSpy).toHaveBeenCalled();
+        });
+
+        it('should call dictionaryErrorEvent.next on an error', async () => {
+            spyOn(controller['http'], 'get').and.callFake(() => {
+                return throwError({ error: { message: 'errormessage' } });
+            });
+            const dictionaryErrorEventSpy = spyOn(controller['dictionaryErrorEvent'], 'next');
+            await controller.handleGetAllDictionariesEvent();
+            expect(dictionaryErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleResetDictionaries', () => {
         it('handleResetDictionaries should  make an HTTP delete request', async () => {
             const httpDeleteSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
-            controller.handleResetDictionaries();
+            await controller.handleResetDictionaries();
             expect(httpDeleteSpy).toHaveBeenCalled();
         });
 
-        // it('handleDeleteAllDictionaries should call dictionariesErrorEvent when receiving an error response ', async () => {
-        //     const endpoint = `${environment.serverUrl}/dictionaries/reset`;
-        //     const expected = {
-        //         code: 'validationFailed',
-        //         message: 'Invalid input',
-        //     };
-        //     httpMock.expectOne(endpoint).flush(expected, { status: 400, statusText: 'Bad Request' });
-        //     const spyErrorEvent = spyOn(controller['dictionariesErrorEvent'], 'next').and.callFake(() => {
-        //         return;
-        //     });
-        //     controller.handleDeleteAllDictionaries();
-        //     expect(spyErrorEvent).toHaveBeenCalled();
-        // });
+        it('should call dictionaryErrorEvent.next on an error', async () => {
+            spyOn(controller['http'], 'delete').and.callFake(() => {
+                return throwError({ error: { message: 'errormessage' } });
+            });
+            const dictionaryErrorEventSpy = spyOn(controller['dictionaryErrorEvent'], 'next').and.callFake(() => {});
+            await controller.handleResetDictionaries();
+            expect(dictionaryErrorEventSpy).toHaveBeenCalled();
+        });
     });
 });

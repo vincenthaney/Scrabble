@@ -16,9 +16,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UpdateVirtualPlayerComponent } from './update-virtual-player-dialog.component';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { UpdateVirtualPlayerDialogParameters } from './update-virtual-player.component.types';
+import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 
 const VIRTUAL_PLAYER_NAME = 'steve';
 export class MatDialogMock {
@@ -42,11 +43,12 @@ describe('UpdateDictionaryComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [UpdateVirtualPlayerComponent, IconComponent, PageHeaderComponent],
+            declarations: [UpdateVirtualPlayerComponent, IconComponent, PageHeaderComponent, NameFieldComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
                 MatFormFieldModule,
+                ReactiveFormsModule,
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,

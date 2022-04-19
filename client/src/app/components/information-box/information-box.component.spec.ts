@@ -378,6 +378,16 @@ describe('InformationBoxComponent', () => {
         expect(typeof timerEl).toEqual(typeof timer(0, SECONDS_TO_MILLISECONDS));
     });
 
+    it('isTimerRunning should return true if it is running', () => {
+        component['timerSubscription'] = { closed: false } as unknown as Subscription;
+        expect(component.isTimerRunning()).toBeTrue();
+    });
+
+    it('isTimerRunning should return false if it is not running', () => {
+        component['timerSubscription'] = { closed: true } as unknown as Subscription;
+        expect(component.isTimerRunning()).toBeFalse();
+    });
+
     it('checkIfIsPlayer1 should return true if player1 is localPlayer', () => {
         gameServiceSpy.getPlayerByNumber.and.returnValue(DEFAULT_PLAYER);
         gameServiceSpy.getLocalPlayer.and.returnValue(DEFAULT_PLAYER);

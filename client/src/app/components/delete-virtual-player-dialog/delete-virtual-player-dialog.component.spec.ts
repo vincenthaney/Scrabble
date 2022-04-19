@@ -18,6 +18,7 @@ import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profi
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { DeleteVirtualPlayerDialogParameters } from '@app/components/admin-virtual-players/admin-virtual-players.types';
 import { DeleteVirtualPlayerDialogComponent } from './delete-virtual-player-dialog.component';
+import { ReactiveFormsModule } from '@angular/forms';
 export class MatDialogMock {
     close() {
         return {
@@ -47,6 +48,7 @@ describe('DeleteVirtualPlayerDialogComponent', () => {
                 AppMaterialModule,
                 HttpClientModule,
                 MatFormFieldModule,
+                ReactiveFormsModule,
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,

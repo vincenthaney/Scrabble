@@ -107,8 +107,10 @@ export class DictionaryService {
     private startDownload(dictionaryData: DictionaryData): void {
         const title = dictionaryData.title + '.json';
         const downloadProcess = window.document.createElement(DOWNLOAD_ELEMENT);
+
         downloadProcess.href = window.URL.createObjectURL(new Blob([JSON.stringify(dictionaryData)], { type: 'application/json' }));
         downloadProcess.download = title;
+
         document.body.appendChild(downloadProcess);
         downloadProcess.click();
         document.body.removeChild(downloadProcess);
