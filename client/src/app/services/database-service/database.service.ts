@@ -2,9 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
 import ConnectionStateService from '@app/classes/connection-state-service/connection-state-service';
-import { environment } from 'src/environments/environment';
-
-export const ENDPOINT = `${environment.serverUrl}/database/is-connected`;
+import { DB_CONNECTED_ENDPOINT } from '@app/constants/services-errors';
 
 @Injectable({
     providedIn: 'root',
@@ -15,7 +13,7 @@ export class DatabaseService extends ConnectionStateService {
     }
 
     checkDatabase() {
-        this.http.get(ENDPOINT).subscribe(
+        this.http.get(DB_CONNECTED_ENDPOINT).subscribe(
             () => this.nextState(ConnectionState.Connected),
             () => this.nextState(ConnectionState.Error),
         );

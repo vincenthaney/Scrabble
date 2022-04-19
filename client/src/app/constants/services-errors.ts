@@ -1,4 +1,5 @@
 import { Message } from '@app/classes/communication/message';
+import { environment } from 'src/environments/environment';
 import { SYSTEM_ID } from './game';
 
 export const MISSING_PLAYER_DATA_TO_INITIALIZE = 'Certaines informations sont manquantes pour créer le joueur';
@@ -21,3 +22,5 @@ export const WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE = (gameId: string): Message =
         gameId,
     };
 };
+
+export const DB_CONNECTED_ENDPOINT = `${environment.serverUrl}/database/is-connected`;

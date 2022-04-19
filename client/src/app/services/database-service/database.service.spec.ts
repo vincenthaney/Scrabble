@@ -3,8 +3,9 @@ import { HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
+import { DB_CONNECTED_ENDPOINT } from '@app/constants/services-errors';
 
-import { DatabaseService, ENDPOINT } from './database.service';
+import { DatabaseService } from './database.service';
 
 describe('DatabaseService', () => {
     let service: DatabaseService;
@@ -28,7 +29,7 @@ describe('DatabaseService', () => {
 
             service.checkDatabase();
 
-            http.expectOne(ENDPOINT).flush({ status: HttpStatusCode.NoContent });
+            http.expectOne(DB_CONNECTED_ENDPOINT).flush({ status: HttpStatusCode.NoContent });
             expect(spy).toHaveBeenCalledOnceWith(ConnectionState.Connected);
         });
 
@@ -37,7 +38,7 @@ describe('DatabaseService', () => {
 
             service.checkDatabase();
 
-            http.expectOne(ENDPOINT).error(new ErrorEvent(''));
+            http.expectOne(DB_CONNECTED_ENDPOINT).error(new ErrorEvent(''));
             expect(spy).toHaveBeenCalledOnceWith(ConnectionState.Error);
         });
     });
