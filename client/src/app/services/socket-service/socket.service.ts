@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import ConnectionStateService, { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
+import ConnectionStateService from '@app/classes/connection-state-service/connection-state-service';
 import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';

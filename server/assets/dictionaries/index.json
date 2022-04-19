@@ -1,11 +1,1 @@
-{
-    "entries": [
-        {
-            "title": "Français",
-            "description": "Dictionaire de la langue française",
-            "id": "02bb3411-315c-4d20-acc3-5ad97a52fd48",
-            "isDefault": true,
-            "filename": "dictionary.json"
-        }
-    ]
-}
+{"entries":[{"title":"Français","description":"Dictionaire de la langue française","id":"02bb3411-315c-4d20-acc3-5ad97a52fd48","isDefault":true,"filename":"dictionary.json"},{"title":"Anglais","description":"Dictionaire de la langue anglaise","id":"fd10a4c6-c1c1-4d8e-a00b-93217549959d","filename":"Anglais-fd10a4c6-c1c1-4d8e-a00b-93217549959d.json","isDefault":false}]}

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
-import { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { SocketService } from '@app/services/';

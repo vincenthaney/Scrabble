@@ -1,11 +1,6 @@
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-export enum ConnectionState {
-    Loading = 'Loading',
-    Connected = 'Connected',
-    Error = 'Error',
-}
+import { ConnectionState } from './connection-state';
 
 export default abstract class ConnectionStateService {
     private state$: BehaviorSubject<ConnectionState> = new BehaviorSubject<ConnectionState>(ConnectionState.Loading);

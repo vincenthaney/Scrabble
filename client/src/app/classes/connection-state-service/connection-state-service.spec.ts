@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 import { Observable } from 'rxjs';
-import ConnectionStateService, { ConnectionState } from './connection-state-service';
+import { ConnectionState } from './connection-state';
+import ConnectionStateService from './connection-state-service';
 
 class TestClass extends ConnectionStateService {}
 

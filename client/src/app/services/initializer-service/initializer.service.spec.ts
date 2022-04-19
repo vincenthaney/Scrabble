@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import SocketService from '@app/services/socket-service/socket.service';
 import { Socket } from 'socket.io-client';

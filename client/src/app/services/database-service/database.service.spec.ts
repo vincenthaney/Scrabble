@@ -2,7 +2,7 @@
 import { HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
 
 import { DatabaseService, ENDPOINT } from './database.service';
 

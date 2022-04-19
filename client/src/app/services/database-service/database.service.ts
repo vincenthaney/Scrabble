@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import ConnectionStateService, { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
+import ConnectionStateService from '@app/classes/connection-state-service/connection-state-service';
 import { environment } from 'src/environments/environment';
 
 export const ENDPOINT = `${environment.serverUrl}/database/connected`;

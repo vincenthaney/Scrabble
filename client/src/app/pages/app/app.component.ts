@@ -8,7 +8,7 @@ import { Subject } from 'rxjs';
     styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnDestroy {
-    states = InitializeState;
+    states: typeof InitializeState = InitializeState;
     state: InitializeState = InitializeState.Loading;
     private componentDestroyed$: Subject<boolean> = new Subject();
 

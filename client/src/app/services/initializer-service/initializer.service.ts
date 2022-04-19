@@ -1,9 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
 import SocketService from '@app/services/socket-service/socket.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DatabaseService } from '@app/services/database-service/database.service';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
 
 export enum InitializeState {
     Loading = "Chargement de l'application",
