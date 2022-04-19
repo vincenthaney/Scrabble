@@ -6,6 +6,10 @@
                 <app-icon icon="hourglass-half" size="sm"></app-icon> {{ roundTime.minutes }}:{{ roundTime.getTimerSecondsPadded() }}
             </div>
             <div class="chip"><app-icon icon="gamepad"></app-icon> {{ lobby.gameType }}</div>
+            <div class="chip">
+                <app-icon icon="book"></app-icon>
+                {{ lobby.dictionary.title }}
+            </div>
         </div>
     </div>
     <div
