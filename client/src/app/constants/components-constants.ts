@@ -60,7 +60,8 @@ export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
 ];
 
 export const YOU_COMPLETED_THIS_OBJECTIVE = 'Vous avez complété cet objectif!';
-export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété cet objectif avant vous';
+export const OPPONENT_COMPLETED_THIS_OBJECTIVE = (isPublic: boolean) =>
+    isPublic ? 'Votre adversaire a complété cet objectif avant vous' : 'Votre adversaire a complété cet objectif';
 
 export const PERCENT = 100;
 
