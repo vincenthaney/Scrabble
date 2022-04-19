@@ -2,40 +2,56 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable dot-notation */
 import { TestBed } from '@angular/core/testing';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state-service';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { SocketService } from '@app/services/';
-import { Socket } from 'socket.io-client';
+
 describe('SocketService', () => {
     let service: SocketService;
+    let socket: SocketTestHelper;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(SocketService);
-        service['socket'] = new SocketTestHelper() as unknown as Socket;
+
+        socket = new SocketTestHelper();
+
+        spyOn<any>(service, 'getSocket').and.returnValue(socket);
+        service['socket'] = service['getSocket']();
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should call connect on initializeService', () => {
-        const spy = spyOn<any>(service, 'connect');
-        service.initializeService();
-        expect(spy).toHaveBeenCalled();
-    });
+    describe('initializeService', () => {
+        let nextStateSpy: jasmine.Spy;
 
-    it('should throw on initializeService error', async () => {
-        const error = 'error';
-        spyOn<any>(service, 'connect').and.throwError(error);
-        await expectAsync(service.initializeService()).toBeRejectedWithError(error);
-    });
+        beforeEach(() => {
+            nextStateSpy = spyOn<any>(service, 'nextState');
+        });
 
-    describe('connect', () => {
-        it('should set socket on connect', () => {
-            (service['socket'] as unknown) = undefined;
-            service['connect']();
-            expect(service['socket']).toBeTruthy();
+        it('should call nextState with connected on connect', (done) => {
+            service.initializeService();
+
+            socket.on('connect', () => {
+                expect(nextStateSpy).toHaveBeenCalledOnceWith(ConnectionState.Connected);
+                done();
+            });
+
+            socket.peerSideEmit('connect');
+        });
+
+        it('should call nextState with Error on connect_error', (done) => {
+            service.initializeService();
+
+            socket.on('connect_error', () => {
+                expect(nextStateSpy).toHaveBeenCalledOnceWith(ConnectionState.Error);
+                done();
+            });
+
+            socket.peerSideEmit('connect_error');
         });
     });
 
