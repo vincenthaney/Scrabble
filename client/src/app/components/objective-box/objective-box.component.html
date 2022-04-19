@@ -4,7 +4,8 @@
         <app-objective [objective]="objective"></app-objective>
     </div>
 
-    <p class="title"><app-icon icon="lock"></app-icon> Objectif privé</p>
+    <p *ngIf="objectiveManager.getPrivateObjectives().length <= 1" class="title"><app-icon icon="lock"></app-icon> Objectif privé</p>
+    <p *ngIf="objectiveManager.getPrivateObjectives().length > 1" class="title"><app-icon icon="lock"></app-icon> Objectifs privés</p>
     <div *ngFor="let objective of objectiveManager.getPrivateObjectives()">
         <app-objective [objective]="objective"></app-objective>
     </div>
