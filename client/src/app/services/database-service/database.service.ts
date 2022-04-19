@@ -12,7 +12,7 @@ export class DatabaseService extends ConnectionStateService {
         super();
     }
 
-    checkDatabase() {
+    checkDatabase(): void {
         this.http.get(DB_CONNECTED_ENDPOINT).subscribe(
             () => this.nextState(ConnectionState.Connected),
             () => this.nextState(ConnectionState.Error),

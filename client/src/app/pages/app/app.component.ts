@@ -22,7 +22,7 @@ export class AppComponent implements OnDestroy {
         this.componentDestroyed$.complete();
     }
 
-    handleNewState(state: InitializeState) {
+    handleNewState(state: InitializeState): void {
         this.state = state;
     }
 }
