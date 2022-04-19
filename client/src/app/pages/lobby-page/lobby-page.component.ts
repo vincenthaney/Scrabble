@@ -50,7 +50,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.gameDispatcherService.subscribeToCanceledGameEvent(this.componentDestroyed$, () => this.lobbyCanceledDialog());
         this.gameDispatcherService.handleLobbyListRequest();
 
-        this.filterFormGroup.get('gameType')?.valueChanges.subscribe(() => this.updateAllLobiesAttributes());
+        this.filterFormGroup.get('gameType')?.valueChanges.subscribe(() => this.updateAllLobbiesAttributes());
     }
 
     ngOnDestroy(): void {
@@ -86,7 +86,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.numberOfLobbiesMeetingFilter = 0;
         this.setFormAvailability(this.playerNameValid);
 
-        this.updateAllLobiesAttributes();
+        this.updateAllLobbiesAttributes();
     }
 
     private setFormAvailability(isNameValid: boolean): void {
@@ -138,7 +138,8 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         return filteredLobbies[Math.floor(Math.random() * filteredLobbies.length)];
     }
 
-    private updateAllLobiesAttributes(): void {
+    private updateAllLobbiesAttributes(): void {
+        this.numberOfLobbiesMeetingFilter = 0;
         for (const lobby of this.lobbies) {
             this.updateLobbyAttributes(lobby);
             if (lobby.meetFilters) this.numberOfLobbiesMeetingFilter++;

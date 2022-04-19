@@ -154,10 +154,12 @@ describe('LobbyPageComponent', () => {
     });
 
     describe('validateName', () => {
-        let updateAllLobiesSpy: jasmine.Spy;
+        let updateAllLobbiesSpy: jasmine.Spy;
 
         beforeEach(() => {
             validateNameSpy.and.callThrough();
+            updateAllLobbiesSpy = spyOn<any>(component, 'updateAllLobbiesAttributes');
+            updateAllLobbiesSpy.and.callThrough();
         });
 
         it('should update canJoin attribute of the lobbies (use #1)', () => {
@@ -171,9 +173,7 @@ describe('LobbyPageComponent', () => {
 
         it('should increment numberOfLobbiesMeetingFilter correctly', () => {
             component.filterFormGroup.setValue(CLASSIC_FILTER_VALUES);
-
-            component.playerName = 'differentName';
-            component.playerNameValid = true;
+            component.numberOfLobbiesMeetingFilter = 0;
             component['validateName']();
             expect(component.numberOfLobbiesMeetingFilter).toEqual(2);
         });
@@ -195,9 +195,9 @@ describe('LobbyPageComponent', () => {
             expect(setFormAvailabilitySpy).toHaveBeenCalled();
         });
 
-        it('should call updateAllLobiesAttributes', () => {
-            component['updateLobbies']([]);
-            expect(updateAllLobiesSpy).toHaveBeenCalled();
+        it('should call updateAllLobbiesAttributes', () => {
+            component['validateName']();
+            expect(updateAllLobbiesSpy).toHaveBeenCalled();
         });
     });
 
@@ -315,9 +315,9 @@ describe('LobbyPageComponent', () => {
         });
     });
 
-    describe('updateAllLobiesAttributes', () => {
+    describe('updateAllLobbiesAttributes', () => {
         it('should be called when gameType changes', () => {
-            const spy = spyOn<any>(component, 'updateAllLobiesAttributes').and.callFake(() => {});
+            const spy = spyOn<any>(component, 'updateAllLobbiesAttributes').and.callFake(() => {});
             component.filterFormGroup.patchValue({ gameType: 'LOG2990' });
             expect(spy).toHaveBeenCalled();
         });
@@ -325,7 +325,7 @@ describe('LobbyPageComponent', () => {
         it('should update canJoin attribute of the lobbies (use #1)', () => {
             component.playerName = 'differentName';
             component.playerNameValid = true;
-            component['updateAllLobiesAttributes']();
+            component['updateAllLobbiesAttributes']();
             for (const lobby of component.lobbies) {
                 expect(lobby.canJoin).toBeTrue();
             }
@@ -335,7 +335,7 @@ describe('LobbyPageComponent', () => {
             component.playerName = 'Name1';
             component.playerNameValid = true;
             const expected = [false, true, true];
-            component['updateAllLobiesAttributes']();
+            component['updateAllLobbiesAttributes']();
             expect(component.lobbies).toBeTruthy();
             for (let i = 0; i++; i < component.lobbies.length) {
                 expect(component.lobbies[i].canJoin).toEqual(expected[i]);
