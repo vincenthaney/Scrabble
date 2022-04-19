@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -29,6 +28,7 @@ import {
     UpdateVirtualPlayersDialogParameters,
     VirtualPlayersComponentState,
 } from './admin-virtual-players.types';
+import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
 @Component({
     selector: 'app-admin-virtual-players',
@@ -36,13 +36,14 @@ import {
     styleUrls: ['./admin-virtual-players.component.scss'],
 })
 export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDestroy {
-    @ViewChild(MatSort) sort: MatSort;
-    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort) sortBeginner: MatSort;
+    @ViewChild(MatSort) sortExpert: MatSort;
     columns: DisplayVirtualPlayersColumns;
     columnsItems: DisplayVirtualPlayersColumnsIteratorItem[];
     columnsControl: FormControl;
     virtualPlayers: VirtualPlayerProfile[];
-    dataSource: MatTableDataSource<VirtualPlayerProfile>;
+    dataSourceBeginner: MatTableDataSource<VirtualPlayerProfile>;
+    dataSourceExpert: MatTableDataSource<VirtualPlayerProfile>;
     state: VirtualPlayersComponentState;
     error: string | undefined;
     isWaitingForServerResponse: boolean;
@@ -51,7 +52,8 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
         this.componentDestroyed$ = new Subject();
         this.columns = VIRTUAL_PLAYERS_COLUMNS;
         this.columnsItems = this.getColumnIterator();
-        this.dataSource = new MatTableDataSource(new Array());
+        this.dataSourceBeginner = new MatTableDataSource(new Array());
+        this.dataSourceExpert = new MatTableDataSource(new Array());
         this.state = VirtualPlayersComponentState.Loading;
         this.error = undefined;
 
@@ -68,9 +70,10 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     }
 
     ngAfterViewInit(): void {
-        this.sort.sort({ id: 'level', start: ASCENDING_COLUMN_SORTER } as MatSortable);
-        this.dataSource.sort = this.sort;
-        this.dataSource.paginator = this.paginator;
+        this.sortBeginner.sort({ id: 'name', start: ASCENDING_COLUMN_SORTER } as MatSortable);
+        this.sortExpert.sort({ id: 'name', start: ASCENDING_COLUMN_SORTER } as MatSortable);
+        this.dataSourceBeginner.sort = this.sortBeginner;
+        this.dataSourceExpert.sort = this.sortExpert;
     }
 
     updateVirtualPlayer(virtualPlayerProfile: VirtualPlayerProfile): void {
@@ -106,8 +109,8 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
         });
     }
 
-    async resetVirtualPlayers(): Promise<void> {
-        await this.virtualPlayerProfilesService.resetVirtualPlayerProfiles();
+    resetVirtualPlayers(): void {
+        this.virtualPlayerProfilesService.resetVirtualPlayerProfiles();
     }
 
     getColumnIterator(): DisplayVirtualPlayersColumnsIteratorItem[] {
@@ -122,7 +125,12 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     }
 
     private convertVirtualPlayerProfilesToMatDataSource(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
-        this.dataSource.data = virtualPlayerProfiles;
+        this.dataSourceBeginner.data = virtualPlayerProfiles.filter((profile) => {
+            return profile.level === VirtualPlayerLevel.Beginner;
+        });
+        this.dataSourceExpert.data = virtualPlayerProfiles.filter((profile) => {
+            return profile.level === VirtualPlayerLevel.Expert;
+        });
     }
 
     private initializeSubscriptions(): void {
