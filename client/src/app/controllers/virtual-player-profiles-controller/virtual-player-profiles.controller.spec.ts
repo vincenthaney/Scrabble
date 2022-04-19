@@ -50,88 +50,88 @@ describe('VirtualPlayerProfilesController', () => {
     });
 
     describe('handleGetAllVirtualPlayerProfilesEvent', () => {
-        it('should  make an HTTP get request', async () => {
+        it('should  make an HTTP get request', () => {
             const httpGetSpy = spyOn(controller['http'], 'get').and.returnValue(of(true) as any);
-            await controller.handleGetAllVirtualPlayerProfilesEvent();
+            controller.handleGetAllVirtualPlayerProfilesEvent();
             expect(httpGetSpy).toHaveBeenCalled();
         });
 
-        it('should call virtualPlayerErrorEvent.next on an error', async () => {
+        it('should call virtualPlayerErrorEvent.next on an error', () => {
             spyOn(controller['http'], 'get').and.callFake(() => {
                 return throwError({ error: { message: 'errormessage' } });
             });
             const virtualPlayerErrorEventSpy = spyOn(controller['virtualPlayerErrorEvent'], 'next').and.callFake(() => {});
-            await controller.handleGetAllVirtualPlayerProfilesEvent();
+            controller.handleGetAllVirtualPlayerProfilesEvent();
             expect(virtualPlayerErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleCreateVirtualPlayerProfileEvent', () => {
-        it('should  make an HTTP post request', async () => {
+        it('should  make an HTTP post request', () => {
             const httpPostSpy = spyOn(controller['http'], 'post').and.returnValue(of(true) as any);
-            await controller.handleCreateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
+            controller.handleCreateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
             expect(httpPostSpy).toHaveBeenCalled();
         });
 
-        it('should call virtualPlayerErrorEvent.next on an error', async () => {
+        it('should call virtualPlayerErrorEvent.next on an error', () => {
             spyOn(controller['http'], 'post').and.callFake(() => {
                 return throwError({ error: { message: 'errormessage' } });
             });
             const virtualPlayerErrorEventSpy = spyOn(controller['virtualPlayerErrorEvent'], 'next').and.callFake(() => {});
-            await controller.handleCreateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
+            controller.handleCreateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
             expect(virtualPlayerErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleUpdateVirtualPlayerProfileEvent', () => {
-        it('handleUpdateVirtualPlayerProfileEvent should  make an HTTP patch request', async () => {
+        it('handleUpdateVirtualPlayerProfileEvent should  make an HTTP patch request', () => {
             spyOn(HttpParams.prototype, 'append').and.returnValue({} as HttpParams);
             const httpPatchSpy = spyOn(controller['http'], 'patch').and.returnValue(of(true) as any);
-            await controller.handleUpdateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
+            controller.handleUpdateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
             expect(httpPatchSpy).toHaveBeenCalled();
         });
 
-        it('should call virtualPlayerErrorEvent.next on an error', async () => {
+        it('should call virtualPlayerErrorEvent.next on an error', () => {
             spyOn(HttpParams.prototype, 'append').and.returnValue({} as HttpParams);
             spyOn(controller['http'], 'patch').and.callFake(() => {
                 return throwError({ error: { message: 'errormessage' } });
             });
             const virtualPlayerErrorEventSpy = spyOn(controller['virtualPlayerErrorEvent'], 'next').and.callFake(() => {});
-            await controller.handleUpdateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
+            controller.handleUpdateVirtualPlayerProfileEvent(TEST_VIRTUAL_PLAYER_DATA);
             expect(virtualPlayerErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleDeleteVirtualPlayerProfileEvent', () => {
-        it('handleDeleteVirtualPlayerProfileEvent should  make an HTTP delete request', async () => {
+        it('handleDeleteVirtualPlayerProfileEvent should  make an HTTP delete request', () => {
             const httpDeleteSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
-            await controller.handleDeleteVirtualPlayerProfileEvent(TEST_ID);
+            controller.handleDeleteVirtualPlayerProfileEvent(TEST_ID);
             expect(httpDeleteSpy).toHaveBeenCalled();
         });
 
-        it('should call virtualPlayerErrorEvent.next on an error', async () => {
+        it('should call virtualPlayerErrorEvent.next on an error', () => {
             spyOn(controller['http'], 'delete').and.callFake(() => {
                 return throwError({ error: { message: 'errormessage' } });
             });
             const virtualPlayerErrorEventSpy = spyOn(controller['virtualPlayerErrorEvent'], 'next').and.callFake(() => {});
-            await controller.handleDeleteVirtualPlayerProfileEvent(TEST_ID);
+            controller.handleDeleteVirtualPlayerProfileEvent(TEST_ID);
             expect(virtualPlayerErrorEventSpy).toHaveBeenCalled();
         });
     });
 
     describe('handleResetVirtualPlayerProfilesEvent', () => {
-        it('handleResetVirtualPlayerProfilesEvent should  make an HTTP delete request', async () => {
+        it('handleResetVirtualPlayerProfilesEvent should  make an HTTP delete request', () => {
             const httpDeleteSpy = spyOn(controller['http'], 'delete').and.returnValue(of(true) as any);
-            await controller.handleResetVirtualPlayerProfilesEvent();
+            controller.handleResetVirtualPlayerProfilesEvent();
             expect(httpDeleteSpy).toHaveBeenCalled();
         });
 
-        it('should call virtualPlayerErrorEvent.next on an error', async () => {
+        it('should call virtualPlayerErrorEvent.next on an error', () => {
             spyOn(controller['http'], 'delete').and.callFake(() => {
                 return throwError({ error: { message: 'errormessage' } });
             });
             const virtualPlayerErrorEventSpy = spyOn(controller['virtualPlayerErrorEvent'], 'next').and.callFake(() => {});
-            await controller.handleResetVirtualPlayerProfilesEvent();
+            controller.handleResetVirtualPlayerProfilesEvent();
             expect(virtualPlayerErrorEventSpy).toHaveBeenCalled();
         });
     });
