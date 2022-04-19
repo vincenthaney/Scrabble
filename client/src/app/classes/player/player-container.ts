@@ -1,11 +1,10 @@
 import { PlayerData } from '@app/classes/communication';
 import { PLAYER_1_INDEX } from '@app/constants/game-constants';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
-import AbstractPlayer from './player';
 import Player from './player';
 
 export class PlayerContainer {
-    private players: Map<number, AbstractPlayer>;
+    private players: Map<number, Player>;
     private readonly localPlayerId: string;
 
     constructor(localPlayerId: string) {
@@ -17,7 +16,7 @@ export class PlayerContainer {
         return this.localPlayerId;
     }
 
-    getLocalPlayer(): AbstractPlayer | undefined {
+    getLocalPlayer(): Player | undefined {
         if (!this.getLocalPlayerId()) return undefined;
         const filteredPlayers = [...this.players.values()].filter((p) => p.id === this.getLocalPlayerId());
 
@@ -36,13 +35,13 @@ export class PlayerContainer {
         return this;
     }
 
-    getPlayer(playerNumber: number): AbstractPlayer {
-        const player: AbstractPlayer | undefined = this.players.get(playerNumber);
+    getPlayer(playerNumber: number): Player {
+        const player: Player | undefined = this.players.get(playerNumber);
         if (!player) throw new Error(PLAYER_NUMBER_INVALID(playerNumber));
         return player;
     }
 
-    setPlayer(playerNumber: number, player: AbstractPlayer): this {
+    setPlayer(playerNumber: number, player: Player): this {
         this.players.set(playerNumber, player);
         return this;
     }
@@ -60,8 +59,8 @@ export class PlayerContainer {
     updatePlayersData(...playersData: PlayerData[]): this {
         playersData.forEach((playerData: PlayerData) => {
             [...this.players.values()]
-                .filter((player: AbstractPlayer) => player.id === playerData.id)
-                .forEach((player: AbstractPlayer) => player.updatePlayerData(playerData));
+                .filter((player: Player) => player.id === playerData.id)
+                .forEach((player: Player) => player.updatePlayerData(playerData));
         });
         return this;
     }

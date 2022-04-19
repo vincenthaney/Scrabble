@@ -38,7 +38,7 @@ describe('Player', () => {
         },
     ];
 
-    it('Creating AbstractPlayer should initialize attributes', () => {
+    it('Creating Player should initialize attributes', () => {
         const id = 'testId';
         const name = 'testName';
         const tiles: Tile[] = [{ letter: 'A', value: 10 }];
@@ -48,7 +48,7 @@ describe('Player', () => {
         expect(player['tiles']).toEqual(tiles);
     });
 
-    it('Creating AbstractPlayer should not set tiles attribute to same reference', () => {
+    it('Creating Player should not set tiles attribute to same reference', () => {
         const id = 'testId';
         const name = 'testName';
         const tiles: Tile[] = [

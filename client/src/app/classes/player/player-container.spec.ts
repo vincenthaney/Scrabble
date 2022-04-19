@@ -3,7 +3,7 @@
 import { PlayerData } from '@app/classes/communication/';
 import { DEFAULT_PLAYER } from '@app/constants/game-constants';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
-import { AbstractPlayer, Player } from '.';
+import { Player } from '.';
 import { PlayerContainer } from './player-container';
 
 describe('PlayerContainer', () => {
@@ -11,11 +11,11 @@ describe('PlayerContainer', () => {
 
     const DEFAULT_LOCAL_PLAYER_ID = '1';
     const DEFAULT_PLAYER_NUMBER = 1;
-    const testPlayers: AbstractPlayer[] = [new Player('1', 'player1', []), new Player('2', 'player2', [])];
+    const testPlayers: Player[] = [new Player('1', 'player1', []), new Player('2', 'player2', [])];
 
-    const initializeMap = (players: AbstractPlayer[]): Map<number, AbstractPlayer> => {
+    const initializeMap = (players: Player[]): Map<number, Player> => {
         const map = new Map();
-        players.forEach((value: AbstractPlayer, index: number) => {
+        players.forEach((value: Player, index: number) => {
             map.set(index + 1, value);
         });
         return map;

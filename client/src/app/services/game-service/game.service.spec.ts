@@ -11,7 +11,7 @@ import { GameUpdateData, PlayerData } from '@app/classes/communication';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { Message } from '@app/classes/communication/message';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round/round';
 import { Square } from '@app/classes/square';
@@ -244,7 +244,7 @@ describe('GameService', () => {
                 },
             };
 
-            roundManagerSpy.getActivePlayer.and.returnValue({ id: DEFAULT_PLAYER_ID } as AbstractPlayer);
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: DEFAULT_PLAYER_ID } as Player);
         });
 
         it('should set gameId', async () => {
@@ -442,8 +442,8 @@ describe('GameService', () => {
     });
 
     describe('handleGameUpdate', () => {
-        let player1: AbstractPlayer;
-        let player2: AbstractPlayer;
+        let player1: Player;
+        let player2: Player;
 
         let gameUpdateData: GameUpdateData;
         let updateTileRackEventEmitSpy: jasmine.Spy;
@@ -608,7 +608,7 @@ describe('GameService', () => {
     describe('getPlayingPlayerId', () => {
         it('should return id or round manager active player', () => {
             const expected = 'expected-id';
-            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
             const result = service.getPlayingPlayerId();
             expect(result).toEqual(expected);
         });
@@ -617,7 +617,7 @@ describe('GameService', () => {
     describe('isLocalPlayerPlaying', () => {
         it('should return true if is local player', () => {
             const expected = 'expected-id';
-            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
             service['playerContainer'] = new PlayerContainer(expected);
             const result = service.isLocalPlayerPlaying();
             expect(result).toBeTrue();
@@ -625,7 +625,7 @@ describe('GameService', () => {
 
         it('should return false if is not local player', () => {
             const expected = 'expected-id';
-            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
             service['playerContainer'] = new PlayerContainer('NOT-expected-id');
             const result = service.isLocalPlayerPlaying();
             expect(result).toBeFalse();
@@ -641,9 +641,9 @@ describe('GameService', () => {
     describe('isLocalPlayerPlayer1', () => {
         it('should return true if is local player', () => {
             const expected = 'expected-id';
-            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
             service['playerContainer'] = new PlayerContainer(expected);
-            service['playerContainer']['players'].set(1, { id: expected } as AbstractPlayer);
+            service['playerContainer']['players'].set(1, { id: expected } as Player);
 
             const result = service.isLocalPlayerPlayer1();
             expect(result).toBeTrue();
@@ -651,9 +651,9 @@ describe('GameService', () => {
 
         it('should return false if is not local player', () => {
             const expected = 'expected-id';
-            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as AbstractPlayer);
+            roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
             service['playerContainer'] = new PlayerContainer('NOT-expected-id');
-            service['playerContainer']['players'].set(1, { id: expected } as AbstractPlayer);
+            service['playerContainer']['players'].set(1, { id: expected } as Player);
             const result = service.isLocalPlayerPlayer1();
             expect(result).toBeFalse();
         });

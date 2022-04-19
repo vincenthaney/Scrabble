@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { Timer } from '@app/classes/round/timer';
 import { IconName } from '@app/components/icon/icon.component.type';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
@@ -55,12 +55,12 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         this.onDestroy();
     }
 
-    getPlayer1(): AbstractPlayer {
+    getPlayer1(): Player {
         const player1 = this.gameService.getPlayerByNumber(PLAYER_1_INDEX);
         return player1 ? player1 : new Player('', 'Player1', []);
     }
 
-    getPlayer2(): AbstractPlayer {
+    getPlayer2(): Player {
         const player2 = this.gameService.getPlayerByNumber(PLAYER_2_INDEX);
         return player2 ? player2 : new Player('', 'Player2', []);
     }
@@ -98,7 +98,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
         }
     }
 
-    private updateActivePlayerBorder(activePlayer: AbstractPlayer | undefined): void {
+    private updateActivePlayerBorder(activePlayer: Player | undefined): void {
         const player1 = this.getPlayer1();
         const player2 = this.getPlayer2();
         if (!activePlayer) {
