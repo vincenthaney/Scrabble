@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
 import { DurationPipe } from './duration.pipe';
 
 describe('DurationPipe', () => {

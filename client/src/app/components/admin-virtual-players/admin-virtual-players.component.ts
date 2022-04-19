@@ -2,24 +2,14 @@ import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort, MatSortable } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ASCENDING_COLUMN_SORTER, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
-import { Subject } from 'rxjs';
 import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
-import {
-    DeleteVirtualPlayerDialogParameters,
-    DisplayVirtualPlayersColumns,
-    DisplayVirtualPlayersColumnsIteratorItem,
-    DisplayVirtualPlayersKeys,
-    UpdateVirtualPlayersDialogParameters,
-    VirtualPlayersComponentState,
-} from './admin-virtual-players.types';
-import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 import { CreateVirtualPlayerComponent } from '@app/components/create-virtual-player-dialog/create-virtual-player-dialog.component';
 import { DeleteVirtualPlayerDialogComponent } from '@app/components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from '@app/components/update-virtual-player-dialog/update-virtual-player-dialog.component';
-import { PositiveFeedback } from '@app/constants/virtual-players-components';
+import { ASCENDING_COLUMN_SORTER, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
 import {
     CREATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
     CREATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
@@ -28,7 +18,17 @@ import {
     UPDATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
 } from '@app/constants/dialogs-constants';
 import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/constants/dictionaries-components';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { PositiveFeedback } from '@app/constants/virtual-players-components-constants';
+import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
+import { Subject } from 'rxjs';
+import {
+    DeleteVirtualPlayerDialogParameters,
+    DisplayVirtualPlayersColumns,
+    DisplayVirtualPlayersColumnsIteratorItem,
+    DisplayVirtualPlayersKeys,
+    UpdateVirtualPlayersDialogParameters,
+    VirtualPlayersComponentState,
+} from './admin-virtual-players.types';
 
 @Component({
     selector: 'app-admin-virtual-players',

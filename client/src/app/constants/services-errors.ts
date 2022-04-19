@@ -1,5 +1,5 @@
 import { Message } from '@app/classes/communication/message';
-import { SYSTEM_ID } from './game';
+import { SYSTEM_ID } from './game-constants';
 
 export const MISSING_PLAYER_DATA_TO_INITIALIZE = 'Certaines informations sont manquantes pour créer le joueur';
 export const NO_LOCAL_PLAYER = "Aucun joueur local n'a encore été défini";

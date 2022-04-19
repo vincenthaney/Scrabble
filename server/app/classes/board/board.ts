@@ -1,7 +1,7 @@
+import { Vec2 } from '@app/classes/board/vec2';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
-import { Vec2 } from '@app/classes/vec2';
 import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 import { StatusCodes } from 'http-status-codes';
 import { BoardNavigator, Orientation, Position } from './';

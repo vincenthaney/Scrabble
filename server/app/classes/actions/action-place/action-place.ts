@@ -1,26 +1,26 @@
-import ActionPlay from '@app/classes/actions/action-play';
+import ActionPlay from '@app/classes/actions/abstract-actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { ActionData, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { FeedbackMessage } from '@app/classes/communication/feedback-messages';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { GameType } from '@app/classes/game/game-type';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { ObjectiveUpdate } from '@app/classes/objectives/objective';
+import { ObjectiveUpdate } from '@app/classes/objectives/objective-utils';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { ScoredWordPlacement, WordPlacement } from '@app/classes/word-finding';
 import { IN_UPPER_CASE } from '@app/constants/classes-constants';
-import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
-import { PlacementToString } from '@app/utils/placement-to-string';
-import { StringConversion } from '@app/utils/string-conversion';
+import { PlacementToString } from '@app/utils/placement-to-string/placement-to-string';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 import { StatusCodes } from 'http-status-codes';
 import { Container } from 'typedi';
-import { ActionErrorsMessages } from './action-errors';
+import { IMPOSSIBLE_ACTION } from './action-errors';
 
 export default class ActionPlace extends ActionPlay {
     wordPlacement: WordPlacement;
@@ -59,7 +59,7 @@ export default class ActionPlace extends ActionPlay {
 
         const wordExtraction = new WordExtraction(this.game.board);
         const createdWords: [Square, Tile][][] = wordExtraction.extract(this.wordPlacement);
-        if (!this.isLegalPlacement(createdWords)) throw new HttpException(ActionErrorsMessages.ImpossibleAction, StatusCodes.FORBIDDEN);
+        if (!this.isLegalPlacement(createdWords)) throw new HttpException(IMPOSSIBLE_ACTION, StatusCodes.FORBIDDEN);
 
         this.wordValidator.verifyWords(StringConversion.wordsToString(createdWords), this.game.dictionarySummary.id);
 

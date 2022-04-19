@@ -2,17 +2,17 @@
 /* eslint-disable dot-notation */
 // Lint no unused expression must be disabled to use chai syntax
 /* eslint-disable @typescript-eslint/no-unused-expressions, no-unused-expressions */
+import { Dictionary } from '@app/classes/dictionary';
 import { INVALID_WORD, WORD_CONTAINS_APOSTROPHE, WORD_CONTAINS_ASTERISK, WORD_CONTAINS_HYPHEN, WORD_TOO_SHORT } from '@app/constants/services-errors';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
-import { WordsVerificationService } from './words-verification.service';
-import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
-import { Dictionary } from '@app/classes/dictionary';
 import { createStubInstance } from 'sinon';
-import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { Container } from 'typedi';
+import { WordsVerificationService } from './words-verification.service';
 
 chai.use(spies);
 chai.use(chaiAsPromised);

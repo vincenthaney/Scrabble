@@ -9,17 +9,17 @@ import Player from '@app/classes/player/player';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import * as BeginnerVirtualPlayer from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import * as ExpertVirtualPlayer from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
 import { SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
-import { CreateGameService } from './create-game.service';
 import * as uuid from 'uuid';
+import { CreateGameService } from './create-game.service';
 
 chai.use(spies);
 

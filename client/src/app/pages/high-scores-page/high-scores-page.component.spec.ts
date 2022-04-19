@@ -15,11 +15,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SingleHighScore } from '@app/classes/admin/high-score';
-import { GameType } from '@app/classes/game-type';
 import { HighScoreBoxComponent } from '@app/components/high-score-box/high-score-box.component';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import { GameType } from '@app/constants/game-type';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
 import { of } from 'rxjs';
 import { HighScoresPageComponent } from './high-scores-page.component';
 

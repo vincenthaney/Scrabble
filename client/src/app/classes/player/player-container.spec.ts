@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 
 import { PlayerData } from '@app/classes/communication/';
-import { DEFAULT_PLAYER } from '@app/constants/game';
+import { DEFAULT_PLAYER } from '@app/constants/game-constants';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
 import { AbstractPlayer, Player } from '.';
 import { PlayerContainer } from './player-container';

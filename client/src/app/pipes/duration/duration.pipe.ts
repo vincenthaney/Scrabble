@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
 import { padStart, take } from 'lodash';
 import { pipe } from 'rxjs';
 

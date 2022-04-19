@@ -1,5 +1,5 @@
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
+import { GameMode } from '@app/constants/game-mode';
+import { GameType } from '@app/constants/game-type';
 
 export const HOST_WAITING_MESSAGE = "En attente d'un adversaire";
 export const OPPONENT_FOUND_MESSAGE = ' a rejoint votre partie.';

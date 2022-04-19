@@ -2,9 +2,9 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NavigationStart, Router } from '@angular/router';
 import { LobbyInfo } from '@app/classes/communication';
-import { Timer } from '@app/classes/timer/timer';
+import { Timer } from '@app/classes/round/timer';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
-import { getRandomFact } from '@app/constants/fun-facts-scrabble';
+import { getRandomFact } from '@app/constants/fun-facts-scrabble-constants';
 import {
     DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
@@ -15,7 +15,7 @@ import {
     DIALOG_REJECT_TITLE,
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
-import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { PlayerLeavesService } from '@app/services/player-leave-service/player-leave.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

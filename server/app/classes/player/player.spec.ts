@@ -4,14 +4,14 @@
 /* eslint-disable dot-notation */
 import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
-import { GameObjectives } from '@app/classes/objectives/objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
+import { GameObjectives } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import {
     generateGameObjectives,
     generateResetableTestObjective,
     generateTestObjective,
-} from '@app/constants/services-constants/objectives-test.const';
+} from '@app/constants/services-constants/objectives-test-const';
 import { Tile } from 'app/classes/tile';
 import * as chai from 'chai';
 import { expect } from 'chai';

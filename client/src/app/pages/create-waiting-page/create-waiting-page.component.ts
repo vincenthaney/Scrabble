@@ -4,11 +4,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import LobbyInfo from '@app/classes/communication/lobby-info';
-import { Timer } from '@app/classes/timer/timer';
+import { Timer } from '@app/classes/round/timer';
 import { ConvertDialogComponent, ConvertResult } from '@app/components/convert-dialog/convert-dialog.component';
 import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import { ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
-import { getRandomFact } from '@app/constants/fun-facts-scrabble';
+import { getRandomFact } from '@app/constants/fun-facts-scrabble-constants';
 import {
     DEFAULT_LOBBY,
     DIALOG_BUTTON_CONTENT_REJECTED,
@@ -19,7 +19,7 @@ import {
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import { GameDispatcherService } from '@app/services/';
-import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { PlayerLeavesService } from '@app/services/player-leave-service/player-leave.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

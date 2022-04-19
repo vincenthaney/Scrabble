@@ -27,7 +27,7 @@ import {
     OPPONENT_FOUND_MESSAGE,
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
-import { PlayerLeavesService } from '@app/services/player-leaves-service/player-leaves.service';
+import { PlayerLeavesService } from '@app/services/player-leave-service/player-leave.service';
 import { of, Subject } from 'rxjs';
 import { CreateWaitingPageComponent } from './create-waiting-page.component';
 import SpyObj = jasmine.SpyObj;

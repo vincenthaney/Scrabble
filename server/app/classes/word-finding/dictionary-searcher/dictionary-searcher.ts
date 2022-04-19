@@ -10,7 +10,7 @@ import {
     SearcherPerpendicularLetters,
 } from '@app/classes/word-finding';
 import { ERROR_PLAYER_DOESNT_HAVE_TILE, NEXT_NODE_DOES_NOT_EXISTS } from '@app/constants/classes-errors';
-import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game';
+import { ALPHABET, BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game-constants';
 import { StatusCodes } from 'http-status-codes';
 
 export default class DictionarySearcher {

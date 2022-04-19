@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { GameObjectivesData } from '@app/classes/communication/game-objectives-data';
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { IResetServiceData } from '@app/classes/i-reset-service-data';
+import { IResetServiceData } from '@app/utils/i-reset-service-data/i-reset-service-data';
 
 @Injectable({
     providedIn: 'root',

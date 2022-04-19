@@ -9,13 +9,13 @@ import { Tile } from '@app/classes/tile';
 import { AbstractWordFinding, WordFindingBeginner, WordFindingHint, WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import WordFindingExpert from '@app/classes/word-finding/word-finding-expert/word-finding-expert';
 import { PartialWordFindingParameters } from '@app/classes/word-finding/word-finding-types';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import WordFindingService from './word-finding.service';
 
 const TEST_ID = 'TEST_ID';

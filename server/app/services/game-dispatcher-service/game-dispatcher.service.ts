@@ -4,7 +4,7 @@ import Room from '@app/classes/game/room';
 import WaitingRoom from '@app/classes/game/waiting-room';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import Player from '@app/classes/player/player';
-import { GOOD_LUCK_MESSAGE } from '@app/constants/game';
+import { GOOD_LUCK_MESSAGE } from '@app/constants/game-constants';
 import {
     CANNOT_HAVE_SAME_NAME,
     INVALID_PLAYER_ID_FOR_GAME,
@@ -18,8 +18,8 @@ import { CreateGameService } from '@app/services/create-game-service/create-game
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { convertToLobbyData } from '@app/utils/convert-to-lobby-data/convert-to-lobby-data';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 

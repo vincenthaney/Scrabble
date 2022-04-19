@@ -3,16 +3,16 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board, Position } from '@app/classes/board';
+import { Vec2 } from '@app/classes/board/vec2';
 import { Square } from '@app/classes/square';
 import ScoreMultiplier, { MultiplierEffect } from '@app/classes/square/score-multiplier';
-import { Vec2 } from '@app/classes/vec2';
 import { BOARD_CONFIG } from '@app/constants/board-config';
-import { BOARD_SIZE } from '@app/constants/game';
+import { BOARD_SIZE } from '@app/constants/game-constants';
+import { BOARD_CONFIG_UNDEFINED_AT, NO_MULTIPLIER_MAPPED_TO_INPUT } from '@app/constants/services-errors';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as spies from 'chai-spies';
 import BoardService from './board.service';
-import { BOARD_CONFIG_UNDEFINED_AT, NO_MULTIPLIER_MAPPED_TO_INPUT } from '@app/constants/services-errors';
 
 const expect = chai.expect;
 chai.use(spies);

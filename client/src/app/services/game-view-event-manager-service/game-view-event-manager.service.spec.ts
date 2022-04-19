@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import { PlaceActionPayload } from '@app/classes/actions/action-data';
-import { Orientation } from '@app/classes/orientation';
+import { Orientation } from '@app/classes/actions/orientation';
 import * as SERVICE_ERRORS from '@app/constants/services-errors';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { EventTypes } from './event-types';

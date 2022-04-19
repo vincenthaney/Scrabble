@@ -14,7 +14,7 @@ import { Params } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
 import { Subject } from 'rxjs';
 import { AdminPageComponent, DEFAULT_ADMIN_TAB } from './admin-page.component';
 

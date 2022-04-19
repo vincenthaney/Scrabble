@@ -1,4 +1,4 @@
-import { Round } from '@app/classes/round';
+import { Round } from '@app/classes/round/round';
 import { Square } from '@app/classes/square';
 import PlayerData from './player-data';
 

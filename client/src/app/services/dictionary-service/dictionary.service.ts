@@ -3,7 +3,7 @@ import { DictionariesState } from '@app/classes/admin/dictionaries';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
 import { DOWNLOAD_ELEMENT } from '@app/constants/dictionary-service-constants';
-import { DictionaryController } from '@app/controllers/dictionary-controller/dictionary-controller';
+import { DictionaryController } from '@app/controllers/dictionary-controller/dictionary.controller';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

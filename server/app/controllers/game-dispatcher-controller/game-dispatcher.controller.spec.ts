@@ -26,13 +26,13 @@ import {
     VIRTUAL_PLAYER_LEVEL_REQUIRED,
     VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { SYSTEM_ID } from '@app/constants/game';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
+import { SYSTEM_ID } from '@app/constants/game-constants';
 import { VIRTUAL_PLAYER_ID_PREFIX } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { CreateGameService } from '@app/services/create-game-service/create-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import * as chai from 'chai';
 import { spy } from 'chai';

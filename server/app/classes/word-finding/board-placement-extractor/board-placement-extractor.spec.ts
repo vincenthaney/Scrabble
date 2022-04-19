@@ -4,19 +4,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable dot-notation */
-import { LetterValue, Tile } from '@app/classes/tile';
 import { Board, BoardNavigator, Orientation, Position } from '@app/classes/board';
-import { Square } from '@app/classes/square';
-import Player from '@app/classes/player/player';
-import BoardPlacementsExtractor from './board-placement-extractor';
-import { Vec2 } from '@app/classes/vec2';
-import { SinonStub, stub } from 'sinon';
-import { expect } from 'chai';
 import Direction from '@app/classes/board/direction';
+import { Vec2 } from '@app/classes/board/vec2';
+import Player from '@app/classes/player/player';
+import { Square } from '@app/classes/square';
+import { LetterValue, Tile } from '@app/classes/tile';
 import { BoardPlacement, LinePlacements, WithDistance } from '@app/classes/word-finding';
-import { INITIAL_POSITION } from '@app/constants/game';
-import { MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
+import { INITIAL_POSITION, MAX_TILES_PER_PLAYER } from '@app/constants/game-constants';
+import { expect } from 'chai';
 import * as sinon from 'sinon';
+import { SinonStub, stub } from 'sinon';
+import BoardPlacementsExtractor from './board-placement-extractor';
 
 const DEFAULT_BOARD: (LetterValue | ' ')[][] = [
     [' ', ' ', 'X', ' ', 'O', 'P'],

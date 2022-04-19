@@ -1,5 +1,5 @@
 import { PlayerData } from '@app/classes/communication';
-import { PLAYER_1_INDEX } from '@app/constants/game';
+import { PLAYER_1_INDEX } from '@app/constants/game-constants';
 import { MISSING_PLAYER_DATA_TO_INITIALIZE, PLAYER_NUMBER_INVALID } from '@app/constants/services-errors';
 import AbstractPlayer from './abstract-player';
 import Player from './player';
