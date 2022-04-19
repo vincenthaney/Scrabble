@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DeleteVirtualPlayerDialogParameters } from '@app/components/admin-virtual-players/admin-virtual-players.types';
-import { DeleteVirtualPlayerComponentStates } from './delete-virtual-player-dialog.component.types';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profiles.service';
 
 @Component({
@@ -10,7 +9,6 @@ import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profi
     styleUrls: ['delete-virtual-player-dialog.component.scss'],
 })
 export class DeleteVirtualPlayerDialogComponent {
-    state: DeleteVirtualPlayerComponentStates;
     virtualPlayerId: string;
     constructor(
         private dialogRef: MatDialogRef<DeleteVirtualPlayerDialogComponent>,
