@@ -5,7 +5,7 @@
 import { ObjectiveData } from '@app/classes/communication/objective-data';
 import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
-import { TestObjective } from '@app/constants/services-constants/objectives-test-const';
+import { TestObjective } from '@app/classes/objectives/objectives-test-helper.spec';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';

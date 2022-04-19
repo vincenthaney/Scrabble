@@ -17,7 +17,7 @@ import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
 import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game-constants';
-import { generateGameObjectives } from '@app/constants/services-constants/objectives-test-const';
+import { generateGameObjectives } from '@app/classes/objectives/objectives-test-helper.spec';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objective-service/objective.service';
