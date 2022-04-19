@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ActionType } from '@app/classes/actions/action-data';
 import { StartGameData } from '@app/classes/communication/game-config';
 import { RoundData } from '@app/classes/communication/round-data';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { Round } from '@app/classes/round/round';
 import { Timer } from '@app/classes/round/timer';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
@@ -24,9 +24,9 @@ export default class RoundManagerService implements IResetServiceData, OnDestroy
     completedRounds: Round[];
     maxRoundTime: number;
     timeout: ReturnType<typeof setTimeout>;
-    timer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
+    timer: Observable<[timer: Timer, activePlayer: Player]>;
     private endRoundEvent$: Subject<void>;
-    private timerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>;
+    private timerSource: BehaviorSubject<[timer: Timer, activePlayer: Player]>;
     private serviceDestroyed$: Subject<boolean>;
 
     constructor(
@@ -57,7 +57,7 @@ export default class RoundManagerService implements IResetServiceData, OnDestroy
 
     initializeEvents(): void {
         this.completedRounds = [];
-        this.timerSource = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([new Timer(0, 0), DEFAULT_PLAYER]);
+        this.timerSource = new BehaviorSubject<[timer: Timer, activePlayer: Player]>([new Timer(0, 0), DEFAULT_PLAYER]);
         this.timer = this.timerSource.asObservable();
         this.endRoundEvent$ = new Subject();
     }
@@ -102,7 +102,7 @@ export default class RoundManagerService implements IResetServiceData, OnDestroy
         this.startRound(this.timeLeft(round.limitTime));
     }
 
-    getActivePlayer(): AbstractPlayer {
+    getActivePlayer(): Player {
         if (!this.currentRound) {
             throw new Error(NO_CURRENT_ROUND);
         }

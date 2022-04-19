@@ -87,7 +87,7 @@ export default class DictionarySearcher {
         }
     }
 
-    private isWordValid(word: string) {
+    private isWordValid(word: string): boolean {
         return this.wordSizeIsWithinBounds(word) && this.nextTileIsEmpty(word) && this.hasAnyNewLetters(word);
     }
 

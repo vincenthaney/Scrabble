@@ -15,7 +15,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { PlayerData } from '@app/classes/communication';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -255,7 +255,7 @@ describe('CommunicationBoxComponent', () => {
         let gameIdSpy: jasmine.Spy;
 
         beforeEach(() => {
-            spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as AbstractPlayer);
+            spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as Player);
             gameIdSpy = spyOn(component['gameService'], 'getGameId').and.returnValue(DEFAULT_SYSTEM_MESSAGE.gameId);
         });
 

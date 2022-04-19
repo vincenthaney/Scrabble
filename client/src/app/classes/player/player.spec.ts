@@ -5,7 +5,7 @@ import { PlayerData } from '@app/classes/communication/';
 import { Tile } from '@app/classes/tile';
 import { Player } from '.';
 
-describe('AbstractPlayer', () => {
+describe('Player', () => {
     const playerDataTestCases: PlayerData[] = [
         {
             name: 'testName2',
@@ -38,7 +38,7 @@ describe('AbstractPlayer', () => {
         },
     ];
 
-    it('Creating AbstractPlayer should initialize attributes', () => {
+    it('Creating Player should initialize attributes', () => {
         const id = 'testId';
         const name = 'testName';
         const tiles: Tile[] = [{ letter: 'A', value: 10 }];
@@ -48,7 +48,7 @@ describe('AbstractPlayer', () => {
         expect(player['tiles']).toEqual(tiles);
     });
 
-    it('Creating AbstractPlayer should not set tiles attribute to same reference', () => {
+    it('Creating Player should not set tiles attribute to same reference', () => {
         const id = 'testId';
         const name = 'testName';
         const tiles: Tile[] = [

@@ -18,7 +18,7 @@ import { ActionData, ActionType, ExchangeActionPayload, PlaceActionPayload } fro
 import { Orientation } from '@app/classes/actions/orientation';
 import Direction from '@app/classes/board-navigator/direction';
 import { Message } from '@app/classes/communication/message';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
@@ -168,7 +168,7 @@ describe('TileRackComponent', () => {
     });
 
     it('Initializing TileRack with player with no tiles should return empty TileRack', () => {
-        const localPlayer: AbstractPlayer = new Player('', 'Test', []);
+        const localPlayer: Player = new Player('', 'Test', []);
 
         gameServiceSpy.getLocalPlayer.and.returnValue(localPlayer);
         spyOn(localPlayer, 'getTiles').and.returnValue([]);
@@ -184,7 +184,7 @@ describe('TileRackComponent', () => {
             { letter: 'B', value: 1, isUsed: false, isSelected: false },
             { letter: 'D', value: 1, isUsed: true, isSelected: false },
         ];
-        const localPlayer: AbstractPlayer = new Player('', 'Test', [
+        const localPlayer: Player = new Player('', 'Test', [
             { letter: 'B', value: 1 },
             { letter: 'D', value: 1 },
             { letter: 'A', value: 10 },

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { GameUpdateData, PlayerData } from '@app/classes/communication/';
 import { InitializeGameData, StartGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
-import { AbstractPlayer } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round/round';
 import { Square } from '@app/classes/square';
@@ -89,12 +89,12 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameId = '';
     }
 
-    getPlayerByNumber(playerNumber: number): AbstractPlayer | undefined {
+    getPlayerByNumber(playerNumber: number): Player | undefined {
         if (!this.playerContainer) return undefined;
         return this.playerContainer.getPlayer(playerNumber);
     }
 
-    getLocalPlayer(): AbstractPlayer | undefined {
+    getLocalPlayer(): Player | undefined {
         if (!this.playerContainer) return undefined;
         return this.playerContainer.getLocalPlayer();
     }
