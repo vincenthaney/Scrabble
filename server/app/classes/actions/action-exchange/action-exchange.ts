@@ -1,4 +1,4 @@
-import ActionPlay from '@app/classes/actions/action-play';
+import ActionPlay from '@app/classes/actions/abstract-actions/action-play';
 import { ActionUtils } from '@app/classes/actions/action-utils/action-utils';
 import { ActionData, ActionExchangePayload, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';

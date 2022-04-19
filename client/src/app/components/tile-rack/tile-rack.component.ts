@@ -11,10 +11,10 @@ import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
-import Delay from '@app/utils/delay';
-import { nextIndex } from '@app/utils/next-index';
-import { preserveArrayOrder } from '@app/utils/preserve-array-order';
-import { Random } from '@app/utils/random';
+import Delay from '@app/utils/delay/delay';
+import { nextIndex } from '@app/utils/next-index/next-index';
+import { preserveArrayOrder } from '@app/utils/preserve-array-order/preserve-array-order';
+import { Random } from '@app/utils/random/random';
 import { pipe, Subject } from 'rxjs';
 
 export type RackTile = Tile & { isUsed: boolean; isSelected: boolean };

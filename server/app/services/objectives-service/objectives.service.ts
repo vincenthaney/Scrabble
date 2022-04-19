@@ -1,7 +1,7 @@
 import { GameObjectivesData, ObjectiveData } from '@app/classes/communication/objective-data';
 import Game from '@app/classes/game/game';
 import { HttpException } from '@app/classes/http-exception/http-exception';
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { GameObjectives, ObjectiveState, ObjectiveUpdate } from '@app/classes/objectives/objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
@@ -11,7 +11,7 @@ import {
     OBJECTIVE_COMPLETE_MESSAGE,
 } from '@app/constants/services-constants/objective-const';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL } from '@app/constants/services-errors';
-import { Random } from '@app/utils/random';
+import { Random } from '@app/utils/random/random';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 

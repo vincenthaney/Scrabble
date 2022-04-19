@@ -22,7 +22,7 @@ import GameHistoriesService from '@app/services/game-histories-service/game-hist
 import HighScoresService from '@app/services/high-scores-service/high-scores.service';
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 import { FeedbackMessage, FeedbackMessages } from './feedback-messages';

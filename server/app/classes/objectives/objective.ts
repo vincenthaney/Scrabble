@@ -1,5 +1,5 @@
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
-import { AbstractObjective } from './abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 
 export interface GameObjectives {
     readonly publicObjectives: Set<AbstractObjective>;

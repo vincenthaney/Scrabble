@@ -79,3 +79,6 @@ export const IS_OPPONENT = false;
 export const NOT_FOUND = -1;
 
 export const GOOD_LUCK_MESSAGE = 'Bonne chance!';
+
+export const MAX_TILES_PER_PLAYER = 7;
+export const BINGO_BONUS_POINTS = 50;

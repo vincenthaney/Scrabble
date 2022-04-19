@@ -1,6 +1,6 @@
 import { Square } from '@app/classes/square';
 import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
-import { switchOrientation } from '@app/utils/switch-orientation';
+import { switchOrientation } from '@app/utils/switch-orientation/switch-orientation';
 import { Board, Orientation, Position } from '.';
 import Direction from './direction';
 

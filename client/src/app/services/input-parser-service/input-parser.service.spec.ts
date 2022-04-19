@@ -9,7 +9,6 @@ import { Location } from '@app/classes/actions/location';
 import { Orientation } from '@app/classes/actions/orientation';
 import { Position } from '@app/classes/board-navigator/position';
 import { Player } from '@app/classes/player';
-import CommandException from '@app/classes/services/command-exception';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
 import { BLANK_TILE_LETTER_VALUE, DEFAULT_ORIENTATION, SYSTEM_ERROR_ID } from '@app/constants/game-constants';
@@ -18,6 +17,7 @@ import { GamePlayController } from '@app/controllers/game-play-controller/game-p
 import { InputParserService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
 import GameService from '@app/services/game-service/game.service';
+import CommandException from '@app/services/input-parser-service/command-exception';
 
 describe('InputParserService', () => {
     const VALID_MESSAGE_INPUT = 'How you doin';

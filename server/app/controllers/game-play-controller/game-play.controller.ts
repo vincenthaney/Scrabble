@@ -11,8 +11,8 @@ import { FeedbackMessage, FeedbackMessages } from '@app/services/game-play-servi
 import { GamePlayService } from '@app/services/game-play-service/game-play.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { Delay } from '@app/utils/delay';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { Delay } from '@app/utils/delay/delay';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

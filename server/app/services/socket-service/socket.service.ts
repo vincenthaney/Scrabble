@@ -1,6 +1,6 @@
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import * as http from 'http';
 import { StatusCodes } from 'http-status-codes';
 import * as io from 'socket.io';

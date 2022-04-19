@@ -2,12 +2,12 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { ActionData, ActionPayload, ActionType, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
 import { Orientation } from '@app/classes/actions/orientation';
 import { Position } from '@app/classes/board-navigator/position';
-import { IResetServiceData } from '@app/classes/services/i-reset-service-data';
 import { Tile } from '@app/classes/tile';
 import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
-import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
+import { ActionPayloadToString } from '@app/utils/action-payload-to-string/action-payload-to-string';
+import { IResetServiceData } from '@app/utils/i-reset-service-data/i-reset-service-data';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

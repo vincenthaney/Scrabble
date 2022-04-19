@@ -9,7 +9,7 @@ import { DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH } from '@app/constants/se
 import { NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import { DatabaseServiceMock } from '@app/services/database-service/database.service.mock.spec';
-import { Random } from '@app/utils/random';
+import { Random } from '@app/utils/random/random';
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

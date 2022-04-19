@@ -21,7 +21,7 @@ import { generateGameObjectives } from '@app/constants/services-constants/object
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
-import * as copy from '@app/utils/deep-copy';
+import * as copy from '@app/utils/deep-copy/deep-copy';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

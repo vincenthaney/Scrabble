@@ -4,7 +4,7 @@ import Range from '@app/classes/range/range';
 import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { WordFindingRequest, WordFindingUseCase } from '@app/classes/word-finding';
 import { EXPERT_NAME_SUFFIX } from '@app/constants/virtual-player-constants';
-import { Random } from '@app/utils/random';
+import { Random } from '@app/utils/random/random';
 
 export const MAX_EXPERT_CONSECUTIVE_EXCHANGES = 3;
 

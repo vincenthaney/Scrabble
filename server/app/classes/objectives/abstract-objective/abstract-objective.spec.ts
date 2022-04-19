@@ -3,14 +3,14 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { ObjectiveData } from '@app/classes/communication/objective-data';
+import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { TestObjective } from '@app/constants/services-constants/objectives-test-const';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { SinonStub, stub } from 'sinon';
 import { AbstractObjective } from './abstract-objective';
-import { ObjectiveState } from './objective';
-import { ObjectiveValidationParameters } from './validation-parameters';
 chai.use(spies);
 
 describe('Abstract Objective', () => {

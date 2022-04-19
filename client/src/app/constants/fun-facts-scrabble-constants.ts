@@ -1,4 +1,4 @@
-import { Random } from '@app/utils/random';
+import { Random } from '@app/utils/random/random';
 
 export const FUN_FACTS: string[] = [
     'MONOPRIX, UNIPRIX et PRISUNIC : ces noms déposés de magasins sont considérés comme des noms communs et donc acceptés au Scrabble.',

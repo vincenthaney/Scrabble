@@ -14,9 +14,9 @@ import {
 import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import { BLANK_TILE_LETTER_VALUE, NOT_FOUND } from '@app/constants/game-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { arrayDeepCopy } from '@app/utils/deep-copy';
-import { Random } from '@app/utils/random';
-import { switchOrientation } from '@app/utils/switch-orientation';
+import { arrayDeepCopy } from '@app/utils/deep-copy/deep-copy';
+import { Random } from '@app/utils/random/random';
+import { switchOrientation } from '@app/utils/switch-orientation/switch-orientation';
 import { StatusCodes } from 'http-status-codes';
 
 export default abstract class AbstractWordFinding {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import Game from '@app/classes/game/game';
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { WordPlacement } from '@app/classes/word-finding';
 

@@ -18,7 +18,7 @@ import {
     MINIMUM_TILES_LEFT_FOR_EXCHANGE,
     PLACE_ACTION_THRESHOLD,
 } from '@app/constants/virtual-player-constants';
-import { Random } from '@app/utils/random';
+import { Random } from '@app/utils/random/random';
 
 export class BeginnerVirtualPlayer extends AbstractVirtualPlayer {
     constructor(gameId: string, name: string) {

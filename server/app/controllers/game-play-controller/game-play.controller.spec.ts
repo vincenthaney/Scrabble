@@ -26,7 +26,7 @@ import { GamePlayService } from '@app/services/game-play-service/game-play.servi
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { Delay } from '@app/utils/delay';
+import { Delay } from '@app/utils/delay/delay';
 import * as chai from 'chai';
 import { spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

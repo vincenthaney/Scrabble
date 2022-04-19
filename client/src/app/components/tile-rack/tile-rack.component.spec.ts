@@ -28,7 +28,7 @@ import { TileRackSelectType } from '@app/constants/tile-rack-select-type';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
-import { Random } from '@app/utils/random';
+import { Random } from '@app/utils/random/random';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RackTile, TileRackComponent } from './tile-rack.component';

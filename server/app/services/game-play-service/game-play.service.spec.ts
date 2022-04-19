@@ -31,7 +31,7 @@ import HighScoresService from '@app/services/high-scores-service/high-scores.ser
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import * as arrowFunction from '@app/utils/is-id-virtual-player';
+import * as arrowFunction from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import * as chai from 'chai';
 import { EventEmitter } from 'events';
 import * as sinon from 'sinon';

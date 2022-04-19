@@ -1,4 +1,4 @@
-import ActionPlay from '@app/classes/actions/action-play';
+import ActionPlay from '@app/classes/actions/abstract-actions/action-play';
 import { ActionData, ActionType } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';

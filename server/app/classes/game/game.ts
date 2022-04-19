@@ -19,7 +19,7 @@ import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 import ObjectivesService from '@app/services/objectives-service/objectives.service';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Container } from 'typedi';
 import { ReadyGameConfig, StartGameData } from './game-config';

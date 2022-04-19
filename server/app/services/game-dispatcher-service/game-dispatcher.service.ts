@@ -18,8 +18,8 @@ import { CreateGameService } from '@app/services/create-game-service/create-game
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { convertToLobbyData } from '@app/utils/convert-to-lobby-data';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { convertToLobbyData } from '@app/utils/convert-to-lobby-data/convert-to-lobby-data';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 

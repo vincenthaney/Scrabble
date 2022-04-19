@@ -12,7 +12,7 @@ import { GAME_ID, PLAYER_ID, TEST_POINT_RANGE } from '@app/constants/virtual-pla
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { Delay } from '@app/utils/delay';
+import { Delay } from '@app/utils/delay/delay';
 import * as chai from 'chai';
 import { expect, spy } from 'chai';
 import { createStubInstance, restore, SinonStubbedInstance } from 'sinon';

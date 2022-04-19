@@ -13,7 +13,7 @@ import {
 import { GameHistory } from '@app/classes/game-history/game-history';
 import { DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
 import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
-import { isKey } from '@app/utils/is-key';
+import { isKey } from '@app/utils/isKey/is-key';
 
 @Component({
     selector: 'app-admin-game-history',

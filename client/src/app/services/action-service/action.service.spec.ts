@@ -8,7 +8,7 @@ import { Orientation } from '@app/classes/actions/orientation';
 import { Tile } from '@app/classes/tile';
 import { DEFAULT_PLAYER } from '@app/constants/game-constants';
 import { WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE } from '@app/constants/services-errors';
-import { ActionPayloadToString } from '@app/utils/action-payload-to-string';
+import { ActionPayloadToString } from '@app/utils/action-payload-to-string/action-payload-to-string';
 import { ActionService } from './action.service';
 
 const DEFAULT_PLAYER_ID = DEFAULT_PLAYER.id;

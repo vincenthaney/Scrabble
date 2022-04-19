@@ -6,7 +6,7 @@ import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
 import { WordPlacement } from '@app/classes/word-finding';
 import { EXTRACTION_NO_WORDS_CREATED, EXTRACTION_SQUARE_ALREADY_FILLED, POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
-import { switchOrientation } from '@app/utils/switch-orientation';
+import { switchOrientation } from '@app/utils/switch-orientation/switch-orientation';
 import { StatusCodes } from 'http-status-codes';
 
 export class WordExtraction {

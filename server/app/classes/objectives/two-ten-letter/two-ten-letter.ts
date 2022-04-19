@@ -1,8 +1,8 @@
-import { AbstractObjective } from '@app/classes/objectives/abstract-objective';
+import { AbstractObjective } from '@app/classes/objectives/abstract-objective/abstract-objective';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import { Square } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { StringConversion } from '@app/utils/string-conversion';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 
 export const NAME = 'Extravagant';
 export const DESCRIPTION = 'Former un mot contenant 2 lettres ou plus de 10 points';

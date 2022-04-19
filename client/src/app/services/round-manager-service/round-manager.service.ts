@@ -6,11 +6,11 @@ import { RoundData } from '@app/classes/communication/round-data';
 import { AbstractPlayer, Player } from '@app/classes/player';
 import { Round } from '@app/classes/round/round';
 import { Timer } from '@app/classes/round/timer';
-import { IResetServiceData } from '@app/classes/services/i-reset-service-data';
 import { DEFAULT_PLAYER, MINIMUM_TIMER_TIME, SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
 import { INVALID_ROUND_DATA_PLAYER, NO_CURRENT_ROUND } from '@app/constants/services-errors';
 import { ActionService } from '@app/services/action-service/action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
+import { IResetServiceData } from '@app/utils/i-reset-service-data/i-reset-service-data';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

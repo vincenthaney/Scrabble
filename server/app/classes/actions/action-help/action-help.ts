@@ -1,4 +1,4 @@
-import ActionInfo from '@app/classes/actions/action-info';
+import ActionInfo from '@app/classes/actions/abstract-actions/action-info';
 import { HELP_ACTIONS } from '@app/constants/classes-constants';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 

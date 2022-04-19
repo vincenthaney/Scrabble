@@ -1,4 +1,4 @@
-import ActionInfo from '@app/classes/actions/action-info';
+import ActionInfo from '@app/classes/actions/abstract-actions/action-info';
 import { FeedbackMessage } from '@app/services/game-play-service/feedback-messages';
 
 export default class ActionReserve extends ActionInfo {

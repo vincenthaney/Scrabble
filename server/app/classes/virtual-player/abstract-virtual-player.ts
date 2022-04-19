@@ -7,7 +7,7 @@ import { FINAL_WAIT_TIME, PRELIMINARY_WAIT_TIME, VIRTUAL_PLAYER_ID_PREFIX } from
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
 import WordFindingService from '@app/services/word-finding-service/word-finding.service';
-import { Delay } from '@app/utils/delay';
+import { Delay } from '@app/utils/delay/delay';
 import { Container } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 

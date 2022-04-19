@@ -6,7 +6,6 @@ import { Message } from '@app/classes/communication/message';
 import { AbstractPlayer } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { Round } from '@app/classes/round/round';
-import { IResetServiceData } from '@app/classes/services/i-reset-service-data';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { SYSTEM_ERROR_ID } from '@app/constants/game-constants';
@@ -16,6 +15,7 @@ import BoardService from '@app/services/board-service/board.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import { ObjectivesManagerService } from '@app/services/objectives-manager-service/objectives-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
+import { IResetServiceData } from '@app/utils/i-reset-service-data/i-reset-service-data';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 

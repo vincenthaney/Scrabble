@@ -1,6 +1,6 @@
 import { ObjectiveData } from '@app/classes/communication/objective-data';
-import { ObjectiveState } from './objective';
-import { ObjectiveValidationParameters } from './validation-parameters';
+import { ObjectiveState } from '@app/classes/objectives/objective';
+import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 
 export abstract class AbstractObjective {
     progress: number = 0;
