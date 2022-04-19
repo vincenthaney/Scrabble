@@ -9,10 +9,10 @@ import { Service } from 'typedi';
 import { DatabaseController } from './controllers/database-controller/database.controller';
 import { DictionaryController } from './controllers/dictionary-controller/dictionary.controller';
 import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
-import { GameHistoriesController } from './controllers/game-histories-controller/game-histories.controller';
+import { GameHistoriesController } from './controllers/game-history-controller/game-history.controller';
 import { GamePlayController } from './controllers/game-play-controller/game-play.controller';
-import { HighScoresController } from './controllers/high-scores-controller/high-scores.controller';
-import { VirtualPlayerProfilesController } from './controllers/virtual-player-profiles-controller/virtual-player-profiles.controller';
+import { HighScoresController } from './controllers/high-score-controller/high-score.controller';
+import { VirtualPlayerProfilesController } from './controllers/virtual-player-profile-controller/virtual-player-profile.controller';
 import DatabaseService from './services/database-service/database.service';
 
 @Service()

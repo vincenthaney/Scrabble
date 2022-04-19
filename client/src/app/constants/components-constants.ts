@@ -1,8 +1,8 @@
-import { DisplayGameHistoryColumns, DisplayGameHistoryKeys } from '@app/classes/admin-game-history';
+import { DisplayGameHistoryColumns, DisplayGameHistoryKeys } from '@app/classes/admin/admin-game-history';
 import { DisplayDictionaryKeys } from '@app/classes/admin/dictionaries';
 import { SingleHighScore } from '@app/classes/admin/high-score';
-import { GameType } from '@app/classes/game-type';
 import { IconName } from '@app/components/icon/icon.component.type';
+import { GameType } from '@app/constants/game-type';
 import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from './dictionaries-components';
 
 export const LOCAL_PLAYER_ICON: IconName[] = ['user-astronaut', 'user-cowboy', 'user-ninja', 'user-crown'];
@@ -24,7 +24,6 @@ export const DICTIONARIES_COLUMNS = {
 
 export const VIRTUAL_PLAYERS_COLUMNS = {
     name: 'Nom',
-    level: 'Niveau',
     actions: '',
 };
 
@@ -49,6 +48,7 @@ export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
 
 export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
+    'startTime',
     'duration',
     'gameType',
     'gameMode',
@@ -59,7 +59,8 @@ export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
 ];
 
 export const YOU_COMPLETED_THIS_OBJECTIVE = 'Vous avez complété cet objectif!';
-export const OPPONENT_COMPLETED_THIS_OBJECTIVE = 'Votre adversaire a complété cet objectif avant vous';
+export const OPPONENT_COMPLETED_THIS_OBJECTIVE = (isPublic: boolean) =>
+    isPublic ? 'Votre adversaire a complété cet objectif avant vous' : 'Votre adversaire a complété cet objectif';
 
 export const PERCENT = 100;
 

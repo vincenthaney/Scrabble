@@ -1,4 +1,4 @@
-import { Position } from '@app/classes/position';
+import { Position } from '@app/classes/board-navigator/position';
 import { Tile } from '@app/classes/tile';
 import ScoreMultiplier from './score-multiplier';
 

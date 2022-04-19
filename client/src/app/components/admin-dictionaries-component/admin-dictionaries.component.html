@@ -29,15 +29,15 @@
                 <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef> {{columns.actions}} </th>
                     <td mat-cell class="right-cell" *matCellDef="let element"> 
-                        <button matTooltip="Vous ne pouvez pas modifier le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="modifyDictionary(element)"[disabled] = "element.isDefault">
-                            <app-icon icon="pencil">
+                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="modifyDictionary(element)"[disabled] = "element.isDefault">
+                            <app-icon matTooltip="Vous ne pouvez pas modifier le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" icon="pencil">
                             </app-icon>
                         </button>
                         <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="downloadDictionary(element.id)">
                             <app-icon icon="download"></app-icon>
                         </button>
-                        <button matTooltip="Vous ne pouvez pas supprimer le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element)" [disabled] = "element.isDefault">
-                            <app-icon icon="trash-alt">
+                        <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteDictionary(element)" [disabled] = "element.isDefault">
+                            <app-icon matTooltip="Vous ne pouvez pas supprimer le dictionnaire par défaut." [matTooltipDisabled]="!element.isDefault" icon="trash-alt">
                             </app-icon>
                         </button> 
                     </td>

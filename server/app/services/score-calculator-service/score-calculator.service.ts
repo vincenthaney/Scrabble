@@ -1,8 +1,8 @@
-import { BINGO_BONUS_POINTS, MAX_TILES_PER_PLAYER } from '@app/classes/actions/action-place/action-place.const';
 import { Square } from '@app/classes/square';
 import { MultiplierEffect } from '@app/classes/square/score-multiplier';
 import { Tile } from '@app/classes/tile';
-import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from '@app/constants/services-constants/score-calculator.const';
+import { BINGO_BONUS_POINTS, MAX_TILES_PER_PLAYER } from '@app/constants/game-constants';
+import { DEFAULT_MULTIPLIER, DEFAULT_SCORE } from '@app/constants/services-constants/score-calculator-const';
 import { Service } from 'typedi';
 
 @Service()

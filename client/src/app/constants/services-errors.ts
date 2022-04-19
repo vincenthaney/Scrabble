@@ -1,7 +1,7 @@
 import { Message } from '@app/classes/communication/message';
+import { SYSTEM_ID } from './game-constants';
 import { InitializeState } from '@app/classes/connection-state-service/connection-state';
 import { environment } from 'src/environments/environment';
-import { SYSTEM_ID } from './game';
 
 export const MISSING_PLAYER_DATA_TO_INITIALIZE = 'Certaines informations sont manquantes pour créer le joueur';
 export const NO_LOCAL_PLAYER = "Aucun joueur local n'a encore été défini";

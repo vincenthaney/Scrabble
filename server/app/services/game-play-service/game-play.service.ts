@@ -2,6 +2,7 @@ import { Action, ActionExchange, ActionHelp, ActionPass, ActionPlace, ActionRese
 import ActionHint from '@app/classes/actions/action-hint/action-hint';
 import { Position } from '@app/classes/board';
 import { ActionData, ActionExchangePayload, ActionPlacePayload, ActionType } from '@app/classes/communication/action-data';
+import { FeedbackMessage, FeedbackMessages } from '@app/classes/communication/feedback-messages';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
 import { RoundData } from '@app/classes/communication/round-data';
@@ -13,19 +14,18 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { ExpertVirtualPlayer } from '@app/classes/virtual-player/expert-virtual-player/expert-virtual-player';
 import { MUST_HAVE_7_TILES_TO_SWAP } from '@app/constants/classes-errors';
-import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
+import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game-constants';
 import { INVALID_COMMAND, INVALID_PAYLOAD, NOT_PLAYER_TURN } from '@app/constants/services-errors';
 import { MINIMUM_TILES_LEFT_FOR_EXCHANGE } from '@app/constants/virtual-player-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import DictionaryService from '@app/services/dictionary-service/dictionary.service';
-import GameHistoriesService from '@app/services/game-histories-service/game-histories.service';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
-import VirtualPlayerProfilesService from '@app/services/virtual-player-profiles-service/virtual-player-profiles.service';
+import GameHistoriesService from '@app/services/game-history-service/game-history.service';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
+import VirtualPlayerProfilesService from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { VirtualPlayerService } from '@app/services/virtual-player-service/virtual-player.service';
-import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player';
+import { isIdVirtualPlayer } from '@app/utils/is-id-virtual-player/is-id-virtual-player';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-import { FeedbackMessage, FeedbackMessages } from './feedback-messages';
 
 @Service()
 export class GamePlayService {
@@ -165,6 +165,7 @@ export class GamePlayService {
         if (isIdVirtualPlayer(playerStillInGame.id)) {
             game.getPlayer(playerWhoLeftId, IS_REQUESTING).isConnected = false;
             await this.handleGameOver(playerStillInGame.name, game, {});
+            this.activeGameService.removeGame(gameId, playerWhoLeftId);
             return;
         }
 

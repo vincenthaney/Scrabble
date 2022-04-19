@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game';
+import { GAME_ID_COOKIE, SOCKET_ID_COOKIE, TIME_TO_RECONNECT } from '@app/constants/game-constants';
 import { NO_LOCAL_PLAYER } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { CookieService } from '@app/services/cookie-service/cookie.service';

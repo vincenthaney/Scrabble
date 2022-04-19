@@ -5,12 +5,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
-import { Timer } from '@app/classes/timer/timer';
+import { Timer } from '@app/classes/round/timer';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { LOCAL_PLAYER_ICON } from '@app/constants/components-constants';
-import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { DEFAULT_PLAYER, SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
 import { GameService } from '@app/services';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
 import RoundManagerService from '@app/services/round-manager-service/round-manager.service';
@@ -20,30 +20,30 @@ import { InformationBoxComponent } from './information-box.component';
 import SpyObj = jasmine.SpyObj;
 
 class MockRoundManager {
-    pTimerSource: BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> = new BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]>([
+    pTimerSource: BehaviorSubject<[timer: Timer, activePlayer: Player]> = new BehaviorSubject<[timer: Timer, activePlayer: Player]>([
         new Timer(0, 0),
         DEFAULT_PLAYER,
     ]);
-    pTimer: Observable<[timer: Timer, activePlayer: AbstractPlayer]>;
+    pTimer: Observable<[timer: Timer, activePlayer: Player]>;
     pEndRoundEvent: Subject<void> = new Subject();
-    pActivePlayer: AbstractPlayer = new Player('mockId', 'mockName', []);
+    pActivePlayer: Player = new Player('mockId', 'mockName', []);
 
-    get timerSource(): BehaviorSubject<[timer: Timer, activePlayer: AbstractPlayer]> {
+    get timerSource(): BehaviorSubject<[timer: Timer, activePlayer: Player]> {
         return this.pTimerSource;
     }
 
-    get timer(): Observable<[timer: Timer, activePlayer: AbstractPlayer]> {
+    get timer(): Observable<[timer: Timer, activePlayer: Player]> {
         return this.timerSource.asObservable();
     }
     get endRoundEvent(): Subject<void> {
         return this.pEndRoundEvent;
     }
 
-    get activePlayer(): AbstractPlayer {
+    get activePlayer(): Player {
         return this.pActivePlayer;
     }
 
-    getActivePlayer(): AbstractPlayer | null {
+    getActivePlayer(): Player | null {
         return this.activePlayer;
     }
     // eslint-disable-next-line no-unused-vars
@@ -193,7 +193,7 @@ describe('InformationBoxComponent', () => {
             const startTimerSpy = spyOn<any>(component, 'startTimer');
             const updateBorderSpy = spyOn<any>(component, 'updateActivePlayerBorder');
             component['setupGame']();
-            mockRoundManager.timerSource.next([{} as unknown as Timer, {} as unknown as AbstractPlayer]);
+            mockRoundManager.timerSource.next([{} as unknown as Timer, {} as unknown as Player]);
             expect(startTimerSpy).toHaveBeenCalled();
             expect(updateBorderSpy).toHaveBeenCalled();
         });
@@ -358,7 +358,7 @@ describe('InformationBoxComponent', () => {
         });
 
         it('getPlayer1 should return a new player if gameservice player1 does not exist', () => {
-            gameServiceSpy.getPlayerByNumber.and.returnValue(undefined as unknown as AbstractPlayer);
+            gameServiceSpy.getPlayerByNumber.and.returnValue(undefined as unknown as Player);
             expect(component.getPlayer1()).toEqual(new Player('', 'Player1', []));
         });
 
@@ -368,7 +368,7 @@ describe('InformationBoxComponent', () => {
         });
 
         it('getPlayer2 should return a new player if gameservice player2 does not exist', () => {
-            gameServiceSpy.getPlayerByNumber.and.returnValue(undefined as unknown as AbstractPlayer);
+            gameServiceSpy.getPlayerByNumber.and.returnValue(undefined as unknown as Player);
             expect(component.getPlayer2()).toEqual(new Player('', 'Player2', []));
         });
     });

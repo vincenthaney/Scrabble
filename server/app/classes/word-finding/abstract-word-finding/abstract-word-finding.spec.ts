@@ -7,25 +7,18 @@
 /* eslint-disable dot-notation */
 import { Board, Orientation, Position } from '@app/classes/board';
 import { Dictionary } from '@app/classes/dictionary';
+import Range from '@app/classes/range/range';
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
-import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { expect } from 'chai';
-import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import {
     BoardPlacement,
+    BoardPlacementsExtractor,
     DictionarySearcher,
+    DictionarySearchResult,
     ScoredWordPlacement,
     WordFindingRequest,
     WordFindingUseCase,
-    DictionarySearchResult,
-    BoardPlacementsExtractor,
 } from '@app/classes/word-finding';
-import AbstractWordFinding from './abstract-word-finding';
-import Range from '@app/classes/range/range';
-import { Random } from '@app/utils/random';
-import { switchOrientation } from '@app/utils/switch-orientation';
-import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
 import {
     boardFromLetterValues,
     DEFAULT_BOARD_PLACEMENT,
@@ -37,7 +30,14 @@ import {
     lettersToTiles,
     LetterValues,
 } from '@app/classes/word-finding/helper.spec';
+import { ERROR_PLAYER_DOESNT_HAVE_TILE } from '@app/constants/classes-errors';
+import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
+import { Random } from '@app/utils/random/random';
+import { switchOrientation } from '@app/utils/switch-orientation/switch-orientation';
+import { expect } from 'chai';
 import * as sinon from 'sinon';
+import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
+import AbstractWordFinding from './abstract-word-finding';
 
 const GRID: LetterValues = [
     // 0   1    2    3    4

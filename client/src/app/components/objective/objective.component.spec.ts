@@ -47,7 +47,7 @@ describe('ObjectiveComponent', () => {
     describe('getStateMessage', () => {
         const tests: [state: ObjectiveState, expected: string][] = [
             [ObjectiveState.Completed, YOU_COMPLETED_THIS_OBJECTIVE],
-            [ObjectiveState.CompletedByOpponent, OPPONENT_COMPLETED_THIS_OBJECTIVE],
+            [ObjectiveState.CompletedByOpponent, OPPONENT_COMPLETED_THIS_OBJECTIVE(DEFAULT_OBJECTIVE.isPublic)],
             [ObjectiveState.NotCompleted, ''],
         ];
 

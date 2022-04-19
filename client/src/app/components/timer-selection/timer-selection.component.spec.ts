@@ -8,10 +8,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
+import { GameMode } from '@app/constants/game-mode';
+import { GameType } from '@app/constants/game-type';
 import { DEFAULT_TIMER_VALUE, MAXIMUM_TIMER_VALUE, MINIMUM_TIMER_VALUE, TIMER_VALUE_INCREMENTS } from '@app/constants/pages-constants';
 import { TimerSelectionComponent } from './timer-selection.component';
 

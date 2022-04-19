@@ -1,10 +1,10 @@
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { Square } from '@app/classes/square';
 import { TileReserveData } from '@app/classes/tile/tile.types';
-import PlayerData from './player-data';
+import { GameMode } from '@app/constants/game-mode';
+import { GameType } from '@app/constants/game-type';
 import { DictionarySummary } from './dictionary-summary';
+import PlayerData from './player-data';
 import { RoundData } from './round-data';
 
 export interface GameConfigData {

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { NAME_VALIDATION } from '@app/classes/name-validation';
 import { NAME_NO_MATCH_REGEX, NAME_REQUIRED, NAME_SAME_AS_VIRTUAL_PLAYER, NAME_TOO_LONG, NAME_TOO_SHORT } from '@app/constants/name-field';
+import { NAME_VALIDATION } from '@app/constants/name-validation';
 
 @Component({
     selector: 'app-name-field',

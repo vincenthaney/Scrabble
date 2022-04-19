@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Board } from '@app/classes/board';
 import { GameObjectivesData } from '@app/classes/communication/objective-data';
-import { GameObjectives } from '@app/classes/objectives/objective';
+import { GameObjectives } from '@app/classes/objectives/objective-utils';
 import Player from '@app/classes/player/player';
 import { Round } from '@app/classes/round/round';
 import RoundManager from '@app/classes/round/round-manager';
@@ -15,13 +15,13 @@ import { LetterValue, Tile } from '@app/classes/tile';
 import TileReserve from '@app/classes/tile/tile-reserve';
 import { TileReserveData } from '@app/classes/tile/tile.types';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
-import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
-import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game';
-import { generateGameObjectives } from '@app/constants/services-constants/objectives-test.const';
+import { TEST_DICTIONARY } from '@app/constants/dictionary-tests-const';
+import { IS_OPPONENT, IS_REQUESTING } from '@app/constants/game-constants';
+import { generateGameObjectives } from '@app/classes/objectives/objectives-test-helper.spec';
 import { INVALID_PLAYER_ID_FOR_GAME } from '@app/constants/services-errors';
 import BoardService from '@app/services/board-service/board.service';
-import ObjectivesService from '@app/services/objectives-service/objectives.service';
-import * as copy from '@app/utils/deep-copy';
+import ObjectivesService from '@app/services/objective-service/objective.service';
+import * as copy from '@app/utils/deep-copy/deep-copy';
 import * as chai from 'chai';
 import { assert } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

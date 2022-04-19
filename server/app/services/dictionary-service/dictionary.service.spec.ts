@@ -9,9 +9,10 @@
 /* eslint-disable dot-notation */
 import { BasicDictionaryData, DictionarySummary, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
+import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary-const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
-import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary.const';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -20,9 +21,8 @@ import { describe } from 'mocha';
 import * as sinon from 'sinon';
 import { SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { Container } from 'typedi';
-import DictionarySavingService from '@app/services/dictionary-saving-service/dictionary-saving.service';
 import {
-    ADDITIONAL_PROPERTY_DICTIONARY as ADDITIONAL_PROPERTY_DICTIONARY,
+    ADDITIONAL_PROPERTY_DICTIONARY,
     DEFAULT_SUMMARY,
     DICTIONARY_1,
     DICTIONARY_1_ID,

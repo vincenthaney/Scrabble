@@ -1,5 +1,5 @@
-import { Orientation } from '@app/classes/orientation';
-import { Position } from '@app/classes/position';
+import { Orientation } from '@app/classes/actions/orientation';
+import { Position } from '@app/classes/board-navigator/position';
 import { Tile } from '@app/classes/tile';
 
 export const ACTION_COMMAND_INDICATOR = '!';

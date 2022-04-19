@@ -2,7 +2,7 @@
 /* eslint-disable dot-notation */
 import { LETTER_DISTRIBUTION_RELATIVE_PATH } from '@app/constants/classes-constants';
 import { AMOUNT_MUST_BE_GREATER_THAN_1, TILE_NOT_IN_RESERVE, TILE_RESERVE_MUST_BE_INITIALIZED } from '@app/constants/classes-errors';
-import { LETTER_VALUES } from '@app/constants/game';
+import { LETTER_VALUES } from '@app/constants/game-constants';
 import { expect, spy } from 'chai';
 import * as mock from 'mock-fs'; // required when running test. Otherwise compiler cannot resolve fs, path and __dirname
 import { join } from 'path';

@@ -22,9 +22,9 @@ import { WordExtraction } from '@app/classes/word-extraction/word-extraction';
 import { WordPlacement } from '@app/classes/word-finding';
 import { TEST_ORIENTATION, TEST_SCORE, TEST_START_POSITION } from '@app/constants/virtual-player-tests-constants';
 import { ScoreCalculatorService } from '@app/services/score-calculator-service/score-calculator.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { WordsVerificationService } from '@app/services/words-verification-service/words-verification.service';
-import { StringConversion } from '@app/utils/string-conversion';
+import { StringConversion } from '@app/utils/string-conversion/string-conversion';
 import * as chai from 'chai';
 import { assert, spy } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -32,7 +32,7 @@ import * as spies from 'chai-spies';
 import * as sinon from 'sinon';
 import { createStubInstance, SinonStub, SinonStubbedInstance, stub } from 'sinon';
 import { ActionPlace } from '..';
-import { ActionErrorsMessages } from './action-errors';
+import { IMPOSSIBLE_ACTION } from './action-errors';
 
 const expect = chai.expect;
 
@@ -298,7 +298,7 @@ describe('ActionPlace', () => {
                     boolean
                 >;
                 const result = () => action.execute();
-                expect(result).to.throw(ActionErrorsMessages.ImpossibleAction);
+                expect(result).to.throw(IMPOSSIBLE_ACTION);
             });
 
             it('should return update', () => {

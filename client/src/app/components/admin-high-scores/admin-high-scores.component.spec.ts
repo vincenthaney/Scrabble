@@ -5,9 +5,9 @@ import { Injectable } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SingleHighScore } from '@app/classes/admin/high-score';
-import { GameType } from '@app/classes/game-type';
 import { IconComponent } from '@app/components/icon/icon.component';
-import HighScoresService from '@app/services/high-scores-service/high-scores.service';
+import { GameType } from '@app/constants/game-type';
+import HighScoresService from '@app/services/high-score-service/high-score.service';
 import { AdminHighScoresComponent } from './admin-high-scores.component';
 
 @Injectable()

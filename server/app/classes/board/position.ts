@@ -1,4 +1,4 @@
-import { Vec2 } from '@app/classes/vec2';
+import { Vec2 } from '@app/classes/board/vec2';
 import { DEFAULT_DISTANCE } from '@app/constants/position-constants';
 import { Orientation } from '.';
 import Direction from './direction';

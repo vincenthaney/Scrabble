@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
+import { Orientation } from '@app/classes/actions/orientation';
+import { Position } from '@app/classes/board-navigator/position';
 import { SquareView } from '@app/classes/square';
 import { LetterValue, Tile } from '@app/classes/tile';
-import { Orientation } from '@app/classes/orientation';
-import { Position } from '@app/classes/position';
 import { BoardNavigator } from './board-navigator';
 import Direction from './direction';
 

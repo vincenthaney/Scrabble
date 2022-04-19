@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
-import { DictionaryController } from '@app/controllers/dictionary-controller/dictionary-controller';
+import { DictionaryController } from '@app/controllers/dictionary-controller/dictionary.controller';
 import { DictionaryService } from './dictionary.service';
 
 const TEST_DICTIONARY_SUMMARY_ARRAY = [{} as DictionarySummary];

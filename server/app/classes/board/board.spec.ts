@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Square } from '@app/classes/square';
 import { Tile } from '@app/classes/tile';
-import { BOARD_SIZE } from '@app/constants/game';
+import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
+import { BOARD_SIZE } from '@app/constants/game-constants';
 import { expect } from 'chai';
 import { createStubInstance } from 'sinon';
 import { Board, BoardNavigator, Orientation, Position } from '.';
 import { SHOULD_HAVE_A_TILE, SHOULD_HAVE_NO_TILE } from './board';
-import { POSITION_OUT_OF_BOARD } from '@app/constants/classes-errors';
 
 const DEFAULT_TILE_A: Tile = { letter: 'A', value: 1 };
 const DEFAULT_TILE_B: Tile = { letter: 'B', value: 2 };

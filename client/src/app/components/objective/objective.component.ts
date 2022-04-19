@@ -20,7 +20,7 @@ export class ObjectiveComponent {
             case ObjectiveState.Completed:
                 return YOU_COMPLETED_THIS_OBJECTIVE;
             case ObjectiveState.CompletedByOpponent:
-                return OPPONENT_COMPLETED_THIS_OBJECTIVE;
+                return OPPONENT_COMPLETED_THIS_OBJECTIVE(this.objective.isPublic);
             default:
                 return '';
         }

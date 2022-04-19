@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { SECONDS_TO_MILLISECONDS } from '@app/constants/game';
+import { SECONDS_TO_MILLISECONDS } from '@app/constants/game-constants';
 import { EXPIRED_COOKIE_AGE } from '@app/constants/services-errors';
 import { CookieService } from './cookie.service';
 

@@ -13,12 +13,12 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GameHistoryState } from '@app/classes/admin-game-history';
+import { GameHistoryState } from '@app/classes/admin/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
+import { GameMode } from '@app/constants/game-mode';
+import { GameType } from '@app/constants/game-type';
 import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
 import { AdminGameHistoryComponent } from './admin-game-history.component';
 

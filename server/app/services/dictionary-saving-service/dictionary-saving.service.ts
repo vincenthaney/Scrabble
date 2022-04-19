@@ -16,8 +16,8 @@ import {
     INVALID_TITLE_ALREADY_USED,
     NO_DICTIONARY_WITH_ID,
     NO_DICTIONARY_WITH_NAME,
-} from '@app/constants/dictionary.const';
-import { NOT_FOUND } from '@app/constants/game';
+} from '@app/constants/dictionary-const';
+import { NOT_FOUND } from '@app/constants/game-constants';
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import { join } from 'path';
@@ -44,7 +44,7 @@ export default class DictionarySavingService {
 
     addDictionary(dictionary: BasicDictionaryData): DictionarySummary {
         if (this.dictionaryIndexes.entries.find((entry) => entry.title === dictionary.title))
-            throw new HttpException(INVALID_TITLE_ALREADY_USED(dictionary.title), StatusCodes.BAD_REQUEST);
+            throw new HttpException(INVALID_TITLE_ALREADY_USED(dictionary.title), StatusCodes.FORBIDDEN);
 
         const id = uuidv4();
         const filename = `${dictionary.title}-${id}.json`;
@@ -67,6 +67,9 @@ export default class DictionarySavingService {
     }
 
     updateDictionary(updateInfo: DictionaryUpdateInfo): DictionarySummary {
+        if (updateInfo.title && this.dictionaryIndexes.entries.find((entry) => entry.title === updateInfo.title))
+            throw new HttpException(INVALID_TITLE_ALREADY_USED(updateInfo.title), StatusCodes.FORBIDDEN);
+
         const [dictionaryEntry, dictionaryEntryIndex] = this.getEntryFromId(updateInfo.id, false);
 
         const dictionary = this.getDictionaryByFilename(dictionaryEntry.filename);

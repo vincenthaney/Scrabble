@@ -15,16 +15,16 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { PlayerData } from '@app/classes/communication';
 import { InitializeGameData } from '@app/classes/communication/game-config';
 import { Message } from '@app/classes/communication/message';
-import { GameMode } from '@app/classes/game-mode';
-import { GameType } from '@app/classes/game-type';
-import { AbstractPlayer, Player } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { PlayerContainer } from '@app/classes/player/player-container';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { TileComponent } from '@app/components/tile/tile.component';
 import { CODE_HTML_TAG } from '@app/constants/components-constants';
 import { INITIAL_MESSAGE } from '@app/constants/controller-constants';
 import { TEST_DICTIONARY } from '@app/constants/controller-test-constants';
-import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game';
+import { SYSTEM_ERROR_ID, SYSTEM_ID } from '@app/constants/game-constants';
+import { GameMode } from '@app/constants/game-mode';
+import { GameType } from '@app/constants/game-type';
 import { GameService, InputParserService } from '@app/services';
 import { FocusableComponentsService } from '@app/services/focusable-components-service/focusable-components.service';
 import { marked } from 'marked';
@@ -255,7 +255,7 @@ describe('CommunicationBoxComponent', () => {
         let gameIdSpy: jasmine.Spy;
 
         beforeEach(() => {
-            spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as AbstractPlayer);
+            spyOn(gameServiceMock['roundManager'], 'getActivePlayer').and.returnValue({ id: CURRENT_PLAYER_ID } as Player);
             gameIdSpy = spyOn(component['gameService'], 'getGameId').and.returnValue(DEFAULT_SYSTEM_MESSAGE.gameId);
         });
 

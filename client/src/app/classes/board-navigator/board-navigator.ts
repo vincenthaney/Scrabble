@@ -1,6 +1,6 @@
+import { Orientation } from '@app/classes/actions/orientation';
+import { Position } from '@app/classes/board-navigator/position';
 import { SquareView } from '@app/classes/square';
-import { Orientation } from '@app/classes/orientation';
-import { Position } from '@app/classes/position';
 import Direction from './direction';
 
 export class BoardNavigator {

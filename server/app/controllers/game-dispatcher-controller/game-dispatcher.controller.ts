@@ -1,5 +1,6 @@
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
 import { LobbyData } from '@app/classes/communication/lobby-data';
+import { PlayerData } from '@app/classes/communication/player-data';
 import { CreateGameRequest, GameRequest, LobbiesRequest } from '@app/classes/communication/request';
 import { GameConfigData } from '@app/classes/game/game-config';
 import { GameMode } from '@app/classes/game/game-mode';
@@ -17,11 +18,11 @@ import {
     VIRTUAL_PLAYER_LEVEL_REQUIRED,
     VIRTUAL_PLAYER_NAME_REQUIRED,
 } from '@app/constants/controllers-errors';
-import { IS_REQUESTING, SYSTEM_ID } from '@app/constants/game';
+import { IS_OPPONENT, IS_REQUESTING, SYSTEM_ID } from '@app/constants/game-constants';
 import { ActiveGameService } from '@app/services/active-game-service/active-game.service';
 import { GameDispatcherService } from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { SocketService } from '@app/services/socket-service/socket.service';
-import { validateName } from '@app/utils/validate-name';
+import { validateName } from '@app/utils/validate-name/validate-name';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -177,13 +178,13 @@ export class GameDispatcherController {
         }
         // Check if there is no player left --> cleanup server and client
         try {
-            this.socketService.removeFromRoom(playerId, gameId);
-            this.socketService.emitToSocket(playerId, 'cleanup');
-
             if (!this.socketService.doesRoomExist(gameId)) {
                 this.activeGameService.removeGame(gameId, playerId);
                 return;
             }
+
+            this.socketService.removeFromRoom(playerId, gameId);
+            this.socketService.emitToSocket(playerId, 'cleanup');
         } catch (exception) {
             // catch errors caused by inexistent socket after client closed application
         }
@@ -284,6 +285,10 @@ export class GameDispatcherController {
 
         const data = game.createStartGameData();
         this.socketService.emitToSocket(newPlayerId, 'startGame', data);
+
+        const newPlayerData: PlayerData = { id: playerId, newId: newPlayerId };
+        const gameUpdateData: GameUpdateData = game.isPlayer1(player.id) ? { player1: newPlayerData } : { player2: newPlayerData };
+        this.socketService.emitToSocket(game.getPlayer(newPlayerId, IS_OPPONENT).id, 'gameUpdate', gameUpdateData);
     }
 
     private handleDisconnection(gameId: string, playerId: string): void {

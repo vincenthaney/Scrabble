@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ActionData, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload, PlaceActionPayload } from '@app/classes/actions/action-data';
-import CommandException from '@app/classes/command-exception';
-import { Location } from '@app/classes/location';
-import { Orientation } from '@app/classes/orientation';
-import { AbstractPlayer } from '@app/classes/player';
-import { Position } from '@app/classes/position';
+import { Location } from '@app/classes/actions/location';
+import { Orientation } from '@app/classes/actions/orientation';
+import { Position } from '@app/classes/board-navigator/position';
+import { Player } from '@app/classes/player';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
 import {
@@ -15,14 +14,15 @@ import {
     LETTER_VALUES,
     ON_YOUR_TURN_ACTIONS,
     SYSTEM_ERROR_ID,
-} from '@app/constants/game';
+} from '@app/constants/game-constants';
 import { ACTIVE_PLAYER_NOT_FOUND } from '@app/constants/services-errors';
 import { GamePlayController } from '@app/controllers/game-play-controller/game-play.controller';
 import { GameService } from '@app/services';
 import { ActionService } from '@app/services/action-service/action.service';
 import { GameViewEventManagerService } from '@app/services/game-view-event-manager-service/game-view-event-manager.service';
-import { isNumber } from '@app/utils/is-number';
-import { removeAccents } from '@app/utils/remove-accents';
+import CommandException from '@app/services/input-parser-service/command-exception';
+import { isNumber } from '@app/utils/isNumber/is-number';
+import { removeAccents } from '@app/utils/remove-accents/remove-accents';
 
 const ASCII_VALUE_OF_LOWERCASE_A = 97;
 
@@ -139,7 +139,7 @@ export default class InputParserService {
             if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandException(CommandExceptionMessages.ExchangeRequireLowercaseLetters);
         }
 
-        const player: AbstractPlayer = this.getLocalPlayer();
+        const player: Player = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile: Tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
@@ -214,8 +214,8 @@ export default class InputParserService {
         return inputStartPosition;
     }
 
-    private getLocalPlayer(): AbstractPlayer {
-        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+    private getLocalPlayer(): Player {
+        const localPlayer: Player | undefined = this.gameService.getLocalPlayer();
         if (localPlayer) {
             return localPlayer;
         }
