@@ -4,7 +4,7 @@
 import { INVALID_ID_FOR_SOCKET, SOCKET_SERVICE_NOT_INITIALIZED } from '@app/constants/services-errors';
 import { Delay } from '@app/utils/delay';
 import { Server } from 'app/server';
-import { expect } from 'chai';
+import { expect, spy } from 'chai';
 import { io as ioClient, Socket } from 'socket.io-client';
 import { Container } from 'typedi';
 import DatabaseService from '@app/services/database-service/database.service';
@@ -12,6 +12,7 @@ import DictionaryService from '@app/services/dictionary-service/dictionary.servi
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { SocketService } from './socket.service';
 import { Application } from '@app/app';
+import * as arrowFunction from '@app/utils/is-id-virtual-player';
 
 const RESPONSE_DELAY = 400;
 const SERVER_URL = 'http://localhost:';
@@ -246,6 +247,18 @@ describe('SocketService', () => {
                     });
                     service.emitToSocket(id, '_test_event', DEFAULT_ARGS);
                 });
+            });
+
+            it('should not emit to socket if id is from virtual player', async () => {
+                const spyGetSocket = spy.on(service, 'getSocket', () => {
+                    return {};
+                });
+
+                spy.on(arrowFunction, 'isIdVirtualPlayer', () => {
+                    return true;
+                });
+                service.emitToSocket(id, '_test_event', DEFAULT_ARGS);
+                expect(spyGetSocket).not.to.have.been.called();
             });
 
             it('should throw if sio is undefined', () => {

@@ -49,6 +49,11 @@ const NON_ALPHABETIC_WORD = [
     [{} as unknown as Square, { letter: 'X' } as Tile],
 ];
 
+const SHORT_WORD = [
+    [{} as unknown as Square, { letter: 'V' } as Tile],
+    [{} as unknown as Square, { letter: 'I' } as Tile],
+];
+
 const VALID_PARAMETERS_ONE_WORD = { createdWords: [ALPHABETIC_WORD_1] } as ObjectiveValidationParameters;
 
 const VALID_PARAMETERS_TWO_WORDS = { createdWords: [ALPHABETIC_WORD_1, ALPHABETIC_WORD_2] } as ObjectiveValidationParameters;
@@ -58,6 +63,8 @@ const VALID_PARAMETERS_DOUBLED_LETTER = { createdWords: [ALPHABETIC_WORD_2] } as
 const VALID_PARAMETERS_BLANK_TILE = { createdWords: [ALPHABETIC_WORD_BLANK_TILE] } as ObjectiveValidationParameters;
 
 const INVALID_PARAMETERS = { createdWords: [NON_ALPHABETIC_WORD] } as ObjectiveValidationParameters;
+
+const SHORT_WORD_PARAMETERS = { createdWords: [SHORT_WORD] } as ObjectiveValidationParameters;
 
 describe('AlphabeticOrderObjective', () => {
     let objective: AlphabeticOrderObjective;
@@ -84,6 +91,12 @@ describe('AlphabeticOrderObjective', () => {
             objective.progress = 0;
             objective.updateProgress(VALID_PARAMETERS_ONE_WORD);
             expect(objective.progress).to.equal(1);
+        });
+
+        it('should update progress if a created word is too short (continue)', () => {
+            objective.progress = 0;
+            objective.updateProgress(SHORT_WORD_PARAMETERS);
+            expect(objective.progress).to.equal(0);
         });
 
         it('should update progress if a created word is in alphabetical order but has 2 identical letters in a row', () => {

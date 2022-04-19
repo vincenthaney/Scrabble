@@ -10,6 +10,9 @@ import * as spies from 'chai-spies';
 import { WordsVerificationService } from './words-verification.service';
 import { Container } from 'typedi';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { Dictionary } from '@app/classes/dictionary';
+import { createStubInstance } from 'sinon';
+import DictionaryService from '@app/services/dictionary-service/dictionary.service';
 
 chai.use(spies);
 chai.use(chaiAsPromised);
@@ -68,16 +71,25 @@ describe('WordsVerificationService', () => {
             expect(result).to.Throw(testWord + WORD_CONTAINS_APOSTROPHE);
         });
 
-        it('should return error if word is not in dictionary', () => {
-            const testWord = 'ufdwihfewa';
+        it('should throw error if word is not in dictionary', () => {
+            const testWord = 'aaaaaaaa';
+            const dictionaryStub = createStubInstance(Dictionary);
+            dictionaryStub.wordExists.returns(false);
+            const dictionaryServiceStub = createStubInstance(DictionaryService);
+            dictionaryServiceStub.getDictionary.returns(dictionaryStub as unknown as Dictionary);
+            (service['dictionaryService'] as unknown) = dictionaryServiceStub;
             const result = () => service.verifyWords([testWord], dictionaryTitle);
             expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
         });
 
-        it('should throw error if dictionary does not exist', () => {
-            const testWord = 'ufdwihfewa';
-            const result = () => service.verifyWords([testWord], 'truc');
-            expect(result).to.Throw(INVALID_WORD(testWord.toUpperCase()));
+        it('should not throw if word is in dictionary', () => {
+            const dictionaryStub = createStubInstance(Dictionary);
+            dictionaryStub.wordExists.returns(true);
+            const dictionaryServiceStub = createStubInstance(DictionaryService);
+            dictionaryServiceStub.getDictionary.returns(dictionaryStub as unknown as Dictionary);
+            (service['dictionaryService'] as unknown) = dictionaryServiceStub;
+
+            expect(service.verifyWords(['bounjour'], dictionaryTitle)).to.be.undefined;
         });
     });
 });

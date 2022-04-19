@@ -78,7 +78,7 @@ export class GamePlayService {
             case ActionType.PLACE: {
                 const payload = this.getActionPlacePayload(actionData);
                 const startPosition = new Position(payload.startPosition.row, payload.startPosition.column);
-                return new ActionPlace(player, game, { tilesToPlace: payload.tiles ?? [], startPosition, orientation: payload.orientation });
+                return new ActionPlace(player, game, { tilesToPlace: payload.tiles, startPosition, orientation: payload.orientation });
             }
             case ActionType.EXCHANGE: {
                 const totalTilesLeft = this.activeGameService.getGame(game.getId(), player.id).getTotalTilesLeft();

@@ -45,7 +45,7 @@ export class GameDispatcherService {
 
     async createSoloGame(config: GameConfigData): Promise<void> {
         const startGameData = await this.createGameService.createSoloGame(config);
-        await this.dictionaryService.useDictionary(config.dictionary.id);
+        this.dictionaryService.useDictionary(config.dictionary.id);
 
         const gameId = startGameData.gameId;
         this.socketService.addToRoom(config.playerId, gameId);
@@ -70,7 +70,7 @@ export class GameDispatcherService {
 
     async createMultiplayerGame(config: GameConfigData): Promise<LobbyData> {
         const waitingRoom = this.createGameService.createMultiplayerGame(config);
-        await this.dictionaryService.useDictionary(config.dictionary.id);
+        this.dictionaryService.useDictionary(config.dictionary.id);
 
         this.addToWaitingRoom(waitingRoom);
         this.socketService.addToRoom(config.playerId, waitingRoom.getId());

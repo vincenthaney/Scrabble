@@ -13,21 +13,22 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { HttpClientModule } from '@angular/common/http';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { UploadDictionaryComponent } from './upload-dictionary.component';
 import { DictionaryData } from '@app/classes/dictionary/dictionary-data';
-import { UploadEvent } from './upload-dictionary.component.types';
+import { UploadEvent, UploadState } from './upload-dictionary.component.types';
+import SpyObj = jasmine.SpyObj;
+import { WRONG_FILE_TYPE } from '@app/constants/dictionaries-components';
+import { ReactiveFormsModule } from '@angular/forms';
 
-const TEST_EVENT: UploadEvent = {
-    addEventListener: () => {},
-    dispatchEvent: () => {
-        return false;
-    },
-    removeEventListener: () => {},
-    files: [{ iAmValue: 'heyhey' } as unknown as File],
-};
+const CORRECT_TYPE_FILE: UploadEvent = {
+    files: [{ iAmValue: 'heyhey', type: 'application/json' } as unknown as File],
+} as unknown as UploadEvent;
+
+const INCORRECT_TYPE_FILE: UploadEvent = {
+    files: [{ iAmValue: 'heyhey', type: 'application/xml' } as unknown as File],
+} as unknown as UploadEvent;
 
 export class MatDialogMock {
     close() {
@@ -41,14 +42,21 @@ describe('UploadDictionaryComponent', () => {
     let component: UploadDictionaryComponent;
     let fixture: ComponentFixture<UploadDictionaryComponent>;
     let dictionariesServiceMock: DictionaryService;
+    let fileReaderSpy: SpyObj<FileReader>;
+
+    beforeEach(() => {
+        fileReaderSpy = jasmine.createSpyObj('FileReader', ['onload', 'readAsText']);
+        fileReaderSpy.readAsText.and.callFake(() => {});
+    });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [UploadDictionaryComponent, IconComponent, PageHeaderComponent],
+            declarations: [UploadDictionaryComponent, IconComponent],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
                 MatFormFieldModule,
+                ReactiveFormsModule,
                 MatSelectModule,
                 MatDividerModule,
                 MatProgressSpinnerModule,
@@ -63,6 +71,10 @@ describe('UploadDictionaryComponent', () => {
                 {
                     provide: MatDialogRef,
                     useClass: MatDialogMock,
+                },
+                {
+                    provide: FileReader,
+                    useValue: fileReaderSpy,
                 },
                 DictionaryService,
             ],
@@ -81,40 +93,56 @@ describe('UploadDictionaryComponent', () => {
     });
 
     describe('handleFileInput', () => {
-        let spyReadAsText: jasmine.Spy;
         beforeEach(() => {
-            spyReadAsText = spyOn(FileReader.prototype, 'readAsText').and.callFake(() => {
-                return;
-            });
+            spyOn(window, 'FileReader').and.returnValue(fileReaderSpy);
         });
 
         it('should assign value to component.selectedFile', () => {
             spyOn(JSON, 'parse').and.callFake(() => {
                 return {} as DictionaryData;
             });
-            component.handleFileInput(TEST_EVENT);
-            expect(spyReadAsText).toHaveBeenCalled();
+            component.handleFileInput(CORRECT_TYPE_FILE);
+            expect(fileReaderSpy.readAsText).toHaveBeenCalled();
         });
 
-        it('should  return null if given null', () => {
+        it('should assign the correct values if the file type is incorrect', () => {
+            spyOn(JSON, 'parse').and.callFake(() => {
+                return {} as DictionaryData;
+            });
+            component.handleFileInput(INCORRECT_TYPE_FILE);
+            expect(component.errorMessage).toEqual(WRONG_FILE_TYPE);
+            expect(component.isDictionaryReady).toEqual(false);
+            expect(component.state).toEqual(UploadState.Error);
+        });
+
+        it('should assign the correct values if the file type is .json', () => {
+            const dictionaryData = {} as DictionaryData;
+            spyOn(JSON, 'parse').and.callFake(() => {
+                return dictionaryData;
+            });
+            component.handleFileInput(CORRECT_TYPE_FILE);
+            if (fileReaderSpy !== null && fileReaderSpy.onload !== null) fileReaderSpy.onload({} as unknown as ProgressEvent<FileReader>);
+            expect(component.state).toEqual(UploadState.Ready);
+            expect(component.errorMessage).toEqual('');
+            expect(component.isDictionaryReady).toEqual(true);
+            expect(component.newDictionary).toEqual(dictionaryData);
+        });
+
+        it('should assign the correct values if the an error is thrown while parsing the .json', () => {
+            const errorMessage = 'parsing error';
+            spyOn(JSON, 'parse').and.callFake(() => {
+                throw new Error(errorMessage);
+            });
+            component.handleFileInput(CORRECT_TYPE_FILE);
+            if (fileReaderSpy !== null && fileReaderSpy.onload !== null) fileReaderSpy.onload({} as unknown as ProgressEvent<FileReader>);
+            expect(component.state).toEqual(UploadState.Error);
+            expect(component.errorMessage).toEqual(errorMessage);
+        });
+
+        it('should early return if given null', () => {
             expect(component.handleFileInput(null)).toBeUndefined();
+            expect(fileReaderSpy.readAsText).not.toHaveBeenCalled();
         });
-
-        // it('should call JSON.parse', () => {
-        //     const spyParse = spyOn(JSON, 'parse').and.callFake(() => {
-        //         return {} as DictionaryData;
-        //     });
-        //     component.onFileChanged(TEST_EVENT);
-        //     expect(spyParse).toHaveBeenCalled();
-        // });
-
-        // it('should assign error message to compoenent.error message when JSON.parse throws', () => {
-        //     spyOn(JSON, 'parse').and.callFake(() => {
-        //         throw new Error('testError');
-        //     });
-        //     component.onFileChanged(TEST_EVENT);
-        //     expect(component.errorMessage).toEqual('testError');
-        // });
     });
 
     describe('onUpload', () => {

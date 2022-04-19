@@ -21,17 +21,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { VirtualPlayerProfile } from '@app/classes/communication/virtual-player-profiles';
 import { GameMode } from '@app/classes/game-mode';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
-import { DEFAULT_OPPONENT_NAME } from '@app/constants/controller-test-constants';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game';
+import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { GameDispatcherService } from '@app/services/';
@@ -55,14 +55,26 @@ describe('GameCreationPageComponent', () => {
     let dictionaryServiceSpy: SpyObj<DictionaryService>;
     let gameDispatcherCreationSubject: Subject<HttpErrorResponse>;
     let dictionaryUpdateSubject: Subject<DictionarySummary[]>;
+    let updateObs: Subject<VirtualPlayerProfile[]>;
 
     const EMPTY_VALUE = '';
 
     let virtualPlayerProfileSpy: SpyObj<VirtualPlayerProfilesService>;
 
     beforeEach(() => {
-        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', ['getVirtualPlayerProfiles']);
-        virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo([]);
+        virtualPlayerProfileSpy = jasmine.createSpyObj('VirtualPlayerProfilesService', [
+            'getAllVirtualPlayersProfile',
+            'subscribeToVirtualPlayerProfilesUpdateEvent',
+            'subscribeToComponentUpdateEvent',
+            'subscribeToRequestSentEvent',
+            'virtualPlayersUpdateEvent',
+        ]);
+        virtualPlayerProfileSpy.getAllVirtualPlayersProfile.and.resolveTo();
+        updateObs = new Subject();
+
+        virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent.and.callFake(
+            (serviceDestroyed$: Subject<boolean>, callback: (dictionaries: VirtualPlayerProfile[]) => void) => updateObs.subscribe(callback),
+        );
     });
 
     beforeEach(() => {
@@ -158,10 +170,22 @@ describe('GameCreationPageComponent', () => {
         });
 
         it('should update dictionaryOptions when dictionary service updates list', () => {
+            const patchValueSpy: jasmine.Spy = spyOn<any>(component['gameParameters'], 'patchValue').and.callFake(() => {});
             dictionaryUpdateSubject.next();
             expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
             expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
+            expect(patchValueSpy).toHaveBeenCalled();
         });
+
+        it('should not update gameParameters if specified', () => {
+            const patchValueSpy: jasmine.Spy = spyOn<any>(component['gameParameters'], 'patchValue').and.callFake(() => {});
+            component['shouldSetToDefaultDictionary'] = false;
+            dictionaryUpdateSubject.next();
+            expect(dictionaryServiceSpy.getDictionaries).toHaveBeenCalled();
+            expect(patchValueSpy).not.toHaveBeenCalled();
+            expect(component.dictionaryOptions).toEqual(dictionaryServiceSpy.getDictionaries());
+        });
+
         it('should patch dictionary value when dictionary service updates list', () => {
             const spy = spyOn(component.gameParameters, 'patchValue').and.callFake(() => {});
             dictionaryUpdateSubject.next();
@@ -202,27 +226,20 @@ describe('GameCreationPageComponent', () => {
             expect(dictionaryServiceSpy.updateAllDictionaries).toHaveBeenCalled();
         });
 
-        it('should subscribe to level value change', async () => {
-            spyOn<any>(component, 'getVirtualPlayerNames').and.returnValue([DEFAULT_OPPONENT_NAME]);
-            const spy = spyOn<any>(component.gameParameters, 'patchValue').and.callFake(() => {});
+        it('should subscribe to subscribeToVirtualPlayerProfilesUpdateEvent', async () => {
             await component.ngOnInit();
-            component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
-            expect(spy).toHaveBeenCalledWith({ virtualPlayerName: DEFAULT_OPPONENT_NAME });
+            expect(virtualPlayerProfileSpy.subscribeToVirtualPlayerProfilesUpdateEvent).toHaveBeenCalled();
         });
 
-        it('should generate virtual player profiles map', (done) => {
-            virtualPlayerProfileSpy.getVirtualPlayerProfiles.and.resolveTo(MOCK_PLAYER_PROFILES);
-            const generateSpy = spyOn<any>(component, 'generateVirtualPlayerProfileMap').and.callFake(() => {});
-            component.ngOnInit();
-
-            setTimeout(() => {
-                expect(generateSpy).toHaveBeenCalledWith(MOCK_PLAYER_PROFILES);
-                done();
-            });
+        it('subscribeToVirtualPlayerProfilesUpdateEvent should call generateVirtualPlayerProfileMap', async () => {
+            const spy = spyOn<any>(component, 'generateVirtualPlayerProfileMap').and.callFake(() => {});
+            await component.ngOnInit();
+            updateObs.next([]);
+            expect(spy).toHaveBeenCalled();
         });
     });
 
-    describe('ngOndestroy', () => {
+    describe('ngOnDestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
             const ngUnsubscribeNextSpy = spyOn<any>(component.pageDestroyed$, 'next');
             const ngUnsubscribeCompleteSpy = spyOn<any>(component.pageDestroyed$, 'complete');
@@ -230,6 +247,23 @@ describe('GameCreationPageComponent', () => {
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
             expect(ngUnsubscribeCompleteSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('getDefaultTimerValue', () => {
+        it('should return the equivalent number', () => {
+            spyOn<any>(window['localStorage'], 'getItem').and.returnValue('1');
+            expect(component['getDefaultTimerValue']()).toEqual(1);
+        });
+
+        it('should return the default value if the stored information is invalid', () => {
+            spyOn<any>(window['localStorage'], 'getItem').and.returnValue('a');
+            expect(component['getDefaultTimerValue']()).toEqual(DEFAULT_TIMER_VALUE);
+        });
+
+        it('should return the default value if there is no stored information', () => {
+            spyOn<any>(window['localStorage'], 'getItem').and.returnValue(null);
+            expect(component['getDefaultTimerValue']()).toEqual(DEFAULT_TIMER_VALUE);
         });
     });
 
@@ -427,8 +461,8 @@ describe('GameCreationPageComponent', () => {
 
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Beginner });
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
-                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Beginner,
-            ).map((profile: VirtualPlayerProfile) => profile.name);
+                (profile: VirtualPlayerData) => profile.level === VirtualPlayerLevel.Beginner,
+            ).map((profile: VirtualPlayerData) => profile.name);
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });
@@ -438,8 +472,8 @@ describe('GameCreationPageComponent', () => {
 
             component.gameParameters.patchValue({ level: VirtualPlayerLevel.Expert });
             const expectedResult: string[] = MOCK_PLAYER_PROFILES.filter(
-                (profile: VirtualPlayerProfile) => profile.level === VirtualPlayerLevel.Expert,
-            ).map((profile: VirtualPlayerProfile) => profile.name);
+                (profile: VirtualPlayerData) => profile.level === VirtualPlayerLevel.Expert,
+            ).map((profile: VirtualPlayerData) => profile.name);
 
             expect(component.getVirtualPlayerNames()).toEqual(expectedResult);
         });

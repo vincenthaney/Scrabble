@@ -17,7 +17,7 @@ import { PageHeaderComponent } from '@app/components/page-header/page-header.com
 import { AppMaterialModule } from '@app/modules/material.module';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { ModifyDictionaryComponent } from './modify-dictionary-dialog.component';
-import { DictionaryDialogParameters, ModifyDictionaryComponentStates } from './modify-dictionary-dialog.component.types';
+import { DictionaryDialogParameters } from './modify-dictionary-dialog.component.types';
 
 const MODEL: DictionaryDialogParameters = {
     dictionaryId: 'testId',
@@ -84,23 +84,14 @@ describe('ModifyDictionaryComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('On componentUpdateEvent', () => {
-        it('should call component.cleanupState()', () => {
-            const spy = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
-                return;
-            });
-            dictionariesServiceMock['componentUpdateEvent'].next();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('ngOnChanges', () => {
         it('should call formParameters.get twice', () => {
             const spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
                 return null;
             });
             component.ngOnChanges();
-            expect(spyFormParameters).toHaveBeenCalledTimes(2);
+            expect(spyFormParameters).toHaveBeenCalledWith('inputDictionaryTitle');
+            expect(spyFormParameters).toHaveBeenCalledWith('inputDictionaryDescription');
         });
 
         it('should call formParameters.get and return valid', () => {
@@ -149,7 +140,7 @@ describe('ModifyDictionaryComponent', () => {
             expect(spyFormParameters).toHaveBeenCalledTimes(2);
         });
 
-        it('shouldhave been called with formParameters.get values undefined', () => {
+        it('should have been called with formParameters.get values undefined', () => {
             spyFormParameters = spyOn(component.formParameters, 'get').and.callFake(() => {
                 return null;
             });
@@ -176,12 +167,8 @@ describe('ModifyDictionaryComponent', () => {
 
     describe('closeDialog', () => {
         let spyDialog: jasmine.Spy;
-        let spyCleanup: jasmine.Spy;
         beforeEach(() => {
             spyDialog = spyOn(component['dialogRef'], 'close').and.callFake(() => {
-                return;
-            });
-            spyCleanup = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
                 return;
             });
         });
@@ -189,11 +176,6 @@ describe('ModifyDictionaryComponent', () => {
         it('should call dialogRef.close()', () => {
             component.closeDialog();
             expect(spyDialog).toHaveBeenCalled();
-        });
-
-        it('should call cleanupDialogStates()', () => {
-            component.closeDialog();
-            expect(spyCleanup).toHaveBeenCalled();
         });
     });
 
@@ -217,13 +199,6 @@ describe('ModifyDictionaryComponent', () => {
             component.isDictionaryTitleValid = false;
             component.isDictionaryDescriptionValid = true;
             expect(component.isInformationValid()).toBeFalse();
-        });
-    });
-
-    describe('cleanupDialogStates', () => {
-        it('should turn state to Ready', () => {
-            component.cleanupDialogStates();
-            expect(component.state).toEqual(ModifyDictionaryComponentStates.Ready);
         });
     });
 });

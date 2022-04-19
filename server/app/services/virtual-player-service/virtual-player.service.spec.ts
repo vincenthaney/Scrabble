@@ -9,6 +9,7 @@ import { GameMode } from '@app/classes/game/game-mode';
 import { GameType } from '@app/classes/game/game-type';
 import Player from '@app/classes/player/player';
 import { Square } from '@app/classes/square';
+import { AbstractVirtualPlayer } from '@app/classes/virtual-player/abstract-virtual-player';
 import { BeginnerVirtualPlayer } from '@app/classes/virtual-player/beginner-virtual-player/beginner-virtual-player';
 import { TEST_DICTIONARY } from '@app/constants/dictionary-tests.const';
 import { GAME_SHOULD_CONTAIN_ROUND } from '@app/constants/virtual-player-constants';
@@ -17,6 +18,7 @@ import { expect } from 'chai';
 import * as spies from 'chai-spies';
 import { StatusCodes } from 'http-status-codes';
 import * as mockttp from 'mockttp';
+import { createStubInstance } from 'sinon';
 import { VirtualPlayerService } from './virtual-player.service';
 
 chai.use(spies);
@@ -113,7 +115,11 @@ describe('VirtualPlayerService', () => {
         });
 
         it('should call game.getplayer', () => {
-            const getPlayerSpy = chai.spy.on(DEFAULT_GAME, 'getPlayer');
+            const playerStub = createStubInstance(AbstractVirtualPlayer);
+            playerStub.playTurn.resolves();
+            const getPlayerSpy = chai.spy.on(DEFAULT_GAME, 'getPlayer', () => {
+                return playerStub;
+            });
             virtualPlayerService.triggerVirtualPlayerTurn(DEFAULT_STARTING_GAME_DATA, DEFAULT_GAME as unknown as Game);
             expect(getPlayerSpy).to.have.been.called();
         });
@@ -121,8 +127,8 @@ describe('VirtualPlayerService', () => {
 
     describe('sliceVirtualPlayerToPlayer', () => {
         it('should return sliced player', async () => {
-            const virtualPlayer = new BeginnerVirtualPlayer(DEFAULT_GAME_ID, DEFAULT_PLAYER1_NAME);
-            expect(virtualPlayerService.sliceVirtualPlayerToPlayer(virtualPlayer.convertToPlayerData())).to.exist;
+            expect(virtualPlayerService.sliceVirtualPlayerToPlayer({ id: '', name: DEFAULT_PLAYER1_NAME, tiles: [], score: 1, isConnected: true })).to
+                .exist;
         });
     });
 });

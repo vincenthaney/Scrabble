@@ -21,6 +21,13 @@ export const DICTIONARIES_COLUMNS = {
     description: 'Description',
     actions: '',
 };
+
+export const VIRTUAL_PLAYERS_COLUMNS = {
+    name: 'Nom',
+    level: 'Niveau',
+    actions: '',
+};
+
 export const DEFAULT_DICTIONARIES_COLUMNS: DisplayDictionaryKeys[] = ['title', 'description', 'actions'];
 
 export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
@@ -61,3 +68,5 @@ export const ERROR_SNACK_BAR_CONFIG = { duration: SNACK_BAR_ERROR_DURATION, pane
 
 export const IS_CLICKABLE_CLASS = 'isClickable';
 export const CODE_HTML_TAG = 'CODE';
+
+export const ASCENDING_COLUMN_SORTER = 'asc';

@@ -1,5 +1,4 @@
 import { MONGO_DATABASE_NAME, MONGO_DB_URL } from '@app/constants/services-constants/mongo-db.const';
-import { EventEmitter } from 'events';
 import { Collection, Db, Document, MongoClient } from 'mongodb';
 import { Service } from 'typedi';
 
@@ -7,11 +6,6 @@ import { Service } from 'typedi';
 export default class DatabaseService {
     private mongoClient: MongoClient;
     private db: Db;
-    private databaseInitialized$: EventEmitter;
-
-    constructor() {
-        this.databaseInitialized$ = new EventEmitter();
-    }
 
     async populateDb(collectionName: string, data: Document[]): Promise<void> {
         const collection = this.db.collection(collectionName);
@@ -25,7 +19,6 @@ export default class DatabaseService {
             const client = await MongoClient.connect(databaseUrl);
             this.mongoClient = client;
             this.db = this.mongoClient.db(MONGO_DATABASE_NAME);
-            this.databaseInitialized$.emit('initialize');
         } catch (exception) {
             return null;
         }
@@ -42,9 +35,5 @@ export default class DatabaseService {
 
     async isCollectionEmpty(collection: Collection<Document>): Promise<boolean> {
         return (await collection.countDocuments({})) === 0;
-    }
-
-    getDatabaseInitializationEvent(): EventEmitter {
-        return this.databaseInitialized$;
     }
 }

@@ -192,6 +192,18 @@ describe('GameDispatcherService', () => {
             expect(virtualPlayerServiceSpy).to.have.been.called();
             expect(activeGameServiceSpy).to.have.been.called();
         });
+
+        it('should call appropriate methods', async () => {
+            DEFAULT_START_GAME_DATA.round.playerData.id = '';
+            await gameDispatcherService['createSoloGame'](DEFAULT_SOLO_GAME_CONFIG_DATA);
+            expect(createSoloGameSpy).to.have.been.called();
+            expect(addToRoomSpy).to.have.been.called();
+            expect(sliceVirtualPlayerToPlayerSpy).to.have.been.called();
+            expect(emitToSocketSpy).to.have.been.called();
+            expect(emitToRoomSpy).to.have.been.called();
+            expect(virtualPlayerServiceSpy).not.to.have.been.called();
+            expect(activeGameServiceSpy).not.to.have.been.called();
+        });
     });
 
     describe('createMultiplayerGame', () => {

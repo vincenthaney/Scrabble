@@ -66,7 +66,7 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
     }
 
     isTimerRunning(): boolean {
-        return this.timerSubscription && !this.timerSubscription.closed;
+        return this.timerSubscription !== undefined && !this.timerSubscription.closed;
     }
 
     private onDestroy(): void {

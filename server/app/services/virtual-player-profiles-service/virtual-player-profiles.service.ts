@@ -1,11 +1,11 @@
-import { VirtualPlayerProfile, VirtualPlayerProfileData } from '@app/classes/database/virtual-player-profile';
+import { VirtualPlayerData, VirtualPlayerProfile, VirtualPlayerProfilesData } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import {
     DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH,
     VIRTUAL_PLAYER_PROFILES_MONGO_COLLECTION_NAME,
 } from '@app/constants/services-constants/mongo-db.const';
-import { CANNOT_ADD_DEFAULT_PROFILE, NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
+import { NAME_ALREADY_USED, NO_PROFILE_OF_LEVEL } from '@app/constants/services-errors';
 import DatabaseService from '@app/services/database-service/database.service';
 import { Random } from '@app/utils/random';
 import { promises } from 'fs';
@@ -22,12 +22,25 @@ export default class VirtualPlayerProfilesService {
     private static async fetchDefaultVirtualPlayerProfiles(): Promise<VirtualPlayerProfile[]> {
         const filePath = join(__dirname, DEFAULT_VIRTUAL_PLAYER_PROFILES_RELATIVE_PATH);
         const dataBuffer = await promises.readFile(filePath, 'utf-8');
-        const defaultVirtualPlayerProfiles: VirtualPlayerProfileData = JSON.parse(dataBuffer);
+        const defaultVirtualPlayerProfiles: VirtualPlayerProfilesData = JSON.parse(dataBuffer);
         return defaultVirtualPlayerProfiles.virtualPlayerProfiles;
     }
 
     async getAllVirtualPlayerProfiles(): Promise<VirtualPlayerProfile[]> {
-        return this.collection.find({}).toArray();
+        const data = await this.collection.find({}, { projection: { name: 1, level: 1, isDefault: 1 } }).toArray();
+        const virtualPlayerProfiles: VirtualPlayerProfile[] = [];
+        data.forEach((virtualPlayer) => {
+            const profile: VirtualPlayerProfile = {
+                name: virtualPlayer.name,
+                level: virtualPlayer.level,
+                // The underscore is necessary to access the ObjectId of the mongodb document which is written '_id'
+                // eslint-disable-next-line no-underscore-dangle
+                id: virtualPlayer._id.toString(),
+                isDefault: virtualPlayer.isDefault,
+            };
+            virtualPlayerProfiles.push(profile);
+        });
+        return virtualPlayerProfiles;
     }
 
     async getVirtualPlayerProfilesFromLevel(level: VirtualPlayerLevel): Promise<VirtualPlayerProfile[]> {
@@ -42,11 +55,14 @@ export default class VirtualPlayerProfilesService {
         throw new HttpException(NO_PROFILE_OF_LEVEL, StatusCodes.NOT_FOUND);
     }
 
-    async addVirtualPlayerProfile(newProfile: VirtualPlayerProfile): Promise<void> {
-        if (await this.isNameAlreadyUsed(newProfile.name)) throw new HttpException(NAME_ALREADY_USED(newProfile.name), StatusCodes.FORBIDDEN);
-        if (newProfile.isDefault) throw new HttpException(CANNOT_ADD_DEFAULT_PROFILE, StatusCodes.BAD_REQUEST);
+    async addVirtualPlayerProfile(newProfileData: VirtualPlayerData): Promise<void> {
+        if (await this.isNameAlreadyUsed(newProfileData.name)) throw new HttpException(NAME_ALREADY_USED(newProfileData.name), StatusCodes.FORBIDDEN);
 
-        await this.collection.insertOne(newProfile);
+        await this.collection.insertOne({
+            name: newProfileData.name,
+            level: newProfileData.level,
+            isDefault: false,
+        } as VirtualPlayerProfile);
     }
 
     async updateVirtualPlayerProfile(newName: string, profileId: string): Promise<void> {

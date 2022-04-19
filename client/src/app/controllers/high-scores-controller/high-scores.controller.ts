@@ -10,6 +10,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class HighScoresController {
+    endpoint = `${environment.serverUrl}/highScores`;
     private highScoresListEvent: Subject<HighScore[]> = new Subject<HighScore[]>();
 
     constructor(private http: HttpClient, public socketService: SocketService) {
@@ -17,13 +18,11 @@ export class HighScoresController {
     }
 
     handleGetHighScores(): void {
-        const endpoint = `${environment.serverUrl}/highScores/${this.socketService.getId()}`;
-        this.http.get(endpoint).subscribe();
+        this.http.get(`${this.endpoint}/${this.socketService.getId()}`).subscribe();
     }
 
     resetHighScores(): void {
-        const endpoint = `${environment.serverUrl}/highScores`;
-        this.http.delete(endpoint).subscribe(() => this.handleGetHighScores());
+        this.http.delete(this.endpoint).subscribe(() => this.handleGetHighScores());
     }
 
     subscribeToHighScoresListEvent(serviceDestroyed$: Subject<boolean>, callback: (highScores: HighScore[]) => void): void {

@@ -192,8 +192,11 @@ describe('InputParserService', () => {
         });
 
         it('should throw error if command does not exist', () => {
+            spyOn<any>(service, 'verifyActionValidity').and.returnValue(true);
+            spyOn<any>(Map.prototype, 'get').and.returnValue(1);
+
             expect(() => {
-                service['createActionData']('!trouver un ami');
+                service['createActionData']('!trouverunami');
             }).toThrow(new CommandException(CommandExceptionMessages.InvalidEntry));
         });
 

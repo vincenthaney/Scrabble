@@ -20,6 +20,7 @@ export class CreateGameService {
                 : new ExpertVirtualPlayer(gameId, config.virtualPlayerName as string),
             this.generateGameConfig(config),
         );
+
         return this.activeGameService.beginGame(gameId, readyGameConfig);
     }
 

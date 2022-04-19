@@ -204,60 +204,47 @@ describe('DictionariesService', () => {
         });
     });
 
-    // describe('startDownload', () => {
-    //     let documentSpy: jasmine.Spy;
-    //     let urlSpy: jasmine.Spy;
-    //     let jsonSpy: jasmine.Spy;
-    //     let appendSpy: jasmine.Spy;
-    //     let removeSpy: jasmine.Spy;
+    describe('startDownload', () => {
+        let documentSpy: jasmine.Spy;
+        let urlSpy: jasmine.Spy;
+        let jsonSpy: jasmine.Spy;
+        let appendSpy: jasmine.Spy;
+        let removeSpy: jasmine.Spy;
+        let blobSpy: jasmine.Spy;
 
-    //     beforeEach(() => {
-    //         documentSpy = spyOn(window.document, 'createElement').and.callFake(() => {
-    //             return {
-    //                 click: () => {
-    //                     return;
-    //                 },
-    //                 href: {} as any,
-    //                 download: {} as any,
-    //             } as unknown as HTMLElement;
-    //         });
-    //         urlSpy = spyOn(URL, 'createObjectURL').and.callFake(() => {
-    //             return {} as string;
-    //         });
-    //         jsonSpy = spyOn(JSON, 'stringify').and.callFake(() => {
-    //             return {} as string;
-    //         });
-    //         appendSpy = spyOn(window.document.body, 'appendChild').and.callFake(() => {
-    //             return {} as any;
-    //         });
-    //         removeSpy = spyOn(window.document.body, 'removeChild').and.callFake(() => {
-    //             return {} as any;
-    //         });
-    //     });
+        beforeEach(() => {
+            documentSpy = spyOn(window.document, 'createElement').and.callFake(() => {
+                return {
+                    click: () => {
+                        return;
+                    },
+                    href: {} as any,
+                    download: {} as any,
+                } as unknown as HTMLAnchorElement;
+            });
+            urlSpy = spyOn(window['URL'], 'createObjectURL').and.callFake(() => {
+                return '' as string;
+            });
+            blobSpy = spyOn(window, 'Blob').and.returnValue({} as Blob);
+            jsonSpy = spyOn(JSON, 'stringify').and.callFake(() => {
+                return '' as string;
+            });
+            appendSpy = spyOn(window.document.body, 'appendChild').and.callFake(() => {
+                return {} as any;
+            });
+            removeSpy = spyOn(window.document.body, 'removeChild').and.callFake(() => {
+                return {} as any;
+            });
+        });
 
-    //     it('should call window.document.createElement', () => {
-    //         service.getDictionaries();
-    //         expect(documentSpy).toHaveBeenCalled();
-    //     });
-
-    //     it('should call JSON.stringify', () => {
-    //         service.getDictionaries();
-    //         expect(jsonSpy).toHaveBeenCalled();
-    //     });
-
-    //     it('should call window.URL.createObjectURL', () => {
-    //         service.getDictionaries();
-    //         expect(urlSpy).toHaveBeenCalled();
-    //     });
-
-    //     it('should call document.body.appendChild', () => {
-    //         service.getDictionaries();
-    //         expect(appendSpy).toHaveBeenCalled();
-    //     });
-
-    //     it('should call document.body.removeChild', () => {
-    //         service.getDictionaries();
-    //         expect(removeSpy).toHaveBeenCalled();
-    //     });
-    // });
+        it('should call the correct methods', () => {
+            service['startDownload']({ title: 'title' } as unknown as DictionaryData);
+            expect(documentSpy).toHaveBeenCalled();
+            expect(jsonSpy).toHaveBeenCalled();
+            expect(urlSpy).toHaveBeenCalled();
+            expect(blobSpy).toHaveBeenCalled();
+            expect(appendSpy).toHaveBeenCalled();
+            expect(removeSpy).toHaveBeenCalled();
+        });
+    });
 });

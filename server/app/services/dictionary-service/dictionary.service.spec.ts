@@ -9,8 +9,8 @@
 /* eslint-disable dot-notation */
 import { BasicDictionaryData, DictionarySummary, DictionaryUpdateInfo, DictionaryUsage } from '@app/classes/communication/dictionary-data';
 import { Dictionary, DictionaryData } from '@app/classes/dictionary';
-import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary.const';
 import { ONE_HOUR_IN_MS } from '@app/constants/services-constants/dictionary-const';
+import { INVALID_DESCRIPTION_FORMAT, INVALID_DICTIONARY_FORMAT, INVALID_DICTIONARY_ID, INVALID_TITLE_FORMAT } from '@app/constants/dictionary.const';
 import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
 import { ValidateFunction } from 'ajv';
 import * as chai from 'chai';
@@ -339,7 +339,7 @@ describe('DictionaryService', () => {
         });
 
         it('should create a new dictionary and add it to the map ', async () => {
-            await service['initializeDictionary'](DICTIONARY_1_ID);
+            service['initializeDictionary'](DICTIONARY_1_ID);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const result: DictionaryUsage = service['activeDictionaries'].get(DICTIONARY_1_ID)!;
 
@@ -453,6 +453,7 @@ describe('DictionaryService', () => {
         });
 
         it('should return true if no active games, isDeleted, no force delete but last use more than 1 hour ago', () => {
+            dictionaryUsage.lastUse = new Date();
             notUsedStub.returns(true);
             expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
         });
@@ -469,7 +470,7 @@ describe('DictionaryService', () => {
 
         it('should return false if used in last hour', () => {
             notUsedStub.returns(true);
-            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.false;
+            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage)).to.be.false;
         });
     });
 
