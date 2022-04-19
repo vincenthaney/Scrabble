@@ -6,13 +6,13 @@
     @include no-select;
     cursor: default;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 1.5fr minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2.5fr) 1fr minmax(0, 2.5fr);
     gap: 8px;
     height: 100%;
 
     #time-container {
         text-align: center;
-        padding: 12px 36px;
+        padding: 12px 12px;
 
         #time-left {
             font-size: 2em;
@@ -96,7 +96,7 @@
             mat-card {
                 align-items: flex-start;
             }
-            
+
             .local-player-active-indicator {
                 left: 12px;
             }
@@ -106,7 +106,7 @@
             mat-card {
                 align-items: flex-end;
             }
-            
+
             .local-player-active-indicator {
                 right: 12px;
             }
@@ -118,13 +118,13 @@
                 background: $primary;
                 color: white;
                 transition: ease-in all 0.1s;
-    
+
                 .score {
                     background: white;
                     color: black;
                     transition: ease-in all 0.2s;
                 }
-    
+
                 app-icon {
                     color: white;
                     transition: ease-in all 0.2s;
@@ -135,8 +135,12 @@
         &.active {
             .local-player-active-indicator {
                 @keyframes hide {
-                    0% { transform: translateY(100%); }
-                    100% { transform: translateY(0%); }
+                    0% {
+                        transform: translateY(100%);
+                    }
+                    100% {
+                        transform: translateY(0%);
+                    }
                 }
 
                 transform: translateY(100%);
