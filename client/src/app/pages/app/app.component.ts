@@ -1,5 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
-import { InitializerService, InitializeState } from '@app/services/initializer-service/initializer.service';
+import { InitializeState } from '@app/classes/connection-state-service/connection-state';
+import { InitializerService } from '@app/services/initializer-service/initializer.service';
 import { Subject } from 'rxjs';
 
 @Component({

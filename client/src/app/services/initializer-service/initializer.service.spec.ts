@@ -2,11 +2,11 @@
 /* eslint-disable dot-notation */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
+import { ConnectionState, InitializeState } from '@app/classes/connection-state-service/connection-state';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper.spec';
 import SocketService from '@app/services/socket-service/socket.service';
 import { Socket } from 'socket.io-client';
-import { InitializerService, InitializeState } from './initializer.service';
+import { InitializerService } from './initializer.service';
 
 describe('InitializerService', () => {
     let service: InitializerService;

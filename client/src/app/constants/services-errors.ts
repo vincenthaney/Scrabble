@@ -1,4 +1,5 @@
 import { Message } from '@app/classes/communication/message';
+import { InitializeState } from '@app/classes/connection-state-service/connection-state';
 import { environment } from 'src/environments/environment';
 import { SYSTEM_ID } from './game';
 
@@ -24,3 +25,4 @@ export const WAIT_FOR_COMMAND_CONFIRMATION_MESSAGE = (gameId: string): Message =
 };
 
 export const DB_CONNECTED_ENDPOINT = `${environment.serverUrl}/database/is-connected`;
+export const DEFAULT_STATE_VALUE: InitializeState = InitializeState.Loading;

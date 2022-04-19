@@ -3,16 +3,8 @@ import SocketService from '@app/services/socket-service/socket.service';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DatabaseService } from '@app/services/database-service/database.service';
-import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
-
-export enum InitializeState {
-    Loading = "Chargement de l'application",
-    Ready = "L'application est prête",
-    ServerNotReachable = "Impossible d'établir une connexion avec le serveur",
-    DatabaseNotReachable = "Impossible d'établir une connexion avec la base de donnée",
-}
-
-export const DEFAULT_STATE_VALUE: InitializeState = InitializeState.Loading;
+import { ConnectionState, InitializeState } from '@app/classes/connection-state-service/connection-state';
+import { DEFAULT_STATE_VALUE } from '@app/constants/services-errors';
 
 @Injectable({
     providedIn: 'root',
