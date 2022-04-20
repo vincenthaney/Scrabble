@@ -28,7 +28,7 @@ export class AdminPageComponent implements OnInit {
             if (!tab) return;
 
             const tabIndex = Number.parseInt(tab, 10);
-            if (!Number.isNaN(tabIndex)) this.selectedTab = tabIndex as AdminTabs;
+            if (Number.isSafeInteger(tabIndex)) this.selectedTab = tabIndex as AdminTabs;
         });
     }
 

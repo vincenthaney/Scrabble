@@ -31,16 +31,14 @@ export class ScoreCalculatorService {
     }
 
     private letterValue(square: Square, tile: Tile): number {
-        if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.LETTER && !square.wasMultiplierUsed) {
-            return tile.value * square.scoreMultiplier.multiplier;
-        }
-        return tile.value;
+        return square.scoreMultiplier?.multiplierEffect === MultiplierEffect.LETTER && !square.wasMultiplierUsed
+            ? tile.value * square.scoreMultiplier.multiplier
+            : tile.value;
     }
 
     private wordMultiplier(square: Square): number {
-        if (square.scoreMultiplier?.multiplierEffect === MultiplierEffect.WORD && !square.wasMultiplierUsed) {
-            return square.scoreMultiplier.multiplier;
-        }
-        return DEFAULT_MULTIPLIER;
+        return square.scoreMultiplier?.multiplierEffect === MultiplierEffect.WORD && !square.wasMultiplierUsed
+            ? square.scoreMultiplier.multiplier
+            : DEFAULT_MULTIPLIER;
     }
 }
