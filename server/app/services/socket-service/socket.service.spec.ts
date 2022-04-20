@@ -69,10 +69,6 @@ describe('SocketService', () => {
             expect(service).to.exist;
         });
 
-        it('should initialize', () => {
-            expect(service.isInitialized()).to.be.true;
-        });
-
         it('should add to the socket map on connect', async () => {
             service.handleSockets();
             clientSocket.connect();
