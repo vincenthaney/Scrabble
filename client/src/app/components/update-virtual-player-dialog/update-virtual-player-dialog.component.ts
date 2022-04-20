@@ -35,7 +35,7 @@ export class UpdateVirtualPlayerComponent implements OnDestroy {
         this.isVirtualPlayerNameValid = valid;
     }
 
-    async updateVirtualPlayer(): Promise<void> {
+    updateVirtualPlayer(): void {
         this.virtualPlayerProfilesService.updateVirtualPlayer({
             name: this.virtualPlayerName,
             level: this.data.level,
