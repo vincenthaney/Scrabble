@@ -275,9 +275,7 @@ export class GameDispatcherController {
     private handleReconnection(gameId: string, playerId: string, newPlayerId: string): void {
         const game = this.activeGameService.getGame(gameId, playerId);
 
-        if (game.areGameOverConditionsMet()) {
-            throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
-        }
+        if (game.areGameOverConditionsMet()) throw new HttpException(GAME_IS_OVER, StatusCodes.FORBIDDEN);
         const player = game.getPlayer(playerId, IS_REQUESTING);
         player.id = newPlayerId;
         player.isConnected = true;
