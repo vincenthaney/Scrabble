@@ -1,6 +1,6 @@
 import { Application } from '@app/app';
 import DatabaseService from '@app/services/database-service/database.service';
-import { ServicesTestingUnit } from '@app/services/services-testing-unit.spec';
+import { ServicesTestingUnit } from '@app/services/service-testing-unit/services-testing-unit.spec';
 import { StatusCodes } from 'http-status-codes';
 import { MongoClient } from 'mongodb';
 import { SinonStubbedInstance } from 'sinon';
