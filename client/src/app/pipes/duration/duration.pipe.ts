@@ -5,9 +5,11 @@ import { pipe } from 'rxjs';
 
 export type DurationTime = [time: number, suffix: string, noPad?: boolean];
 
-const SECONDS_IN_DAY = 86400;
-const SECONDS_IN_HOUR = 3600;
 const SECONDS_IN_MINUTE = 60;
+const MINUTES_IN_HOUR = 60;
+const HOURS_IN_DAY = 24;
+const SECONDS_IN_DAY = HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
+const SECONDS_IN_HOUR = MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
 const MINIMUM_TIME_UNITS = 1;
 const MAXIMUM_TIME_UNITS = 2;
 
