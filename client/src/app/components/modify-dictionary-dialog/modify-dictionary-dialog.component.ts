@@ -12,12 +12,13 @@ import { Subject } from 'rxjs';
     styleUrls: ['./modify-dictionary-dialog.component.scss'],
 })
 export class ModifyDictionaryComponent implements OnChanges, OnDestroy {
-    dictionaryToModify: DictionaryDialogParameters;
     formParameters: FormGroup;
-    isDictionaryTitleValid: boolean;
-    isDictionaryDescriptionValid: boolean;
-    isNewInformationValid: boolean;
+
+    private dictionaryToModify: DictionaryDialogParameters;
+    private isDictionaryTitleValid: boolean;
+    private isDictionaryDescriptionValid: boolean;
     private componentDestroyed$: Subject<boolean>;
+
     constructor(
         private dialogRef: MatDialogRef<ModifyDictionaryComponent>,
         private dictionariesService: DictionaryService,
