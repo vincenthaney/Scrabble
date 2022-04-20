@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
@@ -11,9 +12,10 @@ import {
     GameHistoryState,
 } from '@app/classes/admin/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
-import { DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS } from '@app/constants/components-constants';
+import { ADMIN_RESET_HISTORY_TITLE, ADMIN_RESET_MESSAGE, CANCEL, CANCEL_ICON, DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS, REINITIALIZE, REINITIALIZE_ICON } from '@app/constants/components-constants';
 import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
 import { isKey } from '@app/utils/isKey/is-key';
+import { DefaultDialogComponent } from '../default-dialog/default-dialog.component';
 
 @Component({
     selector: 'app-admin-game-history',
@@ -32,7 +34,7 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     state: GameHistoryState;
     error: string | undefined;
 
-    constructor(private readonly gameHistoryService: GameHistoryService, private readonly snackBar: MatSnackBar) {
+    constructor(private readonly dialog: MatDialog, private readonly gameHistoryService: GameHistoryService, private readonly snackBar: MatSnackBar) {
         this.columns = GAME_HISTORY_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.selectedColumnsItems = this.getSelectedColumns();
@@ -51,6 +53,31 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
     ngAfterViewInit(): void {
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
+    }
+
+    askResetHistory(): void {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: ADMIN_RESET_HISTORY_TITLE,
+                content: ADMIN_RESET_MESSAGE,
+                buttons: [
+                    {
+                        content: CANCEL,
+                        closeDialog: true,
+                        icon: CANCEL_ICON,
+                    },
+                    {
+                        content: REINITIALIZE,
+                        action: this.resetHistory.bind(this),
+                        closeDialog: true,
+                        icon: REINITIALIZE_ICON,
+                        style: {
+                            background: 'tomato',
+                        },
+                    },
+                ],
+            },
+        });
     }
 
     resetHistory(): void {

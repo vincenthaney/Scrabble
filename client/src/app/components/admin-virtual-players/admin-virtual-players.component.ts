@@ -9,7 +9,16 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { CreateVirtualPlayerComponent } from '@app/components/create-virtual-player-dialog/create-virtual-player-dialog.component';
 import { DeleteVirtualPlayerDialogComponent } from '@app/components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from '@app/components/update-virtual-player-dialog/update-virtual-player-dialog.component';
-import { ASCENDING_COLUMN_SORTER, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
+import {
+    ADMIN_RESET_MESSAGE,
+    ADMIN_RESET_VIRTUAL_PLAYER_TITLE,
+    ASCENDING_COLUMN_SORTER,
+    CANCEL,
+    CANCEL_ICON,
+    REINITIALIZE,
+    REINITIALIZE_ICON,
+    VIRTUAL_PLAYERS_COLUMNS,
+} from '@app/constants/components-constants';
 import {
     CREATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
     CREATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
@@ -21,6 +30,7 @@ import { SNACK_BAR_ERROR_DURATION, SNACK_BAR_SUCCESS_DURATION } from '@app/const
 import { PositiveFeedback } from '@app/constants/virtual-players-components-constants';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Subject } from 'rxjs';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 import {
     DeleteVirtualPlayerDialogParameters,
     DisplayVirtualPlayersColumns,
@@ -109,6 +119,31 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
                     this.isWaitingForServerResponse = true;
                 },
             } as DeleteVirtualPlayerDialogParameters,
+        });
+    }
+
+    askResetVirtualPlayers(): void {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: ADMIN_RESET_VIRTUAL_PLAYER_TITLE,
+                content: ADMIN_RESET_MESSAGE,
+                buttons: [
+                    {
+                        content: CANCEL,
+                        closeDialog: true,
+                        icon: CANCEL_ICON,
+                    },
+                    {
+                        content: REINITIALIZE,
+                        action: this.resetVirtualPlayers.bind(this),
+                        closeDialog: true,
+                        icon: REINITIALIZE_ICON,
+                        style: {
+                            background: 'tomato',
+                        },
+                    },
+                ],
+            },
         });
     }
 

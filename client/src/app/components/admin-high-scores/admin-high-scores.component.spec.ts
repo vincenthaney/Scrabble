@@ -3,6 +3,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Injectable } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SingleHighScore } from '@app/classes/admin/high-score';
 import { IconComponent } from '@app/components/icon/icon.component';
@@ -37,7 +38,7 @@ describe('AdminHighScoresComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [AdminHighScoresComponent, IconComponent],
-            imports: [RouterTestingModule, HttpClientTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule, MatDialogModule],
             providers: [{ provide: HighScoresService, useClass: HighScoresServiceSpy }],
         }).compileComponents();
     });
@@ -112,6 +113,14 @@ describe('AdminHighScoresComponent', () => {
         it('should call highScoresService.resetHighScores', () => {
             component.resetHighScores();
             expect(resetHighScoresSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe('askResetVirtualPlayers', () => {
+        it('should call MatDialog open', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component.askResetVirtualPlayers();
+            expect(spy).toHaveBeenCalled();
         });
     });
 });

@@ -4,6 +4,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatOptionModule } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -46,6 +47,7 @@ describe('AdminGameHistoryComponent', () => {
                 MatSnackBarModule,
                 MatPaginatorModule,
                 MatDividerModule,
+                MatDialogModule,
             ],
             declarations: [AdminGameHistoryComponent, MatSort, MatPaginator, IconComponent],
             providers: [{ provide: GameHistoryService, useValue: gameHistoryServiceSpy }],
@@ -321,5 +323,13 @@ describe('AdminGameHistoryComponent', () => {
             });
             index++;
         }
+    });
+
+    describe('askResetHistory', () => {
+        it('should call MatDialog open', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component.askResetHistory();
+            expect(spy).toHaveBeenCalled();
+        });
     });
 });
