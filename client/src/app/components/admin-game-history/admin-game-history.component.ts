@@ -12,10 +12,19 @@ import {
     GameHistoryState,
 } from '@app/classes/admin/admin-game-history';
 import { GameHistory } from '@app/classes/game-history/game-history';
-import { ADMIN_RESET_HISTORY_TITLE, ADMIN_RESET_MESSAGE, CANCEL, CANCEL_ICON, DEFAULT_GAME_HISTORY_COLUMNS, GAME_HISTORY_COLUMNS, REINITIALIZE, REINITIALIZE_ICON } from '@app/constants/components-constants';
+import {
+    ADMIN_RESET_HISTORY_TITLE,
+    ADMIN_RESET_MESSAGE,
+    CANCEL,
+    CANCEL_ICON,
+    DEFAULT_GAME_HISTORY_COLUMNS,
+    GAME_HISTORY_COLUMNS,
+    REINITIALIZE,
+    REINITIALIZE_ICON,
+} from '@app/constants/components-constants';
 import { GameHistoryService } from '@app/services/game-history-service/game-history.service';
 import { isKey } from '@app/utils/isKey/is-key';
-import { DefaultDialogComponent } from '../default-dialog/default-dialog.component';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 
 @Component({
     selector: 'app-admin-game-history',

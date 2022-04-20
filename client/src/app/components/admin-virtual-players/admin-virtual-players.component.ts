@@ -8,11 +8,9 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { CreateVirtualPlayerComponent } from '@app/components/create-virtual-player-dialog/create-virtual-player-dialog.component';
 import { DeleteVirtualPlayerDialogComponent } from '@app/components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from '@app/components/update-virtual-player-dialog/update-virtual-player-dialog.component';
-import { VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
 import {
     ADMIN_RESET_MESSAGE,
     ADMIN_RESET_VIRTUAL_PLAYER_TITLE,
-    ASCENDING_COLUMN_SORTER,
     CANCEL,
     CANCEL_ICON,
     REINITIALIZE,
