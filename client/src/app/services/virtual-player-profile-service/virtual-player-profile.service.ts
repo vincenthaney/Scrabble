@@ -8,7 +8,6 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export class VirtualPlayerProfilesService {
-    virtualPlayerProfiles: VirtualPlayerProfile[];
     private serviceDestroyed$: Subject<boolean>;
     private virtualPlayersUpdateEvent: Subject<VirtualPlayerProfile[]>;
     private componentUpdateEvent: Subject<string>;
@@ -19,7 +18,6 @@ export class VirtualPlayerProfilesService {
         this.componentUpdateEvent = new Subject();
         this.requestSentEvent = new Subject();
         this.virtualPlayerProfilesController.subscribeToGetAllVirtualPlayersEvent(this.serviceDestroyed$, (profiles) => {
-            this.virtualPlayerProfiles = profiles;
             this.virtualPlayersUpdateEvent.next(profiles);
         });
         this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponseEvent(this.serviceDestroyed$, (message) => {
