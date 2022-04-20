@@ -80,15 +80,15 @@ describe('AdminHighScoresComponent', () => {
 
     describe('ngOnDestroy', () => {
         it('should call next', () => {
-            const spy = spyOn(component.componentDestroyed$, 'next');
-            spyOn(component.componentDestroyed$, 'complete');
+            const spy = spyOn(component['componentDestroyed$'], 'next');
+            spyOn(component['componentDestroyed$'], 'complete');
             component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
 
         it('should call complete', () => {
-            spyOn(component.componentDestroyed$, 'next');
-            const spy = spyOn(component.componentDestroyed$, 'complete');
+            spyOn(component['componentDestroyed$'], 'next');
+            const spy = spyOn(component['componentDestroyed$'], 'complete');
             component.ngOnDestroy();
             expect(spy).toHaveBeenCalled();
         });
