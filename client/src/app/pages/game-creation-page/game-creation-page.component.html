@@ -5,8 +5,7 @@
 
     <div class="container">
         <div *ngIf="isCreatingGame" id="game-creation-waiting-container">
-            <mat-label>En attente de la création de la partie</mat-label>
-            <mat-spinner></mat-spinner>
+            <app-loading-page></app-loading-page>
         </div>
         <mat-card *ngIf="!isCreatingGame">
             <form [formGroup]="gameParameters" (ngSubmit)="onSubmit()">
