@@ -1,7 +1,6 @@
 import { ActionPass } from '@app/classes/actions';
 import { ActionData } from '@app/classes/communication/action-data';
 import { GameUpdateData } from '@app/classes/communication/game-update-data';
-import { PlayerData } from '@app/classes/communication/player-data';
 import Game from '@app/classes/game/game';
 import { StartGameData } from '@app/classes/game/game-config';
 import { HttpException } from '@app/classes/http-exception/http-exception';
@@ -28,10 +27,6 @@ export class VirtualPlayerService {
         if (!data.round) throw new HttpException(GAME_SHOULD_CONTAIN_ROUND, StatusCodes.INTERNAL_SERVER_ERROR);
         const virtualPlayer = game.getPlayer(data.round.playerData.id, IS_REQUESTING) as AbstractVirtualPlayer;
         virtualPlayer.playTurn();
-    }
-
-    sliceVirtualPlayerToPlayer(virtualPlayer: PlayerData): PlayerData {
-        return { id: virtualPlayer.id, name: virtualPlayer.name, tiles: virtualPlayer.tiles };
     }
 
     private getEndPoint(): string {

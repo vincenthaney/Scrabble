@@ -50,8 +50,6 @@ export class GameDispatcherService {
         const gameId = startGameData.gameId;
         this.socketService.addToRoom(config.playerId, gameId);
 
-        startGameData.player2 = this.virtualPlayerService.sliceVirtualPlayerToPlayer(startGameData.player2);
-
         this.socketService.emitToSocket(config.playerId, 'startGame', startGameData);
 
         if (isIdVirtualPlayer(startGameData.round.playerData.id)) {
