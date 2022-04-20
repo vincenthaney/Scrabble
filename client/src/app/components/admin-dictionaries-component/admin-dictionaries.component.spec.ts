@@ -19,7 +19,7 @@ import { DictionariesState } from '@app/classes/admin/dictionaries';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
-import { SUCCESS_SNACK_BAR_CONFIG, ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
+import { ERROR_SNACK_BAR_CONFIG, SUCCESS_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
 import { PositiveFeedback } from '@app/constants/dictionaries-components';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
@@ -173,7 +173,7 @@ describe('AdminDictionariesComponent', () => {
 
     describe('getDisplayedColumns', () => {
         it('should return array of keys', () => {
-            component.columnsItems = [
+            component['columnsItems'] = [
                 {
                     key: 'title',
                     label: 'testvalue',
