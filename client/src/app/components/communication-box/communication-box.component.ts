@@ -32,9 +32,8 @@ export class CommunicationBoxComponent extends FocusableComponent<KeyboardEvent>
     messageForm = new FormGroup({
         content: new FormControl('', [Validators.maxLength(MAX_INPUT_LENGTH), Validators.minLength(1)]),
     });
-    isClickableClass = IS_CLICKABLE_CLASS;
 
-    componentDestroyed$: Subject<boolean> = new Subject<boolean>();
+    private componentDestroyed$: Subject<boolean> = new Subject<boolean>();
 
     constructor(
         private inputParser: InputParserService,
