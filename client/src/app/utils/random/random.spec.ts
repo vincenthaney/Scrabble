@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { Random } from './random';
 
 const DEFAULT_ARRAY = ['a', 'b', 'c'];
@@ -32,11 +33,11 @@ describe('random -> getRandomElementsFromArray', () => {
 
     describe('popRandom', () => {
         it('should not always return same element', () => {
-            const lastResult = Random.popRandom([...DEFAULT_ARRAY]);
+            const lastResult = Random['popRandom']([...DEFAULT_ARRAY]);
 
             const iterations = 100;
             for (let i = 0; i < iterations; ++i) {
-                const result = Random.popRandom([...DEFAULT_ARRAY]);
+                const result = Random['popRandom']([...DEFAULT_ARRAY]);
                 if (result !== lastResult) {
                     expect(true).toBeTruthy();
                     return;

@@ -15,10 +15,6 @@ export class Random {
         return result;
     }
 
-    static popRandom<T>(array: T[]): T | undefined {
-        return array.splice(Math.floor(Math.random() * array.length), 1).pop();
-    }
-
     static randomize<T>(array: T[]): T[] {
         array = [...array];
         const output: T[] = [];
@@ -29,5 +25,9 @@ export class Random {
         }
 
         return output;
+    }
+
+    private static popRandom<T>(array: T[]): T | undefined {
+        return array.splice(Math.floor(Math.random() * array.length), 1).pop();
     }
 }
