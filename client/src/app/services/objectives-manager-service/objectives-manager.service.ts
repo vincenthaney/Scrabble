@@ -43,10 +43,14 @@ export class ObjectivesManagerService implements IResetServiceData {
     }
 
     private getOpponentPrivateObjectiveIfCompleted(): ObjectiveData[] {
-        const opponentPrivateObjectives: ObjectiveData[] = this.getObjectives(!this.isLocalPlayerPlayer1).filter(
-            (objective: ObjectiveData) => !objective.isPublic && objective.state === ObjectiveState.Completed,
+        const opponentPrivateObjectives: ObjectiveData[] = this.getObjectives(!this.isLocalPlayerPlayer1).filter((objective: ObjectiveData) =>
+            this.isPrivateObjectiveCompletedByOpponent(objective),
         );
         opponentPrivateObjectives.forEach((objective: ObjectiveData) => (objective.state = ObjectiveState.CompletedByOpponent));
         return opponentPrivateObjectives;
+    }
+
+    private isPrivateObjectiveCompletedByOpponent(objective: ObjectiveData): boolean {
+        return !objective.isPublic && objective.state !== ObjectiveState.NotCompleted;
     }
 }

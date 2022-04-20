@@ -185,4 +185,24 @@ describe('ObjectivesManagerService', () => {
             expect(service['getOpponentPrivateObjectiveIfCompleted']()).toEqual([expectedObjective]);
         });
     });
+
+    describe('isPrivateObjectiveCompletedByOpponent', () => {
+        it('should return false if opponent has not completed the objective', () => {
+            expect(
+                service['isPrivateObjectiveCompletedByOpponent']({ state: ObjectiveState.NotCompleted, isPublic: false } as ObjectiveData),
+            ).toBeFalse();
+        });
+
+        it('should return false if objective is not private', () => {
+            expect(
+                service['isPrivateObjectiveCompletedByOpponent']({ state: ObjectiveState.Completed, isPublic: true } as ObjectiveData),
+            ).toBeFalse();
+        });
+
+        it('should return true if objective is private and different from NotCompleted', () => {
+            expect(
+                service['isPrivateObjectiveCompletedByOpponent']({ state: ObjectiveState.CompletedByOpponent, isPublic: true } as ObjectiveData),
+            ).toBeTrue();
+        });
+    });
 });
