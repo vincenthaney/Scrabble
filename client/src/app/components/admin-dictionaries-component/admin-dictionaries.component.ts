@@ -39,9 +39,9 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     state: DictionariesState;
     error: string | undefined;
     isWaitingForServerResponse: boolean;
-
-    private componentDestroyed$: Subject<boolean> = new Subject();
+    private componentDestroyed$: Subject<boolean>;
     constructor(public dialog: MatDialog, private dictionariesService: DictionaryService, private snackBar: MatSnackBar) {
+        this.componentDestroyed$ = new Subject();
         this.columns = DICTIONARIES_COLUMNS;
         this.columnsItems = this.getColumnIterator();
         this.dataSource = new MatTableDataSource(new Array());
