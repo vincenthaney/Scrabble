@@ -1,23 +1,23 @@
 /* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
-import { IconComponent } from '@app/components/icon/icon.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AppMaterialModule } from '@app/modules/material.module';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
-import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
-import { DeleteDictionaryDialogComponent } from './delete-dictionary-dialog.component';
-import { DeleteDictionaryComponentStates, DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { IconComponent } from '@app/components/icon/icon.component';
+import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { AppMaterialModule } from '@app/modules/material.module';
+import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
+import { DeleteDictionaryDialogComponent } from './delete-dictionary-dialog.component';
+import { DeleteDictionaryDialogParameters } from './delete-dictionary-dialog.component.types';
 
 const MODEL: DeleteDictionaryDialogParameters = {
     pageTitle: 'Dialog title',
@@ -84,16 +84,6 @@ describe('DeleteDictionaryComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('On componentUpdateEvent', () => {
-        it('should call component.cleanupState()', () => {
-            const spy = spyOn(component, 'cleanupDialogStates').and.callFake(() => {
-                return;
-            });
-            dictionariesServiceMock['componentUpdateEvent'].next();
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
     describe('closeDialog', () => {
         it('should call dialogRef.close()', () => {
             const spy = spyOn(component['dialogRef'], 'close').and.callFake(() => {
@@ -101,13 +91,6 @@ describe('DeleteDictionaryComponent', () => {
             });
             component.closeDialog();
             expect(spy).toHaveBeenCalled();
-        });
-    });
-
-    describe('cleanupDialogStates', () => {
-        it('should turn state to Ready', () => {
-            component.cleanupDialogStates();
-            expect(component.state).toEqual(DeleteDictionaryComponentStates.Ready);
         });
     });
 
@@ -125,7 +108,6 @@ describe('DeleteDictionaryComponent', () => {
 
         it('should turn state to Loading', async () => {
             await component.deleteDictionary();
-            expect(component.state).toEqual(DeleteDictionaryComponentStates.Loading);
         });
 
         it('should call dictionariesService.deleteDictionary', async () => {
