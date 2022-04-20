@@ -448,10 +448,6 @@ describe('DictionaryService', () => {
             expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, true)).to.be.true;
         });
 
-        it('should return true if no active games, isDeleted, no force delete but no last use', () => {
-            expect(service['shouldDeleteActiveDictionary'](dictionaryUsage, false)).to.be.true;
-        });
-
         it('should return true if no active games, isDeleted, no force delete but last use more than 1 hour ago', () => {
             dictionaryUsage.lastUse = new Date();
             notUsedStub.returns(true);
@@ -482,8 +478,8 @@ describe('DictionaryService', () => {
             lastUse: undefined,
         };
 
-        it('should return false if no last use', () => {
-            expect(service['notUsedInLastHour'](dictionaryUsage)).to.be.false;
+        it('should return true if no last use', () => {
+            expect(service['notUsedInLastHour'](dictionaryUsage)).to.be.true;
         });
 
         it('should return true if last use was more than an hour ago', () => {
