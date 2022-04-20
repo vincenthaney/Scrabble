@@ -9,10 +9,6 @@ export default abstract class ConnectionStateService {
         return this.state$.pipe(takeUntil(destroy$)).subscribe(next);
     }
 
-    getState(): ConnectionState {
-        return this.state$.value;
-    }
-
     protected nextState(state: ConnectionState): void {
         this.state$.next(state);
     }

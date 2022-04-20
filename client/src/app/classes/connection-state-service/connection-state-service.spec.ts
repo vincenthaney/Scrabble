@@ -22,12 +22,6 @@ describe('ConnectionStateService', () => {
         });
     });
 
-    describe('getState', () => {
-        it('should return state value', () => {
-            expect(connectionStateService.getState()).toEqual(connectionStateService['state$'].value);
-        });
-    });
-
     describe('nextState', () => {
         it('should call next', () => {
             const spy = spyOn(connectionStateService['state$'], 'next');
