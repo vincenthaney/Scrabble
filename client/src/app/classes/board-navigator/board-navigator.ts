@@ -30,7 +30,20 @@ export class BoardNavigator {
         this.position = { ...position };
     }
 
-    move(direction: Direction, distance: number = 1): BoardNavigator {
+    nextEmpty(direction: Direction, allowNotApplied: boolean): SquareView | undefined {
+        return this.moveUntil(direction, () => this.isEmpty(allowNotApplied));
+    }
+
+    switchOrientation(): BoardNavigator {
+        this.orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
+        return this;
+    }
+
+    clone(): BoardNavigator {
+        return new BoardNavigator(this.squareGrid, this.position, this.orientation);
+    }
+
+    private move(direction: Direction, distance: number = 1): BoardNavigator {
         if (this.orientation === Orientation.Horizontal) {
             this.position.column += direction * distance;
         } else {
@@ -39,15 +52,7 @@ export class BoardNavigator {
         return this;
     }
 
-    forward(distance: number = 1): BoardNavigator {
-        return this.move(Direction.Forward, distance);
-    }
-
-    backward(distance: number = 1): BoardNavigator {
-        return this.move(Direction.Backward, distance);
-    }
-
-    moveUntil(direction: Direction, predicate: () => boolean): SquareView | undefined {
+    private moveUntil(direction: Direction, predicate: () => boolean): SquareView | undefined {
         do {
             this.move(direction);
         } while (this.isWithinBounds() && !predicate());
@@ -55,11 +60,7 @@ export class BoardNavigator {
         return this.isWithinBounds() ? this.currentSquareView : undefined;
     }
 
-    nextEmpty(direction: Direction, allowNotApplied: boolean): SquareView | undefined {
-        return this.moveUntil(direction, () => this.isEmpty(allowNotApplied));
-    }
-
-    isWithinBounds(): boolean {
+    private isWithinBounds(): boolean {
         return (
             this.position.row >= 0 &&
             this.position.column >= 0 &&
@@ -68,16 +69,7 @@ export class BoardNavigator {
         );
     }
 
-    switchOrientation(): BoardNavigator {
-        this.orientation = this.orientation === Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
-        return this;
-    }
-
-    isEmpty(allowNotApplied: boolean = false): boolean {
+    private isEmpty(allowNotApplied: boolean = false): boolean {
         return this.currentSquareView.square.tile === null || (allowNotApplied && !this.currentSquareView.applied);
-    }
-
-    clone(): BoardNavigator {
-        return new BoardNavigator(this.squareGrid, this.position, this.orientation);
     }
 }
