@@ -31,7 +31,8 @@ export class TileRackComponent extends FocusableComponent<KeyboardEvent> impleme
     selectionType: TileRackSelectType;
     tileFontSize: number;
     isShuffling: boolean;
-    componentDestroyed$: Subject<boolean>;
+
+    private componentDestroyed$: Subject<boolean>;
 
     constructor(
         public gameService: GameService,
