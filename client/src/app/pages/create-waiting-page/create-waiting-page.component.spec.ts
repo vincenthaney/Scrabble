@@ -189,7 +189,7 @@ describe('CreateWaitingPageComponent', () => {
 
     describe('ngOnDestroy', () => {
         it('ngOnDestroy should call handleCancelGame if the isStartingGame is false', () => {
-            component.isStartingGame = false;
+            component['isStartingGame'] = false;
             gameDispatcherServiceSpy.handleCancelGame.and.callFake(() => {});
 
             component.ngOnDestroy();
@@ -197,7 +197,7 @@ describe('CreateWaitingPageComponent', () => {
         });
 
         it('ngOnDestroy should NOT call handleCancelGame if the isStartingGame is true', () => {
-            component.isStartingGame = true;
+            component['isStartingGame'] = true;
             gameDispatcherServiceSpy.handleCancelGame.and.callFake(() => {});
 
             component.ngOnDestroy();
@@ -294,9 +294,9 @@ describe('CreateWaitingPageComponent', () => {
 
     describe('confirmOpponentToServer', () => {
         it('should set isStartingGame to true', () => {
-            component.isStartingGame = false;
+            component['isStartingGame'] = false;
             component.confirmOpponentToServer();
-            expect(component.isStartingGame).toBeTrue();
+            expect(component['isStartingGame']).toBeTrue();
         });
 
         it('should call gameDispatcher.handleConfirmation if opponentName is defined', () => {

@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class HighScoresController {
-    endpoint = `${environment.serverUrl}/highScores`;
+    private endpoint = `${environment.serverUrl}/highScores`;
     private highScoresListEvent: Subject<HighScore[]> = new Subject<HighScore[]>();
 
     constructor(private http: HttpClient, public socketService: SocketService) {

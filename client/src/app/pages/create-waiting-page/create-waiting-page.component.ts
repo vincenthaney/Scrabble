@@ -30,13 +30,14 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class CreateWaitingPageComponent implements OnInit, OnDestroy {
     @Input() opponentName: string | undefined = undefined;
-    isStartingGame: boolean = false;
     isOpponentFound: boolean = false;
     waitingRoomMessage: string = HOST_WAITING_MESSAGE;
     roundTime: string = '1:00';
     currentLobby: LobbyInfo = DEFAULT_LOBBY;
     funFact: string = '';
-    componentDestroyed$: Subject<boolean> = new Subject();
+
+    private isStartingGame: boolean = false;
+    private componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(
         public dialog: MatDialog,
