@@ -134,7 +134,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should call disconnectGame if player left with quit button or no active game dialog)', () => {
-        component.mustDisconnectGameOnLeave = false;
+        component['mustDisconnectGameOnLeave'] = false;
         const spyDiconnect = spyOn(component['reconnectionService'], 'disconnectGame').and.callFake(() => {
             return;
         });
@@ -143,13 +143,13 @@ describe('GamePageComponent', () => {
     });
 
     it('should not call disconnectGame if player left abnormally during game', () => {
-        component.mustDisconnectGameOnLeave = true;
+        component['mustDisconnectGameOnLeave'] = true;
         const spyDiconnect = spyOn(component['reconnectionService'], 'disconnectGame').and.callFake(() => {
             return;
         });
         component.ngOnDestroy();
         expect(spyDiconnect).toHaveBeenCalled();
-        component.mustDisconnectGameOnLeave = false;
+        component['mustDisconnectGameOnLeave'] = false;
     });
 
     it('should open the Surrender dialog when surrender-dialog-button is clicked ', () => {
@@ -430,7 +430,7 @@ describe('GamePageComponent', () => {
             return;
         });
         component['handlePlayerLeaves']();
-        expect(component.mustDisconnectGameOnLeave).toBeFalse();
+        expect(component['mustDisconnectGameOnLeave']).toBeFalse();
         expect(leaveSpy).toHaveBeenCalled();
     });
 });

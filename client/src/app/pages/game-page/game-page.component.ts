@@ -50,8 +50,8 @@ export class GamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BoardComponent, { static: false }) boardComponent: BoardComponent;
     @ViewChild(TileRackComponent, { static: false }) tileRackComponent: TileRackComponent;
 
-    mustDisconnectGameOnLeave: boolean;
-    componentDestroyed$: Subject<boolean>;
+    private mustDisconnectGameOnLeave: boolean;
+    private componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
