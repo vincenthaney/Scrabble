@@ -186,16 +186,6 @@ describe('AdminVirtualPlayersComponent', () => {
 
     describe('getDisplayedColumns', () => {
         it('should return array of keys', () => {
-            component.columnsItems = [
-                {
-                    key: 'name',
-                    label: 'testvalue',
-                },
-                {
-                    key: 'actions',
-                    label: 'testvalue2',
-                },
-            ];
             component.getDisplayedColumns();
             expect(component.getDisplayedColumns()).toEqual(['name', 'actions']);
         });
