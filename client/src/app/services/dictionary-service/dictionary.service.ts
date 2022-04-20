@@ -11,12 +11,7 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export class DictionaryService {
-    dictionaryData: DictionaryData;
-    dictionaries: DictionarySummary[];
-    updateRequestResponse: string;
-    deleteRequestResponse: string;
-    deleteAllRequestResponse: string;
-    uploadRequestResponse: string;
+    private dictionaries: DictionarySummary[];
     private dictionariesUpdateMessageEvent: Subject<string> = new Subject();
     private componentUpdateEvent: Subject<string> = new Subject();
     private serviceDestroyed$: Subject<boolean> = new Subject();
@@ -70,33 +65,33 @@ export class DictionaryService {
         this.dictionariesUpdateMessageEvent.pipe(takeUntil(serviceDestroyed$)).subscribe(callback);
     }
 
-    async updateDictionary(id: string, title: string, description: string): Promise<void> {
+    updateDictionary(id: string, title: string, description: string): void {
         this.isWaitingForServerResponseEvent.next();
-        await this.dictionariesController.handleUpdateDictionary({ title, description, id });
+        this.dictionariesController.handleUpdateDictionary({ title, description, id });
     }
 
-    async downloadDictionary(id: string): Promise<void> {
+    downloadDictionary(id: string): void {
         this.isWaitingForServerResponseEvent.next();
-        await this.dictionariesController.handleDownloadDictionary(id);
+        this.dictionariesController.handleDownloadDictionary(id);
     }
 
-    async deleteDictionary(id: string): Promise<void> {
+    deleteDictionary(id: string): void {
         this.isWaitingForServerResponseEvent.next();
-        await this.dictionariesController.handleDeleteDictionary(id);
+        this.dictionariesController.handleDeleteDictionary(id);
     }
 
-    async resetDictionaries(): Promise<void> {
+    resetDictionaries(): void {
         this.isWaitingForServerResponseEvent.next();
-        await this.dictionariesController.handleResetDictionaries();
+        this.dictionariesController.handleResetDictionaries();
     }
 
-    async uploadDictionary(dictionaryData: DictionaryData): Promise<void> {
+    uploadDictionary(dictionaryData: DictionaryData): void {
         this.isWaitingForServerResponseEvent.next();
-        await this.dictionariesController.handleUploadDictionary(dictionaryData);
+        this.dictionariesController.handleUploadDictionary(dictionaryData);
     }
 
-    async updateAllDictionaries(): Promise<void> {
-        await this.dictionariesController.handleGetAllDictionariesEvent();
+    updateAllDictionaries(): void {
+        this.dictionariesController.handleGetAllDictionariesEvent();
     }
 
     getDictionaries(): DictionarySummary[] {

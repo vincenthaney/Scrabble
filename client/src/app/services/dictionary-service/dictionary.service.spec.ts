@@ -112,10 +112,6 @@ describe('DictionariesService', () => {
             });
         });
         it('should call dictionariesUpdateMessageEvent.next', () => {
-            controller['getAllDictionariesEvent'].next(TEST_DICTIONARY_SUMMARY_ARRAY);
-            expect(service.dictionaries).toEqual(TEST_DICTIONARY_SUMMARY_ARRAY);
-        });
-        it('should call dictionariesUpdateMessageEvent.next', () => {
             controller['getAllDictionariesEvent'].next();
             expect(dictionariesUpdatedEventSpy).toHaveBeenCalled();
         });
