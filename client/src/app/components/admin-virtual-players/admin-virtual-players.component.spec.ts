@@ -150,14 +150,6 @@ describe('AdminVirtualPlayersComponent', () => {
         });
     });
 
-    describe('ngAfterViewInit', () => {
-        it('should set dataSources.sort', () => {
-            component.ngAfterViewInit();
-            expect(component.dataSourceBeginner.sort).toBe(component['sortBeginner']);
-            expect(component.dataSourceExpert.sort).toBe(component['sortExpert']);
-        });
-    });
-
     describe('updateVirtualPlayer', () => {
         it('should open UpdateVirtualPLayerComponent', () => {
             const spy = spyOn(component['dialog'], 'open');

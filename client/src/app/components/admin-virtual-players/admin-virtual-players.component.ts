@@ -35,7 +35,7 @@ import {
     templateUrl: './admin-virtual-players.component.html',
     styleUrls: ['./admin-virtual-players.component.scss'],
 })
-export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AdminVirtualPlayersComponent implements OnInit, OnDestroy {
     @ViewChild(MatSort) sortBeginner: MatSort;
     @ViewChild(MatSort) sortExpert: MatSort;
     columns: DisplayVirtualPlayersColumns;
@@ -48,6 +48,7 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
     error: string | undefined;
     isWaitingForServerResponse: boolean;
     private componentDestroyed$: Subject<boolean>;
+
     constructor(public dialog: MatDialog, private virtualPlayerProfilesService: VirtualPlayerProfilesService, private snackBar: MatSnackBar) {
         this.componentDestroyed$ = new Subject();
         this.columns = VIRTUAL_PLAYERS_COLUMNS;
@@ -67,13 +68,6 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
 
     ngOnInit(): void {
         this.virtualPlayerProfilesService.getAllVirtualPlayersProfile();
-    }
-
-    ngAfterViewInit(): void {
-        this.sortBeginner.sort({ id: 'name', start: ASCENDING_COLUMN_SORTER } as MatSortable);
-        this.sortExpert.sort({ id: 'name', start: ASCENDING_COLUMN_SORTER } as MatSortable);
-        this.dataSourceBeginner.sort = this.sortBeginner;
-        this.dataSourceExpert.sort = this.sortExpert;
     }
 
     updateVirtualPlayer(virtualPlayerProfile: VirtualPlayerProfile): void {
