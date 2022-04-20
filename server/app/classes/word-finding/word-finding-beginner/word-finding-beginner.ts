@@ -18,12 +18,12 @@ export default class WordFindingBeginner extends AbstractWordFinding {
     }
 
     protected handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
-        if (this.isWithinPointRange(wordPlacement.score)) {
-            const acceptanceProbability = this.acceptanceProbabilities.get(wordPlacement.score) ?? 0;
-            if (acceptanceProbability > this.highestAcceptanceFoundPlacement) {
-                this.wordPlacements = [wordPlacement];
-                this.highestAcceptanceFoundPlacement = acceptanceProbability;
-            }
+        if (!this.isWithinPointRange(wordPlacement.score)) return;
+
+        const acceptanceProbability = this.acceptanceProbabilities.get(wordPlacement.score) ?? 0;
+        if (acceptanceProbability > this.highestAcceptanceFoundPlacement) {
+            this.wordPlacements = [wordPlacement];
+            this.highestAcceptanceFoundPlacement = acceptanceProbability;
         }
     }
 
@@ -40,11 +40,7 @@ export default class WordFindingBeginner extends AbstractWordFinding {
 
         for (const score of this.request.pointRange) {
             const scoreFrequency = this.request.pointHistory.get(score);
-            if (scoreFrequency) {
-                this.acceptanceProbabilities.set(score, 1 / (scoreFrequency - minimumFrequency + 1));
-            } else {
-                this.acceptanceProbabilities.set(score, 1);
-            }
+            this.acceptanceProbabilities.set(score, scoreFrequency ? 1 / (scoreFrequency - minimumFrequency + 1) : 1);
         }
     }
 

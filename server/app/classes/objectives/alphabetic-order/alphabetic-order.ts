@@ -18,9 +18,9 @@ export class AlphabeticOrderObjective extends AbstractObjective {
     updateProgress(validationParameters: ObjectiveValidationParameters): void {
         for (const createdWord of validationParameters.createdWords) {
             const wordLetters: string[] = createdWord.map(([, tile]) => StringConversion.tileToString(tile));
-            const sortedWordLetters = [...wordLetters].sort();
-
             if (wordLetters.length < REQUIRED_NUMBER_OF_LETTERS) continue;
+
+            const sortedWordLetters = [...wordLetters].sort();
 
             if (sortedWordLetters.join('') === wordLetters.join('')) {
                 this.progress = this.maxProgress;

@@ -1,4 +1,4 @@
-<div matSort>
+<div>
     <div class="filter-container">
         <button mat-flat-button color="primary" (click)="askResetVirtualPlayers()" [disabled]="state !== 'ready'">
             Réinitialiser
@@ -8,7 +8,7 @@
             Ajouter un joueur virtuel
             <app-icon class="icon" icon="plus-circle" styling="solid" size="lg"></app-icon>
         </button>
-     </div>
+    </div>
 
     <mat-divider></mat-divider>
 
@@ -18,55 +18,93 @@
                 <div class="table-container">
                     <h2>Joueurs débutants</h2>
                     <table mat-table [dataSource]="dataSourceBeginner">
-                
                         <ng-container matColumnDef="name">
-                            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.name}} </th>
-                            <td mat-cell class="left-cell" *matCellDef="let element"> {{element.name}} </td>
+                            <th mat-header-cell *matHeaderCellDef>{{ columns.name }}</th>
+                            <td mat-cell class="left-cell" *matCellDef="let element">{{ element.name }}</td>
                         </ng-container>
-        
+
                         <ng-container matColumnDef="actions">
-                            <th mat-header-cell *matHeaderCellDef> {{columns.actions}} </th>
-                            <td mat-cell class="right-cell" *matCellDef="let element"> 
-                                <button  mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="updateVirtualPlayer(element)"[disabled] = "element.isDefault">
-                                    <app-icon icon="pencil" matTooltip="Vous ne pouvez pas modifier un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault">
+                            <th mat-header-cell *matHeaderCellDef>{{ columns.actions }}</th>
+                            <td mat-cell class="right-cell" *matCellDef="let element">
+                                <button
+                                    mat-mini-fab
+                                    class="mat-elevation-z0 spaced-button"
+                                    color="primary"
+                                    (click)="updateVirtualPlayer(element)"
+                                    [disabled]="element.isDefault"
+                                >
+                                    <app-icon
+                                        icon="pencil"
+                                        matTooltip="Vous ne pouvez pas modifier un joueur virtuel par défaut."
+                                        [matTooltipDisabled]="!element.isDefault"
+                                    >
                                     </app-icon>
                                 </button>
-                                <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteVirtualPlayer(element)" [disabled] = "element.isDefault">
-                                    <app-icon icon="trash-alt" matTooltip="Vous ne pouvez pas supprimer un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault" >
+                                <button
+                                    mat-mini-fab
+                                    class="mat-elevation-z0 spaced-button"
+                                    color="primary"
+                                    (click)="deleteVirtualPlayer(element)"
+                                    [disabled]="element.isDefault"
+                                >
+                                    <app-icon
+                                        icon="trash-alt"
+                                        matTooltip="Vous ne pouvez pas supprimer un joueur virtuel par défaut."
+                                        [matTooltipDisabled]="!element.isDefault"
+                                    >
                                     </app-icon>
-                                </button> 
+                                </button>
                             </td>
-                        </ng-container> 
-                
+                        </ng-container>
+
                         <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
-                        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
+                        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns()"></tr>
                     </table>
                 </div>
                 <div>
                     <h2>Joueurs experts</h2>
                     <table mat-table [dataSource]="dataSourceExpert">
-                
                         <ng-container matColumnDef="name">
-                            <th mat-header-cell mat-sort-header *matHeaderCellDef> {{columns.name}} </th>
-                            <td mat-cell class="left-cell" *matCellDef="let element"> {{element.name}} </td>
+                            <th mat-header-cell *matHeaderCellDef>{{ columns.name }}</th>
+                            <td mat-cell class="left-cell" *matCellDef="let element">{{ element.name }}</td>
                         </ng-container>
-        
+
                         <ng-container matColumnDef="actions">
-                            <th mat-header-cell *matHeaderCellDef> {{columns.actions}} </th>
-                            <td mat-cell class="right-cell" *matCellDef="let element"> 
-                                <button  mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="updateVirtualPlayer(element)"[disabled] = "element.isDefault">
-                                    <app-icon icon="pencil" matTooltip="Vous ne pouvez pas modifier un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault">
+                            <th mat-header-cell *matHeaderCellDef>{{ columns.actions }}</th>
+                            <td mat-cell class="right-cell" *matCellDef="let element">
+                                <button
+                                    mat-mini-fab
+                                    class="mat-elevation-z0 spaced-button"
+                                    color="primary"
+                                    (click)="updateVirtualPlayer(element)"
+                                    [disabled]="element.isDefault"
+                                >
+                                    <app-icon
+                                        icon="pencil"
+                                        matTooltip="Vous ne pouvez pas modifier un joueur virtuel par défaut."
+                                        [matTooltipDisabled]="!element.isDefault"
+                                    >
                                     </app-icon>
                                 </button>
-                                <button mat-mini-fab class="mat-elevation-z0 spaced-button" color = "primary" (click)="deleteVirtualPlayer(element)" [disabled] = "element.isDefault">
-                                    <app-icon icon="trash-alt" matTooltip="Vous ne pouvez pas supprimer un joueur virtuel par défaut." [matTooltipDisabled]="!element.isDefault" >
+                                <button
+                                    mat-mini-fab
+                                    class="mat-elevation-z0 spaced-button"
+                                    color="primary"
+                                    (click)="deleteVirtualPlayer(element)"
+                                    [disabled]="element.isDefault"
+                                >
+                                    <app-icon
+                                        icon="trash-alt"
+                                        matTooltip="Vous ne pouvez pas supprimer un joueur virtuel par défaut."
+                                        [matTooltipDisabled]="!element.isDefault"
+                                    >
                                     </app-icon>
-                                </button> 
+                                </button>
                             </td>
-                        </ng-container> 
-                
+                        </ng-container>
+
                         <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
-                        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();"></tr>
+                        <tr mat-row *matRowDef="let row; columns: getDisplayedColumns()"></tr>
                     </table>
                 </div>
             </div>
@@ -75,7 +113,7 @@
         <ng-container *ngSwitchCase="'loading'">
             <div class="loading-container">
                 <mat-spinner></mat-spinner>
-                <p>Chargement des dictionnaires...</p>
+                <p>Chargement des profils de joueurs virtuels...</p>
             </div>
         </ng-container>
 

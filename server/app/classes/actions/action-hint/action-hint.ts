@@ -31,14 +31,12 @@ export default class ActionHint extends ActionInfo {
     }
 
     getMessage(): FeedbackMessage {
-        if (this.hintResult.length === 0) {
-            return { message: NO_WORDS_FOUND };
-        } else {
-            let message = `${FOUND_WORDS} :<br>`;
-            if (this.hintResult.length < HINT_ACTION_NUMBER_OF_WORDS) message += `*Seulement ${this.hintResult.length} mot(s) ont été trouvé(s)*<br>`;
-            message += this.hintResult.map((placement) => `\`${PlacementToString.wordPlacementToCommandString(placement)}\``).join('<br>');
-            return { message, isClickable: true };
-        }
+        if (this.hintResult.length === 0) return { message: NO_WORDS_FOUND };
+
+        let message = `${FOUND_WORDS} :<br>`;
+        if (this.hintResult.length < HINT_ACTION_NUMBER_OF_WORDS) message += `*Seulement ${this.hintResult.length} mot(s) ont été trouvé(s)*<br>`;
+        message += this.hintResult.map((placement) => `\`${PlacementToString.wordPlacementToCommandString(placement)}\``).join('<br>');
+        return { message, isClickable: true };
     }
 
     getOpponentMessage(): FeedbackMessage {

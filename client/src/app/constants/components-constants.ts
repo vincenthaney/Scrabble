@@ -50,6 +50,7 @@ export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
     'startTime',
     'duration',
+    'hasBeenAbandoned',
     'gameType',
     'gameMode',
     'player1Name',
