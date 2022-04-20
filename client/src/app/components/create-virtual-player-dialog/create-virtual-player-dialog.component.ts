@@ -15,9 +15,11 @@ import { Subject } from 'rxjs';
 export class CreateVirtualPlayerComponent implements OnDestroy {
     formParameters: FormGroup;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
-    virtualPlayerName: string;
     isVirtualPlayerNameValid: boolean;
+
+    private virtualPlayerName: string;
     private componentDestroyed$: Subject<boolean>;
+
     constructor(private dialogRef: MatDialogRef<CreateVirtualPlayerComponent>, private virtualPlayerProfilesService: VirtualPlayerProfilesService) {
         this.componentDestroyed$ = new Subject();
         this.virtualPlayerLevels = VirtualPlayerLevel;
@@ -44,7 +46,7 @@ export class CreateVirtualPlayerComponent implements OnDestroy {
     }
 
     async createVirtualPlayer(): Promise<void> {
-        await this.virtualPlayerProfilesService.createVirtualPlayer({
+        this.virtualPlayerProfilesService.createVirtualPlayer({
             name: this.virtualPlayerName,
             level: this.formParameters.get('level')?.value as VirtualPlayerLevel,
         } as VirtualPlayerData);
