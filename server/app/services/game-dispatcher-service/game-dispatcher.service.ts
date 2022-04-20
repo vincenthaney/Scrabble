@@ -172,7 +172,7 @@ export class GameDispatcherService {
         return filteredWaitingRoom.length > 0;
     }
 
-    addToWaitingRoom(waitingRoom: WaitingRoom): void {
+    private addToWaitingRoom(waitingRoom: WaitingRoom): void {
         this.waitingRooms.push(waitingRoom);
     }
 }
