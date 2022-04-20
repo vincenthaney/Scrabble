@@ -21,17 +21,17 @@ export class DurationPipe implements PipeTransform {
 
     transform(duration: number): string {
         this.duration = duration;
-        return pipe(this.trimDurationTimes, this.takeMaxItems, this.trimDurationTimes, this.mapToString, this.join)(this.getDurationTimes());
+        return pipe(this.trimDurationTimes, this.takeMaxTimeUnits, this.trimDurationTimes, this.mapToString, this.join)(this.getDurationTimes());
     }
 
-    private trimDurationTimes(durationsTimes: DurationTime[]) {
+    private trimDurationTimes(durationsTimes: DurationTime[]): DurationTime[] {
         durationsTimes = [...durationsTimes];
         while (durationsTimes.length > MINIMUM_TIME_UNITS && durationsTimes[0][0] === 0) durationsTimes.shift();
         while (durationsTimes.length > MINIMUM_TIME_UNITS && durationsTimes[durationsTimes.length - 1][0] === 0) durationsTimes.pop();
         return durationsTimes;
     }
 
-    private takeMaxItems(durationsTimes: DurationTime[]) {
+    private takeMaxTimeUnits(durationsTimes: DurationTime[]) {
         return take(durationsTimes, MAXIMUM_TIME_UNITS);
     }
 

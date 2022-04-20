@@ -7,7 +7,7 @@ export default class Range {
         if (!Range.validateRangeValues(minimum, maximum)) throw new HttpException(INVALID_POINT_RANGE, StatusCodes.BAD_REQUEST);
     }
 
-    private static validateRangeValues(minimum: number, maximum: number) {
+    private static validateRangeValues(minimum: number, maximum: number): boolean {
         return minimum <= maximum;
     }
 
@@ -32,7 +32,7 @@ export default class Range {
         for (let i = this.minimum; i <= this.maximum; ++i) yield i;
     }
 
-    isWithinRange(value: number) {
+    isWithinRange(value: number): boolean {
         return value >= this.minimum && value <= this.maximum;
     }
 }

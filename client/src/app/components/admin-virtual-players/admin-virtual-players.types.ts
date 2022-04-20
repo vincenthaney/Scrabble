@@ -1,6 +1,6 @@
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 
-export type DisplayVirtualPlayersKeys = keyof { name: string; level: string } | 'name' | 'level' | 'actions';
+export type DisplayVirtualPlayersKeys = keyof { name: string } | 'name' | 'actions';
 
 export type DisplayVirtualPlayersColumns = {
     [Property in DisplayVirtualPlayersKeys]: string;

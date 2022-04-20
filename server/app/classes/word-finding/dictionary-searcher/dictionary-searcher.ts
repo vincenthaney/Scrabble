@@ -35,7 +35,7 @@ export default class DictionarySearcher {
 
         try {
             while (this.hasNext()) results.push(this.next());
-        } catch (e) {
+        } catch (exception) {
             // A throw means the iterator reached its end. Nothing special to handle, only return the result
         }
 
@@ -87,7 +87,7 @@ export default class DictionarySearcher {
         }
     }
 
-    private isWordValid(word: string) {
+    private isWordValid(word: string): boolean {
         return this.wordSizeIsWithinBounds(word) && this.nextTileIsEmpty(word) && this.hasAnyNewLetters(word);
     }
 

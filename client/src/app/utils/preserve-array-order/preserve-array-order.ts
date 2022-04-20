@@ -1,6 +1,6 @@
 const NOT_FOUND = -1;
 
-export const preserveArrayOrder = <T, S = T>(array: T[], originalArray: S[], equals: (a: T, b: S) => boolean) => {
+export const preserveArrayOrder = <T, S = T>(array: T[], originalArray: S[], equals: (a: T, b: S) => boolean): T[] => {
     const output: T[] = [];
 
     array = [...array];

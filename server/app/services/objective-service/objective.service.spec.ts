@@ -10,7 +10,7 @@ import { ObjectiveState } from '@app/classes/objectives/objective-utils';
 import { ObjectiveValidationParameters } from '@app/classes/objectives/validation-parameters';
 import Player from '@app/classes/player/player';
 import { GENERATE_LIST_OF_ALL_OBJECTIVES, NUMBER_OF_OBJECTIVES_IN_GAME } from '@app/constants/services-constants/objective-const';
-import { generateTestObjective, TestObjective } from '@app/constants/services-constants/objectives-test-const';
+import { generateTestObjective, TestObjective } from '@app/classes/objectives/objectives-test-helper.spec';
 import { INVALID_PLAYER_ID_FOR_GAME, NO_OBJECTIVE_LEFT_IN_POOL } from '@app/constants/services-errors';
 import { Random } from '@app/utils/random/random';
 import * as chai from 'chai';

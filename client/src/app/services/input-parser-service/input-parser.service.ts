@@ -3,7 +3,7 @@ import { ActionData, ActionType, ACTION_COMMAND_INDICATOR, ExchangeActionPayload
 import { Location } from '@app/classes/actions/location';
 import { Orientation } from '@app/classes/actions/orientation';
 import { Position } from '@app/classes/board-navigator/position';
-import { AbstractPlayer } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 import { LetterValue, Tile } from '@app/classes/tile';
 import { BAD_SYNTAX_MESSAGES, CommandExceptionMessages } from '@app/constants/command-exception-messages';
 import {
@@ -139,7 +139,7 @@ export default class InputParserService {
             if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandException(CommandExceptionMessages.ExchangeRequireLowercaseLetters);
         }
 
-        const player: AbstractPlayer = this.getLocalPlayer();
+        const player: Player = this.getLocalPlayer();
         const playerTiles: Tile[] = [];
         player.getTiles().forEach((tile: Tile) => {
             playerTiles.push(new Tile(tile.letter, tile.value));
@@ -214,8 +214,8 @@ export default class InputParserService {
         return inputStartPosition;
     }
 
-    private getLocalPlayer(): AbstractPlayer {
-        const localPlayer: AbstractPlayer | undefined = this.gameService.getLocalPlayer();
+    private getLocalPlayer(): Player {
+        const localPlayer: Player | undefined = this.gameService.getLocalPlayer();
         if (localPlayer) {
             return localPlayer;
         }

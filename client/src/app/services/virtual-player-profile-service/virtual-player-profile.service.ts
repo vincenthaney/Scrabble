@@ -22,35 +22,35 @@ export class VirtualPlayerProfilesService {
             this.virtualPlayerProfiles = profiles;
             this.virtualPlayersUpdateEvent.next(profiles);
         });
-        this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponseEvent(this.serviceDestroyed$, async (message) => {
+        this.virtualPlayerProfilesController.subscribeToVirtualPlayerServerResponseEvent(this.serviceDestroyed$, (message) => {
             this.requestSentEvent.next();
             this.componentUpdateEvent.next(message);
-            await this.getAllVirtualPlayersProfile();
+            this.getAllVirtualPlayersProfile();
         });
-        this.virtualPlayerProfilesController.subscribeToVirtualPlayerErrorEvent(this.serviceDestroyed$, async (message) => {
+        this.virtualPlayerProfilesController.subscribeToVirtualPlayerErrorEvent(this.serviceDestroyed$, (message) => {
             this.componentUpdateEvent.next(message);
-            await this.getAllVirtualPlayersProfile();
+            this.getAllVirtualPlayersProfile();
         });
     }
 
-    async createVirtualPlayer(virtualPlayerData: VirtualPlayerData): Promise<void> {
-        await this.virtualPlayerProfilesController.handleCreateVirtualPlayerProfileEvent(virtualPlayerData);
+    createVirtualPlayer(virtualPlayerData: VirtualPlayerData): void {
+        this.virtualPlayerProfilesController.handleCreateVirtualPlayerProfileEvent(virtualPlayerData);
     }
 
-    async updateVirtualPlayer(virtualPlayerData: VirtualPlayerData): Promise<void> {
-        await this.virtualPlayerProfilesController.handleUpdateVirtualPlayerProfileEvent(virtualPlayerData);
+    updateVirtualPlayer(virtualPlayerData: VirtualPlayerData): void {
+        this.virtualPlayerProfilesController.handleUpdateVirtualPlayerProfileEvent(virtualPlayerData);
     }
 
-    async getAllVirtualPlayersProfile(): Promise<void> {
-        await this.virtualPlayerProfilesController.handleGetAllVirtualPlayerProfilesEvent();
+    getAllVirtualPlayersProfile(): void {
+        this.virtualPlayerProfilesController.handleGetAllVirtualPlayerProfilesEvent();
     }
 
-    async resetVirtualPlayerProfiles(): Promise<void> {
-        await this.virtualPlayerProfilesController.handleResetVirtualPlayerProfilesEvent();
+    resetVirtualPlayerProfiles(): void {
+        this.virtualPlayerProfilesController.handleResetVirtualPlayerProfilesEvent();
     }
 
-    async deleteVirtualPlayer(id: string): Promise<void> {
-        await this.virtualPlayerProfilesController.handleDeleteVirtualPlayerProfileEvent(id);
+    deleteVirtualPlayer(id: string): void {
+        this.virtualPlayerProfilesController.handleDeleteVirtualPlayerProfileEvent(id);
     }
 
     subscribeToVirtualPlayerProfilesUpdateEvent(serviceDestroyed$: Subject<boolean>, callback: (profiles: VirtualPlayerProfile[]) => void): void {

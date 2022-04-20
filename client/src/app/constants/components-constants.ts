@@ -24,7 +24,6 @@ export const DICTIONARIES_COLUMNS = {
 
 export const VIRTUAL_PLAYERS_COLUMNS = {
     name: 'Nom',
-    level: 'Niveau',
     actions: '',
 };
 

@@ -9,7 +9,7 @@ export default interface GameUpdateData {
     player2?: PlayerData;
     isGameOver?: boolean;
     winners?: string[];
-    board?: Square[] | undefined;
+    board?: Square[];
     round?: RoundData;
     tileReserve?: TileReserveData[];
     gameObjective?: GameObjectivesData;

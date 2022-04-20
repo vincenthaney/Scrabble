@@ -1,7 +1,7 @@
-import { AbstractPlayer } from '@app/classes/player';
+import { Player } from '@app/classes/player';
 
 export interface Round {
-    player: AbstractPlayer;
+    player: Player;
     startTime: Date;
     limitTime: Date;
     completedTime: Date | null;
