@@ -23,8 +23,8 @@ export class InformationBoxComponent implements OnInit, OnDestroy {
     localPlayerIcon: IconName;
     timer: Timer;
 
-    timerSource: Observable<number>;
-    timerSubscription: Subscription;
+    private timerSource: Observable<number>;
+    private timerSubscription: Subscription;
     private componentDestroyed$: Subject<boolean>;
 
     constructor(
