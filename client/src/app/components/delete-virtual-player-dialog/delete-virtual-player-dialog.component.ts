@@ -23,7 +23,7 @@ export class DeleteVirtualPlayerDialogComponent {
     }
 
     async deleteVirtualPlayer(): Promise<void> {
-        await this.virtualPlayerProfilesService.deleteVirtualPlayer(this.virtualPlayerId);
+        this.virtualPlayerProfilesService.deleteVirtualPlayer(this.virtualPlayerId);
         this.closeDialog();
     }
 }
