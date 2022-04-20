@@ -124,11 +124,4 @@ describe('VirtualPlayerService', () => {
             expect(getPlayerSpy).to.have.been.called();
         });
     });
-
-    describe('sliceVirtualPlayerToPlayer', () => {
-        it('should return sliced player', async () => {
-            expect(virtualPlayerService.sliceVirtualPlayerToPlayer({ id: '', name: DEFAULT_PLAYER1_NAME, tiles: [], score: 1, isConnected: true })).to
-                .exist;
-        });
-    });
 });
