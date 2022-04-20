@@ -92,6 +92,8 @@ export class GamePlayController {
                 this.handleFeedback(gameId, playerId, feedback);
             }
         } catch (exception) {
+            if (isIdVirtualPlayer(playerId)) throw new HttpException((exception as HttpException).message, (exception as HttpException).status);
+
             await this.handleError(exception, data.input, playerId, gameId);
 
             if (this.isWordNotInDictionaryError(exception)) {
