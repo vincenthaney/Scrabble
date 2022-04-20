@@ -197,7 +197,7 @@ describe('AdminGameHistoryComponent', () => {
                 { key: 'c', label: 'd' },
             ];
 
-            const result = component.getColumnIterator();
+            const result = component['getColumnIterator']();
 
             expect(result as unknown).toEqual(expected);
         });
@@ -221,7 +221,7 @@ describe('AdminGameHistoryComponent', () => {
         it('should get columns from DEFAULT_COLUMNS', () => {
             const expected = DEFAULT_GAME_HISTORY_COLUMNS.map((key) => ({ key, label: GAME_HISTORY_COLUMNS[key] }));
 
-            const result = component.getSelectedColumns();
+            const result = component['getSelectedColumns']();
 
             expect(expected).toEqual(result);
         });
@@ -230,7 +230,7 @@ describe('AdminGameHistoryComponent', () => {
             component.columnsItems = [];
             const expected = DEFAULT_GAME_HISTORY_COLUMNS.map((key) => ({ key, label: GAME_HISTORY_COLUMNS[key] }));
 
-            const result = component.getSelectedColumns();
+            const result = component['getSelectedColumns']();
 
             expect(expected).toEqual(result);
         });
@@ -281,30 +281,30 @@ describe('AdminGameHistoryComponent', () => {
                     expected = expected[currentElement];
                 }
 
-                expect(component.sortGameHistory(gameHistory, property) as unknown).toEqual(expected);
+                expect(component['sortGameHistory'](gameHistory, property) as unknown).toEqual(expected);
             });
         }
 
         it('should return startTime for startDate', () => {
             const expected = gameHistory.startTime.valueOf();
 
-            expect(component.sortGameHistory(gameHistory, 'startDate')).toEqual(expected);
+            expect(component['sortGameHistory'](gameHistory, 'startDate')).toEqual(expected);
         });
 
         it('should return endTime for endDate', () => {
             const expected = gameHistory.endTime.valueOf();
 
-            expect(component.sortGameHistory(gameHistory, 'endDate')).toEqual(expected);
+            expect(component['sortGameHistory'](gameHistory, 'endDate')).toEqual(expected);
         });
 
         it('should return endTime - startTime for duration', () => {
             const expected = gameHistory.endTime.valueOf() - gameHistory.startTime.valueOf();
 
-            expect(component.sortGameHistory(gameHistory, 'duration')).toEqual(expected);
+            expect(component['sortGameHistory'](gameHistory, 'duration')).toEqual(expected);
         });
 
         it('should return empty array if property does not exists', () => {
-            expect(component.sortGameHistory(gameHistory, 'invalidProperty')).toEqual('');
+            expect(component['sortGameHistory'](gameHistory, 'invalidProperty')).toEqual('');
         });
     });
 

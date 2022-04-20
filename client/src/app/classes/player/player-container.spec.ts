@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 
 import { PlayerData } from '@app/classes/communication/';
@@ -57,7 +58,7 @@ describe('PlayerContainer', () => {
             name: 'test',
             tiles: [],
         };
-        const spy = spyOn(playerContainer, 'setPlayer').and.callFake(() => {
+        const spy = spyOn<any>(playerContainer, 'setPlayer').and.callFake(() => {
             return playerContainer;
         });
 
@@ -127,23 +128,14 @@ describe('PlayerContainer', () => {
     it('addPlayer should add provided player to set', () => {
         const spy = spyOn(playerContainer['players'], 'set').and.callThrough();
 
-        playerContainer.setPlayer(1, DEFAULT_PLAYER);
+        playerContainer['setPlayer'](1, DEFAULT_PLAYER);
         expect(spy).toHaveBeenCalledWith(1, DEFAULT_PLAYER);
-    });
-
-    it('removePlayer should delete provided player from set', () => {
-        const spy = spyOn(playerContainer['players'], 'delete').and.callThrough();
-
-        playerContainer.setPlayer(DEFAULT_PLAYER_NUMBER, DEFAULT_PLAYER);
-        playerContainer.removePlayer(DEFAULT_PLAYER_NUMBER);
-
-        expect(spy).toHaveBeenCalledWith(DEFAULT_PLAYER_NUMBER);
     });
 
     it('resetPlayers should clear the set', () => {
         const spy = spyOn(playerContainer['players'], 'clear').and.callThrough();
 
-        playerContainer.resetPlayers();
+        playerContainer['resetPlayers']();
         expect(spy).toHaveBeenCalledWith();
     });
 

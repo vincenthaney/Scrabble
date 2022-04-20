@@ -143,7 +143,7 @@ describe('GameDispatcherService', () => {
 
     describe('addToRoom', () => {
         it('should add room to waitingRooms', () => {
-            gameDispatcherService.addToWaitingRoom(DEFAULT_WAITING_ROOM);
+            gameDispatcherService['addToWaitingRoom'](DEFAULT_WAITING_ROOM);
             expect(gameDispatcherService['waitingRooms'].length).to.equal(1);
         });
     });
@@ -415,7 +415,7 @@ describe('GameDispatcherService', () => {
             const NTH_GAMES = 5;
             for (let i = 0; i < NTH_GAMES; ++i) {
                 const newRoom = new WaitingRoom(DEFAULT_MULTIPLAYER_CONFIG);
-                gameDispatcherService.addToWaitingRoom(newRoom);
+                gameDispatcherService['addToWaitingRoom'](newRoom);
             }
 
             expect(gameDispatcherService.getAvailableWaitingRooms()).to.have.lengthOf(NTH_GAMES);
@@ -433,7 +433,7 @@ describe('GameDispatcherService', () => {
             for (let i = 0; i < NTH_GAMES; ++i) {
                 const newRoom = new WaitingRoom(DEFAULT_MULTIPLAYER_CONFIG);
                 newRoom['id'] = i as unknown as string;
-                gameDispatcherService.addToWaitingRoom(newRoom);
+                gameDispatcherService['addToWaitingRoom'](newRoom);
                 testIds.push(newRoom['id']);
             }
 

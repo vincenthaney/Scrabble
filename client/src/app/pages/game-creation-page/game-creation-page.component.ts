@@ -30,10 +30,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     gameModes: typeof GameMode;
     virtualPlayerLevels: typeof VirtualPlayerLevel;
     dictionaryOptions: DictionarySummary[];
-    virtualPlayerNames: string[];
     playerName: string;
-    playerNameValid: boolean;
-    pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
 
     dictionaryRequiredError: string;
@@ -42,9 +39,10 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
 
     isCreatingGame: boolean;
 
+    private playerNameValid: boolean;
     private shouldSetToDefaultDictionary: boolean;
-
     private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
+    private pageDestroyed$: Subject<boolean>;
 
     constructor(
         private gameDispatcherService: GameDispatcherService,

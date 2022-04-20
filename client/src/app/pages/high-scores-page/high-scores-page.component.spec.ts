@@ -104,8 +104,8 @@ describe('HighScoresPageComponent', () => {
 
     describe('ngOndestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
-            const ngUnsubscribeNextSpy = spyOn<any>(component.componentDestroyed$, 'next');
-            const ngUnsubscribeCompleteSpy = spyOn<any>(component.componentDestroyed$, 'complete');
+            const ngUnsubscribeNextSpy = spyOn<any>(component['componentDestroyed$'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn<any>(component['componentDestroyed$'], 'complete');
 
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();

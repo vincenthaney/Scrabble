@@ -114,24 +114,28 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
             });
     }
 
-    getColumnIterator(): DisplayGameHistoryColumnsIteratorItem[] {
+    getDisplayedColumns(): DisplayGameHistoryKeys[] {
+        return this.selectedColumnsItems.map(({ key }) => key);
+    }
+
+    getDuration(item: GameHistory): number {
+        return item.endTime.getTime() - item.startTime.getTime();
+    }
+
+    private getColumnIterator(): DisplayGameHistoryColumnsIteratorItem[] {
         return Object.keys(this.columns).map<DisplayGameHistoryColumnsIteratorItem>((key) => ({
             key: key as DisplayGameHistoryKeys,
             label: this.columns[key as DisplayGameHistoryKeys],
         }));
     }
 
-    getDisplayedColumns(): DisplayGameHistoryKeys[] {
-        return this.selectedColumnsItems.map(({ key }) => key);
-    }
-
-    getSelectedColumns(): DisplayGameHistoryColumnsIteratorItem[] {
+    private getSelectedColumns(): DisplayGameHistoryColumnsIteratorItem[] {
         return DEFAULT_GAME_HISTORY_COLUMNS.map<DisplayGameHistoryColumnsIteratorItem>(
             (key) => this.columnsItems.find((item) => item.key === key) || { key, label: this.columns[key] },
         );
     }
 
-    sortGameHistory(item: GameHistory, property: string): string | number {
+    private sortGameHistory(item: GameHistory, property: string): string | number {
         switch (property) {
             case 'player1Name':
                 return item.player1Data.name;
@@ -154,9 +158,5 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
             default:
                 return isKey(property, item) ? (item[property] as string) : '';
         }
-    }
-
-    getDuration(item: GameHistory): number {
-        return item.endTime.getTime() - item.startTime.getTime();
     }
 }

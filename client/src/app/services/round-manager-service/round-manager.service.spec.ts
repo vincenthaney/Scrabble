@@ -160,15 +160,15 @@ describe('RoundManagerService', () => {
         };
         service.initialize(DEFAULT_PLAYER_DATA.id, startGameData);
 
-        expect(service.gameId).toEqual(startGameData.gameId);
-        expect(service.localPlayerId).toEqual(DEFAULT_PLAYER_DATA.id);
-        expect(service.maxRoundTime).toEqual(startGameData.maxRoundTime);
+        expect(service['gameId']).toEqual(startGameData.gameId);
+        expect(service['localPlayerId']).toEqual(DEFAULT_PLAYER_DATA.id);
+        expect(service['maxRoundTime']).toEqual(startGameData.maxRoundTime);
         expect(service.currentRound).toEqual(round);
     });
 
     it('initializeEvents should define attributes', () => {
         service.initializeEvents();
-        expect(service.completedRounds).toBeTruthy();
+        expect(service['completedRounds']).toBeTruthy();
         expect(service['timerSource']).toBeTruthy();
         expect(service.timer).toBeTruthy();
         expect(service['endRoundEvent$']).toBeTruthy();
@@ -230,19 +230,19 @@ describe('RoundManagerService', () => {
         });
 
         it('resetServiceData should reset the gameId', () => {
-            expect(service.gameId).toEqual('');
+            expect(service['gameId']).toEqual('');
         });
 
         it('resetServiceData should reset the localPlayerId', () => {
-            expect(service.localPlayerId).toEqual('');
+            expect(service['localPlayerId']).toEqual('');
         });
 
         it('resetServiceData should reset the completed rounds', () => {
-            expect(service.completedRounds).toEqual([]);
+            expect(service['completedRounds']).toEqual([]);
         });
 
         it('resetServiceData should reset the max round time', () => {
-            expect(service.maxRoundTime).toEqual(0);
+            expect(service['maxRoundTime']).toEqual(0);
         });
 
         it('resetServiceData should complete timerSource', () => {
@@ -253,8 +253,8 @@ describe('RoundManagerService', () => {
     it('resetRoundData should reset round data attributes', () => {
         service['resetRoundData']();
         expect(service.currentRound).toBeFalsy();
-        expect(service.completedRounds).toEqual([]);
-        expect(service.maxRoundTime).toEqual(0);
+        expect(service['completedRounds']).toEqual([]);
+        expect(service['maxRoundTime']).toEqual(0);
     });
 
     describe('resetTimerData', () => {
@@ -305,13 +305,13 @@ describe('RoundManagerService', () => {
         });
 
         it('startRound should set the old current round completed time to new round start time', () => {
-            const numberOfRounds = service.completedRounds.length;
-            expect(service.completedRounds[numberOfRounds - 1].completedTime).toEqual(updatedRound.startTime);
+            const numberOfRounds = service['completedRounds'].length;
+            expect(service['completedRounds'][numberOfRounds - 1].completedTime).toEqual(updatedRound.startTime);
         });
 
         it('startRound should append old current round to the completed rounds array', () => {
-            const numberOfRounds = service.completedRounds.length;
-            const lastRoundInArray = service.completedRounds[numberOfRounds - 1];
+            const numberOfRounds = service['completedRounds'].length;
+            const lastRoundInArray = service['completedRounds'][numberOfRounds - 1];
             currentRound.completedTime = updatedRound.startTime;
 
             expect(lastRoundInArray).toEqual(currentRound);
@@ -348,10 +348,10 @@ describe('RoundManagerService', () => {
         });
 
         it('continueRound should overwrite old current round ', () => {
-            const numberOfRoundsBefore = service.completedRounds.length;
+            const numberOfRoundsBefore = service['completedRounds'].length;
             const roundBefore = service.currentRound;
             service.continueRound(updatedRound);
-            const numberOfRoundsAfter = service.completedRounds.length;
+            const numberOfRoundsAfter = service['completedRounds'].length;
             expect(numberOfRoundsBefore).toEqual(numberOfRoundsAfter);
             expect(roundBefore).not.toEqual(service.currentRound);
         });
@@ -425,13 +425,13 @@ describe('RoundManagerService', () => {
 
     describe('isActivePlayerLocalPlayer', () => {
         it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
-            service.localPlayerId = DEFAULT_PLAYER.id;
+            service['localPlayerId'] = DEFAULT_PLAYER.id;
             service.currentRound = currentRound;
             expect(service['isActivePlayerLocalPlayer']()).toBeTrue();
         });
 
         it('isActivePlayerLocalPlayer should throw error if there is no current round', () => {
-            service.localPlayerId = 'unknown';
+            service['localPlayerId'] = 'unknown';
             service.currentRound = currentRound;
             expect(service['isActivePlayerLocalPlayer']()).toBeFalse();
         });
@@ -454,13 +454,13 @@ describe('RoundManagerService', () => {
 
     describe('isActivePlayerLocalPlayer', () => {
         it('isActivePlayerLocalPlayer should return true if localPlayerId matches activePlayer id', () => {
-            service.localPlayerId = DEFAULT_PLAYER.id;
+            service['localPlayerId'] = DEFAULT_PLAYER.id;
             service.currentRound = currentRound;
             expect(service['isActivePlayerLocalPlayer']()).toBeTrue();
         });
 
         it('isActivePlayerLocalPlayer should throw error if there is no current round', () => {
-            service.localPlayerId = 'unknown';
+            service['localPlayerId'] = 'unknown';
             service.currentRound = currentRound;
             expect(service['isActivePlayerLocalPlayer']()).toBeFalse();
         });
@@ -478,7 +478,7 @@ describe('RoundManagerService', () => {
 
         it('startRound should set new timeout', () => {
             service.startRound();
-            expect(service.timeout).toBeTruthy();
+            expect(service['timeout']).toBeTruthy();
         });
 
         it('startRound should call startTimer with passed timer value', () => {
@@ -488,7 +488,7 @@ describe('RoundManagerService', () => {
 
         it('startRound should call startTimer with maxRoundTime if no value is provided', () => {
             service.startRound();
-            expect(startTimerSpy).toHaveBeenCalledWith(service.maxRoundTime);
+            expect(startTimerSpy).toHaveBeenCalledWith(service['maxRoundTime']);
         });
     });
 
@@ -496,7 +496,7 @@ describe('RoundManagerService', () => {
         const timerSourceSpy = spyOn(service['timerSource'], 'next').and.callFake(() => {
             return;
         });
-        service.maxRoundTime = DEFAULT_MAX_ROUND_TIME;
+        service['maxRoundTime'] = DEFAULT_MAX_ROUND_TIME;
         const newTimer = ONE_MINUTE_TIMER;
 
         service.currentRound = currentRound;
@@ -555,7 +555,11 @@ describe('RoundManagerService', () => {
 
             service['roundTimeout']();
             expect(actionServiceSpy.createActionData).toHaveBeenCalledWith(ActionType.PASS, {});
-            expect(actionServiceSpy.sendAction).toHaveBeenCalledOnceWith(service.gameId, service.localPlayerId, fakeData as unknown as ActionData);
+            expect(actionServiceSpy.sendAction).toHaveBeenCalledOnceWith(
+                service['gameId'],
+                service['localPlayerId'],
+                fakeData as unknown as ActionData,
+            );
         }));
     });
 });

@@ -67,10 +67,6 @@ export class SocketService {
         return this.sio.sockets.adapter.rooms.get(roomName) !== undefined;
     }
 
-    isInitialized(): boolean {
-        return this.sio !== undefined;
-    }
-
     getSocket(id: string): io.Socket {
         const socket = this.sockets.get(id);
         if (!socket) throw new HttpException(INVALID_ID_FOR_SOCKET, StatusCodes.NOT_FOUND);

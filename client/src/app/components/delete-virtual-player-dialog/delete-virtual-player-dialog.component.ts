@@ -22,8 +22,8 @@ export class DeleteVirtualPlayerDialogComponent {
         this.dialogRef.close();
     }
 
-    async deleteVirtualPlayer(): Promise<void> {
-        await this.virtualPlayerProfilesService.deleteVirtualPlayer(this.virtualPlayerId);
+    deleteVirtualPlayer(): void {
+        this.virtualPlayerProfilesService.deleteVirtualPlayer(this.virtualPlayerId);
         this.closeDialog();
     }
 }

@@ -99,7 +99,7 @@ describe('ModifyDictionaryComponent', () => {
                 return { valid: true } as unknown as AbstractControl;
             });
             component.ngOnChanges();
-            expect(component.isDictionaryTitleValid).toBeTrue();
+            expect(component['isDictionaryTitleValid']).toBeTrue();
         });
 
         it('should call formParameters.get and return false', () => {
@@ -107,7 +107,7 @@ describe('ModifyDictionaryComponent', () => {
                 return null;
             });
             component.ngOnChanges();
-            expect(component.isDictionaryTitleValid).toBeFalse();
+            expect(component['isDictionaryTitleValid']).toBeFalse();
         });
     });
 
@@ -181,23 +181,23 @@ describe('ModifyDictionaryComponent', () => {
 
     describe('isInformationValid', () => {
         it('should return true if component.isDictionaryTitleValid && component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = true;
-            component.isDictionaryDescriptionValid = true;
+            component['isDictionaryTitleValid'] = true;
+            component['isDictionaryDescriptionValid'] = true;
             expect(component.isInformationValid()).toBeTrue();
         });
         it('should return false if !component.isDictionaryTitleValid && component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = false;
-            component.isDictionaryDescriptionValid = true;
+            component['isDictionaryTitleValid'] = false;
+            component['isDictionaryDescriptionValid'] = true;
             expect(component.isInformationValid()).toBeFalse();
         });
         it('should return false if component.isDictionaryTitleValid && !component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = false;
-            component.isDictionaryDescriptionValid = true;
+            component['isDictionaryTitleValid'] = false;
+            component['isDictionaryDescriptionValid'] = true;
             expect(component.isInformationValid()).toBeFalse();
         });
         it('should return false if !component.isDictionaryTitleValid && !component.isDictionaryDescriptionValid', () => {
-            component.isDictionaryTitleValid = false;
-            component.isDictionaryDescriptionValid = true;
+            component['isDictionaryTitleValid'] = false;
+            component['isDictionaryDescriptionValid'] = true;
             expect(component.isInformationValid()).toBeFalse();
         });
     });

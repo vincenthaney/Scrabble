@@ -235,7 +235,7 @@ describe('GameDispatcherService', () => {
     });
 
     it('handleCreateGame should call handleGameCreation with the correct parameters for solo game', () => {
-        const spyHandleGameCreation = spyOn(service, 'handleGameCreation').and.callFake(() => {
+        const spyHandleGameCreation = spyOn<any>(service, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -257,7 +257,7 @@ describe('GameDispatcherService', () => {
     });
 
     it('handleCreateGame should call handleGameCreation with the correct parameters for multiplayer game', () => {
-        const spyHandleGameCreation = spyOn(service, 'handleGameCreation').and.callFake(() => {
+        const spyHandleGameCreation = spyOn<any>(service, 'handleGameCreation').and.callFake(() => {
             return;
         });
         spyOn(gameDispatcherControllerMock.socketService, 'getId').and.callFake(() => {
@@ -319,7 +319,7 @@ describe('GameDispatcherService', () => {
         let createSpy: jasmine.Spy;
 
         beforeEach(() => {
-            createSpy = spyOn(service, 'handleGameCreation').and.callFake(() => {
+            createSpy = spyOn<any>(service, 'handleGameCreation').and.callFake(() => {
                 return;
             });
             spyOn(socketServiceMock, 'getId').and.returnValue('socketid');
@@ -375,7 +375,7 @@ describe('GameDispatcherService', () => {
             });
             routerSpy = spyOn(service['router'], 'navigateByUrl');
             gameConfigData = TEST_GAME_PARAMETERS as unknown as GameConfigData;
-            service.handleGameCreation(gameConfigData);
+            service['handleGameCreation'](gameConfigData);
         });
 
         it('should call gameDispatcherController.handleGameCreation', () => {

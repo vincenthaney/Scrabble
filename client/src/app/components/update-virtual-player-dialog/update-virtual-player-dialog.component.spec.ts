@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { AbstractControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -134,17 +134,6 @@ describe('UpdateDictionaryComponent', () => {
         });
 
         it('should call virtualPlayerProfilesService.updateVirtualPlayer with get returning null', () => {
-            spyOn(component.formParameters, 'get').and.callFake(() => {
-                return null;
-            });
-            component.updateVirtualPlayer();
-            expect(spyDictionary).toHaveBeenCalled();
-        });
-
-        it('should call virtualPlayerProfilesService.updateVirtualPlayer with get returning Abstract Control', () => {
-            spyOn(component.formParameters, 'get').and.callFake(() => {
-                return {} as AbstractControl;
-            });
             component.updateVirtualPlayer();
             expect(spyDictionary).toHaveBeenCalled();
         });

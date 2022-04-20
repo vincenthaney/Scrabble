@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
 import { Orientation } from '@app/classes/actions/orientation';
 import { Position } from '@app/classes/board-navigator/position';
@@ -77,7 +78,7 @@ describe('BoardNavigator', () => {
 
             const expected = navigator.column + direction;
 
-            navigator.move(direction);
+            navigator['move'](direction);
 
             expect(navigator.column).toEqual(expected);
         });
@@ -90,7 +91,7 @@ describe('BoardNavigator', () => {
 
             const expected = navigator.column + distance * direction;
 
-            navigator.move(direction, distance);
+            navigator['move'](direction, distance);
 
             expect(navigator.column).toEqual(expected);
         });
@@ -103,47 +104,9 @@ describe('BoardNavigator', () => {
 
             const expected = navigator.row + distance * direction;
 
-            navigator.move(direction, distance);
+            navigator['move'](direction, distance);
 
             expect(navigator.row).toEqual(expected);
-        });
-    });
-
-    describe('forward', () => {
-        it('should call move', () => {
-            const spy = spyOn(navigator, 'move');
-
-            navigator.forward();
-
-            expect(spy).toHaveBeenCalledOnceWith(Direction.Forward, 1);
-        });
-
-        it('should call move with distance', () => {
-            const spy = spyOn(navigator, 'move');
-            const distance = 2;
-
-            navigator.forward(distance);
-
-            expect(spy).toHaveBeenCalledOnceWith(Direction.Forward, distance);
-        });
-    });
-
-    describe('backward', () => {
-        it('should call move', () => {
-            const spy = spyOn(navigator, 'move');
-
-            navigator.backward();
-
-            expect(spy).toHaveBeenCalledOnceWith(Direction.Backward, 1);
-        });
-
-        it('should call move with distance', () => {
-            const spy = spyOn(navigator, 'move');
-            const distance = 2;
-
-            navigator.backward(distance);
-
-            expect(spy).toHaveBeenCalledOnceWith(Direction.Backward, distance);
         });
     });
 
@@ -169,22 +132,22 @@ describe('BoardNavigator', () => {
     describe('isWithinBounds', () => {
         it('should return true if is within bounds', () => {
             navigator.setPosition({ row: 0, column: 0 });
-            expect(navigator.isWithinBounds()).toBeTrue();
+            expect(navigator['isWithinBounds']()).toBeTrue();
         });
 
         it('should return false if is not within bounds', () => {
             navigator.setPosition(OUT_OF_BOUNDS_POSITION);
-            expect(navigator.isWithinBounds()).toBeFalse();
+            expect(navigator['isWithinBounds']()).toBeFalse();
         });
 
         it('should return false if is row not within bounds', () => {
             navigator.setPosition(OUT_OF_BOUNDS_ROW);
-            expect(navigator.isWithinBounds()).toBeFalse();
+            expect(navigator['isWithinBounds']()).toBeFalse();
         });
 
         it('should return false if is column not within bounds', () => {
             navigator.setPosition(OUT_OF_BOUNDS_COLUMN);
-            expect(navigator.isWithinBounds()).toBeFalse();
+            expect(navigator['isWithinBounds']()).toBeFalse();
         });
     });
 
@@ -205,18 +168,18 @@ describe('BoardNavigator', () => {
     describe('isEmpty', () => {
         it('should be true if no tile', () => {
             navigator.setPosition({ row: 0, column: 0 });
-            expect(navigator.isEmpty()).toBeTrue();
+            expect(navigator['isEmpty']()).toBeTrue();
         });
 
         it('should be false if has tile', () => {
             navigator.setPosition({ row: 2, column: 2 });
-            expect(navigator.isEmpty()).toBeFalse();
+            expect(navigator['isEmpty']()).toBeFalse();
         });
 
         it('should return true if not applied', () => {
             board[2][2].applied = false;
             navigator.setPosition({ row: 2, column: 2 });
-            expect(navigator.isEmpty(true)).toBeTrue();
+            expect(navigator['isEmpty'](true)).toBeTrue();
         });
     });
 

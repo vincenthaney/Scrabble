@@ -41,27 +41,22 @@ export class PlayerContainer {
         return player;
     }
 
-    setPlayer(playerNumber: number, player: Player): this {
-        this.players.set(playerNumber, player);
-        return this;
-    }
-
-    removePlayer(playerNumber: number): this {
-        this.players.delete(playerNumber);
-        return this;
-    }
-
-    resetPlayers(): this {
-        this.players.clear();
-        return this;
-    }
-
     updatePlayersData(...playersData: PlayerData[]): this {
         playersData.forEach((playerData: PlayerData) => {
             [...this.players.values()]
                 .filter((player: Player) => player.id === playerData.id)
                 .forEach((player: Player) => player.updatePlayerData(playerData));
         });
+        return this;
+    }
+
+    private setPlayer(playerNumber: number, player: Player): this {
+        this.players.set(playerNumber, player);
+        return this;
+    }
+
+    private resetPlayers(): this {
+        this.players.clear();
         return this;
     }
 }

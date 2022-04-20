@@ -20,12 +20,11 @@ export interface ConvertResult {
 })
 export class ConvertDialogComponent implements OnInit, OnDestroy {
     virtualPlayerLevels: typeof VirtualPlayerLevel;
-    playerName: string;
-    pageDestroyed$: Subject<boolean>;
     gameParameters: FormGroup;
-    isConverting: boolean;
 
+    private playerName: string;
     private virtualPlayerNameMap: Map<VirtualPlayerLevel, string[]>;
+    private pageDestroyed$: Subject<boolean>;
 
     constructor(
         private dialogRef: MatDialogRef<ConvertDialogComponent>,
@@ -33,7 +32,6 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
         private gameDispatcherService: GameDispatcherService,
         private readonly virtualPlayerProfilesService: VirtualPlayerProfilesService,
     ) {
-        this.isConverting = false;
         this.playerName = data;
         this.virtualPlayerLevels = VirtualPlayerLevel;
         this.virtualPlayerNameMap = new Map();
@@ -65,7 +63,6 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
     }
 
     onSubmit(): void {
-        this.isConverting = true;
         this.handleConvertToSolo();
     }
 
@@ -82,6 +79,8 @@ export class ConvertDialogComponent implements OnInit, OnDestroy {
 
     private generateVirtualPlayerProfileMap(virtualPlayerProfiles: VirtualPlayerProfile[]): void {
         virtualPlayerProfiles.forEach((profile: VirtualPlayerProfile) => {
+            if (profile.name === this.playerName) return;
+
             const namesForLevel: string[] | undefined = this.virtualPlayerNameMap.get(profile.level);
             if (!namesForLevel) this.virtualPlayerNameMap.set(profile.level, [profile.name]);
             else namesForLevel.push(profile.name);

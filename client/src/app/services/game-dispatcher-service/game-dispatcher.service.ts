@@ -116,20 +116,6 @@ export default class GameDispatcherService implements OnDestroy {
         this.handleGameCreation(gameConfig);
     }
 
-    handleGameCreation(gameConfig: GameConfigData): void {
-        this.gameDispatcherController.handleGameCreation(gameConfig).subscribe(
-            (response) => {
-                this.currentLobby = response.lobbyData;
-                if (this.currentLobby && this.currentLobby.gameMode === GameMode.Multiplayer) {
-                    this.router.navigateByUrl('waiting-room');
-                }
-            },
-            (error: HttpErrorResponse) => {
-                this.gameCreationFailed$.next(error);
-            },
-        );
-    }
-
     handleCancelGame(mustResetData: boolean = true): void {
         if (this.getCurrentLobbyId()) this.gameDispatcherController.handleCancelGame(this.getCurrentLobbyId());
         if (mustResetData) this.resetServiceData();
@@ -168,6 +154,20 @@ export default class GameDispatcherService implements OnDestroy {
 
     observeGameCreationFailed(): Observable<HttpErrorResponse> {
         return this.gameCreationFailed$.asObservable();
+    }
+
+    private handleGameCreation(gameConfig: GameConfigData): void {
+        this.gameDispatcherController.handleGameCreation(gameConfig).subscribe(
+            (response) => {
+                this.currentLobby = response.lobbyData;
+                if (this.currentLobby && this.currentLobby.gameMode === GameMode.Multiplayer) {
+                    this.router.navigateByUrl('waiting-room');
+                }
+            },
+            (error: HttpErrorResponse) => {
+                this.gameCreationFailed$.next(error);
+            },
+        );
     }
 
     private isGameModeSolo(gameParameters?: FormGroup): boolean {

@@ -21,7 +21,8 @@ import { DefaultDialogComponent } from '@app/components/default-dialog/default-d
 })
 export class AdminHighScoresComponent implements OnInit, OnDestroy {
     isInitialized: boolean = false;
-    componentDestroyed$: Subject<boolean> = new Subject();
+
+    private componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private readonly dialog: MatDialog, private readonly highScoresService: HighScoresService) {}
 

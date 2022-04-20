@@ -67,18 +67,9 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameViewEventManagerService.emitGameViewEvent('gameInitialized', initializeGameData);
     }
 
-    getPlayingPlayerId(): string {
-        return this.roundManager.getActivePlayer().id;
-    }
-
     isLocalPlayerPlaying(): boolean {
         if (!this.playerContainer) return false;
         return this.getPlayingPlayerId() === this.playerContainer.getLocalPlayerId();
-    }
-
-    isLocalPlayerPlayer1(): boolean {
-        if (!this.playerContainer) return false;
-        return this.playerContainer.getLocalPlayerId() === this.playerContainer.getPlayer(1).id;
     }
 
     getGameId(): string {
@@ -120,6 +111,15 @@ export default class GameService implements OnDestroy, IResetServiceData {
         this.gameType = GameType.Classic;
         this.playerContainer = undefined;
         this.gameViewEventManagerService.emitGameViewEvent('resetUsedTiles');
+    }
+
+    private getPlayingPlayerId(): string {
+        return this.roundManager.getActivePlayer().id;
+    }
+
+    private isLocalPlayerPlayer1(): boolean {
+        if (!this.playerContainer) return false;
+        return this.playerContainer.getLocalPlayerId() === this.playerContainer.getPlayer(1).id;
     }
 
     private async initializeGame(localPlayerId: string, startGameData: StartGameData): Promise<void> {

@@ -16,7 +16,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class ActionService implements IResetServiceData, OnDestroy {
     hasActionBeenPlayed: boolean;
-    serviceDestroyed$: Subject<boolean>;
+    private serviceDestroyed$: Subject<boolean>;
 
     constructor(private gamePlayController: GamePlayController, private readonly gameViewEventManagerService: GameViewEventManagerService) {
         this.hasActionBeenPlayed = false;

@@ -35,11 +35,11 @@ import { GameMode } from '@app/constants/game-mode';
 import { DEFAULT_TIMER_VALUE } from '@app/constants/pages-constants';
 import { MOCK_PLAYER_PROFILES, MOCK_PLAYER_PROFILE_MAP } from '@app/constants/service-test-constants';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { LoadingPageComponent } from '@app/pages/loading-page/loading-page.component';
 import { GameDispatcherService } from '@app/services/';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Subject } from 'rxjs';
-import { LoadingPageComponent } from '@app/pages/loading-page/loading-page.component';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -163,7 +163,7 @@ describe('GameCreationPageComponent', () => {
         };
         gameParametersForm.setValue(formValues);
         component.playerName = 'valid name';
-        component.playerNameValid = true;
+        component['playerNameValid'] = true;
     };
 
     it('should create', () => {
@@ -252,8 +252,8 @@ describe('GameCreationPageComponent', () => {
 
     describe('ngOnDestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
-            const ngUnsubscribeNextSpy = spyOn<any>(component.pageDestroyed$, 'next');
-            const ngUnsubscribeCompleteSpy = spyOn<any>(component.pageDestroyed$, 'complete');
+            const ngUnsubscribeNextSpy = spyOn<any>(component['pageDestroyed$'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn<any>(component['pageDestroyed$'], 'complete');
 
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
@@ -331,7 +331,7 @@ describe('GameCreationPageComponent', () => {
             setValidFormValues();
 
             component.playerName = EMPTY_VALUE;
-            component.playerNameValid = false;
+            component['playerNameValid'] = false;
 
             expect(component.isFormValid()).toBeFalse();
         });
@@ -384,7 +384,7 @@ describe('GameCreationPageComponent', () => {
     describe('onPlayerNameChanges', () => {
         it('should set playerName and playerNameCalid', () => {
             component.playerName = EMPTY_VALUE;
-            (component.playerNameValid as unknown) = EMPTY_VALUE;
+            (component['playerNameValid'] as unknown) = EMPTY_VALUE;
 
             const expectedName = 'player name';
             const expectedValid = true;
@@ -392,7 +392,7 @@ describe('GameCreationPageComponent', () => {
             component.onPlayerNameChanges([expectedName, expectedValid]);
 
             expect(component.playerName).toEqual(expectedName);
-            expect(component.playerNameValid).toEqual(expectedValid);
+            expect(component['playerNameValid']).toEqual(expectedValid);
         });
     });
 

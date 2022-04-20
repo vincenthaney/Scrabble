@@ -63,30 +63,6 @@ describe('SocketService', () => {
         expect(spy).toHaveBeenCalledWith(event, action);
     });
 
-    it('should call emit with data when using send', () => {
-        const event = 'helloWorld';
-        const data = 42;
-        const spy = spyOn(service['socket'], 'emit');
-        service.emit(event, data);
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledWith(event, [data]);
-    });
-
-    it('should call emit without data when using send if data is undefined', () => {
-        const event = 'helloWorld';
-        const data = undefined;
-        const spy = spyOn(service['socket'], 'emit');
-        service.emit(event, data);
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledWith(event, [data]);
-    });
-
-    it('should check is socket is undefined on emit', () => {
-        (service['socket'] as unknown) = undefined;
-        const result = service.emit('');
-        expect(result).toBeFalse();
-    });
-
     it('should throw when socket is undefined on getId', () => {
         (service['socket'] as unknown) = undefined;
         expect(() => service.getId()).toThrowError(SOCKET_ID_UNDEFINED);

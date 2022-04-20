@@ -33,8 +33,7 @@ export class GameViewEventManagerService {
     }
 
     emitGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(eventType: T, payload?: S): void {
-        const subject: Subject<S> = this.getSubjectFromMap(eventType);
-        subject.next(payload);
+        this.getSubjectFromMap(eventType).next(payload);
     }
 
     subscribeToGameViewEvent<T extends keyof EventTypes, S extends EventTypes[T]>(

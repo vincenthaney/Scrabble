@@ -14,7 +14,7 @@ import {
 } from '@app/constants/pages-constants';
 import { PLAYER_NAME_KEY } from '@app/constants/session-storage-constants';
 import { GameDispatcherService } from '@app/services/';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-lobby-page',
@@ -28,10 +28,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     playerNameValid: boolean;
     lobbies: LobbyInfo[];
 
-    lobbiesUpdateSubscription: Subscription;
-    lobbyFullSubscription: Subscription;
-    lobbyCanceledSubscription: Subscription;
-    componentDestroyed$: Subject<boolean>;
+    private componentDestroyed$: Subject<boolean>;
 
     constructor(public gameDispatcherService: GameDispatcherService, public dialog: MatDialog, private snackBar: MatSnackBar) {
         this.playerName = window.localStorage.getItem(PLAYER_NAME_KEY) || '';

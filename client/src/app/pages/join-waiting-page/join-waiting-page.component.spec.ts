@@ -137,12 +137,6 @@ describe('JoinWaitingPageComponent', () => {
         });
     });
 
-    it('ngOnDestroy should unsubscribe all subscriptions', () => {
-        const spyUnsubscribeRoutingEvent = spyOn(component.routingSubscription, 'unsubscribe').and.returnValue(of(true) as any);
-        component.ngOnDestroy();
-        expect(spyUnsubscribeRoutingEvent).toHaveBeenCalled();
-    });
-
     describe('routerChangeMethod', () => {
         it('routerChangeMethod should call handleLeaveLobby if the url is diffrent from /game ', () => {
             const spyHandleLeaveLobby = spyOn(component['playerLeavesService'], 'handleLeaveLobby').and.returnValue(of(true) as any);

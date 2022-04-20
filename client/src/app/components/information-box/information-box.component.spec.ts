@@ -279,7 +279,7 @@ describe('InformationBoxComponent', () => {
             });
             const newTimer: Timer = new Timer(1, 0);
             component['startTimer'](newTimer);
-            expect(component.timerSource).toEqual(observable);
+            expect(component['timerSource']).toEqual(observable);
         });
 
         it('StartTimer should subscribe timerSubscription to timerSource and call timer.decrement', () => {
@@ -288,7 +288,7 @@ describe('InformationBoxComponent', () => {
                 return false;
             });
             component['startTimer'](newTimer);
-            expect(component.timerSubscription).toBeTruthy();
+            expect(component['timerSubscription']).toBeTruthy();
         });
     });
 
@@ -300,15 +300,15 @@ describe('InformationBoxComponent', () => {
 
         it('EndRound should unsubscribe from timerSubscription', () => {
             component['startTimer'](new Timer(1, 0));
-            const spy = spyOn(component.timerSubscription, 'unsubscribe');
+            const spy = spyOn(component['timerSubscription'], 'unsubscribe');
             component['endRound']();
             expect(spy).toHaveBeenCalled();
         });
 
         it('EndRound should not unsubscribe if timerSubscription is not defined', () => {
             component['startTimer'](new Timer(1, 0));
-            const spy = spyOn(component.timerSubscription, 'unsubscribe');
-            component.timerSubscription = undefined as unknown as Subscription;
+            const spy = spyOn(component['timerSubscription'], 'unsubscribe');
+            component['timerSubscription'] = undefined as unknown as Subscription;
             component['endRound']();
             expect(spy).not.toHaveBeenCalled();
         });

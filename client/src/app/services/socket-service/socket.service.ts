@@ -28,14 +28,6 @@ export default class SocketService extends ConnectionStateService {
         this.socket.on(ev, handler);
     }
 
-    emit<T>(ev: string, ...args: T[]): boolean {
-        if (!this.socket) {
-            return false;
-        }
-        this.socket.emit(ev, args);
-        return true;
-    }
-
     private getSocket(): Socket {
         // This line cannot be tested since it would connect to the real socket in the tests since it is impossible to mock io()
         return io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });

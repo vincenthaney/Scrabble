@@ -18,15 +18,16 @@ import { takeUntil } from 'rxjs/operators';
     providedIn: 'root',
 })
 export default class RoundManagerService implements IResetServiceData, OnDestroy {
-    gameId: string;
-    localPlayerId: string;
     currentRound: Round;
-    completedRounds: Round[];
-    maxRoundTime: number;
-    timeout: ReturnType<typeof setTimeout>;
     timer: Observable<[timer: Timer, activePlayer: Player]>;
+
+    private gameId: string;
+    private localPlayerId: string;
+    private completedRounds: Round[];
+    private maxRoundTime: number;
     private endRoundEvent$: Subject<void>;
     private timerSource: BehaviorSubject<[timer: Timer, activePlayer: Player]>;
+    private timeout: ReturnType<typeof setTimeout>;
     private serviceDestroyed$: Subject<boolean>;
 
     constructor(

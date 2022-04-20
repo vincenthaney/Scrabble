@@ -16,7 +16,7 @@ export class GamePlayController {
     private newMessage$ = new BehaviorSubject<Message | null>(null);
     private actionDone$ = new Subject<void>();
 
-    constructor(private http: HttpClient, public socketService: SocketService) {
+    constructor(private http: HttpClient, private readonly socketService: SocketService) {
         this.configureSocket();
     }
 
