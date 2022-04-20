@@ -18,12 +18,12 @@ export default class WordFindingBeginner extends AbstractWordFinding {
     }
 
     protected handleWordPlacement(wordPlacement: ScoredWordPlacement): void {
-        if (this.isWithinPointRange(wordPlacement.score)) {
-            const acceptanceProbability = this.acceptanceProbabilities.get(wordPlacement.score) ?? 0;
-            if (acceptanceProbability > this.highestAcceptanceFoundPlacement) {
-                this.wordPlacements = [wordPlacement];
-                this.highestAcceptanceFoundPlacement = acceptanceProbability;
-            }
+        if (!this.isWithinPointRange(wordPlacement.score)) return;
+
+        const acceptanceProbability = this.acceptanceProbabilities.get(wordPlacement.score) ?? 0;
+        if (acceptanceProbability > this.highestAcceptanceFoundPlacement) {
+            this.wordPlacements = [wordPlacement];
+            this.highestAcceptanceFoundPlacement = acceptanceProbability;
         }
     }
 

@@ -47,7 +47,7 @@ export default class DictionarySavingService {
             throw new HttpException(INVALID_TITLE_ALREADY_USED(dictionary.title), StatusCodes.FORBIDDEN);
 
         const id = uuidv4();
-        const filename = `${dictionary.title}-${id}.json`;
+        const filename = `${id}.json`;
 
         const dictionaryEntry: DictionaryEntry = {
             title: dictionary.title,
