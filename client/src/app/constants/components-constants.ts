@@ -37,13 +37,13 @@ export const GAME_HISTORY_COLUMNS: DisplayGameHistoryColumns = {
     duration: 'Durée',
     hasBeenAbandoned: 'Partie abandonnée',
     gameType: 'Type de partie',
-    gameMode: 'Mode de partie',
+    gameMode: 'Mode de jeu',
     player1Data: 'Joueur 1',
     player1Name: 'Nom joueur 1',
-    player1Score: 'Points joueur 1',
+    player1Score: 'Pointage joueur 1',
     player2Data: 'Joueur 2',
     player2Name: 'Nom joueur 2',
-    player2Score: 'Points joueur 2',
+    player2Score: 'Pointage joueur 2',
 };
 
 export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
