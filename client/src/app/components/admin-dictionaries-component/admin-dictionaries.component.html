@@ -54,12 +54,6 @@
                 <p>Chargement des dictionnaires...</p>
             </div>
         </ng-container>
-
-        <ng-container *ngSwitchCase="'error'">
-            <div class="loading-container">
-                <p class="error">{{ error }}</p>
-            </div>
-        </ng-container>
     </ng-container>
     <mat-progress-bar *ngIf="!isWaitingForServerResponse" mode="indeterminate"></mat-progress-bar>
     <mat-paginator [pageSizeOptions] = "[15, 25, 50]" [ngClass]="{ visible: state === 'ready' }" showFirstLastButtons></mat-paginator>

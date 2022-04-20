@@ -40,7 +40,6 @@ export class AdminGameHistoryComponent implements OnInit, AfterViewInit {
         this.dataSource = new MatTableDataSource(new Array());
         this.state = GameHistoryState.Loading;
         this.error = undefined;
-
         this.dataSource.sortingDataAccessor = this.sortGameHistory;
         this.columnsControl.setValue(this.selectedColumnsItems);
     }
