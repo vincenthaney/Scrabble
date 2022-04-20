@@ -27,6 +27,7 @@ import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { IconComponent } from '@app/components/icon/icon.component';
 import { NameFieldComponent } from '@app/components/name-field/name-field.component';
 import { PageHeaderComponent } from '@app/components/page-header/page-header.component';
+import { TileComponent } from '@app/components/tile/tile.component';
 import { TimerSelectionComponent } from '@app/components/timer-selection/timer-selection.component';
 import { INVALID_DICTIONARY_ID } from '@app/constants/controllers-errors';
 import { DEFAULT_PLAYER } from '@app/constants/game-constants';
@@ -38,6 +39,7 @@ import { GameDispatcherService } from '@app/services/';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
 import { VirtualPlayerProfilesService } from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Subject } from 'rxjs';
+import { LoadingPageComponent } from '@app/pages/loading-page/loading-page.component';
 import { GameCreationPageComponent } from './game-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 
@@ -98,7 +100,16 @@ describe('GameCreationPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [GameCreationPageComponent, NameFieldComponent, TestComponent, TimerSelectionComponent, IconComponent, PageHeaderComponent],
+            declarations: [
+                GameCreationPageComponent,
+                NameFieldComponent,
+                TestComponent,
+                TimerSelectionComponent,
+                IconComponent,
+                PageHeaderComponent,
+                LoadingPageComponent,
+                TileComponent,
+            ],
             imports: [
                 AppMaterialModule,
                 HttpClientModule,
