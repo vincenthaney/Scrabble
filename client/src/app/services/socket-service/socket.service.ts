@@ -29,6 +29,7 @@ export default class SocketService extends ConnectionStateService {
     }
 
     private getSocket(): Socket {
+        // This line cannot be tested since it would connect to the real socket in the tests since it is impossible to mock io()
         return io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
     }
 }

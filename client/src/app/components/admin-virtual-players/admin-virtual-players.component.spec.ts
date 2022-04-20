@@ -228,4 +228,12 @@ describe('AdminVirtualPlayersComponent', () => {
             expect(component['isFeedbackPositive']('un ti feedback avec po dfautes' as PositiveFeedback)).toEqual(ERROR_SNACK_BAR_CONFIG);
         });
     });
+
+    describe('askResetVirtualPlayers', () => {
+        it('should call MatDialog open', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component.askResetVirtualPlayers();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
 });

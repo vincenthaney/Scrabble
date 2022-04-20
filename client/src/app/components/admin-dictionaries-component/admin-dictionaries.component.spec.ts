@@ -240,4 +240,12 @@ describe('AdminDictionariesComponent', () => {
             expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
         });
     });
+
+    describe('askResetDictionaries', () => {
+        it('should call MatDialog open', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component.askResetDictionaries();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
 });

@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BUTTON_MUST_HAVE_CONTENT, DIALOG_BUTTONS_MUST_BE_AN_ARRAY, DIALOG_MUST_HAVE_TITLE } from '@app/constants/component-errors';
+import { IconComponent } from '@app/components/icon/icon.component';
 import { DefaultDialogComponent } from './default-dialog.component';
 import { DefaultDialogButtonParameters, DefaultDialogParameters } from './default-dialog.component.types';
 
@@ -28,7 +29,7 @@ const MODEL: DefaultDialogParameters = {
 
 const createDialog = (model: DefaultDialogParameters): [component: DefaultDialogComponent, fixture: ComponentFixture<DefaultDialogComponent>] => {
     TestBed.configureTestingModule({
-        declarations: [DefaultDialogComponent],
+        declarations: [DefaultDialogComponent, IconComponent],
         imports: [MatButtonModule, MatDialogModule, RouterTestingModule.withRoutes([])],
         providers: [
             {
