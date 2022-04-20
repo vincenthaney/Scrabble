@@ -609,7 +609,7 @@ describe('GameService', () => {
         it('should return id or round manager active player', () => {
             const expected = 'expected-id';
             roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
-            const result = service.getPlayingPlayerId();
+            const result = service['getPlayingPlayerId']();
             expect(result).toEqual(expected);
         });
     });
@@ -645,7 +645,7 @@ describe('GameService', () => {
             service['playerContainer'] = new PlayerContainer(expected);
             service['playerContainer']['players'].set(1, { id: expected } as Player);
 
-            const result = service.isLocalPlayerPlayer1();
+            const result = service['isLocalPlayerPlayer1']();
             expect(result).toBeTrue();
         });
 
@@ -654,13 +654,13 @@ describe('GameService', () => {
             roundManagerSpy.getActivePlayer.and.returnValue({ id: expected } as Player);
             service['playerContainer'] = new PlayerContainer('NOT-expected-id');
             service['playerContainer']['players'].set(1, { id: expected } as Player);
-            const result = service.isLocalPlayerPlayer1();
+            const result = service['isLocalPlayerPlayer1']();
             expect(result).toBeFalse();
         });
 
         it('should return false there is no player container', () => {
             service['playerContainer'] = undefined;
-            const result = service.isLocalPlayerPlayer1();
+            const result = service['isLocalPlayerPlayer1']();
             expect(result).toBeFalse();
         });
     });
