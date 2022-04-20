@@ -1,7 +1,7 @@
 <div matSort>
     <div class="filter-container">
         <div class="buttons">
-            <button mat-flat-button color="primary" (click)="resetHistory()" [disabled]="state !== 'ready'">Réinitialiser <app-icon icon="history"></app-icon></button>
+            <button mat-flat-button color="primary" (click)="askResetHistory()" [disabled]="state !== 'ready'">Réinitialiser <app-icon icon="history"></app-icon></button>
             <button mat-flat-button color="primary" (click)="updateHistoryData()" [disabled]="state !== 'ready'">Actualiser <app-icon icon="sync"></app-icon></button>
         </div>
 

@@ -150,14 +150,6 @@ describe('AdminVirtualPlayersComponent', () => {
         });
     });
 
-    describe('ngAfterViewInit', () => {
-        it('should set dataSources.sort', () => {
-            component.ngAfterViewInit();
-            expect(component.dataSourceBeginner.sort).toBe(component['sortBeginner']);
-            expect(component.dataSourceExpert.sort).toBe(component['sortExpert']);
-        });
-    });
-
     describe('updateVirtualPlayer', () => {
         it('should open UpdateVirtualPLayerComponent', () => {
             const spy = spyOn(component['dialog'], 'open');
@@ -194,16 +186,6 @@ describe('AdminVirtualPlayersComponent', () => {
 
     describe('getDisplayedColumns', () => {
         it('should return array of keys', () => {
-            component.columnsItems = [
-                {
-                    key: 'name',
-                    label: 'testvalue',
-                },
-                {
-                    key: 'actions',
-                    label: 'testvalue2',
-                },
-            ];
             component.getDisplayedColumns();
             expect(component.getDisplayedColumns()).toEqual(['name', 'actions']);
         });
@@ -244,6 +226,14 @@ describe('AdminVirtualPlayersComponent', () => {
         });
         it('should return ERROR_SNACK_BAR_CONFIG with negative response', () => {
             expect(component['isFeedbackPositive']('un ti feedback avec po dfautes' as PositiveFeedback)).toEqual(ERROR_SNACK_BAR_CONFIG);
+        });
+    });
+
+    describe('askResetVirtualPlayers', () => {
+        it('should call MatDialog open', () => {
+            const spy = spyOn(component['dialog'], 'open');
+            component.askResetVirtualPlayers();
+            expect(spy).toHaveBeenCalled();
         });
     });
 });

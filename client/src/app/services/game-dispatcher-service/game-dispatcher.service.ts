@@ -108,6 +108,7 @@ export default class GameDispatcherService implements OnDestroy {
             maxRoundTime: this.currentLobby?.maxRoundTime,
             dictionary: this.currentLobby?.dictionary,
         };
+
         if (gameParameters && this.isGameModeSolo(gameParameters)) {
             gameConfig.virtualPlayerName = gameParameters.get('virtualPlayerName')?.value as string;
             gameConfig.virtualPlayerLevel = gameParameters.get('level')?.value as VirtualPlayerLevel;

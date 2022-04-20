@@ -50,6 +50,7 @@ export const DEFAULT_GAME_HISTORY_COLUMNS: DisplayGameHistoryKeys[] = [
     'startDate',
     'startTime',
     'duration',
+    'hasBeenAbandoned',
     'gameType',
     'gameMode',
     'player1Name',
@@ -71,3 +72,13 @@ export const IS_CLICKABLE_CLASS = 'isClickable';
 export const CODE_HTML_TAG = 'CODE';
 
 export const ASCENDING_COLUMN_SORTER = 'asc';
+
+export const ADMIN_RESET_HISTORY_TITLE = "Voulez-vous réinitialiser l'historique de partie?";
+export const ADMIN_RESET_DICTIONARY_TITLE = 'Voulez-vous réinitialiser les dictionnaires?';
+export const ADMIN_RESET_VIRTUAL_PLAYER_TITLE = 'Voulez-vous réinitialiser les joueurs virtuels?';
+export const ADMIN_RESET_HIGH_SCORE_TITLE = 'Voulez-vous réinitialiser les meilleurs scores?';
+export const ADMIN_RESET_MESSAGE = 'Cette opération est irréversible.';
+export const CANCEL = 'Annuler';
+export const CANCEL_ICON: IconName = 'ban';
+export const REINITIALIZE = 'Réinitialiser';
+export const REINITIALIZE_ICON: IconName = 'history';

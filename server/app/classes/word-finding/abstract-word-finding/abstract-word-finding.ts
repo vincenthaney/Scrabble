@@ -110,12 +110,7 @@ export default abstract class AbstractWordFinding {
         const squareTiles: [Square, Tile][] = [];
 
         for (let i = 0; i < word.length; ++i) {
-            let tile: Tile;
-            if (!navigator.square.tile) {
-                tile = this.getTileFromLetter(playerTiles, word.charAt(i));
-            } else {
-                tile = navigator.square.tile;
-            }
+            const tile: Tile = !navigator.square.tile ? this.getTileFromLetter(playerTiles, word.charAt(i)) : navigator.square.tile;
 
             squareTiles.push([navigator.square, tile]);
 

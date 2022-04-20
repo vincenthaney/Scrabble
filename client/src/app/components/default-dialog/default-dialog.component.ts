@@ -33,6 +33,7 @@ export class DefaultDialogComponent {
                 action: button.action,
                 redirect: button.redirect,
                 style: button.style,
+                icon: button.icon,
             });
         });
     }

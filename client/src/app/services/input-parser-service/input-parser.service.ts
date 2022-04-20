@@ -56,18 +56,17 @@ export default class InputParserService {
         try {
             this.actionService.sendAction(gameId, playerId, this.createActionData(input));
         } catch (exception) {
-            if (exception instanceof CommandException) {
-                const errorMessageContent =
-                    exception.message === CommandExceptionMessages.NotYourTurn
-                        ? exception.message
-                        : `La commande **${input}** est invalide :<br />${exception.message}`;
+            if (!(exception instanceof CommandException)) return;
+            const errorMessageContent =
+                exception.message === CommandExceptionMessages.NotYourTurn
+                    ? exception.message
+                    : `La commande **${input}** est invalide :<br />${exception.message}`;
 
-                this.controller.sendError(gameId, playerId, {
-                    content: errorMessageContent,
-                    senderId: SYSTEM_ERROR_ID,
-                    gameId,
-                });
-            }
+            this.controller.sendError(gameId, playerId, {
+                content: errorMessageContent,
+                senderId: SYSTEM_ERROR_ID,
+                gameId,
+            });
         }
     }
 
@@ -135,8 +134,8 @@ export default class InputParserService {
     }
 
     private parseLettersToTiles(lettersToParse: string, actionType: ActionType.PLACE | ActionType.EXCHANGE): Tile[] {
-        if (actionType === ActionType.EXCHANGE) {
-            if (lettersToParse !== lettersToParse.toLowerCase()) throw new CommandException(CommandExceptionMessages.ExchangeRequireLowercaseLetters);
+        if (actionType === ActionType.EXCHANGE && lettersToParse !== lettersToParse.toLowerCase()) {
+            throw new CommandException(CommandExceptionMessages.ExchangeRequireLowercaseLetters);
         }
 
         const player: Player = this.getLocalPlayer();

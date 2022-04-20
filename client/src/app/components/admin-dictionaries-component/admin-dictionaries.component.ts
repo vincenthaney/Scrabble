@@ -12,7 +12,17 @@ import {
     DisplayDictionaryKeys,
 } from '@app/classes/admin/dictionaries';
 import { DictionarySummary } from '@app/classes/communication/dictionary-summary';
-import { DICTIONARIES_COLUMNS, SUCCESS_SNACK_BAR_CONFIG, ERROR_SNACK_BAR_CONFIG } from '@app/constants/components-constants';
+import {
+    DICTIONARIES_COLUMNS,
+    SUCCESS_SNACK_BAR_CONFIG,
+    ERROR_SNACK_BAR_CONFIG,
+    ADMIN_RESET_MESSAGE,
+    CANCEL,
+    CANCEL_ICON,
+    REINITIALIZE,
+    REINITIALIZE_ICON,
+    ADMIN_RESET_DICTIONARY_TITLE,
+} from '@app/constants/components-constants';
 import { PositiveFeedbackResponse } from '@app/constants/dialogs-constants';
 import { PositiveFeedback } from '@app/constants/dictionaries-components';
 import { DictionaryService } from '@app/services/dictionary-service/dictionary.service';
@@ -22,6 +32,7 @@ import { DeleteDictionaryDialogParameters } from '@app/components/delete-diction
 import { ModifyDictionaryComponent } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component';
 import { DictionaryDialogParameters } from '@app/components/modify-dictionary-dialog/modify-dictionary-dialog.component.types';
 import { UploadDictionaryComponent } from '@app/components/upload-dictionary/upload-dictionary.component';
+import { DefaultDialogComponent } from '@app/components/default-dialog/default-dialog.component';
 
 @Component({
     selector: 'app-admin-dictionaries',
@@ -99,6 +110,31 @@ export class AdminDictionariesComponent implements OnInit, AfterViewInit, OnDest
     async downloadDictionary(dictionaryId: string): Promise<void> {
         this.isWaitingForServerResponse = true;
         await this.dictionariesService.downloadDictionary(dictionaryId);
+    }
+
+    askResetDictionaries(): void {
+        this.dialog.open(DefaultDialogComponent, {
+            data: {
+                title: ADMIN_RESET_DICTIONARY_TITLE,
+                content: ADMIN_RESET_MESSAGE,
+                buttons: [
+                    {
+                        content: CANCEL,
+                        closeDialog: true,
+                        icon: CANCEL_ICON,
+                    },
+                    {
+                        content: REINITIALIZE,
+                        action: this.resetDictionaries.bind(this),
+                        closeDialog: true,
+                        icon: REINITIALIZE_ICON,
+                        style: {
+                            background: 'tomato',
+                        },
+                    },
+                ],
+            },
+        });
     }
 
     async resetDictionaries(): Promise<void> {
