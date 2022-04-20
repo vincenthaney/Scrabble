@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -61,13 +62,13 @@ describe('Player', () => {
     });
 
     it('endGameMessage should call tilesToString and return the correct message', () => {
-        const tilesToStringStub = stub(player, 'tilesToString').returns('aaaa');
+        const tilesToStringStub = stub(player, 'tilesToString' as any).returns('aaaa');
         expect(player.endGameMessage()).to.equal(`${player.name} : aaaa`);
         assert(tilesToStringStub.calledOnce);
     });
 
     it('tilesToString should return the string of the tiles', () => {
-        expect(player.tilesToString()).to.equal('abad');
+        expect(player['tilesToString']()).to.equal('abad');
     });
 
     it('getObjectives should return player objectives as array', () => {
