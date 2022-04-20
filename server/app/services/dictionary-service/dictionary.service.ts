@@ -163,13 +163,11 @@ export default class DictionaryService {
 
     private shouldDeleteActiveDictionary(dictionaryUsage: DictionaryUsage, forceDeleteIfUnused: boolean = false): boolean {
         return (
-            dictionaryUsage.numberOfActiveGames <= 0 &&
-            dictionaryUsage.isDeleted &&
-            (forceDeleteIfUnused || !dictionaryUsage.lastUse || this.notUsedInLastHour(dictionaryUsage))
+            dictionaryUsage.numberOfActiveGames <= 0 && dictionaryUsage.isDeleted && (forceDeleteIfUnused || this.notUsedInLastHour(dictionaryUsage))
         );
     }
 
     private notUsedInLastHour(dictionaryUsage: DictionaryUsage): boolean {
-        return dictionaryUsage.lastUse !== undefined && Date.now() - dictionaryUsage.lastUse.getTime() > ONE_HOUR_IN_MS;
+        return dictionaryUsage.lastUse === undefined || Date.now() - dictionaryUsage.lastUse.getTime() > ONE_HOUR_IN_MS;
     }
 }
