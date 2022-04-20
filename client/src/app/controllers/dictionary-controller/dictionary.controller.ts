@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class DictionaryController implements OnDestroy {
-    endpoint = `${environment.serverUrl}/dictionaries`;
+    private endpoint = `${environment.serverUrl}/dictionaries`;
     private dictionaryUpdateMessageEvent: Subject<string> = new Subject();
     private dictionaryErrorEvent: Subject<string> = new Subject();
     private dictionaryDownloadEvent: Subject<BasicDictionaryData> = new Subject();
