@@ -1,15 +1,14 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSort, MatSortable } from '@angular/material/sort';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { VirtualPlayerProfile } from '@app/classes/admin/virtual-player-profile';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
 import { CreateVirtualPlayerComponent } from '@app/components/create-virtual-player-dialog/create-virtual-player-dialog.component';
 import { DeleteVirtualPlayerDialogComponent } from '@app/components/delete-virtual-player-dialog/delete-virtual-player-dialog.component';
 import { UpdateVirtualPlayerComponent } from '@app/components/update-virtual-player-dialog/update-virtual-player-dialog.component';
-import { ASCENDING_COLUMN_SORTER, VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
+import { VIRTUAL_PLAYERS_COLUMNS } from '@app/constants/components-constants';
 import {
     CREATE_VIRTUAL_PLAYER_DIALOG_HEIGHT,
     CREATE_VIRTUAL_PLAYER_DIALOG_WIDTH,
@@ -35,19 +34,18 @@ import {
     templateUrl: './admin-virtual-players.component.html',
     styleUrls: ['./admin-virtual-players.component.scss'],
 })
-export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AdminVirtualPlayersComponent implements OnInit, OnDestroy {
     @ViewChild(MatSort) sortBeginner: MatSort;
     @ViewChild(MatSort) sortExpert: MatSort;
     columns: DisplayVirtualPlayersColumns;
-    columnsItems: DisplayVirtualPlayersColumnsIteratorItem[];
-    columnsControl: FormControl;
-    virtualPlayers: VirtualPlayerProfile[];
     dataSourceBeginner: MatTableDataSource<VirtualPlayerProfile>;
     dataSourceExpert: MatTableDataSource<VirtualPlayerProfile>;
     state: VirtualPlayersComponentState;
     error: string | undefined;
     isWaitingForServerResponse: boolean;
+    private columnsItems: DisplayVirtualPlayersColumnsIteratorItem[];
     private componentDestroyed$: Subject<boolean>;
+
     constructor(public dialog: MatDialog, private virtualPlayerProfilesService: VirtualPlayerProfilesService, private snackBar: MatSnackBar) {
         this.componentDestroyed$ = new Subject();
         this.columns = VIRTUAL_PLAYERS_COLUMNS;
@@ -67,13 +65,6 @@ export class AdminVirtualPlayersComponent implements OnInit, AfterViewInit, OnDe
 
     ngOnInit(): void {
         this.virtualPlayerProfilesService.getAllVirtualPlayersProfile();
-    }
-
-    ngAfterViewInit(): void {
-        this.sortBeginner.sort({ id: 'name', start: ASCENDING_COLUMN_SORTER } as MatSortable);
-        this.sortExpert.sort({ id: 'name', start: ASCENDING_COLUMN_SORTER } as MatSortable);
-        this.dataSourceBeginner.sort = this.sortBeginner;
-        this.dataSourceExpert.sort = this.sortExpert;
     }
 
     updateVirtualPlayer(virtualPlayerProfile: VirtualPlayerProfile): void {

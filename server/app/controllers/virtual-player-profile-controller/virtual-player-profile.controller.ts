@@ -2,7 +2,7 @@ import { VirtualPlayerProfilesRequest } from '@app/classes/communication/request
 import { VirtualPlayerData, VirtualPlayerProfile } from '@app/classes/database/virtual-player-profile';
 import { HttpException } from '@app/classes/http-exception/http-exception';
 import { VirtualPlayerLevel } from '@app/classes/player/virtual-player-level';
-import { MISSING_PARAMETER, MUST_SPECIFY_LEVEL } from '@app/constants/services-errors';
+import { INVALID_LEVEL, MISSING_PARAMETER } from '@app/constants/services-errors';
 import VirtualPlayerProfileService from '@app/services/virtual-player-profile-service/virtual-player-profile.service';
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -30,9 +30,8 @@ export class VirtualPlayerProfilesController {
 
         this.router.get('/virtualPlayerProfiles/:level', async (req: VirtualPlayerProfilesRequest, res: Response) => {
             try {
-                const level: VirtualPlayerLevel | undefined = req.params.level as VirtualPlayerLevel;
-                if (!level || !Object.values(VirtualPlayerLevel).includes(level))
-                    throw new HttpException(MUST_SPECIFY_LEVEL, StatusCodes.BAD_REQUEST);
+                const level: VirtualPlayerLevel = req.params.level as VirtualPlayerLevel;
+                if (!Object.values(VirtualPlayerLevel).includes(level)) throw new HttpException(INVALID_LEVEL, StatusCodes.BAD_REQUEST);
 
                 const virtualPlayerProfiles: VirtualPlayerProfile[] = await this.virtualPlayerProfileService.getVirtualPlayerProfilesFromLevel(level);
                 res.status(StatusCodes.OK).send({ virtualPlayerProfiles });
