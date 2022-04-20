@@ -16,7 +16,8 @@ export class HighScoresPageComponent implements OnInit, OnDestroy {
     });
     gameTypes = GameType;
     isInitialized: boolean = false;
-    componentDestroyed$: Subject<boolean> = new Subject();
+
+    private componentDestroyed$: Subject<boolean> = new Subject();
 
     constructor(private highScoresService: HighScoresService) {}
 
