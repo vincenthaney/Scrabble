@@ -201,7 +201,7 @@ describe('ObjectivesManagerService', () => {
 
         it('should return true if objective is private and different from NotCompleted', () => {
             expect(
-                service['isPrivateObjectiveCompletedByOpponent']({ state: ObjectiveState.CompletedByOpponent, isPublic: true } as ObjectiveData),
+                service['isPrivateObjectiveCompletedByOpponent']({ state: ObjectiveState.CompletedByOpponent, isPublic: false } as ObjectiveData),
             ).toBeTrue();
         });
     });
