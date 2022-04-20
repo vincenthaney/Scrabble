@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
+import { ConnectionState } from '@app/classes/connection-state-service/connection-state';
+import ConnectionStateService from '@app/classes/connection-state-service/connection-state-service';
 import { SOCKET_ID_UNDEFINED } from '@app/constants/services-errors';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-
 @Injectable({
     providedIn: 'root',
 })
-export default class SocketService {
+export default class SocketService extends ConnectionStateService {
     private socket: Socket;
 
-    async initializeService(): Promise<void> {
-        return this.connect();
+    initializeService(): void {
+        this.socket = this.getSocket();
+        this.socket.on('connect', () => this.nextState(ConnectionState.Connected)).on('connect_error', () => this.nextState(ConnectionState.Error));
     }
 
     getId(): string {
@@ -34,10 +36,7 @@ export default class SocketService {
         return true;
     }
 
-    private async connect(): Promise<void> {
-        return new Promise<void>((resolve) => {
-            this.socket = io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
-            this.socket.on('connect', () => resolve());
-        });
+    private getSocket(): Socket {
+        return io(environment.serverUrlWebsocket, { transports: ['websocket'], upgrade: false });
     }
 }

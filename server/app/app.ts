@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import * as logger from 'morgan';
 import { join } from 'path';
 import { Service } from 'typedi';
+import { DatabaseController } from './controllers/database-controller/database.controller';
 import { DictionaryController } from './controllers/dictionary-controller/dictionary.controller';
 import { GameDispatcherController } from './controllers/game-dispatcher-controller/game-dispatcher.controller';
 import { GameHistoriesController } from './controllers/game-history-controller/game-history.controller';
@@ -26,6 +27,7 @@ export class Application {
         private readonly dictionaryController: DictionaryController,
         private readonly gameHistoriesController: GameHistoriesController,
         private readonly virtualPlayerProfilesController: VirtualPlayerProfilesController,
+        private readonly databaseController: DatabaseController,
         private readonly databaseService: DatabaseService,
     ) {
         this.app = express();
@@ -46,6 +48,7 @@ export class Application {
         this.app.use('/api', this.dictionaryController.router);
         this.app.use('/api', this.gameHistoriesController.router);
         this.app.use('/api', this.virtualPlayerProfilesController.router);
+        this.app.use('/api/database', this.databaseController.router);
         this.errorHandling();
     }
 

@@ -17,6 +17,7 @@ npm-debug.log
 
 # Dictionnaires
 assets/dictionaries/
+assets/dictionaries/index.json
 !assets/dictionaries/dictionary.json
 
 
