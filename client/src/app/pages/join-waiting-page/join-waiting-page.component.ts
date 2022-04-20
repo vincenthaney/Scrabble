@@ -16,7 +16,7 @@ import {
 } from '@app/constants/pages-constants';
 import GameDispatcherService from '@app/services/game-dispatcher-service/game-dispatcher.service';
 import { PlayerLeavesService } from '@app/services/player-leave-service/player-leave.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -29,8 +29,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
     currentName: string;
     funFact: string;
     roundTime: string;
-    routingSubscription: Subscription;
-    componentDestroyed$: Subject<boolean>;
+    private componentDestroyed$: Subject<boolean>;
 
     constructor(
         public dialog: MatDialog,
@@ -54,7 +53,7 @@ export class JoinWaitingPageComponent implements OnInit, OnDestroy {
         this.currentName = this.gameDispatcherService.currentName;
         this.funFact = getRandomFact();
 
-        this.routingSubscription = this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
+        this.router.events.pipe(takeUntil(this.componentDestroyed$)).subscribe((event) => {
             if (event instanceof NavigationStart) {
                 this.routerChangeMethod(event.url);
             }
