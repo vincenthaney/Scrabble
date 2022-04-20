@@ -147,8 +147,8 @@ describe('ConvertDialogComponent', () => {
 
     describe('ngOndestroy', () => {
         it('should always call next and complete on ngUnsubscribe', () => {
-            const ngUnsubscribeNextSpy = spyOn<any>(component.pageDestroyed$, 'next');
-            const ngUnsubscribeCompleteSpy = spyOn<any>(component.pageDestroyed$, 'complete');
+            const ngUnsubscribeNextSpy = spyOn<any>(component['pageDestroyed$'], 'next');
+            const ngUnsubscribeCompleteSpy = spyOn<any>(component['pageDestroyed$'], 'complete');
 
             component.ngOnDestroy();
             expect(ngUnsubscribeNextSpy).toHaveBeenCalled();
