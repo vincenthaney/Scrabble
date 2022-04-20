@@ -435,7 +435,7 @@ describe('BoardComponent', () => {
         it('should reset notAppliedSquares values', () => {
             const squareView: SquareView = new SquareView(UNDEFINED_SQUARE, SQUARE_SIZE);
             squareView.square.tile = new Tile('A', 0);
-            component.notAppliedSquares = [squareView];
+            component['notAppliedSquares'] = [squareView];
             component['handlePlaceTiles'](undefined);
 
             expect(squareView.square.tile).toBeNull();
@@ -568,7 +568,7 @@ describe('BoardComponent', () => {
             previousSquare = { square: { tile: {} } } as SquareView;
 
             component['selectedSquare'] = selectedSquare;
-            component.notAppliedSquares = [previousSquare];
+            component['notAppliedSquares'] = [previousSquare];
 
             nextEmptySpy = spyOn(component['navigator'], 'nextEmpty').and.returnValue(previousSquare);
             removeUsedTileSpy = spyOn<any>(component, 'removeUsedTile');
@@ -582,7 +582,7 @@ describe('BoardComponent', () => {
         });
 
         it('should not call nextEmpty if the index is found', () => {
-            spyOn(component.notAppliedSquares, 'indexOf').and.returnValue(1);
+            spyOn(component['notAppliedSquares'], 'indexOf').and.returnValue(1);
 
             component['handleBackspace']();
 
@@ -598,16 +598,16 @@ describe('BoardComponent', () => {
         it('should remove previousSquare from notAppliedSquares', () => {
             component['handleBackspace']();
 
-            expect(component.notAppliedSquares).not.toContain(previousSquare);
+            expect(component['notAppliedSquares']).not.toContain(previousSquare);
         });
 
         it('should not change notAppliedSquare if previousSquare not in it', () => {
-            component.notAppliedSquares = [{}, {}] as SquareView[];
-            const expected = component.notAppliedSquares.length;
+            component['notAppliedSquares'] = [{}, {}] as SquareView[];
+            const expected = component['notAppliedSquares'].length;
 
             component['handleBackspace']();
 
-            expect(component.notAppliedSquares).toHaveSize(expected);
+            expect(component['notAppliedSquares']).toHaveSize(expected);
         });
 
         it('should call removeUsedTile if tile is defined', () => {
@@ -632,11 +632,11 @@ describe('BoardComponent', () => {
 
         it('should not change notAppliedSquares if no previousSquare', () => {
             nextEmptySpy.and.returnValue(undefined);
-            const expected = component.notAppliedSquares.length;
+            const expected = component['notAppliedSquares'].length;
 
             component['handleBackspace']();
 
-            expect(component.notAppliedSquares).toHaveSize(expected);
+            expect(component['notAppliedSquares']).toHaveSize(expected);
         });
 
         it('should not call nextEmpty if canBackspace', () => {

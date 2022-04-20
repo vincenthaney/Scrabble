@@ -30,10 +30,11 @@ export class BoardComponent extends FocusableComponent<KeyboardEvent> implements
     gridSize: Vec2;
     marginLetters: LetterValue[];
     squareGrid: SquareView[][];
-    notAppliedSquares: SquareView[];
     tileFontSize: number;
     selectedSquare: SquareView | undefined;
     navigator: BoardNavigator;
+
+    private notAppliedSquares: SquareView[];
     private newlyPlacedTiles: SquareView[];
     private componentDestroyed$: Subject<boolean>;
 
