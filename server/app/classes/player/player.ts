@@ -36,10 +36,6 @@ export default class Player {
         return `${this.name} : ${this.tilesToString()}`;
     }
 
-    tilesToString(): string {
-        return this.tiles.reduce((prev, next) => prev + next.letter.toLocaleLowerCase(), '');
-    }
-
     getObjectives(): AbstractObjective[] {
         return [...this.objectives];
     }
@@ -70,5 +66,9 @@ export default class Player {
 
     convertToPlayerData(): PlayerData {
         return { id: this.id, name: this.name, score: this.score, tiles: this.tiles, isConnected: this.isConnected, objectives: this.objectives };
+    }
+
+    private tilesToString(): string {
+        return this.tiles.reduce((prev, next) => prev + next.letter.toLocaleLowerCase(), '');
     }
 }
