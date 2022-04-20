@@ -44,7 +44,6 @@ describe('VirtualPlayerProfilesService', () => {
             });
             controller['getAllVirtualPlayersEvent'].next(TEST_VIRTUAL_PLAYER_PROFILES);
             expect(virtualPlayerUpdateSpy).toHaveBeenCalled();
-            expect(service.virtualPlayerProfiles).toEqual(TEST_VIRTUAL_PLAYER_PROFILES);
         });
     });
 
